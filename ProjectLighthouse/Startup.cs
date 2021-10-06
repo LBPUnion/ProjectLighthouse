@@ -35,6 +35,13 @@ namespace ProjectLighthouse {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.Use(async (context, next) => {
+                await next();
+                if(context.Response.StatusCode == 404) {
+                    Console.WriteLine($"404: {context.Request.Method} {context.Request.Path}");
+                }
+            });
+
             app.UseRouting();
 
             app.UseAuthorization();
