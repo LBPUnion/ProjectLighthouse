@@ -100,7 +100,7 @@ namespace ProjectLighthouse.Types {
                           LbpSerializer.StringElement("photosByMeCount", this.PhotosByMeCount) +
                           LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMeCount) +
                           LbpSerializer.StringElement("commentsEnabled", this.CommentsEnabled) +
-                          this.Location.Serialize() +
+                          LbpSerializer.StringElement("location", this.Location.Serialize()) +
                           LbpSerializer.StringElement("favouriteSlotCount", this.FavouriteSlotCount) +
                           LbpSerializer.StringElement("favouriteUserCount", this.FavouriteUserCount) +
                           LbpSerializer.StringElement("lolcatftwCount", this.lolcatftwCount) +
