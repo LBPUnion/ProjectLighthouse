@@ -20,7 +20,8 @@
       "dotnetRunMessages": "true",
       "applicationUrl": "http://localhost:10060;https://localhost:10061",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "LIGHTHOUSE_DB_CONNECTION_STRING": "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse"
       }
     }
   }

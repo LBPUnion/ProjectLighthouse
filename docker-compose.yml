@@ -1,0 +1,19 @@
+# MySQL Docker compose file for development purposes. DO NOT USE IN PRODUCTION!
+
+version: '3'
+
+services:
+  lighthouse-db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: 'lighthouse'
+      MYSQL_ROOT_PASSWORD: 'lighthouse'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306' # Expose port to localhost:3306
+    volumes:
+      - lighthouse-db:/var/lib/mysql
+        
+volumes:
+  lighthouse-db:

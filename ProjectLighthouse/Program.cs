@@ -6,10 +6,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse {
-    public class Program {
+    public static class Program {
         public static void Main(string[] args) {
+            Console.WriteLine("Welcome to Project Lighthouse!");
+            Console.WriteLine(ServerSettings.DbConnected ? "Connected to the database." : "Database unavailable. Starting in stateless mode.");
+
             CreateHostBuilder(args).Build().Run();
         }
 
