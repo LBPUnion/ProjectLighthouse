@@ -4,7 +4,7 @@ namespace ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/plain")]
-    public class EulaAnnounceController : ControllerBase {
+    public class MessageController : ControllerBase {
         [HttpGet("eula")]
         public IActionResult Eula() {
             return Ok("eula test");
