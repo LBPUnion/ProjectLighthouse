@@ -1,6 +1,9 @@
 using ProjectLighthouse.Serialization;
 
 namespace ProjectLighthouse.Types {
+    /// <summary>
+    /// Used on the info moon on LBP1. Broken for unknown reasons
+    /// </summary>
     public class NewsEntry {
         public int Id { get; set; }
         public string Title { get; set; }

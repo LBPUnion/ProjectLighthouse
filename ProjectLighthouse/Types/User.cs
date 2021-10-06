@@ -10,12 +10,20 @@ namespace ProjectLighthouse.Types {
         public int HeartCount { get; set; }
         public string YayHash { get; set; }
         public string BooHash { get; set; }
+        
+        /// <summary>
+        /// A user-customizable biography shown on the profile card
+        /// </summary>
         public string Biography { get; set; }
         public int ReviewCount { get; set; }
         public int CommentCount { get; set; }
         public int PhotosByMeCount { get; set; }
         public int PhotosWithMeCount { get; set; }
         public bool CommentsEnabled { get; set; }
+        
+        /// <summary>
+        /// The location of the profile card on the user's earth
+        /// </summary>
         public Location Location { get; set; }
         public int FavouriteSlotCount { get; set; }
         public int FavouriteUserCount { get; set; }
@@ -28,8 +36,19 @@ namespace ProjectLighthouse.Types {
         
         #region Slots
         
+        /// <summary>
+        /// The maximum amount of slots allowed on the earth
+        /// </summary>
         public static int EntitledSlots = 20;
+        
+        /// <summary>
+        /// The number of used slots on the earth
+        /// </summary>
         public int UsedSlots { get; set; }
+        
+        /// <summary>
+        /// The number of slots remaining on the earth
+        /// </summary>
         public int FreeSlots => EntitledSlots - this.UsedSlots;
 
         private static string[] slotTypes = {

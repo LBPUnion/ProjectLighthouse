@@ -4,6 +4,10 @@ using System.Linq;
 using System.Reflection;
 
 namespace ProjectLighthouse.Serialization {
+    /// <summary>
+    /// LBP doesn't like the XML serializer by C# that much, and it cant be controlled that much (cant have two root elements),
+    /// so I wrote my own crappy one.
+    /// </summary>
     public static class LbpSerializer {
         public static string BlankElement(string key) => $"<{key}></{key}>";
 

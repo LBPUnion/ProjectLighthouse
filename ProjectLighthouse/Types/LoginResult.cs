@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using ProjectLighthouse.Serialization;
 
 namespace ProjectLighthouse.Types {
+    /// <summary>
+    /// Response to POST /login
+    /// </summary>
     public class LoginResult {
         public string AuthTicket { get; set; }
         public string LbpEnvVer { get; set; }

@@ -35,8 +35,11 @@ namespace ProjectLighthouse {
                 app.UseDeveloperExceptionPage();
             }
 
+            // Logs every request and the response to it
+            // Example: "200: GET /LITTLEBIGPLANETPS3_XML/news"
+            // Example: "404: GET /asdasd"
             app.Use(async (context, next) => {
-                await next();
+                await next(); // Handle the request so we can get the status code from it
                 Console.WriteLine($"{context.Response.StatusCode}: {context.Request.Method} {context.Request.Path}");
             });
 

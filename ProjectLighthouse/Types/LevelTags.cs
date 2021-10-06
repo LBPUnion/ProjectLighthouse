@@ -1,4 +1,7 @@
 namespace ProjectLighthouse.Types {
+    /// <summary>
+    /// A series of tags that can be applied to a level
+    /// </summary>
     public enum LevelTags {
         Brilliant,
         Beautiful,
