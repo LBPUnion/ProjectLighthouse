@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse", "ProjectLighthouse\ProjectLighthouse.csproj", "{C6CFD4AD-47ED-4C86-B0C4-A4216D82E0DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6CFD4AD-47ED-4C86-B0C4-A4216D82E0DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6CFD4AD-47ED-4C86-B0C4-A4216D82E0DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6CFD4AD-47ED-4C86-B0C4-A4216D82E0DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6CFD4AD-47ED-4C86-B0C4-A4216D82E0DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
