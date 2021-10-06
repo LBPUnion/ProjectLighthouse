@@ -80,6 +80,10 @@ namespace ProjectLighthouse.Controllers {
                                     }
                                     break;
                                 }
+                                case "icon": {
+                                    user.IconHash = await reader.GetValueAsync();
+                                    break;
+                                }
                             }
                             break;
                         case XmlNodeType.EndElement:
