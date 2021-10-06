@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using ProjectLighthouse.Serialization;
 
 namespace ProjectLighthouse.Types {
     public class User {
+        public int UserId { get; set; }
         public string Username { get; set; }
         public string IconHash { get; set; }
         public int Game { get; set; }
@@ -19,11 +21,16 @@ namespace ProjectLighthouse.Types {
         public int PhotosByMeCount { get; set; }
         public int PhotosWithMeCount { get; set; }
         public bool CommentsEnabled { get; set; }
-        
+
         /// <summary>
         /// The location of the profile card on the user's earth
         /// </summary>
-        public Location Location { get; set; }
+//        [NotMapped]
+        public Location Location = new() {
+            X = 0,
+            Y = 0
+        };
+        
         public int FavouriteSlotCount { get; set; }
         public int FavouriteUserCount { get; set; }
         public int lolcatftwCount { get; set; }
@@ -31,7 +38,8 @@ namespace ProjectLighthouse.Types {
         public int StaffChallengeGoldCount { get; set; }
         public int StaffChallengeSilverCount { get; set; }
         public int StaffChallengeBronzeCount { get; set; }
-        public ClientsConnected ClientsConnected { get; set; }
+//        [NotMapped]
+        public ClientsConnected ClientsConnected = new();
         
         #region Slots
 

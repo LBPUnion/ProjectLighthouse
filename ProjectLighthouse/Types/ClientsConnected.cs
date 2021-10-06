@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using ProjectLighthouse.Serialization;
 
 namespace ProjectLighthouse.Types {
+    [Keyless]
     public class ClientsConnected {
         public bool Lbp1 { get; set; }
         public bool Lbp2 { get; set; }

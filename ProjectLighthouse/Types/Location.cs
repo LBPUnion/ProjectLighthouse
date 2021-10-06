@@ -5,11 +5,6 @@ namespace ProjectLighthouse.Types {
     /// The location of a slot on a planet.
     /// </summary>
     public class Location {
-        public Location(int x, int y) {
-            this.X = x;
-            this.Y = y;
-        }
-        
         public int X;
         public int Y;
 
