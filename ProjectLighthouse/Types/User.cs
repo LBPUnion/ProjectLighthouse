@@ -33,7 +33,7 @@ namespace ProjectLighthouse.Types {
         public int FreeSlots => EntitledSlots - this.UsedSlots;
 
         private static string[] slotTypes = {
-            "lbp1",
+//            "lbp1",
             "lbp2",
             "lbp3",
             "crossControl"
@@ -41,12 +41,13 @@ namespace ProjectLighthouse.Types {
 
         private string SerializeSlots() {
             string slots = string.Empty;
-            
-            foreach(string s in slotTypes) {
-                string slotType = s; // vars in foreach are immutable, define helper var
-                
+
+            slots += LbpSerializer.StringElement("lbp1UsedSlots", this.UsedSlots);
+            slots += LbpSerializer.StringElement("entitledSlots", EntitledSlots);
+            slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
+
+            foreach(string slotType in slotTypes) {
                 slots += LbpSerializer.StringElement(slotType + "UsedSlots", this.UsedSlots);
-                if(slotType == "lbp1") slotType = "";
                 slots += LbpSerializer.StringElement(slotType + "EntitledSlots", EntitledSlots);
                 // ReSharper disable once StringLiteralTypo
                 slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
