@@ -81,7 +81,7 @@ namespace ProjectLighthouse.Types {
                           LbpSerializer.StringElement("staffChallengeGoldCount", this.StaffChallengeGoldCount) +
                           LbpSerializer.StringElement("staffChallengeSilverCount", this.StaffChallengeSilverCount) +
                           LbpSerializer.StringElement("staffChallengeBronzeCount", this.StaffChallengeBronzeCount) +
-                          LbpSerializer.StringElement("photos", "") +
+                          LbpSerializer.BlankElement("photos") +
                           this.ClientsConnected.Serialize();
             
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
