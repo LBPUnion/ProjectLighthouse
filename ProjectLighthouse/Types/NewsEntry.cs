@@ -1,6 +1,6 @@
 using ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse {
+namespace ProjectLighthouse.Types {
     public class NewsEntry {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -11,13 +11,13 @@ namespace ProjectLighthouse {
         public long Date { get; set; }
 
         public string Serialize() {
-            return LbpSerializer.GetStringElement("id", Id) +
-                   LbpSerializer.GetStringElement("title", Title) +
-                   LbpSerializer.GetStringElement("summary", Summary) +
-                   LbpSerializer.GetStringElement("text", Text) +
-                   LbpSerializer.GetStringElement("date", Date) +
-                   Image.Serialize() +
-                   LbpSerializer.GetStringElement("category", Category);
+            return LbpSerializer.GetStringElement("id", this.Id) +
+                   LbpSerializer.GetStringElement("title", this.Title) +
+                   LbpSerializer.GetStringElement("summary", this.Summary) +
+                   LbpSerializer.GetStringElement("text", this.Text) +
+                   LbpSerializer.GetStringElement("date", this.Date) +
+                   this.Image.Serialize() +
+                   LbpSerializer.GetStringElement("category", this.Category);
         }
     }
 }

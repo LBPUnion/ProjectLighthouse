@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]

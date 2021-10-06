@@ -1,7 +1,6 @@
 using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types;
 
-namespace ProjectLighthouse {
+namespace ProjectLighthouse.Types {
     public class User {
         public string Username { get; set; }
         public string IconHash { get; set; }
@@ -31,7 +30,7 @@ namespace ProjectLighthouse {
         
         public static int EntitledSlots = 20;
         public int UsedSlots { get; set; }
-        public int FreeSlots => EntitledSlots - UsedSlots;
+        public int FreeSlots => EntitledSlots - this.UsedSlots;
 
         private static string[] slotTypes = {
             "lbp1",
@@ -46,12 +45,12 @@ namespace ProjectLighthouse {
             foreach(string s in slotTypes) {
                 string slotType = s; // vars in foreach are immutable, define helper var
                 
-                slots += LbpSerializer.GetStringElement(slotType + "UsedSlots", UsedSlots);
+                slots += LbpSerializer.GetStringElement(slotType + "UsedSlots", this.UsedSlots);
                 if(slotType == "lbp1") slotType = "";
                 slots += LbpSerializer.GetStringElement(slotType + "EntitledSlots", EntitledSlots);
                 // ReSharper disable once StringLiteralTypo
                 slots += LbpSerializer.GetStringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
-                slots += LbpSerializer.GetStringElement(slotType + "FreeSlots", FreeSlots);
+                slots += LbpSerializer.GetStringElement(slotType + "FreeSlots", this.FreeSlots);
             }
             return slots;
             
@@ -60,28 +59,28 @@ namespace ProjectLighthouse {
         #endregion Slots
 
         public string Serialize() {
-            string user = LbpSerializer.GetTaggedStringElement("npHandle", Username, "icon", IconHash) +
-                          LbpSerializer.GetStringElement("game", Game) +
+            string user = LbpSerializer.GetTaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
+                          LbpSerializer.GetStringElement("game", this.Game) +
                           this.SerializeSlots() +
-                          LbpSerializer.GetStringElement("lists", Lists) +
+                          LbpSerializer.GetStringElement("lists", this.Lists) +
                           LbpSerializer.GetStringElement("lists_quota", ListsQuota) +
-                          LbpSerializer.GetStringElement("heartCount", HeartCount) +
-                          LbpSerializer.GetStringElement("yay2", YayHash) +
-                          LbpSerializer.GetStringElement("boo2", BooHash) +
-                          LbpSerializer.GetStringElement("biography", Biography) +
-                          LbpSerializer.GetStringElement("reviewCount", ReviewCount) +
-                          LbpSerializer.GetStringElement("commentCount", CommentCount) +
-                          LbpSerializer.GetStringElement("photosByMeCount", PhotosByMeCount) +
-                          LbpSerializer.GetStringElement("photosWithMeCount", PhotosWithMeCount) +
-                          LbpSerializer.GetStringElement("commentsEnabled", CommentsEnabled) +
-                          Location.Serialize() +
-                          LbpSerializer.GetStringElement("favouriteSlotCount", FavouriteSlotCount) +
-                          LbpSerializer.GetStringElement("favouriteUserCount", FavouriteUserCount) +
-                          LbpSerializer.GetStringElement("lolcatftwCount", lolcatftwCount) +
-                          LbpSerializer.GetStringElement("pins", Pins) +
-                          LbpSerializer.GetStringElement("staffChallengeGoldCount", StaffChallengeGoldCount) +
-                          LbpSerializer.GetStringElement("staffChallengeSilverCount", StaffChallengeSilverCount) +
-                          LbpSerializer.GetStringElement("staffChallengeBronzeCount", StaffChallengeBronzeCount) +
+                          LbpSerializer.GetStringElement("heartCount", this.HeartCount) +
+                          LbpSerializer.GetStringElement("yay2", this.YayHash) +
+                          LbpSerializer.GetStringElement("boo2", this.BooHash) +
+                          LbpSerializer.GetStringElement("biography", this.Biography) +
+                          LbpSerializer.GetStringElement("reviewCount", this.ReviewCount) +
+                          LbpSerializer.GetStringElement("commentCount", this.CommentCount) +
+                          LbpSerializer.GetStringElement("photosByMeCount", this.PhotosByMeCount) +
+                          LbpSerializer.GetStringElement("photosWithMeCount", this.PhotosWithMeCount) +
+                          LbpSerializer.GetStringElement("commentsEnabled", this.CommentsEnabled) +
+                          this.Location.Serialize() +
+                          LbpSerializer.GetStringElement("favouriteSlotCount", this.FavouriteSlotCount) +
+                          LbpSerializer.GetStringElement("favouriteUserCount", this.FavouriteUserCount) +
+                          LbpSerializer.GetStringElement("lolcatftwCount", this.lolcatftwCount) +
+                          LbpSerializer.GetStringElement("pins", this.Pins) +
+                          LbpSerializer.GetStringElement("staffChallengeGoldCount", this.StaffChallengeGoldCount) +
+                          LbpSerializer.GetStringElement("staffChallengeSilverCount", this.StaffChallengeSilverCount) +
+                          LbpSerializer.GetStringElement("staffChallengeBronzeCount", this.StaffChallengeBronzeCount) +
                           LbpSerializer.GetStringElement("photos", "") +
                           this.ClientsConnected.Serialize();
             

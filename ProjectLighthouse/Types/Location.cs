@@ -1,6 +1,6 @@
 using ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse {
+namespace ProjectLighthouse.Types {
     public class Location {
         public int X;
         public int Y;

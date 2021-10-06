@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProjectLighthouse.Serialization;
+using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]

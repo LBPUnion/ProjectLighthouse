@@ -1,4 +1,4 @@
-namespace ProjectLighthouse {
+namespace ProjectLighthouse.Types {
     public enum LevelTags {
         Brilliant,
         Beautiful,
