@@ -6,7 +6,6 @@ namespace ProjectLighthouse.Types {
         public string IconHash { get; set; }
         public int Game { get; set; }
         public int Lists { get; set; }
-        public static int ListsQuota = 20;
         public int HeartCount { get; set; }
         public string YayHash { get; set; }
         public string BooHash { get; set; }
@@ -32,15 +31,10 @@ namespace ProjectLighthouse.Types {
         public int StaffChallengeGoldCount { get; set; }
         public int StaffChallengeSilverCount { get; set; }
         public int StaffChallengeBronzeCount { get; set; }
-        public ClientsConnected ClientsConnected;
+        public ClientsConnected ClientsConnected { get; set; }
         
         #region Slots
-        
-        /// <summary>
-        /// The maximum amount of slots allowed on the earth
-        /// </summary>
-        public static int EntitledSlots = 20;
-        
+
         /// <summary>
         /// The number of used slots on the earth
         /// </summary>
@@ -49,7 +43,7 @@ namespace ProjectLighthouse.Types {
         /// <summary>
         /// The number of slots remaining on the earth
         /// </summary>
-        public int FreeSlots => EntitledSlots - this.UsedSlots;
+        public int FreeSlots => ServerSettings.EntitledSlots - this.UsedSlots;
 
         private static string[] slotTypes = {
 //            "lbp1",
@@ -62,12 +56,12 @@ namespace ProjectLighthouse.Types {
             string slots = string.Empty;
 
             slots += LbpSerializer.StringElement("lbp1UsedSlots", this.UsedSlots);
-            slots += LbpSerializer.StringElement("entitledSlots", EntitledSlots);
+            slots += LbpSerializer.StringElement("entitledSlots", ServerSettings.EntitledSlots);
             slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
 
             foreach(string slotType in slotTypes) {
                 slots += LbpSerializer.StringElement(slotType + "UsedSlots", this.UsedSlots);
-                slots += LbpSerializer.StringElement(slotType + "EntitledSlots", EntitledSlots);
+                slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.EntitledSlots);
                 // ReSharper disable once StringLiteralTypo
                 slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
                 slots += LbpSerializer.StringElement(slotType + "FreeSlots", this.FreeSlots);
@@ -83,7 +77,7 @@ namespace ProjectLighthouse.Types {
                           LbpSerializer.StringElement("game", this.Game) +
                           this.SerializeSlots() +
                           LbpSerializer.StringElement("lists", this.Lists) +
-                          LbpSerializer.StringElement("lists_quota", ListsQuota) +
+                          LbpSerializer.StringElement("lists_quota", ServerSettings.ListsQuota) + // technically not a part of the user but LBP expects it
                           LbpSerializer.StringElement("heartCount", this.HeartCount) +
                           LbpSerializer.StringElement("yay2", this.YayHash) +
                           LbpSerializer.StringElement("boo2", this.BooHash) +
