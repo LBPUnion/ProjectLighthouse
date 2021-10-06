@@ -13,7 +13,7 @@ namespace ProjectLighthouse.Controllers {
         public async Task<IActionResult> Eula() {
             User user = await new Database().Users.FirstOrDefaultAsync(u => u.Username == "jvyden");
             
-            return Ok($"You are logged in as user {user.Username} (id {user.UserId})\n{user.Serialize()}");
+            return Ok($"You are logged in as user {user.Username} (id {user.UserId})");
         }
 
         [HttpGet("announce")]

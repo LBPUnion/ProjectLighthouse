@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using ProjectLighthouse.Serialization;
 
 namespace ProjectLighthouse.Types {
@@ -21,16 +22,20 @@ namespace ProjectLighthouse.Types {
         public int PhotosByMeCount { get; set; }
         public int PhotosWithMeCount { get; set; }
         public bool CommentsEnabled { get; set; }
-
+        
+        public int LocationId { get; set; }
+        
+        private Location location;
         /// <summary>
         /// The location of the profile card on the user's earth
         /// </summary>
-//        [NotMapped]
-        public Location Location = new() {
-            X = 0,
-            Y = 0
-        };
-        
+        public Location Location {
+            get {
+                if(location != null) return this.location;
+                return location = new Database().Locations.First(l => l.Id == LocationId);
+            }
+        }
+
         public int FavouriteSlotCount { get; set; }
         public int FavouriteUserCount { get; set; }
         public int lolcatftwCount { get; set; }

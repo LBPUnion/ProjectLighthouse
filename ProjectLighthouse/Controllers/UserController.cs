@@ -13,10 +13,18 @@ namespace ProjectLighthouse.Controllers {
     public class UserController : ControllerBase {
         [HttpGet("user/{username}")]
         public async Task<IActionResult> GetUser(string username) {
-            User user = await new Database().Users.FirstOrDefaultAsync(u => u.Username == username);
+            await using Database database = new();
+            
+            User user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
 
             if(user == null) return this.NotFound();
             return this.Ok(user.Serialize());
+        }
+
+        [HttpPost("user/{username}")]
+        public async Task<IActionResult> CreateUser(string username) {
+            await new Database().CreateUser(username);
+            return await GetUser(username);
         }
 
         [HttpPost("updateUser")]
@@ -52,7 +60,7 @@ namespace ProjectLighthouse.Controllers {
                 }
             }
 
-            await database.SaveChangesAsync();
+            if(database.ChangeTracker.HasChanges()) await database.SaveChangesAsync();
             return this.Ok();
         }
     }
