@@ -4,6 +4,5 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 /.idea/.idea.ProjectLighthouse/.idea/workspace.xml
-.idea/dataSources/*.xml
-.idea/dataSources/**/*.meta
-.idea/dataSources.local.xml
+/.idea/.idea.ProjectLighthouse/.idea/dataSources/
+/.idea/.idea.ProjectLighthouse/.idea/dataSources.local.xml
