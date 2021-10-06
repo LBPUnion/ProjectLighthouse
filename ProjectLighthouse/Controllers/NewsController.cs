@@ -9,7 +9,7 @@ namespace ProjectLighthouse.Controllers {
     public class NewsController : ControllerBase {
         [HttpGet]
         public IActionResult Get() {
-            string newsEntry = LbpSerializer.GetStringElement("item", new NewsEntry {
+            string newsEntry = LbpSerializer.StringElement("item", new NewsEntry {
                 Category = "no_category",
                 Summary = "test summary",
                 Image = new NewsImage {
@@ -22,7 +22,7 @@ namespace ProjectLighthouse.Controllers {
                 Date = 1348755214000
             }.Serialize());
             
-            return this.Ok(LbpSerializer.GetStringElement("news", newsEntry));
+            return this.Ok(LbpSerializer.StringElement("news", newsEntry));
         }
     }
 }

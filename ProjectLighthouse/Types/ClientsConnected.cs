@@ -9,12 +9,12 @@ namespace ProjectLighthouse.Types {
         public bool Lbp3Ps4 { get; set; }
 
         public string Serialize() {
-            return LbpSerializer.GetStringElement("clientsConnected", 
-                LbpSerializer.GetStringElement("lbp1", Lbp1) +
-                LbpSerializer.GetStringElement("lbp2", Lbp2) +
-                LbpSerializer.GetStringElement("lbpme", LbpMe) +
-                LbpSerializer.GetStringElement("lbp3ps3", Lbp3Ps3) +
-                LbpSerializer.GetStringElement("lbp3ps4", Lbp3Ps4));
+            return LbpSerializer.StringElement("clientsConnected", 
+                LbpSerializer.StringElement("lbp1", Lbp1) +
+                LbpSerializer.StringElement("lbp2", Lbp2) +
+                LbpSerializer.StringElement("lbpme", LbpMe) +
+                LbpSerializer.StringElement("lbp3ps3", Lbp3Ps3) +
+                LbpSerializer.StringElement("lbp3ps4", Lbp3Ps4));
         }
     }
 }

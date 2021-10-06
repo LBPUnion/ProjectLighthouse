@@ -8,7 +8,7 @@ namespace ProjectLighthouse.Controllers {
     public class NetworkSettingsController : ControllerBase {
         [HttpGet]
         public IActionResult Get() {
-            return this.Ok(LbpSerializer.GetBlankElement("networkSettings"));
+            return this.Ok(LbpSerializer.BlankElement("networkSettings"));
         }
     }
 }

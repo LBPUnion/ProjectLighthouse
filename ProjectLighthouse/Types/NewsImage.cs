@@ -6,9 +6,9 @@ namespace ProjectLighthouse.Types {
         public string Alignment { get; set; }
 
         public string Serialize() {
-            return LbpSerializer.GetStringElement("image", 
-                LbpSerializer.GetStringElement("hash", this.Hash) +
-                LbpSerializer.GetStringElement("alignment", this.Alignment));
+            return LbpSerializer.StringElement("image", 
+                LbpSerializer.StringElement("hash", this.Hash) +
+                LbpSerializer.StringElement("alignment", this.Alignment));
         }
     }
 }

@@ -6,8 +6,8 @@ namespace ProjectLighthouse.Types {
         public int Y;
 
         public string Serialize() {
-            return LbpSerializer.GetStringElement("x", this.X) +
-                   LbpSerializer.GetStringElement("Y", this.Y);
+            return LbpSerializer.StringElement("x", this.X) +
+                   LbpSerializer.StringElement("Y", this.Y);
         }
     }
 }

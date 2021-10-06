@@ -11,13 +11,13 @@ namespace ProjectLighthouse.Types {
         public long Date { get; set; }
 
         public string Serialize() {
-            return LbpSerializer.GetStringElement("id", this.Id) +
-                   LbpSerializer.GetStringElement("title", this.Title) +
-                   LbpSerializer.GetStringElement("summary", this.Summary) +
-                   LbpSerializer.GetStringElement("text", this.Text) +
-                   LbpSerializer.GetStringElement("date", this.Date) +
+            return LbpSerializer.StringElement("id", this.Id) +
+                   LbpSerializer.StringElement("title", this.Title) +
+                   LbpSerializer.StringElement("summary", this.Summary) +
+                   LbpSerializer.StringElement("text", this.Text) +
+                   LbpSerializer.StringElement("date", this.Date) +
                    this.Image.Serialize() +
-                   LbpSerializer.GetStringElement("category", this.Category);
+                   LbpSerializer.StringElement("category", this.Category);
         }
     }
 }

@@ -5,19 +5,19 @@ using System.Reflection;
 
 namespace ProjectLighthouse.Serialization {
     public static class LbpSerializer {
-        public static string GetBlankElement(string key) => $"<{key}></{key}>";
+        public static string BlankElement(string key) => $"<{key}></{key}>";
 
-        public static string GetStringElement(KeyValuePair<string, object> pair) => $"<{pair.Key}>{pair.Value}</{pair.Key}>";
+        public static string StringElement(KeyValuePair<string, object> pair) => $"<{pair.Key}>{pair.Value}</{pair.Key}>";
 
-        public static string GetStringElement(string key, object value) => $"<{key}>{value}</{key}>";
+        public static string StringElement(string key, object value) => $"<{key}>{value}</{key}>";
 
-        public static string GetTaggedStringElement(KeyValuePair<string, object> pair, KeyValuePair<string, object> tagPair) =>
+        public static string TaggedStringElement(KeyValuePair<string, object> pair, KeyValuePair<string, object> tagPair) =>
             $"<{pair.Key} {tagPair.Key}=\"{tagPair.Value}\">{pair.Value}</{pair.Key}>";
         
-        public static string GetTaggedStringElement(string key, object value, string tagKey, object tagValue) => 
+        public static string TaggedStringElement(string key, object value, string tagKey, object tagValue) => 
             $"<{key} {tagKey}=\"{tagValue}\">{value}</{key}>";
 
-        public static string GetElements(params KeyValuePair<string, object>[] pairs) => 
-            pairs.Aggregate(string.Empty, (current, pair) => current + GetStringElement(pair));
+        public static string Elements(params KeyValuePair<string, object>[] pairs) => 
+            pairs.Aggregate(string.Empty, (current, pair) => current + StringElement(pair));
     }
 }
