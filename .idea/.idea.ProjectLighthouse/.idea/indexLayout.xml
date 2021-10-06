@@ -2,7 +2,13 @@
 <project version="4">
   <component name="UserContentModel">
     <attachedFolders />
-    <explicitIncludes />
-    <explicitExcludes />
+    <explicitIncludes>
+      <Path>.gitignore</Path>
+      <Path>.idea</Path>
+      <Path>ProjectLighthouse.sln.DotSettings</Path>
+    </explicitIncludes>
+    <explicitExcludes>
+      <Path>.idea/.idea.ProjectLighthouse/.idea/workspace.xml</Path>
+    </explicitExcludes>
   </component>
 </project>
