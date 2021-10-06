@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using ProjectLighthouse.Types;
@@ -12,9 +11,15 @@ namespace ProjectLighthouse.Controllers {
         [HttpGet]
         [HttpPost]
         public IActionResult Post() {
+            if(!this.Request.Query.TryGetValue("titleID", out StringValues titleValues)) {
+                this.BadRequest();
+            };
+
+            string titleId = titleValues[0];
+
             return this.Ok(new LoginResult {
                 AuthTicket = "d2c6bbec59162a1e786ed24ad95f2b73",
-                LbpEnvVer = "rLBP_Cepheus"
+                LbpEnvVer = "ProjectLighthouse"
             }.Serialize());
         }
     }

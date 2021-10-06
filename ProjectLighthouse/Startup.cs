@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -39,8 +41,13 @@ namespace ProjectLighthouse {
             // Example: "200: GET /LITTLEBIGPLANETPS3_XML/news"
             // Example: "404: GET /asdasd?query=osucookiezi727ppbluezenithtopplayhdhr"
             app.Use(async (context, next) => {
+                context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
                 await next(); // Handle the request so we can get the status code from it
                 Console.WriteLine($"{context.Response.StatusCode}: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}");
+                if(context.Request.Method == "POST") {
+                    context.Request.Body.Position = 0;
+                    Console.WriteLine(await new StreamReader(context.Request.Body).ReadToEndAsync());
+                }
             });
 
             app.UseRouting();
