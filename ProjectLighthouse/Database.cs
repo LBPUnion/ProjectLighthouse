@@ -34,5 +34,6 @@ namespace ProjectLighthouse {
         public DbSet<User> Users { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Slot> Slots { get; set; }
+        public DbSet<Comment> Comments { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace ProjectLighthouse.Controllers {
                 this.BadRequest();
             };
 
-            string titleId = titleValues[0];
+//            string titleId = titleValues[0];
 
             return this.Ok(new LoginResult {
                 AuthTicket = "d2c6bbec59162a1e786ed24ad95f2b73",
