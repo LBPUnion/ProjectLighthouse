@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace ProjectLighthouse.Types {
@@ -10,6 +12,11 @@ namespace ProjectLighthouse.Types {
         [XmlAttribute("type")]
         [NotMapped]
         public string Type { get; set; }
+
+        [Key]
+        [XmlIgnore]
+        public int SlotId { get; set; }
+
         
         [XmlElement("name")]
         public string Name { get; set; }
@@ -26,8 +33,25 @@ namespace ProjectLighthouse.Types {
         [XmlElement("resource")]
         public string Resource { get; set; }
         
+        [XmlIgnore]
+        public int LocationId { get; set; }
+        
+        [XmlIgnore] 
+        public int CreatorId { get; set; }
+
+        private Location location;
+
+        /// <summary>
+        /// The location of the level on the creator's earth
+        /// </summary>
         [XmlElement("location")]
-        public Location Location { get; set; }
+        public Location Location {
+            get {
+                if(location != null) return this.location;
+
+                return location = new Database().Locations.First(l => l.Id == LocationId);
+            }
+        }
         
         [XmlElement("initiallyLocked")]
         public bool InitiallyLocked { get; set; }
@@ -55,6 +79,5 @@ namespace ProjectLighthouse.Types {
         
         [XmlElement("moveRequired")]
         public bool MoveRequired { get; set; }
-        
     }
 }

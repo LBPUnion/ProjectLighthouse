@@ -25,7 +25,8 @@ namespace ProjectLighthouse.Types {
                 try {
                     return new Database().Database.CanConnect();
                 }
-                catch {
+                catch(Exception e) {
+                    Console.WriteLine(e);
                     return false;
                 }
             }
