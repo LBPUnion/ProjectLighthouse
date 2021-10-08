@@ -53,6 +53,20 @@ namespace ProjectLighthouse.Controllers {
             return this.Ok(bodyString);
         }
 
+        [HttpPost("unpublish/{id:int}")]
+        public async Task<IActionResult> Unpublish(int id) {
+            await using Database database = new();
+
+            Slot slot = await database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+
+            database.Locations.Remove(slot.Location);
+            database.Slots.Remove(slot);
+
+            await database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
         public async Task<Slot> GetSlotFromBody() {
             Request.Body.Position = 0;
             string bodyString = await new StreamReader(Request.Body).ReadToEndAsync();

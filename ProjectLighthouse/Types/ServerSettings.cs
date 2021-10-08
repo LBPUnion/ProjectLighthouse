@@ -6,7 +6,7 @@ namespace ProjectLighthouse.Types {
         /// <summary>
         /// The maximum amount of slots allowed on users' earth
         /// </summary>
-        public const int EntitledSlots = 20;
+        public const int EntitledSlots = int.MaxValue;
 
         public const int ListsQuota = 20;
 

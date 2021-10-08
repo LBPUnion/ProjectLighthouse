@@ -24,5 +24,10 @@ namespace ProjectLighthouse.Controllers {
 
             return this.Ok(slot.Serialize());
         }
+
+        [HttpPost("showModerated")]
+        public IActionResult ShowModerated() {
+            return this.Ok();
+        }
     }
 }
