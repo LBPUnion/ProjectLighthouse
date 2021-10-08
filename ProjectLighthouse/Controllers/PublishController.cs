@@ -47,10 +47,8 @@ namespace ProjectLighthouse.Controllers {
 
             database.Slots.Add(slot);
             await database.SaveChangesAsync();
-
-            Request.Body.Position = 0;
-            string bodyString = await new StreamReader(Request.Body).ReadToEndAsync();
-            return this.Ok(bodyString);
+            
+            return this.Ok(slot.Serialize());
         }
 
         [HttpPost("unpublish/{id:int}")]
