@@ -25,9 +25,16 @@ namespace ProjectLighthouse.Controllers {
             return this.Ok(slot.Serialize());
         }
 
+        [HttpGet("slots/lolcatftw/{username}")]
+        public IActionResult SlotsLolCat(string username) {
+            string response = Enumerable.Aggregate(new Database().Slots, string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
+        }
+
         [HttpPost("showModerated")]
         public IActionResult ShowModerated() {
-            return this.Ok();
+            return this.Ok("<resources/>");
         }
     }
 }

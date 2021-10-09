@@ -109,8 +109,9 @@ namespace ProjectLighthouse.Controllers {
         }
 
         [HttpPost("match")]
+        [Produces("text/json")]
         public IActionResult Match() {
-            return this.Ok();
+            return this.Ok("[{\"StatusCode\":200}]");
         }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProjectLighthouse.Serialization;
+using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]
@@ -12,8 +13,9 @@ namespace ProjectLighthouse.Controllers {
         }
 
         [HttpGet("t_conf")]
+        [Produces("text/json")]
         public IActionResult TConf() {
-            return this.Ok();
+            return this.Ok("[{\"StatusCode\":200}]");
         }
 
         [HttpGet("farc_hashes")]
@@ -22,8 +24,14 @@ namespace ProjectLighthouse.Controllers {
         }
 
         [HttpGet("privacySettings")]
+        [Produces("text/xml")]
         public IActionResult PrivacySettings() {
-            return this.Ok();
+            PrivacySettings ps = new() {
+                LevelVisibility = "unset",
+                ProfileVisibility = "unset"
+            };
+            
+            return this.Ok(ps.Serialize());
         }
     }
 }
