@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProjectLighthouse.Serialization;
 using IOFile = System.IO.File;
@@ -9,10 +10,14 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
     public class ResourcesController : ControllerBase {
-        [HttpPost("filterResources")]
         [HttpPost("showModerated")]
         public IActionResult ShowModerated() {
             return this.Ok(LbpSerializer.BlankElement("resources"));
+        }
+
+        [HttpPost("filterResources")]
+        public async Task<IActionResult> FilterResources() {
+            return this.Ok(await new StreamReader(Request.Body).ReadToEndAsync());
         }
 
         [HttpGet("r/{hash}")]
