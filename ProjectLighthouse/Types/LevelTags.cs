@@ -1,7 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace ProjectLighthouse.Types {
     /// <summary>
     /// A series of tags that can be applied to a level
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum LevelTags {
         Brilliant,
         Beautiful,

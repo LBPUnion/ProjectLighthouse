@@ -35,12 +35,13 @@ namespace ProjectLighthouse.Controllers {
             User poster = await database.Users.FirstOrDefaultAsync(u => u.Username == "jvyden");
             User target = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
 
+            if(comment == null) return this.BadRequest();
+
             comment.PosterUserId = poster.UserId;
             comment.TargetUserId = target.UserId;
 
             database.Comments.Add(comment);
             await database.SaveChangesAsync();
-
             return this.Ok();
         }
     }

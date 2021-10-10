@@ -37,13 +37,13 @@ namespace ProjectLighthouse.Types {
 
         public int FavouriteSlotCount { get; set; }
         public int FavouriteUserCount { get; set; }
-        public int lolcatftwCount { get; set; }
+        public int LolCatFtwCount { get; set; }
         public string Pins { get; set; }
         public int StaffChallengeGoldCount { get; set; }
         public int StaffChallengeSilverCount { get; set; }
         public int StaffChallengeBronzeCount { get; set; }
 //        [NotMapped]
-        public ClientsConnected ClientsConnected = new();
+        public readonly ClientsConnected ClientsConnected = new();
         
         #region Slots
 
@@ -57,7 +57,7 @@ namespace ProjectLighthouse.Types {
         /// </summary>
         public int FreeSlots => ServerSettings.EntitledSlots - this.UsedSlots;
 
-        private static string[] slotTypes = {
+        private static readonly string[] slotTypes = {
 //            "lbp1",
             "lbp2",
             "lbp3",
@@ -102,7 +102,7 @@ namespace ProjectLighthouse.Types {
                           LbpSerializer.StringElement("location", this.Location.Serialize()) +
                           LbpSerializer.StringElement("favouriteSlotCount", this.FavouriteSlotCount) +
                           LbpSerializer.StringElement("favouriteUserCount", this.FavouriteUserCount) +
-                          LbpSerializer.StringElement("lolcatftwCount", this.lolcatftwCount) +
+                          LbpSerializer.StringElement("lolcatftwCount", this.LolCatFtwCount) +
                           LbpSerializer.StringElement("pins", this.Pins) +
                           LbpSerializer.StringElement("staffChallengeGoldCount", this.StaffChallengeGoldCount) +
                           LbpSerializer.StringElement("staffChallengeSilverCount", this.StaffChallengeSilverCount) +

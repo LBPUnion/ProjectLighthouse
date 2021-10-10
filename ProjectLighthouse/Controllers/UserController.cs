@@ -60,6 +60,7 @@ namespace ProjectLighthouse.Controllers {
             using(XmlReader reader = XmlReader.Create(Request.Body, settings)) {
                 List<string> path = new(); // you can think of this as a file path in the XML, like <updateUser> -> <location> -> <x>
                 while(await reader.ReadAsync()) {
+                    // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
                     switch(reader.NodeType) {
                         case XmlNodeType.Element:
                             path.Add(reader.Name);

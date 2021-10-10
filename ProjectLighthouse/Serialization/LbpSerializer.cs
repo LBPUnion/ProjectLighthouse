@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace ProjectLighthouse.Serialization {
@@ -6,13 +7,14 @@ namespace ProjectLighthouse.Serialization {
     /// LBP doesn't like the XML serializer by C# that much, and it cant be controlled that much (cant have two root elements),
     /// so I wrote my own crappy one.
     /// </summary>
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class LbpSerializer {
         public static string BlankElement(string key) => $"<{key}></{key}>";
 
         public static string StringElement(KeyValuePair<string, object> pair) => $"<{pair.Key}>{pair.Value}</{pair.Key}>";
 
         public static string StringElement(string key, object value) => $"<{key}>{value}</{key}>";
-
+        
         public static string TaggedStringElement(KeyValuePair<string, object> pair, KeyValuePair<string, object> tagPair) =>
             $"<{pair.Key} {tagPair.Key}=\"{tagPair.Value}\">{pair.Value}</{pair.Key}>";
         
