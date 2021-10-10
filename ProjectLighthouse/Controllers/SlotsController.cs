@@ -30,10 +30,5 @@ namespace ProjectLighthouse.Controllers {
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
-
-        [HttpPost("showModerated")]
-        public IActionResult ShowModerated() {
-            return this.Ok(LbpSerializer.BlankElement("resources"));
-        }
     }
 }
