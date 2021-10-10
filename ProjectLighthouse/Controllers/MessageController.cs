@@ -20,5 +20,10 @@ namespace ProjectLighthouse.Controllers {
         public IActionResult Announce() {
             return Ok("PROJECT LIGHTHOUSE IS A GO!\nalso ezoiar was here\nnow on ASP.NET!");
         }
+
+        [HttpGet("notification")]
+        public IActionResult Announce() {
+            return this.Ok();
+        }
     }
 }
