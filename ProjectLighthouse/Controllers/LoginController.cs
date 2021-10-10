@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using ProjectLighthouse.Types;
@@ -11,9 +10,9 @@ namespace ProjectLighthouse.Controllers {
         [HttpGet]
         [HttpPost]
         public IActionResult Post() {
-            if(!this.Request.Query.TryGetValue("titleID", out StringValues titleValues)) {
+            if(!this.Request.Query.TryGetValue("titleID", out StringValues _)) {
                 this.BadRequest();
-            };
+            }
 
 //            string titleId = titleValues[0];
 

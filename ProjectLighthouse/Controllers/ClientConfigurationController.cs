@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ProjectLighthouse.Serialization;
 using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse.Controllers {
@@ -14,7 +13,7 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpGet("t_conf")]
         [Produces("text/json")]
-        public IActionResult TConf() {
+        public IActionResult Conf() {
             return this.Ok("[{\"StatusCode\":200}]");
         }
 
@@ -27,8 +26,8 @@ namespace ProjectLighthouse.Controllers {
         [Produces("text/xml")]
         public IActionResult PrivacySettings() {
             PrivacySettings ps = new() {
-                LevelVisibility = "unset",
-                ProfileVisibility = "unset"
+                LevelVisibility = "all",
+                ProfileVisibility = "all"
             };
             
             return this.Ok(ps.Serialize());

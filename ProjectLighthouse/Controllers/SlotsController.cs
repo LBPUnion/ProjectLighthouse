@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +33,7 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpPost("showModerated")]
         public IActionResult ShowModerated() {
-            return this.Ok("<resources/>");
+            return this.Ok(LbpSerializer.BlankElement("resources"));
         }
     }
 }
