@@ -7,6 +7,9 @@
       <Path>.idea</Path>
       <Path>DatabaseMigrations</Path>
       <Path>ProjectLighthouse.sln.DotSettings</Path>
+      <Path>ProjectLighthouse.sln.DotSettings.user</Path>
+      <Path>docker-compose.yml</Path>
+      <Path>global.json</Path>
     </explicitIncludes>
     <explicitExcludes>
       <Path>.idea/.idea.ProjectLighthouse/.idea/workspace.xml</Path>
