@@ -22,7 +22,7 @@ namespace ProjectLighthouse.Controllers {
         }
 
         [HttpGet("notification")]
-        public IActionResult Announce() {
+        public IActionResult Notification() {
             return this.Ok();
         }
     }
