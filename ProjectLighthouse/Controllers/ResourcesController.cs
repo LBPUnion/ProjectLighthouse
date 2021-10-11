@@ -23,13 +23,22 @@ namespace ProjectLighthouse.Controllers {
         [HttpGet("r/{hash}")]
         public IActionResult GetResource(string hash) {
             string path = Path.Combine(Environment.CurrentDirectory, "r", hash);
-            
-            Console.WriteLine($"path: {path}, exists: {IOFile.Exists(path)}");
-            
+
             if(IOFile.Exists(path)) {
                 return this.File(IOFile.OpenRead(path), "image/jpg");
             }
             return this.NotFound();
+        }
+
+        // TODO: check if this is a valid hash
+        [HttpPost("upload/{hash}")]
+        public async Task<IActionResult> UploadResource(string hash) {
+            string path = Path.Combine(Environment.CurrentDirectory, "r", hash);
+            
+            if(IOFile.Exists(path)) this.Ok(); // no reason to fail if it's already uploaded
+            
+            await IOFile.WriteAllTextAsync(path, await new StreamReader(Request.Body).ReadToEndAsync());
+            return this.Ok();
         }
     }
 }
