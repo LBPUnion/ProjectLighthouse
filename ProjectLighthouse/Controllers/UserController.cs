@@ -22,11 +22,11 @@ namespace ProjectLighthouse.Controllers {
             return this.Ok(user.Serialize());
         }
 
-        [HttpPost("user/{username}")]
-        public async Task<IActionResult> CreateUser(string username) {
-            await new Database().CreateUser(username);
-            return await GetUser(username);
-        }
+//        [HttpPost("user/{username}")]
+//        public async Task<IActionResult> CreateUser(string username) {
+//            await new Database().CreateUser(username);
+//            return await GetUser(username);
+//        }
 
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser() {
