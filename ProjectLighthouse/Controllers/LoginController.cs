@@ -1,3 +1,5 @@
+#nullable enable
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using ProjectLighthouse.Types;
@@ -9,12 +11,19 @@ namespace ProjectLighthouse.Controllers {
     public class LoginController : ControllerBase {
         [HttpGet]
         [HttpPost]
-        public IActionResult Post() {
-            if(!this.Request.Query.TryGetValue("titleID", out StringValues _)) {
-                this.BadRequest();
-            }
+        public async Task<IActionResult> Login() {
+            if(!this.Request.Query.TryGetValue("titleID", out StringValues _))
+                return this.BadRequest("");
 
-//            string titleId = titleValues[0];
+            if(!this.Request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null)
+                return this.BadRequest(""); // TODO: send 403
+
+            await using Database database = new();
+
+            // ReSharper disable once InvertIf
+            if(!await database.IsUserAuthenticated(mmAuth)) {
+                if(!await database.AuthenticateUser(mmAuth)) return this.BadRequest(""); // TODO: send 403
+            }
 
             return this.Ok(new LoginResult {
                 AuthTicket = "d2c6bbec59162a1e786ed24ad95f2b73",

@@ -25,7 +25,8 @@ namespace ProjectLighthouse {
             User user = new() {
                 Username = username,
                 LocationId = l.Id,
-                Biography = "No biography provided"
+                Biography = "No biography provided",
+                Pins = ""
             };
             this.Users.Add(user);
 
