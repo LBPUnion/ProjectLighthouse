@@ -1,15 +1,15 @@
-create table ProfileCardLocations
+create table Locations
 (
-    UserId    int not null,
-    LocationX int not null,
-    LocationY int not null
+    Id    int not null,
+    X int not null,
+    Y int not null
 );
 
-create unique index ProfileCardLocations_UserId_uindex
+create unique index Locations_UserId_uindex
     on Locations (Id);
 
 alter table Locations
-    add constraint ProfileCardLocations_pk
+    add constraint Locations_pk
         primary key (Id);
 
 alter table Users

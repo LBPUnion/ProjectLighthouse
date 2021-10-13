@@ -39,17 +39,13 @@ namespace ProjectLighthouse {
         // MM_AUTH=psn_name:?:timestamp, potentially a user creation date?:?:user id?:user's IP:?:password? SHA1
         // just blindly trust the token for now while we get it working
         public async Task<bool> AuthenticateUser(string mmAuth) {
+            if(!mmAuth.Contains(':')) return false;
+            
             Token token = new() {
-                MMAuth = mmAuth
+                UserToken = mmAuth
             };
 
-            string[] split;
-            try {
-                split = mmAuth.Split(":");
-            }
-            catch(ArgumentOutOfRangeException e) {
-                return false; // Token doesn't contain :, cant be a valid token
-            }
+            string[] split = mmAuth.Split(":");
             
             // TODO: don't use psn name to authenticate
             User user = await this.Users.FirstOrDefaultAsync(u => u.Username == split[0]) 
@@ -63,7 +59,7 @@ namespace ProjectLighthouse {
         public async Task<bool> IsUserAuthenticated(string mmAuth) => await UserFromMMAuth(mmAuth) != null;
 
         public async Task<User?> UserFromMMAuth(string mmAuth) {
-            Token? token = await Tokens.FirstOrDefaultAsync(t => t.MMAuth == mmAuth);
+            Token? token = await Tokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
             if(token == null) return null;
             return await Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
