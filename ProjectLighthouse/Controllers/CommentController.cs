@@ -32,10 +32,13 @@ namespace ProjectLighthouse.Controllers {
             Comment comment = (Comment)serializer.Deserialize(new StringReader(bodyString));
 
             await using Database database = new();
-            User poster = await database.Users.FirstOrDefaultAsync(u => u.Username == "jvyden");
-            User target = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            User poster = await database.UserFromRequest(Request);
 
-            if(comment == null) return this.BadRequest();
+            if(poster == null) return this.StatusCode(403, "");
+            
+            User target = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            
+            if(comment == null || target == null) return this.BadRequest();
 
             comment.PosterUserId = poster.UserId;
             comment.TargetUserId = target.UserId;

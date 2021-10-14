@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using ProjectLighthouse.Helpers;
 using ProjectLighthouse.Types;
@@ -59,6 +60,14 @@ namespace ProjectLighthouse {
             Token? token = await Tokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
             if(token == null) return null;
             return await Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        }
+
+        public async Task<User?> UserFromRequest(HttpRequest request) {
+            if(!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) {
+                return null;
+            }
+            
+            return await UserFromAuthToken(mmAuth);
         }
     }
 }

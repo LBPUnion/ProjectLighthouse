@@ -30,7 +30,9 @@ namespace ProjectLighthouse.Controllers {
         public async Task<IActionResult> Publish() {
             await using Database database = new();
 
-            User user = await database.Users.FirstOrDefaultAsync(u => u.Username == "jvyden");
+            User user = await database.UserFromRequest(Request);
+            if(user == null) return this.StatusCode(403, "");
+            
             Slot slot = await this.GetSlotFromBody();
 
             //TODO: parse location in body

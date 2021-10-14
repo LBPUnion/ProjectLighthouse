@@ -32,10 +32,10 @@ namespace ProjectLighthouse.Controllers {
 
             Token? token = await database.AuthenticateUser(loginData);
 
-            if(token == null) return this.BadRequest(""); // TODO: send 403
+            if(token == null) return this.StatusCode(403, "");
 
             return this.Ok(new LoginResult {
-                AuthTicket = token.UserToken,
+                AuthTicket = "MM_AUTH=" + token.UserToken,
                 LbpEnvVer = ServerSettings.ServerName
             }.Serialize());
         }

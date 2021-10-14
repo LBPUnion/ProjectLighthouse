@@ -31,9 +31,9 @@ namespace ProjectLighthouse.Controllers {
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser() {
             await using Database database = new();
-            User user = await database.Users.Where(u => u.Username == "jvyden").FirstOrDefaultAsync();
+            User user = await database.UserFromRequest(Request);
 
-            if(user == null) return this.BadRequest();
+            if(user == null) return this.StatusCode(403, "");
 
             XmlReaderSettings settings = new() {
                 Async = true // this is apparently not default

@@ -36,9 +36,19 @@ namespace ProjectLighthouse.Types {
         
         [XmlIgnore]
         public int LocationId { get; set; }
-        
+
         [XmlIgnore] 
         public int CreatorId { get; set; }
+        
+        private User creator;
+
+        public User Creator {
+            get {
+                if(this.creator != null) return this.creator;
+
+                return creator = new Database().Users.First(u => u.UserId == CreatorId);
+            }
+        }
 
         private Location location;
 
@@ -85,7 +95,7 @@ namespace ProjectLighthouse.Types {
             string slotData = LbpSerializer.StringElement("name", Name) +
                               LbpSerializer.StringElement("id", SlotId) +
                               LbpSerializer.StringElement("game", 1) +
-                              LbpSerializer.StringElement("npHandle", "jvyden") +
+                              LbpSerializer.StringElement("npHandle", Creator.UserId) +
                               LbpSerializer.StringElement("description", Description) +
                               LbpSerializer.StringElement("icon", IconHash) +
                               LbpSerializer.StringElement("resource", Resource) +

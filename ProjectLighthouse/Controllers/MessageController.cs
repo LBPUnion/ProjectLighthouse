@@ -10,14 +10,13 @@ namespace ProjectLighthouse.Controllers {
     public class MessageController : ControllerBase {
         [HttpGet("eula")]
         public async Task<IActionResult> Eula() {
-            User user = await new Database().Users.FirstOrDefaultAsync(u => u.Username == "jvyden");
-            
-            return Ok($"You are logged in as user {user.Username} (id {user.UserId})");
+            User user = await new Database().UserFromRequest(Request);
+            return user == null ? this.StatusCode(403, "") : this.Ok($"You are logged in as user {user.Username} (id {user.UserId})");
         }
 
         [HttpGet("announce")]
         public IActionResult Announce() {
-            return Ok("PROJECT LIGHTHOUSE IS A GO!\nalso ezoiar was here\nnow on ASP.NET!");
+            return Ok("");
         }
 
         [HttpGet("notification")]
