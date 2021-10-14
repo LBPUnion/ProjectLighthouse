@@ -10,6 +10,8 @@ namespace ProjectLighthouse.Types {
 
         public const int ListsQuota = 20;
 
+        public const string ServerName = "ProjectLighthouse";
+
         private static string? dbConnectionString;
         public static string DbConnectionString {
             get {

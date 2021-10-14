@@ -38,28 +38,30 @@ namespace ProjectLighthouse {
 
         // MM_AUTH=psn_name:?:timestamp, potentially a user creation date?:?:user id?:user's IP:?:password? SHA1
         // just blindly trust the token for now while we get it working
-        public async Task<bool> AuthenticateUser(string mmAuth) {
-            if(!mmAuth.Contains(':')) return false;
-            
-            Token token = new() {
-                UserToken = mmAuth
-            };
+        public async Task<Token?> AuthenticateUser(string loginString) {
+            if(!loginString.Contains(':')) return null;
 
-            string[] split = mmAuth.Split(":");
+            string[] split = loginString.Split(":");
             
             // TODO: don't use psn name to authenticate
             User user = await this.Users.FirstOrDefaultAsync(u => u.Username == split[0]) 
                         ?? await this.CreateUser(split[0]);
 
-            token.UserId = user.UserId;
+            Token token = new() {
+                UserToken = HashHelper.GenerateAuthToken(),
+                UserId = user.UserId
+            };
 
-            return true;
+            this.Tokens.Add(token);
+            await this.SaveChangesAsync();
+
+            return token;
         }
 
-        public async Task<bool> IsUserAuthenticated(string mmAuth) => await UserFromMMAuth(mmAuth) != null;
+        public async Task<bool> IsUserAuthenticated(string authToken) => await this.UserFromAuthToken(authToken) != null;
 
-        public async Task<User?> UserFromMMAuth(string mmAuth) {
-            Token? token = await Tokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
+        public async Task<User?> UserFromAuthToken(string authToken) {
+            Token? token = await Tokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
             if(token == null) return null;
             return await Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
