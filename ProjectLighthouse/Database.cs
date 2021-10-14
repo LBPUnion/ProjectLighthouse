@@ -35,17 +35,11 @@ namespace ProjectLighthouse {
             return user;
 
         }
-
-        // MM_AUTH=psn_name:?:timestamp, potentially a user creation date?:?:user id?:user's IP:?:password? SHA1
-        // just blindly trust the token for now while we get it working
-        public async Task<Token?> AuthenticateUser(string loginString) {
-            if(!loginString.Contains(':')) return null;
-
-            string[] split = loginString.Split(":");
-            
+        
+        public async Task<Token?> AuthenticateUser(LoginData loginData) {
             // TODO: don't use psn name to authenticate
-            User user = await this.Users.FirstOrDefaultAsync(u => u.Username == split[0]) 
-                        ?? await this.CreateUser(split[0]);
+            User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username + u.Username[-1]) 
+                        ?? await this.CreateUser(loginData.Username + "_");
 
             Token token = new() {
                 UserToken = HashHelper.GenerateAuthToken(),

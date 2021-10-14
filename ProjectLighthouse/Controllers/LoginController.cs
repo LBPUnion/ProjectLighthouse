@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,21 +18,19 @@ namespace ProjectLighthouse.Controllers {
             if(!this.Request.Query.TryGetValue("titleID", out StringValues _))
                 return this.BadRequest("");
 
-            // FIXME: this will not do, MM_AUTH is created by the client after POST /LOGIN
-            if(!this.Request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null)
-                return this.BadRequest(""); // TODO: send 403
+            string body = await new StreamReader(Request.Body).ReadToEndAsync();
+
+            LoginData loginData;
+            try {
+                loginData = LoginData.CreateFromString(body);
+            }
+            catch(Exception e) {
+                return this.BadRequest();
+            }
 
             await using Database database = new();
 
-            Token? token;
-
-            // ReSharper disable once InvertIf
-            if(!await database.IsUserAuthenticated(mmAuth)) {
-                token = await database.AuthenticateUser(mmAuth);
-            }
-            else {
-                token = await database.Tokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
-            }
+            Token? token = await database.AuthenticateUser(loginData);
 
             if(token == null) return this.BadRequest(""); // TODO: send 403
 
