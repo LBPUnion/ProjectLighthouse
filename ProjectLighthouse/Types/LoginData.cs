@@ -21,9 +21,9 @@ namespace ProjectLighthouse.Types {
 
         public static LoginData CreateFromString(string str) {
             do {
-                str = str.Replace("\b", "");
+                str = str.Replace("\b", string.Empty); // Trim backspace characters
             } while(str.Contains('\b'));
-            
+
             using MemoryStream ms = new(Encoding.ASCII.GetBytes(str));
             using BinaryReader reader = new(ms);
 
@@ -34,7 +34,7 @@ namespace ProjectLighthouse.Types {
 //            byte[] endBytes = reader.ReadBytes((int)(ms.Length - reader.BaseStream.Position));
 //            string end = Encoding.ASCII.GetString(endBytes);
             
-            loginData.Username = BinaryHelper.ReadString(reader);
+            loginData.Username = BinaryHelper.ReadString(reader).Replace("\0", string.Empty);
 
             return loginData;
         }

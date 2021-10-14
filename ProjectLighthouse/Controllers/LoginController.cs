@@ -12,7 +12,6 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/login")]
     [Produces("text/xml")]
     public class LoginController : ControllerBase {
-        [HttpGet]
         [HttpPost]
         public async Task<IActionResult> Login() {
             if(!this.Request.Query.TryGetValue("titleID", out StringValues _))
