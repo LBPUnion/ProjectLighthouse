@@ -17,7 +17,6 @@ namespace ProjectLighthouse.Controllers {
         [HttpPost("startPublish")]
         public async Task<IActionResult> StartPublish() {
             Slot slot = await this.GetSlotFromBody();
-
             if(slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
             return this.Ok(LbpSerializer.TaggedStringElement("slot", "", "type", "user"));

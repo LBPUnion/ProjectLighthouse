@@ -24,7 +24,7 @@ namespace ProjectLighthouse.Controllers {
             try {
                 loginData = LoginData.CreateFromString(body);
             }
-            catch(Exception e) {
+            catch {
                 return this.BadRequest();
             }
 
