@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using ProjectLighthouse.Helpers;
 
 namespace ProjectLighthouse.Types {
     // This is all the information I can understand for now. More testing is required.
@@ -14,28 +15,26 @@ namespace ProjectLighthouse.Types {
     /// The data sent from POST /LOGIN.
     /// </summary>
     public class LoginData {
-        public string Username { get; set; } // Cut off by one for some strange reason
-        public string GameVersion { get; set; }
-        public int UnknownNumber { get; set; } // Seems to increment by 1000 every login attempt
+        public string Username { get; set; }
+//        public string GameVersion { get; set; }
+//        public int UnknownNumber { get; set; } // Seems to increment by 1000 every login attempt
 
         public static LoginData CreateFromString(string str) {
+            do {
+                str = str.Replace("\b", "");
+            } while(str.Contains('\b'));
+            
             using MemoryStream ms = new(Encoding.ASCII.GetBytes(str));
             using BinaryReader reader = new(ms);
 
             LoginData loginData = new();
 
-            reader.ReadBytes(4); // Perhaps a header of sorts?
-            
-            string number = Encoding.ASCII.GetString(reader.ReadBytes(7)); // Number is stored as text for some reason...
-            loginData.UnknownNumber = int.Parse(number);
+            BinaryHelper.ReadUntilByte(reader, 0x20); // Skips to relevant part
 
-            reader.ReadBytes(10); // No clue what this is.
-
-            string end = Encoding.ASCII.GetString(reader.ReadBytes(int.MaxValue)); // ReadToEnd 2: Electric Boogaloo
-            string[] split = end.Split("bru"); // No idea what it means, but it seems to split the gameversion and username apart
+//            byte[] endBytes = reader.ReadBytes((int)(ms.Length - reader.BaseStream.Position));
+//            string end = Encoding.ASCII.GetString(endBytes);
             
-            loginData.Username = split[0];
-            loginData.GameVersion = split[1];
+            loginData.Username = BinaryHelper.ReadString(reader);
 
             return loginData;
         }

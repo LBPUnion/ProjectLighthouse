@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using ProjectLighthouse.Helpers;
 using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse {
@@ -38,8 +39,8 @@ namespace ProjectLighthouse {
         
         public async Task<Token?> AuthenticateUser(LoginData loginData) {
             // TODO: don't use psn name to authenticate
-            User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username + u.Username[-1]) 
-                        ?? await this.CreateUser(loginData.Username + "_");
+            User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username) 
+                        ?? await this.CreateUser(loginData.Username);
 
             Token token = new() {
                 UserToken = HashHelper.GenerateAuthToken(),

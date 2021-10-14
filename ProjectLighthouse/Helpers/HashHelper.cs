@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ProjectLighthouse {
+namespace ProjectLighthouse.Helpers {
     public static class HashHelper {
 //        private static readonly SHA1 sha1 = SHA1.Create();
         private static readonly SHA256 sha256 = SHA256.Create();
