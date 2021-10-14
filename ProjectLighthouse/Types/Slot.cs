@@ -95,7 +95,7 @@ namespace ProjectLighthouse.Types {
             string slotData = LbpSerializer.StringElement("name", Name) +
                               LbpSerializer.StringElement("id", SlotId) +
                               LbpSerializer.StringElement("game", 1) +
-                              LbpSerializer.StringElement("npHandle", Creator.UserId) +
+                              LbpSerializer.StringElement("npHandle", Creator.Username) +
                               LbpSerializer.StringElement("description", Description) +
                               LbpSerializer.StringElement("icon", IconHash) +
                               LbpSerializer.StringElement("resource", Resource) +
