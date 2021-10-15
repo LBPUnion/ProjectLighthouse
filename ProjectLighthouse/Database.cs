@@ -28,7 +28,8 @@ namespace ProjectLighthouse {
                 Username = username,
                 LocationId = l.Id,
                 Biography = "No biography provided",
-                Pins = ""
+                Pins = "",
+                PlanetHash = "",
             };
             this.Users.Add(user);
 
