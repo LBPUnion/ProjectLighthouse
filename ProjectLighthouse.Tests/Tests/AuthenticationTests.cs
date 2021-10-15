@@ -5,7 +5,7 @@ using ProjectLighthouse.Types;
 using Xunit;
 
 namespace ProjectLighthouse.Tests {
-    public class AuthenticationTest : LighthouseTest {
+    public class AuthenticationTests : LighthouseTest {
         [Fact]
         public async Task ShouldReturnErrorOnNoPostData() {
             HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", null!);
