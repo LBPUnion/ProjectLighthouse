@@ -14,9 +14,6 @@ namespace ProjectLighthouse.Controllers {
     public class LoginController : ControllerBase {
         [HttpPost]
         public async Task<IActionResult> Login() {
-            if(!this.Request.Query.TryGetValue("titleID", out StringValues _))
-                return this.BadRequest("");
-
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
             LoginData loginData;
