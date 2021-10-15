@@ -85,6 +85,10 @@ namespace ProjectLighthouse.Controllers {
                                     user.IconHash = await reader.GetValueAsync();
                                     break;
                                 }
+                                case "planets": {
+                                    user.PlanetHash = await reader.GetValueAsync();
+                                    break;
+                                }
                             }
                             break;
                         case XmlNodeType.EndElement:

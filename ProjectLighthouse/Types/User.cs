@@ -42,6 +42,9 @@ namespace ProjectLighthouse.Types {
         public int StaffChallengeGoldCount { get; set; }
         public int StaffChallengeSilverCount { get; set; }
         public int StaffChallengeBronzeCount { get; set; }
+
+        public string PlanetHash { get; set; }
+        
 //        [NotMapped]
         public readonly ClientsConnected ClientsConnected = new();
         
@@ -107,6 +110,7 @@ namespace ProjectLighthouse.Types {
                           LbpSerializer.StringElement("staffChallengeGoldCount", this.StaffChallengeGoldCount) +
                           LbpSerializer.StringElement("staffChallengeSilverCount", this.StaffChallengeSilverCount) +
                           LbpSerializer.StringElement("staffChallengeBronzeCount", this.StaffChallengeBronzeCount) +
+                          LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
                           this.ClientsConnected.Serialize();
             

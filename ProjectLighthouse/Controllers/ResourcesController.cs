@@ -16,6 +16,7 @@ namespace ProjectLighthouse.Controllers {
         }
 
         [HttpPost("filterResources")]
+        [HttpPost("showNotUploaded")]
         public async Task<IActionResult> FilterResources() {
             return this.Ok(await new StreamReader(Request.Body).ReadToEndAsync());
         }
