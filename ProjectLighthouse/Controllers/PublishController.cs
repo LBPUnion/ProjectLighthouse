@@ -11,6 +11,12 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
     public class PublishController : ControllerBase {
+        private readonly Database database;
+        
+        public PublishController(Database database) {
+            this.database = database;
+        }
+
         /// <summary>
         /// Endpoint the game uses to verify that the level is compatible (?)
         /// </summary>
@@ -27,8 +33,6 @@ namespace ProjectLighthouse.Controllers {
         /// </summary>
         [HttpPost("publish")]
         public async Task<IActionResult> Publish() {
-            await using Database database = new();
-
             User user = await database.UserFromRequest(Request);
             if(user == null) return this.StatusCode(403, "");
             
@@ -52,8 +56,6 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpPost("unpublish/{id:int}")]
         public async Task<IActionResult> Unpublish(int id) {
-            await using Database database = new();
-
             Slot slot = await database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
 
             database.Locations.Remove(slot.Location);

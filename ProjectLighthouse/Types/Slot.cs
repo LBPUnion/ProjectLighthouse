@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ProjectLighthouse.Serialization;
 
 namespace ProjectLighthouse.Types {
@@ -39,30 +40,16 @@ namespace ProjectLighthouse.Types {
 
         [XmlIgnore] 
         public int CreatorId { get; set; }
-        
-        private User creator;
 
-        public User Creator {
-            get {
-                if(this.creator != null) return this.creator;
-
-                return creator = new Database().Users.First(u => u.UserId == CreatorId);
-            }
-        }
-
-        private Location location;
+        [ForeignKey(nameof(CreatorId))]
+        public User Creator { get; set; }
 
         /// <summary>
         /// The location of the level on the creator's earth
         /// </summary>
         [XmlElement("location")]
-        public Location Location {
-            get {
-                if(location != null) return this.location;
-
-                return location = new Database().Locations.First(l => l.Id == LocationId);
-            }
-        }
+        [ForeignKey(nameof(LocationId))]
+        public Location Location { get; set; }
         
         [XmlElement("initiallyLocked")]
         public bool InitiallyLocked { get; set; }

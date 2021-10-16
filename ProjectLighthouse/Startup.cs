@@ -3,10 +3,12 @@ using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProjectLighthouse.Serialization;
+using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse {
     public class Startup {
@@ -18,10 +20,11 @@ namespace ProjectLighthouse {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
-
             services.AddControllers();
             services.AddMvc(options =>
                 options.OutputFormatters.Add(new XmlOutputFormatter()));
+            
+            services.AddDbContext<Database>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

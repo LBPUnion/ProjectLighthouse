@@ -1,5 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProjectLighthouse.Types;
 
@@ -9,13 +11,13 @@ namespace ProjectLighthouse {
             Console.WriteLine("Welcome to Project Lighthouse!");
             Console.WriteLine(ServerSettings.DbConnected ? "Connected to the database." : "Database unavailable. Starting in stateless mode.");
 
-            CreateHostBuilder(args).Build().Run();
-        }
+            IHostBuilder builder = Host.CreateDefaultBuilder(args);
+            
+            builder.ConfigureWebHostDefaults(webBuilder => {
+                webBuilder.UseStartup<Startup>();
+            });
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => {
-                    webBuilder.UseStartup<Startup>();
-                });
+            builder.Build().Run();
+        }
     }
 }

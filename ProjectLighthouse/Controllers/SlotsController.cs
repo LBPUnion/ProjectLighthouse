@@ -1,6 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjectLighthouse.Serialization;
 using ProjectLighthouse.Types;
 
@@ -9,22 +10,29 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
     public class SlotsController : ControllerBase {
+        private readonly Database database;
+        public SlotsController(Database database) {
+            this.database = database;
+        }
+
         [HttpGet("slots/by")]
         public IActionResult SlotsBy() {
-            string response = Enumerable.Aggregate(new Database().Slots, string.Empty, (current, slot) => current + slot.Serialize());
+            string response = Enumerable.Aggregate(
+                database.Slots
+                    .Include(s => s.Creator)
+                    .Include(s => s.Location)
+                , string.Empty, (current, slot) => current + slot.Serialize());
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
+        
+        public async Task<IActionResult> SUser(int id) {
+            Slot slot = await this.database.Slots
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .FirstOrDefaultAsync(s => s.SlotId == id);
 
-        [HttpGet("s/user/{id:int}")]
-        public IActionResult SUser(int id) {
-            IEnumerable<Slot> slots = new Database().Slots
-                .Where(s => s.CreatorId == id)
-                .AsEnumerable();
-
-            string response = slots.Aggregate(string.Empty, (current, s) => current + s.Serialize());
-
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
+            return this.Ok(slot.Serialize());
         }
     }
 }

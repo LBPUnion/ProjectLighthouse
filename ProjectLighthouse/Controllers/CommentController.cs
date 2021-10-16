@@ -13,11 +13,17 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
     public class CommentController : ControllerBase {
+        private readonly Database database;
+        public CommentController(Database database) {
+            this.database = database;
+        }
+
         [HttpGet("userComments/{username}")]
         public async Task<IActionResult> GetComments(string username) {
-            // the following is downright retarded, but its 12:48am and i do not give a shit
-            //                                                      ↓ ok...      ↓ why does this need to be wrapped                  ↓ again???? whyyyy
-            List<Comment> comments = (await new Database().Comments.ToListAsync()).Where(c => c.TargetUsername == username).ToList(); 
+            List<Comment> comments = await database.Comments
+                .Include(c => c.Target)
+                .Where(c => c.Target.Username == username)
+                .ToListAsync();
 
             string outputXml = comments.Aggregate(string.Empty, (current, comment) => current + comment.Serialize());
             return this.Ok(LbpSerializer.StringElement("comments", outputXml));
@@ -31,7 +37,6 @@ namespace ProjectLighthouse.Controllers {
             XmlSerializer serializer = new(typeof(Comment));
             Comment comment = (Comment)serializer.Deserialize(new StringReader(bodyString));
 
-            await using Database database = new();
             User poster = await database.UserFromRequest(Request);
 
             if(poster == null) return this.StatusCode(403, "");
