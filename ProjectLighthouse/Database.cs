@@ -27,7 +27,7 @@ namespace ProjectLighthouse {
             User user = new() {
                 Username = username,
                 LocationId = l.Id,
-                Biography = "No biography provided",
+                Biography = username + " hasn't introduced themselves yet.",
                 Pins = "",
                 PlanetHash = "",
             };
