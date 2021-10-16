@@ -1,10 +1,7 @@
 #nullable enable
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse.Controllers {
@@ -20,9 +17,6 @@ namespace ProjectLighthouse.Controllers {
         
         [HttpPost]
         public async Task<IActionResult> Login() {
-            if(!this.Request.Query.TryGetValue("titleID", out StringValues _))
-                return this.BadRequest("");
-
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
             LoginData loginData;
