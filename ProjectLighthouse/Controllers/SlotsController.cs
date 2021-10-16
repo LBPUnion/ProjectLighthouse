@@ -10,23 +10,39 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
     public class SlotsController : ControllerBase {
+        private readonly Database database;
+        public SlotsController(Database database) {
+            this.database = database;
+        }
+
         [HttpGet("slots/by")]
         public IActionResult SlotsBy() {
-            string response = Enumerable.Aggregate(new Database().Slots, string.Empty, (current, slot) => current + slot.Serialize());
+            string response = Enumerable.Aggregate(
+                database.Slots
+                    .Include(s => s.Creator)
+                    .Include(s => s.Location)
+                , string.Empty, (current, slot) => current + slot.Serialize());
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
 
         [HttpGet("s/user/{id:int}")]
         public async Task<IActionResult> SUser(int id) {
-            Slot slot = await new Database().Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            Slot slot = await this.database.Slots
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .FirstOrDefaultAsync(s => s.SlotId == id);
 
             return this.Ok(slot.Serialize());
         }
 
         [HttpGet("slots/lolcatftw/{username}")]
         public IActionResult SlotsLolCat(string username) {
-            string response = Enumerable.Aggregate(new Database().Slots, string.Empty, (current, slot) => current + slot.Serialize());
+            string response = Enumerable.Aggregate(
+                database.Slots
+                    .Include(s => s.Creator)
+                    .Include(s => s.Location)
+                , string.Empty, (current, slot) => current + slot.Serialize());
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
 using ProjectLighthouse.Serialization;
@@ -14,25 +15,11 @@ namespace ProjectLighthouse.Types {
         
         public int TargetUserId { get; set; }
 
-        private string posterUsername;
-
-//        [XmlAttribute("username")]
-        public string PosterUsername {
-            get {
-                if(this.posterUsername != null) return this.posterUsername;
-                return this.posterUsername = new Database().Users.First(u => u.UserId == PosterUserId).Username;
-            }
-        }
-
-        private string targetUsername;
-
-        public string TargetUsername {
-            get {
-                if(this.targetUsername != null) return this.targetUsername;
-
-                return this.targetUsername = new Database().Users.First(u => u.UserId == TargetUserId).Username;
-            }
-        }
+        [ForeignKey(nameof(PosterUserId))]
+        public User Poster { get; set; }
+        
+        [ForeignKey(nameof(TargetUserId))]
+        public User Target { get; set; }
 
         public long Timestamp { get; set; }
 
@@ -43,7 +30,7 @@ namespace ProjectLighthouse.Types {
 
         private string serialize() {
             return LbpSerializer.StringElement("id", CommentId) +
-                   LbpSerializer.StringElement("npHandle", this.PosterUsername) +
+                   LbpSerializer.StringElement("npHandle", this.Poster.Username) +
                    LbpSerializer.StringElement("timestamp", Timestamp) +
                    LbpSerializer.StringElement("message", Message) +
                    LbpSerializer.StringElement("thumbsup", ThumbsUp) +
