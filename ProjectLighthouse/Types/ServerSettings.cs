@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Types {
         public static string DbConnectionString {
             get {
                 if(dbConnectionString == null) {
-                    return dbConnectionString = Environment.GetEnvironmentVariable("") ?? "";
+                    return dbConnectionString = Environment.GetEnvironmentVariable("LIGHTHOUSE_DB_CONNECTION_STRING") ?? "";
                 }
                 return dbConnectionString;
             }
