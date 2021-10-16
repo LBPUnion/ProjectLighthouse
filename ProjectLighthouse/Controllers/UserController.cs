@@ -12,11 +12,16 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
     public class UserController : ControllerBase {
+        private readonly Database database;
+        public UserController(Database database) {
+            this.database = database;
+        }
+
         [HttpGet("user/{username}")]
         public async Task<IActionResult> GetUser(string username) {
-            await using Database database = new();
-            
-            User user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            User user = await database.Users
+                .Include(u => u.Location)
+                .FirstOrDefaultAsync(u => u.Username == username);
 
             if(user == null) return this.NotFound();
             return this.Ok(user.Serialize());
@@ -30,7 +35,6 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser() {
-            await using Database database = new();
             User user = await database.UserFromRequest(Request);
 
             if(user == null) return this.StatusCode(403, "");

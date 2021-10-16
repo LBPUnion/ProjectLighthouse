@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using ProjectLighthouse.Serialization;
 
@@ -23,17 +24,12 @@ namespace ProjectLighthouse.Types {
         public bool CommentsEnabled { get; set; }
         
         public int LocationId { get; set; }
-        
-        private Location location;
+
         /// <summary>
         /// The location of the profile card on the user's earth
         /// </summary>
-        public Location Location {
-            get {
-                if(location != null) return this.location;
-                return location = new Database().Locations.First(l => l.Id == LocationId);
-            }
-        }
+        [ForeignKey("LocationId")]
+        public Location Location { get; set; }
 
         public int FavouriteSlotCount { get; set; }
         public int FavouriteUserCount { get; set; }

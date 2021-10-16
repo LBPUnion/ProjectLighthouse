@@ -12,6 +12,12 @@ namespace ProjectLighthouse.Controllers {
     [Route("LITTLEBIGPLANETPS3_XML/login")]
     [Produces("text/xml")]
     public class LoginController : ControllerBase {
+        private readonly Database database;
+
+        public LoginController(Database database) {
+            this.database = database;
+        }
+        
         [HttpPost]
         public async Task<IActionResult> Login() {
             if(!this.Request.Query.TryGetValue("titleID", out StringValues _))
@@ -26,8 +32,6 @@ namespace ProjectLighthouse.Controllers {
             catch {
                 return this.BadRequest();
             }
-
-            await using Database database = new();
 
             Token? token = await database.AuthenticateUser(loginData);
 
