@@ -37,11 +37,11 @@ jobs:
         run: dotnet build -c Debug
         
       - name: Make sure the default MySQL service is stopped
-        if: ${{ matrix.os.database == 'true' }}
+        if: ${{ matrix.os.database }}
         run: sudo service mysql stop
 
       - name: Set up MySQL
-        if: ${{ matrix.os.database == 'true' }}
+        if: ${{ matrix.os.database }}
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql database: 'lighthouse'
@@ -49,7 +49,7 @@ jobs:
           mysql password: 'lighthouse'
           
       - name: Run database migrations
-        if: ${{ matrix.os.database  }}
+        if: ${{ matrix.os.database }}
         run: mysql --batch --user=lighthouse --password=lighthouse --host=127.0.0.1 --protocol=TCP lighthouse < <(cat DatabaseMigrations/*.sql)
         
       - name: Test
