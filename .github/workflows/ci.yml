@@ -1,0 +1,85 @@
+on: [push, pull_request]
+name: Continuous Integration
+
+# Inspired by osu! lazer's CI
+# https://github.com/ppy/osu/blob/e12249f1270a22cf5811a8bb7a9ee44f2c0250db/.github/workflows/ci.yml
+
+jobs:
+  test:
+    name: Build & Test
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ${{matrix.os.fullName}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - { prettyName: Windows, fullName: windows-latest, database: false }
+          - { prettyName: macOS, fullName: macos-latest, database: true }
+          - { prettyName: Linux, fullName: ubuntu-latest, database: true }
+    timeout-minutes: 10
+    env:
+      DB_DATABASE: lighthouse
+      DB_USER: root
+      DB_PASSWORD: lighthouse
+    steps:
+      - name: Cancel previous runs of this workflow
+        uses: styfle/cancel-workflow-action@0.6.0
+        with:
+          access_token: ${{ github.token }}
+        
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 5.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+          include-prerelease: true
+
+      - name: Install .NET 6.0 Preview
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+          include-prerelease: true
+          
+      - name: Compile
+        run: dotnet build -c Debug
+        
+      - name: Start MySQL
+        if: ${{ matrix.os.database }}
+        uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: '8.0'
+          root-password: ${{ env.DB_PASSWORD }}
+
+      - name: Run database migrations
+        if: ${{ matrix.os.database }}
+        run: |
+          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h127.0.0.1
+          mysql --batch -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h127.0.0.1 ${{ env.DB_DATABASE }} < <(cat DatabaseMigrations/*.sql)
+        
+      - name: Test
+        continue-on-error: true
+        run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx"
+
+
+      # Attempt to upload results even if test fails.
+      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: lighthouse-test-results-${{matrix.os.prettyName}}
+          path: ${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx
+
+      - name: Process Test Results
+        if: ${{ always() }}
+        uses: im-open/process-dotnet-test-results@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check Test Results
+        if: steps.process-trx.outputs.test-outcome == 'Failed'
+        run: |
+          echo "There were test failures."
+          exit 1
