@@ -46,6 +46,7 @@ jobs:
         run: dotnet build -c Debug
         
       - name: Start MySQL
+        if: ${{ matrix.os.database }}
         uses: shogo82148/actions-setup-mysql@v1
         with:
           mysql-version: '8.0'
