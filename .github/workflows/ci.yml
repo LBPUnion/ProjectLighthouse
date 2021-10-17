@@ -1,6 +1,9 @@
 on: [push, pull_request]
 name: Continuous Integration
 
+# Inspired by osu! lazer's CI
+# https://github.com/ppy/osu/blob/e12249f1270a22cf5811a8bb7a9ee44f2c0250db/.github/workflows/ci.yml
+
 jobs:
   test:
     name: Test
@@ -12,6 +15,9 @@ jobs:
           - { prettyname: Windows, fullname: windows-latest }
           - { prettyname: macOS, fullname: macos-latest }
           - { prettyname: Linux, fullname: ubuntu-latest }
+        dotnetVersion:
+          - { prettyname: .NET 6.0 Preview, fullname: 6.0.x }
+          - { prettyname: .NET 5.0, fullname: 5.0.x }
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -29,7 +35,7 @@ jobs:
           include-prerelease: true
           
       - name: Compile
-        run: dotnet build -C Debug
+        run: dotnet build -c Debug
         
       - name: Test
         run: --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
@@ -41,5 +47,5 @@ jobs:
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
-          name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
+          name: lighthouse-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
           path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
