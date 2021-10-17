@@ -55,3 +55,9 @@ jobs:
         uses: im-open/process-dotnet-test-results@v2.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+     - name: Check Test Results
+       if: steps.process-trx.outputs.test-outcome == 'Failed'
+       run: |
+         echo "There were test failures."
+         exit 1
