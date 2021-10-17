@@ -50,7 +50,7 @@ jobs:
           
       - name: Run database migrations
         if: ${{ matrix.os.prettyName == 'Linux' }}
-        run: cat DatabaseMigrations/*.sql | mysql -u lighthouse -p lighthouse lighthouse
+        run: mysql -B -u lighthouse -p lighthouse lighthouse < <(cat DatabaseMigations*.sql)
         
       - name: Test
         continue-on-error: true
