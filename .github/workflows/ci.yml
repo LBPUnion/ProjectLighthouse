@@ -7,38 +7,33 @@ name: Continuous Integration
 jobs:
   test:
     name: Test
-    runs-on: ${{matrix.os.fullname}}
+    runs-on: ${{matrix.os.fullName}}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - { prettyname: Windows, fullname: windows-latest }
-          - { prettyname: macOS, fullname: macos-latest }
-          - { prettyname: Linux, fullname: ubuntu-latest }
+          - { prettyName: Windows, fullName: windows-latest }
+          - { prettyName: macOS, fullName: macos-latest }
+          - { prettyName: Linux, fullName: ubuntu-latest }
         dotnetVersion:
-          - { prettyname: .NET 6.0 Preview, fullname: 6.0.x }
-          - { prettyname: .NET 5.0, fullname: 5.0.x }
+          - { prettyName: .NET 6.0 Preview, fullName: 6.0.x }
+          - { prettyName: .NET 5.0, fullName: 5.0.x }
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install .NET 5.0
+      - name: Install ${{matrix.dotnetVersion.prettyName}}
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "5.0.x"
-
-      - name: Install .NET 6.0 Preview
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "${{matrix.dotnetVersion.fullName}}"
           include-prerelease: true
           
       - name: Compile
         run: dotnet build -c Debug
         
       - name: Test
-        run: --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+        run: --logger "trx;LogFileName=TestResults-${{matrix.os.prettyName}}-${{matrix.threadingMode}}.trx"
 
 
       # Attempt to upload results even if test fails.
@@ -47,5 +42,5 @@ jobs:
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
-          name: lighthouse-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
-          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+          name: lighthouse-test-results-${{matrix.os.prettyName}}-dotnet${{matrix.dotnetVersion.fullName}}
+          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyName}}-dotnet${{matrix.dotnetVersion.fullName}}trx
