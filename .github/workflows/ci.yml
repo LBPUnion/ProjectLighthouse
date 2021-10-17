@@ -15,25 +15,29 @@ jobs:
 #          - { prettyName: Windows, fullName: windows-latest }
 #          - { prettyName: macOS, fullName: macos-latest }
           - { prettyName: Linux, fullName: ubuntu-latest }
-        dotnetVersion:
-          - { prettyName: .NET 6.0 Preview, fullName: 6.0.x, msbuildName: net6.0 }
-          - { prettyName: .NET 5.0, fullName: 5.0.x, msbuildName: net5.0 }
+
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install ${{matrix.dotnetVersion.prettyName}}
+      - name: Install .NET 5.0
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "${{matrix.dotnetVersion.fullName}}"
+          dotnet-version: "5.0.x"
+          include-prerelease: true
+
+      - name: Install .NET 6.0 Preview
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
           include-prerelease: true
           
       - name: Compile
-        run: dotnet build -c Debug -f ${{matrix.dotnetVersion.msbuildName}}
+        run: dotnet build -c Debug
         
       - name: Test
-        run: --logger "trx;LogFileName=TestResults-${{matrix.os.prettyName}}-${{matrix.threadingMode}}.trx"
+        run: dotnet test --logger "trx;LogFileName=TestResults-${{matrix.os.prettyName}}.trx"
 
 
       # Attempt to upload results even if test fails.
@@ -42,5 +46,5 @@ jobs:
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
-          name: lighthouse-test-results-${{matrix.os.prettyName}}-dotnet${{matrix.dotnetVersion.fullName}}
-          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyName}}-dotnet${{matrix.dotnetVersion.fullName}}trx
+          name: lighthouse-test-results-${{matrix.os.prettyName}}
+          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyName}}.trx
