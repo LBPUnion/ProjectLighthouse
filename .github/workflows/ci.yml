@@ -56,8 +56,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-     - name: Check Test Results
-       if: steps.process-trx.outputs.test-outcome == 'Failed'
-       run: |
-         echo "There were test failures."
-         exit 1
+      - name: Check Test Results
+        if: steps.process-trx.outputs.test-outcome == 'Failed'
+        run: |
+          echo "There were test failures."
+          exit 1
