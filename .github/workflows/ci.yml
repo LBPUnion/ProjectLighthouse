@@ -36,6 +36,19 @@ jobs:
       - name: Compile
         run: dotnet build -c Debug
         
+      - name: Make sure the default MySQL service is stopped
+        run: sudo service mysql stop
+
+      - name: Set up MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'lighthouse'
+          mysql user: 'lighthouse'
+          mysql password: 'lighthouse'
+          
+      - name: Run database migrations
+        run: mysql -u lighthouse -p lighthouse lighthouse < DatabaseMigrations/*.sql
+        
       - name: Test
         continue-on-error: true
         run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx"
