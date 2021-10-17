@@ -50,7 +50,7 @@ jobs:
           
       - name: Run database migrations
         if: ${{ matrix.os.database  }}
-        run: mysql -B -u lighthouse -p lighthouse lighthouse < <(cat DatabaseMigrations/*.sql)
+        run: mysql --batch --user=lighthouse --password=lighthouse lighthouse < <(cat DatabaseMigrations/*.sql)
         
       - name: Test
         continue-on-error: true
