@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - { prettyName: Windows, fullName: windows-latest }
-          - { prettyName: macOS, fullName: macos-latest }
+#          - { prettyName: Windows, fullName: windows-latest }
+#          - { prettyName: macOS, fullName: macos-latest }
           - { prettyName: Linux, fullName: ubuntu-latest }
         dotnetVersion:
           - { prettyName: .NET 6.0 Preview, fullName: 6.0.x }
