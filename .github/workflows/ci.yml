@@ -15,8 +15,11 @@ jobs:
           - { prettyName: Windows, fullName: windows-latest, database: false }
           - { prettyName: macOS, fullName: macos-latest, database: false }
           - { prettyName: Linux, fullName: ubuntu-latest, database: true }
-
     timeout-minutes: 10
+    env:
+      DB_DATABASE: lighthouse
+      DB_USER: lighthouse
+      DB_PASSWORD: lighthouse
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -36,21 +39,15 @@ jobs:
       - name: Compile
         run: dotnet build -c Debug
         
-      - name: Make sure the default MySQL service is stopped
+      - name: Start MySQL
         if: ${{ matrix.os.database }}
-        run: sudo service mysql stop
-
-      - name: Set up MySQL
-        if: ${{ matrix.os.database }}
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql database: 'lighthouse'
-          mysql user: 'lighthouse'
-          mysql password: 'lighthouse'
-          
+        run: |
+          sudo service mysql start
+          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+        
       - name: Run database migrations
         if: ${{ matrix.os.database }}
-        run: mysql --batch --user=lighthouse --password=lighthouse --host=127.0.0.1 --protocol=TCP lighthouse < <(cat DatabaseMigrations/*.sql)
+        run: mysql --batch -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} ${{ env.DB_DATABASE }} < <(cat DatabaseMigrations/*.sql)
         
       - name: Test
         continue-on-error: true
