@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 10
     env:
       DB_DATABASE: lighthouse
-      DB_USER: lighthouse
+      DB_USER: root
       DB_PASSWORD: lighthouse
     steps:
       - name: Cancel previous runs of this workflow
@@ -51,6 +51,7 @@ jobs:
           user: ${{ env.DB_USER }}
           password: ${{ env.DB_PASSWORD }}
           mysql-version: '8.0'
+          root-password: ${{ env.DB_PASSWORD }}
 
       - name: Run database migrations
         if: ${{ matrix.os.database }}
