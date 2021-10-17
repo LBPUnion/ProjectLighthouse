@@ -1,4 +1,3 @@
-#nullable enable
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +9,7 @@ namespace ProjectLighthouse {
         public DbSet<User> Users { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Slot> Slots { get; set; }
+        public DbSet<QueuedLevel> QueuedLevels { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Token> Tokens { get; set; }
 
@@ -38,6 +38,7 @@ namespace ProjectLighthouse {
 
         }
         
+        #nullable enable
         public async Task<Token?> AuthenticateUser(LoginData loginData) {
             // TODO: don't use psn name to authenticate
             User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username) 
@@ -71,5 +72,6 @@ namespace ProjectLighthouse {
             
             return await UserFromAuthToken(mmAuth);
         }
+        #nullable disable
     }
 }

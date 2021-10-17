@@ -25,8 +25,7 @@ namespace ProjectLighthouse.Controllers {
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
-
-        [HttpGet("s/user/{id:int}")]
+        
         public async Task<IActionResult> SUser(int id) {
             Slot slot = await this.database.Slots
                 .Include(s => s.Creator)
@@ -34,17 +33,6 @@ namespace ProjectLighthouse.Controllers {
                 .FirstOrDefaultAsync(s => s.SlotId == id);
 
             return this.Ok(slot.Serialize());
-        }
-
-        [HttpGet("slots/lolcatftw/{username}")]
-        public IActionResult SlotsLolCat(string username) {
-            string response = Enumerable.Aggregate(
-                database.Slots
-                    .Include(s => s.Creator)
-                    .Include(s => s.Location)
-                , string.Empty, (current, slot) => current + slot.Serialize());
-
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
     }
 }
