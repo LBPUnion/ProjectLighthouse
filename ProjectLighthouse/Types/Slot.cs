@@ -85,6 +85,7 @@ namespace ProjectLighthouse.Types {
                               LbpSerializer.StringElement("npHandle", Creator.Username) +
                               LbpSerializer.StringElement("description", Description) +
                               LbpSerializer.StringElement("icon", IconHash) +
+                              LbpSerializer.StringElement("rootLevel", RootLevel) +
                               LbpSerializer.StringElement("resource", Resource) +
                               LbpSerializer.StringElement("location", Location.Serialize()) +
                               LbpSerializer.StringElement("initiallyLocked", InitiallyLocked) +
