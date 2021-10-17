@@ -50,7 +50,7 @@ jobs:
           
       - name: Run database migrations
         if: ${{ matrix.os.database  }}
-        run: mysql --batch --user=lighthouse --password=lighthouse --host=localhost lighthouse < <(cat DatabaseMigrations/*.sql)
+        run: mysql --batch --user=lighthouse --password=lighthouse --host=127.0.0.1 --protocol=TCP lighthouse < <(cat DatabaseMigrations/*.sql)
         
       - name: Test
         continue-on-error: true
