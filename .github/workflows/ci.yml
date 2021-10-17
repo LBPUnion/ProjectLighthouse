@@ -55,8 +55,8 @@ jobs:
       - name: Run database migrations
         if: ${{ matrix.os.database }}
         run: |
-          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
-          mysql --batch -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} ${{ env.DB_DATABASE }} < <(cat DatabaseMigrations/*.sql)
+          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h127.0.0.1
+          mysql --batch -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h127.0.0.1 ${{ env.DB_DATABASE }} < <(cat DatabaseMigrations/*.sql)
         
       - name: Test
         continue-on-error: true
