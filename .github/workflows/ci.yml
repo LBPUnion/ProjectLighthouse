@@ -12,9 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - { prettyName: Windows, fullName: windows-latest }
-          - { prettyName: macOS, fullName: macos-latest }
-          - { prettyName: Linux, fullName: ubuntu-latest }
+          - { prettyName: Windows, fullName: windows-latest, database: false }
+          - { prettyName: macOS, fullName: macos-latest, database: false }
+          - { prettyName: Linux, fullName: ubuntu-latest, database: true }
 
     timeout-minutes: 10
     steps:
@@ -37,11 +37,11 @@ jobs:
         run: dotnet build -c Debug
         
       - name: Make sure the default MySQL service is stopped
-        if: ${{ matrix.os.prettyName == 'Linux' }}
+        if: ${{ matrix.os.database == 'true' }}
         run: sudo service mysql stop
 
       - name: Set up MySQL
-        if: ${{ matrix.os.prettyName == 'Linux' }}
+        if: ${{ matrix.os.database == 'true' }}
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql database: 'lighthouse'
@@ -49,8 +49,8 @@ jobs:
           mysql password: 'lighthouse'
           
       - name: Run database migrations
-        if: ${{ matrix.os.prettyName == 'Linux' }}
-        run: mysql -B -u lighthouse -p lighthouse lighthouse < <(cat DatabaseMigations*.sql)
+        if: ${{ matrix.os.database == 'true' }}
+        run: mysql -B -u lighthouse -p lighthouse lighthouse < <(cat DatabaseMigations/*.sql)
         
       - name: Test
         continue-on-error: true
