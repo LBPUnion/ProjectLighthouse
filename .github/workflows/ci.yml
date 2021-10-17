@@ -48,8 +48,6 @@ jobs:
       - name: Start MySQL
         uses: shogo82148/actions-setup-mysql@v1
         with:
-          user: ${{ env.DB_USER }}
-          password: ${{ env.DB_PASSWORD }}
           mysql-version: '8.0'
           root-password: ${{ env.DB_PASSWORD }}
 
