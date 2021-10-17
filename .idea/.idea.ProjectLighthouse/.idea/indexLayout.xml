@@ -3,6 +3,7 @@
   <component name="UserContentModel">
     <attachedFolders />
     <explicitIncludes>
+      <Path>.github</Path>
       <Path>.gitignore</Path>
       <Path>.idea</Path>
       <Path>DatabaseMigrations</Path>

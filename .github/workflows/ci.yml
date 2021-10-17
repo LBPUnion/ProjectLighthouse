@@ -1,0 +1,45 @@
+on: [push, pull_request]
+name: Continuous Integration
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{matrix.os.fullname}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - { prettyname: Windows, fullname: windows-latest }
+          - { prettyname: macOS, fullname: macos-latest }
+          - { prettyname: Linux, fullname: ubuntu-latest }
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 5.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      - name: Install .NET 6.0 Preview
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+          include-prerelease: true
+          
+      - name: Compile
+        run: dotnet build -C Debug
+        
+      - name: Test
+        run: --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+
+
+      # Attempt to upload results even if test fails.
+      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
+          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
