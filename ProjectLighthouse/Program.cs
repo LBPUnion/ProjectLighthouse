@@ -11,13 +11,13 @@ namespace ProjectLighthouse {
             Console.WriteLine("Welcome to Project Lighthouse!");
             Console.WriteLine(ServerSettings.DbConnected ? "Connected to the database." : "Database unavailable. Starting in stateless mode.");
 
-            IHostBuilder builder = Host.CreateDefaultBuilder(args);
-            
-            builder.ConfigureWebHostDefaults(webBuilder => {
-                webBuilder.UseStartup<Startup>();
-            });
-
-            builder.Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
