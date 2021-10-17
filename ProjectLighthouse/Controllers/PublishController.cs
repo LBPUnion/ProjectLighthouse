@@ -25,7 +25,9 @@ namespace ProjectLighthouse.Controllers {
             Slot slot = await this.GetSlotFromBody();
             if(slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slot", "", "type", "user"));
+            string resource = LbpSerializer.StringElement("resource", slot.Resource);
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slot", resource, "type", "user"));
         }
 
         /// <summary>
@@ -56,7 +58,9 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpPost("unpublish/{id:int}")]
         public async Task<IActionResult> Unpublish(int id) {
-            Slot slot = await database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            Slot slot = await database.Slots
+                .Include(s => s.Location)
+                .FirstOrDefaultAsync(s => s.SlotId == id);
 
             database.Locations.Remove(slot.Location);
             database.Slots.Remove(slot);
