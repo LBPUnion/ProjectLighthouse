@@ -49,7 +49,7 @@ jobs:
           mysql password: 'lighthouse'
           
       - name: Run database migrations
-        if: ${{ matrix.os.database == 'true' }}
+        if: ${{ matrix.os.database  }}
         run: mysql -B -u lighthouse -p lighthouse lighthouse < <(cat DatabaseMigations/*.sql)
         
       - name: Test
