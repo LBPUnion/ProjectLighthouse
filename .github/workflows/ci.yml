@@ -16,8 +16,8 @@ jobs:
 #          - { prettyName: macOS, fullName: macos-latest }
           - { prettyName: Linux, fullName: ubuntu-latest }
         dotnetVersion:
-          - { prettyName: .NET 6.0 Preview, fullName: 6.0.x }
-          - { prettyName: .NET 5.0, fullName: 5.0.x }
+          - { prettyName: .NET 6.0 Preview, fullName: 6.0.x, msbuildName: net6.0 }
+          - { prettyName: .NET 5.0, fullName: 5.0.x, msbuildName: net5.0 }
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -30,7 +30,7 @@ jobs:
           include-prerelease: true
           
       - name: Compile
-        run: dotnet build -c Debug
+        run: dotnet build -c Debug -f ${{matrix.dotnetVersion.msbuildName}}
         
       - name: Test
         run: --logger "trx;LogFileName=TestResults-${{matrix.os.prettyName}}-${{matrix.threadingMode}}.trx"
