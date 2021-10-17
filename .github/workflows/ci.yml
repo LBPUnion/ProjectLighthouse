@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - { prettyName: Windows, fullName: windows-latest, database: false }
-          - { prettyName: macOS, fullName: macos-latest, database: false }
+          - { prettyName: Windows, fullName: windows-latest, database: true }
+          - { prettyName: macOS, fullName: macos-latest, database: true }
           - { prettyName: Linux, fullName: ubuntu-latest, database: true }
     timeout-minutes: 10
     env:
