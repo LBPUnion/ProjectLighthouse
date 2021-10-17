@@ -6,7 +6,7 @@ name: Continuous Integration
 
 jobs:
   test:
-    name: Test
+    name: Build & Test
     runs-on: ${{matrix.os.fullName}}
     strategy:
       fail-fast: false
@@ -47,4 +47,4 @@ jobs:
         if: ${{ always() }}
         with:
           name: lighthouse-test-results-${{matrix.os.prettyName}}
-          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyName}}.trx
+          path: ${{github.workspace}}/ProjectLighthouse.Tests/TestResults/TestResults-${{matrix.os.prettyName}}.trx
