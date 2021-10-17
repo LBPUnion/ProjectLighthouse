@@ -37,7 +37,8 @@ jobs:
         run: dotnet build -c Debug
         
       - name: Test
-        run: dotnet test --logger "trx;LogFileName=TestResults-${{matrix.os.prettyName}}.trx"
+        continue-on-error: true
+        run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx"
 
 
       # Attempt to upload results even if test fails.
@@ -47,4 +48,10 @@ jobs:
         if: ${{ always() }}
         with:
           name: lighthouse-test-results-${{matrix.os.prettyName}}
-          path: ${{github.workspace}}/ProjectLighthouse.Tests/TestResults/TestResults-${{matrix.os.prettyName}}.trx
+          path: ${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx
+
+      - name: Process Test Results
+        if: ${{ always() }}
+        uses: im-open/process-dotnet-test-results@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
