@@ -18,6 +18,7 @@ namespace ProjectLighthouse.Controllers {
         }
 
         #region Level Queue (lolcatftw)
+
         [HttpGet("slots/lolcatftw/{username}")]
         public IActionResult GetLevelQueue(string username) {
             IEnumerable<QueuedLevel> queuedLevels = new Database().QueuedLevels
@@ -34,36 +35,37 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpPost("lolcatftw/remove/user/{id:int}")]
         public async Task<IActionResult> RemoveQueuedLevel(int id) {
-            User? user = await database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
             if(user == null) return this.StatusCode(403, "");
 
-            QueuedLevel queuedLevel = await database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
-            if(queuedLevel != null) database.QueuedLevels.Remove(queuedLevel);
+            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            if(queuedLevel != null) this.database.QueuedLevels.Remove(queuedLevel);
 
-            await database.SaveChangesAsync();
+            await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
 
         [HttpPost("lolcatftw/add/user/{id:int}")]
         public async Task<IActionResult> AddQueuedLevel(int id) {
-            User? user = await database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
             if(user == null) return this.StatusCode(403, "");
 
-            QueuedLevel queuedLevel = await database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if(queuedLevel != null) return this.Ok();
 
-            database.QueuedLevels.Add(new QueuedLevel {
+            this.database.QueuedLevels.Add(new QueuedLevel {
                 SlotId = id,
-                UserId = user.UserId
+                UserId = user.UserId,
             });
 
-            await database.SaveChangesAsync();
+            await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
+
         #endregion
-        
+
         #region Hearted Levels
 
         [HttpGet("favouriteSlots/{username}")]
@@ -82,34 +84,36 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpPost("favourite/slot/user/{id:int}")]
         public async Task<IActionResult> AddFavourite(int id) {
-            User? user = await database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
             if(user == null) return this.StatusCode(403, "");
 
-            HeartedLevel heartedLevel = await database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if(heartedLevel != null) return this.Ok();
 
-            database.HeartedLevels.Add(new HeartedLevel {
+            this.database.HeartedLevels.Add(new HeartedLevel {
                 SlotId = id,
                 UserId = user.UserId,
             });
 
-            await database.SaveChangesAsync();
+            await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
 
         [HttpPost("unfavourite/slot/user/{id:int}")]
         public async Task<IActionResult> RemoveFavourite(int id) {
-            User? user = await database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
             if(user == null) return this.StatusCode(403, "");
 
-            HeartedLevel heartedLevel = await database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
-            if(heartedLevel != null) database.HeartedLevels.Remove(heartedLevel);
+            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            if(heartedLevel != null) this.database.HeartedLevels.Remove(heartedLevel);
 
-            await database.SaveChangesAsync();
+            await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
+
         #endregion
+
     }
 }
