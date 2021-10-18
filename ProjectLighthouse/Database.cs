@@ -10,6 +10,7 @@ namespace ProjectLighthouse {
         public DbSet<Location> Locations { get; set; }
         public DbSet<Slot> Slots { get; set; }
         public DbSet<QueuedLevel> QueuedLevels { get; set; }
+        
         public DbSet<HeartedLevel> HeartedLevels { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Token> Tokens { get; set; }
