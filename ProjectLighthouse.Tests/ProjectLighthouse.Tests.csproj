@@ -23,7 +23,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
+        <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
+        <Content Include="ExampleFiles\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
-
 </Project>

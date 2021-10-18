@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -20,6 +21,18 @@ namespace ProjectLighthouse.Helpers {
             do {
                 readByte = reader.ReadByte();
             } while(readByte != byteToReadTo);
+        }
+
+        public static byte[] ReadLastBytes(BinaryReader reader, int count, bool restoreOldPosition = true) {
+            long oldPosition = reader.BaseStream.Position;
+
+            if(reader.BaseStream.Length < count) return Array.Empty<byte>();
+            
+            reader.BaseStream.Position = reader.BaseStream.Length - count;
+            byte[] data = reader.ReadBytes(count);
+            
+            if(restoreOldPosition) reader.BaseStream.Position = oldPosition;
+            return data;
         }
     }
 }

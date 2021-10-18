@@ -49,6 +49,7 @@ namespace ProjectLighthouse.Controllers {
             await database.SaveChangesAsync();
             slot.LocationId = l.Id;
             slot.CreatorId = user.UserId;
+            if(slot.BackgroundHash == null) slot.BackgroundHash = "";
 
             database.Slots.Add(slot);
             await database.SaveChangesAsync();
