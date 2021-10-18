@@ -47,5 +47,15 @@ namespace ProjectLighthouse.Tests {
 
             return this.Client.SendAsync(requestMessage);
         }
+
+        public async Task<HttpResponseMessage> UploadFileRequest(string endpoint, string filePath) {
+            return await this.Client.PostAsync(endpoint, new StringContent(await File.ReadAllTextAsync(filePath)));
+        }
+
+        public async Task<HttpResponseMessage> AuthenticatedUploadFileRequest(string endpoint, string filePath) {
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            requestMessage.Content = new StringContent(await File.ReadAllTextAsync(filePath));
+            return await this.Client.SendAsync(requestMessage);
+        }
     }
 }
