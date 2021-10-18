@@ -11,7 +11,8 @@ namespace ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
-    public class LevelQueueController : ControllerBase {
+    public class LevelListController : ControllerBase {
+        #region Level Queue (lolcatftw)
         [HttpGet("slots/lolcatftw/{username}")]
         public IActionResult GetLevelQueue(string username) {
             IEnumerable<QueuedLevel> queuedLevels = new Database().QueuedLevels
@@ -59,5 +60,10 @@ namespace ProjectLighthouse.Controllers {
 
             return this.Ok();
         }
+        #endregion
+        
+        #region Hearted Levels
+        
+        #endregion
     }
 }
