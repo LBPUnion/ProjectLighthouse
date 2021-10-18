@@ -1,4 +1,4 @@
-on: [push, pull_request]
+on: [push]
 name: Continuous Integration
 
 # Inspired by osu! lazer's CI
@@ -72,12 +72,21 @@ jobs:
           name: lighthouse-test-results-${{matrix.os.prettyName}}
           path: ${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx
 
-      - name: Process Test Results
-        if: ${{ always() }}
+      - name: Process Test Results (Control)
+        if: ${{ matrix.os.prettyName == 'Linux' }}
         uses: im-open/process-dotnet-test-results@v2.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Process Test Results
+        if: ${{ matrix.os.prettyName != 'Linux' }}
+        uses: im-open/process-dotnet-test-results@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          create-status-check: false
+          create-pr-comment: false
+          update-comment-if-one-exists: false
+            
       - name: Check Test Results
         if: steps.process-trx.outputs.test-outcome == 'Failed'
         run: |
