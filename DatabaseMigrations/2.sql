@@ -34,3 +34,4 @@ alter table Slots
 
 alter table Slots
     modify CreatorId int not null after LocationId;
+

@@ -19,3 +19,4 @@ alter table Locations
     modify Id int auto_increment;
 
 
+

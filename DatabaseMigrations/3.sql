@@ -18,4 +18,3 @@ alter table Comments
 
 alter table Comments
     modify CommentId int auto_increment;
-
