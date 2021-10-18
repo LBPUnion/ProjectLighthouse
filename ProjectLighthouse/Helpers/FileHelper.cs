@@ -14,7 +14,11 @@ namespace ProjectLighthouse.Helpers {
                 LbpFileType.Level => true,
                 LbpFileType.FileArchive => false,
                 LbpFileType.Unknown => false,
-                _ => throw new ArgumentOutOfRangeException(nameof(file), "Unknown file type."),
+                #if DEBUG
+                _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
+                #else
+                _ => false,
+                #endif
             };
         }
 
