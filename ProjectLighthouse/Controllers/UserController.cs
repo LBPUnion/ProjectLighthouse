@@ -116,11 +116,5 @@ namespace ProjectLighthouse.Controllers {
             if(database.ChangeTracker.HasChanges()) await database.SaveChangesAsync(); // save the user to the database if we changed anything
             return this.Ok();
         }
-
-        [HttpPost("match")]
-        [Produces("text/json")]
-        public IActionResult Match() {
-            return this.Ok("[{\"StatusCode\":200}]");
-        }
     }
 }
