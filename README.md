@@ -17,11 +17,12 @@ This will be written when we're out of beta. Consider this your barrier to entry
 Lighthouse requires a MySQL database at this time. 
 For Linux users running docker, one can be set up using the `docker-compose.yml` file in the root of the project folder.
 
-Once you've gotten MySQL running you can create the schema by running all of the `.sql` files in the `DatabaseMigrations` folder against the database.
+Next, make sure the `LIGHTHOUSE_DB_CONNECTION_STRING` environment variable is set correctly.
+By default it is `server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse`. If you are running the database via
+the above `docker-compose.yml` you shouldn't need to change this. For other development/especially production environments
+you will need to change this.
 
-Then, you can finally run Lighthouse. It will connect using a connection string stored in `LIGHTHOUSE_DB_CONNECTION_STRING` by default.
-The connection string is `server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse` by default. You can modify it if you'd like to, 
-but you shouldn't need to if you're using docker since the docker-compose file matches this by default.
+Once you've gotten MySQL running you can run Lighthouse. It will take care of the rest.
 
 ## Connecting
 
@@ -48,3 +49,14 @@ To launch the game with the patched EBOOT, open up RPCS3, go to File, Boot SELF/
 Assuming you are running the patched version of RPCS3, you patched the file correctly, the database is migrated, and Lighthouse is running, the game should now connect.
 
 Take a break.
+
+## Contributing Tips
+
+### Database
+
+Some modifications may require updates to the database schema. You can automatically create a migration file by:
+
+1. Making sure the tools are installed. You can do this by running `dotnet tool restore`.
+2. Making sure `LIGHTHOUSE_DB_CONNECTION_STRING is set correctly`.
+3. Making your changes to the database. I wont cover this since if you're making database changes you should know what you're doing.
+4. Running `dotnet ef migrations add <NameOfMigrationInPascalCase>`.
