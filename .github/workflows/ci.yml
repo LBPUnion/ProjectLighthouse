@@ -51,6 +51,10 @@ jobs:
         with:
           mysql-version: '8.0'
           root-password: ${{ env.DB_PASSWORD }}
+          
+      - name: Create Lighthouse Database
+        if: ${{ matrix.os.database }}
+        run: mysql -uroot -p${{ env.DB_PASSWORD }} -h127.0.0.1 -e "CREATE DATABASE lighthouse;";
         
       - name: Test
         continue-on-error: true
