@@ -13,17 +13,18 @@ namespace ProjectLighthouse {
             Console.WriteLine("Welcome to Project Lighthouse!");
             Console.WriteLine("Determining if the database is available...");
             bool dbConnected = ServerSettings.DbConnected;
-            Console.WriteLine(dbConnected ? "Connected to the database." : "Database unavailable. Exiting.");
+            Console.WriteLine(dbConnected ? "Connected to the database." : "Database unavailable! Exiting.");
 
             if(dbConnected) {
                 Stopwatch migrationStopwatch = new();
                 migrationStopwatch.Start();
                 
                 Console.WriteLine("Migrating database...");
-                new Database().Database.Migrate();
+                using Database database = new();
+                database.Database.Migrate();
                 
                 migrationStopwatch.Stop();
-                Console.WriteLine($"Migration took {migrationStopwatch.ElapsedMilliseconds}ms");
+                Console.WriteLine($"Migration took {migrationStopwatch.ElapsedMilliseconds}ms.");
             } else Environment.Exit(1);
             
             startupStopwatch.Stop();
