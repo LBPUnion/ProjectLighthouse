@@ -30,6 +30,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Start MySQL
+        if: ${{ matrix.os.database }}
+        uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: '8.0'
+          root-password: ${{ env.DB_PASSWORD }}
+          
+      - name: Create Lighthouse Database
+        if: ${{ matrix.os.database }}
+        run: mysql -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h 127.0.0.1 -e "CREATE DATABASE ${{ env.DB_DATABASE }};";
+        
       - name: Install .NET 5.0
         uses: actions/setup-dotnet@v1
         with:
@@ -44,17 +55,6 @@ jobs:
           
       - name: Compile
         run: dotnet build -c Debug
-        
-      - name: Start MySQL
-        if: ${{ matrix.os.database }}
-        uses: shogo82148/actions-setup-mysql@v1
-        with:
-          mysql-version: '8.0'
-          root-password: ${{ env.DB_PASSWORD }}
-          
-      - name: Create Lighthouse Database
-        if: ${{ matrix.os.database }}
-        run: mysql -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h 127.0.0.1 -e "CREATE DATABASE ${{ env.DB_DATABASE }};";
         
       - name: Test
         continue-on-error: true
