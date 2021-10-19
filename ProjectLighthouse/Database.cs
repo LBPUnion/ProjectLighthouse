@@ -14,6 +14,8 @@ namespace ProjectLighthouse {
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Token> Tokens { get; set; }
 
+        public DbSet<LastMatch> LastMatches { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseMySql(
             ServerSettings.DbConnectionString,
             MySqlServerVersion.LatestSupportedServerVersion
