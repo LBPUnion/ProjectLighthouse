@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using ProjectLighthouse.Serialization;
 
 namespace ProjectLighthouse.Types {
@@ -60,7 +59,7 @@ namespace ProjectLighthouse.Types {
 //            "lbp1",
             "lbp2",
             "lbp3",
-            "crossControl"
+            "crossControl",
         };
 
         private string SerializeSlots() {

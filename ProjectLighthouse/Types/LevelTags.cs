@@ -82,6 +82,6 @@ namespace ProjectLighthouse.Types {
         Spikes,
         Collectables,
         Vertical,
-        Balancing
+        Balancing,
     }
 }

@@ -45,7 +45,7 @@ namespace ProjectLighthouse {
 
             Token token = new() {
                 UserToken = HashHelper.GenerateAuthToken(),
-                UserId = user.UserId
+                UserId = user.UserId,
             };
 
             this.Tokens.Add(token);
@@ -53,8 +53,6 @@ namespace ProjectLighthouse {
 
             return token;
         }
-
-        public async Task<bool> IsUserAuthenticated(string authToken) => await this.UserFromAuthToken(authToken) != null;
 
         public async Task<User?> UserFromAuthToken(string authToken) {
             Token? token = await Tokens.FirstOrDefaultAsync(t => t.UserToken == authToken);

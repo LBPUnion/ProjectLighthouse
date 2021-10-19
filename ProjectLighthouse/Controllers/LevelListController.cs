@@ -69,7 +69,7 @@ namespace ProjectLighthouse.Controllers {
         #region Hearted Levels
 
         [HttpGet("favouriteSlots/{username}")]
-        public async Task<IActionResult> GetFavouriteSlots(string username) {
+        public IActionResult GetFavouriteSlots(string username) {
             IEnumerable<HeartedLevel> heartedLevels = new Database().HeartedLevels
                 .Include(q => q.User)
                 .Include(q => q.Slot)

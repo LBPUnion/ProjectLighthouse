@@ -40,7 +40,7 @@ namespace ProjectLighthouse.Controllers {
             if(user == null) return this.StatusCode(403, "");
 
             XmlReaderSettings settings = new() {
-                Async = true // this is apparently not default
+                Async = true, // this is apparently not default
             };
 
             bool locationChanged = false;

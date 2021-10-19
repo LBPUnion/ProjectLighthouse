@@ -33,7 +33,7 @@ namespace ProjectLighthouse.Controllers {
 
             return this.Ok(new LoginResult {
                 AuthTicket = "MM_AUTH=" + token.UserToken,
-                LbpEnvVer = ServerSettings.ServerName
+                LbpEnvVer = ServerSettings.ServerName,
             }.Serialize());
         }
     }

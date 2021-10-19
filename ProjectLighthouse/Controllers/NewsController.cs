@@ -14,12 +14,12 @@ namespace ProjectLighthouse.Controllers {
                 Summary = "test summary",
                 Image = new NewsImage {
                     Hash = "4947269c5f7061b27225611ee58a9a91a8031bbe",
-                    Alignment = "right"
+                    Alignment = "right",
                 },
                 Id = 1,
                 Title = "Test Title",
                 Text = "Test Text",
-                Date = 1348755214000
+                Date = 1348755214000,
             }.Serialize());
             
             return this.Ok(LbpSerializer.StringElement("news", newsEntry));

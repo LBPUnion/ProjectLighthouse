@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectLighthouse.Types {
     public class HeartedLevel {
+        // ReSharper disable once UnusedMember.Global
         [Key] public int HeartedLevelId { get; set; }
 
         public int UserId { get; set; }

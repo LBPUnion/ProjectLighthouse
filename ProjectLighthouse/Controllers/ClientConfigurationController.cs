@@ -29,7 +29,7 @@ namespace ProjectLighthouse.Controllers {
         public IActionResult PrivacySettings() {
             PrivacySettings ps = new() {
                 LevelVisibility = "all",
-                ProfileVisibility = "all"
+                ProfileVisibility = "all",
             };
             
             return this.Ok(ps.Serialize());

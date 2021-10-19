@@ -1,4 +1,3 @@
-using System.IO;
 using ProjectLighthouse.Helpers;
 
 namespace ProjectLighthouse.Types.Files {
