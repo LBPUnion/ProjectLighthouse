@@ -65,9 +65,9 @@ namespace ProjectLighthouse.Types {
         
         [XmlElement("authorLabels")]
         public string AuthorLabels { get; set; }
-        
-        [XmlElement("background")]
-        public string BackgroundHash { get; set; }
+
+        [XmlElement("background")] 
+        public string BackgroundHash { get; set; } = "";
         
         [XmlElement("minPlayers")]
         public int MinimumPlayers { get; set; }

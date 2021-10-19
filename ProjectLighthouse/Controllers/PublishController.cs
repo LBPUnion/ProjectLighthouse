@@ -43,13 +43,12 @@ namespace ProjectLighthouse.Controllers {
             //TODO: parse location in body
             Location l = new() {
                 X = 0,
-                Y = 0
+                Y = 0,
             };
             database.Locations.Add(l);
             await database.SaveChangesAsync();
             slot.LocationId = l.Id;
             slot.CreatorId = user.UserId;
-            if(slot.BackgroundHash == null) slot.BackgroundHash = "";
 
             database.Slots.Add(slot);
             await database.SaveChangesAsync();

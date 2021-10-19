@@ -34,12 +34,12 @@ namespace ProjectLighthouse.Types {
         public int FavouriteSlotCount { get; set; }
         public int FavouriteUserCount { get; set; }
         public int LolCatFtwCount { get; set; }
-        public string Pins { get; set; }
+        public string Pins { get; set; } = "";
         public int StaffChallengeGoldCount { get; set; }
         public int StaffChallengeSilverCount { get; set; }
         public int StaffChallengeBronzeCount { get; set; }
 
-        public string PlanetHash { get; set; }
+        public string PlanetHash { get; set; } = "";
         
 //        [NotMapped]
         public readonly ClientsConnected ClientsConnected = new();
