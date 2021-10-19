@@ -18,7 +18,7 @@ Lighthouse requires a MySQL database at this time.
 For Linux users running docker, one can be set up using the `docker-compose.yml` file in the root of the project folder.
 
 Next, make sure the `LIGHTHOUSE_DB_CONNECTION_STRING` environment variable is set correctly.
-By default it is `server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse`. If you are running the database via
+By default, it is `server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse`. If you are running the database via
 the above `docker-compose.yml` you shouldn't need to change this. For other development/especially production environments
 you will need to change this.
 
@@ -57,6 +57,6 @@ Take a break.
 Some modifications may require updates to the database schema. You can automatically create a migration file by:
 
 1. Making sure the tools are installed. You can do this by running `dotnet tool restore`.
-2. Making sure `LIGHTHOUSE_DB_CONNECTION_STRING is set correctly`.
+2. Making sure `LIGHTHOUSE_DB_CONNECTION_STRING` is set correctly. See the `Running` section for more details.
 3. Making your changes to the database. I wont cover this since if you're making database changes you should know what you're doing.
-4. Running `dotnet ef migrations add <NameOfMigrationInPascalCase>`.
+4. Running `dotnet ef migrations add <NameOfMigrationInPascalCase> --project ProjectLighthouse`.
