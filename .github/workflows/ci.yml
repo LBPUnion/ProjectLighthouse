@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - { prettyName: Windows, fullName: windows-latest, database: false }
+          - { prettyName: Windows, fullName: windows-latest, database: true }
           - { prettyName: macOS, fullName: macos-latest, database: true }
           - { prettyName: Linux, fullName: ubuntu-latest, database: true }
     timeout-minutes: 10
@@ -51,12 +51,6 @@ jobs:
         with:
           mysql-version: '8.0'
           root-password: ${{ env.DB_PASSWORD }}
-
-      - name: Run database migrations
-        if: ${{ matrix.os.database }}
-        run: |
-          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h127.0.0.1
-          mysql --batch -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h127.0.0.1 ${{ env.DB_DATABASE }} < <(cat DatabaseMigrations/*.sql)
         
       - name: Test
         continue-on-error: true
