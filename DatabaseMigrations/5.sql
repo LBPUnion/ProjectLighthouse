@@ -1,1 +1,0 @@
-ALTER TABLE Slots MODIFY AuthorLabels TEXT NULL;
