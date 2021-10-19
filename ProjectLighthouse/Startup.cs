@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,12 +33,17 @@ namespace ProjectLighthouse {
             }
 
             // Logs every request and the response to it
-            // Example: "200: GET /LITTLEBIGPLANETPS3_XML/news"
-            // Example: "404: GET /asdasd?query=osucookiezi727ppbluezenithtopplayhdhr"
+            // Example: "200, 13ms: GET /LITTLEBIGPLANETPS3_XML/news"
+            // Example: "404, 127ms: GET /asdasd?query=osucookiezi727ppbluezenithtopplayhdhr"
             app.Use(async (context, next) => {
+                Stopwatch requestStopwatch = new();
+                requestStopwatch.Start();
+                
                 context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
                 await next(); // Handle the request so we can get the status code from it
-                Console.WriteLine($"{context.Response.StatusCode}: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}");
+                
+                requestStopwatch.Stop();
+                Console.WriteLine($"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}");
                 if(context.Request.Method == "POST") {
                     context.Request.Body.Position = 0;
                     Console.WriteLine(await new StreamReader(context.Request.Body).ReadToEndAsync());
