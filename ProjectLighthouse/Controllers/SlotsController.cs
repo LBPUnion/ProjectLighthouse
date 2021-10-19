@@ -16,11 +16,12 @@ namespace ProjectLighthouse.Controllers {
         }
 
         [HttpGet("slots/by")]
-        public IActionResult SlotsBy() {
+        public IActionResult SlotsBy([FromQuery] string u) {
             string response = Enumerable.Aggregate(
                 database.Slots
                     .Include(s => s.Creator)
                     .Include(s => s.Location)
+                    .Where(s => s.Creator.Username == u)
                 , string.Empty, (current, slot) => current + slot.Serialize());
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));

@@ -22,6 +22,7 @@ namespace ProjectLighthouse.Controllers {
         public async Task<IActionResult> GetComments(string username) {
             List<Comment> comments = await database.Comments
                 .Include(c => c.Target)
+                .Include(c => c.Poster)
                 .Where(c => c.Target.Username == username)
                 .ToListAsync();
 
