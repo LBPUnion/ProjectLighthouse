@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace ProjectLighthouse.Helpers {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class HashHelper {
 //        private static readonly SHA1 sha1 = SHA1.Create();
         private static readonly SHA256 sha256 = SHA256.Create();

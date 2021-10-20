@@ -31,7 +31,7 @@ namespace ProjectLighthouse {
             this.Locations.Add(l); // add to table
             await this.SaveChangesAsync(); // saving to the database returns the id and sets it on this entity
 
-            user = new() {
+            user = new User {
                 Username = username,
                 LocationId = l.Id,
                 Biography = username + " hasn't introduced themselves yet.",

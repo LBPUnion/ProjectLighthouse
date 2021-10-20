@@ -4,11 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using ProjectLighthouse.Types;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace ProjectLighthouse.Tests {
     public class MatchTests : LighthouseTest {
-        private static SemaphoreSlim semaphore = new(1, 1);
+        private static readonly SemaphoreSlim semaphore = new(1, 1);
 
         [DatabaseFact]
         public async Task ShouldReturnOk() {

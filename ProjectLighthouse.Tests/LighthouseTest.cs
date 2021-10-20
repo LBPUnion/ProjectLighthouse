@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using ProjectLighthouse.Serialization;
 using ProjectLighthouse.Types;
 
 namespace ProjectLighthouse.Tests {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class LighthouseTest {
         public readonly TestServer Server;
         public readonly HttpClient Client;
