@@ -1,9 +1,12 @@
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectLighthouse.Helpers;
 using ProjectLighthouse.Serialization;
+using ProjectLighthouse.Types;
 using ProjectLighthouse.Types.Files;
 using IOFile = System.IO.File;
 
@@ -20,7 +23,19 @@ namespace ProjectLighthouse.Controllers {
         [HttpPost("filterResources")]
         [HttpPost("showNotUploaded")]
         public async Task<IActionResult> FilterResources() {
-            return this.Ok(await new StreamReader(Request.Body).ReadToEndAsync());
+            string bodyString = await new StreamReader(Request.Body).ReadToEndAsync(); 
+            
+            XmlSerializer serializer = new(typeof(ResourceList));
+            ResourceList resourceList = (ResourceList)serializer.Deserialize(new StringReader(bodyString));
+
+            if(resourceList == null) return this.BadRequest();
+
+            string resources = resourceList.Resources
+                .Where(FileHelper.ResourceExists)
+                .Aggregate("", (current, hash) => 
+                    current + LbpSerializer.StringElement("resource", hash));
+
+            return this.Ok(resources);
         }
 
         [HttpGet("r/{hash}")]
