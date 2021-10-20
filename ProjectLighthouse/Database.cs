@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +23,15 @@ namespace ProjectLighthouse {
         );
 
         public async Task<User> CreateUser(string username) {
+            User user;
+            if((user = await Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null)
+                return user;
+
             Location l = new(); // store to get id after submitting
             this.Locations.Add(l); // add to table
             await this.SaveChangesAsync(); // saving to the database returns the id and sets it on this entity
 
-            User user = new() {
+            user = new() {
                 Username = username,
                 LocationId = l.Id,
                 Biography = username + " hasn't introduced themselves yet.",
@@ -36,7 +41,6 @@ namespace ProjectLighthouse {
             await this.SaveChangesAsync();
 
             return user;
-
         }
         
         #nullable enable
