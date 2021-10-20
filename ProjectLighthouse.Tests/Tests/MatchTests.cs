@@ -8,11 +8,7 @@ using Xunit.Abstractions;
 
 namespace ProjectLighthouse.Tests {
     public class MatchTests : LighthouseTest {
-        private readonly ITestOutputHelper testOutputHelper;
         private static SemaphoreSlim semaphore = new(1, 1);
-        public MatchTests(ITestOutputHelper testOutputHelper) {
-            this.testOutputHelper = testOutputHelper;
-        }
 
         [DatabaseFact]
         public async Task ShouldReturnOk() {

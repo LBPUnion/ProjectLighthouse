@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using ProjectLighthouse.Types;
 using Xunit;
