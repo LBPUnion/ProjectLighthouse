@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Xml.Serialization;
 using ProjectLighthouse.Serialization;
 
@@ -83,6 +84,12 @@ namespace ProjectLighthouse.Types {
         [XmlElement("moveRequired")]
         public bool MoveRequired { get; set; }
 
+        public string SerializeResources() {
+            return this.Resources
+                .Aggregate("", (current, resource) => 
+                    current + LbpSerializer.StringElement("resource", resource));
+        }
+
         public string Serialize() {
             string slotData = LbpSerializer.StringElement("name", Name) +
                               LbpSerializer.StringElement("id", SlotId) +
@@ -91,7 +98,7 @@ namespace ProjectLighthouse.Types {
                               LbpSerializer.StringElement("description", Description) +
                               LbpSerializer.StringElement("icon", IconHash) +
                               LbpSerializer.StringElement("rootLevel", RootLevel) +
-                              LbpSerializer.StringElement("resource", this.Resources) +
+                              this.SerializeResources() +
                               LbpSerializer.StringElement("location", Location.Serialize()) +
                               LbpSerializer.StringElement("initiallyLocked", InitiallyLocked) +
                               LbpSerializer.StringElement("isSubLevel", SubLevel) +

@@ -1,8 +1,10 @@
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProjectLighthouse.Helpers;
 using ProjectLighthouse.Serialization;
 using ProjectLighthouse.Types;
 
@@ -25,9 +27,12 @@ namespace ProjectLighthouse.Controllers {
             Slot slot = await this.GetSlotFromBody();
             if(slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
-            string resource = LbpSerializer.StringElement("resource", slot.Resources);
+            string resources = slot.Resources
+                .Where(hash => !FileHelper.ResourceExists(hash))
+                .Aggregate("", (current, hash) => 
+                    current + LbpSerializer.StringElement("resource", hash));
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slot", resource, "type", "user"));
+            return this.Ok(LbpSerializer.TaggedStringElement("slot", resources, "type", "user"));
         }
 
         /// <summary>
