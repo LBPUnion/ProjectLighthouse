@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,10 +25,10 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpGet("r/{hash}")]
         public IActionResult GetResource(string hash) {
-            string path = Path.Combine(Environment.CurrentDirectory, "r", hash);
+            string path = FileHelper.GetResourcePath(hash);
 
-            if(IOFile.Exists(path)) {
-                return this.File(IOFile.OpenRead(path), "image/jpg");
+            if(FileHelper.ResourceExists(hash)) {
+                return this.File(IOFile.OpenRead(path), "application/octet-stream");
             }
             return this.NotFound();
         }
@@ -37,11 +36,11 @@ namespace ProjectLighthouse.Controllers {
         // TODO: check if this is a valid hash
         [HttpPost("upload/{hash}")]
         public async Task<IActionResult> UploadResource(string hash) {
-            string assetsDirectory = Path.Combine(Environment.CurrentDirectory, "r");
-            string path = Path.Combine(assetsDirectory, hash);
+            string assetsDirectory = FileHelper.ResourcePath;
+            string path = FileHelper.GetResourcePath(hash);
             
-            if(!Directory.Exists(assetsDirectory)) Directory.CreateDirectory(assetsDirectory);
-            if(IOFile.Exists(path)) this.Ok(); // no reason to fail if it's already uploaded
+            FileHelper.EnsureDirectoryCreated(assetsDirectory);
+            if(FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
 
             LbpFile file = new(Encoding.ASCII.GetBytes(await new StreamReader(Request.Body).ReadToEndAsync()));
 

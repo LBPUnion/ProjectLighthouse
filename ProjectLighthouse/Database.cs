@@ -22,6 +22,14 @@ namespace ProjectLighthouse {
             MySqlServerVersion.LatestSupportedServerVersion
         );
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Slot>()
+                .Property<string>(nameof(Slot.ResourceCollection))
+                .HasField(nameof(Slot.ResourceCollection));
+        }
+
         public async Task<User> CreateUser(string username) {
             User user;
             if((user = await Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null)

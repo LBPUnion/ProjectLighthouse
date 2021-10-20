@@ -25,7 +25,7 @@ namespace ProjectLighthouse.Controllers {
             Slot slot = await this.GetSlotFromBody();
             if(slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
-            string resource = LbpSerializer.StringElement("resource", slot.Resource);
+            string resource = LbpSerializer.StringElement("resource", slot.Resources);
 
             return this.Ok(LbpSerializer.TaggedStringElement("slot", resource, "type", "user"));
         }
@@ -69,7 +69,7 @@ namespace ProjectLighthouse.Controllers {
 
             return this.Ok();
         }
-
+        
         public async Task<Slot> GetSlotFromBody() {
             Request.Body.Position = 0;
             string bodyString = await new StreamReader(Request.Body).ReadToEndAsync();

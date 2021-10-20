@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
@@ -29,9 +30,15 @@ namespace ProjectLighthouse.Types {
         
         [XmlElement("rootLevel")]
         public string RootLevel { get; set; }
+
+        public string ResourceCollection;
         
+        [NotMapped]
         [XmlElement("resource")]
-        public string Resource { get; set; }
+        public string[] Resources {
+            get => this.ResourceCollection.Split(",");
+            set => this.ResourceCollection = string.Join(',', value);
+        }
         
         [XmlIgnore]
         public int LocationId { get; set; }
@@ -84,7 +91,7 @@ namespace ProjectLighthouse.Types {
                               LbpSerializer.StringElement("description", Description) +
                               LbpSerializer.StringElement("icon", IconHash) +
                               LbpSerializer.StringElement("rootLevel", RootLevel) +
-                              LbpSerializer.StringElement("resource", Resource) +
+                              LbpSerializer.StringElement("resource", this.Resources) +
                               LbpSerializer.StringElement("location", Location.Serialize()) +
                               LbpSerializer.StringElement("initiallyLocked", InitiallyLocked) +
                               LbpSerializer.StringElement("isSubLevel", SubLevel) +

@@ -1,10 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using ProjectLighthouse.Types.Files;
 
 namespace ProjectLighthouse.Helpers {
     public static class FileHelper {
+        public static readonly string ResourcePath = Path.Combine(Environment.CurrentDirectory, "r");
+
+        public static string GetResourcePath(string hash) => Path.Combine(ResourcePath, hash);
+        
         public static bool IsFileSafe(LbpFile file) {
             if(file.FileType == LbpFileType.Unknown) file.FileType = DetermineFileType(file.Data);
             
@@ -38,5 +44,13 @@ namespace ProjectLighthouse.Helpers {
                 _ => LbpFileType.Unknown,
             };
         }
+
+        public static bool ResourceExists(string hash) => File.Exists(GetResourcePath(hash));
+
+        public static void EnsureDirectoryCreated(string path) {
+            if(!Directory.Exists(path)) Directory.CreateDirectory(path ?? throw new ArgumentNullException(nameof(path)));
+        }
+
+        public static string[] ResourcesNotUploaded(params string[] hashes) => hashes.Where(hash => !ResourceExists(hash)).ToArray();
     }
 }
