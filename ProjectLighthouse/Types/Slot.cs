@@ -31,7 +31,7 @@ namespace ProjectLighthouse.Types {
         [XmlElement("rootLevel")]
         public string RootLevel { get; set; }
 
-        public string ResourceCollection;
+        public string ResourceCollection { get; set; }
         
         [NotMapped]
         [XmlElement("resource")]

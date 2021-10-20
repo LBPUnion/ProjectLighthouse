@@ -20,6 +20,7 @@ namespace ProjectLighthouse.Tests {
                 Name = "slotA",
                 Location = l,
                 LocationId = l.Id,
+                ResourceCollection = "",
             };
 
             Slot slotB = new() {
@@ -27,6 +28,7 @@ namespace ProjectLighthouse.Tests {
                 Name = "slotB",
                 Location = l,
                 LocationId = l.Id,
+                ResourceCollection = "",
             };
 
             database.Slots.Add(slotA);
@@ -43,6 +45,11 @@ namespace ProjectLighthouse.Tests {
             Assert.NotEqual(respA, respB);
             Assert.DoesNotContain(respA, "slotB");
             Assert.DoesNotContain(respB, "slotA");
+            
+            // Cleanup
+
+            database.Slots.Remove(slotA);
+            database.Slots.Remove(slotB);
         }
     }
 }
