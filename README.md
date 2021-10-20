@@ -33,7 +33,7 @@ PS3 is difficult to set up, so I will be going over how to set up RPCS3 instead.
 Start by getting a copy of LittleBigPlanet 2 installed. It can be digital (NPUA80662) or disc (BCUS98245).
 I won't get into how because if you got this far you should already know what you're doing. For those that don't, the [RPCS3 Quickstart Guide](https://rpcs3.net/quickstart) should cover it.
 
-Next, download and compile [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries will be coming shortly, but for now just compile it. If there are binaries, feel free to patch this line out.
+Next, download and compile [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the README.md file.
 
 You should have everything you need now, so open up RPCS3 and go to Utilities -> Decrypt PS3 Binaries. Point this to `rpcs3/dev_hdd0/game/(title id)/USRDIR/EBOOT.BIN`.
 
