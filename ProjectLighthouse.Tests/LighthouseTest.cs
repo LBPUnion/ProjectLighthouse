@@ -1,5 +1,6 @@
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.Hosting;
@@ -52,9 +53,21 @@ namespace ProjectLighthouse.Tests {
             return await this.Client.PostAsync(endpoint, new StringContent(await File.ReadAllTextAsync(filePath)));
         }
 
-        public async Task<HttpResponseMessage> AuthenticatedUploadFileRequest(string endpoint, string filePath) {
+        public async Task<HttpResponseMessage> UploadDataRequest(string endpoint, byte[] data) {
+            return await this.Client.PostAsync(endpoint, new ByteArrayContent(data));
+        }
+
+        public async Task<HttpResponseMessage> AuthenticatedUploadFileRequest(string endpoint, string filePath, string mmAuth) {
             using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            requestMessage.Headers.Add("Cookie", mmAuth);
             requestMessage.Content = new StringContent(await File.ReadAllTextAsync(filePath));
+            return await this.Client.SendAsync(requestMessage);
+        }
+
+        public async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth) {
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            requestMessage.Headers.Add("Cookie", mmAuth);
+            requestMessage.Content = new ByteArrayContent(data);
             return await this.Client.SendAsync(requestMessage);
         }
     }
