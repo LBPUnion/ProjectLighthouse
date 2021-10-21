@@ -24,6 +24,9 @@ namespace LBPUnion.ProjectLighthouse.Logging {
             };
             
             Logger.Log(state.ToString(), loggerLevel);
+            if(exception != null) {
+                Logger.Log(exception.ToString(), loggerLevel);
+            }
         }
     }
 }
