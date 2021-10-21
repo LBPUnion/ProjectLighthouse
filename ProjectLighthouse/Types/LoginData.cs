@@ -1,8 +1,8 @@
 using System.IO;
 using System.Text;
-using ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers;
 
-namespace ProjectLighthouse.Types {
+namespace LBPUnion.ProjectLighthouse.Types {
     // This is all the information I can understand for now. More testing is required.
     // Example data:
     //  - LBP2 digital, with the RPCN username `literally1984`

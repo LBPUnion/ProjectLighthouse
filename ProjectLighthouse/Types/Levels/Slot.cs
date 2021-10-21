@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 
-namespace ProjectLighthouse.Types.Levels {
+namespace LBPUnion.ProjectLighthouse.Types.Levels {
     /// <summary>
     /// A LittleBigPlanet level.
     /// </summary>

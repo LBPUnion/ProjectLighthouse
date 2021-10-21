@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
-using ProjectLighthouse.Types;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/plain")]
@@ -14,13 +14,13 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpGet("eula")]
         public async Task<IActionResult> Eula() {
-            User user = await this.database.UserFromRequest(Request);
+            User user = await this.database.UserFromRequest(this.Request);
             return user == null ? this.StatusCode(403, "") : this.Ok($"You are logged in as user {user.Username} (id {user.UserId})");
         }
 
         [HttpGet("announce")]
         public IActionResult Announce() {
-            return Ok("");
+            return this.Ok("");
         }
 
         [HttpGet("notification")]

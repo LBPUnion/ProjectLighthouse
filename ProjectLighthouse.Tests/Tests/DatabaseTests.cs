@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace ProjectLighthouse.Tests {
+namespace LBPUnion.ProjectLighthouse.Tests {
     public class DatabaseTests : LighthouseTest {
         [DatabaseFact]
         public async Task CanCreateUserTwice() {

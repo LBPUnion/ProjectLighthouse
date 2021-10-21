@@ -3,14 +3,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Files;
 using Microsoft.AspNetCore.Mvc;
-using ProjectLighthouse.Helpers;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Files;
 using IOFile = System.IO.File;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
@@ -23,7 +23,7 @@ namespace ProjectLighthouse.Controllers {
         [HttpPost("filterResources")]
         [HttpPost("showNotUploaded")]
         public async Task<IActionResult> FilterResources() {
-            string bodyString = await new StreamReader(Request.Body).ReadToEndAsync(); 
+            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync(); 
             
             XmlSerializer serializer = new(typeof(ResourceList));
             ResourceList resourceList = (ResourceList)serializer.Deserialize(new StringReader(bodyString));
@@ -57,7 +57,7 @@ namespace ProjectLighthouse.Controllers {
             FileHelper.EnsureDirectoryCreated(assetsDirectory);
             if(FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
 
-            LbpFile file = new(Encoding.ASCII.GetBytes(await new StreamReader(Request.Body).ReadToEndAsync()));
+            LbpFile file = new(Encoding.ASCII.GetBytes(await new StreamReader(this.Request.Body).ReadToEndAsync()));
 
             if(!FileHelper.IsFileSafe(file)) return this.UnprocessableEntity();
             

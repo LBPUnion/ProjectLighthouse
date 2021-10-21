@@ -1,4 +1,4 @@
-namespace ProjectLighthouse.Types.Files {
+namespace LBPUnion.ProjectLighthouse.Types.Files {
     public enum LbpFileType {
         Script, // .ff, FSH
         Texture, // TEX

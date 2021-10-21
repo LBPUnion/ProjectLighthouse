@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 using Xunit;
 
-namespace ProjectLighthouse.Tests {
+namespace LBPUnion.ProjectLighthouse.Tests {
     public class SerializerTests : LighthouseTest {
         [Fact]
         public void BlankElementWorks() {

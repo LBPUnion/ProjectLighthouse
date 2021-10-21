@@ -2,10 +2,10 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types;
 using Xunit;
 
-namespace ProjectLighthouse.Tests {
+namespace LBPUnion.ProjectLighthouse.Tests {
     public class MatchTests : LighthouseTest {
         private static readonly SemaphoreSlim semaphore = new(1, 1);
 
@@ -14,7 +14,7 @@ namespace ProjectLighthouse.Tests {
             LoginResult loginResult = await this.Authenticate();
             await semaphore.WaitAsync();
 
-            HttpResponseMessage result = await AuthenticatedUploadDataRequest("LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
+            HttpResponseMessage result = await this.AuthenticatedUploadDataRequest("LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
             Assert.True(result.IsSuccessStatusCode);
 
             semaphore.Release();
@@ -29,7 +29,7 @@ namespace ProjectLighthouse.Tests {
 
             int oldPlayerCount = await this.GetPlayerCount();
 
-            HttpResponseMessage result = await AuthenticatedUploadDataRequest("LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
+            HttpResponseMessage result = await this.AuthenticatedUploadDataRequest("LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
             Assert.True(result.IsSuccessStatusCode);
 
             int playerCount = await this.GetPlayerCount();

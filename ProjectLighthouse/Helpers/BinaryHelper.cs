@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace ProjectLighthouse.Helpers {
+namespace LBPUnion.ProjectLighthouse.Helpers {
     public static class BinaryHelper {
         public static string ReadString(BinaryReader reader) {
             List<byte> readBytes = new();

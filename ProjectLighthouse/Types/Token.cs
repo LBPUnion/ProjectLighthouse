@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectLighthouse.Types {
+namespace LBPUnion.ProjectLighthouse.Types {
     public class Token {
         // ReSharper disable once UnusedMember.Global
         [Key] public int TokenId { get; set; }

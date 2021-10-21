@@ -1,6 +1,6 @@
-using ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types.News {
+namespace LBPUnion.ProjectLighthouse.Types.News {
     public class NewsImage {
         public string Hash { get; set; }
         public string Alignment { get; set; }

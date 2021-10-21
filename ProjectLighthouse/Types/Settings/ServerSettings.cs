@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 
-namespace ProjectLighthouse.Types.Settings {
+namespace LBPUnion.ProjectLighthouse.Types.Settings {
     public static class ServerSettings {
         /// <summary>
         /// The maximum amount of slots allowed on users' earth

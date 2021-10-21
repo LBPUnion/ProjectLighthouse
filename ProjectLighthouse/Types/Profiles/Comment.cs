@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
-using ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types.Profiles {
+namespace LBPUnion.ProjectLighthouse.Types.Profiles {
     [XmlRoot("comment"), XmlType("comment")]
     public class Comment {
         [Key]

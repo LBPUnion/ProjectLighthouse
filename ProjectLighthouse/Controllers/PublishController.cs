@@ -2,15 +2,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Helpers;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Levels;
-using ProjectLighthouse.Types.Profiles;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
@@ -42,7 +42,7 @@ namespace ProjectLighthouse.Controllers {
         /// </summary>
         [HttpPost("publish")]
         public async Task<IActionResult> Publish() {
-            User user = await database.UserFromRequest(Request);
+            User user = await this.database.UserFromRequest(this.Request);
             if(user == null) return this.StatusCode(403, "");
             
             Slot slot = await this.GetSlotFromBody();
@@ -52,34 +52,34 @@ namespace ProjectLighthouse.Controllers {
                 X = 0,
                 Y = 0,
             };
-            database.Locations.Add(l);
-            await database.SaveChangesAsync();
+            this.database.Locations.Add(l);
+            await this.database.SaveChangesAsync();
             slot.LocationId = l.Id;
             slot.CreatorId = user.UserId;
 
-            database.Slots.Add(slot);
-            await database.SaveChangesAsync();
+            this.database.Slots.Add(slot);
+            await this.database.SaveChangesAsync();
             
             return this.Ok(slot.Serialize());
         }
 
         [HttpPost("unpublish/{id:int}")]
         public async Task<IActionResult> Unpublish(int id) {
-            Slot slot = await database.Slots
+            Slot slot = await this.database.Slots
                 .Include(s => s.Location)
                 .FirstOrDefaultAsync(s => s.SlotId == id);
 
-            database.Locations.Remove(slot.Location);
-            database.Slots.Remove(slot);
+            this.database.Locations.Remove(slot.Location);
+            this.database.Slots.Remove(slot);
 
-            await database.SaveChangesAsync();
+            await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
         
         public async Task<Slot> GetSlotFromBody() {
-            Request.Body.Position = 0;
-            string bodyString = await new StreamReader(Request.Body).ReadToEndAsync();
+            this.Request.Body.Position = 0;
+            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             XmlSerializer serializer = new(typeof(Slot));
             Slot slot = (Slot)serializer.Deserialize(new StringReader(bodyString));

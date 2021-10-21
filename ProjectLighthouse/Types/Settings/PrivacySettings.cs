@@ -1,6 +1,6 @@
-using ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types.Settings {
+namespace LBPUnion.ProjectLighthouse.Types.Settings {
     public class PrivacySettings {
         public string LevelVisibility { get; set; }
         public string ProfileVisibility { get; set; }

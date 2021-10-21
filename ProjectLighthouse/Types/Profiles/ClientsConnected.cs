@@ -1,7 +1,7 @@
+using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types.Profiles {
+namespace LBPUnion.ProjectLighthouse.Types.Profiles {
     [Keyless]
     public class ClientsConnected {
         public bool Lbp1 { get; set; }

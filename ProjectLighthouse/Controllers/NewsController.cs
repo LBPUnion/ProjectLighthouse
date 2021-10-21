@@ -1,8 +1,8 @@
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.News;
 using Microsoft.AspNetCore.Mvc;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types.News;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/news")]
     [Produces("text/xml")]

@@ -1,11 +1,11 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Xunit;
 
-namespace ProjectLighthouse.Tests {
+namespace LBPUnion.ProjectLighthouse.Tests {
     public class AuthenticationTests : LighthouseTest {
         [Fact]
         public async Task ShouldReturnErrorOnNoPostData() {
@@ -43,7 +43,7 @@ namespace ProjectLighthouse.Tests {
         public async Task CanUseToken() {
             LoginResult loginResult = await this.Authenticate();
 
-            HttpResponseMessage response = await AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/eula", loginResult.AuthTicket);
+            HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/eula", loginResult.AuthTicket);
             string responseContent = await response.Content.ReadAsStringAsync();
             
             Assert.True(response.IsSuccessStatusCode);

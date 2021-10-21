@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace ProjectLighthouse.Serialization {
+namespace LBPUnion.ProjectLighthouse.Serialization {
     /// <summary>
     /// LBP doesn't like the XML serializer by C# that much, and it cant be controlled that much (cant have two root elements),
     /// so I wrote my own crappy one.

@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Levels;
-using ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Xunit;
 
-namespace ProjectLighthouse.Tests {
+namespace LBPUnion.ProjectLighthouse.Tests {
     public class SlotTests : LighthouseTest {
         [DatabaseFact]
         public async Task ShouldOnlyShowUsersLevels() {

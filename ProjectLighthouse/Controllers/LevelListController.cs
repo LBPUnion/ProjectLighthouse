@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Levels;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]

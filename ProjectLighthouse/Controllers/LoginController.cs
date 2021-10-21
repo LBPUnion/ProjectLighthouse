@@ -1,11 +1,11 @@
 #nullable enable
 using System.IO;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Settings;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/login")]
     [Produces("text/xml")]
@@ -18,7 +18,7 @@ namespace ProjectLighthouse.Controllers {
         
         [HttpPost]
         public async Task<IActionResult> Login() {
-            string body = await new StreamReader(Request.Body).ReadToEndAsync();
+            string body = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             LoginData loginData;
             try {
@@ -28,7 +28,7 @@ namespace ProjectLighthouse.Controllers {
                 return this.BadRequest();
             }
 
-            Token? token = await database.AuthenticateUser(loginData);
+            Token? token = await this.database.AuthenticateUser(loginData);
 
             if(token == null) return this.StatusCode(403, "");
 

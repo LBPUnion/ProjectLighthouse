@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types {
+namespace LBPUnion.ProjectLighthouse.Types {
     /// <summary>
     /// Response to POST /login
     /// </summary>

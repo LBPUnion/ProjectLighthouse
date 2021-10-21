@@ -1,8 +1,8 @@
 using System;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
-using ProjectLighthouse.Types.Levels;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/tags")]
     [Produces("text/plain")]

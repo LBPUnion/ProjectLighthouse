@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ProjectLighthouse.Types.Files;
+using LBPUnion.ProjectLighthouse.Types.Files;
 
-namespace ProjectLighthouse.Helpers {
+namespace LBPUnion.ProjectLighthouse.Helpers {
     public static class FileHelper {
         public static readonly string ResourcePath = Path.Combine(Environment.CurrentDirectory, "r");
 

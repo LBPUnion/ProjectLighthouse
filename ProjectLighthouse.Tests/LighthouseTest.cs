@@ -3,12 +3,12 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types;
 
-namespace ProjectLighthouse.Tests {
+namespace LBPUnion.ProjectLighthouse.Tests {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class LighthouseTest {
         public readonly TestServer Server;
@@ -41,7 +41,7 @@ namespace ProjectLighthouse.Tests {
             return (LoginResult)serializer.Deserialize(new StringReader(responseContent))!;
         }
 
-        public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
+        public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
 
         public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method) {
             using var requestMessage = new HttpRequestMessage(method, endpoint);

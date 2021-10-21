@@ -1,14 +1,14 @@
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Helpers;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Levels;
-using ProjectLighthouse.Types.Profiles;
-using ProjectLighthouse.Types.Settings;
 
-namespace ProjectLighthouse {
+namespace LBPUnion.ProjectLighthouse {
     public class Database : DbContext {
         public DbSet<User> Users { get; set; }
         public DbSet<Location> Locations { get; set; }
@@ -27,7 +27,7 @@ namespace ProjectLighthouse {
 
         public async Task<User> CreateUser(string username) {
             User user;
-            if((user = await Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null)
+            if((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null)
                 return user;
 
             Location l = new(); // store to get id after submitting
@@ -64,9 +64,9 @@ namespace ProjectLighthouse {
         }
 
         public async Task<User?> UserFromAuthToken(string authToken) {
-            Token? token = await Tokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
+            Token? token = await this.Tokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
             if(token == null) return null;
-            return await Users
+            return await this.Users
                 .Include(u => u.Location)
                 .FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
@@ -76,7 +76,7 @@ namespace ProjectLighthouse {
                 return null;
             }
             
-            return await UserFromAuthToken(mmAuth);
+            return await this.UserFromAuthToken(mmAuth);
         }
         #nullable disable
     }

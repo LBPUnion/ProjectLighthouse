@@ -1,6 +1,6 @@
-using ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers;
 
-namespace ProjectLighthouse.Types.Files {
+namespace LBPUnion.ProjectLighthouse.Types.Files {
     public class LbpFile {
         public LbpFile(byte[] data) {
             this.Data = data;

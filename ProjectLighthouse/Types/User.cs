@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types.Profiles;
-using ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 
-namespace ProjectLighthouse.Types {
+namespace LBPUnion.ProjectLighthouse.Types {
     public class User {
         public int UserId { get; set; }
         public string Username { get; set; }

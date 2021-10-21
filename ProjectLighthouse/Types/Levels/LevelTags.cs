@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace ProjectLighthouse.Types.Levels {
+namespace LBPUnion.ProjectLighthouse.Types.Levels {
     /// <summary>
     /// A series of tags that can be applied to a level
     /// </summary>

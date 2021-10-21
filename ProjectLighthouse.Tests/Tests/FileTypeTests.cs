@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Text;
-using ProjectLighthouse.Types.Files;
+using LBPUnion.ProjectLighthouse.Types.Files;
 using Xunit;
 
-namespace ProjectLighthouse.Tests {
+namespace LBPUnion.ProjectLighthouse.Tests {
     public class FileTypeTests {
         [Fact]
         public void ShouldRecognizeLevel() {

@@ -1,6 +1,6 @@
-using ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types.News {
+namespace LBPUnion.ProjectLighthouse.Types.News {
     /// <summary>
     /// Used on the info moon on LBP1. Broken for unknown reasons
     /// </summary>

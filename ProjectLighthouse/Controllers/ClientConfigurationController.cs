@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
-using ProjectLighthouse.Types.Settings;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/plain")]

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Profiles;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
@@ -20,7 +20,7 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpGet("user/{username}")]
         public async Task<IActionResult> GetUser(string username) {
-            User user = await database.Users
+            User user = await this.database.Users
                 .Include(u => u.Location)
                 .FirstOrDefaultAsync(u => u.Username == username);
 
@@ -36,7 +36,7 @@ namespace ProjectLighthouse.Controllers {
 
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser() {
-            User user = await database.UserFromRequest(Request);
+            User user = await this.database.UserFromRequest(this.Request);
 
             if(user == null) return this.StatusCode(403, "");
 
@@ -62,7 +62,7 @@ namespace ProjectLighthouse.Controllers {
             // </updateUser>
             //
             // if you find a way to make it not stupid feel free to replace this
-            using(XmlReader reader = XmlReader.Create(Request.Body, settings)) {
+            using(XmlReader reader = XmlReader.Create(this.Request.Body, settings)) {
                 List<string> path = new(); // you can think of this as a file path in the XML, like <updateUser> -> <location> -> <x>
                 while(await reader.ReadAsync()) {
                     // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
@@ -105,7 +105,7 @@ namespace ProjectLighthouse.Controllers {
             
             // the way location on a user card works is stupid and will not save with the way below as-is, so we do the following:
             if(locationChanged) { // only modify the database if we modify here
-                Location l = await database.Locations.Where(l => l.Id == user.LocationId).FirstOrDefaultAsync(); // find the location in the database again
+                Location l = await this.database.Locations.Where(l => l.Id == user.LocationId).FirstOrDefaultAsync(); // find the location in the database again
 
                 // set the location in the database to the one we modified above
                 l.X = user.Location.X;
@@ -114,7 +114,7 @@ namespace ProjectLighthouse.Controllers {
                 // now both are in sync, and will update in the database.
             }
             
-            if(database.ChangeTracker.HasChanges()) await database.SaveChangesAsync(); // save the user to the database if we changed anything
+            if(this.database.ChangeTracker.HasChanges()) await this.database.SaveChangesAsync(); // save the user to the database if we changed anything
             return this.Ok();
         }
     }

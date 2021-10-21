@@ -1,11 +1,11 @@
 using System;
 using System.Diagnostics;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using ProjectLighthouse.Types.Settings;
 
-namespace ProjectLighthouse {
+namespace LBPUnion.ProjectLighthouse {
     public static class Program {
         public static void Main(string[] args) {
             Stopwatch startupStopwatch = new();

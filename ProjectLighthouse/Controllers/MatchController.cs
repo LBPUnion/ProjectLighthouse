@@ -1,13 +1,13 @@
 #nullable enable
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Helpers;
-using ProjectLighthouse.Types;
-using ProjectLighthouse.Types.Profiles;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]

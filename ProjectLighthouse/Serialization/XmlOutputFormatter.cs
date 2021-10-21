@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-namespace ProjectLighthouse.Serialization {
+namespace LBPUnion.ProjectLighthouse.Serialization {
     public class XmlOutputFormatter : StringOutputFormatter {
         public XmlOutputFormatter() {
-            SupportedMediaTypes.Add("text/xml");
-            SupportedMediaTypes.Add("application/xml");
+            this.SupportedMediaTypes.Add("text/xml");
+            this.SupportedMediaTypes.Add("application/xml");
         }
     }
 }

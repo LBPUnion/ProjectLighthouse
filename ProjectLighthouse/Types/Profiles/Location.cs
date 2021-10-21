@@ -1,6 +1,6 @@
-using ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types.Profiles {
+namespace LBPUnion.ProjectLighthouse.Types.Profiles {
     /// <summary>
     /// The location of a slot on a planet.
     /// </summary>

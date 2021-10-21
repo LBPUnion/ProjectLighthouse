@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Serialization;
-using ProjectLighthouse.Types.Levels;
 
-namespace ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
@@ -18,7 +18,7 @@ namespace ProjectLighthouse.Controllers {
         [HttpGet("slots/by")]
         public IActionResult SlotsBy([FromQuery] string u) {
             string response = Enumerable.Aggregate(
-                database.Slots
+                this.database.Slots
                     .Include(s => s.Creator)
                     .Include(s => s.Location)
                     .Where(s => s.Creator.Username == u)

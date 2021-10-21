@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ProjectLighthouse.Helpers {
+namespace LBPUnion.ProjectLighthouse.Helpers {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class HashHelper {
 //        private static readonly SHA1 sha1 = SHA1.Create();
