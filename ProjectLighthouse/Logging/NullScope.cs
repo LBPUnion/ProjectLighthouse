@@ -6,6 +6,8 @@ namespace LBPUnion.ProjectLighthouse.Logging {
 
         private NullScope() {}
 
-        public void Dispose() {}
+        public void Dispose() {
+            GC.SuppressFinalize(this);
+        }
     }
 }

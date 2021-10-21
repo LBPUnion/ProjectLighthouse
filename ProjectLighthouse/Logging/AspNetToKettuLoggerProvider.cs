@@ -5,7 +5,7 @@ namespace LBPUnion.ProjectLighthouse.Logging {
     [ProviderAlias("Kettu")]
     public class AspNetToKettuLoggerProvider : ILoggerProvider, IDisposable {
         public void Dispose() {
-            // cry about it
+            GC.SuppressFinalize(this);
         }
         
         public ILogger CreateLogger(string categoryName) {

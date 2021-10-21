@@ -20,7 +20,7 @@ namespace LBPUnion.ProjectLighthouse.Logging {
                 LogLevel.Error => LoggerLevelAspNetError.Instance,
                 LogLevel.Critical => LoggerLevelAspNetCritical.Instance,
                 LogLevel.None => LoggerLevelAspNetNone.Instance,
-                _ => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null),
             };
             
             Logger.Log(state.ToString(), loggerLevel);
