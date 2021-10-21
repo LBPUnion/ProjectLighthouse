@@ -1,13 +1,13 @@
+using System.Buffers;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Files;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
 
@@ -60,7 +60,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             FileHelper.EnsureDirectoryCreated(assetsDirectory);
             if(FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
 
-            LbpFile file = new(this.Request.Body);
+            LbpFile file = new(await BinaryHelper.ReadFromPipeReader(Request.BodyReader));
 
             if(!FileHelper.IsFileSafe(file)) return this.UnprocessableEntity();
             
