@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -43,10 +45,15 @@ namespace LBPUnion.ProjectLighthouse {
                 await next(); // Handle the request so we can get the status code from it
                 
                 requestStopwatch.Stop();
-                Console.WriteLine($"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}");
+                
+                Logger.Log(
+                    $"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}",
+                    LoggerLevelHttp.Instance
+                );
+                
                 if(context.Request.Method == "POST") {
                     context.Request.Body.Position = 0;
-                    Console.WriteLine(await new StreamReader(context.Request.Body).ReadToEndAsync());
+                    Logger.Log(await new StreamReader(context.Request.Body).ReadToEndAsync(), LoggerLevelHttp.Instance);
                 }
             });
 

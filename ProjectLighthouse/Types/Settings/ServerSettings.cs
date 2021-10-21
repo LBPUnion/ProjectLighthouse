@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings {
     public static class ServerSettings {
@@ -29,7 +31,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings {
                     return new Database().Database.CanConnect();
                 }
                 catch(Exception e) {
-                    Console.WriteLine(e);
+                    Logger.Log(e.ToString(), LoggerLevelDatabase.Instance);
                     return false;
                 }
             }

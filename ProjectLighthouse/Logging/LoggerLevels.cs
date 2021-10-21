@@ -11,6 +11,11 @@ namespace LBPUnion.ProjectLighthouse.Logging {
         public static LoggerLevelDatabase Instance = new();
     }
 
+    public class LoggerLevelHttp : LoggerLevel {
+        public override string Name => "HTTP";
+        public static LoggerLevelDatabase Instance = new();
+    }
+
     #region ASP.NET
     public class LoggerLevelAspNetTrace : LoggerLevel {
         public override string Name => "ASP.NET: Trace";
