@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Logging {
             FileHelper.EnsureDirectoryCreated(logsDirectory);
             
             File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel + ".log"), line + "\n");
-            File.AppendAllText(Path.Combine(logsDirectory, "all.log"), line.ToString());
+            File.AppendAllText(Path.Combine(logsDirectory, "all.log"), line + "\n");
         }
     }
 }
