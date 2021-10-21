@@ -6,6 +6,7 @@ using System.Xml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.Profiles;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]

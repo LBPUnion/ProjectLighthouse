@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.Levels;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]

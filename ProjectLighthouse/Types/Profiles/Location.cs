@@ -1,6 +1,6 @@
 using ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types {
+namespace ProjectLighthouse.Types.Profiles {
     /// <summary>
     /// The location of a slot on a planet.
     /// </summary>

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types {
+namespace ProjectLighthouse.Types.Profiles {
     [Keyless]
     public class ClientsConnected {
         public bool Lbp1 { get; set; }
@@ -12,11 +12,11 @@ namespace ProjectLighthouse.Types {
 
         public string Serialize() {
             return LbpSerializer.StringElement("clientsConnected", 
-                LbpSerializer.StringElement("lbp1", Lbp1) +
-                LbpSerializer.StringElement("lbp2", Lbp2) +
-                LbpSerializer.StringElement("lbpme", LbpMe) +
-                LbpSerializer.StringElement("lbp3ps3", Lbp3Ps3) +
-                LbpSerializer.StringElement("lbp3ps4", Lbp3Ps4));
+                LbpSerializer.StringElement("lbp1", this.Lbp1) +
+                LbpSerializer.StringElement("lbp2", this.Lbp2) +
+                LbpSerializer.StringElement("lbpme", this.LbpMe) +
+                LbpSerializer.StringElement("lbp3ps3", this.Lbp3Ps3) +
+                LbpSerializer.StringElement("lbp3ps4", this.Lbp3Ps4));
         }
     }
 }

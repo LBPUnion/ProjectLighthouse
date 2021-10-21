@@ -1,6 +1,6 @@
 using ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types {
+namespace ProjectLighthouse.Types.News {
     public class NewsImage {
         public string Hash { get; set; }
         public string Alignment { get; set; }

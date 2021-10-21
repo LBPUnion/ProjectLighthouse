@@ -3,8 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
 using ProjectLighthouse.Serialization;
+using ProjectLighthouse.Types.Profiles;
 
-namespace ProjectLighthouse.Types {
+namespace ProjectLighthouse.Types.Levels {
     /// <summary>
     /// A LittleBigPlanet level.
     /// </summary>
@@ -90,23 +91,23 @@ namespace ProjectLighthouse.Types {
         }
 
         public string Serialize() {
-            string slotData = LbpSerializer.StringElement("name", Name) +
-                              LbpSerializer.StringElement("id", SlotId) +
+            string slotData = LbpSerializer.StringElement("name", this.Name) +
+                              LbpSerializer.StringElement("id", this.SlotId) +
                               LbpSerializer.StringElement("game", 1) +
-                              LbpSerializer.StringElement("npHandle", Creator.Username) +
-                              LbpSerializer.StringElement("description", Description) +
-                              LbpSerializer.StringElement("icon", IconHash) +
-                              LbpSerializer.StringElement("rootLevel", RootLevel) +
+                              LbpSerializer.StringElement("npHandle", this.Creator.Username) +
+                              LbpSerializer.StringElement("description", this.Description) +
+                              LbpSerializer.StringElement("icon", this.IconHash) +
+                              LbpSerializer.StringElement("rootLevel", this.RootLevel) +
                               this.SerializeResources() +
-                              LbpSerializer.StringElement("location", Location.Serialize()) +
-                              LbpSerializer.StringElement("initiallyLocked", InitiallyLocked) +
-                              LbpSerializer.StringElement("isSubLevel", SubLevel) +
-                              LbpSerializer.StringElement("isLBP1Only", Lbp1Only) +
-                              LbpSerializer.StringElement("shareable", Shareable) +
-                              LbpSerializer.StringElement("background", BackgroundHash) +
-                              LbpSerializer.StringElement("minPlayers", MinimumPlayers) +
-                              LbpSerializer.StringElement("maxPlayers", MaximumPlayers) +
-                              LbpSerializer.StringElement("moveRequired", MoveRequired);
+                              LbpSerializer.StringElement("location", this.Location.Serialize()) +
+                              LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
+                              LbpSerializer.StringElement("isSubLevel", this.SubLevel) +
+                              LbpSerializer.StringElement("isLBP1Only", this.Lbp1Only) +
+                              LbpSerializer.StringElement("shareable", this.Shareable) +
+                              LbpSerializer.StringElement("background", this.BackgroundHash) +
+                              LbpSerializer.StringElement("minPlayers", this.MinimumPlayers) +
+                              LbpSerializer.StringElement("maxPlayers", this.MaximumPlayers) +
+                              LbpSerializer.StringElement("moveRequired", this.MoveRequired);
             
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

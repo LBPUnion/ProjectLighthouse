@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
 using ProjectLighthouse.Serialization;
 
-namespace ProjectLighthouse.Types {
+namespace ProjectLighthouse.Types.Profiles {
     [XmlRoot("comment"), XmlType("comment")]
     public class Comment {
         [Key]
@@ -28,12 +28,12 @@ namespace ProjectLighthouse.Types {
         public int ThumbsDown { get; set; }
 
         private string serialize() {
-            return LbpSerializer.StringElement("id", CommentId) +
+            return LbpSerializer.StringElement("id", this.CommentId) +
                    LbpSerializer.StringElement("npHandle", this.Poster.Username) +
-                   LbpSerializer.StringElement("timestamp", Timestamp) +
-                   LbpSerializer.StringElement("message", Message) +
-                   LbpSerializer.StringElement("thumbsup", ThumbsUp) +
-                   LbpSerializer.StringElement("thumbsdown", ThumbsDown);
+                   LbpSerializer.StringElement("timestamp", this.Timestamp) +
+                   LbpSerializer.StringElement("message", this.Message) +
+                   LbpSerializer.StringElement("thumbsup", this.ThumbsUp) +
+                   LbpSerializer.StringElement("thumbsdown", this.ThumbsDown);
         }
 
         public string Serialize(int yourThumb) {

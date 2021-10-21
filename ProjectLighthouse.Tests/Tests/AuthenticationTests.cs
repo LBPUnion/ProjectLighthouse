@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.Settings;
 using Xunit;
 
 namespace ProjectLighthouse.Tests {

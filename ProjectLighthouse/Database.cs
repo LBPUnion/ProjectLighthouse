@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using ProjectLighthouse.Helpers;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.Levels;
+using ProjectLighthouse.Types.Profiles;
+using ProjectLighthouse.Types.Settings;
 
 namespace ProjectLighthouse {
     public class Database : DbContext {

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProjectLighthouse.Types {
+namespace ProjectLighthouse.Types.Levels {
     public class QueuedLevel {
         // ReSharper disable once UnusedMember.Global
         [Key] public int QueuedLevelId { get; set; }

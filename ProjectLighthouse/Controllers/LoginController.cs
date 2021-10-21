@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.Settings;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]

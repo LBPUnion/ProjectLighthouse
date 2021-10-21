@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using ProjectLighthouse.Helpers;
 using ProjectLighthouse.Serialization;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.Levels;
+using ProjectLighthouse.Types.Profiles;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]

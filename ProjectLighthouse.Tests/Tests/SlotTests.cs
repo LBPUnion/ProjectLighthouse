@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.Levels;
+using ProjectLighthouse.Types.Profiles;
 using Xunit;
 
 namespace ProjectLighthouse.Tests {

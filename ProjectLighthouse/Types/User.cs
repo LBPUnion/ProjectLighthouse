@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using ProjectLighthouse.Serialization;
+using ProjectLighthouse.Types.Profiles;
+using ProjectLighthouse.Types.Settings;
 
 namespace ProjectLighthouse.Types {
     public class User {

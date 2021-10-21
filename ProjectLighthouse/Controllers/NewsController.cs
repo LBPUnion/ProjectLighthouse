@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProjectLighthouse.Serialization;
 using ProjectLighthouse.Types;
+using ProjectLighthouse.Types.News;
 
 namespace ProjectLighthouse.Controllers {
     [ApiController]
