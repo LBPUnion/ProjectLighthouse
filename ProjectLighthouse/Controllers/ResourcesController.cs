@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Files;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
 
@@ -50,14 +51,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
 
         // TODO: check if this is a valid hash
         [HttpPost("upload/{hash}")]
+        [AllowSynchronousIo]
         public async Task<IActionResult> UploadResource(string hash) {
+
             string assetsDirectory = FileHelper.ResourcePath;
             string path = FileHelper.GetResourcePath(hash);
             
             FileHelper.EnsureDirectoryCreated(assetsDirectory);
             if(FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
 
-            LbpFile file = new(Encoding.ASCII.GetBytes(await new StreamReader(this.Request.Body).ReadToEndAsync()));
+            LbpFile file = new(this.Request.Body);
 
             if(!FileHelper.IsFileSafe(file)) return this.UnprocessableEntity();
             
