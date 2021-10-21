@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using ProjectLighthouse.Types;
 using ProjectLighthouse.Types.Settings;
 using Xunit;
 

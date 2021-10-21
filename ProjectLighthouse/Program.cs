@@ -3,7 +3,6 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using ProjectLighthouse.Types;
 using ProjectLighthouse.Types.Settings;
 
 namespace ProjectLighthouse {
