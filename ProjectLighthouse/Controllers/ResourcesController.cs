@@ -1,6 +1,4 @@
-using System.Buffers;
 using System.IO;
-using System.IO.Pipelines;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -32,11 +30,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             if(resourceList == null) return this.BadRequest();
 
             string resources = resourceList.Resources
-                .Where(FileHelper.ResourceExists)
+                .Where(s => !FileHelper.ResourceExists(s))
                 .Aggregate("", (current, hash) => 
                     current + LbpSerializer.StringElement("resource", hash));
 
-            return this.Ok(resources);
+            return this.Ok(LbpSerializer.StringElement("resources", resources));
         }
 
         [HttpGet("r/{hash}")]

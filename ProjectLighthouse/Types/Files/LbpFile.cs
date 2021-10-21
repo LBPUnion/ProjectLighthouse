@@ -1,4 +1,3 @@
-using System.IO;
 using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Types.Files {
