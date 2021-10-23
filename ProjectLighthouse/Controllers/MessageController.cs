@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +28,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         public IActionResult Notification() {
             return this.Ok();
         }
-
+        /// <summary>
+        /// Filters chat messages sent by a user.
+        /// </summary>
         [HttpPost("filter")]
-        public IActionResult Filter() {
-            return this.Ok();
+        public async Task<IActionResult> Filter() {
+            return this.Ok(await new StreamReader(this.Request.Body).ReadToEndAsync());
         }
     }
 }
