@@ -1,5 +1,6 @@
 using System;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Logging {
@@ -24,9 +25,10 @@ namespace LBPUnion.ProjectLighthouse.Logging {
             };
             
             Logger.Log(state.ToString(), loggerLevel);
-            if(exception != null) {
-                Logger.Log(exception.ToString(), loggerLevel);
-            }
+            if(exception == null) return;
+
+            string[] lines = exception.ToDetailedException().Replace("\r", "").Split("\n");
+            foreach(string line in lines) Logger.Log(line, loggerLevel);
         }
     }
 }
