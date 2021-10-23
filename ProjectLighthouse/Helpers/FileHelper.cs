@@ -41,7 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
             return Encoding.ASCII.GetString(header) switch {
                 "TEX" => LbpFileType.Texture,
                 "FSH" => LbpFileType.Script,
-                "VOB" => LbpFileType.Voice,
+                "VOP" => LbpFileType.Voice,
                 "LVL" => LbpFileType.Level,
                 "PLN" => LbpFileType.Plan,
                 _ => LbpFileType.Unknown,
