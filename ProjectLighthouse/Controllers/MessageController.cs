@@ -27,5 +27,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         public IActionResult Notification() {
             return this.Ok();
         }
+
+        [HttpGet("filter")]
+        public IActionResult Filter() {
+            return this.Ok();
+        }
     }
 }
