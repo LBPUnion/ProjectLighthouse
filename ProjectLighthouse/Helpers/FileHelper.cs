@@ -18,6 +18,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
                 LbpFileType.Script => false,
                 LbpFileType.Level => true,
                 LbpFileType.FileArchive => false,
+                LbpFileType.Plan => true,
                 LbpFileType.Unknown => false,
                 #if DEBUG
                 _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
@@ -40,6 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
                 "TEX" => LbpFileType.Texture,
                 "FSH" => LbpFileType.Script,
                 "LVL" => LbpFileType.Level,
+                "PLN" => LbpFileType.Plan,
                 _ => LbpFileType.Unknown,
             };
         }

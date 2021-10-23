@@ -4,6 +4,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Files {
         Texture, // TEX
         Level, // LVL
         FileArchive, // .farc, (ends with FARC)
+        Plan, // PLN, uploaded with levels
         Unknown,
     }
 }
