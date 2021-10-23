@@ -14,12 +14,13 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
             if(file.FileType == LbpFileType.Unknown) file.FileType = DetermineFileType(file.Data);
             
             return file.FileType switch {
+                LbpFileType.FileArchive => false,
+                LbpFileType.Unknown => false,
                 LbpFileType.Texture => true,
                 LbpFileType.Script => false,
                 LbpFileType.Level => true,
-                LbpFileType.FileArchive => false,
+                LbpFileType.Voice => true,
                 LbpFileType.Plan => true,
-                LbpFileType.Unknown => false,
                 #if DEBUG
                 _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
                 #else
@@ -40,6 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
             return Encoding.ASCII.GetString(header) switch {
                 "TEX" => LbpFileType.Texture,
                 "FSH" => LbpFileType.Script,
+                "VOB" => LbpFileType.Voice,
                 "LVL" => LbpFileType.Level,
                 "PLN" => LbpFileType.Plan,
                 _ => LbpFileType.Unknown,

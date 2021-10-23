@@ -5,6 +5,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Files {
         Level, // LVL
         FileArchive, // .farc, (ends with FARC)
         Plan, // PLN, uploaded with levels
+        Voice, // VOB, voice data
         Unknown,
     }
 }
