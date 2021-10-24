@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers.Extensions {
             IEnumerable<string> fields = properties
                 .Select(property => new {
                     property.Name,
-                    Value = property.GetValue(exception, null)
+                    Value = property.GetValue(exception, null),
                 })
                 .Select(x => $"{x.Name} = {(x.Value != null ? x.Value.ToString() : string.Empty)}");
 

@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
@@ -58,6 +59,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             FileHelper.EnsureDirectoryCreated(assetsDirectory);
             if(FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
 
+            Logger.Log($"Processing resource upload (hash: {hash})");
             LbpFile file = new(await BinaryHelper.ReadFromPipeReader(Request.BodyReader));
 
             if(!FileHelper.IsFileSafe(file)) return this.UnprocessableEntity();
