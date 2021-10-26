@@ -122,6 +122,61 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         #region Users
 
         
+        
+        [HttpGet("favouriteUsers/{username}")]
+        public IActionResult GetFavouriteUsers(string username) {
+            IEnumerable<HeartedProfile> heartedProfiles = new Database().HeartedProfiles
+                .Include(q => q.User)
+                .Include(q => q.HeartedUser)
+                .Include(q => q.HeartedUser.Location)
+                .Where(q => q.User.Username == username)
+                .AsEnumerable();
+
+            string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", 1));
+        }
+        
+        [HttpPost("favourite/user/{username}")]
+        public async Task<IActionResult> AddFavouriteUser(string username) {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if(user == null) return this.StatusCode(403, "");
+
+            User? heartedUser = await this.database.Users
+                .FirstOrDefaultAsync(u => u.Username == username);
+            if(heartedUser == null) return this.NotFound();
+
+            HeartedProfile heartedProfile = await this.database.HeartedProfiles
+                .FirstOrDefaultAsync(q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+            if(heartedProfile != null) return this.Ok();
+
+            this.database.HeartedProfiles.Add(new HeartedProfile {
+                HeartedUserId = heartedUser.UserId,
+                UserId = user.UserId,
+            });
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+        
+        [HttpPost("unfavourite/user/{username}")]
+        public async Task<IActionResult> RemoveFavouriteUser(string username) {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if(user == null) return this.StatusCode(403, "");
+
+            User? heartedUser = await this.database.Users
+                .FirstOrDefaultAsync(u => u.Username == username);
+            if(heartedUser == null) return this.NotFound();
+
+            HeartedProfile heartedProfile = await this.database.HeartedProfiles
+                .FirstOrDefaultAsync(q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+            if(heartedProfile != null) this.database.HeartedProfiles.Remove(heartedProfile);
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
 
         #endregion
     }

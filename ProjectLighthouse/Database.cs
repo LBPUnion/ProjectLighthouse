@@ -15,6 +15,7 @@ namespace LBPUnion.ProjectLighthouse {
         public DbSet<Slot> Slots { get; set; }
         public DbSet<QueuedLevel> QueuedLevels { get; set; }
         public DbSet<HeartedLevel> HeartedLevels { get; set; }
+        public DbSet<HeartedProfile> HeartedProfiles { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Token> Tokens { get; set; }
 

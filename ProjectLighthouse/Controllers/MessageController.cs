@@ -16,7 +16,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         [HttpGet("eula")]
         public async Task<IActionResult> Eula() {
             User user = await this.database.UserFromRequest(this.Request);
-            return user == null ? this.StatusCode(403, "") : this.Ok($"You are logged in as user {user.Username} (id {user.UserId})");
+            return user == null ? this.StatusCode(403, "") : 
+                this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
+                        "This is a private testing instance. Please do not make anything public for now, and keep in mind security isn't as tight as a full release would.");
         }
 
         [HttpGet("announce")]
