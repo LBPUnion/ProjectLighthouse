@@ -56,3 +56,11 @@ Some modifications may require updates to the database schema. You can automatic
 2. Making sure `LIGHTHOUSE_DB_CONNECTION_STRING` is set correctly. See the `Running` section for more details.
 3. Making your changes to the database. I won't cover this since if you're making database changes you should know what you're doing.
 4. Running `dotnet ef migrations add <NameOfMigrationInPascalCase> --project ProjectLighthouse`.
+
+## Compatibility across games and platforms
+
+|      	  | PS3        | RPCS3                            |
+|---------|------------|----------------------------------|
+| LBP1    | Somewhat   | Crashes on entering controller   |
+| LBP2    | Yes        | Yes (requires patched RPCS3)     |
+| LBP3    | Connects   | Crashes on startup               |
