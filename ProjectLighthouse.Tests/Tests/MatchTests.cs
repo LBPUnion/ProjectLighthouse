@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
@@ -10,11 +11,27 @@ namespace LBPUnion.ProjectLighthouse.Tests {
         private static readonly SemaphoreSlim semaphore = new(1, 1);
 
         [DatabaseFact]
-        public async Task ShouldReturnOk() {
+        public async Task ShouldRejectEmptyData() {
             LoginResult loginResult = await this.Authenticate();
             await semaphore.WaitAsync();
 
             HttpResponseMessage result = await this.AuthenticatedUploadDataRequest("LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
+            Assert.False(result.IsSuccessStatusCode);
+
+            semaphore.Release();
+        }
+
+        [DatabaseFact]
+        public async Task ShouldReturnOk() {
+            LoginResult loginResult = await this.Authenticate();
+            await semaphore.WaitAsync();
+
+            HttpResponseMessage result = await this.AuthenticatedUploadDataRequest(
+                "LITTLEBIGPLANETPS3_XML/match",
+                Encoding.ASCII.GetBytes("[UpdateMyPlayerData,[\"Player\":\"1984\"]]"),
+                loginResult.AuthTicket
+            );
+            
             Assert.True(result.IsSuccessStatusCode);
 
             semaphore.Release();
@@ -29,7 +46,12 @@ namespace LBPUnion.ProjectLighthouse.Tests {
 
             int oldPlayerCount = await this.GetPlayerCount();
 
-            HttpResponseMessage result = await this.AuthenticatedUploadDataRequest("LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
+            HttpResponseMessage result = await this.AuthenticatedUploadDataRequest(
+                "LITTLEBIGPLANETPS3_XML/match",
+                Encoding.ASCII.GetBytes("[UpdateMyPlayerData,[\"Player\":\"1984\"]]"),
+                loginResult.AuthTicket
+            );
+            
             Assert.True(result.IsSuccessStatusCode);
 
             int playerCount = await this.GetPlayerCount();

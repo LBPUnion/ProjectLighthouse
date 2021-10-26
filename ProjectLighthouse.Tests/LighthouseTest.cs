@@ -23,10 +23,12 @@ namespace LBPUnion.ProjectLighthouse.Tests {
 
         public async Task<HttpResponseMessage> AuthenticateResponse(int number = 0) {
             const char nullChar = (char)0x00;
-            const char sepChar = (char)0x20;
             const string username = "unitTestUser";
 
-            string stringContent = $"{nullChar}{sepChar}{username}{number}{nullChar}";
+            string nullString = "";
+            for(int i = 0; i < 80; i++) nullString += nullChar;
+
+            string stringContent = $"{nullString}{username}{number}{nullChar}";
             
             HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new StringContent(stringContent));
             return response;

@@ -47,7 +47,7 @@ namespace LBPUnion.ProjectLighthouse.Tests {
             string responseContent = await response.Content.ReadAsStringAsync();
             
             Assert.True(response.IsSuccessStatusCode);
-            Assert.Contains("You are logged in", responseContent);
+            Assert.Contains("You are now logged in", responseContent);
         }
 
         [DatabaseFact]
