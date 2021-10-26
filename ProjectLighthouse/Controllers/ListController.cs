@@ -12,12 +12,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
-    public class LevelListController : ControllerBase {
+    public class ListController : ControllerBase {
         private readonly Database database;
-        public LevelListController(Database database) {
+        public ListController(Database database) {
             this.database = database;
         }
 
+        #region Levels
         #region Level Queue (lolcatftw)
 
         [HttpGet("slots/lolcatftw/{username}")]
@@ -34,19 +35,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
 
-        [HttpPost("lolcatftw/remove/user/{id:int}")]
-        public async Task<IActionResult> RemoveQueuedLevel(int id) {
-            User? user = await this.database.UserFromRequest(this.Request);
-            if(user == null) return this.StatusCode(403, "");
-
-            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
-            if(queuedLevel != null) this.database.QueuedLevels.Remove(queuedLevel);
-
-            await this.database.SaveChangesAsync();
-
-            return this.Ok();
-        }
-
         [HttpPost("lolcatftw/add/user/{id:int}")]
         public async Task<IActionResult> AddQueuedLevel(int id) {
             User? user = await this.database.UserFromRequest(this.Request);
@@ -59,6 +47,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
                 SlotId = id,
                 UserId = user.UserId,
             });
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+        
+        [HttpPost("lolcatftw/remove/user/{id:int}")]
+        public async Task<IActionResult> RemoveQueuedLevel(int id) {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if(user == null) return this.StatusCode(403, "");
+
+            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            if(queuedLevel != null) this.database.QueuedLevels.Remove(queuedLevel);
 
             await this.database.SaveChangesAsync();
 
@@ -85,7 +86,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         }
 
         [HttpPost("favourite/slot/user/{id:int}")]
-        public async Task<IActionResult> AddFavourite(int id) {
+        public async Task<IActionResult> AddFavouriteSlot(int id) {
             User? user = await this.database.UserFromRequest(this.Request);
             if(user == null) return this.StatusCode(403, "");
 
@@ -103,7 +104,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         }
 
         [HttpPost("unfavourite/slot/user/{id:int}")]
-        public async Task<IActionResult> RemoveFavourite(int id) {
+        public async Task<IActionResult> RemoveFavouriteSlot(int id) {
             User? user = await this.database.UserFromRequest(this.Request);
             if(user == null) return this.StatusCode(403, "");
 
@@ -116,6 +117,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         }
 
         #endregion
+        #endregion Levels
 
+        #region Users
+
+        
+
+        #endregion
     }
 }
