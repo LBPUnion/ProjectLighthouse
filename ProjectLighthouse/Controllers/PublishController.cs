@@ -22,12 +22,22 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         }
 
         /// <summary>
-        /// Endpoint the game uses to verify that the level is compatible (?)
+        /// Endpoint the game uses to check what resources need to be uploaded and if the level can be uploaded
         /// </summary>
         [HttpPost("startPublish")]
         public async Task<IActionResult> StartPublish() {
+            User user = await this.database.UserFromRequest(this.Request);
+            if(user == null) return this.StatusCode(403, "");
+            
             Slot slot = await this.GetSlotFromBody();
             if(slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
+
+            // Republish logic
+            if(slot.SlotId != 0) {
+                Slot oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+                if(oldSlot == null) return this.NotFound();
+                if(oldSlot.CreatorId != user.UserId) return this.BadRequest();
+            }
 
             string resources = slot.Resources
                 .Where(hash => !FileHelper.ResourceExists(hash))
@@ -46,6 +56,23 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             if(user == null) return this.StatusCode(403, "");
             
             Slot slot = await this.GetSlotFromBody();
+
+            // Republish logic
+            if(slot.SlotId != 0) {
+                Slot oldSlot = await this.database.Slots
+                    .Include(s => s.Location)
+                    .FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+                if(oldSlot == null) return this.NotFound();
+                if(oldSlot.CreatorId != user.UserId) return this.BadRequest();
+
+                slot.CreatorId = oldSlot.CreatorId;
+                slot.LocationId = oldSlot.LocationId;
+                slot.SlotId = oldSlot.SlotId;
+                
+                this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
+                await this.database.SaveChangesAsync();
+                return this.Ok(oldSlot.Serialize());
+            }
 
             //TODO: parse location in body
             Location l = new() {

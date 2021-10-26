@@ -16,7 +16,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels {
         public string Type { get; set; }
 
         [Key]
-        [XmlIgnore]
+        [XmlElement("id")]
         public int SlotId { get; set; }
 
         
