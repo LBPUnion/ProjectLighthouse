@@ -22,11 +22,6 @@ jobs:
       DB_USER: root
       DB_PASSWORD: lighthouse
     steps:
-      - name: Cancel previous runs of this workflow
-        uses: styfle/cancel-workflow-action@0.6.0
-        with:
-          access_token: ${{ github.token }}
-        
       - name: Checkout
         uses: actions/checkout@v2
 
