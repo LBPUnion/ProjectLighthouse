@@ -1,4 +1,5 @@
 using Kettu;
+using Microsoft.Extensions.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Logging {
     public class LoggerLevelStartup : LoggerLevel {
@@ -16,40 +17,11 @@ namespace LBPUnion.ProjectLighthouse.Logging {
         public static readonly LoggerLevelHttp Instance = new();
     }
 
-    #region ASP.NET
-    public class LoggerLevelAspNetTrace : LoggerLevel {
-        public override string Name => "ASP.NET: Trace";
-        public static readonly LoggerLevelAspNetTrace Instance = new();
+    public class LoggerLevelAspNet : LoggerLevel {
+        public override string Name => "AspNet";
+        
+        public LoggerLevelAspNet(LogLevel level) {
+            this.Channel = level.ToString();
+        }
     }
-    
-    public class LoggerLevelAspNetDebug : LoggerLevel {
-        public override string Name => "ASP.NET: Debug";
-        public static readonly LoggerLevelAspNetDebug Instance = new();
-    }
-    
-    public class LoggerLevelAspNetInformation : LoggerLevel {
-        public override string Name => "ASP.NET: Information";
-        public static readonly LoggerLevelAspNetInformation Instance = new();
-    }
-    
-    public class LoggerLevelAspNetWarning : LoggerLevel {
-        public override string Name => "ASP.NET: Warning";
-        public static readonly LoggerLevelAspNetWarning Instance = new();
-    }
-    
-    public class LoggerLevelAspNetError : LoggerLevel {
-        public override string Name => "ASP.NET: Error";
-        public static readonly LoggerLevelAspNetError Instance = new();
-    }
-    
-    public class LoggerLevelAspNetCritical : LoggerLevel {
-        public override string Name => "ASP.NET: Critical";
-        public static readonly LoggerLevelAspNetCritical Instance = new();
-    }
-    
-    public class LoggerLevelAspNetNone : LoggerLevel {
-        public override string Name => "ASP.NET: None";
-        public static readonly LoggerLevelAspNetNone Instance = new();
-    }
-    #endregion
 }

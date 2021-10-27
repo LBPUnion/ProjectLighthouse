@@ -9,9 +9,14 @@ namespace LBPUnion.ProjectLighthouse.Logging {
         
         public override void Send(LoggerLine line) {
             FileHelper.EnsureDirectoryCreated(logsDirectory);
-            
-            File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel + ".log"), line.LineData + "\n");
-            File.AppendAllText(Path.Combine(logsDirectory, "all.log"), line.LineData + "\n");
+
+            string channel = string.IsNullOrEmpty(line.LoggerLevel.Channel) ? "" : $"[{line.LoggerLevel.Channel}] ";
+
+            string contentFile = $"{channel}{line.LineData}\n";
+            string contentAll = $"[{$"{line.LoggerLevel.Name} {channel}".TrimEnd()}] {line.LineData}\n";
+
+            File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel.Name + ".log"), contentFile);
+            File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
         }
     }
 }
