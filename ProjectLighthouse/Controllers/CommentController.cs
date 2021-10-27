@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -49,6 +50,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
 
             comment.PosterUserId = poster.UserId;
             comment.TargetUserId = target.UserId;
+
+            comment.Timestamp = TimeHelper.UnixTimeMilliseconds();
 
             this.database.Comments.Add(comment);
             await this.database.SaveChangesAsync();
