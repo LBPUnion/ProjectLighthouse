@@ -18,6 +18,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
 
         [HttpGet("slots/search")]
         public async Task<IActionResult> SearchSlots([FromQuery] string query) {
+            if(query == null) return this.BadRequest();
             query = query.ToLower();
 
             string[] keywords = query.Split(" ");
