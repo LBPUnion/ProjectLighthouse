@@ -26,7 +26,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
-        
+
+        [HttpGet("s/user/{id:int}")]
         public async Task<IActionResult> SUser(int id) {
             Slot slot = await this.database.Slots
                 .Include(s => s.Creator)
