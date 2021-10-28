@@ -6,3 +6,6 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
         public static long UnixTimeSeconds() => DateTimeOffset.Now.ToUnixTimeSeconds();
     }
 }
+
+// 1397109686193
+// 1635389749454

@@ -68,6 +68,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
                 slot.CreatorId = oldSlot.CreatorId;
                 slot.LocationId = oldSlot.LocationId;
                 slot.SlotId = oldSlot.SlotId;
+                slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
                 
                 this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
                 await this.database.SaveChangesAsync();
@@ -83,6 +84,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             await this.database.SaveChangesAsync();
             slot.LocationId = l.Id;
             slot.CreatorId = user.UserId;
+            slot.FirstUploaded = slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
 
             this.database.Slots.Add(slot);
             await this.database.SaveChangesAsync();
