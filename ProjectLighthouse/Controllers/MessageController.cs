@@ -1,5 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,10 +34,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         }
         /// <summary>
         /// Filters chat messages sent by a user.
+        /// The reponse sent is the text that will appear in-game.
         /// </summary>
         [HttpPost("filter")]
         public async Task<IActionResult> Filter() {
-            return this.Ok(await new StreamReader(this.Request.Body).ReadToEndAsync());
+            User user = await this.database.UserFromRequest(this.Request);
+            if(user == null) return this.StatusCode(403, "");
+            
+            string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();
+            
+            Logger.Log($"{user.Username}: {loggedText}", LoggerLevelFilter.Instance);
+            return this.Ok(loggedText);
         }
     }
 }

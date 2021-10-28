@@ -16,6 +16,11 @@ namespace LBPUnion.ProjectLighthouse.Logging {
         public override string Name => "HTTP";
         public static readonly LoggerLevelHttp Instance = new();
     }
+    
+    public class LoggerLevelFilter : LoggerLevel {
+            public override string Name => "Filter";
+            public static readonly LoggerLevelFilter Instance = new();
+        }
 
     public class LoggerLevelAspNet : LoggerLevel {
         public override string Name => "AspNet";
