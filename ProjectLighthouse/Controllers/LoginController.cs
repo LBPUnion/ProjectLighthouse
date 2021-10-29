@@ -20,13 +20,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         public async Task<IActionResult> Login() {
             string body = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-            LoginData loginData;
+            LoginData? loginData;
             try {
                 loginData = LoginData.CreateFromString(body);
             }
             catch {
-                return this.BadRequest();
+                loginData = null;
             }
+
+            if(loginData == null) return this.BadRequest();
 
             Token? token = await this.database.AuthenticateUser(loginData);
 

@@ -16,9 +16,9 @@ namespace LBPUnion.ProjectLighthouse.Tests {
             await semaphore.WaitAsync();
 
             HttpResponseMessage result = await this.AuthenticatedUploadDataRequest("LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
-            Assert.False(result.IsSuccessStatusCode);
 
             semaphore.Release();
+            Assert.False(result.IsSuccessStatusCode);
         }
 
         [DatabaseFact]
@@ -32,9 +32,9 @@ namespace LBPUnion.ProjectLighthouse.Tests {
                 loginResult.AuthTicket
             );
             
-            Assert.True(result.IsSuccessStatusCode);
 
             semaphore.Release();
+            Assert.True(result.IsSuccessStatusCode);
         }
         public async Task<int> GetPlayerCount() => Convert.ToInt32(await this.Client.GetStringAsync("LITTLEBIGPLANETPS3_XML/totalPlayerCount"));
 
