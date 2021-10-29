@@ -7,7 +7,9 @@ namespace LBPUnion.ProjectLighthouse.Logging {
     public class LighthouseFileLogger : LoggerBase {
         private static readonly string logsDirectory = Path.Combine(Environment.CurrentDirectory, "logs");
         
-        public override void Send(LoggerLine line) {
+        public override void Send(LoggerLine line)
+        {
+            return;
             FileHelper.EnsureDirectoryCreated(logsDirectory);
             
             File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel + ".log"), line.LineData + "\n");
