@@ -26,7 +26,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
                 .Include(c => c.Target)
                 .Include(c => c.Poster)
                 .Where(c => c.Target.Username == username)
-                .OrderBy(c => c.Timestamp)
+                .OrderByDescending(c => c.Timestamp)
                 .ToListAsync();
 
             string outputXml = comments.Aggregate(string.Empty, (current, comment) => current + comment.Serialize());

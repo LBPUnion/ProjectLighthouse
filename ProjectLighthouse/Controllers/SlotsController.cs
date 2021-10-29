@@ -45,7 +45,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             IQueryable<Slot> slots = this.database.Slots
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
-                .OrderBy(s => s.FirstUploaded)
+                .OrderByDescending(s => s.FirstUploaded)
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, 30));
             string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
