@@ -1,7 +1,11 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +18,8 @@ namespace LBPUnion.ProjectLighthouse {
     public static class Program {
         public static void Main(string[] args) {
             // Log startup time
-            Stopwatch startupStopwatch = new();
-            startupStopwatch.Start();
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
             
             // Setup logging
             
@@ -29,22 +33,52 @@ namespace LBPUnion.ProjectLighthouse {
             bool dbConnected = ServerSettings.DbConnected;
             Logger.Log(dbConnected ? "Connected to the database." : "Database unavailable! Exiting.", LoggerLevelStartup.Instance);
 
-            if(dbConnected) {
-                Stopwatch migrationStopwatch = new();
-                migrationStopwatch.Start();
-                
-                Logger.Log("Migrating database...", LoggerLevelDatabase.Instance);
-                using Database database = new();
-                database.Database.Migrate();
-                
-                migrationStopwatch.Stop();
-                Logger.Log($"Migration took {migrationStopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
-            } else Environment.Exit(1);
+            if(!dbConnected) Environment.Exit(1);
+            using Database database = new();
+
+            Logger.Log("Migrating database...", LoggerLevelDatabase.Instance);
+            MigrateDatabase(database);
             
-            startupStopwatch.Stop();
-            Logger.Log($"Ready! Startup took {startupStopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
+
+            Logger.Log("Fixing broken timestamps...", LoggerLevelDatabase.Instance);
+            FixTimestamps(database);
+
+            stopwatch.Stop();
+            Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
 
             CreateHostBuilder(args).Build().Run();
+        }
+
+        public static void MigrateDatabase(Database database) {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            
+            database.Database.Migrate();
+            
+            stopwatch.Stop();
+            Logger.Log($"Migration took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
+        }
+
+        public static void FixTimestamps(Database database) {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            
+            foreach(Slot slot in database.Slots.Where(s => s.FirstUploaded == 0)) {
+                slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
+            }
+
+            foreach(Slot slot in database.Slots.Where(s => s.LastUpdated == 0)) {
+                slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
+            }
+
+            foreach(Comment comment in database.Comments.Where(c => c.Timestamp == 0)) {
+                comment.Timestamp = TimeHelper.UnixTimeMilliseconds();
+            }
+
+            database.SaveChanges();
+            
+            stopwatch.Stop();
+            Logger.Log($"Fixing timestamps took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
