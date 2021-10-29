@@ -65,6 +65,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
                 if(oldSlot == null) return this.NotFound();
                 if(oldSlot.CreatorId != user.UserId) return this.BadRequest();
 
+                oldSlot.Location.X = slot.Location.X;
+                oldSlot.Location.Y = slot.Location.Y;
+
                 slot.CreatorId = oldSlot.CreatorId;
                 slot.LocationId = oldSlot.LocationId;
                 slot.SlotId = oldSlot.SlotId;
@@ -77,8 +80,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
 
             //TODO: parse location in body
             Location l = new() {
-                X = 0,
-                Y = 0,
+                X = slot.Location.X,
+                Y = slot.Location.Y,
             };
             this.database.Locations.Add(l);
             await this.database.SaveChangesAsync();
