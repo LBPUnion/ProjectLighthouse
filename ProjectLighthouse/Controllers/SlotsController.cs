@@ -34,6 +34,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
                 .Include(s => s.Location)
                 .FirstOrDefaultAsync(s => s.SlotId == id);
 
+            if(slot == null) return this.NotFound();
+
             return this.Ok(slot.Serialize());
         }
     }
