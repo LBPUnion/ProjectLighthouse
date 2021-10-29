@@ -22,6 +22,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             return user == null
                 ? this.StatusCode(403, "")
                 : this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
+                          // ReSharper disable once UnreachableCode
                           (EulaHelper.ShowPrivateInstanceNotice ? "\n" + EulaHelper.PrivateInstanceNotice : "") + "\n" +
                           $"{EulaHelper.License}\n");
         }
