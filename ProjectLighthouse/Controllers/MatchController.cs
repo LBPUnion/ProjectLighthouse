@@ -74,15 +74,5 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             
             return this.Ok("[{\"StatusCode\":200}]");
         }
-
-        [HttpGet("playersInPodCount")]
-        [HttpGet("totalPlayerCount")]
-        public async Task<IActionResult> TotalPlayerCount() {
-            int recentMatches = await this.database.LastMatches
-                .Where(l => TimestampHelper.Timestamp - l.Timestamp < 60)
-                .CountAsync();
-
-            return this.Ok(recentMatches.ToString());
-        }
     }
 }
