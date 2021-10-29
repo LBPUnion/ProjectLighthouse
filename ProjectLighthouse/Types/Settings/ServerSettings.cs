@@ -8,9 +8,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings {
         /// <summary>
         /// The maximum amount of slots allowed on users' earth
         /// </summary>
-        public const int EntitledSlots = int.MaxValue;
+        public const int EntitledSlots = 50;
 
-        public const int ListsQuota = 20;
+        public const int ListsQuota = 50;
 
         public const string ServerName = "ProjectLighthouse";
 
