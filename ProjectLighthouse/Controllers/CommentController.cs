@@ -58,5 +58,22 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             await this.database.SaveChangesAsync();
             return this.Ok();
         }
+
+        [HttpPost("deleteUserComment/{username}")]
+        public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string username) {
+            User user = await this.database.UserFromRequest(this.Request);
+            if(user == null) return this.StatusCode(403, "");
+
+            Comment comment = await this.database.Comments
+                .FirstOrDefaultAsync(c => c.CommentId == commentId);
+
+            if(comment.TargetUserId != user.UserId && comment.PosterUserId != user.UserId) 
+                return this.StatusCode(403, "");
+
+            this.database.Comments.Remove(comment);
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
     }
 }
