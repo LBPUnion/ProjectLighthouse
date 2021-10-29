@@ -28,6 +28,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             return this.Ok(user.Serialize());
         }
 
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUserAlt([FromQuery] string u) {
+            return await GetUser(u);
+        }
+
 //        [HttpPost("user/{username}")]
 //        public async Task<IActionResult> CreateUser(string username) {
 //            await new Database().CreateUser(username);

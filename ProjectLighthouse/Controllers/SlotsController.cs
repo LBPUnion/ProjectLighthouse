@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -37,6 +38,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
             if(slot == null) return this.NotFound();
 
             return this.Ok(slot.Serialize());
+        }
+
+        [HttpGet("slots")]
+        public IActionResult NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize) {
+            string response = Enumerable.Aggregate(this.database.Slots
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .OrderBy(s => s.FirstUploaded)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
+            , string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
         }
     }
 }
