@@ -41,7 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         }
 
         [HttpGet("slots")]
-        public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize) {
+        public IActionResult NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize) {
             IQueryable<Slot> slots = this.database.Slots
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
