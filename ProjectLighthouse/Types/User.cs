@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -50,8 +51,14 @@ namespace LBPUnion.ProjectLighthouse.Types {
         /// <summary>
         /// The number of used slots on the earth
         /// </summary>
-        public int UsedSlots { get; set; }
-        
+        [NotMapped]
+        public int UsedSlots {
+            get {
+                using Database database = new();
+                return database.Slots.Count(s => s.CreatorId == this.UserId);
+            }
+        }
+
         /// <summary>
         /// The number of slots remaining on the earth
         /// </summary>
