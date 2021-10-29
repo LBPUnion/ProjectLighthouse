@@ -41,16 +41,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
         }
 
         [HttpGet("slots")]
-        public IActionResult NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize) {
-            string response = Enumerable.Aggregate(this.database.Slots
+        public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize) {
+            IQueryable<Slot> slots = this.database.Slots
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .OrderBy(s => s.FirstUploaded)
                 .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30))
-            , string.Empty, (current, slot) => current + slot.Serialize());
+                .Take(Math.Min(pageSize, 30));
+            string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
         }
     }
 }
