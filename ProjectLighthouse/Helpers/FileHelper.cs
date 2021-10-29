@@ -15,6 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
             
             return file.FileType switch {
                 LbpFileType.FileArchive => false,
+                LbpFileType.Painting => true,
                 LbpFileType.Unknown => false,
                 LbpFileType.Texture => true,
                 LbpFileType.Script => false,
@@ -39,6 +40,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
             byte[] header = reader.ReadBytes(3);
 
             return Encoding.ASCII.GetString(header) switch {
+                "PTG" => LbpFileType.Painting,
                 "TEX" => LbpFileType.Texture,
                 "FSH" => LbpFileType.Script,
                 "VOP" => LbpFileType.Voice,
