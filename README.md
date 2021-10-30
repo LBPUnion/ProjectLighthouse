@@ -59,8 +59,11 @@ Some modifications may require updates to the database schema. You can automatic
 
 ## Compatibility across games and platforms
 
-|      	  | PS3        | RPCS3                            |
-|---------|------------|----------------------------------|
-| LBP1    | Somewhat   | Crashes on entering controller   |
-| LBP2    | Yes        | Yes (requires patched RPCS3)     |
-| LBP3    | Connects   | Crashes on startup               |
+| Game 	   | Console (PS3/Vita)     | Emulator (RPCS3)                               | Next-Gen (PS4/PS5) |
+|----------|------------------------|------------------------------------------------|--------------------|
+| LBP1     | Somewhat compatible    | Incompatible, crashes on entering pod computer | N/A                |
+| LBP2     | Compatible             | Compatible with patched RPCS3                  | N/A                |
+| LBP3     | Somewhat compatible    | Somewhat compatible with workaround            | Incompatible       |
+| LBP Vita | Potentially compatible | N/A                                            | N/A                |
+
+Project Lighthouse is still a heavy work in progress, so this is subject to change at any point.
