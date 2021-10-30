@@ -84,11 +84,14 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels {
         [XmlElement("moveRequired")]
         public bool MoveRequired { get; set; }
         
-        [XmlElement("firstPublished")]
+        [XmlIgnore]
         public long FirstUploaded { get; set; }
         
-        [XmlElement("lastUpdated")]
+        [XmlIgnore]
         public long LastUpdated { get; set; }
+        
+        [XmlIgnore]
+        public bool MMPick { get; set; }
 
         public string SerializeResources() {
             return this.Resources
@@ -115,7 +118,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels {
                               LbpSerializer.StringElement("maxPlayers", this.MaximumPlayers) +
                               LbpSerializer.StringElement("moveRequired", this.MoveRequired) +
                               LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
-                              LbpSerializer.StringElement("lastUpdated", this.LastUpdated);
+                              LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
+                              LbpSerializer.StringElement("mmpick", this.MMPick);
             
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }
