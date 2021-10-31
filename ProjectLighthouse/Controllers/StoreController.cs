@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
@@ -9,9 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class StoreController : Controller
     {
         [HttpGet("promotions")]
-        public IActionResult Promotions()
-        {
-            return Ok();
-        }
+        public IActionResult Promotions() => this.Ok();
     }
 }

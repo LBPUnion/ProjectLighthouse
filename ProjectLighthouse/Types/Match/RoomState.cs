@@ -1,5 +1,7 @@
-namespace LBPUnion.ProjectLighthouse.Types.Match {
-    public enum RoomState {
+namespace LBPUnion.ProjectLighthouse.Types.Match
+{
+    public enum RoomState
+    {
         Idle = 0,
         LookingForPlayersForLevel = 1,
         Unknown = 2,

@@ -40,10 +40,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
             if (bodyString.Contains("FindBestRoom"))
-            {
-                return this.Ok(
-                    "[{\"StatusCode\":200},{\"Players\":[{\"PlayerId\":\"literally1984\",\"matching_res\":0},{\"PlayerId\":\"jvyden\",\"matching_res\":1}],\"Slots\":[[5,0]],\"RoomState\":\"E_ROOM_IN_POD\",\"HostMood\":\"E_MOOD_EVERYONE\",\"LevelCompletionEstimate\":0,\"PassedNoJoinPoint\":0,\"MoveConnected\":false,\"Location\":[\"127.0.0.1\"],\"BuildVersion\":289,\"Language\":1,\"FirstSeenTimestamp\":1427331263756,\"LastSeenTimestamp\":1635112546000,\"GameId\":1,\"NatType\":2,\"Friends\":[],\"Blocked\":[],\"RecentlyLeft\":[],\"FailedJoin\":[]}]");
-            }
+                return this.Ok
+                (
+                    "[{\"StatusCode\":200},{\"Players\":[{\"PlayerId\":\"literally1984\",\"matching_res\":0},{\"PlayerId\":\"jvyden\",\"matching_res\":1}],\"Slots\":[[5,0]],\"RoomState\":\"E_ROOM_IN_POD\",\"HostMood\":\"E_MOOD_EVERYONE\",\"LevelCompletionEstimate\":0,\"PassedNoJoinPoint\":0,\"MoveConnected\":false,\"Location\":[\"127.0.0.1\"],\"BuildVersion\":289,\"Language\":1,\"FirstSeenTimestamp\":1427331263756,\"LastSeenTimestamp\":1635112546000,\"GameId\":1,\"NatType\":2,\"Friends\":[],\"Blocked\":[],\"RecentlyLeft\":[],\"FailedJoin\":[]}]"
+                );
 
             if (bodyString[0] != '[') return this.BadRequest();
 
@@ -52,7 +52,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 matchData = MatchHelper.Deserialize(bodyString);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Logger.Log("Exception while parsing MatchData: " + e);
                 Logger.Log("Data: " + bodyString);
@@ -66,8 +66,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #region Update LastMatch
 
-            LastMatch? lastMatch = await this.database.LastMatches
-                .Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
+            LastMatch? lastMatch = await this.database.LastMatches.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
 
             // below makes it not look like trash
             // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
@@ -87,17 +86,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             #endregion
 
             return this.Ok("[{\"StatusCode\":200}]");
-        }
-
-        [HttpGet("playersInPodCount")]
-        [HttpGet("totalPlayerCount")]
-        public async Task<IActionResult> TotalPlayerCount()
-        {
-            int recentMatches = await this.database.LastMatches
-                .Where(l => TimestampHelper.Timestamp - l.Timestamp < 60)
-                .CountAsync();
-
-            return this.Ok(recentMatches.ToString());
         }
     }
 }

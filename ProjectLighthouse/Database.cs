@@ -23,16 +23,13 @@ namespace LBPUnion.ProjectLighthouse
 
         public DbSet<LastMatch> LastMatches { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseMySql(
-            ServerSettings.DbConnectionString,
-            MySqlServerVersion.LatestSupportedServerVersion
-        );
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+            => options.UseMySql(ServerSettings.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
         public async Task<User> CreateUser(string username)
         {
             User user;
-            if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null)
-                return user;
+            if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;
 
             Location l = new(); // store to get id after submitting
             this.Locations.Add(l); // add to table
@@ -51,12 +48,11 @@ namespace LBPUnion.ProjectLighthouse
             return user;
         }
 
-#nullable enable
+        #nullable enable
         public async Task<Token?> AuthenticateUser(LoginData loginData)
         {
             // TODO: don't use psn name to authenticate
-            User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username)
-                        ?? await this.CreateUser(loginData.Username);
+            User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username) ?? await this.CreateUser(loginData.Username);
 
             Token token = new()
             {
@@ -74,20 +70,16 @@ namespace LBPUnion.ProjectLighthouse
         {
             Token? token = await this.Tokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
             if (token == null) return null;
-            return await this.Users
-                .Include(u => u.Location)
-                .FirstOrDefaultAsync(u => u.UserId == token.UserId);
+
+            return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
 
         public async Task<User?> UserFromRequest(HttpRequest request)
         {
-            if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null)
-            {
-                return null;
-            }
+            if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
             return await this.UserFromAuthToken(mmAuth);
         }
-#nullable disable
+        #nullable disable
     }
 }

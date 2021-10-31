@@ -1,10 +1,16 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 
-namespace LBPUnion.ProjectLighthouse.Types {
-    public class User {
+namespace LBPUnion.ProjectLighthouse.Types
+{
+    public class User
+    {
+
+//        [NotMapped]
+        public readonly ClientsConnected ClientsConnected = new();
         public int UserId { get; set; }
         public string Username { get; set; }
         public string IconHash { get; set; }
@@ -13,21 +19,22 @@ namespace LBPUnion.ProjectLighthouse.Types {
         public int HeartCount { get; set; }
         public string YayHash { get; set; }
         public string BooHash { get; set; }
-        
+
         /// <summary>
-        /// A user-customizable biography shown on the profile card
+        ///     A user-customizable biography shown on the profile card
         /// </summary>
         public string Biography { get; set; }
+
         public int ReviewCount { get; set; }
         public int CommentCount { get; set; }
         public int PhotosByMeCount { get; set; }
         public int PhotosWithMeCount { get; set; }
         public bool CommentsEnabled { get; set; }
-        
+
         public int LocationId { get; set; }
 
         /// <summary>
-        /// The location of the profile card on the user's earth
+        ///     The location of the profile card on the user's earth
         /// </summary>
         [ForeignKey("LocationId")]
         public Location Location { get; set; }
@@ -41,50 +48,9 @@ namespace LBPUnion.ProjectLighthouse.Types {
         public int StaffChallengeBronzeCount { get; set; }
 
         public string PlanetHash { get; set; } = "";
-        
-//        [NotMapped]
-        public readonly ClientsConnected ClientsConnected = new();
-        
-        #region Slots
 
-        /// <summary>
-        /// The number of used slots on the earth
-        /// </summary>
-        public int UsedSlots { get; set; }
-        
-        /// <summary>
-        /// The number of slots remaining on the earth
-        /// </summary>
-        public int FreeSlots => ServerSettings.EntitledSlots - this.UsedSlots;
-
-        private static readonly string[] slotTypes = {
-//            "lbp1",
-            "lbp2",
-            "lbp3",
-            "crossControl",
-        };
-
-        private string SerializeSlots() {
-            string slots = string.Empty;
-
-            slots += LbpSerializer.StringElement("lbp1UsedSlots", this.UsedSlots);
-            slots += LbpSerializer.StringElement("entitledSlots", ServerSettings.EntitledSlots);
-            slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
-
-            foreach(string slotType in slotTypes) {
-                slots += LbpSerializer.StringElement(slotType + "UsedSlots", this.UsedSlots);
-                slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.EntitledSlots);
-                // ReSharper disable once StringLiteralTypo
-                slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
-                slots += LbpSerializer.StringElement(slotType + "FreeSlots", this.FreeSlots);
-            }
-            return slots;
-            
-        }
-        
-        #endregion Slots
-
-        public string Serialize() {
+        public string Serialize()
+        {
             string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                           LbpSerializer.StringElement("game", this.Game) +
                           this.SerializeSlots() +
@@ -110,8 +76,55 @@ namespace LBPUnion.ProjectLighthouse.Types {
                           LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
                           this.ClientsConnected.Serialize();
-            
+
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
         }
+
+        #region Slots
+
+        /// <summary>
+        ///     The number of used slots on the earth
+        /// </summary>
+        [NotMapped]
+        public int UsedSlots {
+            get {
+                using Database database = new();
+                return database.Slots.Count(s => s.CreatorId == this.UserId);
+            }
+        }
+
+        /// <summary>
+        ///     The number of slots remaining on the earth
+        /// </summary>
+        public int FreeSlots => ServerSettings.EntitledSlots - this.UsedSlots;
+
+        private static readonly string[] slotTypes =
+        {
+//            "lbp1",
+            "lbp2", "lbp3", "crossControl",
+        };
+
+        private string SerializeSlots()
+        {
+            string slots = string.Empty;
+
+            slots += LbpSerializer.StringElement("lbp1UsedSlots", this.UsedSlots);
+            slots += LbpSerializer.StringElement("entitledSlots", ServerSettings.EntitledSlots);
+            slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
+
+            foreach (string slotType in slotTypes)
+            {
+                slots += LbpSerializer.StringElement(slotType + "UsedSlots", this.UsedSlots);
+                slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.EntitledSlots);
+                // ReSharper disable once StringLiteralTypo
+                slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
+                slots += LbpSerializer.StringElement(slotType + "FreeSlots", this.FreeSlots);
+            }
+            return slots;
+
+        }
+
+        #endregion Slots
+
     }
 }

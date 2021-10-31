@@ -1,12 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace LBPUnion.ProjectLighthouse.Types.Levels {
+namespace LBPUnion.ProjectLighthouse.Types.Levels
+{
     /// <summary>
-    /// A series of tags that can be applied to a level
+    ///     A series of tags that can be applied to a level
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public enum LevelTags {
+    public enum LevelTags
+    {
         Brilliant,
         Beautiful,
         Funky,

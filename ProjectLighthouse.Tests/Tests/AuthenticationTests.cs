@@ -5,10 +5,13 @@ using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests {
-    public class AuthenticationTests : LighthouseTest {
+namespace LBPUnion.ProjectLighthouse.Tests
+{
+    public class AuthenticationTests : LighthouseTest
+    {
         [Fact]
-        public async Task ShouldReturnErrorOnNoPostData() {
+        public async Task ShouldReturnErrorOnNoPostData()
+        {
             HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", null!);
             Assert.False(response.IsSuccessStatusCode);
             #if NET6_0_OR_GREATER
@@ -19,7 +22,8 @@ namespace LBPUnion.ProjectLighthouse.Tests {
         }
 
         [DatabaseFact]
-        public async Task ShouldReturnWithValidData() {
+        public async Task ShouldReturnWithValidData()
+        {
             HttpResponseMessage response = await this.AuthenticateResponse();
             Assert.True(response.IsSuccessStatusCode);
             string responseContent = await response.Content.ReadAsStringAsync();
@@ -28,9 +32,10 @@ namespace LBPUnion.ProjectLighthouse.Tests {
         }
 
         [DatabaseFact]
-        public async Task CanSerializeBack() {
+        public async Task CanSerializeBack()
+        {
             LoginResult loginResult = await this.Authenticate();
-            
+
             Assert.NotNull(loginResult);
             Assert.NotNull(loginResult.AuthTicket);
             Assert.NotNull(loginResult.LbpEnvVer);
@@ -40,18 +45,20 @@ namespace LBPUnion.ProjectLighthouse.Tests {
         }
 
         [DatabaseFact]
-        public async Task CanUseToken() {
+        public async Task CanUseToken()
+        {
             LoginResult loginResult = await this.Authenticate();
 
             HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/eula", loginResult.AuthTicket);
             string responseContent = await response.Content.ReadAsStringAsync();
-            
+
             Assert.True(response.IsSuccessStatusCode);
-            Assert.Contains("You are logged in", responseContent);
+            Assert.Contains("You are now logged in", responseContent);
         }
 
         [DatabaseFact]
-        public async Task ShouldReturnForbiddenWhenNotAuthenticated() {
+        public async Task ShouldReturnForbiddenWhenNotAuthenticated()
+        {
             HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/eula");
             Assert.False(response.IsSuccessStatusCode);
             Assert.True(response.StatusCode == HttpStatusCode.Forbidden);

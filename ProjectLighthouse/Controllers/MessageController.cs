@@ -1,5 +1,8 @@
 using System.IO;
 using System.Threading.Tasks;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,34 +25,36 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         {
             User user = await this.database.UserFromRequest(this.Request);
             return user == null
-                ? this.Forbid()
-                : this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
-                          "This is a private testing instance. Please do not make anything public for now, and keep in mind security isn't as tight as a full release would.");
+                ? this.StatusCode(403, "")
+                : this.Ok
+                (
+                    $"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
+                    // ReSharper disable once UnreachableCode
+                    (EulaHelper.ShowPrivateInstanceNotice ? "\n" + EulaHelper.PrivateInstanceNotice : "") +
+                    "\n" +
+                    $"{EulaHelper.License}\n"
+                );
         }
 
         [HttpGet("announce")]
-        public async Task<IActionResult> Announce()
-        {
-            User user = await this.database.UserFromRequest(this.Request);
-            return user == null
-                ? this.Forbid()
-                : this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
-                          "This is a private testing instance. Please do not make anything public for now, and keep in mind security isn't as tight as a full release would.");
-        }
+        public IActionResult Announce() => this.Ok("");
 
         [HttpGet("notification")]
-        public IActionResult Notification()
-        {
-            return this.Ok();
-        }
-
+        public IActionResult Notification() => this.Ok();
         /// <summary>
-        /// Filters chat messages sent by a user.
+        ///     Filters chat messages sent by a user.
+        ///     The reponse sent is the text that will appear in-game.
         /// </summary>
         [HttpPost("filter")]
         public async Task<IActionResult> Filter()
         {
-            return this.Ok(await new StreamReader(this.Request.Body).ReadToEndAsync());
+            User user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();
+
+            Logger.Log($"{user.Username}: {loggedText}", LoggerLevelFilter.Instance);
+            return this.Ok(loggedText);
         }
     }
 }

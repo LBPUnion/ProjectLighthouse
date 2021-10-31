@@ -5,92 +5,103 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 
-namespace LBPUnion.ProjectLighthouse.Types.Levels {
+namespace LBPUnion.ProjectLighthouse.Types.Levels
+{
     /// <summary>
-    /// A LittleBigPlanet level.
+    ///     A LittleBigPlanet level.
     /// </summary>
-    [XmlRoot("slot"), XmlType("slot")]
-    public class Slot {
+    [XmlRoot("slot")]
+    [XmlType("slot")]
+    public class Slot
+    {
         [XmlAttribute("type")]
         [NotMapped]
         public string Type { get; set; }
 
         [Key]
-        [XmlIgnore]
+        [XmlElement("id")]
         public int SlotId { get; set; }
 
-        
         [XmlElement("name")]
         public string Name { get; set; }
-        
+
         [XmlElement("description")]
         public string Description { get; set; }
-        
+
         [XmlElement("icon")]
         public string IconHash { get; set; }
-        
+
         [XmlElement("rootLevel")]
         public string RootLevel { get; set; }
 
         public string ResourceCollection { get; set; }
-        
+
         [NotMapped]
         [XmlElement("resource")]
         public string[] Resources {
             get => this.ResourceCollection.Split(",");
             set => this.ResourceCollection = string.Join(',', value);
         }
-        
+
         [XmlIgnore]
         public int LocationId { get; set; }
 
-        [XmlIgnore] 
+        [XmlIgnore]
         public int CreatorId { get; set; }
 
         [ForeignKey(nameof(CreatorId))]
         public User Creator { get; set; }
 
         /// <summary>
-        /// The location of the level on the creator's earth
+        ///     The location of the level on the creator's earth
         /// </summary>
         [XmlElement("location")]
         [ForeignKey(nameof(LocationId))]
         public Location Location { get; set; }
-        
+
         [XmlElement("initiallyLocked")]
         public bool InitiallyLocked { get; set; }
-        
+
         [XmlElement("isSubLevel")]
         public bool SubLevel { get; set; }
-        
+
         [XmlElement("isLBP1Only")]
         public bool Lbp1Only { get; set; }
-        
+
         [XmlElement("shareable")]
         public int Shareable { get; set; }
-        
+
         [XmlElement("authorLabels")]
         public string AuthorLabels { get; set; }
 
-        [XmlElement("background")] 
+        [XmlElement("background")]
         public string BackgroundHash { get; set; } = "";
-        
+
         [XmlElement("minPlayers")]
         public int MinimumPlayers { get; set; }
-        
+
         [XmlElement("maxPlayers")]
         public int MaximumPlayers { get; set; }
-        
+
         [XmlElement("moveRequired")]
         public bool MoveRequired { get; set; }
 
-        public string SerializeResources() {
-            return this.Resources
-                .Aggregate("", (current, resource) => 
-                    current + LbpSerializer.StringElement("resource", resource));
+        [XmlIgnore]
+        public long FirstUploaded { get; set; }
+
+        [XmlIgnore]
+        public long LastUpdated { get; set; }
+
+        [XmlIgnore]
+        public bool MMPick { get; set; }
+
+        public string SerializeResources()
+        {
+            return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
         }
 
-        public string Serialize() {
+        public string Serialize()
+        {
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
                               LbpSerializer.StringElement("game", 1) +
@@ -107,8 +118,11 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels {
                               LbpSerializer.StringElement("background", this.BackgroundHash) +
                               LbpSerializer.StringElement("minPlayers", this.MinimumPlayers) +
                               LbpSerializer.StringElement("maxPlayers", this.MaximumPlayers) +
-                              LbpSerializer.StringElement("moveRequired", this.MoveRequired);
-            
+                              LbpSerializer.StringElement("moveRequired", this.MoveRequired) +
+                              LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
+                              LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
+                              LbpSerializer.StringElement("mmpick", this.MMPick);
+
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }
     }

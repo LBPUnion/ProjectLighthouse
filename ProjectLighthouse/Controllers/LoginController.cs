@@ -24,25 +24,30 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         {
             string body = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-            LoginData loginData;
+            LoginData? loginData;
             try
             {
                 loginData = LoginData.CreateFromString(body);
             }
             catch
             {
-                return this.BadRequest();
+                loginData = null;
             }
+
+            if (loginData == null) return this.BadRequest();
 
             Token? token = await this.database.AuthenticateUser(loginData);
 
             if (token == null) return this.StatusCode(403, "");
 
-            return this.Ok(new LoginResult
-            {
-                AuthTicket = "MM_AUTH=" + token.UserToken,
-                LbpEnvVer = ServerSettings.ServerName,
-            }.Serialize());
+            return this.Ok
+            (
+                new LoginResult
+                {
+                    AuthTicket = "MM_AUTH=" + token.UserToken,
+                    LbpEnvVer = ServerSettings.ServerName,
+                }.Serialize()
+            );
         }
     }
 }

@@ -6,18 +6,24 @@ using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Controllers {
+namespace LBPUnion.ProjectLighthouse.Controllers
+{
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
-    public class SearchController : ControllerBase {
+    public class SearchController : ControllerBase
+    {
         private readonly Database database;
-        public SearchController(Database database) {
+        public SearchController(Database database)
+        {
             this.database = database;
         }
 
         [HttpGet("slots/search")]
-        public async Task<IActionResult> SearchSlots([FromQuery] string query) {
+        public async Task<IActionResult> SearchSlots([FromQuery] string query)
+        {
+            if (query == null) return this.BadRequest();
+
             query = query.ToLower();
 
             string[] keywords = query.Split(" ");
@@ -26,16 +32,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers {
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .Where(s => s.SlotId >= 0); // dumb query to conv into IQueryable
-            
+
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach(string keyword in keywords) {
-                dbQuery = dbQuery.Where(s => 
-                    s.Name.ToLower().Contains(keyword) || 
-                    s.Description.ToLower().Contains(keyword) ||
-                    s.Creator.Username.ToLower().Contains(keyword) ||
-                    s.SlotId.ToString().Equals(keyword)
+            foreach (string keyword in keywords)
+                dbQuery = dbQuery.Where
+                (
+                    s => s.Name.ToLower().Contains(keyword) ||
+                         s.Description.ToLower().Contains(keyword) ||
+                         s.Creator.Username.ToLower().Contains(keyword) ||
+                         s.SlotId.ToString().Equals(keyword)
                 );
-            }
 
             List<Slot> slots = await dbQuery.ToListAsync();
             string response = slots.Aggregate("", (current, slot) => current + slot.Serialize());

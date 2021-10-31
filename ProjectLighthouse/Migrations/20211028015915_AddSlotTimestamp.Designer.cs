@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211028015915_AddSlotTimestamp")]
+    partial class AddSlotTimestamp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,26 +99,17 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<long>("FirstUploaded")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("IconHash")
                         .HasColumnType("longtext");
 
                     b.Property<bool>("InitiallyLocked")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<long>("LastUpdated")
-                        .HasColumnType("bigint");
-
                     b.Property<bool>("Lbp1Only")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("MMPick")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("MaximumPlayers")
                         .HasColumnType("int");
@@ -141,6 +134,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<bool>("SubLevel")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
 
                     b.HasKey("SlotId");
 
@@ -296,6 +292,9 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("StaffChallengeSilverCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsedSlots")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")

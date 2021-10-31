@@ -1,4 +1,4 @@
-on: [push]
+on: [ push ]
 name: Continuous Integration
 
 # Inspired by osu! lazer's CI
@@ -22,11 +22,6 @@ jobs:
       DB_USER: root
       DB_PASSWORD: lighthouse
     steps:
-      - name: Cancel previous runs of this workflow
-        uses: styfle/cancel-workflow-action@0.6.0
-        with:
-          access_token: ${{ github.token }}
-        
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -36,11 +31,11 @@ jobs:
         with:
           mysql-version: '8.0'
           root-password: ${{ env.DB_PASSWORD }}
-          
+
       - name: Create Lighthouse Database
         if: ${{ matrix.os.database }}
         run: mysql -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h 127.0.0.1 -e "CREATE DATABASE ${{ env.DB_DATABASE }};";
-        
+
       - name: Install .NET 5.0
         uses: actions/setup-dotnet@v1
         with:
@@ -52,10 +47,10 @@ jobs:
         with:
           dotnet-version: "6.0.x"
           include-prerelease: true
-          
+
       - name: Compile
         run: dotnet build -c Debug
-        
+
       - name: Test
         continue-on-error: true
         run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx"
@@ -84,7 +79,7 @@ jobs:
           create-status-check: false
           create-pr-comment: false
           update-comment-if-one-exists: false
-            
+
       - name: Check Test Results
         if: steps.process-trx.outputs.test-outcome == 'Failed'
         run: |

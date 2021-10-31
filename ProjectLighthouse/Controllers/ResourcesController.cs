@@ -18,10 +18,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class ResourcesController : ControllerBase
     {
         [HttpPost("showModerated")]
-        public IActionResult ShowModerated()
-        {
-            return this.Ok(LbpSerializer.BlankElement("resources"));
-        }
+        public IActionResult ShowModerated() => this.Ok(LbpSerializer.BlankElement("resources"));
 
         [HttpPost("filterResources")]
         [HttpPost("showNotUploaded")]
@@ -30,14 +27,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             XmlSerializer serializer = new(typeof(ResourceList));
-            ResourceList resourceList = (ResourceList) serializer.Deserialize(new StringReader(bodyString));
+            ResourceList resourceList = (ResourceList)serializer.Deserialize(new StringReader(bodyString));
 
             if (resourceList == null) return this.BadRequest();
 
-            string resources = resourceList.Resources
-                .Where(s => !FileHelper.ResourceExists(s))
-                .Aggregate("", (current, hash) =>
-                    current + LbpSerializer.StringElement("resource", hash));
+            string resources = resourceList.Resources.Where
+                    (s => !FileHelper.ResourceExists(s))
+                .Aggregate("", (current, hash) => current + LbpSerializer.StringElement("resource", hash));
 
             return this.Ok(LbpSerializer.StringElement("resources", resources));
         }
@@ -47,10 +43,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         {
             string path = FileHelper.GetResourcePath(hash);
 
-            if (FileHelper.ResourceExists(hash))
-            {
-                return this.File(IOFile.OpenRead(path), "application/octet-stream");
-            }
+            if (FileHelper.ResourceExists(hash)) return this.File(IOFile.OpenRead(path), "application/octet-stream");
 
             return this.NotFound();
         }
@@ -68,7 +61,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
 
             Logger.Log($"Processing resource upload (hash: {hash})");
-            LbpFile file = new(await BinaryHelper.ReadFromPipeReader(Request.BodyReader));
+            LbpFile file = new(await BinaryHelper.ReadFromPipeReader(this.Request.BodyReader));
 
             if (!FileHelper.IsFileSafe(file)) return this.UnprocessableEntity();
 

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
@@ -8,9 +7,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class DeveloperController : Controller
     {
         [HttpGet("/developer_videos")]
-        public IActionResult DeveloperVideos()
-        {
-            return this.Ok();
-        }
+        public IActionResult DeveloperVideos() => this.Ok();
     }
 }

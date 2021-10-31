@@ -18,7 +18,7 @@
     "ProjectLighthouse": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
-      "applicationUrl": "http://localhost:10060;http://localhost:10061;http://localhost:1062",
+      "applicationUrl": "http://localhost:10060",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "LIGHTHOUSE_DB_CONNECTION_STRING": "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse"

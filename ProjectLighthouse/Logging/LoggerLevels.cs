@@ -1,55 +1,39 @@
 using Kettu;
+using Microsoft.Extensions.Logging;
 
-namespace LBPUnion.ProjectLighthouse.Logging {
-    public class LoggerLevelStartup : LoggerLevel {
-        public override string Name => "Startup";
+namespace LBPUnion.ProjectLighthouse.Logging
+{
+    public class LoggerLevelStartup : LoggerLevel
+    {
         public static readonly LoggerLevelStartup Instance = new();
+        public override string Name => "Startup";
     }
 
-    public class LoggerLevelDatabase : LoggerLevel {
-        public override string Name => "Database";
+    public class LoggerLevelDatabase : LoggerLevel
+    {
         public static readonly LoggerLevelDatabase Instance = new();
+        public override string Name => "Database";
     }
 
-    public class LoggerLevelHttp : LoggerLevel {
-        public override string Name => "HTTP";
+    public class LoggerLevelHttp : LoggerLevel
+    {
         public static readonly LoggerLevelHttp Instance = new();
+        public override string Name => "HTTP";
     }
 
-    #region ASP.NET
-    public class LoggerLevelAspNetTrace : LoggerLevel {
-        public override string Name => "ASP.NET: Trace";
-        public static readonly LoggerLevelAspNetTrace Instance = new();
+    public class LoggerLevelFilter : LoggerLevel
+    {
+        public static readonly LoggerLevelFilter Instance = new();
+        public override string Name => "Filter";
     }
-    
-    public class LoggerLevelAspNetDebug : LoggerLevel {
-        public override string Name => "ASP.NET: Debug";
-        public static readonly LoggerLevelAspNetDebug Instance = new();
+
+    public class LoggerLevelAspNet : LoggerLevel
+    {
+
+        public LoggerLevelAspNet(LogLevel level)
+        {
+            this.Channel = level.ToString();
+        }
+        public override string Name => "AspNet";
     }
-    
-    public class LoggerLevelAspNetInformation : LoggerLevel {
-        public override string Name => "ASP.NET: Information";
-        public static readonly LoggerLevelAspNetInformation Instance = new();
-    }
-    
-    public class LoggerLevelAspNetWarning : LoggerLevel {
-        public override string Name => "ASP.NET: Warning";
-        public static readonly LoggerLevelAspNetWarning Instance = new();
-    }
-    
-    public class LoggerLevelAspNetError : LoggerLevel {
-        public override string Name => "ASP.NET: Error";
-        public static readonly LoggerLevelAspNetError Instance = new();
-    }
-    
-    public class LoggerLevelAspNetCritical : LoggerLevel {
-        public override string Name => "ASP.NET: Critical";
-        public static readonly LoggerLevelAspNetCritical Instance = new();
-    }
-    
-    public class LoggerLevelAspNetNone : LoggerLevel {
-        public override string Name => "ASP.NET: None";
-        public static readonly LoggerLevelAspNetNone Instance = new();
-    }
-    #endregion
 }

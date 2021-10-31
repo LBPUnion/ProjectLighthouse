@@ -14,6 +14,6 @@ services:
       - '3306' # Expose port to localhost:3306
     volumes:
       - lighthouse-db:/var/lib/mysql
-        
+
 volumes:
   lighthouse-db:
