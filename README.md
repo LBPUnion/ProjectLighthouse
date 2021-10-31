@@ -74,9 +74,9 @@ Some modifications may require updates to the database schema. You can automatic
 
 ## Compatibility across games and platforms
 
-| Game       | Console (PS3/Vita)     | Emulator (RPCS3)                               | Next-Gen (PS4/PS5) |
+| Game     | Console (PS3/Vita)     | Emulator (RPCS3)                               | Next-Gen (PS4/PS5) |
 |----------|------------------------|------------------------------------------------|--------------------|
-| LBP1     | Somewhat compatible    | Incompatible, crashes on entering pod computer | N/A                |
+| LBP1     | Compatible             | Incompatible, crashes on entering pod computer | N/A                |
 | LBP2     | Compatible             | Compatible with patched RPCS3                  | N/A                |
 | LBP3     | Somewhat compatible    | Somewhat compatible with workaround            | Incompatible       |
 | LBP Vita | Potentially compatible | N/A                                            | N/A                |
