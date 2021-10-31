@@ -14,6 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class MessageController : ControllerBase
     {
         private readonly Database database;
+
         public MessageController(Database database)
         {
             this.database = database;

@@ -19,6 +19,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class MatchController : ControllerBase
     {
         private readonly Database database;
+
         public MatchController(Database database)
         {
             this.database = database;
@@ -38,14 +39,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // Example POST /match: [UpdateMyPlayerData,["Player":"FireGamer9872"]]
 
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-            if (bodyString.Contains
-                    ("FindBestRoom"))
+            if (bodyString.Contains("FindBestRoom"))
                 return this.Ok
                 (
                     "[{\"StatusCode\":200},{\"Players\":[{\"PlayerId\":\"literally1984\",\"matching_res\":0},{\"PlayerId\":\"jvyden\",\"matching_res\":1}],\"Slots\":[[5,0]],\"RoomState\":\"E_ROOM_IN_POD\",\"HostMood\":\"E_MOOD_EVERYONE\",\"LevelCompletionEstimate\":0,\"PassedNoJoinPoint\":0,\"MoveConnected\":false,\"Location\":[\"127.0.0.1\"],\"BuildVersion\":289,\"Language\":1,\"FirstSeenTimestamp\":1427331263756,\"LastSeenTimestamp\":1635112546000,\"GameId\":1,\"NatType\":2,\"Friends\":[],\"Blocked\":[],\"RecentlyLeft\":[],\"FailedJoin\":[]}]"
                 );
 
-            if (string.IsNullOrEmpty(bodyString) || bodyString[0] != '[') return this.BadRequest();
+            if (bodyString[0] != '[') return this.BadRequest();
 
             IMatchData? matchData;
             try

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LBPUnion.ProjectLighthouse.Helpers
 {
@@ -35,6 +37,30 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             byte[] bytes = (byte[])GenerateRandomBytes(256);
 
             return BCryptHash(Sha256Hash(bytes));
+        }
+
+        public static async Task<string> ComputeDigest(string path, string authCookie, Stream body, string digestKey)
+        {
+            MemoryStream memoryStream = new();
+
+            byte[] pathBytes = Encoding.UTF8.GetBytes(path);
+            byte[] cookieBytes = string.IsNullOrEmpty(authCookie) ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(authCookie);
+            byte[] keyBytes = Encoding.UTF8.GetBytes(digestKey);
+
+            await body.CopyToAsync(memoryStream);
+
+            byte[] bodyBytes = memoryStream.ToArray();
+
+            using IncrementalHash sha1 = IncrementalHash.CreateHash(HashAlgorithmName.SHA1);
+            sha1.AppendData(bodyBytes);
+            if (cookieBytes.Length > 0) sha1.AppendData(cookieBytes);
+            sha1.AppendData(pathBytes);
+            sha1.AppendData(keyBytes);
+
+            byte[] digestBytes = sha1.GetHashAndReset();
+            string digestString = Convert.ToHexString(digestBytes).ToLower();
+
+            return digestString;
         }
 
         #region Hash Functions

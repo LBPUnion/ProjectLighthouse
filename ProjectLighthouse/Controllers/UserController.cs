@@ -16,6 +16,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class UserController : ControllerBase
     {
         private readonly Database database;
+
         public UserController(Database database)
         {
             this.database = database;
@@ -33,6 +34,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("users")]
         public async Task<IActionResult> GetUserAlt([FromQuery] string u) => await this.GetUser(u);
+
+        [HttpGet("user/{username}/playlists")]
+        public IActionResult GetUserPlaylists(string username) => this.Ok();
 
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser()
@@ -102,6 +106,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                                     break;
                                 }
                             }
+
                             break;
                         case XmlNodeType.EndElement:
                             path.RemoveAt(path.Count - 1);
@@ -110,8 +115,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             // the way location on a user card works is stupid and will not save with the way below as-is, so we do the following:
-            if (locationChanged)
-            { // only modify the database if we modify here
+            if (locationChanged) // only modify the database if we modify here
+            {
                 Location l = await this.database.Locations.Where(l => l.Id == user.LocationId).FirstOrDefaultAsync(); // find the location in the database again
 
                 // set the location in the database to the one we modified above
