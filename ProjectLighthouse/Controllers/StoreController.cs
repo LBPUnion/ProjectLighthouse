@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class StoreController : Controller
     {
         [HttpGet("promotions")]
-        public async Task<IActionResult> Promotions()
+        public IActionResult Promotions()
         {
             return Ok();
         }
