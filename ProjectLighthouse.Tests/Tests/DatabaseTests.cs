@@ -1,10 +1,13 @@
 using System;
 using System.Threading.Tasks;
 
-namespace LBPUnion.ProjectLighthouse.Tests {
-    public class DatabaseTests : LighthouseTest {
+namespace LBPUnion.ProjectLighthouse.Tests
+{
+    public class DatabaseTests : LighthouseTest
+    {
         [DatabaseFact]
-        public async Task CanCreateUserTwice() {
+        public async Task CanCreateUserTwice()
+        {
             await using Database database = new();
             int rand = new Random().Next();
 

@@ -1,12 +1,16 @@
 using System;
 
-namespace LBPUnion.ProjectLighthouse.Logging {
-    public class NullScope : IDisposable{
+namespace LBPUnion.ProjectLighthouse.Logging
+{
+    public class NullScope : IDisposable
+    {
+
+        private NullScope()
+        {}
         public static NullScope Instance { get; } = new();
 
-        private NullScope() {}
-
-        public void Dispose() {
+        public void Dispose()
+        {
             GC.SuppressFinalize(this);
         }
     }

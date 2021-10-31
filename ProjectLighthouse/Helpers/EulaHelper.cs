@@ -1,5 +1,7 @@
-namespace LBPUnion.ProjectLighthouse.Helpers {
-    public static class EulaHelper {
+namespace LBPUnion.ProjectLighthouse.Helpers
+{
+    public static class EulaHelper
+    {
         public const string License = @"
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as

@@ -3,11 +3,14 @@ using System.IO;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 
-namespace LBPUnion.ProjectLighthouse.Logging {
-    public class LighthouseFileLogger : LoggerBase {
+namespace LBPUnion.ProjectLighthouse.Logging
+{
+    public class LighthouseFileLogger : LoggerBase
+    {
         private static readonly string logsDirectory = Path.Combine(Environment.CurrentDirectory, "logs");
-        
-        public override void Send(LoggerLine line) {
+
+        public override void Send(LoggerLine line)
+        {
             FileHelper.EnsureDirectoryCreated(logsDirectory);
 
             string channel = string.IsNullOrEmpty(line.LoggerLevel.Channel) ? "" : $"[{line.LoggerLevel.Channel}] ";

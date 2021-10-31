@@ -4,10 +4,13 @@ using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests {
-    public class SlotTests : LighthouseTest {
+namespace LBPUnion.ProjectLighthouse.Tests
+{
+    public class SlotTests : LighthouseTest
+    {
         [DatabaseFact]
-        public async Task ShouldOnlyShowUsersLevels() {
+        public async Task ShouldOnlyShowUsersLevels()
+        {
             await using Database database = new();
 
             User userA = await database.CreateUser("unitTestUser0");
@@ -17,7 +20,8 @@ namespace LBPUnion.ProjectLighthouse.Tests {
             database.Locations.Add(l);
             await database.SaveChangesAsync();
 
-            Slot slotA = new() {
+            Slot slotA = new()
+            {
                 Creator = userA,
                 Name = "slotA",
                 Location = l,
@@ -25,7 +29,8 @@ namespace LBPUnion.ProjectLighthouse.Tests {
                 ResourceCollection = "",
             };
 
-            Slot slotB = new() {
+            Slot slotB = new()
+            {
                 Creator = userB,
                 Name = "slotB",
                 Location = l,
@@ -47,7 +52,7 @@ namespace LBPUnion.ProjectLighthouse.Tests {
             Assert.NotEqual(respA, respB);
             Assert.DoesNotContain(respA, "slotB");
             Assert.DoesNotContain(respB, "slotA");
-            
+
             // Cleanup
 
             database.Slots.Remove(slotA);

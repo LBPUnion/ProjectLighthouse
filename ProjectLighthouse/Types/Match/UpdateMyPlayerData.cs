@@ -1,5 +1,7 @@
-namespace LBPUnion.ProjectLighthouse.Types.Match {
-    public class UpdateMyPlayerData : IMatchData {
+namespace LBPUnion.ProjectLighthouse.Types.Match
+{
+    public class UpdateMyPlayerData : IMatchData
+    {
         public string Player;
     }
 }
