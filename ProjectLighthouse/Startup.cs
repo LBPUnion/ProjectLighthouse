@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -61,33 +62,36 @@ namespace LBPUnion.ProjectLighthouse
                 Stopwatch requestStopwatch = new();
                 requestStopwatch.Start();
 
+                // Log all headers.
+                foreach (var header in context.Request.Headers)
+                    Logger.Log($"{header.Key}: {header.Value}");
+                
                 context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
 
                 // Client digest check.
                 var authCookie = null as string;
                 if (!context.Request.Cookies.TryGetValue("MM_AUTH", out authCookie))
                     authCookie = string.Empty;
-                if (context.Request.Headers.TryGetValue("X-Digest-A", out var clientDigest))
+                var digestPath = context.Request.Path;
+                var body = context.Request.Body;
+
+                var clientRequestDigest = await DigestUtils.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
+
+                // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
+                if (context.Request.Headers.TryGetValue("X-Digest-A", out var sentDigest))
                 {
-                    var digestPath = context.Request.Path;
-                    var body = context.Request.Body;
-
-                    var digest = await DigestUtils.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
-
-                    if (digest != clientDigest)
+                    if (clientRequestDigest != sentDigest)
                     {
-                        Logger.Log($"Client digest {clientDigest} does not match server digest {digest}.");
+                        context.Response.StatusCode = 403;
                         context.Abort();
                         return;
                     }
-                    else
-                    {
-                        context.Response.Headers.Add("X-Digest-B", digest);
-                        context.Request.Body.Position = 0;
-                    }
                 }
 
-                // This does the same as above, but for the response stream.
+                context.Response.Headers.Add("X-Digest-B", clientRequestDigest);
+                context.Request.Body.Position = 0;
+
+                    // This does the same as above, but for the response stream.
                 using var responseBuffer = new MemoryStream();
                 var oldResponseStream = context.Response.Body;
                 context.Response.Body = responseBuffer;
@@ -95,7 +99,7 @@ namespace LBPUnion.ProjectLighthouse
                 await next(); // Handle the request so we can get the status code from it
 
                 // Compute the server digest hash.
-                if (computeDigests && context.Request.Headers.TryGetValue("X-Digest-A", out var a))
+                if (computeDigests)
                 {
                     responseBuffer.Position = 0;
                     
@@ -105,6 +109,9 @@ namespace LBPUnion.ProjectLighthouse
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
 
+                // Set the X-Original-Content-Length header to the length of the response buffer.
+                context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
+                
                 // Copy the buffered response to the actual respose stream.
                 responseBuffer.Position = 0;
                 

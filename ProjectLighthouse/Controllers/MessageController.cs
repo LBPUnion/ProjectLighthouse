@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
-    [Produces("text/plain")]
+    // [Produces("text/plain")]
     public class MessageController : ControllerBase
     {
         private readonly Database database;
@@ -22,15 +22,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         {
             User user = await this.database.UserFromRequest(this.Request);
             return user == null
-                ? this.Ok("You aren't logged in, but you're connected to a private LBP server.")
+                ? this.Forbid()
                 : this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
                           "This is a private testing instance. Please do not make anything public for now, and keep in mind security isn't as tight as a full release would.");
         }
 
         [HttpGet("announce")]
-        public IActionResult Announce()
+        public async Task<IActionResult> Announce()
         {
-            return this.Ok("");
+            User user = await this.database.UserFromRequest(this.Request);
+            return user == null
+                ? this.Forbid()
+                : this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
+                          "This is a private testing instance. Please do not make anything public for now, and keep in mind security isn't as tight as a full release would.");
         }
 
         [HttpGet("notification")]

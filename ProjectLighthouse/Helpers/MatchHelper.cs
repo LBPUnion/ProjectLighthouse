@@ -3,14 +3,18 @@ using System.Linq;
 using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Types.Match;
 
-namespace LBPUnion.ProjectLighthouse.Helpers {
-    public static class MatchHelper {
-        public static IMatchData? Deserialize(string data) {
+namespace LBPUnion.ProjectLighthouse.Helpers
+{
+    public static class MatchHelper
+    {
+        public static IMatchData? Deserialize(string data)
+        {
             string matchType = "";
 
             int i = 1;
-            while(true) {
-                if(data[i] == ',') break;
+            while (true)
+            {
+                if (data[i] == ',') break;
 
                 matchType += data[i];
                 i++;
@@ -21,8 +25,10 @@ namespace LBPUnion.ProjectLighthouse.Helpers {
             return Deserialize(matchType, matchData);
         }
 
-        public static IMatchData? Deserialize(string matchType, string matchData) {
-            return matchType switch {
+        public static IMatchData? Deserialize(string matchType, string matchData)
+        {
+            return matchType switch
+            {
                 "UpdateMyPlayerData" => JsonSerializer.Deserialize<UpdateMyPlayerData>(matchData),
                 "UpdatePlayersInRoom" => JsonSerializer.Deserialize<UpdatePlayersInRoom>(matchData),
                 _ => null,
