@@ -45,7 +45,8 @@ namespace LBPUnion.ProjectLighthouse
             if (string.IsNullOrWhiteSpace(serverDigestKey))
             {
                 Logger.Log(
-                    "SERVER_DIGEST_KEY environment variable wasn't set, so server digest headers won't be set. This will break LBP 1 and LBP 3."
+                    "The SERVER_DIGEST_KEY environment variable wasn't set, so digest headers won't be set or verified. This will prevent LBP 1 and LBP 3 from working. " +
+                    "To increase security, it is recommended that you find and set this variable."
                 );
                 computeDigests = false;
             }
