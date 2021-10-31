@@ -111,7 +111,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("unpublish/{id:int}")]
         public async Task<IActionResult> Unpublish(int id)
         {
+            User user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
             Slot slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
+
+            if (slot.CreatorId != user.UserId) return this.StatusCode(403, "");
 
             this.database.Locations.Remove(slot.Location);
             this.database.Slots.Remove(slot);
