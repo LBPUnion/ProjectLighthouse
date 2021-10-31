@@ -9,7 +9,6 @@ namespace LBPUnion.ProjectLighthouse.Logging {
         
         public override void Send(LoggerLine line)
         {
-            return;
             FileHelper.EnsureDirectoryCreated(logsDirectory);
             
             File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel + ".log"), line.LineData + "\n");
