@@ -34,7 +34,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("user/{username}/playlists")]
-        public async Task<IActionResult> GetUserPlaylists(string username)
+        public IActionResult GetUserPlaylists(string username)
         {
             return this.Ok();
         }
@@ -135,9 +135,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             // the way location on a user card works is stupid and will not save with the way below as-is, so we do the following:
-            if (locationChanged)
+            if (locationChanged) // only modify the database if we modify here
             {
-                // only modify the database if we modify here
                 Location l = await this.database.Locations.Where(l => l.Id == user.LocationId)
                     .FirstOrDefaultAsync(); // find the location in the database again
 
