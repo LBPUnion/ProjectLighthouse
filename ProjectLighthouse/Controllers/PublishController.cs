@@ -96,6 +96,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
             slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
 
+            if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
+            {
+                slot.MinimumPlayers = 1;
+                slot.MaximumPlayers = 4;
+            }
+
             this.database.Slots.Add(slot);
             await this.database.SaveChangesAsync();
 

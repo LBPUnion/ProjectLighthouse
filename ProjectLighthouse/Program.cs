@@ -45,6 +45,9 @@ namespace LBPUnion.ProjectLighthouse
             Logger.Log("Fixing broken timestamps...", LoggerLevelDatabase.Instance);
             FixTimestamps(database);
 
+            Logger.Log("Fixing old LBP1 MinimumPlayers columns", LoggerLevelDatabase.Instance);
+            FixMinimumPlayers(database);
+
             stopwatch.Stop();
             Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
 
@@ -77,6 +80,23 @@ namespace LBPUnion.ProjectLighthouse
 
             stopwatch.Stop();
             Logger.Log($"Fixing timestamps took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
+        }
+
+        public static void FixMinimumPlayers(Database database)
+        {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+
+            foreach (Slot slot in database.Slots.Where(s => s.MinimumPlayers == 0))
+            {
+                slot.MinimumPlayers = 1;
+                slot.MaximumPlayers = 4;
+            }
+
+            database.SaveChanges();
+
+            stopwatch.Stop();
+            Logger.Log($"Fixing minimum players took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)
