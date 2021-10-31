@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
-    // [Produces("text/plain")]
+    [Produces("text/plain")]
     public class MessageController : ControllerBase
     {
         private readonly Database database;
