@@ -28,16 +28,20 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 ? this.StatusCode(403, "")
                 : this.Ok
                 (
-                    $"You are now logged in as user {user.Username} (id {user.UserId}).\n" +
-                    // ReSharper disable once UnreachableCode
-                    (EulaHelper.ShowPrivateInstanceNotice ? "\n" + EulaHelper.PrivateInstanceNotice : "") +
+                    EulaHelper.PrivateInstanceNoticeOrBlank +
                     "\n" +
                     $"{EulaHelper.License}\n"
                 );
         }
 
         [HttpGet("announce")]
-        public IActionResult Announce() => this.Ok("");
+        public async Task<IActionResult> Announce()
+        {
+            User user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            return this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n\n" + EulaHelper.PrivateInstanceNoticeOrBlank);
+        }
 
         [HttpGet("notification")]
         public IActionResult Notification() => this.Ok();
