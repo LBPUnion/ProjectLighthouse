@@ -10,12 +10,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     [Produces("text/xml")]
     public class NewsController : ControllerBase
     {
-        [HttpGet("/developer_videos")]
-        public async Task<IActionResult> DeveloperVideos()
-        {
-            return Ok();
-        }
-        
         [HttpGet]
         public IActionResult Get()
         {
