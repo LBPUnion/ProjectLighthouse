@@ -77,23 +77,27 @@ namespace LBPUnion.ProjectLighthouse
                 string digestPath = context.Request.Path;
                 Stream body = context.Request.Body;
 
-                string clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
-
-                // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
-                if (context.Request.Headers.TryGetValue("X-Digest-A", out var sentDigest))
+                if (computeDigests)
                 {
-                    if (clientRequestDigest != sentDigest)
+                    string clientRequestDigest =
+                        await HashHelper.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
+
+                    // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
+                    if (context.Request.Headers.TryGetValue("X-Digest-A", out var sentDigest))
                     {
-                        context.Response.StatusCode = 403;
-                        context.Abort();
-                        return;
+                        if (clientRequestDigest != sentDigest)
+                        {
+                            context.Response.StatusCode = 403;
+                            context.Abort();
+                            return;
+                        }
                     }
+
+                    context.Response.Headers.Add("X-Digest-B", clientRequestDigest);
+                    context.Request.Body.Position = 0;
                 }
 
-                context.Response.Headers.Add("X-Digest-B", clientRequestDigest);
-                context.Request.Body.Position = 0;
-
-                    // This does the same as above, but for the response stream.
+                // This does the same as above, but for the response stream.
                 using MemoryStream responseBuffer = new MemoryStream();
                 Stream oldResponseStream = context.Response.Body;
                 context.Response.Body = responseBuffer;
