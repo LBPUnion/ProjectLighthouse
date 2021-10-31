@@ -40,8 +40,8 @@ namespace LBPUnion.ProjectLighthouse
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var computeDigests = true;
-            var serverDigestKey = Environment.GetEnvironmentVariable("SERVER_DIGEST_KEY");
+            bool computeDigests = true;
+            string serverDigestKey = Environment.GetEnvironmentVariable("SERVER_DIGEST_KEY");
             if (string.IsNullOrWhiteSpace(serverDigestKey))
             {
                 Logger.Log(
@@ -70,13 +70,13 @@ namespace LBPUnion.ProjectLighthouse
                 context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
 
                 // Client digest check.
-                var authCookie = null as string;
+                string authCookie;
                 if (!context.Request.Cookies.TryGetValue("MM_AUTH", out authCookie))
                     authCookie = string.Empty;
-                var digestPath = context.Request.Path;
-                var body = context.Request.Body;
+                string digestPath = context.Request.Path;
+                Stream body = context.Request.Body;
 
-                var clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
+                string clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
 
                 // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
                 if (context.Request.Headers.TryGetValue("X-Digest-A", out var sentDigest))
@@ -93,8 +93,8 @@ namespace LBPUnion.ProjectLighthouse
                 context.Request.Body.Position = 0;
 
                     // This does the same as above, but for the response stream.
-                using var responseBuffer = new MemoryStream();
-                var oldResponseStream = context.Response.Body;
+                using MemoryStream responseBuffer = new MemoryStream();
+                Stream oldResponseStream = context.Response.Body;
                 context.Response.Body = responseBuffer;
 
                 await next(); // Handle the request so we can get the status code from it
@@ -105,7 +105,7 @@ namespace LBPUnion.ProjectLighthouse
                     responseBuffer.Position = 0;
                     
                     // Compute the digest for the response.
-                    var serverDigest = await HashHelper.ComputeDigest(context.Request.Path, authCookie,
+                    string serverDigest = await HashHelper.ComputeDigest(context.Request.Path, authCookie,
                         responseBuffer, serverDigestKey);
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
