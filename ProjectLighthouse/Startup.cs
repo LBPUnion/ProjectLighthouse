@@ -5,6 +5,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Builder;
@@ -75,7 +76,7 @@ namespace LBPUnion.ProjectLighthouse
                 var digestPath = context.Request.Path;
                 var body = context.Request.Body;
 
-                var clientRequestDigest = await DigestUtils.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
+                var clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
 
                 // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
                 if (context.Request.Headers.TryGetValue("X-Digest-A", out var sentDigest))
@@ -104,7 +105,7 @@ namespace LBPUnion.ProjectLighthouse
                     responseBuffer.Position = 0;
                     
                     // Compute the digest for the response.
-                    var serverDigest = await DigestUtils.ComputeDigest(context.Request.Path, authCookie,
+                    var serverDigest = await HashHelper.ComputeDigest(context.Request.Path, authCookie,
                         responseBuffer, serverDigestKey);
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
