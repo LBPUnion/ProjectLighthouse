@@ -26,6 +26,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 LbpFileType.Level => true,
                 LbpFileType.Voice => true,
                 LbpFileType.Plan => true,
+                LbpFileType.Jpeg => true,
                 #if DEBUG
                 _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
                 #else
@@ -39,9 +40,6 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             using MemoryStream ms = new(data);
             using BinaryReader reader = new(ms);
 
-            string footer = Encoding.ASCII.GetString(BinaryHelper.ReadLastBytes(reader, 4));
-            if (footer == "FARC") return LbpFileType.FileArchive;
-
             byte[] header = reader.ReadBytes(3);
 
             return Encoding.ASCII.GetString(header) switch
@@ -52,8 +50,25 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 "VOP" => LbpFileType.Voice,
                 "LVL" => LbpFileType.Level,
                 "PLN" => LbpFileType.Plan,
-                _ => LbpFileType.Unknown,
+                _ => determineFileTypePartTwoWeirdName(reader),
             };
+        }
+
+        private static LbpFileType determineFileTypePartTwoWeirdName(BinaryReader reader)
+        {
+            reader.BaseStream.Position = 0;
+            
+            // Determine if file is FARC
+            string footer = Encoding.ASCII.GetString(BinaryHelper.ReadLastBytes(reader, 4));
+            if (footer == "FARC") return LbpFileType.FileArchive;
+            
+            // Determine if file is JPEG
+            byte[] header = reader.ReadBytes(9);
+
+            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF && header[3] == 0xE0)
+                return LbpFileType.Jpeg;
+
+            return LbpFileType.Unknown; // Still unknown.
         }
 
         public static bool ResourceExists(string hash) => File.Exists(GetResourcePath(hash));

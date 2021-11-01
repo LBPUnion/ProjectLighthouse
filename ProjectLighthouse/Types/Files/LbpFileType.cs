@@ -9,6 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Files
         Plan, // PLN, uploaded with levels
         Voice, // VOP, voice data
         Painting, // PTG, paintings
+        Jpeg, // JFIF / FIF, used in sticker switches
         Unknown,
     }
 }
