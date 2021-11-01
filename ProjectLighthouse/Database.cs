@@ -20,6 +20,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<HeartedProfile> HeartedProfiles { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Token> Tokens { get; set; }
+        public DbSet<Score> Scores { get; set; }
 
         public DbSet<LastMatch> LastMatches { get; set; }
 

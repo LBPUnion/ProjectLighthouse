@@ -63,7 +63,7 @@ namespace LBPUnion.ProjectLighthouse
                     requestStopwatch.Start();
 
                     // Log all headers.
-                    foreach (KeyValuePair<string, StringValues> header in context.Request.Headers) Logger.Log($"{header.Key}: {header.Value}");
+//                    foreach (KeyValuePair<string, StringValues> header in context.Request.Headers) Logger.Log($"{header.Key}: {header.Value}");
 
                     context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
 

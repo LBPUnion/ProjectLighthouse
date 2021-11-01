@@ -76,6 +76,8 @@ namespace LBPUnion.ProjectLighthouse
 
             foreach (Comment comment in database.Comments.Where(c => c.Timestamp == 0)) comment.Timestamp = TimeHelper.UnixTimeMilliseconds();
 
+            foreach (Slot slot in database.Slots.Where(s => s.FirstUploaded > s.LastUpdated)) slot.FirstUploaded = slot.LastUpdated;
+
             database.SaveChanges();
 
             stopwatch.Stop();
