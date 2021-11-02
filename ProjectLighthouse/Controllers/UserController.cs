@@ -137,13 +137,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            string pinsText = await new System.IO.StreamReader(this.Request.Body).ReadToEndAsync();
-            Pins pinData = JsonSerializer.Deserialize<Pins>(pinsText);
+            string pinsString = await new System.IO.StreamReader(this.Request.Body).ReadToEndAsync();
+            Pins pinJson = JsonSerializer.Deserialize<Pins>(pinsString);
 
             // Sometimes the update gets called periodically as pin progress updates via playing,
             // may not affect equipped profile pins however, so check before setting it.
             string currentPins = user.Pins;
-            string newPins = string.Join(",", pinData.profile_pins);
+            string newPins = string.Join(",", pinJson.profile_pins);
             if (!String.Equals(currentPins,newPins)) {
                 user.Pins = newPins;
                 await this.database.SaveChangesAsync();
