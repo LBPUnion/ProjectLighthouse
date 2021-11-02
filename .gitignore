@@ -9,3 +9,5 @@ riderModule.iml
 *.sln.DotSettings.user
 /ProjectLighthouse/r/*
 /ProjectLighthouse/logs/*
+/ProjectLighthouse/ProjectLighthouse.csproj.user
+.vs/
