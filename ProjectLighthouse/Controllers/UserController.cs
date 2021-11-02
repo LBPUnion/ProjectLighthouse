@@ -131,7 +131,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok();
         }
 
-        // Profile only right now
         [HttpPost("update_my_pins")]
         public async Task<IActionResult> UpdateMyPins()
         {
