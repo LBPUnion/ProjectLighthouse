@@ -16,6 +16,8 @@ namespace LBPUnion.ProjectLighthouse.Serialization
 
         public static string StringElement(KeyValuePair<string, object> pair) => $"<{pair.Key}>{pair.Value}</{pair.Key}>";
 
+        public static string StringElement(string key, bool value) => $"<{key}>{value.ToString().ToLower()}</{key}>";
+        
         public static string StringElement(string key, object value) => $"<{key}>{value}</{key}>";
 
         public static string TaggedStringElement
