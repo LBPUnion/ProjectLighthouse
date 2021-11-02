@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 using System.Xml;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -128,6 +129,27 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (this.database.ChangeTracker.HasChanges()) await this.database.SaveChangesAsync(); // save the user to the database if we changed anything
             return this.Ok();
+        }
+
+        // Profile only right now
+        [HttpPost("update_my_pins")]
+        public async Task<IActionResult> UpdateMyPins()
+        {
+            User user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            string pinsText = await new System.IO.StreamReader(this.Request.Body).ReadToEndAsync();
+            Pins pinData = JsonSerializer.Deserialize<Pins>(pinsText);
+
+            // Sometimes the update gets called periodically as pin progress updates via playing,
+            // may not affect equipped profile pins however, so check before setting it.
+            string currentPins = user.Pins;
+            string newPins = string.Join(",", pinData.profile_pins);
+            if (!String.Equals(currentPins,newPins)) {
+                user.Pins = newPins;
+                await this.database.SaveChangesAsync();
+            }
+            return this.Ok("[{\"StatusCode\":200}]");
         }
     }
 }
