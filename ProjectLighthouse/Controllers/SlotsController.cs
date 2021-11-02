@@ -55,5 +55,20 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
         }
+        
+        [HttpGet("slots/mmpicks")]
+        public IActionResult TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
+        {
+            IQueryable<Slot> slots = this.database.Slots
+                .Where(s => s.TeamPick)
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .OrderByDescending(s => s.LastUpdated)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30));
+            string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
+        
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        }
     }
 }
