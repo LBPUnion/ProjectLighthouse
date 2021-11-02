@@ -49,7 +49,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
         {
             LoginResult loginResult = await this.Authenticate();
 
-            HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/eula", loginResult.AuthTicket);
+            HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/announce", loginResult.AuthTicket);
             string responseContent = await response.Content.ReadAsStringAsync();
 
             Assert.True(response.IsSuccessStatusCode);
