@@ -143,7 +143,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // Sometimes the update gets called periodically as pin progress updates via playing,
             // may not affect equipped profile pins however, so check before setting it.
             string currentPins = user.Pins;
-            string newPins = string.Join(",", pinJson.profile_pins);
+            string newPins = string.Join(",", pinJson.ProfilePins);
             if (!String.Equals(currentPins,newPins)) {
                 user.Pins = newPins;
                 await this.database.SaveChangesAsync();

@@ -1,12 +1,14 @@
-using LBPUnion.ProjectLighthouse.Serialization;
-
+using System.Text.Json.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Profiles
 {
     public class Pins
     {
-        public long[] progress { get; set; }
-        public long[] awards { get; set; }
-        public long[] profile_pins { get; set; }
+        [JsonPropertyName("progress")]
+        public long[] Progress { get; set; }
+        [JsonPropertyName("awards")]
+        public long[] Awards { get; set; }
+        [JsonPropertyName("profile_pins")]
+        public long[] ProfilePins { get; set; }
     }
 }
 
