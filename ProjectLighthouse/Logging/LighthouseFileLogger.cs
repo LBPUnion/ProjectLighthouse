@@ -21,5 +21,6 @@ namespace LBPUnion.ProjectLighthouse.Logging
             File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel.Name + ".log"), contentFile);
             File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
         }
+        public override bool AllowMultiple => false;
     }
 }

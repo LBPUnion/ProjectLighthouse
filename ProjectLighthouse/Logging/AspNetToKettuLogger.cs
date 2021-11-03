@@ -7,7 +7,6 @@ namespace LBPUnion.ProjectLighthouse.Logging
 {
     public class AspNetToKettuLogger : ILogger
     {
-
         public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
         public bool IsEnabled(LogLevel logLevel) => true;
 
