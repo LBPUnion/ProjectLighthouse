@@ -1,11 +1,7 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using Kettu;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -42,12 +38,6 @@ namespace LBPUnion.ProjectLighthouse
             Logger.Log("Migrating database...", LoggerLevelDatabase.Instance);
             MigrateDatabase(database);
 
-            Logger.Log("Fixing broken timestamps...", LoggerLevelDatabase.Instance);
-            FixTimestamps(database);
-
-            Logger.Log("Fixing old LBP1 MinimumPlayers columns", LoggerLevelDatabase.Instance);
-            FixMinimumPlayers(database);
-
             stopwatch.Stop();
             Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
 
@@ -63,42 +53,6 @@ namespace LBPUnion.ProjectLighthouse
 
             stopwatch.Stop();
             Logger.Log($"Migration took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
-        }
-
-        public static void FixTimestamps(Database database)
-        {
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-
-            foreach (Slot slot in database.Slots.Where(s => s.FirstUploaded == 0)) slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
-
-            foreach (Slot slot in database.Slots.Where(s => s.LastUpdated == 0)) slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
-
-            foreach (Comment comment in database.Comments.Where(c => c.Timestamp == 0)) comment.Timestamp = TimeHelper.UnixTimeMilliseconds();
-
-            foreach (Slot slot in database.Slots.Where(s => s.FirstUploaded > s.LastUpdated)) slot.FirstUploaded = slot.LastUpdated;
-
-            database.SaveChanges();
-
-            stopwatch.Stop();
-            Logger.Log($"Fixing timestamps took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
-        }
-
-        public static void FixMinimumPlayers(Database database)
-        {
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-
-            foreach (Slot slot in database.Slots.Where(s => s.MinimumPlayers == 0))
-            {
-                slot.MinimumPlayers = 1;
-                slot.MaximumPlayers = 4;
-            }
-
-            database.SaveChanges();
-
-            stopwatch.Stop();
-            Logger.Log($"Fixing minimum players took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)
