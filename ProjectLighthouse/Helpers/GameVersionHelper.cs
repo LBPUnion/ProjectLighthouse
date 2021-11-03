@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Types;
 
@@ -77,13 +75,13 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             "CUSA01077",
             "CUSA01304",
         };
-        
+
         public GameVersion FromTitleId(string titleId)
         {
             if (this.LittleBigPlanet1TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet1;
             if (this.LittleBigPlanet2TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet2;
             if (this.LittleBigPlanet3TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet3;
-            
+
             return GameVersion.Unknown;
         }
     }

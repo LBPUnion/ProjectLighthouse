@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Xml;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -137,17 +138,21 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            string pinsString = await new System.IO.StreamReader(this.Request.Body).ReadToEndAsync();
+            string pinsString = await new StreamReader(this.Request.Body).ReadToEndAsync();
             Pins pinJson = JsonSerializer.Deserialize<Pins>(pinsString);
+
+            if (pinJson == null) return this.BadRequest();
 
             // Sometimes the update gets called periodically as pin progress updates via playing,
             // may not affect equipped profile pins however, so check before setting it.
             string currentPins = user.Pins;
             string newPins = string.Join(",", pinJson.ProfilePins);
-            if (!String.Equals(currentPins,newPins)) {
-                user.Pins = newPins;
-                await this.database.SaveChangesAsync();
-            }
+
+            if (string.Equals(currentPins, newPins)) return this.Ok("[{\"StatusCode\":200}]");
+
+            user.Pins = newPins;
+            await this.database.SaveChangesAsync();
+
             return this.Ok("[{\"StatusCode\":200}]");
         }
     }

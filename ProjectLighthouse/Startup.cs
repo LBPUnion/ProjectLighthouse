@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Kettu;
@@ -68,8 +67,7 @@ namespace LBPUnion.ProjectLighthouse
                     context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
 
                     // Client digest check.
-                    string authCookie;
-                    if (!context.Request.Cookies.TryGetValue("MM_AUTH", out authCookie)) authCookie = string.Empty;
+                    if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string authCookie)) authCookie = string.Empty;
                     string digestPath = context.Request.Path;
                     Stream body = context.Request.Body;
 
@@ -91,7 +89,7 @@ namespace LBPUnion.ProjectLighthouse
                     }
 
                     // This does the same as above, but for the response stream.
-                    using MemoryStream responseBuffer = new();
+                    await using MemoryStream responseBuffer = new();
                     Stream oldResponseStream = context.Response.Body;
                     context.Response.Body = responseBuffer;
 

@@ -38,7 +38,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         public static LbpFileType DetermineFileType(byte[] data)
         {
             if (data.Length == 0) return LbpFileType.Unknown; // Can't be anything if theres no data.
-            
+
             using MemoryStream ms = new(data);
             using BinaryReader reader = new(ms);
 
@@ -69,8 +69,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             // Determine if file is JPEG
             byte[] header = reader.ReadBytes(9);
 
-            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF && header[3] == 0xE0)
-                return LbpFileType.Jpeg;
+            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF && header[3] == 0xE0) return LbpFileType.Jpeg;
 
             return LbpFileType.Unknown; // Still unknown.
         }

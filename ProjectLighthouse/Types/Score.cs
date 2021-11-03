@@ -12,14 +12,14 @@ namespace LBPUnion.ProjectLighthouse.Types
         [XmlIgnore]
         [Key]
         public int ScoreId { get; set; }
-        
+
         [XmlIgnore]
         public int SlotId { get; set; }
 
         [XmlIgnore]
         [ForeignKey(nameof(SlotId))]
         public Slot Slot { get; set; }
-        
+
         [XmlElement("type")]
         public int Type { get; set; }
 
@@ -32,7 +32,6 @@ namespace LBPUnion.ProjectLighthouse.Types
             get => this.PlayerIdCollection.Split(",");
             set => this.PlayerIdCollection = string.Join(',', value);
         }
-
 
         [XmlElement("score")]
         public int Points { get; set; }

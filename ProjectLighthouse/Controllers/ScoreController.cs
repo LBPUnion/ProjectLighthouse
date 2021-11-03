@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     public class ScoreController : ControllerBase
     {
         private readonly Database database;
-        
+
         public ScoreController(Database database)
         {
             this.database = database;

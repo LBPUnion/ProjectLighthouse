@@ -24,14 +24,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> Eula()
         {
             User user = await this.database.UserFromRequest(this.Request);
-            return user == null
-                ? this.StatusCode(403, "")
-                : this.Ok
-                (
-                    EulaHelper.PrivateInstanceNoticeOrBlank +
-                    "\n" +
-                    $"{EulaHelper.License}\n"
-                );
+            return user == null ? this.StatusCode(403, "") : this.Ok(EulaHelper.PrivateInstanceNoticeOrBlank + "\n" + $"{EulaHelper.License}\n");
         }
 
         [HttpGet("announce")]

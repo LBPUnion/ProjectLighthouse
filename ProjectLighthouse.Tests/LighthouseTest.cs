@@ -47,7 +47,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
         public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
         {
-            using HttpRequestMessage? requestMessage = new(method, endpoint);
+            using HttpRequestMessage requestMessage = new(method, endpoint);
             requestMessage.Headers.Add("Cookie", mmAuth);
 
             return this.Client.SendAsync(requestMessage);
@@ -61,7 +61,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
         public async Task<HttpResponseMessage> AuthenticatedUploadFileRequest(string endpoint, string filePath, string mmAuth)
         {
-            using HttpRequestMessage? requestMessage = new(HttpMethod.Post, endpoint);
+            using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
             requestMessage.Headers.Add("Cookie", mmAuth);
             requestMessage.Content = new StringContent(await File.ReadAllTextAsync(filePath));
             return await this.Client.SendAsync(requestMessage);
@@ -69,7 +69,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
         public async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth)
         {
-            using HttpRequestMessage? requestMessage = new(HttpMethod.Post, endpoint);
+            using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
             requestMessage.Headers.Add("Cookie", mmAuth);
             requestMessage.Content = new ByteArrayContent(data);
             return await this.Client.SendAsync(requestMessage);
