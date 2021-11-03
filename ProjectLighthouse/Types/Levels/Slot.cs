@@ -93,7 +93,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         public long LastUpdated { get; set; }
 
         [XmlIgnore]
-        public bool MMPick { get; set; }
+        public bool TeamPick { get; set; }
 
         public string SerializeResources()
         {
@@ -121,7 +121,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("moveRequired", this.MoveRequired) +
                               LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
                               LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
-                              LbpSerializer.StringElement("mmpick", this.MMPick);
+                              LbpSerializer.StringElement("mmpick", this.TeamPick);
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

@@ -37,8 +37,16 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static LbpFileType DetermineFileType(byte[] data)
         {
+            if (data.Length == 0) return LbpFileType.Unknown; // Can't be anything if theres no data.
+            
             using MemoryStream ms = new(data);
             using BinaryReader reader = new(ms);
+
+            // Determine if file is a FARC (File Archive).
+            // Needs to be done before anything else that determines the type by the header
+            // because this determines the type by the footer.
+            string footer = Encoding.ASCII.GetString(BinaryHelper.ReadLastBytes(reader, 4));
+            if (footer == "FARC") return LbpFileType.FileArchive;
 
             byte[] header = reader.ReadBytes(3);
 
@@ -57,11 +65,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         private static LbpFileType determineFileTypePartTwoWeirdName(BinaryReader reader)
         {
             reader.BaseStream.Position = 0;
-            
-            // Determine if file is FARC
-            string footer = Encoding.ASCII.GetString(BinaryHelper.ReadLastBytes(reader, 4));
-            if (footer == "FARC") return LbpFileType.FileArchive;
-            
+
             // Determine if file is JPEG
             byte[] header = reader.ReadBytes(9);
 
