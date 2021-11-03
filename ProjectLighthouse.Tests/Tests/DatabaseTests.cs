@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Types;
 
 namespace LBPUnion.ProjectLighthouse.Tests
 {
@@ -11,8 +12,13 @@ namespace LBPUnion.ProjectLighthouse.Tests
             await using Database database = new();
             int rand = new Random().Next();
 
-            await database.CreateUser("createUserTwiceTest" + rand);
-            await database.CreateUser("createUserTwiceTest" + rand);
+            User userA = await database.CreateUser("createUserTwiceTest" + rand);
+            User userB = await database.CreateUser("createUserTwiceTest" + rand);
+
+            database.Users.Remove(userA);
+            database.Users.Remove(userB);
+
+            await database.SaveChangesAsync();
         }
     }
 }
