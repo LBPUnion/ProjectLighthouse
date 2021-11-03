@@ -72,11 +72,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/lbp2luckydip")]
-        public IActionResult TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
+        public IActionResult LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
         {
             // TODO: Incorporate seed?
-            IQueryable<Slot> slots = this.database.Slots
-                .OrderBy(_ => Guid.NewGuid())
+            IQueryable<Slot> slots = this.database.Slots.OrderBy
+                    (_ => Guid.NewGuid())
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .Skip(pageStart - 1)
