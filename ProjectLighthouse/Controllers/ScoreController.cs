@@ -88,8 +88,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 {"totalNumScores", rankedScores.Count() } // This is the denominator of your position globally in the side menu.
             });
 
-            Console.WriteLine(res);
-
             return this.Ok(res);
         }
     }
