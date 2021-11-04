@@ -8,11 +8,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers.Extensions
         {
             char[] invalidPathChars = Path.GetInvalidFileNameChars();
             string path = text;
-            
-            foreach (char c in invalidPathChars)
-            {
-                path = path.Replace(c.ToString(), "");
-            }
+
+            foreach (char c in invalidPathChars) path = path.Replace(c.ToString(), "");
 
             return path;
         }

@@ -9,6 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Logging
     public class LighthouseFileLogger : LoggerBase
     {
         private static readonly string logsDirectory = Path.Combine(Environment.CurrentDirectory, "logs");
+        public override bool AllowMultiple => false;
 
         public override void Send(LoggerLine line)
         {
@@ -22,6 +23,5 @@ namespace LBPUnion.ProjectLighthouse.Logging
             File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel.Name.ToFileName() + ".log"), contentFile);
             File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
         }
-        public override bool AllowMultiple => false;
     }
 }

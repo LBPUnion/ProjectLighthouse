@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types
@@ -33,7 +34,29 @@ namespace LBPUnion.ProjectLighthouse.Types
             set => this.PlayerIdCollection = string.Join(',', value);
         }
 
+        [NotMapped]
+        [XmlElement("mainPlayer")]
+        public string MainPlayer {
+            get => this.PlayerIds[0];
+            set => this.PlayerIds[0] = value;
+        }
+
+        [NotMapped]
+        [XmlElement("rank")]
+        public int Rank { get; set; }
+
         [XmlElement("score")]
         public int Points { get; set; }
+
+        public string Serialize()
+        {
+            string score = LbpSerializer.StringElement("type", this.Type) +
+                           LbpSerializer.StringElement("playerIds", this.PlayerIdCollection) +
+                           LbpSerializer.StringElement("mainPlayer", this.MainPlayer) +
+                           LbpSerializer.StringElement("rank", this.Rank) +
+                           LbpSerializer.StringElement("score", this.Points);
+
+            return LbpSerializer.StringElement("playRecord", score);
+        }
     }
 }

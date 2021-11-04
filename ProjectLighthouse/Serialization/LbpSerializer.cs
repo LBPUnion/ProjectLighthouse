@@ -26,6 +26,9 @@ namespace LBPUnion.ProjectLighthouse.Serialization
 
         public static string TaggedStringElement(string key, object value, string tagKey, object tagValue) => $"<{key} {tagKey}=\"{tagValue}\">{value}</{key}>";
 
+        public static string TaggedStringElement(string key, object value, Dictionary<string, object> attrKeyValuePairs)
+            => $"<{key} " + attrKeyValuePairs.Aggregate(string.Empty, (current, kvp) => current + $"{kvp.Key}=\"{kvp.Value}\" ") + $">{value}</{key}>";
+
         public static string Elements
             (params KeyValuePair<string, object>[] pairs)
             => pairs.Aggregate(string.Empty, (current, pair) => current + StringElement(pair));
