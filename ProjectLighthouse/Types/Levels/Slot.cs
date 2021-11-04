@@ -95,6 +95,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [XmlIgnore]
         public bool TeamPick { get; set; }
 
+        [XmlIgnore]
+        public GameVersion GameVersion { get; set; }
+
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
@@ -104,7 +107,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         {
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
-                              LbpSerializer.StringElement("game", 1) +
+                              LbpSerializer.StringElement("game", this.GameVersion) +
                               LbpSerializer.StringElement("npHandle", this.Creator.Username) +
                               LbpSerializer.StringElement("description", this.Description) +
                               LbpSerializer.StringElement("icon", this.IconHash) +

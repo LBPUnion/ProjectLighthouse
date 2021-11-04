@@ -57,8 +57,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("publish")]
         public async Task<IActionResult> Publish()
         {
-            User user = await this.database.UserFromRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+//            User user = await this.database.UserFromRequest(this.Request);
+            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+
+            if (userAndToken != null) return this.StatusCode(403, "");
+
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            Token token = userAndToken.Value.Item2;
 
             Slot slot = await this.GetSlotFromBody();
 
@@ -77,6 +83,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 slot.SlotId = oldSlot.SlotId;
                 slot.FirstUploaded = oldSlot.FirstUploaded;
                 slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
+                slot.GameVersion = token.GameVersion;
 
                 this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
                 await this.database.SaveChangesAsync();
@@ -95,6 +102,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             slot.CreatorId = user.UserId;
             slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
             slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
+            slot.GameVersion = token.GameVersion;
 
             if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
             {
