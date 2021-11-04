@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -30,7 +31,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             XmlSerializer serializer = new(typeof(Score));
-            Score score = (Score)serializer.Deserialize(new StringReader(bodyString));
+            Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
             if (score == null) return this.BadRequest();
 
             score.SlotId = id;
@@ -58,7 +59,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart, [FromQuery] int pageSize)
         {
             // Get username
-            User user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
+
+            if (user == null) return this.StatusCode(403, "");
 
             // This is hella ugly but it technically assigns the proper rank to a score
             // var needed for Anonymous type returned from SELECT
@@ -67,7 +70,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .ToList()
                 .Select
                 (
-                    (Score s, int rank) => new
+                    (s, rank) => new
                     {
                         Score = s,
                         Rank = rank + 1,

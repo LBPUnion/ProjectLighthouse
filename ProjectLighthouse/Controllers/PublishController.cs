@@ -60,7 +60,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 //            User user = await this.database.UserFromRequest(this.Request);
             (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
 
-            if (userAndToken != null) return this.StatusCode(403, "");
+            if (userAndToken == null) return this.StatusCode(403, "");
 
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
