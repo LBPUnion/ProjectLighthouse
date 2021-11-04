@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +30,8 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
             string stringContent = $"{LoginData.UsernamePrefix}{username}{number}{(char)0x00}";
 
-            HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new StringContent(stringContent));
+            HttpResponseMessage response = await this.Client.PostAsync
+                ($"/LITTLEBIGPLANETPS3_XML/login?titleID={GameVersionHelper.LittleBigPlanet2TitleIds[0]}", new StringContent(stringContent));
             return response;
         }
 

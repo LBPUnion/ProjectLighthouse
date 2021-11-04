@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
         [Fact]
         public async Task ShouldReturnErrorOnNoPostData()
         {
-            HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", null!);
+            HttpResponseMessage response = await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/login", null!);
             Assert.False(response.IsSuccessStatusCode);
             #if NET6_0_OR_GREATER
             Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
