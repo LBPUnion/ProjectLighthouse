@@ -107,7 +107,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         {
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
-                              LbpSerializer.StringElement("game", this.GameVersion) +
+                              LbpSerializer.StringElement("game", (int)this.GameVersion) +
                               LbpSerializer.StringElement("npHandle", this.Creator.Username) +
                               LbpSerializer.StringElement("description", this.Description) +
                               LbpSerializer.StringElement("icon", this.IconHash) +
