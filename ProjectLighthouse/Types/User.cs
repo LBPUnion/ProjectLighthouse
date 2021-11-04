@@ -114,7 +114,7 @@ namespace LBPUnion.ProjectLighthouse.Types
 
             foreach (string slotType in slotTypes)
             {
-                slots += LbpSerializer.StringElement(slotType + "UsedSlots", this.UsedSlots);
+                slots += LbpSerializer.StringElement(slotType + "UsedSlots", 0);
                 slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.EntitledSlots);
                 // ReSharper disable once StringLiteralTypo
                 slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
