@@ -1,6 +1,8 @@
 #nullable enable
 using System.IO;
 using System.Threading.Tasks;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +22,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login([FromQuery] string titleId)
         {
             string body = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
@@ -33,12 +35,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 loginData = null;
             }
-
             if (loginData == null) return this.BadRequest();
 
-            Token? token = await this.database.AuthenticateUser(loginData);
-
+            Token? token = await this.database.AuthenticateUser(loginData, titleId);
             if (token == null) return this.StatusCode(403, "");
+
+            Logger.Log
+            (
+                $"Successfully logged in user {(await this.database.UserFromToken(token))!.Username} as {token.GameVersion} client ({titleId})",
+                LoggerLevelLogin.Instance
+            );
 
             return this.Ok
             (

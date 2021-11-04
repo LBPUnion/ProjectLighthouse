@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -50,7 +52,7 @@ namespace LBPUnion.ProjectLighthouse
         }
 
         #nullable enable
-        public async Task<Token?> AuthenticateUser(LoginData loginData)
+        public async Task<Token?> AuthenticateUser(LoginData loginData, string titleId = "")
         {
             // TODO: don't use psn name to authenticate
             User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username) ?? await this.CreateUser(loginData.Username);
@@ -59,7 +61,14 @@ namespace LBPUnion.ProjectLighthouse
             {
                 UserToken = HashHelper.GenerateAuthToken(),
                 UserId = user.UserId,
+                GameVersion = GameVersionHelper.FromTitleId(titleId),
             };
+
+            if (token.GameVersion == GameVersion.Unknown)
+            {
+                Logger.Log($"Unknown GameVersion for TitleId {titleId}", LoggerLevelLogin.Instance);
+                return null;
+            }
 
             this.Tokens.Add(token);
             await this.SaveChangesAsync();
@@ -74,6 +83,8 @@ namespace LBPUnion.ProjectLighthouse
 
             return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
+
+        public async Task<User?> UserFromToken(Token token) => await this.UserFromAuthToken(token.UserToken);
 
         public async Task<User?> UserFromRequest(HttpRequest request)
         {

@@ -23,8 +23,4 @@
         <Compile Remove="Types\SlotXsd.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="logs" />
-    </ItemGroup>
-
 </Project>

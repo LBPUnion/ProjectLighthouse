@@ -6,7 +6,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
     public class GameVersionHelper
     {
         // https://www.serialstation.com/games/b89b4eb4-4e4c-4e54-b72b-f7f9dbfac125
-        public readonly string[] LittleBigPlanet1TitleIds =
+        public static readonly string[] LittleBigPlanet1TitleIds =
         {
             "BCES00141",
             "BCAS20091",
@@ -29,7 +29,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         };
 
         // https://serialstation.com/games/35e69aba-1872-4fd7-9d39-11ce75924040
-        public readonly string[] LittleBigPlanet2TitleIds =
+        public static readonly string[] LittleBigPlanet2TitleIds =
         {
             "BCUS98249",
             "BCES01086",
@@ -49,7 +49,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         // https://www.serialstation.com/games/b62d53d9-fdff-4463-8134-64b81e1cbd50
         // includes PS4 games
-        public readonly string[] LittleBigPlanet3TitleIds =
+        public static readonly string[] LittleBigPlanet3TitleIds =
         {
             "CUSA00063",
             "CUSA00693",
@@ -76,11 +76,11 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             "CUSA01304",
         };
 
-        public GameVersion FromTitleId(string titleId)
+        public static GameVersion FromTitleId(string titleId)
         {
-            if (this.LittleBigPlanet1TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet1;
-            if (this.LittleBigPlanet2TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet2;
-            if (this.LittleBigPlanet3TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet3;
+            if (LittleBigPlanet1TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet1;
+            if (LittleBigPlanet2TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet2;
+            if (LittleBigPlanet3TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet3;
 
             return GameVersion.Unknown;
         }
