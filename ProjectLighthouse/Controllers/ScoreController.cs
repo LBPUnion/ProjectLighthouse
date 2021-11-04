@@ -34,7 +34,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             score.SlotId = id;
 
-            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.PlayerIdCollection == score.PlayerIdCollection);
+            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId && s.PlayerIdCollection == score.PlayerIdCollection);
 
             if (existingScore.Any())
             {
@@ -82,11 +82,20 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 return current + rs.Score.Serialize();
             });
 
-            string res = LbpSerializer.TaggedStringElement("scores", serializedScores, new Dictionary<string, object>() {
-                {"yourScore",  myScore.Score.Points},
-                {"yourRank",  myScore.Rank }, //This is the numerator of your position globally in the side menu.
-                {"totalNumScores", rankedScores.Count() } // This is the denominator of your position globally in the side menu.
-            });
+            string res;
+            if (myScore == null)
+            {
+                res = LbpSerializer.StringElement("scores", serializedScores);
+            } 
+            else
+            {
+                res = LbpSerializer.TaggedStringElement("scores", serializedScores, new Dictionary<string, object>() {
+                    {"yourScore",  myScore.Score.Points},
+                    {"yourRank",  myScore.Rank }, //This is the numerator of your position globally in the side menu.
+                    {"totalNumScores", rankedScores.Count() } // This is the denominator of your position globally in the side menu.
+                });
+            }
+             
 
             return this.Ok(res);
         }
