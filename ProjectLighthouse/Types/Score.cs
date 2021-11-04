@@ -35,16 +35,16 @@ namespace LBPUnion.ProjectLighthouse.Types
             set => this.PlayerIdCollection = string.Join(',', value);
         }
 
-        [XmlElement("mainPlayer")]
         [NotMapped]
+        [XmlElement("mainPlayer")]
         public string MainPlayer
         {
             get => this.PlayerIds[0];
             set => this.PlayerIds[0] = value;
         }
 
-        [XmlElement("rank")]
         [NotMapped]
+        [XmlElement("rank")]
         public int Rank { get; set; }
 
         [XmlElement("score")]
