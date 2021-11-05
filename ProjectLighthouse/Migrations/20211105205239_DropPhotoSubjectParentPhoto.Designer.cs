@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211105205239_DropPhotoSubjectParentPhoto")]
+    partial class DropPhotoSubjectParentPhoto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,6 +174,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("PlanHash")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("SlotId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SmallHash")
                         .HasColumnType("longtext");
 
@@ -179,6 +184,8 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("PhotoId");
+
+                    b.HasIndex("SlotId");
 
                     b.ToTable("Photos");
                 });
@@ -464,6 +471,17 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Photo", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.PhotoSubject", b =>

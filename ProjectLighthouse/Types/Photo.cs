@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types
 {
@@ -28,14 +28,28 @@ namespace LBPUnion.ProjectLighthouse.Types
         [XmlElement("plan")]
         public string PlanHash { get; set; }
 
-        [XmlIgnore]
-        public int SlotId { get; set; }
+//        [XmlIgnore]
+//        public int SlotId { get; set; }
+//
+//        [XmlIgnore]
+//        [ForeignKey(nameof(SlotId))]
+//        public Slot Slot { get; set; }
 
-        [XmlIgnore]
-        [ForeignKey(nameof(SlotId))]
-        public Slot Slot { get; set; }
+        /// <summary>
+        /// Only use when parsing from XML.
+        /// </summary>
+        [NotMapped]
+        [XmlArray("subjects")]
+        [XmlArrayItem("subject")]
+        public List<PhotoSubject> Subjects { get; set; }
 
-        [XmlElement("subjects")]
-        public PhotoSubject[] Subjects { get; set; }
+        [NotMapped]
+        [XmlIgnore]
+        public string[] PhotoSubjectIds {
+            get => this.PhotoSubjectCollection.Split(",");
+            set => this.PhotoSubjectCollection = string.Join(',', value);
+        }
+
+        public string PhotoSubjectCollection { get; set; }
     }
 }
