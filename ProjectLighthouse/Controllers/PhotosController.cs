@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +54,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             await this.database.SaveChangesAsync();
 
             return this.Ok();
+        }
+
+        [HttpGet("photos/user/{id:int}")]
+        public async Task<IActionResult> SlotPhotos(int id)
+        {
+            List<Photo> photos = await this.database.Photos.Take(50).ToListAsync();
+
+            string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id));
+
+            return this.Ok(LbpSerializer.StringElement("photos", response));
         }
     }
 }

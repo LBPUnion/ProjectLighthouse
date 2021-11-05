@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types
 {
@@ -51,5 +52,20 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         public string PhotoSubjectCollection { get; set; }
+
+        public string Serialize(int slotId)
+        {
+            string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", "user");
+
+            string photo = LbpSerializer.StringElement("id", this.PhotoId) +
+                           LbpSerializer.StringElement("small", this.SmallHash) +
+                           LbpSerializer.StringElement("medium", this.MediumHash) +
+                           LbpSerializer.StringElement("large", this.LargeHash) +
+                           LbpSerializer.StringElement("plan", this.PlanHash) +
+                           LbpSerializer.StringElement("author", "a43243221") +
+                           slot;
+
+            return LbpSerializer.TaggedStringElement("photo", photo, "timestamp", Timestamp * 1000);
+        }
     }
 }

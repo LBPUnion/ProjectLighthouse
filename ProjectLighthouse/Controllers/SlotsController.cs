@@ -42,6 +42,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(slot.Serialize());
         }
 
+        [HttpGet("slots/cool")]
+        public IActionResult CoolSlots([FromQuery] int page) => NewestSlots(30 * page, 30);
+
         [HttpGet("slots")]
         public IActionResult NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {

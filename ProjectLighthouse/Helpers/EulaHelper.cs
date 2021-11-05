@@ -22,6 +22,6 @@ Please do not make anything public for now, and keep in mind security isn't as t
         // ReSharper disable once UnreachableCode
         public const string PrivateInstanceNoticeOrBlank = ShowPrivateInstanceNotice ? PrivateInstanceNotice : "";
 
-        public const bool ShowPrivateInstanceNotice = true;
+        public const bool ShowPrivateInstanceNotice = false;
     }
 }
