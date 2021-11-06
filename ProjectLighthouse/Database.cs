@@ -107,6 +107,9 @@ namespace LBPUnion.ProjectLighthouse
 
             return (user, token);
         }
+
+        public async Task<Photo?> PhotoFromSubject(PhotoSubject subject)
+            => await this.Photos.FirstOrDefaultAsync(p => p.PhotoSubjectIds.Contains(subject.PhotoSubjectId.ToString()));
         #nullable disable
     }
 }

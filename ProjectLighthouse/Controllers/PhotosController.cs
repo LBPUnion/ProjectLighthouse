@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,13 +26,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("uploadPhoto")]
         public async Task<IActionResult> UploadPhoto()
         {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             XmlSerializer serializer = new(typeof(Photo));
-            Photo photo = (Photo)serializer.Deserialize(new StringReader(bodyString));
-
+            Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
             if (photo == null) return this.BadRequest();
+
+            photo.CreatorId = user.UserId;
+            photo.Creator = user;
 
             foreach (PhotoSubject subject in photo.Subjects)
             {
@@ -59,10 +65,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("photos/user/{id:int}")]
         public async Task<IActionResult> SlotPhotos(int id)
         {
-            List<Photo> photos = await this.database.Photos.Take(50).ToListAsync();
-
+            List<Photo> photos = await this.database.Photos.Take(10).ToListAsync();
             string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id));
+            return this.Ok(LbpSerializer.StringElement("photos", response));
+        }
 
+        [HttpGet("photos/by")]
+        public async Task<IActionResult> UserPhotos([FromQuery] string user)
+        {
+            User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
+            if (user == null) return this.NotFound();
+
+            List<Photo> photos = await this.database.Photos.Where(p => p.CreatorId == userFromQuery.UserId).Take(10).ToListAsync();
+            string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
             return this.Ok(LbpSerializer.StringElement("photos", response));
         }
     }
