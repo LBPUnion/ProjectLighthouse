@@ -74,6 +74,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> UserPhotos([FromQuery] string user)
         {
             User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (user == null) return this.NotFound();
 
             List<Photo> photos = await this.database.Photos.Where(p => p.CreatorId == userFromQuery.UserId).Take(10).ToListAsync();
