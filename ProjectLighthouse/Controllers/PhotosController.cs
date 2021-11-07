@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -71,13 +72,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("photos/by")]
-        public async Task<IActionResult> UserPhotos([FromQuery] string user)
+        public async Task<IActionResult> UserPhotos([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
         {
             User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (user == null) return this.NotFound();
 
-            List<Photo> photos = await this.database.Photos.Where(p => p.CreatorId == userFromQuery.UserId).Take(10).ToListAsync();
+            List<Photo> photos = await this.database.Photos.Where
+                    (p => p.CreatorId == userFromQuery.UserId)
+                .OrderByDescending(s => s.Timestamp)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
+                .ToListAsync();
             string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
             return this.Ok(LbpSerializer.StringElement("photos", response));
         }
