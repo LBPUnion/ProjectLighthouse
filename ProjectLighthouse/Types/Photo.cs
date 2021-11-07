@@ -39,14 +39,12 @@ namespace LBPUnion.ProjectLighthouse.Types
         [NotMapped]
         [XmlArray("subjects")]
         [XmlArrayItem("subject")]
-        public List<PhotoSubject> SubjectsXmlDontUse {
-            get => null!;
-            set => Subjects = value;
-        }
+        public List<PhotoSubject>? SubjectsXmlDontUseLiterallyEver;
 
         [NotMapped]
         public List<PhotoSubject> Subjects {
             get {
+                if (this.SubjectsXmlDontUseLiterallyEver != null) return this.SubjectsXmlDontUseLiterallyEver;
                 if (this.subjects != null) return this.subjects;
 
                 List<PhotoSubject> response = new();

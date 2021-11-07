@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Kettu;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
@@ -40,21 +41,25 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             photo.CreatorId = user.UserId;
             photo.Creator = user;
 
-            foreach (PhotoSubject subject in photo.SubjectsXmlDontUse) // fine for here
+            foreach (PhotoSubject subject in photo.Subjects)
             {
                 subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
 
                 if (subject.User == null) return this.BadRequest();
 
                 subject.UserId = subject.User.UserId;
+                Logger.Log($"Adding PhotoSubject (userid {subject.UserId}) to db");
 
                 this.database.PhotoSubjects.Add(subject);
             }
 
             await this.database.SaveChangesAsync();
 
-            photo.PhotoSubjectCollection = photo.Subjects.Aggregate(string.Empty, (s, subject) => s + subject.PhotoSubjectId);
-//            photo.Slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId);
+            photo.PhotoSubjectIds = photo.Subjects.Select(subject => subject.PhotoSubjectId.ToString()).ToArray();
+
+            //            photo.Slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId);
+
+            Logger.Log($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo");
 
             this.database.Photos.Add(photo);
 
