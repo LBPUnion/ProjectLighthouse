@@ -49,11 +49,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
             await this.database.SaveChangesAsync();
 
-            return this.Ok();
+            return await TopScores(score.SlotId, score.Type);
         }
 
+        [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
+        public async Task<IActionResult> FriendScores(int slotId, int type) 
+            => await TopScores(slotId, type);
+
         [HttpGet("topscores/user/{slotId:int}/{type:int}")]
-        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart, [FromQuery] int pageSize)
+        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart=-1, [FromQuery] int pageSize=5)
         {
             // Get username
             User user = await this.database.UserFromRequest(this.Request);
@@ -72,9 +76,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .OrderByDescending(rs => rs.Score.Points)
                 .FirstOrDefault();
 
-            // Paginated viewing
-           var pagedScores = rankedScores
-                .Skip(pageStart - 1)
+            // Paginated viewing: if not requesting pageStart, get results around user
+            var pagedScores = rankedScores
+                .Skip(pageStart != -1 ? pageStart - 1 : myScore.Rank - 3)
                 .Take(Math.Min(pageSize, 30));
 
             string serializedScores = Enumerable.Aggregate(pagedScores, string.Empty, (current,  rs) => {
@@ -95,7 +99,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     {"totalNumScores", rankedScores.Count() } // This is the denominator of your position globally in the side menu.
                 });
             }
-             
 
             return this.Ok(res);
         }
