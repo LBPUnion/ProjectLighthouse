@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             photo.CreatorId = user.UserId;
             photo.Creator = user;
 
-            foreach (PhotoSubject subject in photo.Subjects)
+            foreach (PhotoSubject subject in photo.SubjectsXmlDontUse) // fine for here
             {
                 subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
 
@@ -71,14 +72,40 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("photos/by")]
-        public async Task<IActionResult> UserPhotos([FromQuery] string user)
+        public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
         {
             User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (user == null) return this.NotFound();
 
-            List<Photo> photos = await this.database.Photos.Where(p => p.CreatorId == userFromQuery.UserId).Take(10).ToListAsync();
+            List<Photo> photos = await this.database.Photos.Where(p => p.CreatorId == userFromQuery.UserId)
+                .OrderByDescending(s => s.Timestamp)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
+                .ToListAsync();
             string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
+            return this.Ok(LbpSerializer.StringElement("photos", response));
+        }
+
+        [HttpGet("photos/with")]
+        public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
+        {
+            User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (user == null) return this.NotFound();
+
+            List<Photo> photos = new();
+            foreach (Photo photo in this.database.Photos)
+            {
+                photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
+            }
+
+            string response = photos.OrderByDescending
+                    (s => s.Timestamp)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
+                .Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
+
             return this.Ok(LbpSerializer.StringElement("photos", response));
         }
     }

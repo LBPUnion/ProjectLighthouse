@@ -37,7 +37,12 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         [NotMapped]
-        public int PhotosWithMeCount { get; set; }
+        public int PhotosWithMeCount {
+            get {
+                using Database database = new();
+                return Enumerable.Sum(database.Photos, photo => photo.Subjects.Count(subject => subject.User.UserId == this.UserId));
+            }
+        }
 
         public bool CommentsEnabled { get; set; }
 
