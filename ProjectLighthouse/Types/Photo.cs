@@ -33,17 +33,23 @@ namespace LBPUnion.ProjectLighthouse.Types
         [XmlElement("plan")]
         public string PlanHash { get; set; }
 
+        [NotMapped]
         private List<PhotoSubject>? subjects;
 
         [NotMapped]
         [XmlArray("subjects")]
         [XmlArrayItem("subject")]
+        public List<PhotoSubject> SubjectsXmlDontUse {
+            get => null!;
+            set => Subjects = value;
+        }
+
+        [NotMapped]
         public List<PhotoSubject> Subjects {
             get {
                 if (this.subjects != null) return this.subjects;
 
                 List<PhotoSubject> response = new();
-
                 using Database database = new();
 
                 foreach (string idStr in this.PhotoSubjectIds)

@@ -40,7 +40,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             photo.CreatorId = user.UserId;
             photo.Creator = user;
 
-            foreach (PhotoSubject subject in photo.Subjects)
+            foreach (PhotoSubject subject in photo.SubjectsXmlDontUse) // fine for here
             {
                 subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
 
