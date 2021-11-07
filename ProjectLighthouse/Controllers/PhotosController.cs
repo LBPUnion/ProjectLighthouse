@@ -45,7 +45,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
 
-                if (subject.User == null) return this.BadRequest();
+                if (subject.User == null) continue;
 
                 subject.UserId = subject.User.UserId;
                 Logger.Log($"Adding PhotoSubject (userid {subject.UserId}) to db");
