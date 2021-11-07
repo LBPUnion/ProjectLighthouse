@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211105205010_UpdatePhotoAndPhotoSubjectToDoStuffWeirdName")]
+    partial class UpdatePhotoAndPhotoSubjectToDoStuffWeirdName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,27 +162,22 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("LargeHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("MediumHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("PhotoSubjectCollection")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("PlanHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("SlotId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SmallHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<long>("Timestamp")
@@ -188,7 +185,7 @@ namespace ProjectLighthouse.Migrations
 
                     b.HasKey("PhotoId");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("SlotId");
 
                     b.ToTable("Photos");
                 });
@@ -202,10 +199,15 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Bounds")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("ParentPhotoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("PhotoSubjectId");
+
+                    b.HasIndex("ParentPhotoId");
 
                     b.HasIndex("UserId");
 
@@ -363,6 +365,12 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("LolCatFtwCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("PhotosByMeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PhotosWithMeCount")
+                        .HasColumnType("int");
+
                     b.Property<string>("Pins")
                         .HasColumnType("longtext");
 
@@ -472,22 +480,30 @@ namespace ProjectLighthouse.Migrations
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Photo", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Creator")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
                         .WithMany()
-                        .HasForeignKey("CreatorId")
+                        .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Creator");
+                    b.Navigation("Slot");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.PhotoSubject", b =>
                 {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Photo", "ParentPhoto")
+                        .WithMany()
+                        .HasForeignKey("ParentPhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ParentPhoto");
 
                     b.Navigation("User");
                 });

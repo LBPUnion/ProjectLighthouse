@@ -22,8 +22,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromQuery] string titleId)
+        public async Task<IActionResult> Login([FromQuery] string? titleId)
         {
+            titleId ??= "";
+
             string body = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             LoginData? loginData;

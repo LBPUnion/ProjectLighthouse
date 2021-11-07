@@ -27,8 +27,18 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public int ReviewCount { get; set; }
         public int CommentCount { get; set; }
-        public int PhotosByMeCount { get; set; }
+
+        [NotMapped]
+        public int PhotosByMeCount {
+            get {
+                using Database database = new();
+                return database.Photos.Count(p => p.CreatorId == this.UserId);
+            }
+        }
+
+        [NotMapped]
         public int PhotosWithMeCount { get; set; }
+
         public bool CommentsEnabled { get; set; }
 
         public int LocationId { get; set; }

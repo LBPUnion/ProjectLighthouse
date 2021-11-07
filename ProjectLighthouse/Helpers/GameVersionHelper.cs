@@ -82,7 +82,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             if (LittleBigPlanet2TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet2;
             if (LittleBigPlanet3TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet3;
 
-            return GameVersion.Unknown;
+            return GameVersion.LittleBigPlanet1;
         }
     }
 }

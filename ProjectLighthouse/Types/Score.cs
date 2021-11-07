@@ -29,16 +29,14 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         [NotMapped]
         [XmlElement("playerIds")]
-        public string[] PlayerIds
-        {
+        public string[] PlayerIds {
             get => this.PlayerIdCollection.Split(",");
             set => this.PlayerIdCollection = string.Join(',', value);
         }
 
         [NotMapped]
         [XmlElement("mainPlayer")]
-        public string MainPlayer
-        {
+        public string MainPlayer {
             get => this.PlayerIds[0];
             set => this.PlayerIds[0] = value;
         }

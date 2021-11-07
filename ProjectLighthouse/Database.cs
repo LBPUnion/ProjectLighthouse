@@ -23,7 +23,8 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Token> Tokens { get; set; }
         public DbSet<Score> Scores { get; set; }
-
+        public DbSet<PhotoSubject> PhotoSubjects { get; set; }
+        public DbSet<Photo> Photos { get; set; }
         public DbSet<LastMatch> LastMatches { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -106,6 +107,9 @@ namespace LBPUnion.ProjectLighthouse
 
             return (user, token);
         }
+
+        public async Task<Photo?> PhotoFromSubject(PhotoSubject subject)
+            => await this.Photos.FirstOrDefaultAsync(p => p.PhotoSubjectIds.Contains(subject.PhotoSubjectId.ToString()));
         #nullable disable
     }
 }

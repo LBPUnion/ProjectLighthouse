@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211105205749_DropPhotoSlot")]
+    partial class DropPhotoSlot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,35 +162,25 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("LargeHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("MediumHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("PhotoSubjectCollection")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("PlanHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("SmallHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<long>("Timestamp")
                         .HasColumnType("bigint");
 
                     b.HasKey("PhotoId");
-
-                    b.HasIndex("CreatorId");
 
                     b.ToTable("Photos");
                 });
@@ -363,6 +355,12 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("LolCatFtwCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("PhotosByMeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PhotosWithMeCount")
+                        .HasColumnType("int");
+
                     b.Property<string>("Pins")
                         .HasColumnType("longtext");
 
@@ -468,17 +466,6 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("Location");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Photo", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.PhotoSubject", b =>

@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211106010424_AddCreatorToPhoto")]
+    partial class AddCreatorToPhoto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,23 +166,18 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LargeHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("MediumHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("PhotoSubjectCollection")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("PlanHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("SmallHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<long>("Timestamp")
@@ -361,6 +358,12 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("LolCatFtwCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PhotosByMeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PhotosWithMeCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Pins")
