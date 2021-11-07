@@ -79,6 +79,6 @@ Some modifications may require updates to the database schema. You can automatic
 | LBP1     | Compatible                        | Incompatible, crashes on entering pod computer | N/A                |
 | LBP2     | Compatible                        | Compatible with patched RPCS3                  | N/A                |
 | LBP3     | Somewhat compatible               | Somewhat compatible with workaround            | Incompatible       |
-| LBP Vita | Potentially compatible            | N/A                                            | N/A                |
+| LBP Vita | Somewhat compatible               | N/A                                            | N/A                |
 
 Project Lighthouse is still a heavy work in progress, so this is subject to change at any point.
