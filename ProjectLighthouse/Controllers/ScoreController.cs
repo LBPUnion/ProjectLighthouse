@@ -14,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
-    [Produces("text/plain")]
+    [Produces("text/xml")]
     public class ScoreController : ControllerBase
     {
         private readonly Database database;
