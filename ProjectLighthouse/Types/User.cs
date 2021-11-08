@@ -44,8 +44,6 @@ namespace LBPUnion.ProjectLighthouse.Types
             }
         }
 
-        public bool CommentsEnabled { get; set; }
-
         public int LocationId { get; set; }
 
         /// <summary>
@@ -79,7 +77,7 @@ namespace LBPUnion.ProjectLighthouse.Types
                           LbpSerializer.StringElement("commentCount", this.CommentCount) +
                           LbpSerializer.StringElement("photosByMeCount", this.PhotosByMeCount) +
                           LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMeCount) +
-                          LbpSerializer.StringElement("commentsEnabled", this.CommentsEnabled) +
+                          LbpSerializer.StringElement("commentsEnabled", "true") +
                           LbpSerializer.StringElement("location", this.Location.Serialize()) +
                           LbpSerializer.StringElement("favouriteSlotCount", this.FavouriteSlotCount) +
                           LbpSerializer.StringElement("favouriteUserCount", this.FavouriteUserCount) +
