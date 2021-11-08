@@ -27,6 +27,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("scoreboard/user/{id:int}")]
         public async Task<IActionResult> SubmitScore(int id)
         {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
@@ -51,22 +54,28 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
             await this.database.SaveChangesAsync();
 
-            return await TopScores(score.SlotId, score.Type);
+            string myRanking = await GetScores(score.SlotId, score.Type, user);
+
+            return this.Ok(myRanking);
         }
 
         [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
-        public async Task<IActionResult> FriendScores(int slotId, int type) 
-            => await TopScores(slotId, type);
+        public async Task<IActionResult> FriendScores(int slotId, int type)
+        //=> await TopScores(slotId, type);
+        => this.Ok("<scores />");
 
         [HttpGet("topscores/user/{slotId:int}/{type:int}")]
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
-        {
+        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5) {
             // Get username
             User? user = await this.database.UserFromRequest(this.Request);
 
             if (user == null) return this.StatusCode(403, "");
+            return this.Ok(await GetScores(slotId, type, user, pageStart, pageSize));
+        }
 
+        public async Task<string> GetScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
+        {
             // This is hella ugly but it technically assigns the proper rank to a score
             // var needed for Anonymous type returned from SELECT
             var rankedScores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type)
@@ -89,7 +98,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             // Paginated viewing: if not requesting pageStart, get results around user
             var pagedScores = rankedScores
-                .Skip(pageStart != -1 ? pageStart - 1 : myScore.Rank - 3)
+                .Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3)
                 .Take(Math.Min(pageSize, 30));
 
             string serializedScores = pagedScores.Aggregate
@@ -128,7 +137,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 );
             }
 
-            return this.Ok(res);
+            return res;
         }
     }
 }
