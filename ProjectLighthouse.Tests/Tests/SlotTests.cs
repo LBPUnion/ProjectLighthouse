@@ -46,8 +46,12 @@ namespace LBPUnion.ProjectLighthouse.Tests
 //            XmlSerializer serializer = new(typeof(Slot));
 //            Slot slot = (Slot)serializer.Deserialize(new StringReader(bodyString));
 
-            string respA = await this.Client.GetStringAsync("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser0");
-            string respB = await this.Client.GetStringAsync("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser1");
+            LoginResult loginResult = await this.Authenticate();
+
+            string respA = await (await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser0", loginResult.AuthTicket)).Content
+                .ReadAsStringAsync();
+            string respB = await (await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser1", loginResult.AuthTicket)).Content
+                .ReadAsStringAsync();
 
             Assert.NotEqual(respA, respB);
             Assert.DoesNotContain(respA, "slotB");
