@@ -68,7 +68,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
-        public async Task<IActionResult> FriendScores(int slotId, int type)
+        public IActionResult FriendScores(int slotId, int type)
         //=> await TopScores(slotId, type);
         => this.Ok("<scores />");
 
