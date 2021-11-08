@@ -31,7 +31,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> PlanetStats()
         {
             int totalSlotCount = await this.database.Slots.CountAsync();
-            const int mmPicksCount = 0;
+            int mmPicksCount = await this.database.Slots.CountAsync(s => s.TeamPick);
 
             return this.Ok
             (
