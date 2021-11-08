@@ -32,6 +32,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     (q => q.User)
                 .Include(q => q.Slot)
                 .Include(q => q.Slot.Location)
+                .Include(q => q.Slot.Creator)
                 .Where(q => q.User.Username == username)
                 .AsEnumerable();
 
