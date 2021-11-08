@@ -20,8 +20,13 @@ namespace LBPUnion.ProjectLighthouse.Logging
             string contentFile = $"{channel}{line.LineData}\n";
             string contentAll = $"[{$"{line.LoggerLevel.Name} {channel}".TrimEnd()}] {line.LineData}\n";
 
-            File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel.Name.ToFileName() + ".log"), contentFile);
-            File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
+            try
+            {
+                File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel.Name.ToFileName() + ".log"), contentFile);
+                File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
+            }
+            catch (IOException) { } // windows, ya goofed
+
         }
     }
 }

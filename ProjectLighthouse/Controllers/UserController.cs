@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,6 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -24,18 +26,32 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             this.database = database;
         }
 
-        [HttpGet("user/{username}")]
-        public async Task<IActionResult> GetUser(string username)
+        public async Task<string> GetSerializedUser(string username)
         {
-            User user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
+            User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
+            return user?.Serialize();
+        }
 
+        [HttpGet("user/{username}")]
+        public async Task<IActionResult> GetUser(string username) {
+            string? user = await this.GetSerializedUser(username);
             if (user == null) return this.NotFound();
-
-            return this.Ok(user.Serialize());
+            return this.Ok(user);
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> GetUserAlt([FromQuery] string u) => await this.GetUser(u);
+        public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
+        {
+            List<string> serializedUsers = new();
+            foreach (string userId in u)
+            {
+                serializedUsers.Add(await this.GetSerializedUser(userId));
+            }
+
+            string serialized = serializedUsers.Aggregate(string.Empty, (current, u) => u == null ? current : current + u);
+
+            return this.Ok(LbpSerializer.StringElement("users", serialized));
+        }
 
         [HttpGet("user/{username}/playlists")]
         public IActionResult GetUserPlaylists(string username) => this.Ok();

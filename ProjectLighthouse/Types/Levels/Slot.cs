@@ -109,8 +109,37 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         }
 
         [XmlIgnore]
-        public int Plays { get; set; }
+        [NotMapped]
+        public int Plays { get => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3; }
+        [XmlIgnore]
+        [NotMapped]
+        public int PlaysUnique { get => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique; }
+        [XmlIgnore]
+        [NotMapped]
+        public int PlaysComplete { get => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete; }
 
+        [XmlIgnore]
+        public int PlaysLBP1 { get; set; }
+        [XmlIgnore]
+        public int PlaysLBP1Complete { get; set; }
+        [XmlIgnore]
+        public int PlaysLBP1Unique { get; set; }
+
+        [XmlIgnore]
+        public int PlaysLBP2 { get; set; }
+        [XmlIgnore]
+        public int PlaysLBP2Complete { get; set; }
+        [XmlIgnore]
+        public int PlaysLBP2Unique { get; set; }
+
+        [XmlIgnore]
+        public int PlaysLBP3 { get; set; }
+        [XmlIgnore]
+        public int PlaysLBP3Complete { get; set; }
+        [XmlIgnore]
+        public int PlaysLBP3Unique { get; set; }
+
+        
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
@@ -121,7 +150,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
                               LbpSerializer.StringElement("game", (int)this.GameVersion) +
-                              LbpSerializer.StringElement("npHandle", this.Creator.Username) +
+                              LbpSerializer.StringElement("npHandle", this.Creator?.Username) +
                               LbpSerializer.StringElement("description", this.Description) +
                               LbpSerializer.StringElement("icon", this.IconHash) +
                               LbpSerializer.StringElement("rootLevel", this.RootLevel) +
@@ -139,7 +168,18 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
                               LbpSerializer.StringElement("mmpick", this.TeamPick) +
                               LbpSerializer.StringElement("heartCount", this.Hearts) +
-                              LbpSerializer.StringElement("playCount", this.Plays);
+                              LbpSerializer.StringElement("playCount", this.Plays) +
+                              LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
+                              LbpSerializer.StringElement("completionCount", this.PlaysComplete) +
+                              LbpSerializer.StringElement("lbp1PlayCount", this.PlaysLBP1) +
+                              LbpSerializer.StringElement("lbp1CompletionCount", this.PlaysLBP1Complete) +
+                              LbpSerializer.StringElement("lbp1UniquePlayCount", this.PlaysLBP1Unique) +
+                              LbpSerializer.StringElement("lbp2PlayCount", this.PlaysLBP2) +
+                              LbpSerializer.StringElement("lbp2CompletionCount", this.PlaysLBP2Complete) +
+                              LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBP2Unique) + // not actually used ingame, as per above comment
+                              LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
+                              LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
+                              LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique);
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

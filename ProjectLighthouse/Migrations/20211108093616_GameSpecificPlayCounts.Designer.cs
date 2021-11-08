@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211108093616_GameSpecificPlayCounts")]
+    partial class GameSpecificPlayCounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,30 +181,6 @@ namespace ProjectLighthouse.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("Slots");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.VisitedLevel", b =>
-                {
-                    b.Property<int>("VisitedLevelId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("GameVersion")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SlotId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("VisitedLevelId");
-
-                    b.HasIndex("SlotId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("VisitedLevels");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Photo", b =>
@@ -495,25 +473,6 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("Location");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.VisitedLevel", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
-                        .WithMany()
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Slot");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Photo", b =>

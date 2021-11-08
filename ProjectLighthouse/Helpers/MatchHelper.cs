@@ -1,6 +1,8 @@
 #nullable enable
+using System;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using LBPUnion.ProjectLighthouse.Types.Match;
 
 namespace LBPUnion.ProjectLighthouse.Helpers
@@ -21,6 +23,9 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             }
 
             string matchData = $"{{{string.Concat(data.Skip(matchType.Length + 3).SkipLast(2))}}}";
+
+            // JSON does not like the hex value that location comes in (0x7f000001) so, convert it to int
+            matchData = Regex.Replace(matchData, @"0x[a-fA-F0-9]{8}", m => Convert.ToInt32(m.Value, 16).ToString());
 
             return Deserialize(matchType, matchData);
         }

@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
-    [Produces("text/plain")]
+    [Produces("text/xml")]
     public class ScoreController : ControllerBase
     {
         private readonly Database database;
@@ -25,8 +26,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost("scoreboard/user/{id:int}")]
-        public async Task<IActionResult> SubmitScore(int id)
+        public async Task<IActionResult> SubmitScore(int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
         {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
@@ -36,8 +40,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             score.SlotId = id;
 
-            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId && s.PlayerIdCollection == score.PlayerIdCollection);
+            Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
+            if (slot == null) return this.BadRequest();
+            if (lbp1) slot.PlaysLBP1Complete++;
+            if (lbp2) slot.PlaysLBP2Complete++;
+            if (lbp3) slot.PlaysLBP3Complete++;
 
+            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId && s.PlayerIdCollection == score.PlayerIdCollection);
+            
             if (existingScore.Any())
             {
                 Score first = existingScore.First(s => s.SlotId == score.SlotId);
@@ -49,20 +59,31 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 this.database.Scores.Add(score);
             }
+
             await this.database.SaveChangesAsync();
 
-            return this.Ok();
+            string myRanking = await GetScores(score.SlotId, score.Type, user);
+
+            return this.Ok(myRanking);
         }
+
+        [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
+        public IActionResult FriendScores(int slotId, int type)
+        //=> await TopScores(slotId, type);
+        => this.Ok(LbpSerializer.BlankElement("scores"));
 
         [HttpGet("topscores/user/{slotId:int}/{type:int}")]
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart, [FromQuery] int pageSize)
-        {
+        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5) {
             // Get username
             User? user = await this.database.UserFromRequest(this.Request);
 
             if (user == null) return this.StatusCode(403, "");
+            return this.Ok(await GetScores(slotId, type, user, pageStart, pageSize));
+        }
 
+        public async Task<string> GetScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
+        {
             // This is hella ugly but it technically assigns the proper rank to a score
             // var needed for Anonymous type returned from SELECT
             var rankedScores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type)
@@ -83,8 +104,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .OrderByDescending(rs => rs.Score.Points)
                 .FirstOrDefault();
 
-            // Paginated viewing
-            var pagedScores = rankedScores.Skip(pageStart - 1).Take(Math.Min(pageSize, 30));
+            // Paginated viewing: if not requesting pageStart, get results around user
+            var pagedScores = rankedScores
+                .Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3)
+                .Take(Math.Min(pageSize, 30));
 
             string serializedScores = pagedScores.Aggregate
             (
@@ -122,7 +145,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 );
             }
 
-            return this.Ok(res);
+            return res;
         }
     }
 }
