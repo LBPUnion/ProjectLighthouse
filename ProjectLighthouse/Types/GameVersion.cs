@@ -5,7 +5,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         LittleBigPlanet1 = 0,
         LittleBigPlanet2 = 1,
         LittleBigPlanet3 = 2,
-        LittleBigPlanetVita = 1,
+        LittleBigPlanetVita = 3,
         Unknown = -1,
     }
 }
