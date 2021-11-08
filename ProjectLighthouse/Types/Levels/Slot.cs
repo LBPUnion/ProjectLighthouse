@@ -139,7 +139,37 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [XmlIgnore]
         public int PlaysLBP3Unique { get; set; }
 
-        
+        [XmlElement("thumbsup")]
+        public int Thumbsup
+        {
+            get
+            {
+                using Database database = new();
+
+                return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
+            }
+        }
+        [XmlElement("thumbsdown")]
+        public int Thumbsdown
+        {
+            get
+            {
+                using Database database = new();
+
+                return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
+            }
+        }
+        [XmlElement("averageRating")]
+        public double RatingLBP1 { get {
+                using Database database = new();
+
+                IQueryable<RatedLevel> ratedLevels = database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
+                if (!ratedLevels.Any()) return 3.0;
+
+                return Enumerable.Average(ratedLevels, r => r.RatingLBP1); ;
+            } 
+        } 
+
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
@@ -179,7 +209,10 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBP2Unique) + // not actually used ingame, as per above comment
                               LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                               LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
-                              LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique);
+                              LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
+                              LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
+                              LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
+                              LbpSerializer.StringElement("averageRating", this.RatingLBP1);
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

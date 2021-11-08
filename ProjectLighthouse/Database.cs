@@ -27,6 +27,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<Photo> Photos { get; set; }
         public DbSet<LastMatch> LastMatches { get; set; }
         public DbSet<VisitedLevel> VisitedLevels { get; set; }
+        public DbSet<RatedLevel> RatedLevels { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseMySql(ServerSettings.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
