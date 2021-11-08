@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,13 +42,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
         {
-            List<string> tasks = new();
+            List<string> serializedUsers = new();
             foreach (string userId in u)
             {
-                tasks.Add(await this.GetSerializedUser(userId));
+                serializedUsers.Add(await this.GetSerializedUser(userId));
             }
 
-            string serialized = tasks.Aggregate(string.Empty, (current, u) => u == null ? current : current + u);
+            string serialized = serializedUsers.Aggregate(string.Empty, (current, u) => u == null ? current : current + u);
 
             return this.Ok(LbpSerializer.StringElement("users", serialized));
         }
