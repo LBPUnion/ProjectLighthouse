@@ -70,7 +70,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
         public IActionResult FriendScores(int slotId, int type)
         //=> await TopScores(slotId, type);
-        => this.Ok("<scores />");
+        => this.Ok(LbpSerializer.BlankElement("scores"));
 
         [HttpGet("topscores/user/{slotId:int}/{type:int}")]
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
