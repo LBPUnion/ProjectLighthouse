@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Match;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -39,11 +40,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // Example POST /match: [UpdateMyPlayerData,["Player":"FireGamer9872"]]
 
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-            if (bodyString.Contains("FindBestRoom"))
-                return this.Ok
-                (
-                    "[{\"StatusCode\":200},{\"Players\":[{\"PlayerId\":\"literally1984\",\"matching_res\":0},{\"PlayerId\":\"jvyden\",\"matching_res\":1}],\"Slots\":[[5,0]],\"RoomState\":\"E_ROOM_IN_POD\",\"HostMood\":\"E_MOOD_EVERYONE\",\"LevelCompletionEstimate\":0,\"PassedNoJoinPoint\":0,\"MoveConnected\":false,\"Location\":[\"127.0.0.1\"],\"BuildVersion\":289,\"Language\":1,\"FirstSeenTimestamp\":1427331263756,\"LastSeenTimestamp\":1635112546000,\"GameId\":1,\"NatType\":2,\"Friends\":[],\"Blocked\":[],\"RecentlyLeft\":[],\"FailedJoin\":[]}]"
-                );
 
             if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
 
@@ -61,6 +57,28 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             if (matchData == null) return this.BadRequest();
+
+            #endregion
+
+            #region Process match data
+
+            if (matchData is CreateRoom createRoom)
+            {
+                if (createRoom.Slots.Count == 0) return this.BadRequest();
+                if (createRoom.FirstSlot.Count != 2) return this.BadRequest();
+
+                int slotType = createRoom.FirstSlot[0];
+                int slotId = createRoom.FirstSlot[1];
+
+                if (slotType == 1)
+                {
+                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+                    if (slot == null) return this.BadRequest();
+
+                    slot.Plays++;
+                    await this.database.SaveChangesAsync();
+                }
+            }
 
             #endregion
 

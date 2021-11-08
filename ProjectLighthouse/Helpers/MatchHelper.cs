@@ -31,6 +31,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             {
                 "UpdateMyPlayerData" => JsonSerializer.Deserialize<UpdateMyPlayerData>(matchData),
                 "UpdatePlayersInRoom" => JsonSerializer.Deserialize<UpdatePlayersInRoom>(matchData),
+                "CreateRoom" => JsonSerializer.Deserialize<CreateRoom>(matchData),
                 _ => null,
             };
         }
