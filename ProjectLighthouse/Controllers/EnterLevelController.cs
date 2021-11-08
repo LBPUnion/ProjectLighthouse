@@ -55,8 +55,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 v.UserId = user.UserId;
                 v.GameVersion = gameVersion;
                 this.database.VisitedLevels.Add(v);
-                await this.database.SaveChangesAsync();
-
             }
 
             switch (gameVersion)
@@ -70,6 +68,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 default:
                     return this.BadRequest();
             }
+
+            await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
