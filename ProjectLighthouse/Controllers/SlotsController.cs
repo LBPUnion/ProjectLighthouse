@@ -122,6 +122,5 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
         }
 
-        
     }
 }
