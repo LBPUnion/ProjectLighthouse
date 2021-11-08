@@ -52,12 +52,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [ForeignKey(nameof(CreatorId))]
         public User Creator { get; set; }
 
-        [NotMapped]
-        public string CreatorName
-        {
-            get => this.Creator?.Username;
-        }
-
         /// <summary>
         ///     The location of the level on the creator's earth
         /// </summary>
@@ -145,7 +139,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [XmlIgnore]
         public int PlaysLBP3Unique { get; set; }
 
-
+        
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
@@ -156,7 +150,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
                               LbpSerializer.StringElement("game", (int)this.GameVersion) +
-                              LbpSerializer.StringElement("npHandle", this.CreatorName) +
+                              LbpSerializer.StringElement("npHandle", this.Creator?.Username) +
                               LbpSerializer.StringElement("description", this.Description) +
                               LbpSerializer.StringElement("icon", this.IconHash) +
                               LbpSerializer.StringElement("rootLevel", this.RootLevel) +
