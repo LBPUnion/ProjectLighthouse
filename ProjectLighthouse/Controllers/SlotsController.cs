@@ -60,8 +60,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(slot.Serialize());
         }
 
+        [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await NewestSlots(30 * page, 30);
+        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await LuckyDipSlots(30 * page, 30, 69);
 
         [HttpGet("slots")]
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
