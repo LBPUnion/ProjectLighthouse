@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -24,18 +25,49 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             this.database = database;
         }
 
-        [HttpGet("user/{username}")]
-        public async Task<IActionResult> GetUser(string username)
+        public async Task<string> GetSerializedUser(string username)
         {
-            User user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
+            try
+            {
+                User user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
+                return user.Serialize();
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
+            
+        }
 
+        [HttpPost("play/user/{userId}")]
+        public async Task<IActionResult> Play([FromQuery] bool lbp2)
+        {
+            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+            Console.WriteLine(bodyString);
+            return this.Ok();
+        }
+
+        [HttpGet("user/{username}")]
+        public async Task<IActionResult> GetUser(string username) {
+            string? user = await this.GetSerializedUser(username);
             if (user == null) return this.NotFound();
-
-            return this.Ok(user.Serialize());
+            return this.Ok(user);
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> GetUserAlt([FromQuery] string u) => await this.GetUser(u);
+        public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
+        {
+            List<Task<string>> tasks = new();
+            foreach (string userId in u)
+            {
+                tasks.Add(this.GetSerializedUser(userId));
+            }
+            await Task.WhenAll(tasks).ConfigureAwait(true);
+
+            string serialized = tasks.Aggregate(string.Empty, (current, u) => u.Result == null ? current : current + u);
+
+            return this.Ok(LbpSerializer.StringElement("users", serialized));
+        }
 
         [HttpGet("user/{username}/playlists")]
         public IActionResult GetUserPlaylists(string username) => this.Ok();
