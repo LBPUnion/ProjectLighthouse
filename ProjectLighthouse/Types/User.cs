@@ -62,6 +62,14 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public string PlanetHash { get; set; } = "";
 
+        public int Hearts {
+            get {
+                using Database database = new();
+
+                return database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
+            }
+        }
+
         public string Serialize()
         {
             string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
@@ -88,7 +96,8 @@ namespace LBPUnion.ProjectLighthouse.Types
                           LbpSerializer.StringElement("staffChallengeBronzeCount", this.StaffChallengeBronzeCount) +
                           LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
-                          this.ClientsConnected.Serialize();
+                          LbpSerializer.StringElement("heartCount", Hearts);
+            this.ClientsConnected.Serialize();
 
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
         }
