@@ -61,7 +61,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             #endregion
 
             #region Process match data
-
+            /*
             if (matchData is CreateRoom createRoom)
             {
                 if (createRoom.Slots.Count == 0) return this.BadRequest();
@@ -79,7 +79,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     await this.database.SaveChangesAsync();
                 }
             }
-
+            */
             #endregion
 
             #region Update LastMatch

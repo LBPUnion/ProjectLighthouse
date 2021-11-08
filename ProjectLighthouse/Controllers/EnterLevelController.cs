@@ -22,13 +22,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("enterLevel/{id:int}")]
         public async Task<IActionResult> EnterLevel(int id)
         {
-            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            /*Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
             if (slot == null) return this.NotFound();
 
             slot.Plays++;
 
             await this.database.SaveChangesAsync();
-
+            */
             return this.Ok();
         }
     }
