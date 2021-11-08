@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
@@ -25,7 +26,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost("scoreboard/user/{id:int}")]
-        public async Task<IActionResult> SubmitScore(int id)
+        public async Task<IActionResult> SubmitScore(int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
         {
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
@@ -39,8 +40,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             score.SlotId = id;
 
-            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId && s.PlayerIdCollection == score.PlayerIdCollection);
+            Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
+            if (slot == null) return this.BadRequest();
+            if (lbp1) slot.PlaysLBP1Complete++;
+            if (lbp2) slot.PlaysLBP2Complete++;
+            if (lbp3) slot.PlaysLBP3Complete++;
 
+            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId && s.PlayerIdCollection == score.PlayerIdCollection);
+            
             if (existingScore.Any())
             {
                 Score first = existingScore.First(s => s.SlotId == score.SlotId);
@@ -52,6 +59,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 this.database.Scores.Add(score);
             }
+
             await this.database.SaveChangesAsync();
 
             string myRanking = await GetScores(score.SlotId, score.Type, user);
