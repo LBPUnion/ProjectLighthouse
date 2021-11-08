@@ -27,24 +27,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         public async Task<string> GetSerializedUser(string username)
         {
-            try
-            {
-                User user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
-                return user.Serialize();
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
-            
-        }
-
-        [HttpPost("play/user/{userId}")]
-        public async Task<IActionResult> Play([FromQuery] bool lbp2)
-        {
-            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-            Console.WriteLine(bodyString);
-            return this.Ok();
+            User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
+            return user?.Serialize();
         }
 
         [HttpGet("user/{username}")]
@@ -57,14 +41,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
         {
-            List<Task<string>> tasks = new();
+            List<string> tasks = new();
             foreach (string userId in u)
             {
-                tasks.Add(this.GetSerializedUser(userId));
+                tasks.Add(await this.GetSerializedUser(userId));
             }
-            await Task.WhenAll(tasks).ConfigureAwait(true);
 
-            string serialized = tasks.Aggregate(string.Empty, (current, u) => u.Result == null ? current : current + u);
+            string serialized = tasks.Aggregate(string.Empty, (current, u) => u == null ? current : current + u);
 
             return this.Ok(LbpSerializer.StringElement("users", serialized));
         }
