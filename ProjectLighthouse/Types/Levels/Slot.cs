@@ -98,6 +98,19 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [XmlIgnore]
         public GameVersion GameVersion { get; set; }
 
+        [XmlIgnore]
+        [NotMapped]
+        public int Hearts {
+            get {
+                using Database database = new();
+
+                return database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
+            }
+        }
+
+        [XmlIgnore]
+        public int Plays { get; set; }
+
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
@@ -124,7 +137,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("moveRequired", this.MoveRequired) +
                               LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
                               LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
-                              LbpSerializer.StringElement("mmpick", this.TeamPick);
+                              LbpSerializer.StringElement("mmpick", this.TeamPick) +
+                              LbpSerializer.StringElement("heartCount", this.Hearts) +
+                              LbpSerializer.StringElement("playCount", this.Plays);
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

@@ -8,15 +8,15 @@ namespace LBPUnion.ProjectLighthouse.Types
 {
     public class User
     {
-
-//        [NotMapped]
         public readonly ClientsConnected ClientsConnected = new();
         public int UserId { get; set; }
         public string Username { get; set; }
         public string IconHash { get; set; }
         public int Game { get; set; }
+
+        [NotMapped]
         public int Lists { get; set; }
-        public int HeartCount { get; set; }
+
         public string YayHash { get; set; }
         public string BooHash { get; set; }
 
@@ -25,8 +25,16 @@ namespace LBPUnion.ProjectLighthouse.Types
         /// </summary>
         public string Biography { get; set; }
 
-        public int ReviewCount { get; set; }
-        public int CommentCount { get; set; }
+        [NotMapped]
+        public int ReviewCount => 0;
+
+        [NotMapped]
+        public int CommentCount {
+            get {
+                using Database database = new();
+                return database.Comments.Count(c => c.PosterUserId == this.UserId);
+            }
+        }
 
         [NotMapped]
         public int PhotosByMeCount {
@@ -44,8 +52,6 @@ namespace LBPUnion.ProjectLighthouse.Types
             }
         }
 
-        public bool CommentsEnabled { get; set; }
-
         public int LocationId { get; set; }
 
         /// <summary>
@@ -54,15 +60,44 @@ namespace LBPUnion.ProjectLighthouse.Types
         [ForeignKey("LocationId")]
         public Location Location { get; set; }
 
-        public int FavouriteSlotCount { get; set; }
-        public int FavouriteUserCount { get; set; }
-        public int LolCatFtwCount { get; set; }
+        [NotMapped]
+        public int HeartedLevels {
+            get {
+                using Database database = new();
+                return database.HeartedLevels.Count(p => p.UserId == this.UserId);
+            }
+        }
+
+        [NotMapped]
+        public int HeartedUsers {
+            get {
+                using Database database = new();
+                return database.HeartedProfiles.Count(p => p.UserId == this.UserId);
+            }
+        }
+
+        [NotMapped]
+        public int QueuedLevelsCount {
+            get {
+                using Database database = new();
+                return database.QueuedLevels.Count(p => p.UserId == this.UserId);
+            }
+        }
+
         public string Pins { get; set; } = "";
         public int StaffChallengeGoldCount { get; set; }
         public int StaffChallengeSilverCount { get; set; }
         public int StaffChallengeBronzeCount { get; set; }
 
         public string PlanetHash { get; set; } = "";
+
+        public int Hearts {
+            get {
+                using Database database = new();
+
+                return database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
+            }
+        }
 
         public string Serialize()
         {
@@ -71,7 +106,6 @@ namespace LBPUnion.ProjectLighthouse.Types
                           this.SerializeSlots() +
                           LbpSerializer.StringElement("lists", this.Lists) +
                           LbpSerializer.StringElement("lists_quota", ServerSettings.ListsQuota) + // technically not a part of the user but LBP expects it
-                          LbpSerializer.StringElement("heartCount", this.HeartCount) +
                           LbpSerializer.StringElement("yay2", this.YayHash) +
                           LbpSerializer.StringElement("boo2", this.BooHash) +
                           LbpSerializer.StringElement("biography", this.Biography) +
@@ -79,18 +113,19 @@ namespace LBPUnion.ProjectLighthouse.Types
                           LbpSerializer.StringElement("commentCount", this.CommentCount) +
                           LbpSerializer.StringElement("photosByMeCount", this.PhotosByMeCount) +
                           LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMeCount) +
-                          LbpSerializer.StringElement("commentsEnabled", this.CommentsEnabled) +
+                          LbpSerializer.StringElement("commentsEnabled", "true") +
                           LbpSerializer.StringElement("location", this.Location.Serialize()) +
-                          LbpSerializer.StringElement("favouriteSlotCount", this.FavouriteSlotCount) +
-                          LbpSerializer.StringElement("favouriteUserCount", this.FavouriteUserCount) +
-                          LbpSerializer.StringElement("lolcatftwCount", this.LolCatFtwCount) +
+                          LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels) +
+                          LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +
+                          LbpSerializer.StringElement("lolcatftwCount", this.QueuedLevelsCount) +
                           LbpSerializer.StringElement("pins", this.Pins) +
                           LbpSerializer.StringElement("staffChallengeGoldCount", this.StaffChallengeGoldCount) +
                           LbpSerializer.StringElement("staffChallengeSilverCount", this.StaffChallengeSilverCount) +
                           LbpSerializer.StringElement("staffChallengeBronzeCount", this.StaffChallengeBronzeCount) +
                           LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
-                          this.ClientsConnected.Serialize();
+                          LbpSerializer.StringElement("heartCount", Hearts);
+            this.ClientsConnected.Serialize();
 
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
         }

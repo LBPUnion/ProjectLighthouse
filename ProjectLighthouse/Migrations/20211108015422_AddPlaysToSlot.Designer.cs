@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211108015422_AddPlaysToSlot")]
+    partial class AddPlaysToSlot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,13 +338,31 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("BooHash")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("CommentCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FavouriteSlotCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FavouriteUserCount")
+                        .HasColumnType("int");
+
                     b.Property<int>("Game")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HeartCount")
                         .HasColumnType("int");
 
                     b.Property<string>("IconHash")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("Lists")
+                        .HasColumnType("int");
+
                     b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LolCatFtwCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Pins")
@@ -350,6 +370,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("PlanetHash")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("ReviewCount")
+                        .HasColumnType("int");
 
                     b.Property<int>("StaffChallengeBronzeCount")
                         .HasColumnType("int");

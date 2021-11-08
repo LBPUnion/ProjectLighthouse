@@ -1,7 +1,9 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +22,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/by")]
-        public IActionResult SlotsBy([FromQuery] string u)
+        public async Task<IActionResult> SlotsBy([FromQuery] string u)
         {
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.BadRequest();
+
+            GameVersion gameVersion = token.GameVersion;
+
             string response = Enumerable.Aggregate
             (
-                this.database.Slots.Include(s => s.Creator).Include(s => s.Location).Where(s => s.Creator.Username == u),
+                this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+                    .Include(s => s.Creator)
+                    .Include(s => s.Location)
+                    .Where(s => s.Creator.Username == u),
                 string.Empty,
                 (current, slot) => current + slot.Serialize()
             );
@@ -35,7 +45,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("s/user/{id:int}")]
         public async Task<IActionResult> SUser(int id)
         {
-            Slot slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.BadRequest();
+
+            GameVersion gameVersion = token.GameVersion;
+
+            Slot slot = await this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .FirstOrDefaultAsync(s => s.SlotId == id);
 
             if (slot == null) return this.NotFound();
 
@@ -43,13 +61,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/cool")]
-        public IActionResult CoolSlots([FromQuery] int page) => NewestSlots(30 * page, 30);
+        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await NewestSlots(30 * page, 30);
 
         [HttpGet("slots")]
-        public IActionResult NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
+        public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            IQueryable<Slot> slots = this.database.Slots.Include
-                    (s => s.Creator)
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.BadRequest();
+
+            GameVersion gameVersion = token.GameVersion;
+
+            IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+                .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .OrderByDescending(s => s.FirstUploaded)
                 .Skip(pageStart - 1)
@@ -60,10 +83,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/mmpicks")]
-        public IActionResult TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
+        public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            IQueryable<Slot> slots = this.database.Slots.Where
-                    (s => s.TeamPick)
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.BadRequest();
+
+            GameVersion gameVersion = token.GameVersion;
+
+            IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+                .Where(s => s.TeamPick)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .OrderByDescending(s => s.LastUpdated)
@@ -75,11 +103,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/lbp2luckydip")]
-        public IActionResult LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
+        public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
         {
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.BadRequest();
+
+            GameVersion gameVersion = token.GameVersion;
+
             // TODO: Incorporate seed?
-            IQueryable<Slot> slots = this.database.Slots.OrderBy
-                    (_ => Guid.NewGuid())
+            IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+                .OrderBy(_ => Guid.NewGuid())
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .Skip(pageStart - 1)

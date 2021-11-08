@@ -94,6 +94,13 @@ namespace LBPUnion.ProjectLighthouse
             return await this.UserFromAuthToken(mmAuth);
         }
 
+        public async Task<Token?> TokenFromRequest(HttpRequest request)
+        {
+            if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
+
+            return await this.Tokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
+        }
+
         public async Task<(User, Token)?> UserAndTokenFromRequest(HttpRequest request)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;

@@ -2,19 +2,21 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211108013443_RemoveCommentsEnabled")]
+    partial class RemoveCommentsEnabled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
-                .HasAnnotation("ProductVersion", "5.0.12");
+                .HasAnnotation("ProductVersion", "5.0.11");
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
                 {
@@ -129,9 +131,6 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
-
-                    b.Property<int>("Plays")
-                        .HasColumnType("int");
 
                     b.Property<string>("ResourceCollection")
                         .HasColumnType("longtext");
@@ -336,13 +335,31 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("BooHash")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("CommentCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FavouriteSlotCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FavouriteUserCount")
+                        .HasColumnType("int");
+
                     b.Property<int>("Game")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HeartCount")
                         .HasColumnType("int");
 
                     b.Property<string>("IconHash")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("Lists")
+                        .HasColumnType("int");
+
                     b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LolCatFtwCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Pins")
@@ -350,6 +367,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("PlanetHash")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("ReviewCount")
+                        .HasColumnType("int");
 
                     b.Property<int>("StaffChallengeBronzeCount")
                         .HasColumnType("int");
