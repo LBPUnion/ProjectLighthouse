@@ -121,5 +121,29 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
         }
+
+        [HttpPost("play/user/{slotId}")]
+        public async Task<IActionResult> PlayLevel(int slotId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+            if (slot == null) return this.StatusCode(403, "");
+
+            if (lbp1) slot.PlaysLBP1++;
+            if (lbp2) slot.PlaysLBP2++;
+            if (lbp3) slot.PlaysLBP3++;
+
+            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == slotId && s.PlayerIdCollection.Contains(user.Username));
+            if (!existingScore.Any())
+            {
+                if (lbp1) slot.PlaysLBP1Unique++;
+                if (lbp2) slot.PlaysLBP2Unique++;
+                if (lbp3) slot.PlaysLBP3Unique++;
+            }
+                
+            await this.database.SaveChangesAsync();
+            return this.Ok();
+        }
     }
 }
