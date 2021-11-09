@@ -61,12 +61,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (slot == null) return this.NotFound();
 
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-            if (ratedLevel != null) {
-                slot.YourRating = ratedLevel.RatingLBP1;
-                slot.YourDPadRating = ratedLevel.Rating;
-            }
-            
-            return this.Ok(slot.Serialize());
+            string res = ratedLevel != null ? slot.Serialize(ratedLevel.RatingLBP1, ratedLevel.Rating) : slot.Serialize();
+            return this.Ok(res);
         }
 
         [HttpGet("slots/lbp2cool")]

@@ -175,28 +175,12 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
             }
         }
 
-        [NotMapped]
-        [XmlElement("yourRating")]
-        public double YourRating { get; set; }
-
-        [NotMapped]
-        [XmlElement("yourDPadRating")]
-        public int YourDPadRating { get; set; }
-
-        [NotMapped]
-        [XmlElement("yourLBP1PlayCount")]
-        public int YourLBP1PlayCount { get; set; }
-
-        [NotMapped]
-        [XmlElement("yourLBP2PlayCount")]
-        public int YourLBP2PlayCount { get; set; }
-
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
         }
 
-        public string Serialize()
+        public string Serialize(double? yourRating = null, int? yourDPadRating = null, int? yourLBP1PlayCount = null, int? yourLBP2PlayCount = null)
         {
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
@@ -233,11 +217,11 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
                               LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
                               LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
-                              LbpSerializer.StringElement("yourRating", this.YourRating) +
-                              LbpSerializer.StringElement("yourDPadRating", this.YourDPadRating) +
-                              LbpSerializer.StringElement("yourLBP1PlayCount", this.YourLBP1PlayCount) +
-                              LbpSerializer.StringElement("yourLBP2PlayCount", this.YourLBP2PlayCount) +
-                              LbpSerializer.StringElement("averageRating", this.RatingLBP1);
+                              LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
+                              yourRating        != null ? LbpSerializer.StringElement("yourRating", yourRating) : "" +
+                              yourDPadRating    != null ? LbpSerializer.StringElement("yourDPadRating", yourDPadRating) : "" +
+                              yourLBP1PlayCount != null ? LbpSerializer.StringElement("yourLBP1PlayCount", yourLBP1PlayCount) : "" +
+                              yourLBP2PlayCount != null ? LbpSerializer.StringElement("yourLBP2PlayCount", yourLBP2PlayCount) : "";
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }
