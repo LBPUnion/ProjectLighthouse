@@ -188,6 +188,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
             }
         }
 
+        [XmlElement("leveltype")]
+        public string LevelType { get; set; }
+
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
@@ -234,7 +237,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               (yourRating != null ? LbpSerializer.StringElement("yourRating", yourRating) : "") +
                               (yourDPadRating != null ? LbpSerializer.StringElement("yourDPadRating", yourDPadRating) : "") +
                               (yourLBP1PlayCount != null ? LbpSerializer.StringElement("yourLBP1PlayCount", yourLBP1PlayCount) : "") +
-                              (yourLBP2PlayCount != null ? LbpSerializer.StringElement("yourLBP2PlayCount", yourLBP2PlayCount) : "");
+                              (yourLBP2PlayCount != null ? LbpSerializer.StringElement("yourLBP2PlayCount", yourLBP2PlayCount) : "") +
+                              LbpSerializer.StringElement("leveltype", this.LevelType);
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }
