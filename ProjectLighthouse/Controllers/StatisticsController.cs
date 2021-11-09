@@ -39,5 +39,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     ("planetStats", LbpSerializer.StringElement("totalSlotCount", totalSlotCount) + LbpSerializer.StringElement("mmPicksCount", mmPicksCount))
             );
         }
+
+        [HttpGet("planetStats/totalLevelCount")]
+        public async Task<IActionResult> TotalLevelCount() => this.Ok((await this.database.Slots.CountAsync()).ToString());
     }
 }
