@@ -20,29 +20,59 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             this.database = database;
         }
 
-        [HttpPost("dpadrate/user/{slotId}")]
-        public async Task<IActionResult> DPadRate(int slotId, [FromQuery] int rating)
+        // LBP1 rating
+        [HttpPost("rate/user/{slotId}")]
+        public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
         {
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+            Slot? slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
             if (slot == null) return this.StatusCode(403, "");
 
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
             if (ratedLevel == null)
             {
                 ratedLevel = new();
+                ratedLevel.SlotId = slotId;
+                ratedLevel.UserId = user.UserId;
+                ratedLevel.Rating = 0;
                 this.database.RatedLevels.Add(ratedLevel);
             }
-            ratedLevel.SlotId = slotId;
-            ratedLevel.UserId = user.UserId;
-            ratedLevel.Rating = rating;
-            // Unsupported: ratedLevel.LBP1Rating
+            
+            ratedLevel.RatingLBP1 = Math.Max(Math.Min(5, rating), 0);
 
             await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
+
+        // LBP2 and beyond rating
+        [HttpPost("dpadrate/user/{slotId}")]
+        public async Task<IActionResult> DPadRate(int slotId, [FromQuery] int rating)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            Slot? slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
+            if (slot == null) return this.StatusCode(403, "");
+
+            RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
+            if (ratedLevel == null)
+            {
+                ratedLevel = new();
+                ratedLevel.SlotId = slotId;
+                ratedLevel.UserId = user.UserId;
+                ratedLevel.RatingLBP1 = 0;
+                this.database.RatedLevels.Add(ratedLevel);
+            }
+            
+            ratedLevel.Rating = Math.Max(Math.Min(1, rating), -1);
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+        
     }
 }
