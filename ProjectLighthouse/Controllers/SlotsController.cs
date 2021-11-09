@@ -45,18 +45,27 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("s/user/{id:int}")]
         public async Task<IActionResult> SUser(int id)
         {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
 
             GameVersion gameVersion = token.GameVersion;
 
-            Slot slot = await this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+            Slot? slot = await this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .FirstOrDefaultAsync(s => s.SlotId == id);
 
             if (slot == null) return this.NotFound();
 
+            RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
+            if (ratedLevel != null) {
+                slot.YourRating = ratedLevel.RatingLBP1;
+                slot.YourDPadRating = ratedLevel.Rating;
+            }
+            
             return this.Ok(slot.Serialize());
         }
 
