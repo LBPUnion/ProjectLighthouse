@@ -117,13 +117,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameVersion gameVersion = token.GameVersion;
 
             // TODO: Incorporate seed?
-            IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
-                .OrderBy(_ => Guid.NewGuid())
+            IOrderedEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30));
-            string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
+                .Take(Math.Min(pageSize, 30))
+                .AsEnumerable()
+                .OrderBy(_ => Guid.NewGuid());
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
         }
