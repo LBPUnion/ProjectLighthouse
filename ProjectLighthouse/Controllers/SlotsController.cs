@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -115,15 +116,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (token == null) return this.BadRequest();
 
             GameVersion gameVersion = token.GameVersion;
+            int slotCount = await this.database.Slots.Where(s => s.GameVersion <= gameVersion).CountAsync();
+            pageSize = Math.Min(pageSize, 30);
+
+            int skipCount = new Random().Next(seed, slotCount) + pageStart - 1;
 
             // TODO: Incorporate seed?
-            IOrderedEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
-                .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30))
-                .AsEnumerable()
-                .OrderBy(_ => Guid.NewGuid());
+                .Skip(skipCount)
+                .Take(pageSize)
+                .AsEnumerable();
+
             string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
