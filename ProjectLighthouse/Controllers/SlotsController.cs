@@ -68,7 +68,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await LuckyDipSlots(30 * page, 30, 69);
+        public async Task<IActionResult> CoolSlots([FromQuery] int pageStart, [FromQuery] int pageSize) => await NewestSlots(pageStart, pageSize);
 
         [HttpGet("slots")]
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
