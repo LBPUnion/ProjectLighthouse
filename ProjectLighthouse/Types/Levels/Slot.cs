@@ -110,42 +110,93 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [XmlIgnore]
         [NotMapped]
-        public int Plays { get => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3; }
+        public int Plays {
+            get => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3;
+        }
+
         [XmlIgnore]
         [NotMapped]
-        public int PlaysUnique { get => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique; }
+        public int PlaysUnique {
+            get => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique;
+        }
+
         [XmlIgnore]
         [NotMapped]
-        public int PlaysComplete { get => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete; }
+        public int PlaysComplete {
+            get => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete;
+        }
 
         [XmlIgnore]
         public int PlaysLBP1 { get; set; }
+
         [XmlIgnore]
         public int PlaysLBP1Complete { get; set; }
+
         [XmlIgnore]
         public int PlaysLBP1Unique { get; set; }
 
         [XmlIgnore]
         public int PlaysLBP2 { get; set; }
+
         [XmlIgnore]
         public int PlaysLBP2Complete { get; set; }
+
         [XmlIgnore]
         public int PlaysLBP2Unique { get; set; }
 
         [XmlIgnore]
         public int PlaysLBP3 { get; set; }
+
         [XmlIgnore]
         public int PlaysLBP3Complete { get; set; }
+
         [XmlIgnore]
         public int PlaysLBP3Unique { get; set; }
 
-        
+        [NotMapped]
+        [XmlElement("thumbsup")]
+        public int Thumbsup {
+            get {
+                using Database database = new();
+
+                return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
+            }
+        }
+
+        [NotMapped]
+        [XmlElement("thumbsdown")]
+        public int Thumbsdown {
+            get {
+                using Database database = new();
+
+                return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
+            }
+        }
+
+        [NotMapped]
+        [XmlElement("averageRating")]
+        public double RatingLBP1 {
+            get {
+                using Database database = new();
+
+                IQueryable<RatedLevel> ratedLevels = database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
+                if (!ratedLevels.Any()) return 3.0;
+
+                return Enumerable.Average(ratedLevels, r => r.RatingLBP1);
+
+                ;
+            }
+        }
+
+        [XmlElement("leveltype")]
+        public string LevelType { get; set; }
+
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
         }
 
-        public string Serialize()
+        public string Serialize(double? yourRating = null, int? yourDPadRating = null, int? yourLBP1PlayCount = null, int? yourLBP2PlayCount = null)
         {
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
@@ -179,7 +230,15 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBP2Unique) + // not actually used ingame, as per above comment
                               LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                               LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
-                              LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique);
+                              LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
+                              LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
+                              LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
+                              LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
+                              (yourRating != null ? LbpSerializer.StringElement("yourRating", yourRating) : "") +
+                              (yourDPadRating != null ? LbpSerializer.StringElement("yourDPadRating", yourDPadRating) : "") +
+                              (yourLBP1PlayCount != null ? LbpSerializer.StringElement("yourLBP1PlayCount", yourLBP1PlayCount) : "") +
+                              (yourLBP2PlayCount != null ? LbpSerializer.StringElement("yourLBP2PlayCount", yourLBP2PlayCount) : "") +
+                              LbpSerializer.StringElement("leveltype", this.LevelType);
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -45,19 +46,24 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("s/user/{id:int}")]
         public async Task<IActionResult> SUser(int id)
         {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
 
             GameVersion gameVersion = token.GameVersion;
 
-            Slot slot = await this.database.Slots.Where(s => s.GameVersion <= gameVersion)
+            Slot? slot = await this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .FirstOrDefaultAsync(s => s.SlotId == id);
 
             if (slot == null) return this.NotFound();
 
-            return this.Ok(slot.Serialize());
+            RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
+            string res = ratedLevel != null ? slot.Serialize(ratedLevel.RatingLBP1, ratedLevel.Rating) : slot.Serialize();
+            return this.Ok(res);
         }
 
         [HttpGet("slots/lbp2cool")]
@@ -110,15 +116,20 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (token == null) return this.BadRequest();
 
             GameVersion gameVersion = token.GameVersion;
+            int slotCount = await this.database.Slots.Where(s => s.GameVersion <= gameVersion).CountAsync();
+            pageSize = Math.Min(pageSize, 30);
+
+            int skipCount = new Random().Next(seed, slotCount) + pageStart - 1;
 
             // TODO: Incorporate seed?
-            IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
-                .OrderBy(_ => Guid.NewGuid())
+            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
-                .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30));
-            string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
+                .Skip(skipCount)
+                .Take(pageSize)
+                .AsEnumerable();
+
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
         }
