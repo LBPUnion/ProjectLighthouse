@@ -74,6 +74,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             "CUSA00473",
             "CUSA01077",
             "CUSA01304",
+            "NPUA81116",
         };
 
         public static readonly string[] LittleBigPlanetVitaTitleIds =
