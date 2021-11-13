@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -9,6 +10,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 {
     public static class MatchHelper
     {
+        public static Dictionary<int, string?> UserLocations = new();
+
         public static IMatchData? Deserialize(string data)
         {
             string matchType = "";
@@ -37,6 +40,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 "UpdateMyPlayerData" => JsonSerializer.Deserialize<UpdateMyPlayerData>(matchData),
                 "UpdatePlayersInRoom" => JsonSerializer.Deserialize<UpdatePlayersInRoom>(matchData),
                 "CreateRoom" => JsonSerializer.Deserialize<CreateRoom>(matchData),
+                "FindBestRoom" => JsonSerializer.Deserialize<FindBestRoom>(matchData),
                 _ => null,
             };
         }

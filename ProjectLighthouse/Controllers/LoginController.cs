@@ -1,5 +1,6 @@
 #nullable enable
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -39,7 +40,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
             if (loginData == null) return this.BadRequest();
 
-            Token? token = await this.database.AuthenticateUser(loginData, titleId);
+            IPAddress? ipAddress = this.HttpContext.Connection.RemoteIpAddress;
+            if (ipAddress == null) return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
+
+            string userLocation = ipAddress.ToString();
+
+            Token? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
             if (token == null) return this.StatusCode(403, "");
 
             Logger.Log

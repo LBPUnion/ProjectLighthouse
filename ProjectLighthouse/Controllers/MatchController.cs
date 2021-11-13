@@ -1,12 +1,13 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Match;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -27,13 +28,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost("match")]
-        [Produces("text/json")]
+        [Produces("text/plain")]
         public async Task<IActionResult> Match()
         {
+            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
 
-            User? user = await this.database.UserFromRequest(this.Request);
+            if (userAndToken == null) return this.StatusCode(403, "");
 
-            if (user == null) return this.StatusCode(403, "");
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            Token token = userAndToken.Value.Item2;
 
             #region Parse match data
 
@@ -61,25 +65,62 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             #endregion
 
             #region Process match data
-            /*
-            if (matchData is CreateRoom createRoom)
+
+            if (matchData is UpdateMyPlayerData)
             {
-                if (createRoom.Slots.Count == 0) return this.BadRequest();
-                if (createRoom.FirstSlot.Count != 2) return this.BadRequest();
+                if (MatchHelper.UserLocations.TryGetValue(user.UserId, out string? _)) MatchHelper.UserLocations.Remove(user.UserId);
+                MatchHelper.UserLocations.Add(user.UserId, token.UserLocation);
+            }
 
-                int slotType = createRoom.FirstSlot[0];
-                int slotId = createRoom.FirstSlot[1];
-
-                if (slotType == 1)
+            if (matchData is FindBestRoom findBestRoom)
+            {
+                if (MatchHelper.UserLocations.Count > 1)
                 {
-                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
-                    if (slot == null) return this.BadRequest();
+                    foreach ((int id, string? location) in MatchHelper.UserLocations)
+                    {
+                        if (id == user.UserId) continue;
+                        if (location == null) continue;
 
-                    slot.Plays++;
-                    await this.database.SaveChangesAsync();
+                        User? otherUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+                        if (otherUser == null) continue;
+
+                        FindBestRoomResponse response = new()
+                        {
+                            Players = new List<Player>
+                            {
+                                new()
+                                {
+                                    MatchingRes = 0,
+                                    PlayerId = otherUser.Username,
+                                },
+                                new()
+                                {
+                                    MatchingRes = 1,
+                                    PlayerId = user.Username,
+                                },
+                            },
+                            Locations = new List<string>
+                            {
+                                location,
+                                token.UserLocation,
+                            },
+                            Slots = new List<List<int>>
+                            {
+                                new()
+                                {
+                                    5,
+                                    0,
+                                },
+                            },
+                        };
+
+                        string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
+
+                        return new ObjectResult($"[{{\"StatusCode\":200}},{serialized}]");
+                    }
                 }
             }
-            */
+
             #endregion
 
             #region Update LastMatch

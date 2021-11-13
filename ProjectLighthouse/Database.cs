@@ -55,7 +55,7 @@ namespace LBPUnion.ProjectLighthouse
         }
 
         #nullable enable
-        public async Task<Token?> AuthenticateUser(LoginData loginData, string titleId = "")
+        public async Task<Token?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
         {
             // TODO: don't use psn name to authenticate
             User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username) ?? await this.CreateUser(loginData.Username);
@@ -64,6 +64,7 @@ namespace LBPUnion.ProjectLighthouse
             {
                 UserToken = HashHelper.GenerateAuthToken(),
                 UserId = user.UserId,
+                UserLocation = userLocation,
                 GameVersion = GameVersionHelper.FromTitleId(titleId),
             };
 
