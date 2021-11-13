@@ -115,5 +115,20 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             return this.Ok(LbpSerializer.StringElement("photos", response));
         }
+
+        [HttpPost("deletePhoto/{id:int}")]
+        public async Task<IActionResult> DeletePhoto(int id)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
+            if (photo == null) return this.NotFound();
+            if (photo.CreatorId != user.UserId) return this.StatusCode(401, "");
+
+            this.database.Photos.Remove(photo);
+            await this.database.SaveChangesAsync();
+            return this.Ok();
+        }
     }
 }
