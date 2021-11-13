@@ -27,6 +27,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 LbpFileType.Voice => true,
                 LbpFileType.Plan => true,
                 LbpFileType.Jpeg => true,
+                LbpFileType.Png => true,
                 #if DEBUG
                 _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
                 #else
@@ -66,10 +67,11 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         {
             reader.BaseStream.Position = 0;
 
-            // Determine if file is JPEG
+            // Determine if file is JPEG/PNG
             byte[] header = reader.ReadBytes(9);
 
             if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF && header[3] == 0xE0) return LbpFileType.Jpeg;
+            if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47) return LbpFileType.Png;
 
             return LbpFileType.Unknown; // Still unknown.
         }
