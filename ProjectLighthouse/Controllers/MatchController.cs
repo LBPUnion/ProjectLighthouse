@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -66,58 +65,26 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #region Process match data
 
-            if (matchData is UpdateMyPlayerData)
-            {
-                if (MatchHelper.UserLocations.TryGetValue(user.UserId, out string? _)) MatchHelper.UserLocations.Remove(user.UserId);
-                MatchHelper.UserLocations.Add(user.UserId, token.UserLocation);
-            }
+            if (matchData is UpdateMyPlayerData) MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
 
-            if (matchData is FindBestRoom findBestRoom)
+            if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
             {
-                if (MatchHelper.UserLocations.Count > 1)
+                foreach ((int id, string? location) in MatchHelper.UserLocations)
                 {
-                    foreach ((int id, string? location) in MatchHelper.UserLocations)
-                    {
-                        if (id == user.UserId) continue;
-                        if (location == null) continue;
+                    if (id == user.UserId) continue;
+                    if (location == null) continue;
+                    if (MatchHelper.DidUserRecentlyDiveInWith(user.UserId, id)) continue;
 
-                        User? otherUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
-                        if (otherUser == null) continue;
+                    User? otherUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+                    if (otherUser == null) continue;
 
-                        FindBestRoomResponse response = new()
-                        {
-                            Players = new List<Player>
-                            {
-                                new()
-                                {
-                                    MatchingRes = 0,
-                                    PlayerId = otherUser.Username,
-                                },
-                                new()
-                                {
-                                    MatchingRes = 1,
-                                    PlayerId = user.Username,
-                                },
-                            },
-                            Locations = new List<string>
-                            {
-                                location,
-                                token.UserLocation,
-                            },
-                            Slots = new List<List<int>>
-                            {
-                                new()
-                                {
-                                    5,
-                                    0,
-                                },
-                            },
-                        };
+                    FindBestRoomResponse response = MatchHelper.FindBestRoomResponse(user.Username, otherUser.Username, token.UserLocation, location);
 
-                        string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
+                    string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
 
-                        return new ObjectResult($"[{{\"StatusCode\":200}},{serialized}]");
-                    }
+                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, id);
+
+                    return new ObjectResult($"[{{\"StatusCode\":200}},{serialized}]");
                 }
             }
 
