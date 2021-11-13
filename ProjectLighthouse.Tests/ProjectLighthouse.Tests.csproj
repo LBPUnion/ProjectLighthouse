@@ -5,7 +5,7 @@
 
         <IsPackable>false</IsPackable>
 
-        <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+        <TargetFramework>net6.0</TargetFramework>
 
         <AssemblyName>LBPUnion.ProjectLighthouse.Tests</AssemblyName>
 

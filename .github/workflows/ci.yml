@@ -36,17 +36,10 @@ jobs:
         if: ${{ matrix.os.database }}
         run: mysql -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h 127.0.0.1 -e "CREATE DATABASE ${{ env.DB_DATABASE }};";
 
-      - name: Install .NET 5.0
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "5.0.x"
-          include-prerelease: true
-
-      - name: Install .NET 6.0 Preview
+      - name: Install .NET 6.0
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
-          include-prerelease: true
 
       - name: Compile
         run: dotnet build -c Debug
