@@ -35,7 +35,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             GameVersion gameVersion = token.GameVersion;
 
-            IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == user.UserId && s.GameVersion == gameVersion);
+            IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == user.UserId);
+            VisitedLevel v;
             if (!visited.Any())
             {
                 switch (gameVersion)
@@ -50,20 +51,25 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                         return this.BadRequest();
                 }
 
-                VisitedLevel v = new();
+                v = new();
                 v.SlotId = slotId;
                 v.UserId = user.UserId;
-                v.GameVersion = gameVersion;
                 this.database.VisitedLevels.Add(v);
+            } 
+            else
+            {
+                v = await visited.FirstOrDefaultAsync();
             }
 
             switch (gameVersion)
             {
                 case GameVersion.LittleBigPlanet2:
                     slot.PlaysLBP2++;
+                    v.PlaysLBP2++;
                     break;
                 case GameVersion.LittleBigPlanet3:
                     slot.PlaysLBP3++;
+                    v.PlaysLBP3++;
                     break;
                 default:
                     return this.BadRequest();
@@ -84,20 +90,24 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
             if (slot == null) return this.NotFound();
 
-            IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == id && s.UserId == user.UserId && s.GameVersion == GameVersion.LittleBigPlanet1);
+            IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == id && s.UserId == user.UserId);
+            VisitedLevel v;
             if (!visited.Any())
             {
                 slot.PlaysLBP1Unique++;
 
-                VisitedLevel v = new();
+                v = new();
                 v.SlotId = id;
                 v.UserId = user.UserId;
-                v.GameVersion = GameVersion.LittleBigPlanet1;
                 this.database.VisitedLevels.Add(v);
-
+            }
+            else
+            {
+                v = await visited.FirstOrDefaultAsync();
             }
 
             slot.PlaysLBP1++;
+            v.PlaysLBP1++;
 
             await this.database.SaveChangesAsync();
 

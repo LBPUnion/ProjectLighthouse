@@ -1,3 +1,4 @@
+#nullable enable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -196,8 +197,16 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
         }
 
-        public string Serialize(double? yourRating = null, int? yourDPadRating = null, int? yourLBP1PlayCount = null, int? yourLBP2PlayCount = null)
+        public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null)
         {
+            string yourRatingStatsSerialized = LbpSerializer.StringElement("yourRating", yourRatingStats?.RatingLBP1) + 
+                LbpSerializer.StringElement("yourDPadRating", yourRatingStats?.Rating);
+            
+            
+            string yourVisitedStatsSerialized = LbpSerializer.StringElement("yourLBP1PlayCount", yourVisitedStats?.PlaysLBP1) +
+                LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBP2) +
+                LbpSerializer.StringElement("yourLBP3PlayCount", yourVisitedStats?.PlaysLBP3);
+            
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
                               LbpSerializer.StringElement("game", (int)this.GameVersion) +
@@ -234,11 +243,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
                               LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
                               LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
-                              (yourRating != null ? LbpSerializer.StringElement("yourRating", yourRating) : "") +
-                              (yourDPadRating != null ? LbpSerializer.StringElement("yourDPadRating", yourDPadRating) : "") +
-                              (yourLBP1PlayCount != null ? LbpSerializer.StringElement("yourLBP1PlayCount", yourLBP1PlayCount) : "") +
-                              (yourLBP2PlayCount != null ? LbpSerializer.StringElement("yourLBP2PlayCount", yourLBP2PlayCount) : "") +
-                              LbpSerializer.StringElement("leveltype", this.LevelType);
+                              LbpSerializer.StringElement("leveltype", this.LevelType) +
+                              yourRatingStatsSerialized +
+                              yourVisitedStatsSerialized;
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

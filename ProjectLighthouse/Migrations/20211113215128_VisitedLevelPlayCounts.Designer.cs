@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211113215128_VisitedLevelPlayCounts")]
+    partial class VisitedLevelPlayCounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,6 +225,9 @@ namespace ProjectLighthouse.Migrations
                 {
                     b.Property<int>("VisitedLevelId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameVersion")
                         .HasColumnType("int");
 
                     b.Property<int>("PlaysLBP1")
