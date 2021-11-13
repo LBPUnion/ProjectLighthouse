@@ -74,7 +74,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (!FriendHelper.FriendIdsByUserId.TryGetValue(user.UserId, out int[]? friendIds) || friendIds == null)
             {
-                return this.NotFound();
+                return this.Ok(LbpSerializer.BlankElement("myFriends"));
             }
 
             string friends = "";
