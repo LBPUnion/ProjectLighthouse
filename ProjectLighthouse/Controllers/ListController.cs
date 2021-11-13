@@ -28,7 +28,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/lolcatftw/{username}")]
         public IActionResult GetLevelQueue(string username)
         {
-            IEnumerable<QueuedLevel> queuedLevels = new Database().QueuedLevels.Include
+            IEnumerable<QueuedLevel> queuedLevels = this.database.QueuedLevels.Include
                     (q => q.User)
                 .Include(q => q.Slot)
                 .Include(q => q.Slot.Location)
@@ -85,7 +85,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("favouriteSlots/{username}")]
         public IActionResult GetFavouriteSlots(string username)
         {
-            IEnumerable<HeartedLevel> heartedLevels = new Database().HeartedLevels.Include
+            IEnumerable<HeartedLevel> heartedLevels = this.database.HeartedLevels.Include
                     (q => q.User)
                 .Include(q => q.Slot)
                 .Include(q => q.Slot.Location)
