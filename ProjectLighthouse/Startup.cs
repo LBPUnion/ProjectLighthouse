@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,9 +30,24 @@ namespace LBPUnion.ProjectLighthouse
         {
             services.AddControllers();
 
-            services.AddMvc(options => options.OutputFormatters.Add(new XmlOutputFormatter()));
+            services.AddMvc
+            (
+                options =>
+                {
+                    options.OutputFormatters.Add(new XmlOutputFormatter());
+                    options.OutputFormatters.Add(new JsonOutputFormatter());
+                }
+            );
 
             services.AddDbContext<Database>();
+
+            services.Configure<ForwardedHeadersOptions>
+            (
+                options =>
+                {
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                }
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +66,8 @@ namespace LBPUnion.ProjectLighthouse
             }
 
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
+            app.UseForwardedHeaders();
 
             // Logs every request and the response to it
             // Example: "200, 13ms: GET /LITTLEBIGPLANETPS3_XML/news"

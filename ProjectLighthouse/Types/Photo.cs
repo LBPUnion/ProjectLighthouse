@@ -92,7 +92,7 @@ namespace LBPUnion.ProjectLighthouse.Types
                            LbpSerializer.StringElement("medium", this.MediumHash) +
                            LbpSerializer.StringElement("large", this.LargeHash) +
                            LbpSerializer.StringElement("plan", this.PlanHash) +
-                           LbpSerializer.StringElement("author", this.CreatorId) +
+                           LbpSerializer.StringElement("author", this.Creator.Username) +
                            LbpSerializer.StringElement("subjects", subjectsAggregate) +
                            slot;
 

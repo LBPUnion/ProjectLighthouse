@@ -71,7 +71,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("photos/user/{id:int}")]
         public async Task<IActionResult> SlotPhotos(int id)
         {
-            List<Photo> photos = await this.database.Photos.Take(10).ToListAsync();
+            List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Take(10).ToListAsync();
             string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id));
             return this.Ok(LbpSerializer.StringElement("photos", response));
         }
@@ -83,7 +83,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (user == null) return this.NotFound();
 
-            List<Photo> photos = await this.database.Photos.Where(p => p.CreatorId == userFromQuery.UserId)
+            List<Photo> photos = await this.database.Photos.Include
+                    (p => p.Creator)
+                .Where(p => p.CreatorId == userFromQuery.UserId)
                 .OrderByDescending(s => s.Timestamp)
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, 30))
@@ -100,7 +102,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (user == null) return this.NotFound();
 
             List<Photo> photos = new();
-            foreach (Photo photo in this.database.Photos)
+            foreach (Photo photo in this.database.Photos.Include(p => p.Creator))
             {
                 photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
             }
@@ -112,6 +114,21 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
 
             return this.Ok(LbpSerializer.StringElement("photos", response));
+        }
+
+        [HttpPost("deletePhoto/{id:int}")]
+        public async Task<IActionResult> DeletePhoto(int id)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
+            if (photo == null) return this.NotFound();
+            if (photo.CreatorId != user.UserId) return this.StatusCode(401, "");
+
+            this.database.Photos.Remove(photo);
+            await this.database.SaveChangesAsync();
+            return this.Ok();
         }
     }
 }

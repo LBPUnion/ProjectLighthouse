@@ -12,6 +12,8 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public string UserToken { get; set; }
 
+        public string UserLocation { get; set; }
+
         public GameVersion GameVersion { get; set; }
     }
 }

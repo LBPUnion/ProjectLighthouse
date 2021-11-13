@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>LBPUnion.ProjectLighthouse</AssemblyName>
         <RootNamespace>LBPUnion.ProjectLighthouse</RootNamespace>
     </PropertyGroup>

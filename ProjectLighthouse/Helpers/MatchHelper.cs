@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -9,6 +11,65 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 {
     public static class MatchHelper
     {
+        public static readonly Dictionary<int, string?> UserLocations = new();
+        public static readonly Dictionary<int, List<int>?> UserRecentlyDivedIn = new();
+
+        public static void SetUserLocation(int userId, string location)
+        {
+            if (UserLocations.TryGetValue(userId, out string? _)) UserLocations.Remove(userId);
+            UserLocations.Add(userId, location);
+        }
+
+        public static void AddUserRecentlyDivedIn(int userId, int otherUserId)
+        {
+            if (!UserRecentlyDivedIn.TryGetValue(userId, out List<int>? recentlyDivedIn))
+            {
+                UserRecentlyDivedIn.Add(userId, recentlyDivedIn = new List<int>());
+            }
+
+            Debug.Assert(recentlyDivedIn != null, nameof(recentlyDivedIn) + " is null, somehow.");
+
+            recentlyDivedIn.Add(otherUserId);
+        }
+
+        public static bool DidUserRecentlyDiveInWith(int userId, int otherUserId)
+        {
+            if (!UserRecentlyDivedIn.TryGetValue(userId, out List<int>? recentlyDivedIn) || recentlyDivedIn == null) return false;
+
+            return recentlyDivedIn.Contains(otherUserId);
+        }
+
+        public static FindBestRoomResponse FindBestRoomResponse(string username, string otherUsername, string location, string otherLocation)
+            => new()
+            {
+                Players = new List<Player>
+                {
+                    new()
+                    {
+                        MatchingRes = 0,
+                        PlayerId = otherUsername,
+                    },
+                    new()
+                    {
+                        MatchingRes = 1,
+                        PlayerId = username,
+                    },
+                },
+                Locations = new List<string>
+                {
+                    location,
+                    otherLocation,
+                },
+                Slots = new List<List<int>>
+                {
+                    new()
+                    {
+                        5,
+                        0,
+                    },
+                },
+            };
+
         public static IMatchData? Deserialize(string data)
         {
             string matchType = "";
@@ -37,6 +98,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 "UpdateMyPlayerData" => JsonSerializer.Deserialize<UpdateMyPlayerData>(matchData),
                 "UpdatePlayersInRoom" => JsonSerializer.Deserialize<UpdatePlayersInRoom>(matchData),
                 "CreateRoom" => JsonSerializer.Deserialize<CreateRoom>(matchData),
+                "FindBestRoom" => JsonSerializer.Deserialize<FindBestRoom>(matchData),
                 _ => null,
             };
         }
