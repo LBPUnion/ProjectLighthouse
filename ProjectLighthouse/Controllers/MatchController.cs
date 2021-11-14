@@ -60,7 +60,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 return this.BadRequest();
             }
 
-            if (matchData == null) return this.BadRequest();
+            if (matchData == null)
+            {
+                Logger.Log("Could not parse match data: matchData is null", LoggerLevelMatch.Instance);
+                Logger.Log("Data: " + bodyString, LoggerLevelMatch.Instance);
+                return this.BadRequest();
+            }
+
+            Logger.Log($"Parsed match from {user.Username} (type: {matchData.GetType()})", LoggerLevelMatch.Instance);
 
             #endregion
 
