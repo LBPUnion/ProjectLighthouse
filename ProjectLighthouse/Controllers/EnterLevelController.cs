@@ -45,7 +45,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                         break;
                     case GameVersion.LittleBigPlanetVita:
                         slot.PlaysLBP2Unique++;
-                        break;                    
+                        break;
                     case GameVersion.LittleBigPlanet3:
                         slot.PlaysLBP3Unique++;
                         break;
