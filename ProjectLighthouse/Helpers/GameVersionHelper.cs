@@ -79,7 +79,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static readonly string[] LittleBigPlanetVitaTitleIds =
         {
-            "PCSF00021", "PCSA00017", "PCSC00013",
+            "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549"
         };
 
         public static GameVersion FromTitleId(string titleId)
