@@ -60,7 +60,8 @@ namespace LBPUnion.ProjectLighthouse
                 Logger.Log
                 (
                     "The SERVER_DIGEST_KEY environment variable wasn't set, so digest headers won't be set or verified. This will prevent LBP 1 and LBP 3 from working. " +
-                    "To increase security, it is recommended that you find and set this variable."
+                    "To increase security, it is recommended that you find and set this variable.",
+                    LoggerLevelStartup.Instance
                 );
                 computeDigests = false;
             }

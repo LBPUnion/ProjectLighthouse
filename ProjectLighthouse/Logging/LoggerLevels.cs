@@ -33,6 +33,24 @@ namespace LBPUnion.ProjectLighthouse.Logging
         public override string Name => "Login";
     }
 
+    public class LoggerLevelResources : LoggerLevel
+    {
+        public static readonly LoggerLevelResources Instance = new();
+        public override string Name => "Resources";
+    }
+
+    public class LoggerLevelMatch : LoggerLevel
+    {
+        public static readonly LoggerLevelMatch Instance = new();
+        public override string Name => "Match";
+    }
+
+    public class LoggerLevelPhotos : LoggerLevel
+    {
+        public static readonly LoggerLevelPhotos Instance = new();
+        public override string Name => "Photos";
+    }
+
     public class LoggerLevelAspNet : LoggerLevel
     {
 

@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Match;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -53,8 +54,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
             catch(Exception e)
             {
-                Logger.Log("Exception while parsing MatchData: " + e);
-                Logger.Log("Data: " + bodyString);
+                Logger.Log("Exception while parsing MatchData: " + e, LoggerLevelMatch.Instance);
+                Logger.Log("Data: " + bodyString, LoggerLevelMatch.Instance);
 
                 return this.BadRequest();
             }
