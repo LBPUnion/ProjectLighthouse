@@ -15,10 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         public int Game { get; set; }
 
         [NotMapped]
-        public int Lists { get; set; }
-
-        public string YayHash { get; set; }
-        public string BooHash { get; set; }
+        public int Lists => 0;
 
         /// <summary>
         ///     A user-customizable biography shown on the profile card
@@ -26,10 +23,10 @@ namespace LBPUnion.ProjectLighthouse.Types
         public string Biography { get; set; }
 
         [NotMapped]
-        public int ReviewCount => 0;
+        public int Reviews => 0;
 
         [NotMapped]
-        public int CommentCount {
+        public int Comments {
             get {
                 using Database database = new();
                 return database.Comments.Count(c => c.PosterUserId == this.UserId);
@@ -37,7 +34,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         [NotMapped]
-        public int PhotosByMeCount {
+        public int PhotosByMe {
             get {
                 using Database database = new();
                 return database.Photos.Count(p => p.CreatorId == this.UserId);
@@ -45,7 +42,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         [NotMapped]
-        public int PhotosWithMeCount {
+        public int PhotosWithMe {
             get {
                 using Database database = new();
                 return Enumerable.Sum(database.Photos, photo => photo.Subjects.Count(subject => subject.User.UserId == this.UserId));
@@ -77,7 +74,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         [NotMapped]
-        public int QueuedLevelsCount {
+        public int QueuedLevels {
             get {
                 using Database database = new();
                 return database.QueuedLevels.Count(p => p.UserId == this.UserId);
@@ -85,9 +82,6 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         public string Pins { get; set; } = "";
-        public int StaffChallengeGoldCount { get; set; }
-        public int StaffChallengeSilverCount { get; set; }
-        public int StaffChallengeBronzeCount { get; set; }
 
         public string PlanetHash { get; set; } = "";
 
@@ -106,25 +100,20 @@ namespace LBPUnion.ProjectLighthouse.Types
                           this.SerializeSlots() +
                           LbpSerializer.StringElement("lists", this.Lists) +
                           LbpSerializer.StringElement("lists_quota", ServerSettings.ListsQuota) + // technically not a part of the user but LBP expects it
-                          LbpSerializer.StringElement("yay2", this.YayHash) +
-                          LbpSerializer.StringElement("boo2", this.BooHash) +
                           LbpSerializer.StringElement("biography", this.Biography) +
-                          LbpSerializer.StringElement("reviewCount", this.ReviewCount) +
-                          LbpSerializer.StringElement("commentCount", this.CommentCount) +
-                          LbpSerializer.StringElement("photosByMeCount", this.PhotosByMeCount) +
-                          LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMeCount) +
+                          LbpSerializer.StringElement("reviewCount", this.Reviews) +
+                          LbpSerializer.StringElement("commentCount", this.Comments) +
+                          LbpSerializer.StringElement("photosByMeCount", this.PhotosByMe) +
+                          LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMe) +
                           LbpSerializer.StringElement("commentsEnabled", "true") +
                           LbpSerializer.StringElement("location", this.Location.Serialize()) +
                           LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels) +
                           LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +
-                          LbpSerializer.StringElement("lolcatftwCount", this.QueuedLevelsCount) +
+                          LbpSerializer.StringElement("lolcatftwCount", this.QueuedLevels) +
                           LbpSerializer.StringElement("pins", this.Pins) +
-                          LbpSerializer.StringElement("staffChallengeGoldCount", this.StaffChallengeGoldCount) +
-                          LbpSerializer.StringElement("staffChallengeSilverCount", this.StaffChallengeSilverCount) +
-                          LbpSerializer.StringElement("staffChallengeBronzeCount", this.StaffChallengeBronzeCount) +
                           LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
-                          LbpSerializer.StringElement("heartCount", Hearts);
+                          LbpSerializer.StringElement("heartCount", this.Hearts);
             this.ClientsConnected.Serialize();
 
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
