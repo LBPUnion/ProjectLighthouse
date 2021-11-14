@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,24 +24,44 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/by")]
-        public async Task<IActionResult> SlotsBy([FromQuery] string u)
+        public async Task<IActionResult> SlotsBy([FromQuery] string u, [FromQuery] int pageStart, [FromQuery] int pageSize)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
 
             GameVersion gameVersion = token.GameVersion;
 
+            User user = await this.database.Users.FirstOrDefaultAsync(dbUser => dbUser.Username == u);
+
             string response = Enumerable.Aggregate
             (
                 this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                     .Include(s => s.Creator)
                     .Include(s => s.Location)
-                    .Where(s => s.Creator.Username == u),
+                    .Where(s => s.Creator.Username == user.Username)
+                    .Skip(pageStart - 1)
+                    .Take(Math.Min(pageSize, ServerSettings.EntitledSlots)),
                 string.Empty,
                 (current, slot) => current + slot.Serialize()
             );
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "slots",
+                    response,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.EntitledSlots)
+                        },
+                        {
+                            "total", user.UsedSlots
+                        },
+                    }
+                )
+            );
         }
 
         [HttpGet("s/user/{id:int}")]
