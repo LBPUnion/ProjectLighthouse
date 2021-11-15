@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         #region Level Queue (lolcatftw)
 
         [HttpGet("slots/lolcatftw/{username}")]
-        public async Task<IActionResult> GetLevelQueue(string username)
+        public async Task<IActionResult> GetLevelQueue(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
@@ -39,11 +40,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Include(q => q.Slot.Creator)
                 .Where(q => q.Slot.GameVersion <= gameVersion)
                 .Where(q => q.User.Username == username)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
                 .AsEnumerable();
+
+            int lolcatftwLength = this.database.QueuedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count();
 
             string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", queuedLevels.Count()));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", lolcatftwLength));
         }
 
         [HttpPost("lolcatftw/add/user/{id:int}")]
@@ -88,7 +93,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         #region Hearted Levels
 
         [HttpGet("favouriteSlots/{username}")]
-        public async Task<IActionResult> GetFavouriteSlots(string username)
+        public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
@@ -101,11 +106,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Include(q => q.Slot.Creator)
                 .Where(q => q.Slot.GameVersion <= gameVersion)
                 .Where(q => q.User.Username == username)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
                 .AsEnumerable();
+
+            int favouriteSlotsLength = this.database.HeartedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count();
 
             string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", heartedLevels.Count()));
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", favouriteSlotsLength));
         }
 
         [HttpPost("favourite/slot/user/{id:int}")]
@@ -152,7 +161,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         #region Users
 
         [HttpGet("favouriteUsers/{username}")]
-        public async Task<IActionResult> GetFavouriteUsers(string username)
+        public async Task<IActionResult> GetFavouriteUsers(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
@@ -162,11 +171,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Include(q => q.HeartedUser)
                 .Include(q => q.HeartedUser.Location)
                 .Where(q => q.User.Username == username)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
                 .AsEnumerable();
+
+            int favouriteUsersLength = this.database.HeartedProfiles.Include(q => q.User).Where(q => q.User.Username == username).Count();
 
             string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", heartedProfiles.Count()));
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", heartedProfiles));
         }
 
         [HttpPost("favourite/user/{username}")]
