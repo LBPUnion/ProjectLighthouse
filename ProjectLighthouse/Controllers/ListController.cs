@@ -166,7 +166,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", 1));
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", heartedProfiles.Count()));
         }
 
         [HttpPost("favourite/user/{username}")]
