@@ -36,6 +36,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Slot slot = await this.GetSlotFromBody();
             if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
+            if (string.IsNullOrEmpty(slot.RootLevel)) return this.BadRequest();
+
+            if (string.IsNullOrEmpty(slot.ResourceCollection)) slot.ResourceCollection = slot.RootLevel;
+
             // Republish logic
             if (slot.SlotId != 0)
             {
@@ -43,6 +47,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 if (oldSlot == null) return this.NotFound();
                 if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
             }
+
+            slot.ResourceCollection += "," + slot.IconHash; // tells LBP to upload icon after we process resources here
 
             string resources = slot.Resources.Where
                     (hash => !FileHelper.ResourceExists(hash))
