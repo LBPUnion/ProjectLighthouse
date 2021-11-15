@@ -99,6 +99,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             GameVersion gameVersion = token.GameVersion;
 
+            int totalSlotCount = await this.database.Slots.CountAsync();
+
             IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
@@ -107,7 +109,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30));
             string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, 
+                new Dictionary<string, object>
+                {
+                    {
+                        "hint_start", pageStart + Math.Min(pageSize, 30)
+                    },
+                    {
+                        "total", totalSlotCount
+                    }
+                }
+                ));
         }
 
         [HttpGet("slots/mmpicks")]
@@ -118,6 +130,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             GameVersion gameVersion = token.GameVersion;
 
+            int mmPicksCount = await this.database.Slots.CountAsync(s => s.TeamPick);
+
             IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Where(s => s.TeamPick)
                 .Include(s => s.Creator)
@@ -127,7 +141,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30));
             string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response,
+                new Dictionary<string, object>
+                {
+                    {
+                        "hint_start", pageStart + Math.Min(pageSize, 30)
+                    },
+                    {
+                        "total", mmPicksCount
+                    }
+                }));
         }
 
         [HttpGet("slots/lbp2luckydip")]
@@ -138,6 +161,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             GameVersion gameVersion = token.GameVersion;
 
+            int totalSlotCount = await this.database.Slots.CountAsync();
+
             IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
@@ -146,7 +171,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, 
+                new Dictionary<string, object>
+                {
+                    {
+                        "hint_start", pageStart + Math.Min(pageSize, 30)
+                    },
+                    {
+                        "total", totalSlotCount
+                    }
+                }));
         }
 
     }
