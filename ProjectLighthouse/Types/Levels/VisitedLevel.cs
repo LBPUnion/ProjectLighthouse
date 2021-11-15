@@ -1,4 +1,3 @@
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,5 +22,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         public int PlaysLBP1 { get; set; }
         public int PlaysLBP2 { get; set; }
         public int PlaysLBP3 { get; set; }
+        public int PlaysLBPVita { get; set; }
     }
 }

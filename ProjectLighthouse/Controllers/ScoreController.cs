@@ -28,8 +28,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("scoreboard/user/{id:int}")]
         public async Task<IActionResult> SubmitScore(int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+
+            if (userAndToken == null) return this.StatusCode(403, "");
+
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            Token token = userAndToken.Value.Item2;
 
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -42,12 +47,25 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
             if (slot == null) return this.BadRequest();
-            if (lbp1) slot.PlaysLBP1Complete++;
-            if (lbp2) slot.PlaysLBP2Complete++;
-            if (lbp3) slot.PlaysLBP3Complete++;
+
+            switch (token.GameVersion)
+            {
+                case GameVersion.LittleBigPlanet1:
+                    slot.PlaysLBP1Complete++;
+                    break;
+                case GameVersion.LittleBigPlanet2:
+                    slot.PlaysLBP2Complete++;
+                    break;
+                case GameVersion.LittleBigPlanet3:
+                    slot.PlaysLBP3Complete++;
+                    break;
+                case GameVersion.LittleBigPlanetVita:
+                    slot.PlaysLBPVitaComplete++;
+                    break;
+            }
 
             IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId && s.PlayerIdCollection == score.PlayerIdCollection);
-            
+
             if (existingScore.Any())
             {
                 Score first = existingScore.First(s => s.SlotId == score.SlotId);
@@ -69,16 +87,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
         public IActionResult FriendScores(int slotId, int type)
-        //=> await TopScores(slotId, type);
-        => this.Ok(LbpSerializer.BlankElement("scores"));
+            //=> await TopScores(slotId, type);
+            => this.Ok(LbpSerializer.BlankElement("scores"));
 
         [HttpGet("topscores/user/{slotId:int}/{type:int}")]
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5) {
+        public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+        {
             // Get username
             User? user = await this.database.UserFromRequest(this.Request);
 
             if (user == null) return this.StatusCode(403, "");
+
             return this.Ok(await GetScores(slotId, type, user, pageStart, pageSize));
         }
 
@@ -105,9 +125,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .FirstOrDefault();
 
             // Paginated viewing: if not requesting pageStart, get results around user
-            var pagedScores = rankedScores
-                .Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3)
-                .Take(Math.Min(pageSize, 30));
+            var pagedScores = rankedScores.Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3).Take(Math.Min(pageSize, 30));
 
             string serializedScores = pagedScores.Aggregate
             (

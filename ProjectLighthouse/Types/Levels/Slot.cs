@@ -112,19 +112,19 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [XmlIgnore]
         [NotMapped]
         public int Plays {
-            get => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3;
+            get => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3 + this.PlaysLBPVita;
         }
 
         [XmlIgnore]
         [NotMapped]
         public int PlaysUnique {
-            get => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique;
+            get => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique + this.PlaysLBPVitaUnique;
         }
 
         [XmlIgnore]
         [NotMapped]
         public int PlaysComplete {
-            get => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete;
+            get => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete + this.PlaysLBPVitaComplete;
         }
 
         [XmlIgnore]
@@ -153,6 +153,15 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [XmlIgnore]
         public int PlaysLBP3Unique { get; set; }
+
+        [XmlIgnore]
+        public int PlaysLBPVita { get; set; }
+
+        [XmlIgnore]
+        public int PlaysLBPVitaComplete { get; set; }
+
+        [XmlIgnore]
+        public int PlaysLBPVitaUnique { get; set; }
 
         [NotMapped]
         [XmlElement("thumbsup")]
@@ -233,6 +242,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                               LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
                               LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
+                              LbpSerializer.StringElement("lbpvitaPlayCount", this.PlaysLBPVita) +
+                              LbpSerializer.StringElement("lbpvitaCompletionCount", this.PlaysLBPVitaComplete) +
+                              LbpSerializer.StringElement("lbpvitaUniquePlayCount", this.PlaysLBPVitaUnique) +
                               LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
                               LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
                               LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
@@ -241,7 +253,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("yourDPadRating", yourRatingStats?.Rating) +
                               LbpSerializer.StringElement("yourLBP1PlayCount", yourVisitedStats?.PlaysLBP1) +
                               LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBP2) +
-                              LbpSerializer.StringElement("yourLBP3PlayCount", yourVisitedStats?.PlaysLBP3);
+                              LbpSerializer.StringElement("yourLBP3PlayCount", yourVisitedStats?.PlaysLBP3) +
+                              LbpSerializer.StringElement
+                                  ("yourLBPVitaPlayCount", yourVisitedStats?.PlaysLBPVita); // i doubt this is the right name but we'll go with it
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }

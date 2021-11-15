@@ -20,7 +20,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             this.database = database;
         }
 
-
         [HttpPost("play/user/{slotId}")]
         public async Task<IActionResult> PlayLevel(int slotId)
         {
@@ -47,15 +46,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     case GameVersion.LittleBigPlanet3:
                         slot.PlaysLBP3Unique++;
                         break;
-                    default:
-                        return this.BadRequest();
+                    case GameVersion.LittleBigPlanetVita:
+                        slot.PlaysLBPVitaUnique++;
+                        break;
+                    default: return this.BadRequest();
                 }
 
                 v = new();
                 v.SlotId = slotId;
                 v.UserId = user.UserId;
                 this.database.VisitedLevels.Add(v);
-            } 
+            }
             else
             {
                 v = await visited.FirstOrDefaultAsync();
@@ -71,8 +72,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     slot.PlaysLBP3++;
                     v.PlaysLBP3++;
                     break;
-                default:
-                    return this.BadRequest();
+                case GameVersion.LittleBigPlanetVita:
+                    slot.PlaysLBPVita++;
+                    v.PlaysLBPVita++;
+                    break;
+                default: return this.BadRequest();
             }
 
             await this.database.SaveChangesAsync();
