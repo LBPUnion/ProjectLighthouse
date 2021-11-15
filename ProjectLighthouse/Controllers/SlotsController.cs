@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,173 +14,214 @@ namespace LBPUnion.ProjectLighthouse.Controllers
     [ApiController]
     [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
-    public class SlotsController : ControllerBase
+    public class ListController : ControllerBase
     {
         private readonly Database database;
-        public SlotsController(Database database)
+        public ListController(Database database)
         {
             this.database = database;
         }
 
-        [HttpGet("slots/by")]
-        public async Task<IActionResult> SlotsBy([FromQuery] string u, [FromQuery] int pageStart, [FromQuery] int pageSize)
+        #region Levels
+
+        #region Level Queue (lolcatftw)
+
+        [HttpGet("slots/lolcatftw/{username}")]
+        public async Task<IActionResult> GetLevelQueue(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
 
             GameVersion gameVersion = token.GameVersion;
 
-            User user = await this.database.Users.FirstOrDefaultAsync(dbUser => dbUser.Username == u);
+            IEnumerable<QueuedLevel> queuedLevels = this.database.QueuedLevels.Include(q => q.User)
+                .Include(q => q.Slot)
+                .Include(q => q.Slot.Location)
+                .Include(q => q.Slot.Creator)
+                .Where(q => q.Slot.GameVersion <= gameVersion)
+                .Where(q => q.User.Username == username)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
+                .AsEnumerable();
 
-            string response = Enumerable.Aggregate
-            (
-                this.database.Slots.Where(s => s.GameVersion <= gameVersion)
-                    .Include(s => s.Creator)
-                    .Include(s => s.Location)
-                    .Where(s => s.Creator.Username == user.Username)
-                    .Skip(pageStart - 1)
-                    .Take(Math.Min(pageSize, ServerSettings.EntitledSlots)),
-                string.Empty,
-                (current, slot) => current + slot.Serialize()
-            );
+            string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok
-            (
-                LbpSerializer.TaggedStringElement
-                (
-                    "slots",
-                    response,
-                    new Dictionary<string, object>
-                    {
-                        {
-                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.EntitledSlots)
-                        },
-                        {
-                            "total", user.UsedSlots
-                        },
-                    }
-                )
-            );
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", this.database.QueuedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
         }
 
-        [HttpGet("s/user/{id:int}")]
-        public async Task<IActionResult> SUser(int id)
+        [HttpPost("lolcatftw/add/user/{id:int}")]
+        public async Task<IActionResult> AddQueuedLevel(int id)
         {
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            if (queuedLevel != null) return this.Ok();
 
-            GameVersion gameVersion = token.GameVersion;
-
-            Slot? slot = await this.database.Slots.Where(s => s.GameVersion <= gameVersion)
-                .Include(s => s.Creator)
-                .Include(s => s.Location)
-                .FirstOrDefaultAsync(s => s.SlotId == id);
-
-            if (slot == null) return this.NotFound();
-
-            RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-            VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-            return this.Ok(slot.Serialize(ratedLevel, visitedLevel));
-        }
-
-        [HttpGet("slots/lbp2cool")]
-        [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await LuckyDipSlots(30 * page, 30, 69);
-
-        [HttpGet("slots")]
-        public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
-        {
-            Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
-
-            GameVersion gameVersion = token.GameVersion;
-
-            int totalSlotCount = await this.database.Slots.CountAsync();
-
-            IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
-                .Include(s => s.Creator)
-                .Include(s => s.Location)
-                .OrderByDescending(s => s.FirstUploaded)
-                .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30));
-            string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
-
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, 
-                new Dictionary<string, object>
+            this.database.QueuedLevels.Add
+            (
+                new QueuedLevel
                 {
-                    {
-                        "hint_start", pageStart + Math.Min(pageSize, 30)
-                    },
-                    {
-                        "total", totalSlotCount
-                    }
+                    SlotId = id,
+                    UserId = user.UserId,
                 }
-                ));
+            );
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
         }
 
-        [HttpGet("slots/mmpicks")]
-        public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
+        [HttpPost("lolcatftw/remove/user/{id:int}")]
+        public async Task<IActionResult> RemoveQueuedLevel(int id)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            if (queuedLevel != null) this.database.QueuedLevels.Remove(queuedLevel);
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        #endregion
+
+        #region Hearted Levels
+
+        [HttpGet("favouriteSlots/{username}")]
+        public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
 
             GameVersion gameVersion = token.GameVersion;
 
-            int mmPicksCount = await this.database.Slots.CountAsync(s => s.TeamPick);
-
-            IQueryable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
-                .Where(s => s.TeamPick)
-                .Include(s => s.Creator)
-                .Include(s => s.Location)
-                .OrderByDescending(s => s.LastUpdated)
+            IEnumerable<HeartedLevel> heartedLevels = this.database.HeartedLevels.Include(q => q.User)
+                .Include(q => q.Slot)
+                .Include(q => q.Slot.Location)
+                .Include(q => q.Slot.Creator)
+                .Where(q => q.Slot.GameVersion <= gameVersion)
+                .Where(q => q.User.Username == username)
                 .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30));
-            string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
+                .Take(Math.Min(pageSize, 30))
+                .AsEnumerable();
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response,
-                new Dictionary<string, object>
-                {
-                    {
-                        "hint_start", pageStart + Math.Min(pageSize, 30)
-                    },
-                    {
-                        "total", mmPicksCount
-                    }
-                }));
+            string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
         }
 
-        [HttpGet("slots/lbp2luckydip")]
-        public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
+        [HttpPost("favourite/slot/user/{id:int}")]
+        public async Task<IActionResult> AddFavouriteSlot(int id)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            if (heartedLevel != null) return this.Ok();
+
+            this.database.HeartedLevels.Add
+            (
+                new HeartedLevel
+                {
+                    SlotId = id,
+                    UserId = user.UserId,
+                }
+            );
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        [HttpPost("unfavourite/slot/user/{id:int}")]
+        public async Task<IActionResult> RemoveFavouriteSlot(int id)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            if (heartedLevel != null) this.database.HeartedLevels.Remove(heartedLevel);
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        #endregion
+
+        #endregion Levels
+
+        #region Users
+
+        [HttpGet("favouriteUsers/{username}")]
+        public async Task<IActionResult> GetFavouriteUsers(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
-            GameVersion gameVersion = token.GameVersion;
+            IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include
+                    (q => q.User)
+                .Include(q => q.HeartedUser)
+                .Include(q => q.HeartedUser.Location)
+                .Where(q => q.User.Username == username)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
+                .AsEnumerable();
 
-            int totalSlotCount = await this.database.Slots.CountAsync();
+            string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
 
-            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
-                .Include(s => s.Creator)
-                .Include(s => s.Location)
-                .OrderBy(_ => EF.Functions.Random())
-                .Take(Math.Min(pageSize, 30));
-
-            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
-
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, 
-                new Dictionary<string, object>
-                {
-                    {
-                        "hint_start", pageStart + Math.Min(pageSize, 30)
-                    },
-                    {
-                        "total", totalSlotCount
-                    }
-                }));
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Where(q => q.User.Username == username).Count()));
         }
+
+        [HttpPost("favourite/user/{username}")]
+        public async Task<IActionResult> AddFavouriteUser(string username)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (heartedUser == null) return this.NotFound();
+
+            HeartedProfile heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
+                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+            if (heartedProfile != null) return this.Ok();
+
+            this.database.HeartedProfiles.Add
+            (
+                new HeartedProfile
+                {
+                    HeartedUserId = heartedUser.UserId,
+                    UserId = user.UserId,
+                }
+            );
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        [HttpPost("unfavourite/user/{username}")]
+        public async Task<IActionResult> RemoveFavouriteUser(string username)
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (heartedUser == null) return this.NotFound();
+
+            HeartedProfile heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
+                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+            if (heartedProfile != null) this.database.HeartedProfiles.Remove(heartedProfile);
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        #endregion
 
     }
 }
