@@ -26,13 +26,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         #region Level Queue (lolcatftw)
 
         [HttpGet("slots/lolcatftw/{username}")]
-        public IActionResult GetLevelQueue(string username)
+        public async Task<IActionResult> GetLevelQueue(string username)
         {
-            IEnumerable<QueuedLevel> queuedLevels = new Database().QueuedLevels.Include
-                    (q => q.User)
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.BadRequest();
+
+            GameVersion gameVersion = token.GameVersion;
+
+            IEnumerable<QueuedLevel> queuedLevels = new Database().QueuedLevels.Include(q => q.User)
                 .Include(q => q.Slot)
                 .Include(q => q.Slot.Location)
                 .Include(q => q.Slot.Creator)
+                .Where(q => q.Slot.GameVersion <= gameVersion)
                 .Where(q => q.User.Username == username)
                 .AsEnumerable();
 
@@ -83,13 +88,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         #region Hearted Levels
 
         [HttpGet("favouriteSlots/{username}")]
-        public IActionResult GetFavouriteSlots(string username)
+        public async Task<IActionResult> GetFavouriteSlots(string username)
         {
-            IEnumerable<HeartedLevel> heartedLevels = new Database().HeartedLevels.Include
-                    (q => q.User)
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.BadRequest();
+
+            GameVersion gameVersion = token.GameVersion;
+
+            IEnumerable<HeartedLevel> heartedLevels = new Database().HeartedLevels.Include(q => q.User)
                 .Include(q => q.Slot)
                 .Include(q => q.Slot.Location)
                 .Include(q => q.Slot.Creator)
+                .Where(q => q.Slot.GameVersion <= gameVersion)
                 .Where(q => q.User.Username == username)
                 .AsEnumerable();
 
