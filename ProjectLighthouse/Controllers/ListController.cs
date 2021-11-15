@@ -44,11 +44,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30))
                 .AsEnumerable();
 
-            int lolcatftwLength = this.database.QueuedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count();
-
             string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", lolcatftwLength));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", this.database.QueuedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
         }
 
         [HttpPost("lolcatftw/add/user/{id:int}")]
@@ -110,11 +108,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30))
                 .AsEnumerable();
 
-            int favouriteSlotsLength = this.database.HeartedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count();
-
             string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", favouriteSlotsLength));
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
         }
 
         [HttpPost("favourite/slot/user/{id:int}")]
@@ -175,11 +171,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30))
                 .AsEnumerable();
 
-            int favouriteUsersLength = this.database.HeartedProfiles.Include(q => q.User).Where(q => q.User.Username == username).Count();
-
             string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", heartedProfiles));
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Where(q => q.User.Username == username).Count()));
         }
 
         [HttpPost("favourite/user/{username}")]
