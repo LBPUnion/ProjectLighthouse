@@ -2,14 +2,16 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211114231343_UserRefactor")]
+    partial class UserRefactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,18 +115,15 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AuthorLabels")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("BackgroundHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<long>("FirstUploaded")
@@ -134,7 +133,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("IconHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("InitiallyLocked")
@@ -147,7 +145,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("LevelType")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("LocationId")
@@ -163,7 +160,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("PlaysLBP1")
@@ -194,11 +190,9 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ResourceCollection")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("RootLevel")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("Shareable")
@@ -225,13 +219,7 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PlaysLBP1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBP2")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBP3")
+                    b.Property<int>("GameVersion")
                         .HasColumnType("int");
 
                     b.Property<int>("SlotId")

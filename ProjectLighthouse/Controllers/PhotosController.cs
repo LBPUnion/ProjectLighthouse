@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 if (subject.User == null) continue;
 
                 subject.UserId = subject.User.UserId;
-                Logger.Log($"Adding PhotoSubject (userid {subject.UserId}) to db");
+                Logger.Log($"Adding PhotoSubject (userid {subject.UserId}) to db", LoggerLevelPhotos.Instance);
 
                 this.database.PhotoSubjects.Add(subject);
             }
@@ -59,7 +60,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             //            photo.Slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId);
 
-            Logger.Log($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo");
+            Logger.Log($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LoggerLevelPhotos.Instance);
 
             this.database.Photos.Add(photo);
 

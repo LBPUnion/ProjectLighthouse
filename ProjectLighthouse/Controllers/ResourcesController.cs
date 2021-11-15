@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Files;
@@ -60,11 +61,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             FileHelper.EnsureDirectoryCreated(assetsDirectory);
             if (FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
 
-            Logger.Log($"Processing resource upload (hash: {hash})");
+            Logger.Log($"Processing resource upload (hash: {hash})", LoggerLevelResources.Instance);
             LbpFile file = new(await BinaryHelper.ReadFromPipeReader(this.Request.BodyReader));
 
-            if (!FileHelper.IsFileSafe(file)) return this.UnprocessableEntity();
+            if (!FileHelper.IsFileSafe(file))
+            {
+                Logger.Log($"File is unsafe (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
+                return this.UnprocessableEntity();
+            }
 
+            Logger.Log($"File is OK! (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
             await IOFile.WriteAllBytesAsync(path, file.Data);
             return this.Ok();
         }
