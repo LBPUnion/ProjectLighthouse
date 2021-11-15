@@ -43,7 +43,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", 1));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", queuedLevels.Count()));
         }
 
         [HttpPost("lolcatftw/add/user/{id:int}")]
