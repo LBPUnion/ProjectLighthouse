@@ -73,7 +73,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         public int Shareable { get; set; }
 
         [XmlElement("authorLabels")]
-        public string AuthorLabels { get; set; }
+        public string AuthorLabels { get; set; } = "";
 
         [XmlElement("background")]
         public string BackgroundHash { get; set; } = "";
@@ -190,7 +190,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         }
 
         [XmlElement("leveltype")]
-        public string LevelType { get; set; }
+        public string LevelType { get; set; } = "";
 
         public string SerializeResources()
         {
@@ -199,7 +199,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null)
         {
-            
+
             string slotData = LbpSerializer.StringElement("name", this.Name) +
                               LbpSerializer.StringElement("id", this.SlotId) +
                               LbpSerializer.StringElement("game", (int)this.GameVersion) +
