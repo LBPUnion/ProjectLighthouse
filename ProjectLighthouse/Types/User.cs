@@ -132,6 +132,12 @@ namespace LBPUnion.ProjectLighthouse.Types
             }
         }
 
+        public int GetUsedSlotsForGame(GameVersion version)
+        {
+            using Database database = new();
+            return database.Slots.Count(s => s.CreatorId == this.UserId && s.GameVersion == version);
+        }
+
         /// <summary>
         ///     The number of slots remaining on the earth
         /// </summary>
@@ -147,13 +153,15 @@ namespace LBPUnion.ProjectLighthouse.Types
         {
             string slots = string.Empty;
 
-            slots += LbpSerializer.StringElement("lbp1UsedSlots", this.UsedSlots);
+            slots += LbpSerializer.StringElement("lbp1UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet1));
+            slots += LbpSerializer.StringElement("lbp2UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet2));
+            slots += LbpSerializer.StringElement("lbp3UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet3));
+
             slots += LbpSerializer.StringElement("entitledSlots", ServerSettings.EntitledSlots);
             slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
 
             foreach (string slotType in slotTypes)
             {
-                slots += LbpSerializer.StringElement(slotType + "UsedSlots", 0);
                 slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.EntitledSlots);
                 // ReSharper disable once StringLiteralTypo
                 slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
