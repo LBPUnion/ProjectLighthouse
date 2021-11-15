@@ -141,8 +141,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
-                .AsEnumerable() // performance?
-                .OrderBy(x => new Random().Next())
+                .OrderBy(_ => EF.Functions.Random())
                 .Take(Math.Min(pageSize, 30));
 
             string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
