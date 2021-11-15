@@ -84,10 +84,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
             VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-
-            string res = slot.Serialize(ratedLevel, visitedLevel);
-            Console.WriteLine(res);
-            return this.Ok(res);
+            return this.Ok(slot.Serialize(ratedLevel, visitedLevel));
         }
 
         [HttpGet("slots/lbp2cool")]
