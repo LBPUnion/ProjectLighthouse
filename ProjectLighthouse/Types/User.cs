@@ -93,11 +93,11 @@ namespace LBPUnion.ProjectLighthouse.Types
             }
         }
 
-        public string Serialize()
+        public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
             string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                           LbpSerializer.StringElement("game", this.Game) +
-                          this.SerializeSlots() +
+                          this.SerializeSlots(gameVersion == GameVersion.LittleBigPlanetVita) +
                           LbpSerializer.StringElement("lists", this.Lists) +
                           LbpSerializer.StringElement("lists_quota", ServerSettings.ListsQuota) + // technically not a part of the user but LBP expects it
                           LbpSerializer.StringElement("biography", this.Biography) +
@@ -149,18 +149,32 @@ namespace LBPUnion.ProjectLighthouse.Types
             "lbp2", "lbp3", "crossControl",
         };
 
-        private string SerializeSlots()
+        private string SerializeSlots(bool isVita = false)
         {
             string slots = string.Empty;
 
-            slots += LbpSerializer.StringElement("lbp1UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet1));
-            slots += LbpSerializer.StringElement("lbp2UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet2));
-            slots += LbpSerializer.StringElement("lbp3UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet3));
+            string[] slotTypesLocal;
+
+            if (isVita)
+            {
+                slots += LbpSerializer.StringElement("lbp2UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanetVita));
+                slotTypesLocal = new[]
+                {
+                    "lbp2",
+                };
+            }
+            else
+            {
+                slots += LbpSerializer.StringElement("lbp1UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet1));
+                slots += LbpSerializer.StringElement("lbp2UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet2));
+                slots += LbpSerializer.StringElement("lbp3UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet3));
+                slotTypesLocal = slotTypes;
+            }
 
             slots += LbpSerializer.StringElement("entitledSlots", ServerSettings.EntitledSlots);
             slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
 
-            foreach (string slotType in slotTypes)
+            foreach (string slotType in slotTypesLocal)
             {
                 slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.EntitledSlots);
                 // ReSharper disable once StringLiteralTypo

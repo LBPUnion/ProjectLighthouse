@@ -152,8 +152,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         #region Users
 
         [HttpGet("favouriteUsers/{username}")]
-        public IActionResult GetFavouriteUsers(string username)
+        public async Task<IActionResult> GetFavouriteUsers(string username)
         {
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.StatusCode(403, "");
+
             IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include
                     (q => q.User)
                 .Include(q => q.HeartedUser)
@@ -161,7 +164,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Where(q => q.User.Username == username)
                 .AsEnumerable();
 
-            string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize());
+            string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
 
             return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", 1));
         }

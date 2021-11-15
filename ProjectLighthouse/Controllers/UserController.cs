@@ -26,26 +26,35 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             this.database = database;
         }
 
-        public async Task<string> GetSerializedUser(string username)
+        public async Task<string> GetSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
+
             User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
-            return user?.Serialize();
+            return user?.Serialize(gameVersion);
         }
 
         [HttpGet("user/{username}")]
-        public async Task<IActionResult> GetUser(string username) {
-            string? user = await this.GetSerializedUser(username);
+        public async Task<IActionResult> GetUser(string username)
+        {
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.StatusCode(403, "");
+
+            string? user = await this.GetSerializedUser(username, token.GameVersion);
             if (user == null) return this.NotFound();
+
             return this.Ok(user);
         }
 
         [HttpGet("users")]
         public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
         {
+            Token? token = await this.database.TokenFromRequest(this.Request);
+            if (token == null) return this.StatusCode(403, "");
+
             List<string> serializedUsers = new();
             foreach (string userId in u)
             {
-                serializedUsers.Add(await this.GetSerializedUser(userId));
+                serializedUsers.Add(await this.GetSerializedUser(userId, token.GameVersion));
             }
 
             string serialized = serializedUsers.Aggregate(string.Empty, (current, u) => u == null ? current : current + u);
