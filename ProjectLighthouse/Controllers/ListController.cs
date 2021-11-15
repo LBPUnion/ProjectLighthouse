@@ -105,7 +105,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", 1));
+            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", heartedLevels.Count()));
         }
 
         [HttpPost("favourite/slot/user/{id:int}")]
