@@ -2,6 +2,7 @@
 using LBPUnion.ProjectLighthouse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    partial class DatabaseModelSnapshot : ModelSnapshot
+    [Migration("20211115050553_UserAddDefaultsToNullableStrings")]
+    partial class UserAddDefaultsToNullableStrings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -195,15 +197,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PlaysLBP3Unique")
                         .HasColumnType("int");
 
-                    b.Property<int>("PlaysLBPVita")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBPVitaComplete")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBPVitaUnique")
-                        .HasColumnType("int");
-
                     b.Property<string>("ResourceCollection")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -243,9 +236,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("PlaysLBP3")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBPVita")
                         .HasColumnType("int");
 
                     b.Property<int>("SlotId")

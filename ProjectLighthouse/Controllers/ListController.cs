@@ -33,7 +33,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             GameVersion gameVersion = token.GameVersion;
 
-            IEnumerable<QueuedLevel> queuedLevels = new Database().QueuedLevels.Include(q => q.User)
+            IEnumerable<QueuedLevel> queuedLevels = this.database.QueuedLevels.Include(q => q.User)
                 .Include(q => q.Slot)
                 .Include(q => q.Slot.Location)
                 .Include(q => q.Slot.Creator)
@@ -95,7 +95,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             GameVersion gameVersion = token.GameVersion;
 
-            IEnumerable<HeartedLevel> heartedLevels = new Database().HeartedLevels.Include(q => q.User)
+            IEnumerable<HeartedLevel> heartedLevels = this.database.HeartedLevels.Include(q => q.User)
                 .Include(q => q.Slot)
                 .Include(q => q.Slot.Location)
                 .Include(q => q.Slot.Creator)
@@ -154,7 +154,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("favouriteUsers/{username}")]
         public IActionResult GetFavouriteUsers(string username)
         {
-            IEnumerable<HeartedProfile> heartedProfiles = new Database().HeartedProfiles.Include
+            IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include
                     (q => q.User)
                 .Include(q => q.HeartedUser)
                 .Include(q => q.HeartedUser.Location)

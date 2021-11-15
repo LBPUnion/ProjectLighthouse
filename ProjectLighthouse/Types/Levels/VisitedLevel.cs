@@ -19,6 +19,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [ForeignKey(nameof(SlotId))]
         public Slot Slot { get; set; }
 
-        public GameVersion GameVersion { get; set; }
+        public int PlaysLBP1 { get; set; }
+        public int PlaysLBP2 { get; set; }
+        public int PlaysLBP3 { get; set; }
+        public int PlaysLBPVita { get; set; }
     }
 }
