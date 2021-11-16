@@ -27,7 +27,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> SlotsBy([FromQuery] string u, [FromQuery] int pageStart, [FromQuery] int pageSize)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
 
@@ -71,7 +71,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (user == null) return this.StatusCode(403, "");
 
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
 
@@ -95,7 +95,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
 
@@ -114,7 +114,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
 
@@ -134,7 +134,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
 

@@ -204,7 +204,7 @@ namespace LBPUnion.ProjectLighthouse.Types
 
             return user1.UserId == user2.UserId;
         }
-        public static bool operator !=(User user1, User user2) => !(user1 == user2);
+        public static bool operator !=(User? user1, User? user2) => !(user1 == user2);
 
         public override int GetHashCode() => this.UserId;
         #nullable disable

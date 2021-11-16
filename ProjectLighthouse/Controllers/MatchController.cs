@@ -135,19 +135,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     else return this.BadRequest();
                 }
 
-                // Delete old rooms based on host
-                RoomHelper.Rooms.RemoveAll(r => r.Host == user);
-
                 // Create a new one as requested
-                Room newRoom = RoomHelper.CreateRoom(users, createRoom.RoomSlot);
-
-                // Remove players in this new room from other rooms
-                foreach (Room room in RoomHelper.Rooms)
-                {
-                    if (room == newRoom) continue;
-
-                    foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
-                }
+                RoomHelper.CreateRoom(users, createRoom.RoomSlot);
             }
 
             #endregion
