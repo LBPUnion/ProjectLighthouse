@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -37,9 +38,12 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 (
                     p =>
                     {
-                        bool gotValue = MatchHelper.UserLocations.TryGetValue(p.UserId, out string? value) && value != null;
+                        bool gotValue = MatchHelper.UserLocations.TryGetValue(p.UserId, out string? value);
 
-                        if (gotValue) relevantUserLocations.Add(p.UserId, value!);
+                        if (gotValue && value != null)
+                        {
+                            relevantUserLocations.Add(p.UserId, value);
+                        }
                         return gotValue;
                     }
                 );
@@ -97,7 +101,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             (
                 new List<User>
                 {
-                    user
+                    user,
                 },
                 slot
             );
@@ -112,6 +116,9 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             };
 
             Rooms.Add(room);
+
+            CleanupRooms(room.Host, room);
+
             return room;
         }
 
@@ -125,6 +132,27 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 }
             }
             return null;
+        }
+
+        [SuppressMessage("ReSharper", "InvertIf")]
+        public static void CleanupRooms(User? host = null, Room? newRoom = null)
+        {
+            // Delete old rooms based on host
+            if (host != null)
+            {
+                Rooms.RemoveAll(r => r.Host == host);
+            }
+
+            // Remove players in this new room from other rooms
+            if (newRoom != null)
+            {
+                foreach (Room room in Rooms)
+                {
+                    if (room == newRoom) continue;
+
+                    foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
+                }
+            }
         }
     }
 }
