@@ -39,37 +39,6 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             return recentlyDivedIn.Contains(otherUserId);
         }
 
-        public static FindBestRoomResponse FindBestRoomResponse(string username, string otherUsername, string location, string otherLocation)
-            => new()
-            {
-                Players = new List<Player>
-                {
-                    new()
-                    {
-                        MatchingRes = 0,
-                        PlayerId = otherUsername,
-                    },
-                    new()
-                    {
-                        MatchingRes = 1,
-                        PlayerId = username,
-                    },
-                },
-                Locations = new List<string>
-                {
-                    location,
-                    otherLocation,
-                },
-                Slots = new List<List<int>>
-                {
-                    new()
-                    {
-                        5,
-                        0,
-                    },
-                },
-            };
-
         public static IMatchData? Deserialize(string data)
         {
             string matchType = "";

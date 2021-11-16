@@ -71,33 +71,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #endregion
 
-            #region Process match data
-
-            if (matchData is UpdateMyPlayerData) MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
-
-            if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
-            {
-                foreach ((int id, string? location) in MatchHelper.UserLocations)
-                {
-                    if (id == user.UserId) continue;
-                    if (location == null) continue;
-                    if (MatchHelper.DidUserRecentlyDiveInWith(user.UserId, id)) continue;
-
-                    User? otherUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
-                    if (otherUser == null) continue;
-
-                    FindBestRoomResponse response = MatchHelper.FindBestRoomResponse(user.Username, otherUser.Username, token.UserLocation, location);
-
-                    string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
-
-                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, id);
-
-                    return new ObjectResult($"[{{\"StatusCode\":200}},{serialized}]");
-                }
-            }
-
-            #endregion
-
             #region Update LastMatch
 
             LastMatch? lastMatch = await this.database.LastMatches.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
@@ -116,6 +89,27 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             lastMatch.Timestamp = TimestampHelper.Timestamp;
 
             await this.database.SaveChangesAsync();
+
+            #endregion
+
+            #region Process match data
+
+            if (matchData is UpdateMyPlayerData) MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+
+            if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
+            {
+                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, token.UserLocation);
+
+                if (response == null) return this.BadRequest();
+
+                string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
+                foreach (Player player in response.Players)
+                {
+                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
+                }
+
+                return new ObjectResult($"[{{\"StatusCode\":200}},{serialized}]");
+            }
 
             #endregion
 
