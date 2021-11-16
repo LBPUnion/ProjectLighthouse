@@ -197,10 +197,10 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
-        public static bool operator ==(User user1, User user2)
+        public static bool operator ==(User? user1, User? user2)
         {
             if (ReferenceEquals(user1, user2)) return true;
-            if ((object)user1 == null || (object)user2 == null) return false;
+            if ((object?)user1 == null || (object?)user2 == null) return false;
 
             return user1.UserId == user2.UserId;
         }

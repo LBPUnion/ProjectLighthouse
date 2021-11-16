@@ -17,6 +17,10 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             SlotId = 0,
         };
 
+        private static int roomIdIncrement = 0;
+
+        internal static int RoomIdIncrement => roomIdIncrement++ - 1;
+
         public static FindBestRoomResponse? FindBestRoom(User user, string location)
         {
             bool anyRoomsLookingForPlayers = Rooms.Any(r => r.IsLookingForPlayers);
@@ -99,16 +103,28 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             );
         public static Room CreateRoom(List<User> users, RoomSlot? slot = null)
         {
-            Room room = new();
-
-            room.Players = users;
-            room.State = RoomState.Idle;
-            room.Slot = slot ?? PodSlot;
+            Room room = new()
+            {
+                RoomId = RoomIdIncrement,
+                Players = users,
+                State = RoomState.Idle,
+                Slot = slot ?? PodSlot,
+            };
 
             Rooms.Add(room);
             return room;
         }
 
-        public static Room? FindRoomByUser(User user) => Rooms.FirstOrDefault(r => r.Players.Contains(user));
+        public static Room? FindRoomByUser(User user)
+        {
+            foreach (Room room in Rooms)
+            {
+                foreach (User player in room.Players)
+                {
+                    if (user == player) return room;
+                }
+            }
+            return null;
+        }
     }
 }
