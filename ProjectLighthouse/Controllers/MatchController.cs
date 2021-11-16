@@ -110,7 +110,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, token.UserLocation);
 
-                if (response == null) return this.BadRequest();
+                if (response == null) return this.NotFound();
 
                 string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
                 foreach (Player player in response.Players)
