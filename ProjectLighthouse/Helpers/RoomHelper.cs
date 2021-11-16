@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Match;
 
 namespace LBPUnion.ProjectLighthouse.Helpers
@@ -9,6 +10,12 @@ namespace LBPUnion.ProjectLighthouse.Helpers
     public class RoomHelper
     {
         public static readonly List<Room> Rooms = new();
+
+        public static readonly RoomSlot PodSlot = new()
+        {
+            SlotType = SlotType.Pod,
+            SlotId = 0,
+        };
 
         public static FindBestRoomResponse? FindBestRoom(User user, string location)
         {
@@ -80,5 +87,28 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
             return null;
         }
+
+        public static Room CreateRoom(User user, RoomSlot? slot = null)
+            => CreateRoom
+            (
+                new List<User>
+                {
+                    user
+                },
+                slot
+            );
+        public static Room CreateRoom(List<User> users, RoomSlot? slot = null)
+        {
+            Room room = new();
+
+            room.Players = users;
+            room.State = RoomState.Idle;
+            room.Slot = slot ?? PodSlot;
+
+            Rooms.Add(room);
+            return room;
+        }
+
+        public static Room? FindRoomByUser(User user) => Rooms.FirstOrDefault(r => r.Players.Contains(user));
     }
 }

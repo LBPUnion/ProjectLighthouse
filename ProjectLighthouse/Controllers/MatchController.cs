@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -94,7 +95,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #region Process match data
 
-            if (matchData is UpdateMyPlayerData) MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+            if (matchData is UpdateMyPlayerData playerData)
+            {
+                MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+
+                if (playerData.RoomState != null)
+                {
+                    Room? room = RoomHelper.FindRoomByUser(user);
+                    if (room != null && Equals(room.Host, user)) room.State = (RoomState)playerData.RoomState;
+                }
+            }
 
             if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
             {
@@ -108,7 +118,35 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
                 }
 
-                return new ObjectResult($"[{{\"StatusCode\":200}},{serialized}]");
+                return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
+            }
+
+            if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
+            {
+                List<User> users = new();
+                foreach (string playerUsername in createRoom.Players)
+                {
+                    User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                    if (player != null)
+                    {
+                        users.Add(player);
+                    }
+                    else return this.BadRequest();
+                }
+
+                Room newRoom = RoomHelper.CreateRoom(users, createRoom.RoomSlot);
+
+                // Delete old rooms based on host
+                RoomHelper.Rooms.RemoveAll(r => r.Host == newRoom.Host);
+
+                // Remove players in this new room from other rooms
+                foreach (Room room in RoomHelper.Rooms)
+                {
+                    if (room == newRoom) continue;
+
+                    foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
+                }
             }
 
             #endregion

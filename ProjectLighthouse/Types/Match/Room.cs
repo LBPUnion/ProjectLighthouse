@@ -11,5 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
 
         public bool IsInPod => Slot.SlotType == SlotType.Pod;
         public bool IsLookingForPlayers => this.State == RoomState.DivingIntoLevel || this.State == RoomState.DivingInWaiting;
+
+        public User Host => this.Players[0];
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -187,5 +188,25 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         #endregion Slots
 
+        #nullable enable
+        public override bool Equals(object? obj)
+        {
+            if (obj is User user) return user.UserId == UserId;
+
+            return false;
+        }
+
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
+        public static bool operator ==(User user1, User user2)
+        {
+            if (ReferenceEquals(user1, user2)) return true;
+            if ((object)user1 == null || (object)user2 == null) return false;
+
+            return user1.UserId == user2.UserId;
+        }
+        public static bool operator !=(User user1, User user2) => !(user1 == user2);
+
+        public override int GetHashCode() => this.UserId;
+        #nullable disable
     }
 }
