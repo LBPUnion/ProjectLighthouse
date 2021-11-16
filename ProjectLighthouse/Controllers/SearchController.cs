@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/search")]
-        public async Task<IActionResult> SearchSlots([FromQuery] string query)
+        public async Task<IActionResult> SearchSlots([FromQuery] string query, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             if (query == null) return this.BadRequest();
 
@@ -43,10 +44,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                          s.SlotId.ToString().Equals(keyword)
                 );
 
-            List<Slot> slots = await dbQuery.ToListAsync();
+            List<Slot> slots = await dbQuery
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30))
+                .ToListAsync();
+
             string response = slots.Aggregate("", (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.StringElement("slots", response));
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", dbQuery.Count()));
         }
     }
 }
