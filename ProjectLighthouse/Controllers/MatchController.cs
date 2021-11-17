@@ -98,10 +98,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (matchData is UpdateMyPlayerData playerData)
             {
                 MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+                Room? room = RoomHelper.FindRoomByUser(user, true);
 
                 if (playerData.RoomState != null)
                 {
-                    Room? room = RoomHelper.FindRoomByUser(user);
                     if (room != null && Equals(room.Host, user)) room.State = (RoomState)playerData.RoomState;
                 }
             }

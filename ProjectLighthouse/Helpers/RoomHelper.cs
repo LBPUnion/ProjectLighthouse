@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Match;
@@ -20,16 +22,17 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         private static int roomIdIncrement = 0;
 
-        internal static int RoomIdIncrement => roomIdIncrement++ - 1;
+        internal static int RoomIdIncrement => roomIdIncrement++;
 
         public static FindBestRoomResponse? FindBestRoom(User user, string location)
         {
             bool anyRoomsLookingForPlayers = Rooms.Any(r => r.IsLookingForPlayers);
 
-            // Look for rooms looking for players before moving on to rooms that are idle.
-            foreach (Room room in Rooms.Where(r => !anyRoomsLookingForPlayers || r.IsLookingForPlayers))
+            List<Room> rooms = anyRoomsLookingForPlayers ? Rooms.Where(r => anyRoomsLookingForPlayers && r.IsLookingForPlayers).ToList() : Rooms;
+            foreach (Room room in rooms)
+                // Look for rooms looking for players before moving on to rooms that are idle.
             {
-                if (MatchHelper.DidUserRecentlyDiveInWith(user.UserId, room.Players[0].UserId)) continue;
+                if (MatchHelper.DidUserRecentlyDiveInWith(user.UserId, room.Host.UserId)) continue;
 
                 Dictionary<int, string> relevantUserLocations = new();
 
@@ -56,6 +59,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 FindBestRoomResponse response = new();
 
                 response.Players = new List<Player>();
+                response.Locations = new List<string>();
                 foreach (User player in room.Players)
                 {
                     response.Players.Add
@@ -115,14 +119,14 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 Slot = slot ?? PodSlot,
             };
 
-            Rooms.Add(room);
-
             CleanupRooms(room.Host, room);
+            Rooms.Add(room);
+            Logger.Log($"Created room (id: {room.RoomId}) for host {room.Host.Username} (id: {room.Host.UserId})", LoggerLevelMatch.Instance);
 
             return room;
         }
 
-        public static Room? FindRoomByUser(User user)
+        public static Room? FindRoomByUser(User user, bool createIfDoesNotExist = false)
         {
             foreach (Room room in Rooms)
             {
@@ -131,7 +135,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                     if (user == player) return room;
                 }
             }
-            return null;
+            return createIfDoesNotExist ? CreateRoom(user) : null;
         }
 
         [SuppressMessage("ReSharper", "InvertIf")]
