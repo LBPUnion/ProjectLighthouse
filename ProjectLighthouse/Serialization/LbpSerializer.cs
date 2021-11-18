@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Serialization
 {
@@ -13,27 +12,22 @@ namespace LBPUnion.ProjectLighthouse.Serialization
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class LbpSerializer
     {
-        // IMPORTANT: All functions using values must call .ToSafeXml();
         public static string BlankElement(string key) => $"<{key}></{key}>";
 
-        public static string StringElement(KeyValuePair<string, object> pair) => $"<{pair.Key}>{pair.Value.ToString().ToSafeXml()}</{pair.Key}>";
+        public static string StringElement(KeyValuePair<string, object> pair) => $"<{pair.Key}>{pair.Value}</{pair.Key}>";
 
-        public static string StringElement(string key, bool value) => $"<{key}>{value.ToString().ToLower().ToSafeXml()}</{key}>";
+        public static string StringElement(string key, bool value) => $"<{key}>{value.ToString().ToLower()}</{key}>";
 
-        public static string StringElement(string key, object value) => $"<{key}>{value.ToString().ToSafeXml()}</{key}>";
+        public static string StringElement(string key, object value) => $"<{key}>{value}</{key}>";
 
         public static string TaggedStringElement
             (KeyValuePair<string, object> pair, KeyValuePair<string, object> tagPair)
-            => $"<{pair.Key} {tagPair.Key}=\"{tagPair.Value.ToString().ToSafeXml()}\">{pair.Value.ToString().ToSafeXml()}</{pair.Key}>";
+            => $"<{pair.Key} {tagPair.Key}=\"{tagPair.Value}\">{pair.Value}</{pair.Key}>";
 
-        public static string TaggedStringElement
-            (string key, object value, string tagKey, object tagValue)
-            => $"<{key} {tagKey}=\"{tagValue.ToString().ToSafeXml()}\">{value.ToString().ToSafeXml()}</{key}>";
+        public static string TaggedStringElement(string key, object value, string tagKey, object tagValue) => $"<{key} {tagKey}=\"{tagValue}\">{value}</{key}>";
 
         public static string TaggedStringElement(string key, object value, Dictionary<string, object> attrKeyValuePairs)
-            => $"<{key} " +
-               attrKeyValuePairs.Aggregate(string.Empty, (current, kvp) => current + $"{kvp.Key}=\"{kvp.Value.ToString().ToSafeXml()}\" ") +
-               $">{value.ToString().ToSafeXml()}</{key}>";
+            => $"<{key} " + attrKeyValuePairs.Aggregate(string.Empty, (current, kvp) => current + $"{kvp.Key}=\"{kvp.Value}\" ") + $">{value}</{key}>";
 
         public static string Elements
             (params KeyValuePair<string, object>[] pairs)
