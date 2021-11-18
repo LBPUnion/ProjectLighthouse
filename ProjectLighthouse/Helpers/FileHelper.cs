@@ -78,6 +78,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static bool ResourceExists(string hash) => File.Exists(GetResourcePath(hash));
 
+        public static int ResourceSize(string hash) => (int)new FileInfo(GetResourcePath(hash)).Length;
+
         public static void EnsureDirectoryCreated(string path)
         {
             if (!Directory.Exists(path)) Directory.CreateDirectory(path ?? throw new ArgumentNullException(nameof(path)));
