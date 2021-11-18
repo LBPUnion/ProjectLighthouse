@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -48,10 +49,17 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
             LoginResult loginResult = await this.Authenticate();
 
-            string respA = await (await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser0", loginResult.AuthTicket)).Content
-                .ReadAsStringAsync();
-            string respB = await (await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser1", loginResult.AuthTicket)).Content
-                .ReadAsStringAsync();
+            HttpResponseMessage respMessageA = await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser0", loginResult.AuthTicket);
+            HttpResponseMessage respMessageB = await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser1", loginResult.AuthTicket);
+
+            Assert.True(respMessageA.IsSuccessStatusCode);
+            Assert.True(respMessageB.IsSuccessStatusCode);
+
+            string respA = await respMessageA.Content.ReadAsStringAsync();
+            string respB = await respMessageB.Content.ReadAsStringAsync();
+
+            Assert.False(string.IsNullOrEmpty(respA));
+            Assert.False(string.IsNullOrEmpty(respB));
 
             Assert.NotEqual(respA, respB);
             Assert.DoesNotContain(respA, "slotB");

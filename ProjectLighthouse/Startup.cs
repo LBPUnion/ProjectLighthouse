@@ -51,7 +51,7 @@ namespace LBPUnion.ProjectLighthouse
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             bool computeDigests = true;
             string serverDigestKey = Environment.GetEnvironmentVariable("SERVER_DIGEST_KEY");
