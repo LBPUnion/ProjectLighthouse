@@ -20,7 +20,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             SlotId = 0,
         };
 
-        private static int roomIdIncrement = 0;
+        private static int roomIdIncrement;
 
         internal static int RoomIdIncrement => roomIdIncrement++;
 
@@ -128,13 +128,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static Room? FindRoomByUser(User user, bool createIfDoesNotExist = false)
         {
-            foreach (Room room in Rooms)
-            {
-                foreach (User player in room.Players)
-                {
-                    if (user == player) return room;
-                }
-            }
+            foreach (Room room in Rooms.Where(room => room.Players.Any(player => user == player))) return room;
+
             return createIfDoesNotExist ? CreateRoom(user) : null;
         }
 

@@ -17,25 +17,25 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
     {
         [XmlAttribute("type")]
         [NotMapped]
-        public string Type { get; set; }
+        public string Type { get; set; } = "user";
 
         [Key]
         [XmlElement("id")]
         public int SlotId { get; set; }
 
         [XmlElement("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         [XmlElement("description")]
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         [XmlElement("icon")]
-        public string IconHash { get; set; }
+        public string IconHash { get; set; } = "";
 
         [XmlElement("rootLevel")]
-        public string RootLevel { get; set; }
+        public string RootLevel { get; set; } = "";
 
-        public string ResourceCollection { get; set; }
+        public string ResourceCollection { get; set; } = "";
 
         [NotMapped]
         [XmlElement("resource")]
@@ -51,14 +51,14 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         public int CreatorId { get; set; }
 
         [ForeignKey(nameof(CreatorId))]
-        public User Creator { get; set; }
+        public User? Creator { get; set; }
 
         /// <summary>
         ///     The location of the level on the creator's earth
         /// </summary>
         [XmlElement("location")]
         [ForeignKey(nameof(LocationId))]
-        public Location Location { get; set; }
+        public Location? Location { get; set; }
 
         [XmlElement("initiallyLocked")]
         public bool InitiallyLocked { get; set; }
@@ -111,21 +111,15 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [XmlIgnore]
         [NotMapped]
-        public int Plays {
-            get => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3 + this.PlaysLBPVita;
-        }
+        public int Plays => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3 + this.PlaysLBPVita;
 
         [XmlIgnore]
         [NotMapped]
-        public int PlaysUnique {
-            get => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique + this.PlaysLBPVitaUnique;
-        }
+        public int PlaysUnique => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique + this.PlaysLBPVitaUnique;
 
         [XmlIgnore]
         [NotMapped]
-        public int PlaysComplete {
-            get => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete + this.PlaysLBPVitaComplete;
-        }
+        public int PlaysComplete => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete + this.PlaysLBPVitaComplete;
 
         [XmlIgnore]
         public int PlaysLBP1 { get; set; }
@@ -193,8 +187,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                 if (!ratedLevels.Any()) return 3.0;
 
                 return Enumerable.Average(ratedLevels, r => r.RatingLBP1);
-
-                ;
             }
         }
 
@@ -217,7 +209,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("icon", this.IconHash) +
                               LbpSerializer.StringElement("rootLevel", this.RootLevel) +
                               this.SerializeResources() +
-                              LbpSerializer.StringElement("location", this.Location.Serialize()) +
+                              LbpSerializer.StringElement("location", this.Location?.Serialize()) +
                               LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
                               LbpSerializer.StringElement("isSubLevel", this.SubLevel) +
                               LbpSerializer.StringElement("isLBP1Only", this.Lbp1Only) +

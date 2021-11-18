@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types.Match
@@ -17,6 +18,13 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
         public User Host => this.Players[0];
 
         #nullable enable
+        public override bool Equals(object? obj)
+        {
+            if (obj is Room room) return room.RoomId == RoomId;
+
+            return false;
+        }
+
         public static bool operator ==(Room? room1, Room? room2)
         {
             if (ReferenceEquals(room1, room2)) return true;
@@ -26,6 +34,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
         }
         public static bool operator !=(Room? room1, Room? room2) => !(room1 == room2);
 
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode() => this.RoomId;
         #nullable disable
     }

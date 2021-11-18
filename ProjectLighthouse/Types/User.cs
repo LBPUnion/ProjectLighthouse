@@ -206,6 +206,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
         public static bool operator !=(User? user1, User? user2) => !(user1 == user2);
 
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode() => this.UserId;
         #nullable disable
     }

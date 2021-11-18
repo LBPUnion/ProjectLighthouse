@@ -32,14 +32,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameVersion gameVersion = token.GameVersion;
 
             User? user = await this.database.Users.FirstOrDefaultAsync(dbUser => dbUser.Username == u);
-            if (user == null) return StatusCode(403, "");
+            if (user == null) return this.NotFound();
 
             string response = Enumerable.Aggregate
             (
                 this.database.Slots.Where(s => s.GameVersion <= gameVersion)
                     .Include(s => s.Creator)
                     .Include(s => s.Location)
-                    .Where(s => s.Creator.Username == user.Username)
+                    .Where(s => s.Creator!.Username == user.Username)
                     .Skip(pageStart - 1)
                     .Take(Math.Min(pageSize, ServerSettings.EntitledSlots)),
                 string.Empty,
