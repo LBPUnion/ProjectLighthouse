@@ -26,9 +26,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             this.database = database;
         }
 
-        public async Task<string> GetSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
+        public async Task<string?> GetSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
-
             User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
             if (user == null) return "";
             return user.Serialize(gameVersion);
@@ -52,14 +51,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Token? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
-            List<string> serializedUsers = new();
+            List<string?> serializedUsers = new();
             foreach (string userId in u)
             {
                 string? serializedUser = await this.GetSerializedUser(userId, token.GameVersion);
                 if (serializedUser != "") serializedUsers.Add(serializedUser);
             }
 
-            string serialized = serializedUsers.Aggregate(string.Empty, (current, u) => u == null ? current : current + u);
+            string serialized = serializedUsers.Aggregate(string.Empty, (current, user) => user == null ? current : current + user);
 
             return this.Ok(LbpSerializer.StringElement("users", serialized));
         }
@@ -145,8 +144,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // the way location on a user card works is stupid and will not save with the way below as-is, so we do the following:
             if (locationChanged) // only modify the database if we modify here
             {
-                Location? l = await this.database.Locations.Where(l => l.Id == user.LocationId).FirstOrDefaultAsync(); // find the location in the database again
-                if (l == null) return this.StatusCode(403, "");
+                Location? l = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == user.LocationId); // find the location in the database again
+
+                if (l == null)
+                {
+                    throw new Exception("this shouldn't happen ever but we handle this");
+                }
+
                 // set the location in the database to the one we modified above
                 l.X = user.Location.X;
                 l.Y = user.Location.Y;
@@ -166,7 +170,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string pinsString = await new StreamReader(this.Request.Body).ReadToEndAsync();
             Pins? pinJson = JsonSerializer.Deserialize<Pins>(pinsString);
-
             if (pinJson == null) return this.BadRequest();
 
             // Sometimes the update gets called periodically as pin progress updates via playing,

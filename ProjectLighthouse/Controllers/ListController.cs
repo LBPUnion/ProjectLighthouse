@@ -46,7 +46,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", this.database.QueuedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                    ("slots", response, "total", this.database.QueuedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+            );
         }
 
         [HttpPost("lolcatftw/add/user/{id:int}")]
@@ -110,7 +114,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                    ("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+            );
         }
 
         [HttpPost("favourite/slot/user/{id:int}")]
@@ -173,7 +181,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Where(q => q.User.Username == username).Count()));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                    ("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Count(q => q.User.Username == username))
+            );
         }
 
         [HttpPost("favourite/user/{username}")]

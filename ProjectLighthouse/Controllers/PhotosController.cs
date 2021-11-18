@@ -82,7 +82,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         {
             User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (user == null || userFromQuery == null) return this.NotFound();
+            if (userFromQuery == null) return this.NotFound();
 
             List<Photo> photos = await this.database.Photos.Include
                     (p => p.Creator)
@@ -100,7 +100,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         {
             User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (user == null || userFromQuery == null) return this.NotFound();
+            if (userFromQuery == null) return this.NotFound();
 
             List<Photo> photos = new();
             foreach (Photo photo in this.database.Photos.Include(p => p.Creator))

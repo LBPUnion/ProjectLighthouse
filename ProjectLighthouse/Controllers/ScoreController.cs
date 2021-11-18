@@ -102,6 +102,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(GetScores(slotId, type, user, pageStart, pageSize));
         }
 
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public string GetScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
         {
             // This is hella ugly but it technically assigns the proper rank to a score

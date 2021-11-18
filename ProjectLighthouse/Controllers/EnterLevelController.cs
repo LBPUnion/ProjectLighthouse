@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
@@ -52,7 +53,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     default: return this.BadRequest();
                 }
 
-                v = new();
+                v = new VisitedLevel();
                 v.SlotId = slotId;
                 v.UserId = user.UserId;
                 this.database.VisitedLevels.Add(v);
@@ -62,6 +63,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 v = await visited.FirstOrDefaultAsync();
             }
             if (v == null) return this.StatusCode(403, "");
+
+            if (v == null)
+            {
+                return this.NotFound();
+            }
 
             switch (gameVersion)
             {
@@ -77,7 +83,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     slot.PlaysLBPVita++;
                     v.PlaysLBPVita++;
                     break;
-                default: return this.BadRequest();
+                case GameVersion.LittleBigPlanetPSP: throw new NotImplementedException();
+                case GameVersion.Unknown:
+                default:
+                    return this.BadRequest();
             }
 
             await this.database.SaveChangesAsync();
@@ -101,7 +110,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 slot.PlaysLBP1Unique++;
 
-                v = new();
+                v = new VisitedLevel();
                 v.SlotId = id;
                 v.UserId = user.UserId;
                 this.database.VisitedLevels.Add(v);
@@ -111,6 +120,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 v = await visited.FirstOrDefaultAsync();
             }
             if (v == null) return StatusCode(403, "");
+
+            if (v == null)
+            {
+                return this.NotFound();
+            }
 
             slot.PlaysLBP1++;
             v.PlaysLBP1++;

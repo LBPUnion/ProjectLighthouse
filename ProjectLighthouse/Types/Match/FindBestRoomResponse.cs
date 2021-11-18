@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Match
@@ -13,6 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
         public IEnumerable<int> FirstSlot => this.Slots[0];
 
         [JsonPropertyName("Location")]
+        [SuppressMessage("ReSharper", "CollectionNeverQueried.Global")]
         public List<string> Locations { get; set; }
     }
 }

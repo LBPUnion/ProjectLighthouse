@@ -19,7 +19,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
         public LighthouseTest()
         {
-            this.Server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            this.Server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
 
             this.Client = this.Server.CreateClient();
         }
