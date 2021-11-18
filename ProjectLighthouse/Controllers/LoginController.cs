@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -48,11 +49,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Token? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
             if (token == null) return this.StatusCode(403, "");
 
-            Logger.Log
-            (
-                $"Successfully logged in user {(await this.database.UserFromToken(token))!.Username} as {token.GameVersion} client ({titleId})",
-                LoggerLevelLogin.Instance
-            );
+            User? user = await this.database.UserFromToken(token);
+            if (user == null) return this.StatusCode(403, "");
+
+            Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
+
+            // Create a new room on LBP2+/Vita
+            if (token.GameVersion != GameVersion.LittleBigPlanet1)
+            {
+                RoomHelper.CreateRoom(user);
+            }
 
             return this.Ok
             (

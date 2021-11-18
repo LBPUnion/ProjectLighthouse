@@ -79,7 +79,12 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static readonly string[] LittleBigPlanetVitaTitleIds =
         {
-            "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549", "PCSF00516"
+            "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549", "PCSF00516",
+        };
+
+        public static readonly string[] LittleBigPlanetPSPTitleIds =
+        {
+            "NPWR00500", "UCAS40262", "UCES01264", "UCUS98744", "UCJS10107",
         };
 
         public static GameVersion FromTitleId(string titleId)
@@ -88,6 +93,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             if (LittleBigPlanet2TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet2;
             if (LittleBigPlanet3TitleIds.Contains(titleId)) return GameVersion.LittleBigPlanet3;
             if (LittleBigPlanetVitaTitleIds.Contains(titleId)) return GameVersion.LittleBigPlanetVita;
+            if (LittleBigPlanetPSPTitleIds.Contains(titleId)) return GameVersion.LittleBigPlanetPSP;
 
             return GameVersion.LittleBigPlanet1;
         }

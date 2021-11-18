@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -71,33 +72,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #endregion
 
-            #region Process match data
-
-            if (matchData is UpdateMyPlayerData) MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
-
-            if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
-            {
-                foreach ((int id, string? location) in MatchHelper.UserLocations)
-                {
-                    if (id == user.UserId) continue;
-                    if (location == null) continue;
-                    if (MatchHelper.DidUserRecentlyDiveInWith(user.UserId, id)) continue;
-
-                    User? otherUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
-                    if (otherUser == null) continue;
-
-                    FindBestRoomResponse response = MatchHelper.FindBestRoomResponse(user.Username, otherUser.Username, token.UserLocation, location);
-
-                    string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
-
-                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, id);
-
-                    return new ObjectResult($"[{{\"StatusCode\":200}},{serialized}]");
-                }
-            }
-
-            #endregion
-
             #region Update LastMatch
 
             LastMatch? lastMatch = await this.database.LastMatches.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
@@ -116,6 +90,54 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             lastMatch.Timestamp = TimestampHelper.Timestamp;
 
             await this.database.SaveChangesAsync();
+
+            #endregion
+
+            #region Process match data
+
+            if (matchData is UpdateMyPlayerData playerData)
+            {
+                MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+                Room? room = RoomHelper.FindRoomByUser(user, true);
+
+                if (playerData.RoomState != null)
+                {
+                    if (room != null && Equals(room.Host, user)) room.State = (RoomState)playerData.RoomState;
+                }
+            }
+
+            if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
+            {
+                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, token.UserLocation);
+
+                if (response == null) return this.NotFound();
+
+                string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
+                foreach (Player player in response.Players)
+                {
+                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
+                }
+
+                return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
+            }
+
+            if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
+            {
+                List<User> users = new();
+                foreach (string playerUsername in createRoom.Players)
+                {
+                    User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                    if (player != null)
+                    {
+                        users.Add(player);
+                    }
+                    else return this.BadRequest();
+                }
+
+                // Create a new one as requested
+                RoomHelper.CreateRoom(users, createRoom.RoomSlot);
+            }
 
             #endregion
 

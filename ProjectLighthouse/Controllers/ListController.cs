@@ -30,7 +30,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> GetLevelQueue(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
 
@@ -94,7 +94,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
             Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.BadRequest();
+            if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
 
