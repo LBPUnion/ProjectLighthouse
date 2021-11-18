@@ -80,7 +80,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             await this.database.SaveChangesAsync();
 
-            string myRanking = await GetScores(score.SlotId, score.Type, user);
+            string myRanking = GetScores(score.SlotId, score.Type, user);
 
             return this.Ok(myRanking);
         }
@@ -99,10 +99,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (user == null) return this.StatusCode(403, "");
 
-            return this.Ok(await GetScores(slotId, type, user, pageStart, pageSize));
+            return this.Ok(GetScores(slotId, type, user, pageStart, pageSize));
         }
 
-        public async Task<string> GetScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
+        public string GetScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
         {
             // This is hella ugly but it technically assigns the proper rank to a score
             // var needed for Anonymous type returned from SELECT

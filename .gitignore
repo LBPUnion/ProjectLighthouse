@@ -12,3 +12,5 @@ riderModule.iml
 /ProjectLighthouse/logs/*
 /ProjectLighthouse/ProjectLighthouse.csproj.user
 .vs/
+.vscode/
+.editorconfig

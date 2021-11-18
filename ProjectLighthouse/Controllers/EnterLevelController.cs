@@ -35,7 +35,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameVersion gameVersion = token.GameVersion;
 
             IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == user.UserId);
-            VisitedLevel v;
+            VisitedLevel? v;
             if (!visited.Any())
             {
                 switch (gameVersion)
@@ -61,6 +61,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 v = await visited.FirstOrDefaultAsync();
             }
+            if (v == null) return this.StatusCode(403, "");
 
             switch (gameVersion)
             {
@@ -95,7 +96,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (slot == null) return this.NotFound();
 
             IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == id && s.UserId == user.UserId);
-            VisitedLevel v;
+            VisitedLevel? v;
             if (!visited.Any())
             {
                 slot.PlaysLBP1Unique++;
@@ -109,6 +110,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 v = await visited.FirstOrDefaultAsync();
             }
+            if (v == null) return StatusCode(403, "");
 
             slot.PlaysLBP1++;
             v.PlaysLBP1++;

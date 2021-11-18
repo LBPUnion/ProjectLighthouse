@@ -55,7 +55,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (queuedLevel != null) return this.Ok();
 
             this.database.QueuedLevels.Add
@@ -78,7 +78,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (queuedLevel != null) this.database.QueuedLevels.Remove(queuedLevel);
 
             await this.database.SaveChangesAsync();
@@ -119,7 +119,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (heartedLevel != null) return this.Ok();
 
             this.database.HeartedLevels.Add
@@ -142,7 +142,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (heartedLevel != null) this.database.HeartedLevels.Remove(heartedLevel);
 
             await this.database.SaveChangesAsync();
@@ -185,7 +185,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
+            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
                 (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
             if (heartedProfile != null) return this.Ok();
 
@@ -212,7 +212,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
+            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
                 (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
             if (heartedProfile != null) this.database.HeartedProfiles.Remove(heartedProfile);
 

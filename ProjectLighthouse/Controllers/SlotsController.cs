@@ -31,7 +31,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             GameVersion gameVersion = token.GameVersion;
 
-            User user = await this.database.Users.FirstOrDefaultAsync(dbUser => dbUser.Username == u);
+            User? user = await this.database.Users.FirstOrDefaultAsync(dbUser => dbUser.Username == u);
+            if (user == null) return StatusCode(403, "");
 
             string response = Enumerable.Aggregate
             (
