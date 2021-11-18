@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
@@ -35,7 +36,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameVersion gameVersion = token.GameVersion;
 
             IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == user.UserId);
-            VisitedLevel v;
+            VisitedLevel? v;
             if (!visited.Any())
             {
                 switch (gameVersion)
@@ -52,7 +53,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     default: return this.BadRequest();
                 }
 
-                v = new();
+                v = new VisitedLevel();
                 v.SlotId = slotId;
                 v.UserId = user.UserId;
                 this.database.VisitedLevels.Add(v);
@@ -60,6 +61,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             else
             {
                 v = await visited.FirstOrDefaultAsync();
+            }
+
+            if (v == null)
+            {
+                return this.NotFound();
             }
 
             switch (gameVersion)
@@ -76,7 +82,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     slot.PlaysLBPVita++;
                     v.PlaysLBPVita++;
                     break;
-                default: return this.BadRequest();
+                case GameVersion.LittleBigPlanetPSP: throw new NotImplementedException();
+                case GameVersion.Unknown:
+                default:
+                    return this.BadRequest();
             }
 
             await this.database.SaveChangesAsync();
@@ -95,12 +104,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (slot == null) return this.NotFound();
 
             IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == id && s.UserId == user.UserId);
-            VisitedLevel v;
+            VisitedLevel? v;
             if (!visited.Any())
             {
                 slot.PlaysLBP1Unique++;
 
-                v = new();
+                v = new VisitedLevel();
                 v.SlotId = id;
                 v.UserId = user.UserId;
                 this.database.VisitedLevels.Add(v);
@@ -108,6 +117,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             else
             {
                 v = await visited.FirstOrDefaultAsync();
+            }
+
+            if (v == null)
+            {
+                return this.NotFound();
             }
 
             slot.PlaysLBP1++;

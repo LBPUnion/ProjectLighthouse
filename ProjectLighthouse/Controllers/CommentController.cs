@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,14 +45,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             XmlSerializer serializer = new(typeof(Comment));
-            Comment comment = (Comment)serializer.Deserialize(new StringReader(bodyString));
+            Comment? comment = (Comment?)serializer.Deserialize(new StringReader(bodyString));
 
-            User poster = await this.database.UserFromRequest(this.Request);
-
+            User? poster = await this.database.UserFromRequest(this.Request);
             if (poster == null) return this.StatusCode(403, "");
 
-            User target = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-
+            User? target = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (comment == null || target == null) return this.BadRequest();
 
             comment.PosterUserId = poster.UserId;
@@ -67,10 +66,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("deleteUserComment/{username}")]
         public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string username)
         {
-            User user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            Comment comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+            Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+            if (comment == null)
+            {
+                return this.NotFound();
+            }
 
             if (comment.TargetUserId != user.UserId && comment.PosterUserId != user.UserId) return this.StatusCode(403, "");
 

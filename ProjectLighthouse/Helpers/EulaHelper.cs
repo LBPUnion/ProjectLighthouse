@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace LBPUnion.ProjectLighthouse.Helpers
 {
     public static class EulaHelper
@@ -19,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         public const string PrivateInstanceNotice = @"This server is a private testing instance. 
 Please do not make anything public for now, and keep in mind security isn't as tight as a full release would.";
 
-        // ReSharper disable once UnreachableCode
+        [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
         public const string PrivateInstanceNoticeOrBlank = ShowPrivateInstanceNotice ? PrivateInstanceNotice : "";
 
         public const bool ShowPrivateInstanceNotice = false;

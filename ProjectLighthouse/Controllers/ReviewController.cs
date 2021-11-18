@@ -33,13 +33,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
             if (ratedLevel == null)
             {
-                ratedLevel = new();
+                ratedLevel = new RatedLevel();
                 ratedLevel.SlotId = slotId;
                 ratedLevel.UserId = user.UserId;
                 ratedLevel.Rating = 0;
                 this.database.RatedLevels.Add(ratedLevel);
             }
-            
+
             ratedLevel.RatingLBP1 = Math.Max(Math.Min(5, rating), 0);
 
             await this.database.SaveChangesAsync();
@@ -48,7 +48,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         // LBP2 and beyond rating
-        [HttpPost("dpadrate/user/{slotId}")]
+        [HttpPost("dpadrate/user/{slotId:int}")]
         public async Task<IActionResult> DPadRate(int slotId, [FromQuery] int rating)
         {
             User? user = await this.database.UserFromRequest(this.Request);
@@ -60,19 +60,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
             if (ratedLevel == null)
             {
-                ratedLevel = new();
+                ratedLevel = new RatedLevel();
                 ratedLevel.SlotId = slotId;
                 ratedLevel.UserId = user.UserId;
                 ratedLevel.RatingLBP1 = 0;
                 this.database.RatedLevels.Add(ratedLevel);
             }
-            
+
             ratedLevel.Rating = Math.Max(Math.Min(1, rating), -1);
 
             await this.database.SaveChangesAsync();
 
             return this.Ok();
         }
-        
+
     }
 }

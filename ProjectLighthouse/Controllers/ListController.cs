@@ -46,7 +46,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", this.database.QueuedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                    ("slots", response, "total", this.database.QueuedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+            );
         }
 
         [HttpPost("lolcatftw/add/user/{id:int}")]
@@ -55,7 +59,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (queuedLevel != null) return this.Ok();
 
             this.database.QueuedLevels.Add
@@ -78,7 +82,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            QueuedLevel queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (queuedLevel != null) this.database.QueuedLevels.Remove(queuedLevel);
 
             await this.database.SaveChangesAsync();
@@ -110,7 +114,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Where(q => q.User.Username == username).Count()));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                    ("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+            );
         }
 
         [HttpPost("favourite/slot/user/{id:int}")]
@@ -119,7 +127,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (heartedLevel != null) return this.Ok();
 
             this.database.HeartedLevels.Add
@@ -142,7 +150,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            HeartedLevel heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
+            HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
             if (heartedLevel != null) this.database.HeartedLevels.Remove(heartedLevel);
 
             await this.database.SaveChangesAsync();
@@ -173,7 +181,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
 
-            return this.Ok(LbpSerializer.TaggedStringElement("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Where(q => q.User.Username == username).Count()));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                    ("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Count(q => q.User.Username == username))
+            );
         }
 
         [HttpPost("favourite/user/{username}")]
@@ -185,7 +197,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
+            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
                 (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
             if (heartedProfile != null) return this.Ok();
 
@@ -212,7 +224,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
+            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
                 (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
             if (heartedProfile != null) this.database.HeartedProfiles.Remove(heartedProfile);
 

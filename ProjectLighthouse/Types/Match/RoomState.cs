@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace LBPUnion.ProjectLighthouse.Types.Match
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum RoomState
     {
         /// <summary>

@@ -1,3 +1,5 @@
+#nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,10 +32,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("startPublish")]
         public async Task<IActionResult> StartPublish()
         {
-            User user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            Slot slot = await this.GetSlotFromBody();
+            Slot? slot = await this.GetSlotFromBody();
             if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
             if (string.IsNullOrEmpty(slot.RootLevel)) return this.BadRequest();
@@ -43,7 +45,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // Republish logic
             if (slot.SlotId != 0)
             {
-                Slot oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+                Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
                 if (oldSlot == null) return this.NotFound();
                 if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
             }
@@ -72,13 +74,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User user = userAndToken.Value.Item1;
             Token token = userAndToken.Value.Item2;
 
-            Slot slot = await this.GetSlotFromBody();
+            Slot? slot = await this.GetSlotFromBody();
+            if (slot == null || slot.Location == null) return this.BadRequest();
 
             // Republish logic
             if (slot.SlotId != 0)
             {
-                Slot oldSlot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+                Slot? oldSlot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
                 if (oldSlot == null) return this.NotFound();
+
+                if (oldSlot.Location == null) throw new ArgumentNullException();
+
                 if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
 
                 oldSlot.Location.X = slot.Location.X;
@@ -125,10 +131,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("unpublish/{id:int}")]
         public async Task<IActionResult> Unpublish(int id)
         {
-            User user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            Slot slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
+            Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
+            if (slot == null) return this.NotFound();
+
+            if (slot.Location == null) throw new ArgumentNullException();
 
             if (slot.CreatorId != user.UserId) return this.StatusCode(403, "");
 
@@ -140,13 +149,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok();
         }
 
-        public async Task<Slot> GetSlotFromBody()
+        public async Task<Slot?> GetSlotFromBody()
         {
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             XmlSerializer serializer = new(typeof(Slot));
-            Slot slot = (Slot)serializer.Deserialize(new StringReader(bodyString));
+            Slot? slot = (Slot?)serializer.Deserialize(new StringReader(bodyString));
 
             return slot;
         }

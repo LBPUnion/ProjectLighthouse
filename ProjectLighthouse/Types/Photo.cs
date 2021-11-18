@@ -22,19 +22,19 @@ namespace LBPUnion.ProjectLighthouse.Types
         public long Timestamp { get; set; }
 
         [XmlElement("small")]
-        public string SmallHash { get; set; }
+        public string SmallHash { get; set; } = "";
 
         [XmlElement("medium")]
-        public string MediumHash { get; set; }
+        public string MediumHash { get; set; } = "";
 
         [XmlElement("large")]
-        public string LargeHash { get; set; }
+        public string LargeHash { get; set; } = "";
 
         [XmlElement("plan")]
-        public string PlanHash { get; set; }
+        public string PlanHash { get; set; } = "";
 
         [NotMapped]
-        private List<PhotoSubject>? subjects;
+        private List<PhotoSubject>? _subjects;
 
         [NotMapped]
         [XmlArray("subjects")]
@@ -45,15 +45,13 @@ namespace LBPUnion.ProjectLighthouse.Types
         public List<PhotoSubject> Subjects {
             get {
                 if (this.SubjectsXmlDontUseLiterallyEver != null) return this.SubjectsXmlDontUseLiterallyEver;
-                if (this.subjects != null) return this.subjects;
+                if (this._subjects != null) return this._subjects;
 
                 List<PhotoSubject> response = new();
                 using Database database = new();
 
-                foreach (string idStr in this.PhotoSubjectIds)
+                foreach (string idStr in this.PhotoSubjectIds.Where(idStr => !string.IsNullOrEmpty(idStr)))
                 {
-                    if (string.IsNullOrEmpty(idStr)) continue;
-
                     if (!int.TryParse(idStr, out int id)) throw new InvalidCastException(idStr + " is not a valid number.");
 
                     PhotoSubject? photoSubject = database.PhotoSubjects.Include(p => p.User).FirstOrDefault(p => p.PhotoSubjectId == id);
@@ -64,7 +62,7 @@ namespace LBPUnion.ProjectLighthouse.Types
 
                 return response;
             }
-            set => this.subjects = value;
+            set => this._subjects = value;
         }
 
         [NotMapped]
@@ -74,12 +72,12 @@ namespace LBPUnion.ProjectLighthouse.Types
             set => this.PhotoSubjectCollection = string.Join(',', value);
         }
 
-        public string PhotoSubjectCollection { get; set; }
+        public string PhotoSubjectCollection { get; set; } = "";
 
         public int CreatorId { get; set; }
 
         [ForeignKey(nameof(CreatorId))]
-        public User Creator { get; set; }
+        public User? Creator { get; set; }
 
         public string Serialize(int slotId)
         {
@@ -92,7 +90,7 @@ namespace LBPUnion.ProjectLighthouse.Types
                            LbpSerializer.StringElement("medium", this.MediumHash) +
                            LbpSerializer.StringElement("large", this.LargeHash) +
                            LbpSerializer.StringElement("plan", this.PlanHash) +
-                           LbpSerializer.StringElement("author", this.Creator.Username) +
+                           LbpSerializer.StringElement("author", this.Creator?.Username) +
                            LbpSerializer.StringElement("subjects", subjectsAggregate) +
                            slot;
 
