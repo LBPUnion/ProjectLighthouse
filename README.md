@@ -62,7 +62,7 @@ Finally, take a break. Chances are that took a while.
 
 ## Contributing Tips
 
-### Database
+### Database migrations
 
 Some modifications may require updates to the database schema. You can automatically create a migration file by:
 
@@ -71,6 +71,12 @@ Some modifications may require updates to the database schema. You can automatic
 3. Making your changes to the database. I won't cover this since if you're making database changes you should know what
    you're doing.
 4. Running `dotnet ef migrations add <NameOfMigrationInPascalCase> --project ProjectLighthouse`.
+
+### Running tests
+
+You can run tests either through your IDE or by running `dotnet tests`.
+
+Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNECTION_STRING` set.
 
 ## Compatibility across games and platforms
 
