@@ -6,6 +6,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         LittleBigPlanet2 = 1,
         LittleBigPlanet3 = 2,
         LittleBigPlanetVita = 3,
+        LittleBigPlanetPSP = 4,
         Unknown = -1,
     }
 }
