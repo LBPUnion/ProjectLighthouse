@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +29,7 @@ namespace LBPUnion.ProjectLighthouse
             Logger.AddLogger(new LighthouseFileLogger());
 
             Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
+            Logger.Log($"Running {ServerStatics.ServerName} {GitVersionHelper.CommitHash}@{GitVersionHelper.Branch}", LoggerLevelStartup.Instance);
 
             // This loads the config, see ServerSettings.cs for more information
             Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);

@@ -13,3 +13,5 @@ riderModule.iml
 /ProjectLighthouse/ProjectLighthouse.csproj.user
 .vs/
 lighthouse.config.json
+gitBranch.txt
+gitVersion.txt
