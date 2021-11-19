@@ -44,6 +44,12 @@ namespace LBPUnion.ProjectLighthouse
             Logger.Log("Migrating database...", LoggerLevelDatabase.Instance);
             MigrateDatabase(database);
 
+            if (ServerSettings.Instance.InfluxEnabled)
+            {
+                Logger.Log("Influx logging is enabled. Starting influx logging...", LoggerLevelStartup.Instance);
+                InfluxHelper.StartLogging();
+            }
+
             stopwatch.Stop();
             Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
 
