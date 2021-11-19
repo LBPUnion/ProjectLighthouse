@@ -12,3 +12,4 @@ riderModule.iml
 /ProjectLighthouse/logs/*
 /ProjectLighthouse/ProjectLighthouse.csproj.user
 .vs/
+lighthouse.config.json

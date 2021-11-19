@@ -4,6 +4,7 @@ using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
@@ -21,11 +22,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("eula")]
-        public async Task<IActionResult> Eula()
-        {
-            User user = await this.database.UserFromRequest(this.Request);
-            return user == null ? this.StatusCode(403, "") : this.Ok(EulaHelper.PrivateInstanceNoticeOrBlank + "\n" + $"{EulaHelper.License}\n");
-        }
+        public IActionResult Eula() => this.Ok(ServerSettings.Instance.EulaText + "\n" + $"{EulaHelper.License}\n");
 
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
@@ -33,7 +30,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User user = await this.database.UserFromRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            return this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n\n" + EulaHelper.PrivateInstanceNoticeOrBlank);
+            return this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n\n" + ServerSettings.Instance.EulaText);
         }
 
         [HttpGet("notification")]

@@ -28,6 +28,10 @@ namespace LBPUnion.ProjectLighthouse
             Logger.AddLogger(new LighthouseFileLogger());
 
             Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
+
+            // This loads the config, see ServerSettings.cs for more information
+            Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);
+
             Logger.Log("Determining if the database is available...", LoggerLevelStartup.Instance);
             bool dbConnected = ServerStatics.DbConnected;
             Logger.Log(dbConnected ? "Connected to the database." : "Database unavailable! Exiting.", LoggerLevelStartup.Instance);
