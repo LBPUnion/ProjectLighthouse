@@ -78,7 +78,17 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static bool ResourceExists(string hash) => File.Exists(GetResourcePath(hash));
 
-        public static int ResourceSize(string hash) => (int)new FileInfo(GetResourcePath(hash)).Length;
+        public static int ResourceSize(string hash)
+        {
+            try
+            {
+                return (int)new FileInfo(GetResourcePath(hash)).Length;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
 
         public static void EnsureDirectoryCreated(string path)
         {
