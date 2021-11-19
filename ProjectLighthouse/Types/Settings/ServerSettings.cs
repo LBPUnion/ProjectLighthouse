@@ -13,6 +13,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
     {
         static ServerSettings()
         {
+            if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
+
             if (File.Exists(ConfigFileName))
             {
                 string configFile = File.ReadAllText(ConfigFileName);

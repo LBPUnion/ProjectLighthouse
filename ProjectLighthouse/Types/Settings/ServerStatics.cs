@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Linq;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 
@@ -29,5 +30,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
                 }
             }
         }
+
+        public static bool IsUnitTesting => AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.FullName.StartsWith("xunit"));
     }
 }
