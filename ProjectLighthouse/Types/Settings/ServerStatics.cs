@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings
 {
-    public static class ServerSettings
+    public static class ServerStatics
     {
         /// <summary>
         ///     The maximum amount of slots allowed on users' earth

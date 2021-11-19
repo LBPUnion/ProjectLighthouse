@@ -29,7 +29,7 @@ namespace LBPUnion.ProjectLighthouse
 
             Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
             Logger.Log("Determining if the database is available...", LoggerLevelStartup.Instance);
-            bool dbConnected = ServerSettings.DbConnected;
+            bool dbConnected = ServerStatics.DbConnected;
             Logger.Log(dbConnected ? "Connected to the database." : "Database unavailable! Exiting.", LoggerLevelStartup.Instance);
 
             if (!dbConnected) Environment.Exit(1);
