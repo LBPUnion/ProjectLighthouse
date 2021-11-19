@@ -30,7 +30,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<RatedLevel> RatedLevels { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseMySql(ServerStatics.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
+            => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
         public async Task<User> CreateUser(string username)
         {
