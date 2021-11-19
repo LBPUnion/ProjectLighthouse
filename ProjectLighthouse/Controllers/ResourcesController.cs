@@ -54,7 +54,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [AllowSynchronousIo]
         public async Task<IActionResult> UploadResource(string hash)
         {
-
             string assetsDirectory = FileHelper.ResourcePath;
             string path = FileHelper.GetResourcePath(hash);
 
@@ -68,6 +67,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 Logger.Log($"File is unsafe (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
                 return this.UnprocessableEntity();
+            }
+
+            if (HashHelper.Sha1Hash(file.Data) != hash)
+            {
+                Logger.Log($"File hash does not match the uploaded file! (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
+                return this.Conflict();
             }
 
             Logger.Log($"File is OK! (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);

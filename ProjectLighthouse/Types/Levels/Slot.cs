@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 
@@ -195,7 +196,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         public string SerializeResources()
         {
-            return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource));
+            return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource)) +
+                   LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
         }
 
         public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null)

@@ -17,13 +17,18 @@ namespace LBPUnion.ProjectLighthouse.Tests
             User userA = await database.CreateUser("unitTestUser0");
             User userB = await database.CreateUser("unitTestUser1");
 
-            Location l = new();
+            Location l = new()
+            {
+                X = 0,
+                Y = 0,
+            };
             database.Locations.Add(l);
             await database.SaveChangesAsync();
 
             Slot slotA = new()
             {
                 Creator = userA,
+                CreatorId = userA.UserId,
                 Name = "slotA",
                 Location = l,
                 LocationId = l.Id,
@@ -33,6 +38,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
             Slot slotB = new()
             {
                 Creator = userB,
+                CreatorId = userB.UserId,
                 Name = "slotB",
                 Location = l,
                 LocationId = l.Id,
@@ -49,8 +55,10 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
             LoginResult loginResult = await this.Authenticate();
 
-            HttpResponseMessage respMessageA = await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser0", loginResult.AuthTicket);
-            HttpResponseMessage respMessageB = await this.AuthenticatedRequest("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser1", loginResult.AuthTicket);
+            HttpResponseMessage respMessageA = await this.AuthenticatedRequest
+                ("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser0&pageStart=1&pageSize=1", loginResult.AuthTicket);
+            HttpResponseMessage respMessageB = await this.AuthenticatedRequest
+                ("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser1&pageStart=1&pageSize=1", loginResult.AuthTicket);
 
             Assert.True(respMessageA.IsSuccessStatusCode);
             Assert.True(respMessageB.IsSuccessStatusCode);

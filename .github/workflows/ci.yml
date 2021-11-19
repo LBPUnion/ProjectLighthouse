@@ -60,13 +60,13 @@ jobs:
 
       - name: Process Test Results (Control)
         if: ${{ matrix.os.prettyName == 'Linux' }}
-        uses: im-open/process-dotnet-test-results@v2.0.0
+        uses: im-open/process-dotnet-test-results@v2.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Process Test Results
         if: ${{ matrix.os.prettyName != 'Linux' }}
-        uses: im-open/process-dotnet-test-results@v2.0.0
+        uses: im-open/process-dotnet-test-results@v2.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           create-status-check: false
