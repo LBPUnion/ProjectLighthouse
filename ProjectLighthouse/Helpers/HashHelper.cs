@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class HashHelper
     {
-//        private static readonly SHA1 sha1 = SHA1.Create();
+        private static readonly SHA1 sha1 = SHA1.Create();
         private static readonly SHA256 sha256 = SHA256.Create();
         private static readonly Random random = new();
 
@@ -67,11 +67,11 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static string Sha256Hash(string str) => Sha256Hash(Encoding.UTF8.GetBytes(str));
 
-        public static string Sha256Hash(byte[] bytes)
-        {
-            byte[] hash = sha256.ComputeHash(bytes);
-            return Encoding.UTF8.GetString(hash, 0, hash.Length);
-        }
+        public static string Sha256Hash(byte[] bytes) => BitConverter.ToString(sha256.ComputeHash(bytes)).Replace("-", "");
+
+        public static string Sha1Hash(string str) => Sha1Hash(Encoding.UTF8.GetBytes(str));
+
+        public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(sha1.ComputeHash(bytes)).Replace("-", "");
 
         public static string BCryptHash(string str) => BCrypt.Net.BCrypt.HashPassword(str);
 
