@@ -47,7 +47,10 @@ namespace LBPUnion.ProjectLighthouse
             if (ServerSettings.Instance.InfluxEnabled)
             {
                 Logger.Log("Influx logging is enabled. Starting influx logging...", LoggerLevelStartup.Instance);
+                #pragma warning disable CS4014
                 InfluxHelper.StartLogging();
+                #pragma warning restore CS4014
+                if (ServerSettings.Instance.InfluxLoggingEnabled) Logger.AddLogger(new InfluxLogger());
             }
 
             stopwatch.Stop();

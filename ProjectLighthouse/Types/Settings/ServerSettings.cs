@@ -68,7 +68,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         [NotNull]
         public static ServerSettings Instance;
 
-        public const int CurrentConfigVersion = 3;
+        public const int CurrentConfigVersion = 4;
 
         [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
         public int ConfigVersion { get; set; } = CurrentConfigVersion;
@@ -77,7 +77,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
 
         #endregion Meta
 
-        public bool InfluxEnabled { get; set; } = false;
+        public bool InfluxEnabled { get; set; }
+        public bool InfluxLoggingEnabled { get; set; }
         public string InfluxOrg { get; set; } = "lighthouse";
         public string InfluxBucket { get; set; } = "lighthouse";
         public string InfluxToken { get; set; } = "";

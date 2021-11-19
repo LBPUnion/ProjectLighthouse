@@ -14,8 +14,10 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static async void Log()
         {
-            WriteApi writeApi = Client.GetWriteApi();
-            PointData point = PointData.Measurement("lighthouse").Field("playerCount", await StatisticsHelper.RecentMatches());
+            using WriteApi writeApi = Client.GetWriteApi();
+            PointData point = PointData.Measurement("lighthouse")
+                .Field("playerCount", await StatisticsHelper.RecentMatches())
+                .Field("slotCount", await StatisticsHelper.SlotCount());
 
             writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, point);
 
@@ -26,17 +28,17 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         {
             await Client.ReadyAsync();
             Logger.Log("InfluxDB is now ready.", LoggerLevelInflux.Instance);
-            Thread t = new Thread
+            Thread t = new
             (
                 delegate()
                 {
                     while (true)
                     {
-                        Thread.Sleep(5000);
                         #pragma warning disable CS4014
                         Log();
                         #pragma warning restore CS4014
-                        Logger.Log("Logged.", LoggerLevelInflux.Instance);
+//                        Logger.Log("Logged.", LoggerLevelInflux.Instance);
+                        Thread.Sleep(60000);
                     }
                 }
             );
