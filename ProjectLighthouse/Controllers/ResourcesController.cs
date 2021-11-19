@@ -51,7 +51,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         // TODO: check if this is a valid hash
         [HttpPost("upload/{hash}")]
-        [AllowSynchronousIo]
         public async Task<IActionResult> UploadResource(string hash)
         {
             string assetsDirectory = FileHelper.ResourcePath;
