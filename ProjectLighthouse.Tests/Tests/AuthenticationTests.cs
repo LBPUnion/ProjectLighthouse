@@ -59,7 +59,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
         [DatabaseFact]
         public async Task ShouldReturnForbiddenWhenNotAuthenticated()
         {
-            HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/eula");
+            HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/announce");
             Assert.False(response.IsSuccessStatusCode);
             Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
         }
