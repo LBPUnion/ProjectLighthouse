@@ -33,7 +33,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<RatedReview> RatedReviews { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseMySql(ServerSettings.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
+            => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
         public async Task<User> CreateUser(string username)
         {

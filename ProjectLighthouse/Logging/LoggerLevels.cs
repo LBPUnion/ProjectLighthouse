@@ -51,6 +51,18 @@ namespace LBPUnion.ProjectLighthouse.Logging
         public override string Name => "Photos";
     }
 
+    public class LoggerLevelConfig : LoggerLevel
+    {
+        public static readonly LoggerLevelConfig Instance = new();
+        public override string Name => "Config";
+    }
+
+    public class LoggerLevelInflux : LoggerLevel
+    {
+        public static readonly LoggerLevelInflux Instance = new();
+        public override string Name => "Influx";
+    }
+
     public class LoggerLevelAspNet : LoggerLevel
     {
 

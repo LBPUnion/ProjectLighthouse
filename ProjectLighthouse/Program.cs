@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Hosting;
@@ -28,8 +29,13 @@ namespace LBPUnion.ProjectLighthouse
             Logger.AddLogger(new LighthouseFileLogger());
 
             Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
+            Logger.Log($"Running {ServerStatics.ServerName} {GitVersionHelper.CommitHash}@{GitVersionHelper.Branch}", LoggerLevelStartup.Instance);
+
+            // This loads the config, see ServerSettings.cs for more information
+            Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);
+
             Logger.Log("Determining if the database is available...", LoggerLevelStartup.Instance);
-            bool dbConnected = ServerSettings.DbConnected;
+            bool dbConnected = ServerStatics.DbConnected;
             Logger.Log(dbConnected ? "Connected to the database." : "Database unavailable! Exiting.", LoggerLevelStartup.Instance);
 
             if (!dbConnected) Environment.Exit(1);
@@ -37,6 +43,15 @@ namespace LBPUnion.ProjectLighthouse
 
             Logger.Log("Migrating database...", LoggerLevelDatabase.Instance);
             MigrateDatabase(database);
+
+            if (ServerSettings.Instance.InfluxEnabled)
+            {
+                Logger.Log("Influx logging is enabled. Starting influx logging...", LoggerLevelStartup.Instance);
+                #pragma warning disable CS4014
+                InfluxHelper.StartLogging();
+                #pragma warning restore CS4014
+                if (ServerSettings.Instance.InfluxLoggingEnabled) Logger.AddLogger(new InfluxLogger());
+            }
 
             stopwatch.Stop();
             Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);

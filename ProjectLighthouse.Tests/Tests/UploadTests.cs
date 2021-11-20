@@ -17,35 +17,35 @@ namespace LBPUnion.ProjectLighthouse.Tests
         [Fact]
         public async Task ShouldNotAcceptScript()
         {
-            HttpResponseMessage response = await this.UploadFileRequest("/LITTLEBIGPLANETPS3_XML/upload/scriptTest", "ExampleFiles/TestScript.ff");
+            HttpResponseMessage response = await this.UploadFileEndpointRequest("ExampleFiles/TestScript.ff");
             Assert.False(response.IsSuccessStatusCode);
         }
 
         [Fact]
         public async Task ShouldNotAcceptFarc()
         {
-            HttpResponseMessage response = await this.UploadFileRequest("/LITTLEBIGPLANETPS3_XML/upload/farcTest", "ExampleFiles/TestFarc.farc");
+            HttpResponseMessage response = await this.UploadFileEndpointRequest("ExampleFiles/TestFarc.farc");
             Assert.False(response.IsSuccessStatusCode);
         }
 
         [Fact]
         public async Task ShouldNotAcceptGarbage()
         {
-            HttpResponseMessage response = await this.UploadFileRequest("/LITTLEBIGPLANETPS3_XML/upload/garbageTest", "ExampleFiles/TestGarbage.bin");
+            HttpResponseMessage response = await this.UploadFileEndpointRequest("ExampleFiles/TestGarbage.bin");
             Assert.False(response.IsSuccessStatusCode);
         }
 
         [Fact]
         public async Task ShouldAcceptTexture()
         {
-            HttpResponseMessage response = await this.UploadFileRequest("/LITTLEBIGPLANETPS3_XML/upload/textureTest", "ExampleFiles/TestTexture.tex");
+            HttpResponseMessage response = await this.UploadFileEndpointRequest("ExampleFiles/TestTexture.tex");
             Assert.True(response.IsSuccessStatusCode);
         }
 
         [Fact]
         public async Task ShouldAcceptLevel()
         {
-            HttpResponseMessage response = await this.UploadFileRequest("/LITTLEBIGPLANETPS3_XML/upload/levelTest", "ExampleFiles/TestLevel.lvl");
+            HttpResponseMessage response = await this.UploadFileEndpointRequest("ExampleFiles/TestLevel.lvl");
             Assert.True(response.IsSuccessStatusCode);
         }
     }

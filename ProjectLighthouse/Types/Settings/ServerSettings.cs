@@ -1,44 +1,91 @@
-#nullable enable
 using System;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings
 {
-    public static class ServerSettings
+    [Serializable]
+    public class ServerSettings
     {
-        /// <summary>
-        ///     The maximum amount of slots allowed on users' earth
-        /// </summary>
-        public const int EntitledSlots = 50;
+        static ServerSettings()
+        {
+            if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
-        public const int ListsQuota = 50;
+            if (File.Exists(ConfigFileName))
+            {
+                string configFile = File.ReadAllText(ConfigFileName);
 
-        public const string ServerName = "ProjectLighthouse";
+                Instance = JsonSerializer.Deserialize<ServerSettings>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
 
-        private static string? dbConnectionString;
+                if (Instance.ConfigVersion >= CurrentConfigVersion) return;
 
-        public static string DbConnectionString {
-            get {
-                if (dbConnectionString == null) return dbConnectionString = Environment.GetEnvironmentVariable("LIGHTHOUSE_DB_CONNECTION_STRING") ?? "";
+                Logger.Log($"Upgrading config file from version {Instance.ConfigVersion} to version {CurrentConfigVersion}", LoggerLevelConfig.Instance);
+                Instance.ConfigVersion = CurrentConfigVersion;
+                configFile = JsonSerializer.Serialize
+                (
+                    Instance,
+                    typeof(ServerSettings),
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    }
+                );
 
-                return dbConnectionString;
+                File.WriteAllText(ConfigFileName, configFile);
             }
-            set => dbConnectionString = value;
+            else
+            {
+                string configFile = JsonSerializer.Serialize
+                (
+                    new ServerSettings(),
+                    typeof(ServerSettings),
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    }
+                );
+
+                File.WriteAllText(ConfigFileName, configFile);
+
+                Logger.Log
+                (
+                    "The configuration file was not found. " +
+                    "A blank configuration file has been created for you at " +
+                    $"{Path.Combine(Environment.CurrentDirectory, ConfigFileName)}",
+                    LoggerLevelConfig.Instance
+                );
+
+                Environment.Exit(1);
+            }
         }
 
-        public static bool DbConnected {
-            get {
-                try
-                {
-                    return new Database().Database.CanConnect();
-                }
-                catch(Exception e)
-                {
-                    Logger.Log(e.ToString(), LoggerLevelDatabase.Instance);
-                    return false;
-                }
-            }
-        }
+        #region Meta
+
+        [NotNull]
+        public static ServerSettings Instance;
+
+        public const int CurrentConfigVersion = 4;
+
+        [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
+        public int ConfigVersion { get; set; } = CurrentConfigVersion;
+
+        public const string ConfigFileName = "lighthouse.config.json";
+
+        #endregion Meta
+
+        public bool InfluxEnabled { get; set; }
+        public bool InfluxLoggingEnabled { get; set; }
+        public string InfluxOrg { get; set; } = "lighthouse";
+        public string InfluxBucket { get; set; } = "lighthouse";
+        public string InfluxToken { get; set; } = "";
+        public string InfluxUrl { get; set; } = "http://localhost:8086";
+
+        public string EulaText { get; set; } = "";
+
+        public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
     }
 }

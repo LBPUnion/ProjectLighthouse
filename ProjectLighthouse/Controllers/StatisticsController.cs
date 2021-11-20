@@ -1,9 +1,7 @@
-using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
@@ -20,18 +18,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("playersInPodCount")]
         [HttpGet("totalPlayerCount")]
-        public async Task<IActionResult> TotalPlayerCount()
-        {
-            int recentMatches = await this.database.LastMatches.Where(l => TimestampHelper.Timestamp - l.Timestamp < 60).CountAsync();
-
-            return this.Ok(recentMatches.ToString());
-        }
+        public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatches()).ToString()!);
 
         [HttpGet("planetStats")]
         public async Task<IActionResult> PlanetStats()
         {
-            int totalSlotCount = await this.database.Slots.CountAsync();
-            int mmPicksCount = await this.database.Slots.CountAsync(s => s.TeamPick);
+            int totalSlotCount = await StatisticsHelper.SlotCount();
+            int mmPicksCount = await StatisticsHelper.MMPicksCount();
 
             return this.Ok
             (
@@ -41,6 +34,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("planetStats/totalLevelCount")]
-        public async Task<IActionResult> TotalLevelCount() => this.Ok((await this.database.Slots.CountAsync()).ToString());
+        public async Task<IActionResult> TotalLevelCount() => this.Ok((await StatisticsHelper.SlotCount()).ToString());
     }
 }

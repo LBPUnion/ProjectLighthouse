@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.2"/>
+        <PackageReference Include="InfluxDB.Client" Version="3.1.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
         <PackageReference Include="Kettu" Version="1.2.1"/>
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.0"/>
@@ -21,7 +22,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Types\SlotXsd.cs"/>
+        <None Remove="gitVersion.txt"/>
+        <EmbeddedResource Include="gitVersion.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="gitBranch.txt"/>
+        <EmbeddedResource Include="gitBranch.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
+
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;"/>
+        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;"/>
+    </Target>
 
 </Project>

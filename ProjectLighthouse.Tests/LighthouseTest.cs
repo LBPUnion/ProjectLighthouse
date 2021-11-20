@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -53,6 +54,14 @@ namespace LBPUnion.ProjectLighthouse.Tests
             requestMessage.Headers.Add("Cookie", mmAuth);
 
             return this.Client.SendAsync(requestMessage);
+        }
+
+        public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(await File.ReadAllTextAsync(filePath));
+            string hash = HashHelper.Sha1Hash(bytes);
+
+            return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
         }
 
         public async Task<HttpResponseMessage> UploadFileRequest(string endpoint, string filePath)

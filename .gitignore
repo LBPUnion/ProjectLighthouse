@@ -14,3 +14,6 @@ riderModule.iml
 .vs/
 .vscode/
 .editorconfig
+lighthouse.config.json
+gitBranch.txt
+gitVersion.txt

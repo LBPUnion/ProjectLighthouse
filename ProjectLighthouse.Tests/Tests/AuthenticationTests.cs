@@ -28,7 +28,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
             Assert.True(response.IsSuccessStatusCode);
             string responseContent = await response.Content.ReadAsStringAsync();
             Assert.Contains("MM_AUTH=", responseContent);
-            Assert.Contains(ServerSettings.ServerName, responseContent);
+            Assert.Contains(ServerStatics.ServerName, responseContent);
         }
 
         [DatabaseFact]
@@ -41,7 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
             Assert.NotNull(loginResult.LbpEnvVer);
 
             Assert.Contains("MM_AUTH=", loginResult.AuthTicket);
-            Assert.Equal(ServerSettings.ServerName, loginResult.LbpEnvVer);
+            Assert.Equal(ServerStatics.ServerName, loginResult.LbpEnvVer);
         }
 
         [DatabaseFact]
@@ -59,7 +59,7 @@ namespace LBPUnion.ProjectLighthouse.Tests
         [DatabaseFact]
         public async Task ShouldReturnForbiddenWhenNotAuthenticated()
         {
-            HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/eula");
+            HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/announce");
             Assert.False(response.IsSuccessStatusCode);
             Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
         }

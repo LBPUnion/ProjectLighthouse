@@ -90,6 +90,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok();
         }
 
+        [HttpPost("lolcatftw/clear")]
+        public async Task<IActionResult> ClearQueuedLevels()
+        {
+            User? user = await this.database.UserFromRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            this.database.QueuedLevels.RemoveRange(this.database.QueuedLevels.Where(q => q.UserId == user.UserId));
+
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
         #endregion
 
         #region Hearted Levels
