@@ -11,12 +11,8 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
 {
     public class RegisterForm : BaseLayout
     {
-        private readonly Database database;
-
-        public RegisterForm(Database database)
-        {
-            this.database = database;
-        }
+        public RegisterForm(Database database) : base(database)
+        {}
 
         public bool WasRegisterRequest { get; private set; }
 
@@ -32,10 +28,10 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
             if (WasRegisterRequest)
             {
                 Console.WriteLine(password);
-                bool userExists = await this.database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
+                bool userExists = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
                 if (userExists) return this.BadRequest();
 
-                this.database.CreateUser(username, HashHelper.BCryptHash(password));
+                this.Database.CreateUser(username, HashHelper.BCryptHash(password));
             }
 
             return this.Page();

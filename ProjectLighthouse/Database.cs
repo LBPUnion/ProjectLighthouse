@@ -130,6 +130,28 @@ namespace LBPUnion.ProjectLighthouse
 
         #region Web Token Shenanigans
 
+        public async Task<User?> UserFromLighthouseToken(string lighthouseToken)
+        {
+            WebToken? token = await this.WebTokens.FirstOrDefaultAsync(t => t.UserToken == lighthouseToken);
+            if (token == null) return null;
+
+            return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        }
+
+        public async Task<User?> UserFromWebRequest(HttpRequest request)
+        {
+            if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken) || lighthouseToken == null) return null;
+
+            return await this.UserFromLighthouseToken(lighthouseToken);
+        }
+
+        public async Task<WebToken?> WebTokenFromRequest(HttpRequest request)
+        {
+            if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken) || lighthouseToken == null) return null;
+
+            return await this.WebTokens.FirstOrDefaultAsync(t => t.UserToken == lighthouseToken);
+        }
+
         #endregion
 
         public async Task<Photo?> PhotoFromSubject(PhotoSubject subject)

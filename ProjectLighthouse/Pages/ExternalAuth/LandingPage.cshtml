@@ -4,4 +4,9 @@
 @{
     Layout = "Layouts/BaseLayout";
 }
-<h1>Welcome to <b>Project Lighthouse</b>.</h1>
+<h1>Welcome to <b>Project Lighthouse</b>!</h1>
+
+@if (Model.User != null)
+{
+    <p>You are currently logged in as <b>@Model.User.Username</b>.</p>
+}

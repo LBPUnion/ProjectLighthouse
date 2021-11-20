@@ -11,12 +11,8 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
 {
     public class LoginForm : BaseLayout
     {
-        private readonly Database database;
-
-        public LoginForm(Database database)
-        {
-            this.database = database;
-        }
+        public LoginForm(Database database) : base(database)
+        {}
 
         public bool WasLoginRequest { get; private set; }
 
@@ -27,7 +23,7 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
 
             if (WasLoginRequest)
             {
-                User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+                User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
                 if (user == null) return this.StatusCode(403, "");
 
                 if (!BCrypt.Net.BCrypt.Verify(password, user.Password)) return this.StatusCode(403, "");
@@ -38,8 +34,8 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
                     UserToken = HashHelper.GenerateAuthToken(),
                 };
 
-                this.database.WebTokens.Add(webToken);
-                await this.database.SaveChangesAsync();
+                this.Database.WebTokens.Add(webToken);
+                await this.Database.SaveChangesAsync();
 
                 this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
 
