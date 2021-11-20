@@ -204,10 +204,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (user == null) return this.StatusCode(403, "");
 
             User? reviewer = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (reviewer == null) return this.StatusCode(403, "");
+            if (reviewer == null) return this.StatusCode(400, "");
 
             Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewer.UserId);
-            if (review == null) return this.StatusCode(403, "");
+            if (review == null) return this.StatusCode(400, "");
 
             RatedReview? ratedReview = await this.database.RatedReviews.FirstOrDefaultAsync(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
             if (ratedReview == null)
