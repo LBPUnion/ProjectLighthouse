@@ -40,7 +40,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (token == null) return this.StatusCode(403, "");
 
             string? user = await this.GetSerializedUser(username, token.GameVersion);
-            if (user == "") return this.NotFound();
+            if (string.IsNullOrEmpty(user)) return this.NotFound();
 
             return this.Ok(user);
         }
