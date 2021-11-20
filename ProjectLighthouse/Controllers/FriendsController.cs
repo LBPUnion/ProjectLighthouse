@@ -26,7 +26,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("npdata")]
         public async Task<IActionResult> NPData()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             this.Request.Body.Position = 0;
@@ -69,7 +69,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("myFriends")]
         public async Task<IActionResult> MyFriends()
         {
-            (User, GameToken)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 

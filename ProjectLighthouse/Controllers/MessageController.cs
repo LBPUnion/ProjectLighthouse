@@ -27,7 +27,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
-            User user = await this.database.UserFromRequest(this.Request);
+            User user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             return this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n\n" + ServerSettings.Instance.EulaText);
@@ -42,7 +42,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("filter")]
         public async Task<IActionResult> Filter()
         {
-            User user = await this.database.UserFromRequest(this.Request);
+            User user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();

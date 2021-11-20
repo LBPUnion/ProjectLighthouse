@@ -32,7 +32,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("startPublish")]
         public async Task<IActionResult> StartPublish()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Slot? slot = await this.GetSlotFromBody();
@@ -65,8 +65,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("publish")]
         public async Task<IActionResult> Publish()
         {
-//            User user = await this.database.UserFromRequest(this.Request);
-            (User, GameToken)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+//            User user = await this.database.UserFromGameRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
@@ -131,7 +131,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("unpublish/{id:int}")]
         public async Task<IActionResult> Unpublish(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);

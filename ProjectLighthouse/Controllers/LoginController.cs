@@ -49,7 +49,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameToken? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
             if (token == null) return this.StatusCode(403, "");
 
-            User? user = await this.database.UserFromToken(token);
+            User? user = await this.database.UserFromGameToken(token);
             if (user == null) return this.StatusCode(403, "");
 
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);

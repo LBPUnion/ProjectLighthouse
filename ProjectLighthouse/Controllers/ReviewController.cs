@@ -24,7 +24,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("rate/user/{slotId}")]
         public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Slot? slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
@@ -51,7 +51,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("dpadrate/user/{slotId:int}")]
         public async Task<IActionResult> DPadRate(int slotId, [FromQuery] int rating)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Slot? slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);

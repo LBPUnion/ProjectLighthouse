@@ -47,7 +47,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             XmlSerializer serializer = new(typeof(Comment));
             Comment? comment = (Comment?)serializer.Deserialize(new StringReader(bodyString));
 
-            User? poster = await this.database.UserFromRequest(this.Request);
+            User? poster = await this.database.UserFromGameRequest(this.Request);
             if (poster == null) return this.StatusCode(403, "");
 
             User? target = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -66,7 +66,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("deleteUserComment/{username}")]
         public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string username)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);

@@ -32,7 +32,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [Produces("text/plain")]
         public async Task<IActionResult> Match()
         {
-            (User, GameToken)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 

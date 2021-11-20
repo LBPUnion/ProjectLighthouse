@@ -28,7 +28,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("scoreboard/user/{id:int}")]
         public async Task<IActionResult> SubmitScore(int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
         {
-            (User, GameToken)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
@@ -95,7 +95,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
         {
             // Get username
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
 
             if (user == null) return this.StatusCode(403, "");
 

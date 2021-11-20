@@ -86,7 +86,9 @@ namespace LBPUnion.ProjectLighthouse
             return gameToken;
         }
 
-        public async Task<User?> UserFromAuthToken(string authToken)
+        #region Game Token Shenanigans
+
+        public async Task<User?> UserFromMMAuth(string authToken)
         {
             GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
             if (token == null) return null;
@@ -94,35 +96,41 @@ namespace LBPUnion.ProjectLighthouse
             return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
 
-        public async Task<User?> UserFromToken(GameToken gameToken) => await this.UserFromAuthToken(gameToken.UserToken);
+        public async Task<User?> UserFromGameToken(GameToken gameToken) => await this.UserFromMMAuth(gameToken.UserToken);
 
-        public async Task<User?> UserFromRequest(HttpRequest request)
+        public async Task<User?> UserFromGameRequest(HttpRequest request)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
-            return await this.UserFromAuthToken(mmAuth);
+            return await this.UserFromMMAuth(mmAuth);
         }
 
-        public async Task<GameToken?> TokenFromRequest(HttpRequest request)
+        public async Task<GameToken?> GameTokenFromRequest(HttpRequest request)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
             return await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
         }
 
-        public async Task<(User, GameToken)?> UserAndTokenFromRequest(HttpRequest request)
+        public async Task<(User, GameToken)?> UserAndGameTokenFromRequest(HttpRequest request)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
             GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
             if (token == null) return null;
 
-            User? user = await this.UserFromToken(token);
+            User? user = await this.UserFromGameToken(token);
 
             if (user == null) return null;
 
             return (user, token);
         }
+
+        #endregion
+
+        #region Web Token Shenanigans
+
+        #endregion
 
         public async Task<Photo?> PhotoFromSubject(PhotoSubject subject)
             => await this.Photos.FirstOrDefaultAsync(p => p.PhotoSubjectIds.Contains(subject.PhotoSubjectId.ToString()));
