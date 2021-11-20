@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -20,18 +19,16 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
         [SuppressMessage("ReSharper", "SpecifyStringComparison")]
         public async Task<IActionResult> OnGet([FromQuery] string username, [FromQuery] string password, [FromQuery] string confirmPassword)
         {
-            this.WasRegisterRequest = !string.IsNullOrEmpty(username) &&
-                                      !string.IsNullOrEmpty(password) &&
-                                      !string.IsNullOrEmpty(confirmPassword) &&
-                                      password == confirmPassword;
+            this.WasRegisterRequest = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(confirmPassword);
 
             if (WasRegisterRequest)
             {
-                Console.WriteLine(password);
+                if (password != confirmPassword) return this.BadRequest();
+
                 bool userExists = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
                 if (userExists) return this.BadRequest();
 
-                this.Database.CreateUser(username, HashHelper.BCryptHash(password));
+                await this.Database.CreateUser(username, HashHelper.BCryptHash(password));
             }
 
             return this.Page();

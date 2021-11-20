@@ -4,8 +4,21 @@
 @{
     Layout = "Layouts/BaseLayout";
 }
+
+<script src="https://geraintluff.github.io/sha256/sha256.min.js"></script>
+
+<script>
+    function onSubmit(form) {
+        const password = form['password'];
+        
+        password.value = sha256(password.value);
+        
+        return true;
+    }
+</script>
+
 <h1>Log in</h1>
-<form>
+<form onsubmit="return onSubmit(this)">
     <label for="text">Username: </label>
     <input type="text" name="username" id="text"><br>
 
