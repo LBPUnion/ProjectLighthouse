@@ -92,7 +92,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await LuckyDipSlots(30 * page, 30, 69);
+        public async Task<IActionResult> CoolSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] int? page = null) 
+        {
+            int _pageStart = pageStart;
+            if (page != null) _pageStart = (int)page * 30;
+            // bit of a better placeholder until we can track average user interaction with /stream endpoint
+            return await ThumbsSlots(_pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisWeek");
+        }
 
         [HttpGet("slots")]
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
@@ -145,6 +151,137 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .OrderBy(_ => EF.Functions.Random())
+                .Take(Math.Min(pageSize, 30));
+
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        }
+
+        [HttpGet("slots/thumbs")]
+        public async Task<IActionResult> ThumbsSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null) 
+        {
+                                                        // v--- not sure of API in LBP3 here, needs testing
+            GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
+            
+            long oldestTime;
+
+            string _dateFilterType = dateFilterType != null ? dateFilterType : "";
+
+            switch (_dateFilterType)
+            {
+                case "thisWeek":
+                    oldestTime = DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds();
+                    break;
+                case "thisMonth":
+                    oldestTime = DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds();
+                    break;
+                default:
+                    oldestTime = 0;
+                    break;
+            }
+
+            Random rand = new();
+
+            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime)
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .AsEnumerable()
+                .OrderByDescending(s => s.Thumbsup)
+                .ThenBy(_ => rand.Next())
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30));
+
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        }
+
+        [HttpGet("slots/mostUniquePlays")]
+        public async Task<IActionResult> MostUniquePlaysSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null) 
+        {
+                                                        // v--- not sure of API in LBP3 here, needs testing
+            GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
+            
+            long oldestTime;
+
+            string _dateFilterType = dateFilterType != null ? dateFilterType : "";
+
+            switch (_dateFilterType)
+            {
+                case "thisWeek":
+                    oldestTime = DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds();
+                    break;
+                case "thisMonth":
+                    oldestTime = DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds();
+                    break;
+                default:
+                    oldestTime = 0;
+                    break;
+            }
+
+            Random rand = new();
+
+            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime)
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .AsEnumerable()
+                .OrderByDescending(s => {
+                    // probably not the best way to do this
+                    switch (gameVersion) {
+                        case GameVersion.LittleBigPlanet1:
+                            return s.PlaysLBP1Unique;
+                        case GameVersion.LittleBigPlanet2:
+                            return s.PlaysLBP2Unique;
+                        case GameVersion.LittleBigPlanet3:
+                            return s.PlaysLBP3Unique;
+                        case GameVersion.LittleBigPlanetVita:
+                            return s.PlaysLBPVitaUnique;
+                        default:
+                            return s.PlaysUnique;
+                    }
+                })
+                .ThenBy(_ => rand.Next())
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30));
+
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        }
+
+        [HttpGet("slots/mostHearted")]
+        public async Task<IActionResult> MostHeartedSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null) 
+        {
+                                                        // v--- not sure of API in LBP3 here, needs testing
+            GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
+            
+            long oldestTime;
+
+            string _dateFilterType = dateFilterType != null ? dateFilterType : "";
+
+            switch (_dateFilterType)
+            {
+                case "thisWeek":
+                    oldestTime = DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds();
+                    break;
+                case "thisMonth":
+                    oldestTime = DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds();
+                    break;
+                default:
+                    oldestTime = 0;
+                    break;
+            }
+
+            Random rand = new();
+
+            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime)
+                .Include(s => s.Creator)
+                .Include(s => s.Location)
+                .AsEnumerable()
+                .OrderByDescending(s => s.Hearts)
+                .ThenBy(_ => rand.Next())
+                .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, 30));
 
             string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
