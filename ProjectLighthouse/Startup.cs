@@ -29,7 +29,11 @@ namespace LBPUnion.ProjectLighthouse
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddRazorPages().WithRazorPagesAtContentRoot();
+            #if DEBUG
+            services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation();
+            #else
+            services.AddRazorPages().WithRazorPagesAtContentRoot()
+            #endif
 
             services.AddMvc
             (
