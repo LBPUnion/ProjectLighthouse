@@ -1,4 +1,5 @@
 @using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Pages.Layouts.BaseLayout
 
 <!DOCTYPE html>
@@ -7,6 +8,14 @@
 <head>
     <title>Project Lighthouse</title>
 </head>
+<header>
+    <nav>
+        @foreach (PageNavigationItem navigationItem in Model!.NavigationItems)
+        {
+            <a href="@navigationItem.Url">@navigationItem.Name</a>
+        }
+    </nav>
+</header>
 <body>
 @RenderBody()
 </body>
