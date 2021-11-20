@@ -1,10 +1,12 @@
+using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace LBPUnion.ProjectLighthouse.Controllers.ExternalAuth
+namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
 {
-    public class LandingPage : PageModel
+    public class LandingPage : BaseLayout
     {
+        [UsedImplicitly]
         public IActionResult OnGet() => this.Page();
     }
 }

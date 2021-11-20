@@ -32,10 +32,6 @@
         </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Controllers\ExternalAuth"/>
-    </ItemGroup>
-
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;"/>
         <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;"/>

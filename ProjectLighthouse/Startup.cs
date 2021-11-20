@@ -153,7 +153,7 @@ namespace LBPUnion.ProjectLighthouse
 
             app.UseRouting();
 
-//            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
             app.UseEndpoints(endpoints => endpoints.MapRazorPages());
         }
     }
