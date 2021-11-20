@@ -29,7 +29,7 @@ namespace LBPUnion.ProjectLighthouse
             Logger.AddLogger(new LighthouseFileLogger());
 
             Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
-            Logger.Log($"Running {ServerStatics.ServerName} {GitVersionHelper.CommitHash}@{GitVersionHelper.Branch}", LoggerLevelStartup.Instance);
+            Logger.Log($"Running {GitVersionHelper.FullVersion}", LoggerLevelStartup.Instance);
 
             // This loads the config, see ServerSettings.cs for more information
             Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);

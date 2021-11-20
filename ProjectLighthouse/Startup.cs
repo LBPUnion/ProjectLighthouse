@@ -29,6 +29,7 @@ namespace LBPUnion.ProjectLighthouse
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddRazorPages().WithRazorPagesAtContentRoot();
 
             services.AddMvc
             (
@@ -152,7 +153,8 @@ namespace LBPUnion.ProjectLighthouse
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+//            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseEndpoints(endpoints => endpoints.MapRazorPages());
         }
     }
 }
