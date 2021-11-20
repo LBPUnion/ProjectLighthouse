@@ -1,0 +1,18 @@
+@page "/authentication"
+@using LBPUnion.ProjectLighthouse.Types
+@model LBPUnion.ProjectLighthouse.Pages.ExternalAuth.AuthenticationPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+<br>
+@foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
+{
+    <div style="background-color: lightgray; display: flex; flex-direction: column; vertical-align: center; padding: 3px;">
+        <p style="margin: 0px">A <b>@authAttempt.Platform</b> authentication request was logged at <b>@authAttempt.Timestamp</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
+        <div>
+            <a href="/">Approve</a>
+            <a href="/">Deny</a>
+        </div>
+    </div>
+}

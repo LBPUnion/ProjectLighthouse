@@ -12,7 +12,8 @@
     }
     else
     {
-        Model.NavigationItems.Add(new PageNavigationItem("Log out", "/logout"));
+        Model.NavigationItems.Add(new PageNavigationItem("Authentication", "/authentication"));
+        Model.NavigationItems.Add(new PageNavigationItem("Log out", "/logout")); // should always be last
     }
 }
 
