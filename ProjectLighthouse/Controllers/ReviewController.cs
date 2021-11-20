@@ -175,7 +175,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             IEnumerable<Review> reviews = this.database.Reviews.Where(r => r.Reviewer.Username == username && r.Slot.GameVersion <= gameVersion)
                 .Include(r => r.Reviewer)
                 .Include(r => r.Slot)
-                .AsEnumerable() // performance?
                 .OrderByDescending(r => r.Timestamp)
                 .Skip(pageStart - 1)
                 .Take(pageSize);
