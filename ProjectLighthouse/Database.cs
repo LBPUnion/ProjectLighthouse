@@ -23,6 +23,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<HeartedProfile> HeartedProfiles { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<GameToken> GameTokens { get; set; }
+        public DbSet<WebToken> WebTokens { get; set; }
         public DbSet<Score> Scores { get; set; }
         public DbSet<PhotoSubject> PhotoSubjects { get; set; }
         public DbSet<Photo> Photos { get; set; }

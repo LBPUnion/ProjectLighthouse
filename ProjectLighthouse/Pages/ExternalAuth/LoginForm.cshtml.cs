@@ -1,7 +1,7 @@
 #nullable enable
-using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +32,18 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
 
                 if (!BCrypt.Net.BCrypt.Verify(password, user.Password)) return this.StatusCode(403, "");
 
-                Console.WriteLine(user.UserId);
+                WebToken webToken = new()
+                {
+                    UserId = user.UserId,
+                    UserToken = HashHelper.GenerateAuthToken(),
+                };
+
+                this.database.WebTokens.Add(webToken);
+                await this.database.SaveChangesAsync();
+
+                this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
+
+                return this.RedirectToPage(nameof(LandingPage));
             }
 
             return this.Page();
