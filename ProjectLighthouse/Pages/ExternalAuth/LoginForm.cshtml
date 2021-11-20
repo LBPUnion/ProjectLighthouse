@@ -4,8 +4,13 @@
 @{
     Layout = "Layouts/BaseLayout";
 }
+<h1>Log in</h1>
 <form>
-    <input type="text" name="username"><br>
-    <input type="password" name="password" aria-label="Password"><br>
-    <input type="submit"><br>
+    <label for="text">Username: </label>
+    <input type="text" name="username" id="text"><br>
+
+    <label for="password">Password: </label>
+    <input type="password" name="password" id="password"><br>
+
+    <input type="submit" value="Log in" id="submit"><br>
 </form>

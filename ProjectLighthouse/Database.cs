@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Kettu;
@@ -32,8 +33,10 @@ namespace LBPUnion.ProjectLighthouse
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
-        public async Task<User> CreateUser(string username)
+        public async Task<User> CreateUser(string username, string password)
         {
+            if (!password.StartsWith("$2a")) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
+
             User user;
             if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;
 
@@ -44,6 +47,7 @@ namespace LBPUnion.ProjectLighthouse
             user = new User
             {
                 Username = username,
+                Password = password,
                 LocationId = l.Id,
                 Biography = username + " hasn't introduced themselves yet.",
             };
@@ -58,7 +62,8 @@ namespace LBPUnion.ProjectLighthouse
         public async Task<Token?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
         {
             // TODO: don't use psn name to authenticate
-            User user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username) ?? await this.CreateUser(loginData.Username);
+            User? user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username);
+            if (user == null) return null;
 
             Token token = new()
             {

@@ -12,6 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         public readonly ClientsConnected ClientsConnected = new();
         public int UserId { get; set; }
         public string Username { get; set; }
+        public string Password { get; set; }
         public string IconHash { get; set; }
         public int Game { get; set; }
 
