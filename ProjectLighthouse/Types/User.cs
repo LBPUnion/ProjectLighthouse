@@ -24,13 +24,18 @@ namespace LBPUnion.ProjectLighthouse.Types
         public string Biography { get; set; }
 
         [NotMapped]
-        public int Reviews => 0;
+        public int Reviews {
+            get {
+                using Database database = new();
+                return database.Reviews.Count(r => r.ReviewerId == this.UserId);
+            }
+        }
 
         [NotMapped]
         public int Comments {
             get {
                 using Database database = new();
-                return database.Comments.Count(c => c.PosterUserId == this.UserId);
+                return database.Comments.Count(c => c.TargetUserId == this.UserId);
             }
         }
 
@@ -114,8 +119,8 @@ namespace LBPUnion.ProjectLighthouse.Types
                           LbpSerializer.StringElement("pins", this.Pins) +
                           LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
-                          LbpSerializer.StringElement("heartCount", this.Hearts);
-            this.ClientsConnected.Serialize();
+                          LbpSerializer.StringElement("heartCount", this.Hearts)
+                          + this.ClientsConnected.Serialize();
 
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
         }
