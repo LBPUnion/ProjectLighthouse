@@ -30,6 +30,8 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
                 User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
                 if (user == null) return this.StatusCode(403, "");
 
+                if (!BCrypt.Net.BCrypt.Verify(password, user.Password)) return this.StatusCode(403, "");
+
                 Console.WriteLine(user.UserId);
             }
 
