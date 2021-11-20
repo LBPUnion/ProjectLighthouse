@@ -52,9 +52,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (token == null) return this.StatusCode(403, "");
 
             List<string?> serializedUsers = new();
-            foreach (string userId in u)
+            foreach (string username in u)
             {
-                string? serializedUser = await this.GetSerializedUser(userId, token.GameVersion);
+                string? serializedUser = await this.GetSerializedUser(username, token.GameVersion);
                 if (serializedUser != "") serializedUsers.Add(serializedUser);
             }
 
