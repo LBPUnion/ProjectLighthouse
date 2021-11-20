@@ -22,7 +22,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<HeartedLevel> HeartedLevels { get; set; }
         public DbSet<HeartedProfile> HeartedProfiles { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<Token> Tokens { get; set; }
+        public DbSet<GameToken> GameTokens { get; set; }
         public DbSet<Score> Scores { get; set; }
         public DbSet<PhotoSubject> PhotoSubjects { get; set; }
         public DbSet<Photo> Photos { get; set; }
@@ -59,13 +59,13 @@ namespace LBPUnion.ProjectLighthouse
         }
 
         #nullable enable
-        public async Task<Token?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
+        public async Task<GameToken?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
         {
             // TODO: don't use psn name to authenticate
             User? user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username);
             if (user == null) return null;
 
-            Token token = new()
+            GameToken gameToken = new()
             {
                 UserToken = HashHelper.GenerateAuthToken(),
                 UserId = user.UserId,
@@ -73,27 +73,27 @@ namespace LBPUnion.ProjectLighthouse
                 GameVersion = GameVersionHelper.FromTitleId(titleId),
             };
 
-            if (token.GameVersion == GameVersion.Unknown)
+            if (gameToken.GameVersion == GameVersion.Unknown)
             {
                 Logger.Log($"Unknown GameVersion for TitleId {titleId}", LoggerLevelLogin.Instance);
                 return null;
             }
 
-            this.Tokens.Add(token);
+            this.GameTokens.Add(gameToken);
             await this.SaveChangesAsync();
 
-            return token;
+            return gameToken;
         }
 
         public async Task<User?> UserFromAuthToken(string authToken)
         {
-            Token? token = await this.Tokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
+            GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
             if (token == null) return null;
 
             return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
 
-        public async Task<User?> UserFromToken(Token token) => await this.UserFromAuthToken(token.UserToken);
+        public async Task<User?> UserFromToken(GameToken gameToken) => await this.UserFromAuthToken(gameToken.UserToken);
 
         public async Task<User?> UserFromRequest(HttpRequest request)
         {
@@ -102,18 +102,18 @@ namespace LBPUnion.ProjectLighthouse
             return await this.UserFromAuthToken(mmAuth);
         }
 
-        public async Task<Token?> TokenFromRequest(HttpRequest request)
+        public async Task<GameToken?> TokenFromRequest(HttpRequest request)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
-            return await this.Tokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
+            return await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
         }
 
-        public async Task<(User, Token)?> UserAndTokenFromRequest(HttpRequest request)
+        public async Task<(User, GameToken)?> UserAndTokenFromRequest(HttpRequest request)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
-            Token? token = await this.Tokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
+            GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
             if (token == null) return null;
 
             User? user = await this.UserFromToken(token);

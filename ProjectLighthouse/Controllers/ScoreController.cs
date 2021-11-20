@@ -28,13 +28,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("scoreboard/user/{id:int}")]
         public async Task<IActionResult> SubmitScore(int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
         {
-            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
-            Token token = userAndToken.Value.Item2;
+            GameToken gameToken = userAndToken.Value.Item2;
 
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -48,7 +48,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
             if (slot == null) return this.BadRequest();
 
-            switch (token.GameVersion)
+            switch (gameToken.GameVersion)
             {
                 case GameVersion.LittleBigPlanet1:
                     slot.PlaysLBP1Complete++;

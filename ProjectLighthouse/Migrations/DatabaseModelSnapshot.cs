@@ -18,6 +18,29 @@ namespace ProjectLighthouse.Migrations
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
+                {
+                    b.Property<int>("TokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameVersion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserLocation")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserToken")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TokenId");
+
+                    b.ToTable("GameTokens");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
                 {
                     b.Property<int>("HeartedProfileId")
@@ -408,29 +431,6 @@ namespace ProjectLighthouse.Migrations
                     b.HasIndex("SlotId");
 
                     b.ToTable("Scores");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Token", b =>
-                {
-                    b.Property<int>("TokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("GameVersion")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserLocation")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserToken")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("TokenId");
-
-                    b.ToTable("Tokens");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.User", b =>

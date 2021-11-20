@@ -5,18 +5,43 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20211113091631_AddUserLocationToToken")]
-    partial class AddUserLocationToToken
+    [Migration("20211120052549_RenameTokensToGameTokens")]
+    partial class RenameTokensToGameTokens
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 64)
-                .HasAnnotation("ProductVersion", "5.0.12");
+                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
+                {
+                    b.Property<int>("TokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameVersion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserLocation")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserToken")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TokenId");
+
+                    b.ToTable("GameTokens");
+                });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
                 {
@@ -115,15 +140,18 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AuthorLabels")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("BackgroundHash")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<long>("FirstUploaded")
@@ -133,6 +161,7 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("IconHash")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("InitiallyLocked")
@@ -145,6 +174,7 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("LevelType")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("LocationId")
@@ -160,6 +190,7 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("PlaysLBP1")
@@ -189,10 +220,21 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PlaysLBP3Unique")
                         .HasColumnType("int");
 
+                    b.Property<int>("PlaysLBPVita")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlaysLBPVitaComplete")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlaysLBPVitaUnique")
+                        .HasColumnType("int");
+
                     b.Property<string>("ResourceCollection")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("RootLevel")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("Shareable")
@@ -219,7 +261,16 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("GameVersion")
+                    b.Property<int>("PlaysLBP1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlaysLBP2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlaysLBP3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlaysLBPVita")
                         .HasColumnType("int");
 
                     b.Property<int>("SlotId")
@@ -384,29 +435,6 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Scores");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
-                {
-                    b.Property<int>("TokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("GameVersion")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserLocation")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserToken")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("TokenId");
-
-                    b.ToTable("Tokens");
-                });
-
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -414,9 +442,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Biography")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("BooHash")
                         .HasColumnType("longtext");
 
                     b.Property<int>("Game")
@@ -428,25 +453,16 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Pins")
                         .HasColumnType("longtext");
 
                     b.Property<string>("PlanetHash")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("StaffChallengeBronzeCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StaffChallengeGoldCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StaffChallengeSilverCount")
-                        .HasColumnType("int");
-
                     b.Property<string>("Username")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("YayHash")
                         .HasColumnType("longtext");
 
                     b.HasKey("UserId");

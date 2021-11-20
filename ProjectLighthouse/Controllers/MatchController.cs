@@ -32,13 +32,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [Produces("text/plain")]
         public async Task<IActionResult> Match()
         {
-            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
-            Token token = userAndToken.Value.Item2;
+            GameToken gameToken = userAndToken.Value.Item2;
 
             #region Parse match data
 
@@ -97,7 +97,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (matchData is UpdateMyPlayerData playerData)
             {
-                MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+                MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
                 Room? room = RoomHelper.FindRoomByUser(user, true);
 
                 if (playerData.RoomState != null)
@@ -108,7 +108,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
             {
-                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, token.UserLocation);
+                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.UserLocation);
 
                 if (response == null) return this.NotFound();
 

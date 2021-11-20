@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LBPUnion.ProjectLighthouse.Types
 {
-    public class Token
+    public class GameToken
     {
         // ReSharper disable once UnusedMember.Global
         [Key]

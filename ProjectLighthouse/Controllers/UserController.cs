@@ -35,7 +35,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("user/{username}")]
         public async Task<IActionResult> GetUser(string username)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             string? user = await this.GetSerializedUser(username, token.GameVersion);
@@ -47,7 +47,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             List<string?> serializedUsers = new();

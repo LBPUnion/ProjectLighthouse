@@ -29,7 +29,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/lolcatftw/{username}")]
         public async Task<IActionResult> GetLevelQueue(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -110,7 +110,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("favouriteSlots/{username}")]
         public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -180,7 +180,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("favouriteUsers/{username}")]
         public async Task<IActionResult> GetFavouriteUsers(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include

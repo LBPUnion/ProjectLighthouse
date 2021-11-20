@@ -46,7 +46,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string userLocation = ipAddress.ToString();
 
-            Token? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
+            GameToken? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
             if (token == null) return this.StatusCode(403, "");
 
             User? user = await this.database.UserFromToken(token);

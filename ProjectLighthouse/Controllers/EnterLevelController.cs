@@ -30,7 +30,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
             if (slot == null) return this.StatusCode(403, "");
 
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.TokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
