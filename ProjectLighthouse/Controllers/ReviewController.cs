@@ -235,7 +235,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (review == null) return this.StatusCode(403, "");
 
             review.Deleted = true;
-            review.DeletedBy = "level_author"; // other value is "moderator"
+            review.DeletedBy = DeletedBy.LevelAuthor;
 
             await this.database.SaveChangesAsync();
             return this.Ok();
