@@ -77,6 +77,7 @@ namespace LBPUnion.ProjectLighthouse
                     webBuilder =>
                     {
                         webBuilder.UseStartup<Startup>();
+                        webBuilder.UseWebRoot("StaticFiles");
                     }
                 )
                 .ConfigureLogging

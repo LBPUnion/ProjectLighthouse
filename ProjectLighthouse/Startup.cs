@@ -157,6 +157,8 @@ namespace LBPUnion.ProjectLighthouse
 
             app.UseRouting();
 
+            app.UseStaticFiles();
+
             app.UseEndpoints(endpoints => endpoints.MapControllers());
             app.UseEndpoints(endpoints => endpoints.MapRazorPages());
         }
