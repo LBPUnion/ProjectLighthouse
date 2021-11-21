@@ -8,11 +8,15 @@
 <h1>Authentication</h1>
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
 {
-    <div style="background-color: lightgray; display: flex; flex-direction: column; vertical-align: center; padding: 3px;">
-        <p style="margin: 0px">A <b>@authAttempt.Platform</b> authentication request was logged at <b>@authAttempt.Timestamp</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
+    <div class="ui red segment">
+        <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@authAttempt.Timestamp</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>
-            <a href="/">Approve</a>
-            <a href="/">Deny</a>
+            <a href="/authentication/approve/1">
+                <button class="ui tiny green button">Approve</button>
+            </a>
+            <a href="/authentication/deny/1">
+                <button class="ui tiny red button">Deny</button>
+            </a>
         </div>
     </div>
 }

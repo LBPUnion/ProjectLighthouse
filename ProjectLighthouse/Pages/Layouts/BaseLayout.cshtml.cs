@@ -18,7 +18,7 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
 
         public readonly List<PageNavigationItem> NavigationItems = new()
         {
-            new PageNavigationItem("Home", "/"),
+            new PageNavigationItem("Home", "/", "home"),
         };
 
     }
