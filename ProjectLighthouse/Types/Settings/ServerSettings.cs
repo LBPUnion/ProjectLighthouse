@@ -90,5 +90,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
 
         public string ExternalUrl { get; set; } = "http://localhost:10060";
         public string ServerDigestKey { get; set; }
+        public bool UseExternalAuth { get; set; }
     }
 }

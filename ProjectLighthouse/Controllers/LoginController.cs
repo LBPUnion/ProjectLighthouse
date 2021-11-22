@@ -54,28 +54,36 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameToken(token, true);
             if (user == null) return this.StatusCode(403, "");
 
-            string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
-            if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || (DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3))
+            if (ServerSettings.Instance.UseExternalAuth)
             {
-                this.database.AuthenticationAttempts.RemoveRange
-                    (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
+                string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
+                if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || (DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3))
+                {
+                    this.database.AuthenticationAttempts.RemoveRange
+                        (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
 
-                DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
+                    DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
 
-                await this.database.SaveChangesAsync();
-                return this.StatusCode(403, "");
+                    await this.database.SaveChangesAsync();
+                    return this.StatusCode(403, "");
+                }
+
+                AuthenticationAttempt authAttempt = new()
+                {
+                    GameToken = token,
+                    GameTokenId = token.TokenId,
+                    Timestamp = TimestampHelper.Timestamp,
+                    IPAddress = userLocation,
+                    Platform = token.GameVersion == GameVersion.LittleBigPlanetVita ? Platform.Vita : Platform.PS3, // TODO: properly identify RPCS3
+                };
+
+                this.database.AuthenticationAttempts.Add(authAttempt);
+            }
+            else
+            {
+                token.Approved = true;
             }
 
-            AuthenticationAttempt authAttempt = new()
-            {
-                GameToken = token,
-                GameTokenId = token.TokenId,
-                Timestamp = TimestampHelper.Timestamp,
-                IPAddress = userLocation,
-                Platform = token.GameVersion == GameVersion.LittleBigPlanetVita ? Platform.Vita : Platform.PS3, // TODO: properly identify RPCS3
-            };
-
-            this.database.AuthenticationAttempts.Add(authAttempt);
             await this.database.SaveChangesAsync();
 
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);

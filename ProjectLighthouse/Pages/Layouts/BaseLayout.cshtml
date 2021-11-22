@@ -1,5 +1,6 @@
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.Layouts.BaseLayout
 
 @{
@@ -10,7 +11,10 @@
     }
     else
     {
-        Model.NavigationItems.Add(new PageNavigationItem("Authentication", "/authentication", "key"));
+        if (ServerSettings.Instance.UseExternalAuth)
+        {
+            Model.NavigationItems.Add(new PageNavigationItem("Authentication", "/authentication", "key"));
+        }
         Model.NavigationItems.Add(new PageNavigationItem("Log out", "/logout", "user alternate slash")); // should always be last
     }
 }
