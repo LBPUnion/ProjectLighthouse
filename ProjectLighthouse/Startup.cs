@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 
 namespace LBPUnion.ProjectLighthouse
@@ -71,7 +70,9 @@ namespace LBPUnion.ProjectLighthouse
                 computeDigests = false;
             }
 
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            #if DEBUG
+            app.UseDeveloperExceptionPage();
+            #endif
 
             app.UseForwardedHeaders();
 

@@ -56,7 +56,7 @@ namespace LBPUnion.ProjectLighthouse
             #if DEBUG
             Logger.Log
             (
-                "This is a debug build. Performance may vary with a release build. " +
+                "This is a debug build, so performance may suffer! " +
                 "If you are running Lighthouse in a production environment, " +
                 "it is highly recommended to run a release build. ",
                 LoggerLevelStartup.Instance
