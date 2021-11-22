@@ -20,6 +20,7 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
             this.AuthenticationAttempts = this.Database.AuthenticationAttempts.Include
                     (a => a.GameToken)
                 .Where(a => a.GameToken.UserId == this.User.UserId)
+                .OrderByDescending(a => a.Timestamp)
                 .ToList();
 
             return this.Page();
