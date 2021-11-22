@@ -22,10 +22,10 @@ else
     <div class="ui red segment">
         <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>
-            <a href="/authentication/approve/@authAttempt.GameTokenId">
+            <a href="/authentication/approve/@authAttempt.AuthenticationAttemptId">
                 <button class="ui tiny green button">Approve</button>
             </a>
-            <a href="/authentication/deny/@authAttempt.GameTokenId">
+            <a href="/authentication/deny/@authAttempt.AuthenticationAttemptId">
                 <button class="ui tiny red button">Deny</button>
             </a>
         </div>

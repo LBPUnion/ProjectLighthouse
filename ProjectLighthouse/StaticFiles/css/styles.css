@@ -3,11 +3,3 @@ footer.lighthouse-footer {
     bottom: 0;
     position: fixed;
 }
-
-div.authentication-attempt {
-    background-color: lightgray;
-    display: flex;
-    flex-direction: column;
-    vertical-align: center;
-    padding: 3px;
-}
