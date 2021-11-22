@@ -53,6 +53,17 @@ namespace LBPUnion.ProjectLighthouse
                 if (ServerSettings.Instance.InfluxLoggingEnabled) Logger.AddLogger(new InfluxLogger());
             }
 
+            #if DEBUG
+            Logger.Log
+            (
+                "This is a debug build. Performance may vary with a release build. " +
+                "If you are running Lighthouse in a production environment, " +
+                "it is highly recommended to run a release build. ",
+                LoggerLevelStartup.Instance
+            );
+            Logger.Log("You can do so by running any dotnet command with the flag: \"-c Release\". ", LoggerLevelStartup.Instance);
+            #endif
+
             stopwatch.Stop();
             Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
 
