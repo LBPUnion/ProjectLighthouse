@@ -89,36 +89,46 @@ namespace LBPUnion.ProjectLighthouse
 
         #region Game Token Shenanigans
 
-        public async Task<User?> UserFromMMAuth(string authToken)
+        public async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)
         {
             GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
+
             if (token == null) return null;
+            if (!allowUnapproved && !token.Approved) return null;
 
             return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
         }
 
-        public async Task<User?> UserFromGameToken(GameToken gameToken) => await this.UserFromMMAuth(gameToken.UserToken);
+        public async Task<User?> UserFromGameToken
+            (GameToken gameToken, bool allowUnapproved = false)
+            => await this.UserFromMMAuth(gameToken.UserToken, allowUnapproved);
 
-        public async Task<User?> UserFromGameRequest(HttpRequest request)
+        public async Task<User?> UserFromGameRequest(HttpRequest request, bool allowUnapproved = false)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
-            return await this.UserFromMMAuth(mmAuth);
+            return await this.UserFromMMAuth(mmAuth, allowUnapproved);
         }
 
-        public async Task<GameToken?> GameTokenFromRequest(HttpRequest request)
+        public async Task<GameToken?> GameTokenFromRequest(HttpRequest request, bool allowUnapproved = false)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
-            return await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
+            GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
+
+            if (token == null) return null;
+            if (!allowUnapproved && !token.Approved) return null;
+
+            return token;
         }
 
-        public async Task<(User, GameToken)?> UserAndGameTokenFromRequest(HttpRequest request)
+        public async Task<(User, GameToken)?> UserAndGameTokenFromRequest(HttpRequest request, bool allowUnapproved = false)
         {
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
             GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
             if (token == null) return null;
+            if (!allowUnapproved && !token.Approved) return null;
 
             User? user = await this.UserFromGameToken(token);
 

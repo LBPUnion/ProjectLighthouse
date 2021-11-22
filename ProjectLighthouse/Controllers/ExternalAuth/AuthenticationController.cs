@@ -1,5 +1,6 @@
 #nullable enable
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers.ExternalAuth
 
             this.database.GameTokens.Remove(authAttempt.GameToken);
             this.database.AuthenticationAttempts.Remove(authAttempt);
+
+            DeniedAuthenticationHelper.Set($"{authAttempt.IPAddress}|{user.Username}");
 
             await this.database.SaveChangesAsync();
 

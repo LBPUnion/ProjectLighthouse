@@ -49,8 +49,22 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameToken? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
             if (token == null) return this.StatusCode(403, "");
 
-            User? user = await this.database.UserFromGameToken(token);
+            User? user = await this.database.UserFromGameToken(token, true);
             if (user == null) return this.StatusCode(403, "");
+
+            if (DeniedAuthenticationHelper.RecentlyDenied($"{token.UserLocation}|{user.Username}")) return this.StatusCode(403, "");
+
+            AuthenticationAttempt authAttempt = new()
+            {
+                GameToken = token,
+                GameTokenId = token.TokenId,
+                Timestamp = TimestampHelper.Timestamp,
+                IPAddress = userLocation,
+                Platform = token.GameVersion == GameVersion.LittleBigPlanetVita ? Platform.Vita : Platform.PS3, // TODO: properly identify RPCS3
+            };
+
+            this.database.AuthenticationAttempts.Add(authAttempt);
+            await this.database.SaveChangesAsync();
 
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
 

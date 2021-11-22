@@ -27,10 +27,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
-            User user = await this.database.UserFromGameRequest(this.Request);
+            User user = await this.database.UserFromGameRequest(this.Request, true);
             if (user == null) return this.StatusCode(403, "");
 
-            return this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n\n" + ServerSettings.Instance.EulaText);
+            return this.Ok
+            (
+                $"Please stay on this screen.\n" +
+                $"Before continuing, you must approve this session at {ServerSettings.Instance.ExternalUrl}.\n" +
+                $"Once approved, you may press X and continue.\n\n" +
+                ServerSettings.Instance.EulaText
+            );
         }
 
         [HttpGet("notification")]
