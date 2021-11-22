@@ -1,10 +1,10 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -59,12 +59,12 @@ namespace LBPUnion.ProjectLighthouse
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             bool computeDigests = true;
-            string serverDigestKey = Environment.GetEnvironmentVariable("SERVER_DIGEST_KEY");
-            if (string.IsNullOrWhiteSpace(serverDigestKey))
+            string serverDigestKey = ServerSettings.Instance.ServerDigestKey;
+            if (string.IsNullOrEmpty(serverDigestKey))
             {
                 Logger.Log
                 (
-                    "The SERVER_DIGEST_KEY environment variable wasn't set, so digest headers won't be set or verified. This will prevent LBP 1 and LBP 3 from working. " +
+                    "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will also prevent LBP 1, LBP 2, and LBP Vita from working. " +
                     "To increase security, it is recommended that you find and set this variable.",
                     LoggerLevelStartup.Instance
                 );
@@ -95,7 +95,7 @@ namespace LBPUnion.ProjectLighthouse
                     string digestPath = context.Request.Path;
                     Stream body = context.Request.Body;
 
-                    if (computeDigests)
+                    if (computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
                     {
                         string clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
 

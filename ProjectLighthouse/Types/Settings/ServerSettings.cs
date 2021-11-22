@@ -89,5 +89,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
 
         public string ExternalUrl { get; set; } = "http://localhost:10060";
+        public string ServerDigestKey { get; set; }
     }
 }
