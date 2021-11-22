@@ -18,8 +18,9 @@ else
 
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
 {
+    DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(authAttempt.Timestamp);
     <div class="ui red segment">
-        <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@authAttempt.Timestamp</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
+        <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>
             <a href="/authentication/approve/@authAttempt.GameTokenId">
                 <button class="ui tiny green button">Approve</button>
