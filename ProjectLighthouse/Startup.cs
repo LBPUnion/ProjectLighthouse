@@ -31,7 +31,7 @@ namespace LBPUnion.ProjectLighthouse
             #if DEBUG
             services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation();
             #else
-            services.AddRazorPages().WithRazorPagesAtContentRoot()
+            services.AddRazorPages().WithRazorPagesAtContentRoot();
             #endif
 
             services.AddMvc
