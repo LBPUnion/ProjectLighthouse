@@ -30,6 +30,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<LastMatch> LastMatches { get; set; }
         public DbSet<VisitedLevel> VisitedLevels { get; set; }
         public DbSet<RatedLevel> RatedLevels { get; set; }
+        public DbSet<AuthenticationAttempt> AuthenticationAttempts { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);

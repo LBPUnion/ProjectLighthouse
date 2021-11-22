@@ -6,15 +6,25 @@
     Layout = "Layouts/BaseLayout";
 }
 <h1>Authentication</h1>
+
+@if (Model.AuthenticationAttempts.Count == 0)
+{
+    <p>You have no pending authentication attempts.</p>
+}
+else
+{
+    <p>You have @Model.AuthenticationAttempts.Count authentication attempts pending.</p>
+}
+
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
 {
     <div class="ui red segment">
         <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@authAttempt.Timestamp</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>
-            <a href="/authentication/approve/1">
+            <a href="/authentication/approve/@authAttempt.GameTokenId">
                 <button class="ui tiny green button">Approve</button>
             </a>
-            <a href="/authentication/deny/1">
+            <a href="/authentication/deny/@authAttempt.GameTokenId">
                 <button class="ui tiny red button">Deny</button>
             </a>
         </div>

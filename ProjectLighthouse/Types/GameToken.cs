@@ -15,5 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         public string UserLocation { get; set; }
 
         public GameVersion GameVersion { get; set; }
+
+        public bool Approved { get; set; } = false;
     }
 }

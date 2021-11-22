@@ -2,7 +2,8 @@ namespace LBPUnion.ProjectLighthouse.Types
 {
     public enum Platform
     {
-        PS3,
-        RPCS3,
+        PS3 = 0,
+        RPCS3 = 1,
+        Vita = 2,
     }
 }
