@@ -3,9 +3,7 @@
 @model LBPUnion.ProjectLighthouse.Pages.Layouts.BaseLayout
 
 @{
-    Model!.User = await Model.Database.UserFromWebRequest(Model.Request);
-
-    if (Model.User == null)
+    if (Model!.User == null)
     {
         Model.NavigationItems.Add(new PageNavigationItem("Log in", "/login", "user alternate"));
         Model.NavigationItems.Add(new PageNavigationItem("Register", "/register", "user alternate edit"));

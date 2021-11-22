@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
         {}
         public async Task<IActionResult> OnGet()
         {
-            WebToken? token = await this.Database.WebTokenFromRequest(this.Request);
+            WebToken? token = this.Database.WebTokenFromRequest(this.Request);
             if (token == null) return this.BadRequest();
 
             this.Database.WebTokens.Remove(token);

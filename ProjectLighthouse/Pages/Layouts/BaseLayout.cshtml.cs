@@ -9,7 +9,16 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
     {
         public readonly Database Database;
 
-        public new User? User { get; set; }
+        private User? user;
+
+        public new User? User {
+            get {
+                if (this.user != null) return this.user;
+
+                return user = Database.UserFromWebRequest(this.Request);
+            }
+            set => this.user = value;
+        }
 
         public BaseLayout(Database database)
         {
