@@ -14,8 +14,8 @@ using IOFile = System.IO.File;
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
     [ApiController]
-    [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
+    [Route("LITTLEBIGPLANETPS3_XML")]
     public class ResourcesController : ControllerBase
     {
         [HttpPost("showModerated")]
@@ -39,6 +39,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(LbpSerializer.StringElement("resources", resources));
         }
 
+        [HttpGet("/gameAssets/{hash}")]
         [HttpGet("r/{hash}")]
         public IActionResult GetResource(string hash)
         {

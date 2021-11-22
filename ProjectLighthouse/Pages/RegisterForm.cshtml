@@ -1,5 +1,5 @@
-@page "/login"
-@model LBPUnion.ProjectLighthouse.Pages.ExternalAuth.LoginForm
+@page "/register"
+@model LBPUnion.ProjectLighthouse.Pages.RegisterForm
 
 @{
     Layout = "Layouts/BaseLayout";
@@ -10,24 +10,29 @@
 <script>
     function onSubmit(form) {
         const password = form['password'];
+        const confirmPassword = form['confirmPassword'];
         
         password.value = sha256(password.value);
+        confirmPassword.value = sha256(confirmPassword.value);
         
         return true;
     }
 </script>
 
-<h1>Log in</h1>
+
+<h1>Register</h1>
 <form onsubmit="return onSubmit(this)">
     <div class="ui left labeled input">
         <label for="text" class="ui label">Username: </label>
         <input type="text" name="username" id="text">
     </div><br>
-
     <div class="ui left labeled input">
         <label for="password" class="ui label">Password: </label>
         <input type="password" name="password" id="password">
+    </div><br>
+    <div class="ui left labeled input">
+        <label for="password" class="ui label">Confirm Password: </label>
+        <input type="password" name="confirmPassword" id="confirmPassword">
     </div><br><br>
-
-    <input type="submit" value="Log in" id="submit" class="ui button"><br>
+    <input type="submit" value="Register" id="submit" class="ui button"><br>
 </form>

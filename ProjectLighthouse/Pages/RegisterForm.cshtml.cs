@@ -7,7 +7,7 @@ using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
+namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class RegisterForm : BaseLayout
     {
@@ -22,7 +22,7 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
         {
             this.WasRegisterRequest = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(confirmPassword);
 
-            if (WasRegisterRequest)
+            if (this.WasRegisterRequest)
             {
                 if (password != confirmPassword) return this.BadRequest();
 

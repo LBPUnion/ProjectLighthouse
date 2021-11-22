@@ -7,7 +7,7 @@ using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
+namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class LoginForm : BaseLayout
     {
@@ -19,9 +19,9 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
         [UsedImplicitly]
         public async Task<IActionResult> OnGet([FromQuery] string username, [FromQuery] string password)
         {
-            WasLoginRequest = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password);
+            this.WasLoginRequest = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password);
 
-            if (WasLoginRequest)
+            if (this.WasLoginRequest)
             {
                 User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
                 if (user == null) return this.StatusCode(403, "");
