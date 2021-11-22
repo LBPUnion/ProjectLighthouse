@@ -13,5 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         public static async Task<int> SlotCount() => await database.Slots.CountAsync();
 
         public static async Task<int> MMPicksCount() => await database.Slots.CountAsync(s => s.TeamPick);
+
+        public static async Task<int> PhotoCount() => await database.Photos.CountAsync();
     }
 }
