@@ -68,7 +68,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         [NotNull]
         public static ServerSettings Instance;
 
-        public const int CurrentConfigVersion = 5;
+        public const int CurrentConfigVersion = 6;
 
         [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
         public int ConfigVersion { get; set; } = CurrentConfigVersion;
