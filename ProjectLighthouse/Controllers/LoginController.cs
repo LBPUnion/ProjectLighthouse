@@ -1,5 +1,6 @@
 #nullable enable
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Kettu;
@@ -8,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
@@ -52,7 +54,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameToken(token, true);
             if (user == null) return this.StatusCode(403, "");
 
-            if (DeniedAuthenticationHelper.RecentlyDenied($"{token.UserLocation}|{user.Username}")) return this.StatusCode(403, "");
+            string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
+            if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 5)
+            {
+                this.database.AuthenticationAttempts.RemoveRange
+                    (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
+
+                DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
+
+                await this.database.SaveChangesAsync();
+                return this.StatusCode(403, "");
+            }
 
             AuthenticationAttempt authAttempt = new()
             {

@@ -14,6 +14,9 @@
 else
 {
     <p>You have @Model.AuthenticationAttempts.Count authentication attempts pending.</p>
+    <a href="/authentication/denyAll">
+        <button class="ui small red button">Deny all</button>
+    </a>
 }
 
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)

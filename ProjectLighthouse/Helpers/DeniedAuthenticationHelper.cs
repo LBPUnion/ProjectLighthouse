@@ -5,8 +5,9 @@ namespace LBPUnion.ProjectLighthouse.Helpers
     public static class DeniedAuthenticationHelper
     {
         public static readonly Dictionary<string, long> IPAddressAndNameDeniedAt = new();
+        public static readonly Dictionary<string, int> AttemptsByIPAddressAndName = new();
 
-        public static void Set(string ipAddressAndName, long timestamp = 0)
+        public static void SetDeniedAt(string ipAddressAndName, long timestamp = 0)
         {
             if (timestamp == 0) timestamp = TimestampHelper.Timestamp;
 
@@ -19,6 +20,19 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             if (!IPAddressAndNameDeniedAt.TryGetValue(ipAddressAndName, out long timestamp)) return false;
 
             return TimestampHelper.Timestamp < timestamp + 60;
+        }
+
+        public static void AddAttempt(string ipAddressAndName)
+        {
+            if (AttemptsByIPAddressAndName.TryGetValue(ipAddressAndName, out int attempts)) AttemptsByIPAddressAndName.Remove(ipAddressAndName);
+            AttemptsByIPAddressAndName.Add(ipAddressAndName, attempts + 1);
+        }
+
+        public static int GetAttempts(string ipAddressAndName)
+        {
+            if (!AttemptsByIPAddressAndName.TryGetValue(ipAddressAndName, out int attempts)) return 0;
+
+            return attempts;
         }
     }
 }

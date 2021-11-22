@@ -1,4 +1,6 @@
 #nullable enable
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
@@ -55,7 +57,31 @@ namespace LBPUnion.ProjectLighthouse.Controllers.ExternalAuth
             this.database.GameTokens.Remove(authAttempt.GameToken);
             this.database.AuthenticationAttempts.Remove(authAttempt);
 
-            DeniedAuthenticationHelper.Set($"{authAttempt.IPAddress}|{user.Username}");
+            DeniedAuthenticationHelper.SetDeniedAt($"{authAttempt.IPAddress}|{user.Username}");
+
+            await this.database.SaveChangesAsync();
+
+            return this.Redirect("~/authentication");
+        }
+
+        [HttpGet("denyAll")]
+        public async Task<IActionResult> DenyAll()
+        {
+            User? user = this.database.UserFromWebRequest(this.Request);
+            if (user == null) return this.Redirect("/login");
+
+            List<AuthenticationAttempt> authAttempts = await this.database.AuthenticationAttempts.Include
+                    (a => a.GameToken)
+                .Where(a => a.GameToken.UserId == user.UserId)
+                .ToListAsync();
+
+            foreach (AuthenticationAttempt authAttempt in authAttempts)
+            {
+                this.database.GameTokens.Remove(authAttempt.GameToken);
+                this.database.AuthenticationAttempts.Remove(authAttempt);
+
+                DeniedAuthenticationHelper.SetDeniedAt($"{authAttempt.IPAddress}|{user.Username}");
+            }
 
             await this.database.SaveChangesAsync();
 
