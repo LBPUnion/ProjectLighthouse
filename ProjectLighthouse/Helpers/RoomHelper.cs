@@ -139,7 +139,14 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             // Delete old rooms based on host
             if (host != null)
             {
-                Rooms.RemoveAll(r => r.Host == host);
+                try
+                {
+                    Rooms.RemoveAll(r => r.Host == host);
+                }
+                catch
+                {
+                    // TODO: detect the room that failed and remove it
+                }
             }
 
             // Remove players in this new room from other rooms

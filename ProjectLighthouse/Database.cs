@@ -91,6 +91,7 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)
         {
+            if (ServerStatics.IsUnitTesting) allowUnapproved = true;
             GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
 
             if (token == null) return null;
@@ -105,6 +106,7 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<User?> UserFromGameRequest(HttpRequest request, bool allowUnapproved = false)
         {
+            if (ServerStatics.IsUnitTesting) allowUnapproved = true;
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
             return await this.UserFromMMAuth(mmAuth, allowUnapproved);
@@ -112,6 +114,7 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<GameToken?> GameTokenFromRequest(HttpRequest request, bool allowUnapproved = false)
         {
+            if (ServerStatics.IsUnitTesting) allowUnapproved = true;
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
             GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
@@ -124,6 +127,7 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<(User, GameToken)?> UserAndGameTokenFromRequest(HttpRequest request, bool allowUnapproved = false)
         {
+            if (ServerStatics.IsUnitTesting) allowUnapproved = true;
             if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
 
             GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
