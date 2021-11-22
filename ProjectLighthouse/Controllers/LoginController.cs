@@ -55,7 +55,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (user == null) return this.StatusCode(403, "");
 
             string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
-            if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 5)
+            if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || (DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3))
             {
                 this.database.AuthenticationAttempts.RemoveRange
                     (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));

@@ -19,7 +19,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         {
             if (!IPAddressAndNameDeniedAt.TryGetValue(ipAddressAndName, out long timestamp)) return false;
 
-            return TimestampHelper.Timestamp < timestamp + 60;
+            return TimestampHelper.Timestamp < timestamp + 300;
         }
 
         public static void AddAttempt(string ipAddressAndName)

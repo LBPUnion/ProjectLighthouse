@@ -34,6 +34,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             (
                 $"Please stay on this screen.\n" +
                 $"Before continuing, you must approve this session at {ServerSettings.Instance.ExternalUrl}.\n" +
+                $"Please keep in mind that if the session is denied you may have to wait up to 5-10 minutes to try logging in again.\n" +
                 $"Once approved, you may press X and continue.\n\n" +
                 ServerSettings.Instance.EulaText
             );
