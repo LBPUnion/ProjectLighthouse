@@ -39,6 +39,8 @@ namespace LBPUnion.ProjectLighthouse.CommandLine
 
             user.Password = HashHelper.BCryptHash(password);
 
+            await this.database.SaveChangesAsync();
+
             Console.WriteLine($"The password for user {user.Username} (id: {user.UserId}) has been reset.");
         }
     }
