@@ -39,6 +39,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(LbpSerializer.StringElement("resources", resources));
         }
 
+        [ResponseCache(Duration = 86400)]
         [HttpGet("/gameAssets/{hash}")]
         [HttpGet("r/{hash}")]
         public IActionResult GetResource(string hash)
