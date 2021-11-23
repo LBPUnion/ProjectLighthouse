@@ -70,9 +70,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 return this.UnprocessableEntity();
             }
 
-            if (HashHelper.Sha1Hash(file.Data) != hash)
+            string calculatedHash = HashHelper.Sha1Hash(file.Data);
+            if (calculatedHash != hash)
             {
-                Logger.Log($"File hash does not match the uploaded file! (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
+                Logger.Log
+                (
+                    $"File hash does not match the uploaded file! (hash: {hash}, calculatedHash: {calculatedHash}, type: {file.FileType})",
+                    LoggerLevelResources.Instance
+                );
                 return this.Conflict();
             }
 
