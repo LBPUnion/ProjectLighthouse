@@ -28,7 +28,12 @@ namespace LBPUnion.ProjectLighthouse.Pages
 
             this.PageNumber = pageNumber;
 
-            this.Photos = await this.Database.Photos.Include(p => p.Creator).Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
+            this.Photos = await this.Database.Photos.Include
+                    (p => p.Creator)
+                .OrderByDescending(p => p.Timestamp)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             return this.Page();
         }
