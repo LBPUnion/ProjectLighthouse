@@ -7,3 +7,12 @@ div.pageContainer {
 div.main {
     flex: 1;
 }
+
+div.userStats > i {
+    margin-right: 2px;
+}
+
+div.userStats > span {
+    margin-right: 5px;
+}
+

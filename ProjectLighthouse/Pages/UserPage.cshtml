@@ -9,11 +9,11 @@
 
 <h1>@Model.ProfileUser!.Username's user page</h1>
 
-<div>
-    <i class="pink heart icon" title="Hearts"></i> @Model.ProfileUser.Hearts
-    <i class="blue comment icon" title="Comments"></i> @Model.ProfileUser.Comments
-    <i class="green upload icon" title="Uploaded Levels"></i>@Model.ProfileUser.UsedSlots / @ServerStatics.EntitledSlots
-    <i class="purple camera icon" title="Uploaded Photos"></i>@Model.ProfileUser.PhotosByMe
+<div class="userStats">
+    <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
+    <i class="blue comment icon" title="Comments"></i> <span>@Model.ProfileUser.Comments</span>
+    <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.ProfileUser.UsedSlots / @ServerStatics.EntitledSlots</span>
+    <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.ProfileUser.PhotosByMe</span>
 </div>
 
 <div class="ui blue segment">
