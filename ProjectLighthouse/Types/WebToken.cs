@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LBPUnion.ProjectLighthouse.Types
 {
-    public class Token
+    public class WebToken
     {
         // ReSharper disable once UnusedMember.Global
         [Key]
@@ -11,9 +11,5 @@ namespace LBPUnion.ProjectLighthouse.Types
         public int UserId { get; set; }
 
         public string UserToken { get; set; }
-
-        public string UserLocation { get; set; }
-
-        public GameVersion GameVersion { get; set; }
     }
 }

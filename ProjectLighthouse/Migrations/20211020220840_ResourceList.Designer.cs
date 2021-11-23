@@ -189,7 +189,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Slots");
                 });
 
-            modelBuilder.Entity("ProjectLighthouse.Types.Token", b =>
+            modelBuilder.Entity("ProjectLighthouse.Types.GameToken", b =>
                 {
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using Xunit;
 
@@ -36,7 +37,6 @@ namespace LBPUnion.ProjectLighthouse.Tests
             semaphore.Release();
             Assert.True(result.IsSuccessStatusCode);
         }
-        public async Task<int> GetPlayerCount() => Convert.ToInt32(await this.Client.GetStringAsync("LITTLEBIGPLANETPS3_XML/totalPlayerCount"));
 
         [DatabaseFact]
         public async Task ShouldIncrementPlayerCount()
@@ -45,14 +45,14 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
             await semaphore.WaitAsync();
 
-            int oldPlayerCount = await this.GetPlayerCount();
+            int oldPlayerCount = await StatisticsHelper.RecentMatches();
 
             HttpResponseMessage result = await this.AuthenticatedUploadDataRequest
                 ("LITTLEBIGPLANETPS3_XML/match", Encoding.ASCII.GetBytes("[UpdateMyPlayerData,[\"Player\":\"1984\"]]"), loginResult.AuthTicket);
 
             Assert.True(result.IsSuccessStatusCode);
 
-            int playerCount = await this.GetPlayerCount();
+            int playerCount = await StatisticsHelper.RecentMatches();
 
             semaphore.Release();
             Assert.Equal(oldPlayerCount + 1, playerCount);

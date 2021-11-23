@@ -29,7 +29,7 @@ namespace LBPUnion.ProjectLighthouse
             Logger.AddLogger(new LighthouseFileLogger());
 
             Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
-            Logger.Log($"Running {ServerStatics.ServerName} {GitVersionHelper.CommitHash}@{GitVersionHelper.Branch}", LoggerLevelStartup.Instance);
+            Logger.Log($"Running {GitVersionHelper.FullVersion}", LoggerLevelStartup.Instance);
 
             // This loads the config, see ServerSettings.cs for more information
             Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);
@@ -52,6 +52,17 @@ namespace LBPUnion.ProjectLighthouse
                 #pragma warning restore CS4014
                 if (ServerSettings.Instance.InfluxLoggingEnabled) Logger.AddLogger(new InfluxLogger());
             }
+
+            #if DEBUG
+            Logger.Log
+            (
+                "This is a debug build, so performance may suffer! " +
+                "If you are running Lighthouse in a production environment, " +
+                "it is highly recommended to run a release build. ",
+                LoggerLevelStartup.Instance
+            );
+            Logger.Log("You can do so by running any dotnet command with the flag: \"-c Release\". ", LoggerLevelStartup.Instance);
+            #endif
 
             stopwatch.Stop();
             Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
@@ -77,6 +88,7 @@ namespace LBPUnion.ProjectLighthouse
                     webBuilder =>
                     {
                         webBuilder.UseStartup<Startup>();
+                        webBuilder.UseWebRoot("StaticFiles");
                     }
                 )
                 .ConfigureLogging

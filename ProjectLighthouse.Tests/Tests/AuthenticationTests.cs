@@ -49,11 +49,10 @@ namespace LBPUnion.ProjectLighthouse.Tests
         {
             LoginResult loginResult = await this.Authenticate();
 
-            HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/announce", loginResult.AuthTicket);
+            HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/enterLevel/1", loginResult.AuthTicket);
             string responseContent = await response.Content.ReadAsStringAsync();
 
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.Contains("You are now logged in", responseContent);
+            Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
         }
 
         [DatabaseFact]

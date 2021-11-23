@@ -1,0 +1,25 @@
+@page "/"
+@model LBPUnion.ProjectLighthouse.Pages.LandingPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+<h1>Welcome to <b>Project Lighthouse</b>!</h1>
+
+@if (Model.User != null)
+{
+    <p>You are currently logged in as <b>@Model.User.Username</b>.</p>
+}
+
+@if (Model.PlayersOnline == 1)
+{
+    <p>There is 1 user currently online.</p>
+}
+else if (Model.PlayersOnline == 0)
+{
+    <p>There are no users online. Why not hop on?</p>
+}
+else
+{
+    <p>There are currently @Model.PlayersOnline users online.</p>
+}

@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -14,8 +15,8 @@ namespace LBPUnion.ProjectLighthouse.Tests
         {
             await using Database database = new();
 
-            User userA = await database.CreateUser("unitTestUser0");
-            User userB = await database.CreateUser("unitTestUser1");
+            User userA = await database.CreateUser("unitTestUser0", HashHelper.GenerateAuthToken());
+            User userB = await database.CreateUser("unitTestUser1", HashHelper.GenerateAuthToken());
 
             Location l = new()
             {

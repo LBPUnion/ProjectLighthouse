@@ -1,0 +1,33 @@
+@page "/login"
+@model LBPUnion.ProjectLighthouse.Pages.LoginForm
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+
+<script src="https://geraintluff.github.io/sha256/sha256.min.js"></script>
+
+<script>
+    function onSubmit(form) {
+        const password = form['password'];
+        
+        password.value = sha256(password.value);
+        
+        return true;
+    }
+</script>
+
+<h1>Log in</h1>
+<form onsubmit="return onSubmit(this)">
+    <div class="ui left labeled input">
+        <label for="text" class="ui label">Username: </label>
+        <input type="text" name="username" id="text">
+    </div><br>
+
+    <div class="ui left labeled input">
+        <label for="password" class="ui label">Password: </label>
+        <input type="password" name="password" id="password">
+    </div><br><br>
+
+    <input type="submit" value="Log in" id="submit" class="ui button"><br>
+</form>

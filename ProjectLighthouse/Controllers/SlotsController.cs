@@ -27,7 +27,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/by")]
         public async Task<IActionResult> SlotsBy([FromQuery] string u, [FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -69,10 +69,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("s/user/{id:int}")]
         public async Task<IActionResult> SUser(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -97,7 +97,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots")]
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -116,7 +116,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/mmpicks")]
         public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -136,7 +136,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/lbp2luckydip")]
         public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;

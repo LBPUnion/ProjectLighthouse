@@ -68,7 +68,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         [NotNull]
         public static ServerSettings Instance;
 
-        public const int CurrentConfigVersion = 4;
+        public const int CurrentConfigVersion = 7;
 
         [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
         public int ConfigVersion { get; set; } = CurrentConfigVersion;
@@ -87,5 +87,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public string EulaText { get; set; } = "";
 
         public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
+
+        public string ExternalUrl { get; set; } = "http://localhost:10060";
+        public string ServerDigestKey { get; set; }
+        public bool UseExternalAuth { get; set; }
     }
 }

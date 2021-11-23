@@ -1,0 +1,43 @@
+@page "/photos/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Types
+@model LBPUnion.ProjectLighthouse.Pages.PhotosPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+
+<h1>Photos</h1>
+<p>There are @Model.PhotoCount total photos!</p>
+
+@foreach (Photo photo in Model.Photos)
+{
+    <div class="ui segment">
+        <img src="/gameAssets/@photo.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
+        <br>
+
+        <p>
+            <i>
+                Taken by
+                <b>
+                    <a href="/users/@photo.Creator!.UserId">@photo.Creator.Username</a>
+                </b>
+            </i>
+        </p>
+
+        <p>
+            <b>Photo contains @photo.Subjects.Count @(photo.Subjects.Count == 1 ? "person" : "people"):</b>
+        </p>
+        @foreach (PhotoSubject subject in photo.Subjects)
+        {
+            <a href="/users/@subject.UserId">@subject.User.Username</a>
+        }
+    </div>
+}
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/photos/@(Model.PageNumber - 1)">Previous Page</a>
+}
+<a href="/photos/@(Model.PageNumber + 1)">Next Page</a>
+
+<div style="height: 100px; width: 1px;"></div> @* solves quirk with footer *@

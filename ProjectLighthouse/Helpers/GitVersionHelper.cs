@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers
 {
@@ -50,6 +51,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static string CommitHash { get; set; }
         public static string Branch { get; set; }
+        public static string FullVersion => $"{ServerStatics.ServerName} {Branch}@{CommitHash}";
         public static bool IsDirty => CommitHash.EndsWith("-dirty");
         public static bool CanCheckForUpdates { get; set; }
     }

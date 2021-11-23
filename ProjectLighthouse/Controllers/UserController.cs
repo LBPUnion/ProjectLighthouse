@@ -36,7 +36,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("user/{username}")]
         public async Task<IActionResult> GetUser(string username)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             string? user = await this.GetSerializedUser(username, token.GameVersion);
@@ -48,7 +48,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             List<string?> serializedUsers = new();
@@ -69,7 +69,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             XmlReaderSettings settings = new()
@@ -165,7 +165,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("update_my_pins")]
         public async Task<IActionResult> UpdateMyPins()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             string pinsString = await new StreamReader(this.Request.Body).ReadToEndAsync();

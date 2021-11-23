@@ -29,7 +29,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("uploadPhoto")]
         public async Task<IActionResult> UploadPhoto()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             this.Request.Body.Position = 0;
@@ -120,7 +120,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("deletePhoto/{id:int}")]
         public async Task<IActionResult> DeletePhoto(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);

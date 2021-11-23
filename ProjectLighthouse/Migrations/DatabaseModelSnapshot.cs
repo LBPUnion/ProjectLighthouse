@@ -18,6 +18,57 @@ namespace ProjectLighthouse.Migrations
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.AuthenticationAttempt", b =>
+                {
+                    b.Property<int>("AuthenticationAttemptId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameTokenId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Platform")
+                        .HasColumnType("int");
+
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AuthenticationAttemptId");
+
+                    b.HasIndex("GameTokenId");
+
+                    b.ToTable("AuthenticationAttempts");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
+                {
+                    b.Property<int>("TokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Approved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("GameVersion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserLocation")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserToken")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TokenId");
+
+                    b.ToTable("GameTokens");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
                 {
                     b.Property<int>("HeartedProfileId")
@@ -473,29 +524,6 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Scores");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Token", b =>
-                {
-                    b.Property<int>("TokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("GameVersion")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserLocation")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserToken")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("TokenId");
-
-                    b.ToTable("Tokens");
-                });
-
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -514,6 +542,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Pins")
                         .HasColumnType("longtext");
 
@@ -528,6 +559,34 @@ namespace ProjectLighthouse.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.WebToken", b =>
+                {
+                    b.Property<int>("TokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserToken")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TokenId");
+
+                    b.ToTable("WebTokens");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.AuthenticationAttempt", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.GameToken", "GameToken")
+                        .WithMany()
+                        .HasForeignKey("GameTokenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GameToken");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>

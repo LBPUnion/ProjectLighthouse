@@ -26,7 +26,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("npdata")]
         public async Task<IActionResult> NPData()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             this.Request.Body.Position = 0;
@@ -69,13 +69,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("myFriends")]
         public async Task<IActionResult> MyFriends()
         {
-            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
-            Token token = userAndToken.Value.Item2;
+            GameToken gameToken = userAndToken.Value.Item2;
 
             if (!FriendHelper.FriendIdsByUserId.TryGetValue(user.UserId, out int[]? friendIds) || friendIds == null)
             {
@@ -88,7 +88,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 User? friend = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == friendId);
                 if (friend == null) continue;
 
-                friends += friend.Serialize(token.GameVersion);
+                friends += friend.Serialize(gameToken.GameVersion);
             }
 
             return this.Ok(LbpSerializer.StringElement("myFriends", friends));

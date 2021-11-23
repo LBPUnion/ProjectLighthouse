@@ -29,7 +29,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/lolcatftw/{username}")]
         public async Task<IActionResult> GetLevelQueue(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -56,7 +56,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("lolcatftw/add/user/{id:int}")]
         public async Task<IActionResult> AddQueuedLevel(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
@@ -79,7 +79,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("lolcatftw/remove/user/{id:int}")]
         public async Task<IActionResult> RemoveQueuedLevel(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
@@ -93,7 +93,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("lolcatftw/clear")]
         public async Task<IActionResult> ClearQueuedLevels()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             this.database.QueuedLevels.RemoveRange(this.database.QueuedLevels.Where(q => q.UserId == user.UserId));
@@ -110,7 +110,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("favouriteSlots/{username}")]
         public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -137,7 +137,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("favourite/slot/user/{id:int}")]
         public async Task<IActionResult> AddFavouriteSlot(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
@@ -160,7 +160,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("unfavourite/slot/user/{id:int}")]
         public async Task<IActionResult> RemoveFavouriteSlot(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
@@ -180,7 +180,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("favouriteUsers/{username}")]
         public async Task<IActionResult> GetFavouriteUsers(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include
@@ -204,7 +204,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("favourite/user/{username}")]
         public async Task<IActionResult> AddFavouriteUser(string username)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -231,7 +231,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("unfavourite/user/{username}")]
         public async Task<IActionResult> RemoveFavouriteUser(string username)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
