@@ -95,6 +95,8 @@ namespace LBPUnion.ProjectLighthouse.Types
             }
         }
 
+        public bool IsAdmin { get; set; } = false;
+
         public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
             string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +

@@ -37,7 +37,7 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<User> CreateUser(string username, string password)
         {
-            if (!password.StartsWith("$2a")) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
+            if (!password.StartsWith("$")) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
 
             User user;
             if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;
