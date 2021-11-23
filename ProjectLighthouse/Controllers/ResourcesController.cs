@@ -70,7 +70,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 return this.UnprocessableEntity();
             }
 
-            string calculatedHash = HashHelper.Sha1Hash(file.Data);
+            string calculatedHash = HashHelper.Sha1Hash(file.Data).ToLower();
             if (calculatedHash != hash)
             {
                 Logger.Log
