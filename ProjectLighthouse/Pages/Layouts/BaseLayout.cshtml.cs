@@ -31,5 +31,8 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
             new PageNavigationItem("Photos", "/photos/0", "camera"),
         };
 
+        public readonly List<PageNavigationItem> NavigationItemsRight = new()
+            {};
+
     }
 }

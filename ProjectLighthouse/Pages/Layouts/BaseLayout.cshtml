@@ -6,8 +6,8 @@
 @{
     if (Model!.User == null)
     {
-        Model.NavigationItems.Add(new PageNavigationItem("Log in", "/login", "user alternate"));
-        Model.NavigationItems.Add(new PageNavigationItem("Register", "/register", "user alternate edit"));
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Log in", "/login", "user alternate"));
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Register", "/register", "user alternate edit"));
     }
     else
     {
@@ -15,7 +15,8 @@
         {
             Model.NavigationItems.Add(new PageNavigationItem("Authentication", "/authentication", "key"));
         }
-        Model.NavigationItems.Add(new PageNavigationItem("Log out", "/logout", "user alternate slash")); // should always be last
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Profile", "/user/" + Model.User.UserId, "user alternate"));
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Log out", "/logout", "user alternate slash")); // should always be last
     }
 }
 
@@ -40,6 +41,18 @@
                     @navigationItem.Name
                 </a>
             }
+            <div class="right menu">
+                @foreach (PageNavigationItem navigationItem in Model!.NavigationItemsRight)
+                {
+                    <a class="item" href="@navigationItem.Url">
+                        @if (navigationItem.Icon != null)
+                        {
+                            <i class="@navigationItem.Icon icon"></i>
+                        }
+                        @navigationItem.Name
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </header>
