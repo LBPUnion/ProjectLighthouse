@@ -19,11 +19,16 @@ namespace LBPUnion.ProjectLighthouse.Pages
 
         public List<Photo> Photos;
 
-        public async Task<IActionResult> OnGet()
+        public int PageNumber;
+
+        public async Task<IActionResult> OnGet([FromRoute] int pageNumber)
         {
+            const int pageSize = 20;
             this.PhotoCount = await StatisticsHelper.PhotoCount();
 
-            this.Photos = await this.Database.Photos.Include(p => p.Creator).Take(20).ToListAsync();
+            this.PageNumber = pageNumber;
+
+            this.Photos = await this.Database.Photos.Include(p => p.Creator).Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
 
             return this.Page();
         }

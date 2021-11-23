@@ -1,4 +1,4 @@
-@page "/photos"
+@page "/photos/{pageNumber:int}"
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Pages.PhotosPage
 
@@ -12,7 +12,8 @@
 @foreach (Photo photo in Model.Photos)
 {
     <div class="ui segment">
-        <img src="/gameAssets/@photo.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;"><br>
+        <img src="/gameAssets/@photo.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
+        <br>
 
         <p>
             <i>
@@ -32,3 +33,11 @@
         }
     </div>
 }
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/photos/@(Model.PageNumber - 1)">Previous Page</a>
+}
+<a href="/photos/@(Model.PageNumber + 1)">Next Page</a>
+
+<div style="height: 100px; width: 1px;"></div> @* solves quirk with footer *@
