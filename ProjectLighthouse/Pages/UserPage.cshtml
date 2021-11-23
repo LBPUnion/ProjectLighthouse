@@ -1,0 +1,47 @@
+@page "/user/{userId:int}"
+@using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Settings
+@model LBPUnion.ProjectLighthouse.Pages.UserPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+
+<h1>@Model.ProfileUser!.Username's user page</h1>
+
+<div>
+    <i class="pink heart icon" title="Hearts"></i> @Model.ProfileUser.Hearts
+    <i class="blue comment icon" title="Comments"></i> @Model.ProfileUser.Comments
+    <i class="green upload icon" title="Uploaded Levels"></i>@Model.ProfileUser.UsedSlots / @ServerStatics.EntitledSlots
+    <i class="purple camera icon" title="Uploaded Photos"></i>@Model.ProfileUser.PhotosByMe
+</div>
+
+<div class="ui blue segment">
+    <h2>Biography</h2>
+    <p>@Model.ProfileUser.Biography</p>
+</div>
+
+@if (Model.Photos != null && Model.Photos.Count != 0)
+{
+    <div class="ui purple segment">
+        <h2>Most recent photos</h2>
+
+        <div class="ui center aligned grid">
+            @foreach (Photo photo in Model.Photos)
+            {
+                <div class="eight wide column">
+                    <img src="/gameAssets/@photo.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
+                    <br>
+
+                    <p>
+                        <b>Photo contains @photo.Subjects.Count @(photo.Subjects.Count == 1 ? "person" : "people"):</b>
+                    </p>
+                    @foreach (PhotoSubject subject in photo.Subjects)
+                    {
+                        <a href="/user/@subject.UserId">@subject.User.Username</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
