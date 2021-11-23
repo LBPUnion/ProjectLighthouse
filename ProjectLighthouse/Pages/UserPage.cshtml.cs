@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,10 @@ namespace LBPUnion.ProjectLighthouse.Pages
         {}
 
         public User? ProfileUser;
+
         public List<Photo>? Photos;
+        public List<Comment>? Comments;
+
         public bool IsProfileUserHearted;
 
         public async Task<IActionResult> OnGet([FromRoute] int userId)
@@ -24,6 +28,13 @@ namespace LBPUnion.ProjectLighthouse.Pages
             if (this.ProfileUser == null) return this.NotFound();
 
             this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(5).ToListAsync();
+            this.Comments = await this.Database.Comments.Include
+                    (p => p.Poster)
+                .Include(p => p.Target)
+                .OrderByDescending(p => p.Timestamp)
+                .Where(p => p.TargetUserId == userId)
+                .Take(50)
+                .ToListAsync();
 
             if (this.User != null)
             {

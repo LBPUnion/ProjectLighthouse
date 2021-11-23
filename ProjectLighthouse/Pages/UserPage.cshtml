@@ -1,5 +1,6 @@
 @page "/user/{userId:int}"
 @using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Profiles
 @using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.UserPage
 
@@ -75,5 +76,24 @@
                 </div>
             }
         </div>
+    </div>
+}
+
+@if (Model.ProfileUser.Comments > 0)
+{
+    <div class="ui yellow segment">
+        <h1>Comments</h1>
+        @foreach (Comment comment in Model.Comments!)
+        {
+            DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
+            <div>
+                <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
+                <span>@comment.Message</span>
+                <p>
+                    <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
+                </p>
+                <div class="ui divider"></div>
+            </div>
+        }
     </div>
 }
