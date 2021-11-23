@@ -210,20 +210,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
-                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
-            if (heartedProfile != null) return this.Ok();
-
-            this.database.HeartedProfiles.Add
-            (
-                new HeartedProfile
-                {
-                    HeartedUserId = heartedUser.UserId,
-                    UserId = user.UserId,
-                }
-            );
-
-            await this.database.SaveChangesAsync();
+            await this.database.HeartUser(user, heartedUser);
 
             return this.Ok();
         }
@@ -237,11 +224,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
-                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
-            if (heartedProfile != null) this.database.HeartedProfiles.Remove(heartedProfile);
-
-            await this.database.SaveChangesAsync();
+            await this.database.UnheartUser(user, heartedUser);
 
             return this.Ok();
         }

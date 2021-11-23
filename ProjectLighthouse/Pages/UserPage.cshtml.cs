@@ -16,6 +16,7 @@ namespace LBPUnion.ProjectLighthouse.Pages
 
         public User? ProfileUser;
         public List<Photo>? Photos;
+        public bool IsProfileUserHearted;
 
         public async Task<IActionResult> OnGet([FromRoute] int userId)
         {
@@ -23,6 +24,14 @@ namespace LBPUnion.ProjectLighthouse.Pages
             if (this.ProfileUser == null) return this.NotFound();
 
             this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(5).ToListAsync();
+
+            if (this.User != null)
+            {
+
+                this.IsProfileUserHearted = (await this.Database.HeartedProfiles.FirstOrDefaultAsync
+                                                (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId)) !=
+                                            null;
+            }
 
             return this.Page();
         }

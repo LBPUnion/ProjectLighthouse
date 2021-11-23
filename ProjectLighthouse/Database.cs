@@ -87,6 +87,37 @@ namespace LBPUnion.ProjectLighthouse
             return gameToken;
         }
 
+        #region Hearts & Queues
+
+        public async Task HeartUser(User user, User heartedUser)
+        {
+            HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync
+                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+            if (heartedProfile != null) return;
+
+            this.HeartedProfiles.Add
+            (
+                new HeartedProfile
+                {
+                    HeartedUserId = heartedUser.UserId,
+                    UserId = user.UserId,
+                }
+            );
+
+            await this.SaveChangesAsync();
+        }
+
+        public async Task UnheartUser(User user, User heartedUser)
+        {
+            HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync
+                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+            if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
+
+            await this.SaveChangesAsync();
+        }
+
+        #endregion
+
         #region Game Token Shenanigans
 
         public async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)

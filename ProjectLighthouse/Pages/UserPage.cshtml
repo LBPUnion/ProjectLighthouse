@@ -7,19 +7,51 @@
     Layout = "Layouts/BaseLayout";
 }
 
-<h1>@Model.ProfileUser!.Username's user page</h1>
+<div class="ui grid">
+    <div class="eight wide column">
+        <h1>@Model.ProfileUser!.Username's user page</h1>
 
-<div class="userStats">
-    <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
-    <i class="blue comment icon" title="Comments"></i> <span>@Model.ProfileUser.Comments</span>
-    <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.ProfileUser.UsedSlots / @ServerStatics.EntitledSlots</span>
-    <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.ProfileUser.PhotosByMe</span>
+        <div class="userStats">
+            <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@Model.ProfileUser.Comments</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.ProfileUser.UsedSlots / @ServerStatics.EntitledSlots</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.ProfileUser.PhotosByMe</span>
+        </div>
+    </div>
+    <div class="eight wide right aligned column">
+        <br>
+        @if (Model.ProfileUser != Model.User && Model.User != null)
+        {
+            if (!Model.IsProfileUserHearted)
+            {
+                <a class="ui pink button" href="/user/@Model.ProfileUser.UserId/heart">
+                    <i class="heart icon"></i>
+                    <span>Heart</span>
+                </a>
+            }
+            else
+            {
+                <a class="ui pink button" href="/user/@Model.ProfileUser.UserId/unheart">
+                    <i class="heart broken icon"></i>
+                    <span>Unheart</span>
+                </a>
+            }
+        }
+    </div>
+    <div class="eight wide column">
+        <div class="ui blue segment">
+            <h2>Biography</h2>
+            <p>@Model.ProfileUser.Biography</p>
+        </div>
+    </div>
+    <div class="eight wide column">
+        <div class="ui red segment">
+            <h2>Recent Activity</h2>
+            <p>Coming soon!</p>
+        </div>
+    </div>
 </div>
 
-<div class="ui blue segment">
-    <h2>Biography</h2>
-    <p>@Model.ProfileUser.Biography</p>
-</div>
 
 @if (Model.Photos != null && Model.Photos.Count != 0)
 {
