@@ -1,8 +1,11 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Files;
 
 namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
 {
@@ -17,22 +20,49 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
         {
             foreach (Photo photo in this.database.Photos)
             {
-                bool hashNullOrEmpty = string.IsNullOrEmpty
-                                           (photo.LargeHash) ||
-                                       string.IsNullOrEmpty(photo.MediumHash) ||
-                                       string.IsNullOrEmpty(photo.SmallHash) ||
-                                       string.IsNullOrEmpty(photo.PlanHash);
+                bool hashNullOrEmpty = false;
+                bool noHashesExist = false;
+                bool largeHashIsInvalidFile = false;
 
-                bool allHashesDontExist = FileHelper.ResourcesNotUploaded(photo.LargeHash, photo.MediumHash, photo.SmallHash, photo.PlanHash).Length != 0;
+                hashNullOrEmpty = string.IsNullOrEmpty
+                                      (photo.LargeHash) ||
+                                  string.IsNullOrEmpty(photo.MediumHash) ||
+                                  string.IsNullOrEmpty(photo.SmallHash) ||
+                                  string.IsNullOrEmpty(photo.PlanHash);
+                if (hashNullOrEmpty) goto removePhoto;
 
-                if (hashNullOrEmpty || allHashesDontExist)
+                List<string> hashes = new()
                 {
-                    Console.WriteLine
-                    (
-                        $"Removing photo (id: {photo.PhotoId}): {nameof(hashNullOrEmpty)}: {hashNullOrEmpty}, {nameof(allHashesDontExist)}: {allHashesDontExist}"
-                    );
-                    this.database.Photos.Remove(photo);
+                    photo.LargeHash,
+                    photo.MediumHash,
+                    photo.SmallHash,
+                    photo.PlanHash,
+                };
+
+                noHashesExist = FileHelper.ResourcesNotUploaded(hashes.ToArray()).Length != 0;
+                if (noHashesExist) goto removePhoto;
+
+                LbpFile? file = LbpFile.FromHash(photo.LargeHash);
+//                Console.WriteLine(file.FileType, );
+                if (file == null || file.FileType != LbpFileType.Jpeg && file.FileType != LbpFileType.Png)
+                {
+                    largeHashIsInvalidFile = true;
+                    goto removePhoto;
                 }
+
+                continue;
+
+                removePhoto:
+
+                Console.WriteLine
+                (
+                    $"Removing photo (id: {photo.PhotoId}): " +
+                    $"{nameof(hashNullOrEmpty)}: {hashNullOrEmpty}, " +
+                    $"{nameof(noHashesExist)}: {noHashesExist}, " +
+                    $"{nameof(largeHashIsInvalidFile)}: {largeHashIsInvalidFile}"
+                );
+
+                this.database.Photos.Remove(photo);
             }
 
             await this.database.SaveChangesAsync();
