@@ -31,7 +31,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         public int Comments {
             get {
                 using Database database = new();
-                return database.Comments.Count(c => c.PosterUserId == this.UserId);
+                return database.Comments.Count(c => c.TargetUserId == this.UserId);
             }
         }
 
