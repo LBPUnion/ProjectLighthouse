@@ -12,6 +12,8 @@ namespace LBPUnion.ProjectLighthouse.CommandLine
 
         public string FirstAlias => this.Aliases()[0];
 
+        public string Arguments();
+
         public int RequiredArgs();
     }
 }

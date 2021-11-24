@@ -16,6 +16,7 @@ namespace LBPUnion.ProjectLighthouse.CommandLine
             {
                 "setPassword", "resetPassword", "passwd", "password",
             };
+        public string Arguments() => "<username/userId> <sha256/plaintext>";
         public int RequiredArgs() => 2;
 
         public async Task Run(string[] args)

@@ -16,6 +16,7 @@ namespace LBPUnion.ProjectLighthouse.CommandLine
             {
                 "makeAdmin",
             };
+        public string Arguments() => "<username/userId>";
         public int RequiredArgs() => 1;
 
         public async Task Run(string[] args)

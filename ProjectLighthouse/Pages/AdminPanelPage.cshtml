@@ -16,10 +16,13 @@
                 <h3>@command.Name()</h3>
                 <form>
                     <div class="ui input" style="width: 100%;">
-                        <input type="text" name="args" placeholder="Arguments">
+                        <input type="text" name="args" placeholder="@command.Arguments()">
                     </div><br><br>
                     <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
-                    <input type="submit" value="Execute Command" class="ui green button" style="width: 100%;">
+                    <button type="submit" class="ui green button" style="width: 100%;">
+                        <i class="play icon"></i>
+                        Execute
+                    </button>
                 </form>
             </div>
         </div>
