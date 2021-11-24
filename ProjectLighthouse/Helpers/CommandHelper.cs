@@ -9,11 +9,11 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 {
     public static class CommandHelper
     {
-        private static List<ICommand> commands;
+        public static List<ICommand> Commands { get; }
 
         static CommandHelper()
         {
-            commands = Assembly.GetExecutingAssembly()
+            Commands = Assembly.GetExecutingAssembly()
                 .GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(ICommand)) && t.GetConstructor(Type.EmptyTypes) != null)
                 .Select(t => Activator.CreateInstance(t) as ICommand)
@@ -34,7 +34,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             string baseCmd = args[0];
             args = args.Skip(1).ToArray();
 
-            IEnumerable<ICommand> suitableCommands = commands.Where
+            IEnumerable<ICommand> suitableCommands = Commands.Where
                     (command => command.Aliases().Any(a => a.ToLower() == baseCmd.ToLower()))
                 .Where(command => args.Length >= command.RequiredArgs());
             foreach (ICommand command in suitableCommands)

@@ -1,0 +1,27 @@
+@page "/admin"
+@using LBPUnion.ProjectLighthouse.CommandLine
+@model LBPUnion.ProjectLighthouse.Pages.AdminPanelPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+
+<h1>Admin Panel</h1>
+
+<div class="ui grid">
+    @foreach (ICommand command in Model!.Commands)
+    {
+        <div class="four wide column">
+            <div class="ui black segment">
+                <h3>@command.Name()</h3>
+                <form>
+                    <div class="ui input" style="width: 100%;">
+                        <input type="text" name="args" placeholder="Arguments">
+                    </div><br><br>
+                    <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
+                    <input type="submit" value="Execute Command" class="ui green button" style="width: 100%;">
+                </form>
+            </div>
+        </div>
+    }
+</div>
