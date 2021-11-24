@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace LBPUnion.ProjectLighthouse.CommandLine
+namespace LBPUnion.ProjectLighthouse.Maintenance
 {
     public interface ICommand
     {

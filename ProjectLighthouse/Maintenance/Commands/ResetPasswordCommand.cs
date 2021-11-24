@@ -1,23 +1,25 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.CommandLine
+namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
 {
-    public class MakeUserAdminCommand : ICommand
+    [UsedImplicitly]
+    public class ResetPasswordCommand : ICommand
     {
         private readonly Database database = new();
-
-        public string Name() => "Make User Admin";
+        public string Name() => "Reset Password";
         public string[] Aliases()
             => new[]
             {
-                "makeAdmin",
+                "setPassword", "resetPassword", "passwd", "password",
             };
-        public string Arguments() => "<username/userId>";
-        public int RequiredArgs() => 1;
+        public string Arguments() => "<username/userId> <sha256/plaintext>";
+        public int RequiredArgs() => 2;
 
         public async Task Run(string[] args)
         {
@@ -35,11 +37,14 @@ namespace LBPUnion.ProjectLighthouse.CommandLine
                     return;
                 }
             }
+            string password = args[1];
+            if (password.Length != 64) password = HashHelper.Sha256Hash(password);
 
-            user.IsAdmin = true;
+            user.Password = HashHelper.BCryptHash(password);
+
             await this.database.SaveChangesAsync();
 
-            Console.WriteLine($"The user {user.Username} (id: {user.UserId}) is now an admin.");
+            Console.WriteLine($"The password for user {user.Username} (id: {user.UserId}) has been reset.");
         }
     }
 }

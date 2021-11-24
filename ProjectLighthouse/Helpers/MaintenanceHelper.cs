@@ -1,23 +1,32 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.CommandLine;
+using LBPUnion.ProjectLighthouse.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Helpers
 {
-    public static class CommandHelper
+    public static class MaintenanceHelper
     {
         public static List<ICommand> Commands { get; }
 
-        static CommandHelper()
+        public static List<IMaintenanceJob> MaintenanceJobs { get; }
+
+        private static List<T> getListOfInterfaceObjects<T>() where T : class
         {
-            Commands = Assembly.GetExecutingAssembly()
+            return Assembly.GetExecutingAssembly()
                 .GetTypes()
-                .Where(t => t.GetInterfaces().Contains(typeof(ICommand)) && t.GetConstructor(Type.EmptyTypes) != null)
-                .Select(t => Activator.CreateInstance(t) as ICommand)
-                .ToList();
+                .Where(t => t.GetInterfaces().Contains(typeof(T)) && t.GetConstructor(Type.EmptyTypes) != null)
+                .Select(t => Activator.CreateInstance(t) as T)
+                .ToList()!;
+        }
+
+        static MaintenanceHelper()
+        {
+            Commands = getListOfInterfaceObjects<ICommand>();
+            MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
         }
 
         public static async Task RunCommand(string[] args)
@@ -45,6 +54,19 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             }
 
             Console.WriteLine("Command not found.");
+        }
+
+        public static async Task RunMaintenanceJob(string jobName)
+        {
+            IMaintenanceJob? job = MaintenanceJobs.FirstOrDefault(j => j.GetType().Name == jobName);
+            if (job == null) throw new ArgumentNullException();
+
+            await RunMaintenanceJob(job);
+        }
+
+        public static async Task RunMaintenanceJob(IMaintenanceJob job)
+        {
+            await job.Run();
         }
     }
 }

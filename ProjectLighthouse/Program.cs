@@ -65,7 +65,7 @@ namespace LBPUnion.ProjectLighthouse
 
             if (args.Length != 0)
             {
-                CommandHelper.RunCommand(args).Wait();
+                MaintenanceHelper.RunCommand(args).Wait();
                 return;
             }
 

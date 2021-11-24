@@ -7,7 +7,7 @@ using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Controllers.ExternalAuth
+namespace LBPUnion.ProjectLighthouse.Controllers.Website.ExternalAuth
 {
     [ApiController]
     [Route("/authentication")]
