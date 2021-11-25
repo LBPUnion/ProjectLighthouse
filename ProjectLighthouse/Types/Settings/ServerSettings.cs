@@ -63,12 +63,12 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
             }
         }
 
+        public const int CurrentConfigVersion = 8; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+
         #region Meta
 
         [NotNull]
         public static ServerSettings Instance;
-
-        public const int CurrentConfigVersion = 7;
 
         [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
         public int ConfigVersion { get; set; } = CurrentConfigVersion;
@@ -91,5 +91,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public string ExternalUrl { get; set; } = "http://localhost:10060";
         public string ServerDigestKey { get; set; }
         public bool UseExternalAuth { get; set; }
+
+        public bool CheckForUnsafeFiles { get; set; } = true;
     }
 }
