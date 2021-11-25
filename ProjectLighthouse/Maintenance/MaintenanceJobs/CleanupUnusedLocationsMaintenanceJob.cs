@@ -23,7 +23,7 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
 
             foreach (Location location in locationsToRemove)
             {
-                Console.WriteLine("Removing location" + location.Id);
+                Console.WriteLine("Removing location " + location.Id);
                 this.database.Locations.Remove(location);
             }
 
