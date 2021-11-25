@@ -11,7 +11,9 @@
 <div class="ui grid">
     <div class="eight wide column">
         <h1>@Model.ProfileUser!.Username's user page</h1>
-
+        <p>
+            <i>@Model.ProfileUser.Status</i>
+        </p>
         <div class="userStats">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
             <i class="blue comment icon" title="Comments"></i> <span>@Model.ProfileUser.Comments</span>

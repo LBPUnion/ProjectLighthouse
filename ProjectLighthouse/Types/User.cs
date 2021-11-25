@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -96,6 +97,22 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
 
         public bool IsAdmin { get; set; } = false;
+
+        #nullable enable
+        [NotMapped]
+        public string Status {
+            get {
+                using Database database = new();
+                LastMatch? lastMatch = database.LastMatches.Where
+                        (l => l.UserId == this.UserId)
+                    .FirstOrDefault(l => TimestampHelper.Timestamp - l.Timestamp < 300);
+
+                if (lastMatch == null) return "Offline";
+
+                return "Currently online on " + lastMatch.GameVersion.ToPrettyString();
+            }
+        }
+        #nullable disable
 
         public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {

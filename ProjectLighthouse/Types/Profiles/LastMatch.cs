@@ -8,5 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Profiles
         public int UserId { get; set; }
 
         public long Timestamp { get; set; }
+
+        public GameVersion GameVersion { get; set; } = GameVersion.Unknown;
     }
 }
