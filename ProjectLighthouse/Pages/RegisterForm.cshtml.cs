@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,8 @@ namespace LBPUnion.ProjectLighthouse.Pages
         [SuppressMessage("ReSharper", "SpecifyStringComparison")]
         public async Task<IActionResult> OnGet([FromQuery] string username, [FromQuery] string password, [FromQuery] string confirmPassword)
         {
+            if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
+
             this.WasRegisterRequest = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(confirmPassword);
 
             if (this.WasRegisterRequest)

@@ -63,7 +63,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
             }
         }
 
-        public const int CurrentConfigVersion = 8; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+        public const int CurrentConfigVersion = 9; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
 
         #region Meta
 
@@ -93,5 +93,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public bool UseExternalAuth { get; set; }
 
         public bool CheckForUnsafeFiles { get; set; } = true;
+
+        public bool RegistrationEnabled { get; set; } = true;
     }
 }
