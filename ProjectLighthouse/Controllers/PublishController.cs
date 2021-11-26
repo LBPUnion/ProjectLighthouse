@@ -93,8 +93,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 slot.CreatorId = oldSlot.CreatorId;
                 slot.LocationId = oldSlot.LocationId;
                 slot.SlotId = oldSlot.SlotId;
+
                 slot.FirstUploaded = oldSlot.FirstUploaded;
                 slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
+
+                slot.TeamPick = oldSlot.TeamPick;
+
                 slot.GameVersion = gameToken.GameVersion;
 
                 this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
