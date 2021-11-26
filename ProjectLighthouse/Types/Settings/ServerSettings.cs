@@ -63,7 +63,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
             }
         }
 
-        public const int CurrentConfigVersion = 9; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+        public const int CurrentConfigVersion = 10; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
 
         #region Meta
 
@@ -95,5 +95,12 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public bool CheckForUnsafeFiles { get; set; } = true;
 
         public bool RegistrationEnabled { get; set; } = true;
+
+        /// <summary>
+        ///     The maximum amount of slots allowed on users' earth
+        /// </summary>
+        public int EntitledSlots { get; set; } = 50;
+
+        public int ListsQuota { get; set; } = 50;
     }
 }

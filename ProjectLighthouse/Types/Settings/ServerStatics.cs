@@ -8,13 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
 {
     public static class ServerStatics
     {
-        /// <summary>
-        ///     The maximum amount of slots allowed on users' earth
-        /// </summary>
-        public const int EntitledSlots = 50;
-
-        public const int ListsQuota = 50;
-
         public const string ServerName = "ProjectLighthouse";
 
         public static bool DbConnected {

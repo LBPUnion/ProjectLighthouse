@@ -41,7 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     .Include(s => s.Location)
                     .Where(s => s.Creator!.Username == user.Username)
                     .Skip(pageStart - 1)
-                    .Take(Math.Min(pageSize, ServerStatics.EntitledSlots)),
+                    .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
                 string.Empty,
                 (current, slot) => current + slot.Serialize()
             );
@@ -55,7 +55,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     new Dictionary<string, object>
                     {
                         {
-                            "hint_start", pageStart + Math.Min(pageSize, ServerStatics.EntitledSlots)
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
                         },
                         {
                             "total", user.UsedSlots
