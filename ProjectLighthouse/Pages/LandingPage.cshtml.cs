@@ -22,6 +22,9 @@ namespace LBPUnion.ProjectLighthouse.Pages
         [UsedImplicitly]
         public async Task<IActionResult> OnGet()
         {
+            User? user = this.Database.UserFromWebRequest(this.Request);
+            if (user != null && user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
+
             this.PlayersOnlineCount = await StatisticsHelper.RecentMatches();
 
             List<int> userIds = await this.Database.LastMatches.Where(l => TimestampHelper.Timestamp - l.Timestamp < 300).Select(l => l.UserId).ToListAsync();

@@ -41,6 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
             if (password.Length != 64) password = HashHelper.Sha256Hash(password);
 
             user.Password = HashHelper.BCryptHash(password);
+            user.PasswordResetRequired = true;
 
             await this.database.SaveChangesAsync();
 

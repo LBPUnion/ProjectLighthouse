@@ -98,6 +98,8 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public bool IsAdmin { get; set; } = false;
 
+        public bool PasswordResetRequired { get; set; }
+
         #nullable enable
         [NotMapped]
         public string Status {

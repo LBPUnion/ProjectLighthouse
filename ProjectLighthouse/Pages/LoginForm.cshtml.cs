@@ -39,6 +39,8 @@ namespace LBPUnion.ProjectLighthouse.Pages
 
                 this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
 
+                if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
+
                 return this.RedirectToPage(nameof(LandingPage));
             }
 
