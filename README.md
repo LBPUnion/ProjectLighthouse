@@ -80,11 +80,11 @@ Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNEC
 
 ## Compatibility across games and platforms
 
-| Game     | Console (PS3/Vita)                  | Emulator (RPCS3)                               | Next-Gen (PS4/PS5) |
-|----------|-------------------------------------|------------------------------------------------|--------------------|
-| LBP1     | Compatible                          | Incompatible, crashes on entering pod computer | N/A                |
-| LBP2     | Compatible                          | Compatible with patched RPCS3                  | N/A                |
-| LBP3     | Somewhat compatible                 | Somewhat compatible with workaround            | Incompatible       |
-| LBP Vita | Compatible                          | N/A                                            | N/A                |
+| Game     | Console (PS3/Vita)                    | Emulator (RPCS3/Vita3k)                                  | Next-Gen (PS4/PS5) |
+|----------|---------------------------------------|----------------------------------------------------------|--------------------|
+| LBP1     | Compatible                            | Incompatible, crashes on entering pod computer           | N/A                |
+| LBP2     | Compatible                            | Compatible with patched RPCS3                            | N/A                |
+| LBP3     | Somewhat compatible, frequent crashes | Somewhat compatible with patched RPCS3, frequent crashes | Incompatible       |
+| LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k             | N/A                |
 
-Project Lighthouse is still a heavy work in progress, so this is subject to change at any point.
+Project Lighthouse is still a heavy work in progress, so this chart is subject to change at any point.
