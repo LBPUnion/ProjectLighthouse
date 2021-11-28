@@ -40,6 +40,13 @@
                 </a>
             }
         }
+        @if (Model.ProfileUser == Model.User)
+        {
+            <a class="ui blue button" href="/passwordReset">
+                <i class="key icon"></i>
+                <span>Reset Password</span>
+            </a>
+        }
     </div>
     <div class="eight wide column">
         <div class="ui blue segment">
