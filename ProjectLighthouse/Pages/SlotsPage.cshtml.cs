@@ -4,33 +4,33 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Pages
 {
-    public class PhotosPage : BaseLayout
+    public class SlotsPage : BaseLayout
     {
-        public PhotosPage([NotNull] Database database) : base(database)
+        public SlotsPage([NotNull] Database database) : base(database)
         {}
 
-        public int PhotoCount;
+        public int SlotCount;
 
-        public List<Photo> Photos;
+        public List<Slot> Slots;
 
         public int PageNumber;
 
         public async Task<IActionResult> OnGet([FromRoute] int pageNumber)
         {
-            this.PhotoCount = await StatisticsHelper.PhotoCount();
+            this.SlotCount = await StatisticsHelper.SlotCount();
 
             this.PageNumber = pageNumber;
 
-            this.Photos = await this.Database.Photos.Include
+            this.Slots = await this.Database.Slots.Include
                     (p => p.Creator)
-                .OrderByDescending(p => p.Timestamp)
+                .OrderByDescending(p => p.FirstUploaded)
                 .Skip(pageNumber * ServerStatics.PageSize)
                 .Take(ServerStatics.PageSize)
                 .ToListAsync();

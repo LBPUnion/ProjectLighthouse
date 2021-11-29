@@ -75,7 +75,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameToken gameToken = userAndToken.Value.Item2;
 
             Slot? slot = await this.GetSlotFromBody();
-            if (slot == null || slot.Location == null) return this.BadRequest();
+            if (slot?.Location == null) return this.BadRequest();
 
             // Republish logic
             if (slot.SlotId != 0)
@@ -93,8 +93,28 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 slot.CreatorId = oldSlot.CreatorId;
                 slot.LocationId = oldSlot.LocationId;
                 slot.SlotId = oldSlot.SlotId;
+
+                slot.PlaysLBP1 = oldSlot.PlaysLBP1;
+                slot.PlaysLBP1Complete = oldSlot.PlaysLBP1Complete;
+                slot.PlaysLBP1Unique = oldSlot.PlaysLBP1Unique;
+
+                slot.PlaysLBP2 = oldSlot.PlaysLBP2;
+                slot.PlaysLBP2Complete = oldSlot.PlaysLBP2Complete;
+                slot.PlaysLBP2Unique = oldSlot.PlaysLBP2Unique;
+
+                slot.PlaysLBP3 = oldSlot.PlaysLBP3;
+                slot.PlaysLBP3Complete = oldSlot.PlaysLBP3Complete;
+                slot.PlaysLBP3Unique = oldSlot.PlaysLBP3Unique;
+
+                slot.PlaysLBPVita = oldSlot.PlaysLBPVita;
+                slot.PlaysLBPVitaComplete = oldSlot.PlaysLBPVitaComplete;
+                slot.PlaysLBPVitaUnique = oldSlot.PlaysLBPVitaUnique;
+
                 slot.FirstUploaded = oldSlot.FirstUploaded;
                 slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
+
+                slot.TeamPick = oldSlot.TeamPick;
+
                 slot.GameVersion = gameToken.GameVersion;
 
                 this.database.Entry(oldSlot).CurrentValues.SetValues(slot);

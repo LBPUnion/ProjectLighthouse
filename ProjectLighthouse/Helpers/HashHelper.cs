@@ -67,7 +67,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static string Sha256Hash(string str) => Sha256Hash(Encoding.UTF8.GetBytes(str));
 
-        public static string Sha256Hash(byte[] bytes) => BitConverter.ToString(sha256.ComputeHash(bytes)).Replace("-", "");
+        public static string Sha256Hash(byte[] bytes) => BitConverter.ToString(sha256.ComputeHash(bytes)).Replace("-", "").ToLower();
 
         public static string Sha1Hash(string str) => Sha1Hash(Encoding.UTF8.GetBytes(str));
 

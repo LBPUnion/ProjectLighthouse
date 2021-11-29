@@ -1,0 +1,108 @@
+@page "/user/{userId:int}"
+@using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Profiles
+@using LBPUnion.ProjectLighthouse.Types.Settings
+@model LBPUnion.ProjectLighthouse.Pages.UserPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+
+<div class="ui grid">
+    <div class="eight wide column">
+        <h1>@Model.ProfileUser!.Username's user page</h1>
+        <p>
+            <i>@Model.ProfileUser.Status</i>
+        </p>
+        <div class="statsUnderTitle">
+            <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@Model.ProfileUser.Comments</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.ProfileUser.UsedSlots / @ServerSettings.Instance.EntitledSlots</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.ProfileUser.PhotosByMe</span>
+        </div>
+    </div>
+    <div class="eight wide right aligned column">
+        <br>
+        @if (Model.ProfileUser != Model.User && Model.User != null)
+        {
+            if (!Model.IsProfileUserHearted)
+            {
+                <a class="ui pink button" href="/user/@Model.ProfileUser.UserId/heart">
+                    <i class="heart icon"></i>
+                    <span>Heart</span>
+                </a>
+            }
+            else
+            {
+                <a class="ui pink button" href="/user/@Model.ProfileUser.UserId/unheart">
+                    <i class="heart broken icon"></i>
+                    <span>Unheart</span>
+                </a>
+            }
+        }
+        @if (Model.ProfileUser == Model.User)
+        {
+            <a class="ui blue button" href="/passwordReset">
+                <i class="key icon"></i>
+                <span>Reset Password</span>
+            </a>
+        }
+    </div>
+    <div class="eight wide column">
+        <div class="ui blue segment">
+            <h2>Biography</h2>
+            <p>@Model.ProfileUser.Biography</p>
+        </div>
+    </div>
+    <div class="eight wide column">
+        <div class="ui red segment">
+            <h2>Recent Activity</h2>
+            <p>Coming soon!</p>
+        </div>
+    </div>
+</div>
+
+
+@if (Model.Photos != null && Model.Photos.Count != 0)
+{
+    <div class="ui purple segment">
+        <h2>Most recent photos</h2>
+
+        <div class="ui center aligned grid">
+            @foreach (Photo photo in Model.Photos)
+            {
+                <div class="eight wide column">
+                    <img src="/gameAssets/@photo.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
+                    <br>
+
+                    <p>
+                        <b>Photo contains @photo.Subjects.Count @(photo.Subjects.Count == 1 ? "person" : "people"):</b>
+                    </p>
+                    @foreach (PhotoSubject subject in photo.Subjects)
+                    {
+                        <a href="/user/@subject.UserId">@subject.User.Username</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (Model.ProfileUser.Comments > 0)
+{
+    <div class="ui yellow segment">
+        <h1>Comments</h1>
+        @foreach (Comment comment in Model.Comments!)
+        {
+            DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
+            <div>
+                <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
+                <span>@comment.Message</span>
+                <p>
+                    <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
+                </p>
+                <div class="ui divider"></div>
+            </div>
+        }
+    </div>
+}

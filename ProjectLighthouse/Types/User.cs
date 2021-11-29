@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -100,13 +101,34 @@ namespace LBPUnion.ProjectLighthouse.Types
             }
         }
 
+        public bool IsAdmin { get; set; } = false;
+
+        public bool PasswordResetRequired { get; set; }
+
+        #nullable enable
+        [NotMapped]
+        public string Status {
+            get {
+                using Database database = new();
+                LastMatch? lastMatch = database.LastMatches.Where
+                        (l => l.UserId == this.UserId)
+                    .FirstOrDefault(l => TimestampHelper.Timestamp - l.Timestamp < 300);
+
+                if (lastMatch == null) return "Offline";
+
+                return "Currently online on " + lastMatch.GameVersion.ToPrettyString();
+            }
+        }
+        #nullable disable
+
         public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
             string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                           LbpSerializer.StringElement("game", this.Game) +
                           this.SerializeSlots(gameVersion == GameVersion.LittleBigPlanetVita) +
                           LbpSerializer.StringElement("lists", this.Lists) +
-                          LbpSerializer.StringElement("lists_quota", ServerStatics.ListsQuota) + // technically not a part of the user but LBP expects it
+                          LbpSerializer.StringElement
+                              ("lists_quota", ServerSettings.Instance.ListsQuota) + // technically not a part of the user but LBP expects it
                           LbpSerializer.StringElement("biography", this.Biography) +
                           LbpSerializer.StringElement("reviewCount", this.Reviews) +
                           LbpSerializer.StringElement("commentCount", this.Comments) +
@@ -148,7 +170,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         /// <summary>
         ///     The number of slots remaining on the earth
         /// </summary>
-        public int FreeSlots => ServerStatics.EntitledSlots - this.UsedSlots;
+        public int FreeSlots => ServerSettings.Instance.EntitledSlots - this.UsedSlots;
 
         private static readonly string[] slotTypes =
         {
@@ -178,12 +200,12 @@ namespace LBPUnion.ProjectLighthouse.Types
                 slotTypesLocal = slotTypes;
             }
 
-            slots += LbpSerializer.StringElement("entitledSlots", ServerStatics.EntitledSlots);
+            slots += LbpSerializer.StringElement("entitledSlots", ServerSettings.Instance.EntitledSlots);
             slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
 
             foreach (string slotType in slotTypesLocal)
             {
-                slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerStatics.EntitledSlots);
+                slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.Instance.EntitledSlots);
                 // ReSharper disable once StringLiteralTypo
                 slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
                 slots += LbpSerializer.StringElement(slotType + "FreeSlots", this.FreeSlots);

@@ -88,6 +88,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             lastMatch.Timestamp = TimestampHelper.Timestamp;
+            lastMatch.GameVersion = gameToken.GameVersion;
 
             await this.database.SaveChangesAsync();
 

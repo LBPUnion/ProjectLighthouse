@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Types.Files;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers
 {
@@ -14,6 +15,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static bool IsFileSafe(LbpFile file)
         {
+            if (!ServerSettings.Instance.CheckForUnsafeFiles) return true;
+
             if (file.FileType == LbpFileType.Unknown) file.FileType = DetermineFileType(file.Data);
 
             return file.FileType switch
