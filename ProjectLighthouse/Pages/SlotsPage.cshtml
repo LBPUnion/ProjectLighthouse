@@ -50,26 +50,26 @@
                 {
                     if (isHearted)
                     {
-                        <a class="ui pink tiny button" href="/slot/@slot.SlotId/unheart" title="Unheart">
+                        <a class="ui pink tiny button" href="/slot/@slot.SlotId/unheart?callbackUrl=~/slots/@Model.PageNumber" title="Unheart">
                             <i class="broken heart icon" style="margin: 0"></i>
                         </a>
                     }
                     else
                     {
-                        <a class="ui pink tiny button" href="/slot/@slot.SlotId/heart" title="Heart">
+                        <a class="ui pink tiny button" href="/slot/@slot.SlotId/heart?callbackUrl=~/slots/@Model.PageNumber" title="Heart">
                             <i class="heart icon" style="margin: 0"></i>
                         </a>
                     }
 
                     if (isQueued)
                     {
-                        <a class="ui yellow tiny button" href="/slot/@slot.SlotId/unqueue" title="Unqueue">
+                        <a class="ui yellow tiny button" href="/slot/@slot.SlotId/unqueue?callbackUrl=~/slots/@Model.PageNumber" title="Unqueue">
                             <i class="bell slash icon" style="margin: 0"></i>
                         </a>
                     }
                     else
                     {
-                        <a class="ui yellow tiny button" href="/slot/@slot.SlotId/queue" title="Queue">
+                        <a class="ui yellow tiny button" href="/slot/@slot.SlotId/queue?callbackUrl=~/slots/@Model.PageNumber" title="Queue">
                             <i class="bell icon" style="margin: 0"></i>
                         </a>
                     }
