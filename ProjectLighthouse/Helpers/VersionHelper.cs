@@ -6,9 +6,9 @@ using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers
 {
-    public static class GitVersionHelper
+    public static class VersionHelper
     {
-        static GitVersionHelper()
+        static VersionHelper()
         {
             try
             {
@@ -51,8 +51,17 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static string CommitHash { get; set; }
         public static string Branch { get; set; }
-        public static string FullVersion => $"{ServerStatics.ServerName} {Branch}@{CommitHash}";
+        public static string FullVersion => $"{ServerStatics.ServerName} {Branch}@{CommitHash} {Build}";
         public static bool IsDirty => CommitHash.EndsWith("-dirty");
         public static bool CanCheckForUpdates { get; set; }
+
+        public const string Build =
+            #if DEBUG
+            "Debug";
+        #elif RELEASE
+            "Release";
+        #else
+            "Unknown";
+        #endif
     }
 }

@@ -1,0 +1,55 @@
+@page "/admin"
+@using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Maintenance
+@model LBPUnion.ProjectLighthouse.Pages.AdminPanelPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+
+<h1>Admin Panel</h1>
+
+<h2>Commands</h2>
+<div class="ui grid">
+    @foreach (ICommand command in MaintenanceHelper.Commands)
+    {
+        <div class="four wide column">
+            <div class="ui blue segment">
+                <h3>@command.Name()</h3>
+                <form>
+                    <div class="ui input" style="width: 100%;">
+                        <input type="text" name="args" placeholder="@command.Arguments()">
+                    </div><br><br>
+                    <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
+                    <button type="submit" class="ui green button" style="width: 100%;">
+                        <i class="play icon"></i>
+                        Execute
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+<h2>Maintenance Jobs</h2>
+<p>
+    <b>Warning: Interrupting Lighthouse during maintenance may leave the database in an unclean state.</b>
+</p>
+
+<div class="ui grid">
+    @foreach (IMaintenanceJob job in MaintenanceHelper.MaintenanceJobs)
+    {
+        <div class="four wide column">
+            <div class="ui red segment">
+                <h3>@job.Name()</h3>
+                <p>@job.Description()</p>
+                <form>
+                    <input type="text" name="maintenanceJob" style="display: none;" value="@job.GetType().Name">
+                    <button type="submit" class="ui green button" style="width: 100%;">
+                        <i class="play icon"></i>
+                        Execute
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+</div>

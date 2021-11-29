@@ -59,19 +59,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
-            if (queuedLevel != null) return this.Ok();
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            if (slot == null) return this.NotFound();
 
-            this.database.QueuedLevels.Add
-            (
-                new QueuedLevel
-                {
-                    SlotId = id,
-                    UserId = user.UserId,
-                }
-            );
-
-            await this.database.SaveChangesAsync();
+            await this.database.QueueLevel(user, slot);
 
             return this.Ok();
         }
@@ -82,10 +73,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            QueuedLevel? queuedLevel = await this.database.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
-            if (queuedLevel != null) this.database.QueuedLevels.Remove(queuedLevel);
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            if (slot == null) return this.NotFound();
 
-            await this.database.SaveChangesAsync();
+            await this.database.UnqueueLevel(user, slot);
 
             return this.Ok();
         }
@@ -140,19 +131,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
-            if (heartedLevel != null) return this.Ok();
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            if (slot == null) return this.NotFound();
 
-            this.database.HeartedLevels.Add
-            (
-                new HeartedLevel
-                {
-                    SlotId = id,
-                    UserId = user.UserId,
-                }
-            );
-
-            await this.database.SaveChangesAsync();
+            await this.database.HeartLevel(user, slot);
 
             return this.Ok();
         }
@@ -163,10 +145,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            HeartedLevel? heartedLevel = await this.database.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == id);
-            if (heartedLevel != null) this.database.HeartedLevels.Remove(heartedLevel);
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            if (slot == null) return this.NotFound();
 
-            await this.database.SaveChangesAsync();
+            await this.database.UnheartLevel(user, slot);
 
             return this.Ok();
         }
@@ -210,20 +192,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
-                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
-            if (heartedProfile != null) return this.Ok();
-
-            this.database.HeartedProfiles.Add
-            (
-                new HeartedProfile
-                {
-                    HeartedUserId = heartedUser.UserId,
-                    UserId = user.UserId,
-                }
-            );
-
-            await this.database.SaveChangesAsync();
+            await this.database.HeartUser(user, heartedUser);
 
             return this.Ok();
         }
@@ -237,11 +206,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (heartedUser == null) return this.NotFound();
 
-            HeartedProfile? heartedProfile = await this.database.HeartedProfiles.FirstOrDefaultAsync
-                (q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
-            if (heartedProfile != null) this.database.HeartedProfiles.Remove(heartedProfile);
-
-            await this.database.SaveChangesAsync();
+            await this.database.UnheartUser(user, heartedUser);
 
             return this.Ok();
         }

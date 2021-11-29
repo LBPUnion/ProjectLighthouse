@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -42,7 +43,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     .Include(s => s.Location)
                     .Where(s => s.Creator!.Username == user.Username)
                     .Skip(pageStart - 1)
-                    .Take(Math.Min(pageSize, ServerStatics.EntitledSlots)),
+                    .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
                 string.Empty,
                 (current, slot) => current + slot.Serialize()
             );
@@ -56,7 +57,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     new Dictionary<string, object>
                     {
                         {
-                            "hint_start", pageStart + Math.Min(pageSize, ServerStatics.EntitledSlots)
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
                         },
                         {
                             "total", user.UsedSlots
@@ -110,7 +111,23 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30));
             string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "slots",
+                    response,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        },
+                        {
+                            "total", await StatisticsHelper.SlotCount()
+                        },
+                    }
+                )
+            );
         }
 
         [HttpGet("slots/mmpicks")]
@@ -130,7 +147,23 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30));
             string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "slots",
+                    response,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        },
+                        {
+                            "total", await StatisticsHelper.MMPicksCount()
+                        },
+                    }
+                )
+            );
         }
 
         [HttpGet("slots/lbp2luckydip")]
@@ -149,7 +182,23 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "slots",
+                    response,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        },
+                        {
+                            "total", await StatisticsHelper.SlotCount()
+                        },
+                    }
+                )
+            );
         }
 
     }

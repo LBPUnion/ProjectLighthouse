@@ -24,12 +24,13 @@ namespace LBPUnion.ProjectLighthouse
             // Setup logging
 
             Logger.StartLogging();
+            Logger.UpdateRate /= 2;
             LoggerLine.LogFormat = "[{0}] {1}";
             Logger.AddLogger(new ConsoleLogger());
             Logger.AddLogger(new LighthouseFileLogger());
 
             Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
-            Logger.Log($"Running {GitVersionHelper.FullVersion}", LoggerLevelStartup.Instance);
+            Logger.Log($"Running {VersionHelper.FullVersion}", LoggerLevelStartup.Instance);
 
             // This loads the config, see ServerSettings.cs for more information
             Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);
@@ -47,9 +48,7 @@ namespace LBPUnion.ProjectLighthouse
             if (ServerSettings.Instance.InfluxEnabled)
             {
                 Logger.Log("Influx logging is enabled. Starting influx logging...", LoggerLevelStartup.Instance);
-                #pragma warning disable CS4014
-                InfluxHelper.StartLogging();
-                #pragma warning restore CS4014
+                InfluxHelper.StartLogging().Wait();
                 if (ServerSettings.Instance.InfluxLoggingEnabled) Logger.AddLogger(new InfluxLogger());
             }
 
@@ -64,6 +63,12 @@ namespace LBPUnion.ProjectLighthouse
             Logger.Log("You can do so by running any dotnet command with the flag: \"-c Release\". ", LoggerLevelStartup.Instance);
             #endif
 
+            if (args.Length != 0)
+            {
+                MaintenanceHelper.RunCommand(args).Wait();
+                return;
+            }
+
             stopwatch.Stop();
             Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
 
@@ -75,7 +80,7 @@ namespace LBPUnion.ProjectLighthouse
             Stopwatch stopwatch = new();
             stopwatch.Start();
 
-            database.Database.Migrate();
+            database.Database.MigrateAsync().Wait();
 
             stopwatch.Stop();
             Logger.Log($"Migration took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);

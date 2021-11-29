@@ -63,12 +63,12 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
             }
         }
 
+        public const int CurrentConfigVersion = 10; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+
         #region Meta
 
         [NotNull]
         public static ServerSettings Instance;
-
-        public const int CurrentConfigVersion = 7;
 
         [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
         public int ConfigVersion { get; set; } = CurrentConfigVersion;
@@ -91,5 +91,16 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public string ExternalUrl { get; set; } = "http://localhost:10060";
         public string ServerDigestKey { get; set; }
         public bool UseExternalAuth { get; set; }
+
+        public bool CheckForUnsafeFiles { get; set; } = true;
+
+        public bool RegistrationEnabled { get; set; } = true;
+
+        /// <summary>
+        ///     The maximum amount of slots allowed on users' earth
+        /// </summary>
+        public int EntitledSlots { get; set; } = 50;
+
+        public int ListsQuota { get; set; } = 50;
     }
 }

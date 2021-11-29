@@ -19,7 +19,7 @@
             <i>
                 Taken by
                 <b>
-                    <a href="/users/@photo.Creator!.UserId">@photo.Creator.Username</a>
+                    <a href="/user/@photo.Creator!.UserId">@photo.Creator.Username</a>
                 </b>
             </i>
         </p>
@@ -29,7 +29,7 @@
         </p>
         @foreach (PhotoSubject subject in photo.Subjects)
         {
-            <a href="/users/@subject.UserId">@subject.User.Username</a>
+            <a href="/user/@subject.UserId">@subject.User.Username</a>
         }
     </div>
 }
@@ -39,5 +39,3 @@
     <a href="/photos/@(Model.PageNumber - 1)">Previous Page</a>
 }
 <a href="/photos/@(Model.PageNumber + 1)">Next Page</a>
-
-<div style="height: 100px; width: 1px;"></div> @* solves quirk with footer *@

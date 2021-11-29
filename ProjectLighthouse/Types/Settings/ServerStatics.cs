@@ -8,13 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
 {
     public static class ServerStatics
     {
-        /// <summary>
-        ///     The maximum amount of slots allowed on users' earth
-        /// </summary>
-        public const int EntitledSlots = 50;
-
-        public const int ListsQuota = 50;
-
         public const string ServerName = "ProjectLighthouse";
 
         public static bool DbConnected {
@@ -32,5 +25,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         }
 
         public static bool IsUnitTesting => AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.FullName.StartsWith("xunit"));
+
+        public const int PageSize = 20;
     }
 }

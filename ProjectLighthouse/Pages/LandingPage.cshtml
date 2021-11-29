@@ -1,4 +1,5 @@
 @page "/"
+@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Pages.LandingPage
 
 @{
@@ -11,15 +12,23 @@
     <p>You are currently logged in as <b>@Model.User.Username</b>.</p>
 }
 
-@if (Model.PlayersOnline == 1)
+@if (Model.PlayersOnlineCount == 1)
 {
-    <p>There is 1 user currently online.</p>
+    <p>There is 1 user currently online:</p>
+    @foreach (User user in Model.PlayersOnline)
+    {
+        <a href="/user/@user.UserId">@user.Username</a>
+    }
 }
-else if (Model.PlayersOnline == 0)
+else if (Model.PlayersOnlineCount == 0)
 {
     <p>There are no users online. Why not hop on?</p>
 }
 else
 {
-    <p>There are currently @Model.PlayersOnline users online.</p>
+    <p>There are currently @Model.PlayersOnlineCount users online:</p>
+    @foreach (User user in Model.PlayersOnline)
+    {
+        <a href="/user/@user.UserId">@user.Username</a>
+    }
 }

@@ -1,5 +1,18 @@
-footer.lighthouse-footer {
-    width: 100%;
-    bottom: 0;
-    position: fixed;
+div.pageContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
+
+div.main {
+    flex: 1;
+}
+
+div.statsUnderTitle > i {
+    margin-right: 2px;
+}
+
+div.statsUnderTitle > span {
+    margin-right: 5px;
+}
+
