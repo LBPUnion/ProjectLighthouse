@@ -82,25 +82,27 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost("postReview/user/{slotId:int}")]
-        public async Task<IActionResult> PostReview(int slotId) {
-            User? user = await this.database.UserFromRequest(this.Request);
+        public async Task<IActionResult> PostReview(int slotId)
+        {
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
             Review? newReview = await this.GetReviewFromBody();
             if (newReview == null) return this.BadRequest();
-            if (review == null) {
+            if (review == null)
+            {
                 review = new();
                 review.SlotId = slotId;
                 review.ReviewerId = user.UserId;
                 review.DeletedBy = "none";
-            
+
             }
             review.LabelCollection = newReview.LabelCollection;
             review.Text = newReview.Text;
             review.Deleted = false;
             review.Timestamp = TimeHelper.UnixTimeMilliseconds();
-            
+
             // sometimes the game posts a review without also calling dpadrate/user/etc (why??)
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
             if (ratedLevel == null)
@@ -113,7 +115,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             ratedLevel.Rating = newReview.Thumb;
-            
+
 
             await this.database.SaveChangesAsync();
 
@@ -121,15 +123,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("reviewsFor/user/{slotId:int}")]
-        public async Task<IActionResult> ReviewsFor(int slotId, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10) 
+        public async Task<IActionResult> ReviewsFor(int slotId, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
-            Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.StatusCode(403, "");
+            if (userAndToken == null) return this.StatusCode(403, "");
 
-            GameVersion gameVersion = token.GameVersion;
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            GameToken gameToken = userAndToken.Value.Item2;
+
+            GameVersion gameVersion = gameToken.GameVersion;
 
             Random rand = new();
 
@@ -141,11 +145,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .ThenByDescending(_ => rand.Next())
                 .Skip(pageStart - 1)
                 .Take(pageSize);
-                
-            string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) => {
+
+            string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) =>
+            {
                 RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == slotId && r.UserId == review.ReviewerId);
                 RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
-                
+
                 return current + review.Serialize(ratedLevel, ratedReview);
             });
 
@@ -162,15 +167,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("reviewsBy/{username}")]
-        public async Task<IActionResult> ReviewsBy(string username, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10) 
+        public async Task<IActionResult> ReviewsBy(string username, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
-            Token? token = await this.database.TokenFromRequest(this.Request);
-            if (token == null) return this.StatusCode(403, "");
+            if (userAndToken == null) return this.StatusCode(403, "");
 
-            GameVersion gameVersion = token.GameVersion;
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            GameToken gameToken = userAndToken.Value.Item2;
+
+            GameVersion gameVersion = gameToken.GameVersion;
 
             IEnumerable<Review> reviews = this.database.Reviews.Where(r => r.Reviewer.Username == username && r.Slot.GameVersion <= gameVersion)
                 .Include(r => r.Reviewer)
@@ -178,8 +185,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .OrderByDescending(r => r.Timestamp)
                 .Skip(pageStart - 1)
                 .Take(pageSize);
-                
-            string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) => {
+
+            string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) =>
+            {
                 RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == review.SlotId && r.UserId == user.UserId);
                 RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
                 return current + review.Serialize(ratedLevel, ratedReview);
@@ -199,8 +207,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost("rateReview/user/{slotId:int}/{username}")]
-        public async Task<IActionResult> RateReview(int slotId, string username, [FromQuery] int rating = 0) {
-            User? user = await this.database.UserFromRequest(this.Request);
+        public async Task<IActionResult> RateReview(int slotId, string username, [FromQuery] int rating = 0)
+        {
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             User? reviewer = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -227,7 +236,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpPost("deleteReview/user/{slotId:int}/{username}")]
-        public async Task<IActionResult> DeleteReview(int slotId, string username) {
+        public async Task<IActionResult> DeleteReview(int slotId, string username)
+        {
             User? reviewer = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (reviewer == null) return this.StatusCode(403, "");
 
