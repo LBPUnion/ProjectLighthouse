@@ -8,11 +8,11 @@ div.main {
     flex: 1;
 }
 
-div.userStats > i {
+div.statsUnderTitle > i {
     margin-right: 2px;
 }
 
-div.userStats > span {
+div.statsUnderTitle > span {
     margin-right: 5px;
 }
 

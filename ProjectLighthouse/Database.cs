@@ -116,6 +116,56 @@ namespace LBPUnion.ProjectLighthouse
             await this.SaveChangesAsync();
         }
 
+        public async Task HeartLevel(User user, Slot heartedSlot)
+        {
+            HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == heartedSlot.SlotId);
+            if (heartedLevel != null) return;
+
+            this.HeartedLevels.Add
+            (
+                new HeartedLevel
+                {
+                    SlotId = heartedSlot.SlotId,
+                    UserId = user.UserId,
+                }
+            );
+
+            await this.SaveChangesAsync();
+        }
+
+        public async Task UnheartLevel(User user, Slot heartedSlot)
+        {
+            HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == heartedSlot.SlotId);
+            if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
+
+            await this.SaveChangesAsync();
+        }
+
+        public async Task QueueLevel(User user, Slot queuedSlot)
+        {
+            QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == queuedSlot.SlotId);
+            if (queuedLevel != null) return;
+
+            this.QueuedLevels.Add
+            (
+                new QueuedLevel
+                {
+                    SlotId = queuedSlot.SlotId,
+                    UserId = user.UserId,
+                }
+            );
+
+            await this.SaveChangesAsync();
+        }
+
+        public async Task UnqueueLevel(User user, Slot queuedSlot)
+        {
+            QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == queuedSlot.SlotId);
+            if (queuedLevel != null) this.QueuedLevels.Remove(queuedLevel);
+
+            await this.SaveChangesAsync();
+        }
+
         #endregion
 
         #region Game Token Shenanigans
