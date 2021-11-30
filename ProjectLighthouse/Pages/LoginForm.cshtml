@@ -3,6 +3,7 @@
 
 @{
     Layout = "Layouts/BaseLayout";
+    Model.Title = "Log in";
 }
 
 <script src="https://geraintluff.github.io/sha256/sha256.min.js"></script>
@@ -16,8 +17,6 @@
         return true;
     }
 </script>
-
-<h1>Log in</h1>
 <form onsubmit="return onSubmit(this)">
     <div class="ui left labeled input">
         <label for="text" class="ui blue label">Username: </label>

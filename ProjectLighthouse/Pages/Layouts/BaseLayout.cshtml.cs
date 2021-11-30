@@ -11,6 +11,10 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
 
         private User? user;
 
+        public string Title = string.Empty;
+
+        public bool ShowTitleInPage = true;
+
         public new User? User {
             get {
                 if (this.user != null) return this.user;

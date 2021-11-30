@@ -6,11 +6,13 @@
 
 @{
     Layout = "Layouts/BaseLayout";
+    Model.Title = "Model.ProfileUser!.Username's user page";
+    Model.ShowTitleInPage = false;
 }
 
 <div class="ui grid">
     <div class="eight wide column">
-        <h1>@Model.ProfileUser!.Username's user page</h1>
+        <h1>@Model.Title</h1>
         <p>
             <i>@Model.ProfileUser.Status</i>
         </p>
