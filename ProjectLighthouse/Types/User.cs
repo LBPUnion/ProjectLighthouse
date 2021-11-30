@@ -100,6 +100,10 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public bool PasswordResetRequired { get; set; }
 
+        public string YayHash { get; set; } = "";
+        public string BooHash { get; set; } = "";
+        public string MehHash { get; set; } = "";
+
         #nullable enable
         [NotMapped]
         public string Status {
@@ -137,7 +141,10 @@ namespace LBPUnion.ProjectLighthouse.Types
                           LbpSerializer.StringElement("pins", this.Pins) +
                           LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
-                          LbpSerializer.StringElement("heartCount", this.Hearts);
+                          LbpSerializer.StringElement("heartCount", this.Hearts) +
+                          LbpSerializer.StringElement("yay2", YayHash) +
+                          LbpSerializer.StringElement("boo2", YayHash) +
+                          LbpSerializer.StringElement("meh2", YayHash);
             this.ClientsConnected.Serialize();
 
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
