@@ -12,25 +12,7 @@
 @foreach (Photo photo in Model.Photos)
 {
     <div class="ui segment">
-        <img src="/gameAssets/@photo.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
-        <br>
-
-        <p>
-            <i>
-                Taken by
-                <b>
-                    <a href="/user/@photo.Creator!.UserId">@photo.Creator.Username</a>
-                </b>
-            </i>
-        </p>
-
-        <p>
-            <b>Photo contains @photo.Subjects.Count @(photo.Subjects.Count == 1 ? "person" : "people"):</b>
-        </p>
-        @foreach (PhotoSubject subject in photo.Subjects)
-        {
-            <a href="/user/@subject.UserId">@subject.User.Username</a>
-        }
+        @await Html.PartialAsync("Partials/PhotoPartial", photo)
     </div>
 }
 

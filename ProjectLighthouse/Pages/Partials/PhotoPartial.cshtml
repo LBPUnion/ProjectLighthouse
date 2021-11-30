@@ -1,0 +1,22 @@
+@using LBPUnion.ProjectLighthouse.Types
+@model LBPUnion.ProjectLighthouse.Types.Photo
+
+<img src="/gameAssets/@Model.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
+<br>
+
+<p>
+    <i>
+        Taken by
+        <b>
+            <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a>
+        </b>
+    </i>
+</p>
+
+<p>
+    <b>Photo contains @Model.Subjects.Count @(Model.Subjects.Count == 1 ? "person" : "people"):</b>
+</p>
+@foreach (PhotoSubject subject in Model.Subjects)
+{
+    <a href="/user/@subject.UserId">@subject.User.Username</a>
+}
