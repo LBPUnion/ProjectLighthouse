@@ -17,7 +17,7 @@ namespace LBPUnion.ProjectLighthouse.Pages
 
         public async Task<IActionResult> OnGet([FromRoute] int id)
         {
-            Slot? slot = await this.Database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            Slot? slot = await this.Database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
             if (slot == null) return this.NotFound();
 
             this.Slot = slot;

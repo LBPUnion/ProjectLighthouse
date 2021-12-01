@@ -31,7 +31,7 @@
     <div class="eight wide column">
         <div class="ui red segment">
             <h2>Tags</h2>
-            @foreach (string label in Model.Slot.AuthorLabels.Split(","))
+            @foreach (string label in Model.Slot.AuthorLabels.Split(",").Where(label => !string.IsNullOrEmpty(label)))
             {
                 <div class="ui blue label">@label.Replace("LABEL_", "")</div>
             }
