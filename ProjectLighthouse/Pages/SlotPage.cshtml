@@ -1,0 +1,40 @@
+@page "/slot/{id:int}"
+@model LBPUnion.ProjectLighthouse.Pages.SlotPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Slot.Name;
+    Model.ShowTitleInPage = false;
+}
+
+@await Html.PartialAsync("Partials/SlotCardPartial", Model.Slot, new ViewDataDictionary(ViewData)
+{
+    {
+        "User", Model.User
+    },
+    {
+        "CallbackUrl", $"~/slot/{Model.Slot.SlotId}"
+    },
+    {
+        "ShowLink", false
+    },
+})
+
+
+<div class="ui grid">
+    <div class="eight wide column">
+        <div class="ui blue segment">
+            <h2>Description</h2>
+            <p>@Model.Slot.Description</p>
+        </div>
+    </div>
+    <div class="eight wide column">
+        <div class="ui red segment">
+            <h2>Tags</h2>
+            @foreach (string label in Model.Slot.AuthorLabels.Split(","))
+            {
+                <div class="ui blue label">@label.Replace("LABEL_", "")</div>
+            }
+        </div>
+    </div>
+</div>

@@ -21,10 +21,22 @@
     }
 
     string callbackUrl = (string)ViewData["CallbackUrl"];
+    bool showLink = (bool?)ViewData["ShowLink"] ?? false;
 }
 <div class="ui grid">
     <div class="eight wide column">
-        <h2 style="margin-bottom: 2px;">@slotName</h2>
+        @if (showLink)
+        {
+            <h2 style="margin-bottom: 2px;">
+                <a href="~/slot/@Model.SlotId">@slotName</a>
+            </h2>
+        }
+        else
+        {
+            <h1 style="margin-bottom: 2px;">
+                @slotName
+            </h1>
+        }
         <div class="statsUnderTitle" style="margin-bottom: 10px;">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
             <i class="blue play icon" title="Plays"></i> <span>@Model.Plays</span>
