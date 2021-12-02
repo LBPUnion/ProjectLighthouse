@@ -74,17 +74,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #region Update LastMatch
 
-            LastMatch? lastMatch = await this.database.LastMatches.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
+            LastContact? lastMatch = await this.database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
 
             // below makes it not look like trash
             // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (lastMatch == null)
             {
-                lastMatch = new LastMatch
+                lastMatch = new LastContact
                 {
                     UserId = user.UserId,
                 };
-                this.database.LastMatches.Add(lastMatch);
+                this.database.LastContacts.Add(lastMatch);
             }
 
             lastMatch.Timestamp = TimestampHelper.Timestamp;

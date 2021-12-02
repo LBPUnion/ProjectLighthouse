@@ -109,7 +109,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         public string Status {
             get {
                 using Database database = new();
-                LastMatch? lastMatch = database.LastMatches.Where
+                LastContact? lastMatch = database.LastContacts.Where
                         (l => l.UserId == this.UserId)
                     .FirstOrDefault(l => TimestampHelper.Timestamp - l.Timestamp < 300);
 
