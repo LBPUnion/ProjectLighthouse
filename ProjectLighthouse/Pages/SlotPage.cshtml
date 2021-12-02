@@ -20,21 +20,62 @@
     },
 })
 
-
 <div class="ui grid">
     <div class="eight wide column">
         <div class="ui blue segment">
             <h2>Description</h2>
-            <p>@Model.Slot.Description</p>
+            <p>@(string.IsNullOrEmpty(Model.Slot.Description) ? "This level has no description." : Model.Slot.Description)</p>
         </div>
     </div>
     <div class="eight wide column">
         <div class="ui red segment">
             <h2>Tags</h2>
-            @foreach (string label in Model.Slot.AuthorLabels.Split(",").Where(label => !string.IsNullOrEmpty(label)))
-            {
-                <div class="ui blue label">@label.Replace("LABEL_", "")</div>
+            @{
+                string[] authorLabels = Model.Slot.AuthorLabels.Split(",");
+                if (authorLabels.Length == 1) // ..?? ok c#
+                {
+                    <p>This level has no tags.</p>
+                }
+                else
+                {
+                    foreach (string label in authorLabels.Where(label => !string.IsNullOrEmpty(label)))
+                    {
+                        <div class="ui blue label">@label.Replace("LABEL_", "")</div>
+                    }
+                }
             }
         </div>
     </div>
 </div>
+@if (Model.User != null && Model.User.IsAdmin)
+{
+    <div class="ui yellow segment">
+        <h2>Admin Settings</h2>
+
+        @if (Model.Slot.TeamPick)
+        {
+            <a href="/admin/slot/@Model.Slot.SlotId/removeTeamPick">
+                <div class="ui pink button">
+                    <i class="ribbon icon"></i>
+                    <span>Remove Team Pick</span>
+                </div>
+            </a>
+        }
+        else
+        {
+            <a href="/admin/slot/@Model.Slot.SlotId/teamPick">
+                <div class="ui pink button">
+                    <i class="ribbon icon"></i>
+                    <span>Team Pick</span>
+                </div>
+            </a>
+        }
+
+        <a href="/admin/slot/@Model.Slot.SlotId/delete">
+            <div class="ui red button">
+                <i class="trash icon"></i>
+                <span>Delete</span>
+            </div>
+        </a>
+    </div>
+}
