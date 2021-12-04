@@ -16,8 +16,21 @@
         
         return true;
     }
-</script>
-<form onsubmit="return onSubmit(this)">
+</script>                   
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="ui negative message">
+        <div class="header">
+            Uh oh!
+        </div>    
+        <p>@Model.Error</p>
+    </div>
+}
+
+<form onsubmit="return onSubmit(this)" method="post">
+    @Html.AntiForgeryToken()
+
     <div class="ui left labeled input">
         <label for="text" class="ui blue label">Username: </label>
         <input type="text" name="username" id="text">

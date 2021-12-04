@@ -12,38 +12,63 @@ namespace LBPUnion.ProjectLighthouse.Pages
     public class LoginForm : BaseLayout
     {
         public LoginForm(Database database) : base(database)
-        {}
+        { }
+
+        public string Error { get; private set; }
 
         public bool WasLoginRequest { get; private set; }
 
         [UsedImplicitly]
-        public async Task<IActionResult> OnGet([FromQuery] string username, [FromQuery] string password)
+        public async Task<IActionResult> OnPost(string username, string password)
         {
-            this.WasLoginRequest = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password);
-
-            if (this.WasLoginRequest)
+            if (string.IsNullOrWhiteSpace(username))
             {
-                User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
-                if (user == null) return this.StatusCode(403, "");
-
-                if (!BCrypt.Net.BCrypt.Verify(password, user.Password)) return this.StatusCode(403, "");
-
-                WebToken webToken = new()
-                {
-                    UserId = user.UserId,
-                    UserToken = HashHelper.GenerateAuthToken(),
-                };
-
-                this.Database.WebTokens.Add(webToken);
-                await this.Database.SaveChangesAsync();
-
-                this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
-
-                if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
-
-                return this.RedirectToPage(nameof(LandingPage));
+                this.Error = "The username field is required.";
+                return this.Page();
             }
 
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                this.Error = "The password field is required.";
+                return this.Page();
+            }
+
+            User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null)
+            {
+                this.Error = "The username or password you entered is invalid.";
+                return this.Page();
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(password,
+                user.Password))
+            {
+                this.Error = "The username or password you entered is invalid.";
+                return this.Page();
+            }
+
+            WebToken webToken = new()
+            {
+                UserId = user.UserId,
+                UserToken = HashHelper.GenerateAuthToken(),
+            };
+
+            this.Database.WebTokens.Add(webToken);
+            await this.Database.SaveChangesAsync();
+
+            this.Response.Cookies.Append("LighthouseToken",
+                webToken.UserToken);
+
+            if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
+
+            return this.RedirectToPage(nameof(LandingPage));
+        }
+
+
+        [UsedImplicitly]
+        public async Task<IActionResult> OnGet()
+        {
+            Error = string.Empty;
             return this.Page();
         }
     }
