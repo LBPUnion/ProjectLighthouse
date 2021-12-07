@@ -1,3 +1,9 @@
+# LBP resources.
+r/
+
+# rider
+.idea/
+
 r/ # cdn resources folder
 bin/
 obj/

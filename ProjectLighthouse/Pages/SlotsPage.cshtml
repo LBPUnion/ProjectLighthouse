@@ -1,81 +1,29 @@
 @page "/slots/{pageNumber:int}"
-@using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Levels
-@using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Pages.SlotsPage
 
 @{
     Layout = "Layouts/BaseLayout";
+    Model.Title = "Levels";
 }
 
-<h1>Levels</h1>
 <p>There are @Model.SlotCount total levels!</p>
 
 @foreach (Slot slot in Model.Slots)
 {
-    string slotName = string.IsNullOrEmpty(slot.Name) ? "Unnamed Level" : slot.Name;
-
-    bool isQueued = false;
-    bool isHearted = false;
-
-    if (Model.User != null)
-    {
-        isQueued = await Model.Database.QueuedLevels.FirstOrDefaultAsync(h => h.SlotId == slot.SlotId && h.UserId == Model.User.UserId) != null;
-
-        isHearted = await Model.Database.HeartedLevels.FirstOrDefaultAsync(h => h.SlotId == slot.SlotId && h.UserId == Model.User.UserId) != null;
-    }
-
     <div class="ui segment">
-        <div class="ui grid">
-            <div class="eight wide column">
-                <h2 style="margin-bottom: 2px;">@slotName</h2>
-                <div class="statsUnderTitle" style="margin-bottom: 10px;">
-                    <i class="pink heart icon" title="Hearts"></i> <span>@slot.Hearts</span>
-                    <i class="blue play icon" title="Plays"></i> <span>@slot.Plays</span>
-                    <i class="green thumbs up icon" title="Yays"></i> <span>@slot.Thumbsup</span>
-                    <i class="red thumbs down icon" title="Boos"></i> <span>@slot.Thumbsdown</span>
-
-                    @if (slot.GameVersion == GameVersion.LittleBigPlanet1)
-                    {
-                        <i class="yellow star icon" title="LBP1 Stars"></i>
-                        <span>@slot.RatingLBP1</span>
-                    }
-                </div>
-                <p>
-                    <i>Created by <a href="/user/@slot.Creator?.UserId">@slot.Creator?.Username</a></i>
-                </p>
-            </div>
-            <div class="eight wide right aligned column">
-                @if (Model.User != null)
-                {
-                    if (isHearted)
-                    {
-                        <a class="ui pink tiny button" href="/slot/@slot.SlotId/unheart?callbackUrl=~/slots/@Model.PageNumber" title="Unheart">
-                            <i class="broken heart icon" style="margin: 0"></i>
-                        </a>
-                    }
-                    else
-                    {
-                        <a class="ui pink tiny button" href="/slot/@slot.SlotId/heart?callbackUrl=~/slots/@Model.PageNumber" title="Heart">
-                            <i class="heart icon" style="margin: 0"></i>
-                        </a>
-                    }
-
-                    if (isQueued)
-                    {
-                        <a class="ui yellow tiny button" href="/slot/@slot.SlotId/unqueue?callbackUrl=~/slots/@Model.PageNumber" title="Unqueue">
-                            <i class="bell slash icon" style="margin: 0"></i>
-                        </a>
-                    }
-                    else
-                    {
-                        <a class="ui yellow tiny button" href="/slot/@slot.SlotId/queue?callbackUrl=~/slots/@Model.PageNumber" title="Queue">
-                            <i class="bell icon" style="margin: 0"></i>
-                        </a>
-                    }
-                }
-            </div>
-        </div>
+        @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
+        {
+            {
+                "User", Model.User
+            },
+            {
+                "CallbackUrl", $"~/slots/{Model.PageNumber}"
+            },
+            {
+                "ShowLink", true
+            },
+        })
     </div>
 }
 

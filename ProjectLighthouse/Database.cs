@@ -28,7 +28,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<Score> Scores { get; set; }
         public DbSet<PhotoSubject> PhotoSubjects { get; set; }
         public DbSet<Photo> Photos { get; set; }
-        public DbSet<LastMatch> LastMatches { get; set; }
+        public DbSet<LastContact> LastContacts { get; set; }
         public DbSet<VisitedLevel> VisitedLevels { get; set; }
         public DbSet<RatedLevel> RatedLevels { get; set; }
         public DbSet<Review> Reviews { get; set; }

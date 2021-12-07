@@ -14,39 +14,67 @@ namespace LBPUnion.ProjectLighthouse.Pages
     {
         public RegisterForm(Database database) : base(database)
         {}
-
+        
+        public string Error { get; private set; }
         public bool WasRegisterRequest { get; private set; }
 
         [UsedImplicitly]
-        [SuppressMessage("ReSharper", "SpecifyStringComparison")]
-        public async Task<IActionResult> OnGet([FromQuery] string username, [FromQuery] string password, [FromQuery] string confirmPassword)
+        [SuppressMessage("ReSharper",
+            "SpecifyStringComparison")]
+        public async Task<IActionResult> OnPost(string username, string password, string confirmPassword)
         {
             if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
 
-            this.WasRegisterRequest = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(confirmPassword);
-
-            if (this.WasRegisterRequest)
+            if (string.IsNullOrWhiteSpace(username))
             {
-                if (password != confirmPassword) return this.BadRequest();
-
-                bool userExists = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
-                if (userExists) return this.BadRequest();
-
-                User user = await this.Database.CreateUser(username, HashHelper.BCryptHash(password));
-
-                WebToken webToken = new()
-                {
-                    UserId = user.UserId,
-                    UserToken = HashHelper.GenerateAuthToken(),
-                };
-
-                this.Database.WebTokens.Add(webToken);
-                await this.Database.SaveChangesAsync();
-
-                this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
-
-                return this.RedirectToPage(nameof(LandingPage));
+                this.Error = "The username field is blank.";
+                return this.Page();
             }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                this.Error = "Password field is required.";
+                return this.Page();
+            }
+
+            if (password != confirmPassword)
+            {
+                this.Error = "Passwords do not match!";
+                return this.Page();
+            }
+
+            bool userExists =
+                await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
+            if (userExists)
+            {
+                this.Error = "The username you've chosen is already taken.";
+                return this.Page();
+            }
+
+            User user = await this.Database.CreateUser(username,
+                HashHelper.BCryptHash(password));
+
+            WebToken webToken = new()
+            {
+                UserId = user.UserId,
+                UserToken = HashHelper.GenerateAuthToken(),
+            };
+
+            this.Database.WebTokens.Add(webToken);
+            await this.Database.SaveChangesAsync();
+
+            this.Response.Cookies.Append("LighthouseToken",
+                webToken.UserToken);
+
+            return this.RedirectToPage(nameof(LandingPage));
+        }
+
+        [UsedImplicitly]
+        [SuppressMessage("ReSharper", "SpecifyStringComparison")]
+        public IActionResult OnGet()
+        {
+            Error = string.Empty;
+            if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
 
             return this.Page();
         }

@@ -6,13 +6,15 @@
 
 @{
     Layout = "Layouts/BaseLayout";
+    Model.Title = Model.ProfileUser!.Username + "'s user page";
+    Model.ShowTitleInPage = false;
 }
 
 <div class="ui grid">
     <div class="eight wide column">
-        <h1>@Model.ProfileUser!.Username's user page</h1>
+        <h1>@Model.Title</h1>
         <p>
-            <i>@Model.ProfileUser.Status</i>
+            <i>@Model.ProfileUser!.Status</i>
         </p>
         <div class="statsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
@@ -72,16 +74,7 @@
             @foreach (Photo photo in Model.Photos)
             {
                 <div class="eight wide column">
-                    <img src="/gameAssets/@photo.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
-                    <br>
-
-                    <p>
-                        <b>Photo contains @photo.Subjects.Count @(photo.Subjects.Count == 1 ? "person" : "people"):</b>
-                    </p>
-                    @foreach (PhotoSubject subject in photo.Subjects)
-                    {
-                        <a href="/user/@subject.UserId">@subject.User.Username</a>
-                    }
+                    @await Html.PartialAsync("Partials/PhotoPartial", photo);
                 </div>
             }
         </div>

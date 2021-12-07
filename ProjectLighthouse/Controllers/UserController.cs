@@ -132,6 +132,21 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                                     user.PlanetHash = await reader.GetValueAsync();
                                     break;
                                 }
+                                case "yay2":
+                                {
+                                    user.YayHash = await reader.GetValueAsync();
+                                    break;
+                                }
+                                case "boo2":
+                                {
+                                    user.BooHash = await reader.GetValueAsync();
+                                    break;
+                                }
+                                case "meh2":
+                                {
+                                    user.MehHash = await reader.GetValueAsync();
+                                    break;
+                                }
                             }
 
                             break;
