@@ -26,12 +26,7 @@ namespace LBPUnion.ProjectLighthouse.Types
         public string Biography { get; set; }
 
         [NotMapped]
-        public int Reviews {
-            get {
-                using Database database = new();
-                return database.Reviews.Count(r => r.ReviewerId == this.UserId);
-            }
-        }
+        public int Reviews => 0;
 
         [NotMapped]
         public int Comments {
