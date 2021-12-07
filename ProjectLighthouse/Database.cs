@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Types.Reviews;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,8 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<LastContact> LastContacts { get; set; }
         public DbSet<VisitedLevel> VisitedLevels { get; set; }
         public DbSet<RatedLevel> RatedLevels { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<RatedReview> RatedReviews { get; set; }
         public DbSet<AuthenticationAttempt> AuthenticationAttempts { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -60,7 +63,7 @@ namespace LBPUnion.ProjectLighthouse
             return user;
         }
 
-        #nullable enable
+#nullable enable
         public async Task<GameToken?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
         {
             // TODO: don't use psn name to authenticate
@@ -252,6 +255,6 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<Photo?> PhotoFromSubject(PhotoSubject subject)
             => await this.Photos.FirstOrDefaultAsync(p => p.PhotoSubjectIds.Contains(subject.PhotoSubjectId.ToString()));
-        #nullable disable
+#nullable disable
     }
 }

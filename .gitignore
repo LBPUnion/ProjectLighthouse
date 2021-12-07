@@ -15,9 +15,11 @@ riderModule.iml
 /.idea/.idea.ProjectLighthouse/.idea/dataSources.local.xml
 *.sln.DotSettings.user
 /ProjectLighthouse/r/*
-/ProjectLighthouse/logs/*
+logs
 /ProjectLighthouse/ProjectLighthouse.csproj.user
 .vs/
+.vscode/
+.editorconfig
 lighthouse.config.json
 gitBranch.txt
 gitVersion.txt
