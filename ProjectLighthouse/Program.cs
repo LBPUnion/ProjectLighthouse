@@ -18,7 +18,7 @@ namespace LBPUnion.ProjectLighthouse
     {
         public static void Main(string[] args)
         {
-            if (args[0] == "--wait-for-debugger")
+            if (args.Length != 0 && args[0] == "--wait-for-debugger")
             {
                 Console.WriteLine("Waiting for a debugger to be attached...");
                 while (!Debugger.IsAttached)
