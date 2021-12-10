@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -17,6 +18,16 @@ namespace LBPUnion.ProjectLighthouse
     {
         public static void Main(string[] args)
         {
+            if (args[0] == "--wait-for-debugger")
+            {
+                Console.WriteLine("Waiting for a debugger to be attached...");
+                while (!Debugger.IsAttached)
+                {
+                    Thread.Sleep(100);
+                }
+                Console.WriteLine("Debugger attached.");
+            }
+
             // Log startup time
             Stopwatch stopwatch = new();
             stopwatch.Start();
