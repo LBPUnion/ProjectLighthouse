@@ -81,21 +81,24 @@
     </div>
 }
 
-@if (Model.ProfileUser.Comments > 0)
-{
-    <div class="ui yellow segment">
-        <h1>Comments</h1>
-        @foreach (Comment comment in Model.Comments!)
-        {
-            DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
-            <div>
-                <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
-                <span>@comment.Message</span>
-                <p>
-                    <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
-                </p>
-                <div class="ui divider"></div>
-            </div>
-        }
-    </div>
-}
+
+<div class="ui yellow segment">
+    <h1>Comments</h1>
+    @if (Model.ProfileUser.Comments == 0)
+    {
+        <p>There are no comments.</p>
+    }
+
+    @foreach (Comment comment in Model.Comments!)
+    {
+        DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
+        <div>
+            <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
+            <span>@comment.Message</span>
+            <p>
+                <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
+            </p>
+            <div class="ui divider"></div>
+        </div>
+    }
+</div>

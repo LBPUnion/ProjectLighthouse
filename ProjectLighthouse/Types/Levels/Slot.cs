@@ -6,7 +6,6 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
-using LBPUnion.ProjectLighthouse.Types.Reviews;
 
 namespace LBPUnion.ProjectLighthouse.Types.Levels
 {
@@ -195,23 +194,13 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
         [XmlElement("leveltype")]
         public string LevelType { get; set; } = "";
 
-        [NotMapped]
-        [XmlElement("reviewCount")]
-        public int ReviewCount {
-            get {
-                using Database database = new();
-
-                return database.Reviews.Count(r => r.SlotId == this.SlotId);
-            }
-        }
-
         public string SerializeResources()
         {
             return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource)) +
                    LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
         }
 
-        public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null, Review? yourReview = null)
+        public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null)
         {
 
             string slotData = LbpSerializer.StringElement("name", this.Name) +
@@ -259,12 +248,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("yourLBP1PlayCount", yourVisitedStats?.PlaysLBP1) +
                               LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBP2) +
                               LbpSerializer.StringElement("yourLBP3PlayCount", yourVisitedStats?.PlaysLBP3) +
-                              LbpSerializer.StringElement("yourLBPVitaPlayCount", yourVisitedStats?.PlaysLBPVita) + // i doubt this is the right name but we'll go with it
-                              yourReview?.Serialize("yourReview") +
-                              LbpSerializer.StringElement("reviewsEnabled", true) +
-                              LbpSerializer.StringElement("commentsEnabled", false) +
-                              LbpSerializer.StringElement("reviewCount", this.ReviewCount);
-            
+                              LbpSerializer.StringElement
+                                  ("yourLBPVitaPlayCount", yourVisitedStats?.PlaysLBPVita); // i doubt this is the right name but we'll go with it
+
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }
     }
