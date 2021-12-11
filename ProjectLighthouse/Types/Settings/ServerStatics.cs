@@ -10,13 +10,15 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
     {
         public const string ServerName = "ProjectLighthouse";
 
-        public static bool DbConnected {
-            get {
+        public static bool DbConnected
+        {
+            get
+            {
                 try
                 {
                     return new Database().Database.CanConnect();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Logger.Log(e.ToString(), LoggerLevelDatabase.Instance);
                     return false;

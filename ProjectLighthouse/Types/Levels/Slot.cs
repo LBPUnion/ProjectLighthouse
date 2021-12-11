@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Reviews;
 
 namespace LBPUnion.ProjectLighthouse.Types.Levels
 {
@@ -40,7 +41,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("resource")]
-        public string[] Resources {
+        public string[] Resources
+        {
             get => this.ResourceCollection.Split(",");
             set => this.ResourceCollection = string.Join(',', value);
         }
@@ -102,8 +104,10 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [XmlIgnore]
         [NotMapped]
-        public int Hearts {
-            get {
+        public int Hearts
+        {
+            get
+            {
                 using Database database = new();
 
                 return database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
@@ -160,8 +164,10 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("thumbsup")]
-        public int Thumbsup {
-            get {
+        public int Thumbsup
+        {
+            get
+            {
                 using Database database = new();
 
                 return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
@@ -170,8 +176,10 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("thumbsdown")]
-        public int Thumbsdown {
-            get {
+        public int Thumbsdown
+        {
+            get
+            {
                 using Database database = new();
 
                 return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
@@ -180,14 +188,28 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("averageRating")]
-        public double RatingLBP1 {
-            get {
+        public double RatingLBP1
+        {
+            get
+            {
                 using Database database = new();
 
                 IQueryable<RatedLevel> ratedLevels = database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
                 if (!ratedLevels.Any()) return 3.0;
 
                 return Enumerable.Average(ratedLevels, r => r.RatingLBP1);
+            }
+        }
+
+        [NotMapped]
+        [XmlElement("reviewCount")]
+        public int ReviewCount
+        {
+            get
+            {
+                using Database database = new();
+
+                return database.Reviews.Count(r => r.SlotId == this.SlotId);
             }
         }
 
@@ -200,7 +222,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                    LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
         }
 
-        public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null)
+        public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null, Review? yourReview = null)
         {
 
             string slotData = LbpSerializer.StringElement("name", this.Name) +
@@ -249,7 +271,11 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
                               LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBP2) +
                               LbpSerializer.StringElement("yourLBP3PlayCount", yourVisitedStats?.PlaysLBP3) +
                               LbpSerializer.StringElement
-                                  ("yourLBPVitaPlayCount", yourVisitedStats?.PlaysLBPVita); // i doubt this is the right name but we'll go with it
+                                  ("yourLBPVitaPlayCount", yourVisitedStats?.PlaysLBPVita) + // i doubt this is the right name but we'll go with it
+                              yourReview?.Serialize("yourReview") +
+                              LbpSerializer.StringElement("reviewsEnabled", true) +
+                              LbpSerializer.StringElement("commentsEnabled", false) +
+                              LbpSerializer.StringElement("reviewCount", this.ReviewCount);
 
             return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
         }
