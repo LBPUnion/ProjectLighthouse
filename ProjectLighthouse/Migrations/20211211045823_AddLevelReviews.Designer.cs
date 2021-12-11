@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20211211043517_CacheReviewStats")]
-    partial class CacheReviewStats
+    [Migration("20211211045823_AddLevelReviews")]
+    partial class AddLevelReviews
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -407,7 +407,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.LastMatch", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.LastContact", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -421,7 +421,7 @@ namespace ProjectLighthouse.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("LastMatches");
+                    b.ToTable("LastContacts");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Location", b =>
@@ -546,6 +546,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Biography")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("BooHash")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("Game")
                         .HasColumnType("int");
 
@@ -557,6 +560,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
+
+                    b.Property<string>("MehHash")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Password")
                         .HasColumnType("longtext");
@@ -571,6 +577,9 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Username")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("YayHash")
                         .HasColumnType("longtext");
 
                     b.HasKey("UserId");

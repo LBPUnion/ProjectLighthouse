@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿#nullable enable
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Kettu;
@@ -21,7 +20,7 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
             string password = args[1];
 
             password = HashHelper.Sha256Hash(password);
-            
+
             User? user = await this._database.Users.FirstOrDefaultAsync(u => u.Username == onlineId);
             if (user == null)
             {

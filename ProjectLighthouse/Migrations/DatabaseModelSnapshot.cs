@@ -770,6 +770,44 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Target");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.RatedReview", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Reviews.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.Review", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reviewer");
+
+                    b.Navigation("Slot");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Score", b =>
                 {
                     b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
