@@ -1,9 +1,15 @@
+using System.Xml.Serialization;
+
 namespace LBPUnion.ProjectLighthouse.Types
 {
-    public static class DeletedBy
+    public enum DeletedBy
     {
-        public static string Moderator { get => "moderator"; }
-        public static string LevelAuthor { get => "level_author"; }
+        [XmlEnum(Name = "none")]
+        None,
+        [XmlEnum(Name = "moderator")]
+        Moderator,
+        [XmlEnum(Name = "level_author")]
+        LevelAuthor
         // TODO: deletion types for comments (profile etc) 
     }
 }

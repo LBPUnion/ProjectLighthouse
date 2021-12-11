@@ -37,7 +37,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Reviews
 
         [NotMapped]
         [XmlIgnore]
-        public string[] Labels {
+        public string[] Labels
+        {
             get => this.LabelCollection.Split(",");
             set => this.LabelCollection = string.Join(',', value);
         }
@@ -46,44 +47,29 @@ namespace LBPUnion.ProjectLighthouse.Types.Reviews
         public Boolean Deleted { get; set; }
 
         [XmlElement("deleted_by")]
-        public string DeletedBy { get; set; } // enum ? Needs testing e.g. Moderated/Author/Level Author? etc.
+        public DeletedBy DeletedBy { get; set; }
 
         [XmlElement("text")]
         public string Text { get; set; }
 
-        [NotMapped]
         [XmlElement("thumb")]
-        public int Thumb { get; set; } // (unused) -- temp value for getting thumb from review upload body for updating level rating
-        
-        [NotMapped]
+        public int Thumb { get; set; }
+
         [XmlElement("thumbsup")]
-        public int ThumbsUp { 
-            get {
-                using Database database = new();
-
-                return database.RatedReviews.Count(r => r.ReviewId == this.ReviewId && r.Thumb == 1);
-            } 
-        }
-        [NotMapped]
+        public int ThumbsUp { get; set; }
         [XmlElement("thumbsdown")]
-        public int ThumbsDown { 
-            get {
-                using Database database = new();
+        public int ThumbsDown { get; set; }
 
-                return database.RatedReviews.Count(r => r.ReviewId == this.ReviewId && r.Thumb == -1);
-            } 
-        }
-
-        public string Serialize(RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null) {
+        public string Serialize(RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null)
+        {
             return this.Serialize("review", yourLevelRating, yourRatingStats);
         }
 
         public string Serialize(string elementOverride, RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null)
         {
-
             string reviewData = LbpSerializer.TaggedStringElement("slot_id", this.SlotId, "type", this.Slot.Type) +
                                 LbpSerializer.StringElement("reviewer", this.Reviewer.Username) +
-                                LbpSerializer.StringElement("thumb", yourLevelRating?.Rating) +
+                                LbpSerializer.StringElement("thumb", this.Thumb) +
                                 LbpSerializer.StringElement("timestamp", this.Timestamp) +
                                 LbpSerializer.StringElement("labels", this.LabelCollection) +
                                 LbpSerializer.StringElement("deleted", this.Deleted) +
@@ -97,5 +83,5 @@ namespace LBPUnion.ProjectLighthouse.Types.Reviews
         }
     }
 
-    
+
 }

@@ -76,6 +76,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             ratedLevel.Rating = Math.Max(Math.Min(1, rating), -1);
 
+            Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
+            if (review != null)
+            {
+                review.Thumb = ratedLevel.Rating;
+            }
+
             await this.database.SaveChangesAsync();
 
             return this.Ok();
@@ -95,15 +101,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 review = new();
                 review.SlotId = slotId;
                 review.ReviewerId = user.UserId;
-                review.DeletedBy = "none";
-
+                review.DeletedBy = DeletedBy.None;
+                review.ThumbsUp = 0;
+                review.ThumbsDown = 0;
+                this.database.Reviews.Add(review);
             }
+            review.Thumb = newReview.Thumb;
             review.LabelCollection = newReview.LabelCollection;
             review.Text = newReview.Text;
             review.Deleted = false;
             review.Timestamp = TimeHelper.UnixTimeMilliseconds();
 
-            // sometimes the game posts a review without also calling dpadrate/user/etc (why??)
+            // sometimes the game posts/updates a review rating without also calling dpadrate/user/etc (why??)
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
             if (ratedLevel == null)
             {
@@ -115,7 +124,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             ratedLevel.Rating = newReview.Thumb;
-
 
             await this.database.SaveChangesAsync();
 
@@ -137,21 +145,51 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             Random rand = new();
 
-            IEnumerable<Review> reviews = this.database.Reviews.Where(r => r.SlotId == slotId && r.Slot.GameVersion <= gameVersion)
+            Review? yourReview = await this.database.Reviews.FirstOrDefaultAsync(r => r.ReviewerId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
+            VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(v => v.UserId == user.UserId && v.SlotId == slotId && v.Slot.GameVersion <= gameVersion);
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+            if (slot == null) return this.BadRequest();
+            Boolean canNowReviewLevel = visitedLevel != null && yourReview == null;
+            if (canNowReviewLevel)
+            {
+                RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
+
+                yourReview = new();
+                yourReview.ReviewerId = user.UserId;
+                yourReview.Reviewer = user;
+                yourReview.Thumb = ratedLevel?.Rating == null ? 0 : ratedLevel.Rating;
+                yourReview.Slot = slot;
+                yourReview.SlotId = slotId;
+                yourReview.DeletedBy = DeletedBy.None;
+                yourReview.Text = "You haven't reviewed this level yet. Edit this blank review to upload it!";
+                yourReview.LabelCollection = "";
+                yourReview.Deleted = false;
+                yourReview.Timestamp = TimeHelper.UnixTimeMilliseconds();
+            }
+
+            IQueryable<Review?> reviews = this.database.Reviews.Where(r => r.SlotId == slotId && r.Slot.GameVersion <= gameVersion)
                 .Include(r => r.Reviewer)
                 .Include(r => r.Slot)
-                .AsEnumerable() // performance? Needed for next line (ThumbsUp is not in DB)
                 .OrderByDescending(r => r.ThumbsUp)
-                .ThenByDescending(_ => rand.Next())
+                .ThenByDescending(_ => EF.Functions.Random())
                 .Skip(pageStart - 1)
                 .Take(pageSize);
 
-            string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) =>
+            IEnumerable<Review?> prependedReviews;
+            if (canNowReviewLevel) // this can only be true if you have not posted a review but have visited the level
             {
-                RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == slotId && r.UserId == review.ReviewerId);
-                RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
+                // prepend the fake review to the top of the list to be easily edited
+                prependedReviews = reviews.ToList().Prepend(yourReview);
+            }
+            else
+            {
+                prependedReviews = reviews.ToList();
+            }
 
-                return current + review.Serialize(ratedLevel, ratedReview);
+            string inner = Enumerable.Aggregate(prependedReviews, string.Empty, (current, review) =>
+            {
+                if (review == null) return current;
+                return current + review.Serialize();
             });
 
             string response = LbpSerializer.TaggedStringElement("reviews", inner, new Dictionary<string, object>
