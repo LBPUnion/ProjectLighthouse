@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace LBPUnion.ProjectLighthouse.Pages
         public int PageNumber;
 
         public int SlotCount;
+        
+        public int PageAmount;
 
         public List<Slot> Slots;
         public SlotsPage([NotNull] Database database) : base(database)
@@ -27,7 +30,13 @@ namespace LBPUnion.ProjectLighthouse.Pages
             this.SlotCount = await StatisticsHelper.SlotCount();
 
             this.PageNumber = pageNumber;
+            this.PageAmount = (int)Math.Ceiling((double)this.SlotCount / ServerStatics.PageSize);
 
+            if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount)
+            {
+                return this.Redirect($"/slots/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
+            }
+            
             this.Slots = await this.Database.Slots.Include
                     (p => p.Creator)
                 .OrderByDescending(p => p.FirstUploaded)
