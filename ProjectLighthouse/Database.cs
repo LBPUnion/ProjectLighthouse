@@ -6,8 +6,8 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Reviews;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Reviews;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -63,7 +63,7 @@ namespace LBPUnion.ProjectLighthouse
             return user;
         }
 
-#nullable enable
+        #nullable enable
         public async Task<GameToken?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
         {
             // TODO: don't use psn name to authenticate
@@ -255,6 +255,37 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<Photo?> PhotoFromSubject(PhotoSubject subject)
             => await this.Photos.FirstOrDefaultAsync(p => p.PhotoSubjectIds.Contains(subject.PhotoSubjectId.ToString()));
-#nullable disable
+
+        public async Task RemoveUser(User user)
+        {
+            this.Locations.Remove(user.Location);
+            LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
+            if (lastContact != null) this.LastContacts.Remove(lastContact);
+
+            foreach (Slot slot in this.Slots.Where(s => s.CreatorId == user.UserId)) await this.RemoveSlot(slot, false);
+
+            this.AuthenticationAttempts.RemoveRange(this.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
+            this.HeartedProfiles.RemoveRange(this.HeartedProfiles.Where(h => h.UserId == user.UserId));
+            this.PhotoSubjects.RemoveRange(this.PhotoSubjects.Where(s => s.UserId == user.UserId));
+            this.HeartedLevels.RemoveRange(this.HeartedLevels.Where(h => h.UserId == user.UserId));
+            this.VisitedLevels.RemoveRange(this.VisitedLevels.Where(v => v.UserId == user.UserId));
+            this.QueuedLevels.RemoveRange(this.QueuedLevels.Where(q => q.UserId == user.UserId));
+            this.RatedLevels.RemoveRange(this.RatedLevels.Where(r => r.UserId == user.UserId));
+            this.GameTokens.RemoveRange(this.GameTokens.Where(t => t.UserId == user.UserId));
+            this.WebTokens.RemoveRange(this.WebTokens.Where(t => t.UserId == user.UserId));
+            this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
+            this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
+
+            await this.SaveChangesAsync();
+        }
+
+        public async Task RemoveSlot(Slot slot, bool saveChanges = true)
+        {
+            if (slot.Location != null) this.Locations.Remove(slot.Location);
+            this.Slots.Remove(slot);
+
+            if (saveChanges) await this.SaveChangesAsync();
+        }
+        #nullable disable
     }
 }

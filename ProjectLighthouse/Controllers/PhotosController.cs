@@ -9,6 +9,7 @@ using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,12 +33,22 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
+            if (user.PhotosByMe >= ServerSettings.Instance.PhotosQuota) return this.BadRequest();
+
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
             XmlSerializer serializer = new(typeof(Photo));
             Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
             if (photo == null) return this.BadRequest();
+
+            foreach (Photo p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
+            {
+                if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uplaoded
+                if (p.MediumHash == photo.MediumHash) return this.Ok();
+                if (p.SmallHash == photo.SmallHash) return this.Ok();
+                if (p.PlanHash == photo.PlanHash) return this.Ok();
+            }
 
             photo.CreatorId = user.UserId;
             photo.Creator = user;
