@@ -269,7 +269,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 this.database.RatedReviews.Add(ratedReview);
             }
 
+            int oldThumb = ratedReview.Thumb;
             ratedReview.Thumb = Math.Max(Math.Min(1, rating), -1);
+
+            if (oldThumb != ratedReview.Thumb)
+            {
+                if (oldThumb == -1) review.ThumbsDown--;
+                else if (oldThumb == 1) review.ThumbsUp--;
+
+                if (ratedReview.Thumb == -1) review.ThumbsDown++;
+                else if (ratedReview.Thumb == 1) review.ThumbsUp++;
+            }
 
             await this.database.SaveChangesAsync();
 
