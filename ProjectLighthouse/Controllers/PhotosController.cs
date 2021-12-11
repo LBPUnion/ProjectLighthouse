@@ -9,6 +9,7 @@ using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         {
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
+
+            if (user.PhotosByMe >= ServerSettings.Instance.PhotosQuota) return this.BadRequest();
 
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();

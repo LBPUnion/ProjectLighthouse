@@ -63,7 +63,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
             }
         }
 
-        public const int CurrentConfigVersion = 11; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+        public const int CurrentConfigVersion = 12; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
 
         #region Meta
 
@@ -102,6 +102,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public int EntitledSlots { get; set; } = 50;
 
         public int ListsQuota { get; set; } = 50;
+
+        public int PhotosQuota { get; set; } = 500;
 
         public bool GoogleAnalyticsEnabled { get; set; } = false;
 
