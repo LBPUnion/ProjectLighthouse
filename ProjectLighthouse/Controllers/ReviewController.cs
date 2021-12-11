@@ -165,7 +165,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 yourReview.SlotId = slotId;
                 yourReview.Deleted = false;
                 yourReview.DeletedBy = DeletedBy.None;
-                yourReview.Text = "You haven't reviewed this level yet. Edit this blank review to upload it!";
+                yourReview.Text = "You haven't reviewed this level yet. Edit this blank review to upload one!";
                 yourReview.LabelCollection = "";
                 yourReview.Timestamp = TimeHelper.UnixTimeMilliseconds();
             }
