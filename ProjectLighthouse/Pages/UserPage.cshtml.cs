@@ -12,15 +12,15 @@ namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class UserPage : BaseLayout
     {
-        public UserPage(Database database) : base(database)
-        {}
-
-        public User? ProfileUser;
-
-        public List<Photo>? Photos;
         public List<Comment>? Comments;
 
         public bool IsProfileUserHearted;
+
+        public List<Photo>? Photos;
+
+        public User? ProfileUser;
+        public UserPage(Database database) : base(database)
+        {}
 
         public async Task<IActionResult> OnGet([FromRoute] int userId)
         {
@@ -37,12 +37,9 @@ namespace LBPUnion.ProjectLighthouse.Pages
                 .ToListAsync();
 
             if (this.User != null)
-            {
-
-                this.IsProfileUserHearted = (await this.Database.HeartedProfiles.FirstOrDefaultAsync
-                                                (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId)) !=
+                this.IsProfileUserHearted = await this.Database.HeartedProfiles.FirstOrDefaultAsync
+                                                (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId) !=
                                             null;
-            }
 
             return this.Page();
         }

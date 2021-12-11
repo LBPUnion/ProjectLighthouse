@@ -80,7 +80,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             await this.database.SaveChangesAsync();
 
-            string myRanking = GetScores(score.SlotId, score.Type, user);
+            string myRanking = this.GetScores(score.SlotId, score.Type, user);
 
             return this.Ok(myRanking);
         }
@@ -99,7 +99,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (user == null) return this.StatusCode(403, "");
 
-            return this.Ok(GetScores(slotId, type, user, pageStart, pageSize));
+            return this.Ok(this.GetScores(slotId, type, user, pageStart, pageSize));
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -139,17 +139,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             );
 
             string res;
-            if (myScore == null)
-            {
-                res = LbpSerializer.StringElement("scores", serializedScores);
-            }
+            if (myScore == null) res = LbpSerializer.StringElement("scores", serializedScores);
             else
-            {
                 res = LbpSerializer.TaggedStringElement
                 (
                     "scores",
                     serializedScores,
-                    new Dictionary<string, object>()
+                    new Dictionary<string, object>
                     {
                         {
                             "yourScore", myScore.Score.Points
@@ -162,7 +158,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                         }, // This is the denominator of your position globally in the side menu.
                     }
                 );
-            }
 
             return res;
         }

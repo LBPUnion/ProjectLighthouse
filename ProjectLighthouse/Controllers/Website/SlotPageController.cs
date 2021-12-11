@@ -26,10 +26,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.Website
         [HttpGet("heart")]
         public async Task<IActionResult> HeartLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
         {
-            if (string.IsNullOrEmpty(callbackUrl))
-            {
-                callbackUrl = "~/slot/" + id;
-            }
+            if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
             User? user = this.database.UserFromWebRequest(this.Request);
             if (user == null) return this.Redirect("~/login");
@@ -45,10 +42,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.Website
         [HttpGet("unheart")]
         public async Task<IActionResult> UnheartLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
         {
-            if (string.IsNullOrEmpty(callbackUrl))
-            {
-                callbackUrl = "~/slot/" + id;
-            }
+            if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
             User? user = this.database.UserFromWebRequest(this.Request);
             if (user == null) return this.Redirect("~/login");
@@ -64,10 +58,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.Website
         [HttpGet("queue")]
         public async Task<IActionResult> QueueLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
         {
-            if (string.IsNullOrEmpty(callbackUrl))
-            {
-                callbackUrl = "~/slot/" + id;
-            }
+            if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
             User? user = this.database.UserFromWebRequest(this.Request);
             if (user == null) return this.Redirect("~/login");
@@ -83,10 +74,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.Website
         [HttpGet("unqueue")]
         public async Task<IActionResult> UnqueueLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
         {
-            if (string.IsNullOrEmpty(callbackUrl))
-            {
-                callbackUrl = "~/slot/" + id;
-            }
+            if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
             User? user = this.database.UserFromWebRequest(this.Request);
             if (user == null) return this.Redirect("~/login");

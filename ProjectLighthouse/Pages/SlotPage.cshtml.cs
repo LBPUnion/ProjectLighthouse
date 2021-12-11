@@ -10,10 +10,10 @@ namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class SlotPage : BaseLayout
     {
-        public SlotPage([NotNull] Database database) : base(database)
-        {}
 
         public Slot Slot;
+        public SlotPage([NotNull] Database database) : base(database)
+        {}
 
         public async Task<IActionResult> OnGet([FromRoute] int id)
         {

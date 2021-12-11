@@ -8,6 +8,17 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
     [SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
     public class CreateRoom : IMatchData
     {
+        public int BuildVersion;
+        public int HostMood;
+        public int Language;
+        public List<int> Location;
+
+        public List<int> NAT;
+        public int PassedNoJoinPoint;
+        public RoomState RoomState;
+
+        public string Search;
+
         //[CreateRoom,["Players":["LumaLivy"],"Reservations":["0"],"NAT":[2],"Slots":[[1,3]],"RoomState":0,"HostMood":1,"PassedNoJoinPoint":0,"Location":[0x7f000001],"Language":1,"BuildVersion":289,"Search":""]]
         public List<string> Players { get; set; }
 
@@ -25,17 +36,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
         public RoomSlot RoomSlot
             => new()
             {
-                SlotType = (SlotType)Slots[0][0],
-                SlotId = Slots[0][1],
+                SlotType = (SlotType)this.Slots[0][0],
+                SlotId = this.Slots[0][1],
             };
-
-        public List<int> NAT;
-        public RoomState RoomState;
-        public int HostMood;
-        public int PassedNoJoinPoint;
-        public List<int> Location;
-        public int Language;
-        public int BuildVersion;
-        public string Search;
     }
 }

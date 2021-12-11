@@ -22,10 +22,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static void AddUserRecentlyDivedIn(int userId, int otherUserId)
         {
-            if (!UserRecentlyDivedIn.TryGetValue(userId, out List<int>? recentlyDivedIn))
-            {
-                UserRecentlyDivedIn.Add(userId, recentlyDivedIn = new List<int>());
-            }
+            if (!UserRecentlyDivedIn.TryGetValue(userId, out List<int>? recentlyDivedIn)) UserRecentlyDivedIn.Add(userId, recentlyDivedIn = new List<int>());
 
             Debug.Assert(recentlyDivedIn != null, nameof(recentlyDivedIn) + " is null, somehow.");
 

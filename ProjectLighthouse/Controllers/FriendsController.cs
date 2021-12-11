@@ -78,9 +78,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameToken gameToken = userAndToken.Value.Item2;
 
             if (!FriendHelper.FriendIdsByUserId.TryGetValue(user.UserId, out int[]? friendIds) || friendIds == null)
-            {
                 return this.Ok(LbpSerializer.BlankElement("myFriends"));
-            }
 
             string friends = "";
             foreach (int friendId in friendIds)

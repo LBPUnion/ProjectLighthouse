@@ -26,40 +26,32 @@ namespace LBPUnion.ProjectLighthouse.Types
         public string Biography { get; set; }
 
         [NotMapped]
-        public int Reviews
-        {
-            get
-            {
+        public int Reviews {
+            get {
                 using Database database = new();
                 return database.Reviews.Count(r => r.ReviewerId == this.UserId);
             }
         }
 
         [NotMapped]
-        public int Comments
-        {
-            get
-            {
+        public int Comments {
+            get {
                 using Database database = new();
                 return database.Comments.Count(c => c.TargetUserId == this.UserId);
             }
         }
 
         [NotMapped]
-        public int PhotosByMe
-        {
-            get
-            {
+        public int PhotosByMe {
+            get {
                 using Database database = new();
                 return database.Photos.Count(p => p.CreatorId == this.UserId);
             }
         }
 
         [NotMapped]
-        public int PhotosWithMe
-        {
-            get
-            {
+        public int PhotosWithMe {
+            get {
                 using Database database = new();
                 return Enumerable.Sum(database.Photos, photo => photo.Subjects.Count(subject => subject.User.UserId == this.UserId));
             }
@@ -74,30 +66,24 @@ namespace LBPUnion.ProjectLighthouse.Types
         public Location Location { get; set; }
 
         [NotMapped]
-        public int HeartedLevels
-        {
-            get
-            {
+        public int HeartedLevels {
+            get {
                 using Database database = new();
                 return database.HeartedLevels.Count(p => p.UserId == this.UserId);
             }
         }
 
         [NotMapped]
-        public int HeartedUsers
-        {
-            get
-            {
+        public int HeartedUsers {
+            get {
                 using Database database = new();
                 return database.HeartedProfiles.Count(p => p.UserId == this.UserId);
             }
         }
 
         [NotMapped]
-        public int QueuedLevels
-        {
-            get
-            {
+        public int QueuedLevels {
+            get {
                 using Database database = new();
                 return database.QueuedLevels.Count(p => p.UserId == this.UserId);
             }
@@ -107,10 +93,8 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public string PlanetHash { get; set; } = "";
 
-        public int Hearts
-        {
-            get
-            {
+        public int Hearts {
+            get {
                 using Database database = new();
 
                 return database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
@@ -125,12 +109,10 @@ namespace LBPUnion.ProjectLighthouse.Types
         public string BooHash { get; set; } = "";
         public string MehHash { get; set; } = "";
 
-#nullable enable
+        #nullable enable
         [NotMapped]
-        public string Status
-        {
-            get
-            {
+        public string Status {
+            get {
                 using Database database = new();
                 LastContact? lastMatch = database.LastContacts.Where
                         (l => l.UserId == this.UserId)
@@ -141,7 +123,7 @@ namespace LBPUnion.ProjectLighthouse.Types
                 return "Currently online on " + lastMatch.GameVersion.ToPrettyString();
             }
         }
-#nullable disable
+        #nullable disable
 
         public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
@@ -165,9 +147,9 @@ namespace LBPUnion.ProjectLighthouse.Types
                           LbpSerializer.StringElement("planets", this.PlanetHash) +
                           LbpSerializer.BlankElement("photos") +
                           LbpSerializer.StringElement("heartCount", this.Hearts) +
-                          LbpSerializer.StringElement("yay2", YayHash) +
-                          LbpSerializer.StringElement("boo2", YayHash) +
-                          LbpSerializer.StringElement("meh2", YayHash);
+                          LbpSerializer.StringElement("yay2", this.YayHash) +
+                          LbpSerializer.StringElement("boo2", this.YayHash) +
+                          LbpSerializer.StringElement("meh2", this.YayHash);
             this.ClientsConnected.Serialize();
 
             return LbpSerializer.TaggedStringElement("user", user, "type", "user");
@@ -179,10 +161,8 @@ namespace LBPUnion.ProjectLighthouse.Types
         ///     The number of used slots on the earth
         /// </summary>
         [NotMapped]
-        public int UsedSlots
-        {
-            get
-            {
+        public int UsedSlots {
+            get {
                 using Database database = new();
                 return database.Slots.Count(s => s.CreatorId == this.UserId);
             }
@@ -243,10 +223,10 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         #endregion Slots
 
-#nullable enable
+        #nullable enable
         public override bool Equals(object? obj)
         {
-            if (obj is User user) return user.UserId == UserId;
+            if (obj is User user) return user.UserId == this.UserId;
 
             return false;
         }
@@ -263,6 +243,6 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode() => this.UserId;
-#nullable disable
+        #nullable disable
     }
 }

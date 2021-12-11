@@ -13,11 +13,11 @@ namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class LandingPage : BaseLayout
     {
-        public LandingPage(Database database) : base(database)
-        {}
+        public List<User> PlayersOnline;
 
         public int PlayersOnlineCount;
-        public List<User> PlayersOnline;
+        public LandingPage(Database database) : base(database)
+        {}
 
         [UsedImplicitly]
         public async Task<IActionResult> OnGet()

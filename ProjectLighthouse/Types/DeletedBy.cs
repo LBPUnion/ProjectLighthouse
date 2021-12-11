@@ -7,10 +7,12 @@ namespace LBPUnion.ProjectLighthouse.Types
     {
         [XmlEnum(Name = "none")]
         None,
+
         [XmlEnum(Name = "moderator")]
         Moderator,
+
         [XmlEnum(Name = "level_author")]
-        LevelAuthor
+        LevelAuthor,
         // TODO: deletion types for comments (profile etc) 
     }
 }

@@ -10,15 +10,15 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
     {
         public const string ServerName = "ProjectLighthouse";
 
-        public static bool DbConnected
-        {
-            get
-            {
+        public const int PageSize = 20;
+
+        public static bool DbConnected {
+            get {
                 try
                 {
                     return new Database().Database.CanConnect();
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
                     Logger.Log(e.ToString(), LoggerLevelDatabase.Instance);
                     return false;
@@ -27,7 +27,5 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         }
 
         public static bool IsUnitTesting => AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.FullName.StartsWith("xunit"));
-
-        public const int PageSize = 20;
     }
 }

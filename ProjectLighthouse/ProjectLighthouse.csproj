@@ -8,38 +8,38 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
-        <PackageReference Include="InfluxDB.Client" Version="3.2.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
-        <PackageReference Include="Kettu" Version="1.2.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.2"/>
+        <PackageReference Include="InfluxDB.Client" Version="3.2.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
+        <PackageReference Include="Kettu" Version="1.2.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="gitVersion.txt" />
+        <None Remove="gitVersion.txt"/>
         <EmbeddedResource Include="gitVersion.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="gitBranch.txt" />
+        <None Remove="gitBranch.txt"/>
         <EmbeddedResource Include="gitBranch.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Pages\Admin\Index.cshtml" />
+        <_ContentIncludedByDefault Remove="Pages\Admin\Index.cshtml"/>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;" />
-        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;" />
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;"/>
+        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;"/>
     </Target>
 
 </Project>

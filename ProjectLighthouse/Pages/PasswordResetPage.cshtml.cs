@@ -13,7 +13,6 @@ namespace LBPUnion.ProjectLighthouse.Pages
         public PasswordResetPage(Database database) : base(database)
         {}
 
-
         public string Error { get; private set; }
 
         [UsedImplicitly]
@@ -47,6 +46,7 @@ namespace LBPUnion.ProjectLighthouse.Pages
         {
             User? user = this.Database.UserFromWebRequest(this.Request);
             if (user == null) return this.Redirect("~/login");
+
             return this.Page();
         }
     }

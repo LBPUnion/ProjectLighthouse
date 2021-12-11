@@ -114,10 +114,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (userFromQuery == null) return this.NotFound();
 
             List<Photo> photos = new();
-            foreach (Photo photo in this.database.Photos.Include(p => p.Creator))
-            {
-                photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
-            }
+            foreach (Photo photo in this.database.Photos.Include
+                         (p => p.Creator)) photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
 
             string response = photos.OrderByDescending
                     (s => s.Timestamp)

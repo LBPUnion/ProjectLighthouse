@@ -11,10 +11,10 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
 {
     public class AuthenticationPage : BaseLayout
     {
-        public AuthenticationPage(Database database) : base(database)
-        { }
 
         public List<AuthenticationAttempt> AuthenticationAttempts;
+        public AuthenticationPage(Database database) : base(database)
+        {}
 
         public async Task<IActionResult> OnGet()
         {

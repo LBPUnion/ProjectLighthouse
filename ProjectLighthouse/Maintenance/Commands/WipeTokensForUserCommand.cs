@@ -23,7 +23,6 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
         {
             User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
             if (user == null)
-            {
                 try
                 {
                     user = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == Convert.ToInt32(args[0]));
@@ -34,7 +33,6 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
                     Console.WriteLine($"Could not find user by parameter '{args[0]}'");
                     return;
                 }
-            }
 
             this.database.GameTokens.RemoveRange(this.database.GameTokens.Where(t => t.UserId == user.UserId));
             this.database.WebTokens.RemoveRange(this.database.WebTokens.Where(t => t.UserId == user.UserId));

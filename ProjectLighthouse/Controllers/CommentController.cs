@@ -70,10 +70,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (user == null) return this.StatusCode(403, "");
 
             Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
-            if (comment == null)
-            {
-                return this.NotFound();
-            }
+            if (comment == null) return this.NotFound();
 
             if (comment.TargetUserId != user.UserId && comment.PosterUserId != user.UserId) return this.StatusCode(403, "");
 

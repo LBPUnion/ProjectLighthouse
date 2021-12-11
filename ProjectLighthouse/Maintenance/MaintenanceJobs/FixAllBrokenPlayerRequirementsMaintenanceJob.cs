@@ -14,7 +14,6 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
         {
             int count = 0;
             await foreach (Slot slot in this.database.Slots)
-            {
                 if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
                 {
                     slot.MinimumPlayers = 1;
@@ -23,7 +22,6 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
                     Console.WriteLine($"Fixed slotId {slot.SlotId}");
                     count++;
                 }
-            }
 
             await this.database.SaveChangesAsync();
 

@@ -1,17 +1,17 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
@@ -77,10 +77,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             ratedLevel.Rating = Math.Max(Math.Min(1, rating), -1);
 
             Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
-            if (review != null)
-            {
-                review.Thumb = ratedLevel.Rating;
-            }
+            if (review != null) review.Thumb = ratedLevel.Rating;
 
             await this.database.SaveChangesAsync();
 
@@ -96,9 +93,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
             Review? newReview = await this.GetReviewFromBody();
             if (newReview == null) return this.BadRequest();
+
             if (review == null)
             {
-                review = new();
+                review = new Review();
                 review.SlotId = slotId;
                 review.ReviewerId = user.UserId;
                 review.DeletedBy = DeletedBy.None;
@@ -145,19 +143,22 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             Random rand = new();
 
-            Review? yourReview = await this.database.Reviews.FirstOrDefaultAsync(r => r.ReviewerId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
+            Review? yourReview = await this.database.Reviews.FirstOrDefaultAsync
+                (r => r.ReviewerId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
 
-            VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(v => v.UserId == user.UserId && v.SlotId == slotId && v.Slot.GameVersion <= gameVersion);
+            VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync
+                (v => v.UserId == user.UserId && v.SlotId == slotId && v.Slot.GameVersion <= gameVersion);
 
             Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
             if (slot == null) return this.BadRequest();
 
-            Boolean canNowReviewLevel = slot.CreatorId != user.UserId && visitedLevel != null && yourReview == null;
+            bool canNowReviewLevel = slot.CreatorId != user.UserId && visitedLevel != null && yourReview == null;
             if (canNowReviewLevel)
             {
-                RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
+                RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync
+                    (r => r.UserId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
 
-                yourReview = new();
+                yourReview = new Review();
                 yourReview.ReviewerId = user.UserId;
                 yourReview.Reviewer = user;
                 yourReview.Thumb = ratedLevel?.Rating == null ? 0 : ratedLevel.Rating;
@@ -180,30 +181,35 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             IEnumerable<Review?> prependedReviews;
             if (canNowReviewLevel) // this can only be true if you have not posted a review but have visited the level
-            {
                 // prepend the fake review to the top of the list to be easily edited
                 prependedReviews = reviews.ToList().Prepend(yourReview);
-            }
-            else
-            {
-                prependedReviews = reviews.ToList();
-            }
+            else prependedReviews = reviews.ToList();
 
-            string inner = Enumerable.Aggregate(prependedReviews, string.Empty, (current, review) =>
-            {
-                if (review == null) return current;
-                return current + review.Serialize();
-            });
+            string inner = prependedReviews.Aggregate
+            (
+                string.Empty,
+                (current, review) =>
+                {
+                    if (review == null) return current;
 
-            string response = LbpSerializer.TaggedStringElement("reviews", inner, new Dictionary<string, object>
+                    return current + review.Serialize();
+                }
+            );
+
+            string response = LbpSerializer.TaggedStringElement
+            (
+                "reviews",
+                inner,
+                new Dictionary<string, object>
+                {
                     {
-                        {
-                            "hint_start", pageStart + pageSize
-                        },
-                        {
-                            "hint", pageStart // not sure
-                        },
-                    });
+                        "hint_start", pageStart + pageSize
+                    },
+                    {
+                        "hint", pageStart // not sure
+                    },
+                }
+            );
             return this.Ok(response);
         }
 
@@ -227,22 +233,31 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Skip(pageStart - 1)
                 .Take(pageSize);
 
-            string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) =>
-            {
-                //RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == review.SlotId && r.UserId == user.UserId);
-                //RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
-                return current + review.Serialize(/*, ratedReview*/);
-            });
+            string inner = reviews.Aggregate
+            (
+                string.Empty,
+                (current, review) =>
+                {
+                    //RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == review.SlotId && r.UserId == user.UserId);
+                    //RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
+                    return current + review.Serialize( /*, ratedReview*/);
+                }
+            );
 
-            string response = LbpSerializer.TaggedStringElement("reviews", inner, new Dictionary<string, object>
+            string response = LbpSerializer.TaggedStringElement
+            (
+                "reviews",
+                inner,
+                new Dictionary<string, object>
+                {
                     {
-                        {
-                            "hint_start", pageStart
-                        },
-                        {
-                            "hint", reviews.Last().Timestamp // Seems to be the timestamp of oldest
-                        },
-                    });
+                        "hint_start", pageStart
+                    },
+                    {
+                        "hint", reviews.Last().Timestamp // Seems to be the timestamp of oldest
+                    },
+                }
+            );
 
             return this.Ok(response);
         }
@@ -312,6 +327,5 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             return review;
         }
-
     }
 }

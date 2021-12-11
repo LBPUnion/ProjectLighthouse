@@ -9,25 +9,6 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
     {
         public readonly Database Database;
 
-        public string Title = string.Empty;
-        public bool ShowTitleInPage = true;
-
-        private User? user;
-
-        public new User? User {
-            get {
-                if (this.user != null) return this.user;
-
-                return user = Database.UserFromWebRequest(this.Request);
-            }
-            set => this.user = value;
-        }
-
-        public BaseLayout(Database database)
-        {
-            this.Database = database;
-        }
-
         public readonly List<PageNavigationItem> NavigationItems = new()
         {
             new PageNavigationItem("Home", "/", "home"),
@@ -35,8 +16,26 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
             new PageNavigationItem("Levels", "/slots/0", "certificate"),
         };
 
-        public readonly List<PageNavigationItem> NavigationItemsRight = new()
-            {};
+        public readonly List<PageNavigationItem> NavigationItemsRight = new();
 
+        public bool ShowTitleInPage = true;
+
+        public string Title = string.Empty;
+
+        private User? user;
+
+        public BaseLayout(Database database)
+        {
+            this.Database = database;
+        }
+
+        public new User? User {
+            get {
+                if (this.user != null) return this.user;
+
+                return this.user = this.Database.UserFromWebRequest(this.Request);
+            }
+            set => this.user = value;
+        }
     }
 }

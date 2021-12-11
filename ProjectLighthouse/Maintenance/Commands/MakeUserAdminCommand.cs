@@ -25,7 +25,6 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
         {
             User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
             if (user == null)
-            {
                 try
                 {
                     user = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == Convert.ToInt32(args[0]));
@@ -36,7 +35,6 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
                     Console.WriteLine($"Could not find user by parameter '{args[0]}'");
                     return;
                 }
-            }
 
             user.IsAdmin = true;
             await this.database.SaveChangesAsync();

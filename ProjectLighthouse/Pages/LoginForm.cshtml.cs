@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Pages
     public class LoginForm : BaseLayout
     {
         public LoginForm(Database database) : base(database)
-        { }
+        {}
 
         public string Error { get; private set; }
 
@@ -40,8 +40,7 @@ namespace LBPUnion.ProjectLighthouse.Pages
                 return this.Page();
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(password,
-                user.Password))
+            if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
                 this.Error = "The username or password you entered is invalid.";
                 return this.Page();
@@ -56,19 +55,17 @@ namespace LBPUnion.ProjectLighthouse.Pages
             this.Database.WebTokens.Add(webToken);
             await this.Database.SaveChangesAsync();
 
-            this.Response.Cookies.Append("LighthouseToken",
-                webToken.UserToken);
+            this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
 
             if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 
             return this.RedirectToPage(nameof(LandingPage));
         }
 
-
         [UsedImplicitly]
         public async Task<IActionResult> OnGet()
         {
-            Error = string.Empty;
+            this.Error = string.Empty;
             return this.Page();
         }
     }

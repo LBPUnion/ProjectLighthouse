@@ -80,9 +80,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 Room? room = RoomHelper.FindRoomByUser(user, true);
 
                 if (playerData.RoomState != null)
-                {
-                    if (room != null && Equals(room.Host, user)) room.State = (RoomState)playerData.RoomState;
-                }
+                    if (room != null && Equals(room.Host, user))
+                        room.State = (RoomState)playerData.RoomState;
             }
 
             if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
@@ -92,10 +91,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 if (response == null) return this.NotFound();
 
                 string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
-                foreach (Player player in response.Players)
-                {
-                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
-                }
+                foreach (Player player in response.Players) MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
 
                 return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
             }
@@ -107,10 +103,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 {
                     User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                    if (player != null)
-                    {
-                        users.Add(player);
-                    }
+                    if (player != null) users.Add(player);
                     else return this.BadRequest();
                 }
 

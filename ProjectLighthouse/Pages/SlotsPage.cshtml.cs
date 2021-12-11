@@ -13,14 +13,14 @@ namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class SlotsPage : BaseLayout
     {
-        public SlotsPage([NotNull] Database database) : base(database)
-        {}
+
+        public int PageNumber;
 
         public int SlotCount;
 
         public List<Slot> Slots;
-
-        public int PageNumber;
+        public SlotsPage([NotNull] Database database) : base(database)
+        {}
 
         public async Task<IActionResult> OnGet([FromRoute] int pageNumber)
         {

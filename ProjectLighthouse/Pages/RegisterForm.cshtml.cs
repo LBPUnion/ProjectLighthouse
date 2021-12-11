@@ -14,13 +14,12 @@ namespace LBPUnion.ProjectLighthouse.Pages
     {
         public RegisterForm(Database database) : base(database)
         {}
-        
+
         public string Error { get; private set; }
         public bool WasRegisterRequest { get; private set; }
 
         [UsedImplicitly]
-        [SuppressMessage("ReSharper",
-            "SpecifyStringComparison")]
+        [SuppressMessage("ReSharper", "SpecifyStringComparison")]
         public async Task<IActionResult> OnPost(string username, string password, string confirmPassword)
         {
             if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
@@ -43,16 +42,14 @@ namespace LBPUnion.ProjectLighthouse.Pages
                 return this.Page();
             }
 
-            bool userExists =
-                await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
+            bool userExists = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
             if (userExists)
             {
                 this.Error = "The username you've chosen is already taken.";
                 return this.Page();
             }
 
-            User user = await this.Database.CreateUser(username,
-                HashHelper.BCryptHash(password));
+            User user = await this.Database.CreateUser(username, HashHelper.BCryptHash(password));
 
             WebToken webToken = new()
             {
@@ -63,8 +60,7 @@ namespace LBPUnion.ProjectLighthouse.Pages
             this.Database.WebTokens.Add(webToken);
             await this.Database.SaveChangesAsync();
 
-            this.Response.Cookies.Append("LighthouseToken",
-                webToken.UserToken);
+            this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
 
             return this.RedirectToPage(nameof(LandingPage));
         }
@@ -73,7 +69,7 @@ namespace LBPUnion.ProjectLighthouse.Pages
         [SuppressMessage("ReSharper", "SpecifyStringComparison")]
         public IActionResult OnGet()
         {
-            Error = string.Empty;
+            this.Error = string.Empty;
             if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
 
             return this.Page();

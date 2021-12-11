@@ -88,7 +88,7 @@ Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNEC
 | LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k             | N/A                    |
 | LBP PSP  | Potentially compatible                | Incompatible, PSN not supported on PPSSPP                | Potentially Compatible |
 
-While LBP Vita and LBP PSP can be supported, they are not properly seperated from the mainline games at this time. 
-We recommend you run seperate instances for these games to avoid problems.
+While LBP Vita and LBP PSP can be supported, they are not properly seperated from the mainline games at this time. We
+recommend you run seperate instances for these games to avoid problems.
 
 Project Lighthouse is still a heavy work in progress, so this chart is subject to change at any point.

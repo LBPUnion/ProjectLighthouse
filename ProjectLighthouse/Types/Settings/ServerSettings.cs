@@ -11,6 +11,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
     [Serializable]
     public class ServerSettings
     {
+
+        public const int CurrentConfigVersion = 12; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
         static ServerSettings()
         {
             if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
@@ -63,20 +65,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
             }
         }
 
-        public const int CurrentConfigVersion = 12; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
-
-        #region Meta
-
-        [NotNull]
-        public static ServerSettings Instance;
-
-        [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
-        public int ConfigVersion { get; set; } = CurrentConfigVersion;
-
-        public const string ConfigFileName = "lighthouse.config.json";
-
-        #endregion Meta
-
         public bool InfluxEnabled { get; set; }
         public bool InfluxLoggingEnabled { get; set; }
         public string InfluxOrg { get; set; } = "lighthouse";
@@ -105,8 +93,21 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
 
         public int PhotosQuota { get; set; } = 500;
 
-        public bool GoogleAnalyticsEnabled { get; set; } = false;
+        public bool GoogleAnalyticsEnabled { get; set; }
 
         public string GoogleAnalyticsId { get; set; } = "";
+
+        #region Meta
+
+        [NotNull]
+        public static ServerSettings Instance;
+
+        [JsonPropertyName("ConfigVersionDoNotModifyOrYouWillBeSlapped")]
+        public int ConfigVersion { get; set; } = CurrentConfigVersion;
+
+        public const string ConfigFileName = "lighthouse.config.json";
+
+        #endregion Meta
+
     }
 }

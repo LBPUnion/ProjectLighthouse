@@ -13,14 +13,14 @@ namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class PhotosPage : BaseLayout
     {
-        public PhotosPage([NotNull] Database database) : base(database)
-        {}
+
+        public int PageNumber;
 
         public int PhotoCount;
 
         public List<Photo> Photos;
-
-        public int PageNumber;
+        public PhotosPage([NotNull] Database database) : base(database)
+        {}
 
         public async Task<IActionResult> OnGet([FromRoute] int pageNumber)
         {

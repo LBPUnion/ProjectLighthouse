@@ -11,10 +11,10 @@ namespace LBPUnion.ProjectLighthouse.Pages
 {
     public class AdminPanelPage : BaseLayout
     {
-        public AdminPanelPage(Database database) : base(database)
-        {}
 
         public List<ICommand> Commands = MaintenanceHelper.Commands;
+        public AdminPanelPage(Database database) : base(database)
+        {}
 
         public async Task<IActionResult> OnGet([FromQuery] string? args, [FromQuery] string? command, [FromQuery] string? maintenanceJob)
         {

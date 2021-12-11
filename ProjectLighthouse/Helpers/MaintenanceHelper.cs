@@ -10,6 +10,12 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 {
     public static class MaintenanceHelper
     {
+
+        static MaintenanceHelper()
+        {
+            Commands = getListOfInterfaceObjects<ICommand>();
+            MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
+        }
         public static List<ICommand> Commands { get; }
 
         public static List<IMaintenanceJob> MaintenanceJobs { get; }
@@ -23,22 +29,14 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 .ToList()!;
         }
 
-        static MaintenanceHelper()
-        {
-            Commands = getListOfInterfaceObjects<ICommand>();
-            MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
-        }
-
         public static async Task RunCommand(string[] args)
         {
             if (args.Length < 1)
-            {
                 throw new Exception
                 (
                     "This should never happen. " +
                     "If it did, its because you tried to run a command before validating that the user actually wants to run one."
                 );
-            }
 
             string baseCmd = args[0];
             args = args.Skip(1).ToArray();

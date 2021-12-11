@@ -51,10 +51,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (token == null) return this.StatusCode(403, "");
 
             List<string?> serializedUsers = new();
-            foreach (string userId in u)
-            {
-                serializedUsers.Add(await this.GetSerializedUser(userId, token.GameVersion));
-            }
+            foreach (string userId in u) serializedUsers.Add(await this.GetSerializedUser(userId, token.GameVersion));
 
             string serialized = serializedUsers.Aggregate(string.Empty, (current, user) => user == null ? current : current + user);
 
@@ -159,10 +156,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 Location? l = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == user.LocationId); // find the location in the database again
 
-                if (l == null)
-                {
-                    throw new Exception("this shouldn't happen ever but we handle this");
-                }
+                if (l == null) throw new Exception("this shouldn't happen ever but we handle this");
 
                 // set the location in the database to the one we modified above
                 l.X = user.Location.X;

@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -91,7 +91,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await LuckyDipSlots(30 * page, 30, 69);
+        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await this.LuckyDipSlots(30 * page, 30, 69);
 
         [HttpGet("slots")]
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
@@ -198,6 +198,5 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 )
             );
         }
-
     }
 }

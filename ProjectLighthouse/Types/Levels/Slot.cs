@@ -41,8 +41,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("resource")]
-        public string[] Resources
-        {
+        public string[] Resources {
             get => this.ResourceCollection.Split(",");
             set => this.ResourceCollection = string.Join(',', value);
         }
@@ -104,10 +103,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [XmlIgnore]
         [NotMapped]
-        public int Hearts
-        {
-            get
-            {
+        public int Hearts {
+            get {
                 using Database database = new();
 
                 return database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
@@ -164,10 +161,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("thumbsup")]
-        public int Thumbsup
-        {
-            get
-            {
+        public int Thumbsup {
+            get {
                 using Database database = new();
 
                 return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
@@ -176,10 +171,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("thumbsdown")]
-        public int Thumbsdown
-        {
-            get
-            {
+        public int Thumbsdown {
+            get {
                 using Database database = new();
 
                 return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
@@ -188,10 +181,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("averageRating")]
-        public double RatingLBP1
-        {
-            get
-            {
+        public double RatingLBP1 {
+            get {
                 using Database database = new();
 
                 IQueryable<RatedLevel> ratedLevels = database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
@@ -203,10 +194,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels
 
         [NotMapped]
         [XmlElement("reviewCount")]
-        public int ReviewCount
-        {
-            get
-            {
+        public int ReviewCount {
+            get {
                 using Database database = new();
 
                 return database.Reviews.Count(r => r.SlotId == this.SlotId);

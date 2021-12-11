@@ -57,7 +57,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (ServerSettings.Instance.UseExternalAuth)
             {
                 string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
-                if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || (DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3))
+                if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3)
                 {
                     this.database.AuthenticationAttempts.RemoveRange
                         (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
@@ -89,10 +89,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
 
             // Create a new room on LBP2+/Vita
-            if (token.GameVersion != GameVersion.LittleBigPlanet1)
-            {
-                RoomHelper.CreateRoom(user);
-            }
+            if (token.GameVersion != GameVersion.LittleBigPlanet1) RoomHelper.CreateRoom(user);
 
             return this.Ok
             (
