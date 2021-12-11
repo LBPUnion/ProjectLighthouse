@@ -117,6 +117,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
                 slot.GameVersion = gameToken.GameVersion;
 
+                if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
+                {
+                    slot.MinimumPlayers = 1;
+                    slot.MaximumPlayers = 4;
+                }
+
                 this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
                 await this.database.SaveChangesAsync();
                 return this.Ok(oldSlot.Serialize());

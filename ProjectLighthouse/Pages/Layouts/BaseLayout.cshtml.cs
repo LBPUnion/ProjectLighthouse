@@ -9,6 +9,9 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
     {
         public readonly Database Database;
 
+        public string Title = string.Empty;
+        public bool ShowTitleInPage = true;
+
         private User? user;
 
         public new User? User {

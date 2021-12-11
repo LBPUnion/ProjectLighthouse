@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Kettu;
@@ -10,7 +9,6 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Match;
-using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -72,27 +70,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #endregion
 
-            #region Update LastMatch
-
-            LastMatch? lastMatch = await this.database.LastMatches.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
-
-            // below makes it not look like trash
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            if (lastMatch == null)
-            {
-                lastMatch = new LastMatch
-                {
-                    UserId = user.UserId,
-                };
-                this.database.LastMatches.Add(lastMatch);
-            }
-
-            lastMatch.Timestamp = TimestampHelper.Timestamp;
-            lastMatch.GameVersion = gameToken.GameVersion;
-
-            await this.database.SaveChangesAsync();
-
-            #endregion
+            await LastContactHelper.SetLastContact(user, gameToken.GameVersion);
 
             #region Process match data
 

@@ -3,6 +3,7 @@
 
 @{
     Layout = "Layouts/BaseLayout";
+    Model.Title = "Register";
 }
 
 <script src="https://geraintluff.github.io/sha256/sha256.min.js"></script>
@@ -19,10 +20,20 @@
     }
 </script>
 
-<h1>Register</h1>
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="ui negative message">
+        <div class="header">
+            Uh oh!
+        </div>    
+        <p>@Model.Error</p>
+    </div>
+}
 
-<form onsubmit="return onSubmit(this)">
+<form onsubmit="return onSubmit(this)" method="post">
     <div class="ui left labeled input">
+        @Html.AntiForgeryToken()
+
         <label for="text" class="ui blue label">Username: </label>
         <input type="text" name="username" id="text">
     </div><br><br>

@@ -4,6 +4,7 @@ using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -135,10 +136,24 @@ namespace LBPUnion.ProjectLighthouse
 
                     // Copy the buffered response to the actual respose stream.
                     responseBuffer.Position = 0;
-
                     await responseBuffer.CopyToAsync(oldResponseStream);
-
                     context.Response.Body = oldResponseStream;
+
+                    #nullable enable
+                    // Log LastContact for LBP1. This is done on LBP2/3/V on a Match request.
+                    if (context.Request.Path.ToString().StartsWith("/LITTLEBIGPLANETPS3_XML"))
+                    {
+                        // We begin by grabbing a token from the request, if this is a LBPPS3_XML request of course.
+                        await using Database database = new(); // Gets nuked at the end of the scope
+                        GameToken? gameToken = await database.GameTokenFromRequest(context.Request);
+
+                        if (gameToken != null && gameToken.GameVersion == GameVersion.LittleBigPlanet1)
+                        {
+                            // Ignore UserFromGameToken null because user must exist for a token to exist
+                            await LastContactHelper.SetLastContact((await database.UserFromGameToken(gameToken))!, GameVersion.LittleBigPlanet1);
+                        }
+                    }
+                    #nullable disable
 
                     requestStopwatch.Stop();
 

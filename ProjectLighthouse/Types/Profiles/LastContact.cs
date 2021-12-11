@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LBPUnion.ProjectLighthouse.Types.Profiles
 {
-    public class LastMatch
+    public class LastContact
     {
         [Key]
         public int UserId { get; set; }

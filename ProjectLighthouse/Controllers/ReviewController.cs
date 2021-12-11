@@ -1,17 +1,17 @@
 #nullable enable
 using System;
 using System.IO;
-using System.Xml.Serialization;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
@@ -227,8 +227,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) =>
             {
                 RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == review.SlotId && r.UserId == user.UserId);
-                RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
-                return current + review.Serialize(ratedLevel, ratedReview);
+                //RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
+                return current + review.Serialize(ratedLevel/*, ratedReview*/);
             });
 
             string response = LbpSerializer.TaggedStringElement("reviews", inner, new Dictionary<string, object>

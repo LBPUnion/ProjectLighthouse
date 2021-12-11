@@ -62,8 +62,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 v = await visited.FirstOrDefaultAsync();
             }
-            
-            if (v == null) return this.NotFound();
+
+            if (v == null)
+            {
+                return this.NotFound();
+            }
 
             switch (gameVersion)
             {
@@ -116,7 +119,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 v = await visited.FirstOrDefaultAsync();
             }
 
-            if (v == null) return this.NotFound();
+            if (v == null)
+            {
+                return this.NotFound();
+            }
 
             slot.PlaysLBP1++;
             v.PlaysLBP1++;

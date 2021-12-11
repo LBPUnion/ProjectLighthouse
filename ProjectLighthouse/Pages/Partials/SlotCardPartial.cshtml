@@ -1,0 +1,86 @@
+@using LBPUnion.ProjectLighthouse
+@using LBPUnion.ProjectLighthouse.Types
+@using Microsoft.EntityFrameworkCore
+@model LBPUnion.ProjectLighthouse.Types.Levels.Slot
+
+@{
+    User user = (User)ViewData["User"];
+
+    await using Database database = new();
+
+    string slotName = string.IsNullOrEmpty(Model.Name) ? "Unnamed Level" : Model.Name;
+
+    bool isQueued = false;
+    bool isHearted = false;
+
+    if (user != null)
+    {
+        isQueued = await database.QueuedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
+
+        isHearted = await database.HeartedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
+    }
+
+    string callbackUrl = (string)ViewData["CallbackUrl"];
+    bool showLink = (bool?)ViewData["ShowLink"] ?? false;
+}
+<div class="ui grid">
+    <div class="eight wide column">
+        @if (showLink)
+        {
+            <h2 style="margin-bottom: 2px;">
+                <a href="~/slot/@Model.SlotId">@slotName</a>
+            </h2>
+        }
+        else
+        {
+            <h1 style="margin-bottom: 2px;">
+                @slotName
+            </h1>
+        }
+        <div class="statsUnderTitle" style="margin-bottom: 10px;">
+            <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
+            <i class="blue play icon" title="Plays"></i> <span>@Model.Plays</span>
+            <i class="green thumbs up icon" title="Yays"></i> <span>@Model.Thumbsup</span>
+            <i class="red thumbs down icon" title="Boos"></i> <span>@Model.Thumbsdown</span>
+
+            @if (Model.GameVersion == GameVersion.LittleBigPlanet1)
+            {
+                <i class="yellow star icon" title="LBP1 Stars"></i>
+                <span>@Model.RatingLBP1</span>
+            }
+        </div>
+        <p>
+            <i>Created by <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a></i>
+        </p>
+    </div>
+    <div class="eight wide right aligned column">
+        @if (user != null)
+        {
+            if (isHearted)
+            {
+                <a class="ui pink tiny button" href="/slot/@Model.SlotId/unheart?callbackUrl=@callbackUrl" title="Unheart">
+                    <i class="broken heart icon" style="margin: 0"></i>
+                </a>
+            }
+            else
+            {
+                <a class="ui pink tiny button" href="/slot/@Model.SlotId/heart?callbackUrl=@callbackUrl" title="Heart">
+                    <i class="heart icon" style="margin: 0"></i>
+                </a>
+            }
+
+            if (isQueued)
+            {
+                <a class="ui yellow tiny button" href="/slot/@Model.SlotId/unqueue?callbackUrl=@callbackUrl" title="Unqueue">
+                    <i class="bell slash icon" style="margin: 0"></i>
+                </a>
+            }
+            else
+            {
+                <a class="ui yellow tiny button" href="/slot/@Model.SlotId/queue?callbackUrl=@callbackUrl" title="Queue">
+                    <i class="bell icon" style="margin: 0"></i>
+                </a>
+            }
+        }
+    </div>
+</div>
