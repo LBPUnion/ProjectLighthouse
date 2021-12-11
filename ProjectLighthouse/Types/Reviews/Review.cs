@@ -1,10 +1,11 @@
 #nullable enable
 using System;
+using System.IO;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Serialization;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Reviews
@@ -67,13 +68,25 @@ namespace LBPUnion.ProjectLighthouse.Types.Reviews
 
         public string Serialize(string elementOverride, RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null)
         {
+
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.OmitXmlDeclaration = true;
+
+            XmlSerializer serializer = new(typeof(DeletedBy));
+            StringWriter stringWriter = new StringWriter();
+            using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, settings))
+            {
+                serializer.Serialize(xmlWriter, this.DeletedBy);
+            }
+            string deletedBy = stringWriter.ToString();
+
             string reviewData = LbpSerializer.TaggedStringElement("slot_id", this.SlotId, "type", this.Slot.Type) +
                                 LbpSerializer.StringElement("reviewer", this.Reviewer.Username) +
                                 LbpSerializer.StringElement("thumb", this.Thumb) +
                                 LbpSerializer.StringElement("timestamp", this.Timestamp) +
                                 LbpSerializer.StringElement("labels", this.LabelCollection) +
                                 LbpSerializer.StringElement("deleted", this.Deleted) +
-                                LbpSerializer.StringElement("deleted_by", this.DeletedBy) +
+                                deletedBy +
                                 LbpSerializer.StringElement("text", this.Text) +
                                 LbpSerializer.StringElement("thumbsup", this.ThumbsUp) +
                                 LbpSerializer.StringElement("thumbsdown", this.ThumbsDown) +

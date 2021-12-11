@@ -146,10 +146,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Random rand = new();
 
             Review? yourReview = await this.database.Reviews.FirstOrDefaultAsync(r => r.ReviewerId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
+
             VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(v => v.UserId == user.UserId && v.SlotId == slotId && v.Slot.GameVersion <= gameVersion);
+
             Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
             if (slot == null) return this.BadRequest();
-            Boolean canNowReviewLevel = visitedLevel != null && yourReview == null;
+
+            Boolean canNowReviewLevel = slot.CreatorId != user.UserId && visitedLevel != null && yourReview == null;
             if (canNowReviewLevel)
             {
                 RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
@@ -160,10 +163,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 yourReview.Thumb = ratedLevel?.Rating == null ? 0 : ratedLevel.Rating;
                 yourReview.Slot = slot;
                 yourReview.SlotId = slotId;
+                yourReview.Deleted = false;
                 yourReview.DeletedBy = DeletedBy.None;
                 yourReview.Text = "You haven't reviewed this level yet. Edit this blank review to upload it!";
                 yourReview.LabelCollection = "";
-                yourReview.Deleted = false;
                 yourReview.Timestamp = TimeHelper.UnixTimeMilliseconds();
             }
 
@@ -226,9 +229,9 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string inner = Enumerable.Aggregate(reviews, string.Empty, (current, review) =>
             {
-                RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == review.SlotId && r.UserId == user.UserId);
+                //RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == review.SlotId && r.UserId == user.UserId);
                 //RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
-                return current + review.Serialize(ratedLevel/*, ratedReview*/);
+                return current + review.Serialize(/*, ratedReview*/);
             });
 
             string response = LbpSerializer.TaggedStringElement("reviews", inner, new Dictionary<string, object>

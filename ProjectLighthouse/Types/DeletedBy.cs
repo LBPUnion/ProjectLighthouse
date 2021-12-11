@@ -2,6 +2,7 @@ using System.Xml.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types
 {
+    [XmlRoot("deleted_by")]
     public enum DeletedBy
     {
         [XmlEnum(Name = "none")]
