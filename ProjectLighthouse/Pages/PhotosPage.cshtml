@@ -20,4 +20,8 @@
 {
     <a href="/photos/@(Model.PageNumber - 1)">Previous Page</a>
 }
-<a href="/photos/@(Model.PageNumber + 1)">Next Page</a>
+@(Model.PageNumber + 1) / @(Model.PageAmount)
+@if (Model.PageNumber < Model.PageAmount - 1)
+{
+    <a href="/photos/@(Model.PageNumber + 1)">Next Page</a>
+}

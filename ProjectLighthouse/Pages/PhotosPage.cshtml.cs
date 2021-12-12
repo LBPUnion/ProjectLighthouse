@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace LBPUnion.ProjectLighthouse.Pages
 
         public int PhotoCount;
 
+        public int PageAmount;
+
         public List<Photo> Photos;
         public PhotosPage([NotNull] Database database) : base(database)
         {}
@@ -27,6 +30,12 @@ namespace LBPUnion.ProjectLighthouse.Pages
             this.PhotoCount = await StatisticsHelper.PhotoCount();
 
             this.PageNumber = pageNumber;
+            this.PageAmount = (int)Math.Ceiling((double)this.PhotoCount / ServerStatics.PageSize);
+
+            if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount)
+            {
+                return this.Redirect($"/photos/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
+            }
 
             this.Photos = await this.Database.Photos.Include
                     (p => p.Creator)
