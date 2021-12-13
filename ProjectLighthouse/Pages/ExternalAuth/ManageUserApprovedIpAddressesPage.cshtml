@@ -1,0 +1,22 @@
+@page "/authentication/autoApprovals"
+@using LBPUnion.ProjectLighthouse.Types
+@model LBPUnion.ProjectLighthouse.Pages.ExternalAuth.ManageUserApprovedIpAddressesPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Automatically approved IP addresses";
+}
+
+
+@foreach (UserApprovedIpAddress approvedIpAddress in Model.ApprovedIpAddresses)
+{
+    <div class="ui blue segment">
+        <p>@approvedIpAddress.IpAddress</p>
+        <a href="/authentication/revokeAutoApproval/@approvedIpAddress.UserApprovedIpAddressId">
+            <button class="ui red button">
+                <i class="trash icon"></i>
+                <span>Revoke</span>
+            </button>
+        </a>
+    </div>
+}

@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -43,12 +44,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
             if (loginData == null) return this.BadRequest();
 
-            IPAddress? ipAddress = this.HttpContext.Connection.RemoteIpAddress;
-            if (ipAddress == null) return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
+            IPAddress? remoteIpAddress = this.HttpContext.Connection.RemoteIpAddress;
+            if (remoteIpAddress == null) return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
 
-            string userLocation = ipAddress.ToString();
+            string ipAddress = remoteIpAddress.ToString();
 
-            GameToken? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
+            GameToken? token = await this.database.AuthenticateUser(loginData, ipAddress, titleId);
             if (token == null) return this.StatusCode(403, "");
 
             User? user = await this.database.UserFromGameToken(token, true);
@@ -56,28 +57,38 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (ServerSettings.Instance.UseExternalAuth)
             {
-                string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
-                if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3)
+                if (ServerSettings.Instance.BlockDeniedUsers)
                 {
-                    this.database.AuthenticationAttempts.RemoveRange
-                        (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
+                    string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
+                    if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3)
+                    {
+                        this.database.AuthenticationAttempts.RemoveRange
+                            (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
 
-                    DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
+                        DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
 
-                    await this.database.SaveChangesAsync();
-                    return this.StatusCode(403, "");
+                        await this.database.SaveChangesAsync();
+                        return this.StatusCode(403, "");
+                    }
                 }
 
-                AuthenticationAttempt authAttempt = new()
-                {
-                    GameToken = token,
-                    GameTokenId = token.TokenId,
-                    Timestamp = TimestampHelper.Timestamp,
-                    IPAddress = userLocation,
-                    Platform = token.GameVersion == GameVersion.LittleBigPlanetVita ? Platform.Vita : Platform.PS3, // TODO: properly identify RPCS3
-                };
+                List<UserApprovedIpAddress> approvedIpAddresses = await this.database.UserApprovedIpAddresses.Where(a => a.UserId == user.UserId).ToListAsync();
+                bool ipAddressApproved = approvedIpAddresses.Select(a => a.IpAddress).Contains(ipAddress);
 
-                this.database.AuthenticationAttempts.Add(authAttempt);
+                if (ipAddressApproved) token.Approved = true;
+                else
+                {
+                    AuthenticationAttempt authAttempt = new()
+                    {
+                        GameToken = token,
+                        GameTokenId = token.TokenId,
+                        Timestamp = TimestampHelper.Timestamp,
+                        IPAddress = ipAddress,
+                        Platform = token.GameVersion == GameVersion.LittleBigPlanetVita ? Platform.Vita : Platform.PS3, // TODO: properly identify RPCS3
+                    };
+
+                    this.database.AuthenticationAttempts.Add(authAttempt);
+                }
             }
             else
             {

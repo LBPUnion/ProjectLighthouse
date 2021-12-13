@@ -1,3 +1,4 @@
+#nullable enable
 using System.IO;
 using System.Threading.Tasks;
 using Kettu;
@@ -27,10 +28,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
-            User user = await this.database.UserFromGameRequest(this.Request, true);
-            if (user == null) return this.StatusCode(403, "");
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
-            if (ServerSettings.Instance.UseExternalAuth)
+            if (userAndToken == null) return this.StatusCode(403, "");
+
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            GameToken gameToken = userAndToken.Value.Item2;
+
+            if (ServerSettings.Instance.UseExternalAuth && !gameToken.Approved)
                 return this.Ok
                 (
                     "Please stay on this screen.\n" +
