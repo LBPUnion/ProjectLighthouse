@@ -16,6 +16,8 @@ namespace LBPUnion.ProjectLighthouse.Pages
         public List<User> PlayersOnline;
 
         public int PlayersOnlineCount;
+
+        public int AuthenticationAttemptsCount;
         public LandingPage(Database database) : base(database)
         {}
 
@@ -26,6 +28,13 @@ namespace LBPUnion.ProjectLighthouse.Pages
             if (user != null && user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 
             this.PlayersOnlineCount = await StatisticsHelper.RecentMatches();
+
+            if (user != null)
+            {
+                this.AuthenticationAttemptsCount = await this.Database.AuthenticationAttempts.Include
+                        (a => a.GameToken)
+                    .CountAsync(a => a.GameToken.UserId == user.UserId);
+            }
 
             List<int> userIds = await this.Database.LastContacts.Where(l => TimestampHelper.Timestamp - l.Timestamp < 300).Select(l => l.UserId).ToListAsync();
 
