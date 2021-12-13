@@ -18,19 +18,6 @@ else
     {
         <p>This device's IP address is <b>@(Model.IpAddress.ToString())</b>. If this matches with an authentication attempt below, then it's safe to assume the authentication attempt came from the same network as this device.</p>
     }
-
-    <a href="/authentication/autoApprovals">
-        <button class="ui small blue button">
-            <i class="cog icon"></i>
-            <span>Manage automatically approved IP addresses</span>
-        </button>
-    </a>
-    <a href="/authentication/denyAll">
-        <button class="ui small red button">
-            <i class="x icon"></i>
-            <span>Deny all</span>
-        </button>
-    </a>
 }
 
 <a href="/authentication/autoApprovals">
