@@ -100,6 +100,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (!token.Approved) return this.StatusCode(403, "");
 
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
+
+            Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
             // After this point we are now considering this session as logged in.
 
             // We just logged in with the token. Mark it as used so someone else doesnt try to use it,
