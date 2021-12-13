@@ -97,6 +97,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             await this.database.SaveChangesAsync();
 
+            if (!token.Approved) return this.StatusCode(403, "");
+
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
 
             // Create a new room on LBP2+/Vita
