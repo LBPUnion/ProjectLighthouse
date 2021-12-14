@@ -208,8 +208,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/thumbs")]
         public async Task<IActionResult> ThumbsSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
         {
-            // v--- not sure of API in LBP3 here, needs testing
-            GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
+
 
             long oldestTime;
 
@@ -228,9 +227,42 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     break;
             }
 
-            Random rand = new();
+            Random rand = new(); GameVersion gameVersion;
 
-            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime)
+            switch (gameFilterType)
+            {
+                case "lbp1":
+                    gameVersion = GameVersion.LittleBigPlanet1;
+                    break;
+                case "lbp2":
+                    gameVersion = GameVersion.LittleBigPlanet2;
+                    break;
+                case "lbp3":
+                    gameVersion = GameVersion.LittleBigPlanet3;
+                    break;
+                case "both": // LBP2 default option
+                    gameVersion = GameVersion.LittleBigPlanet2;
+                    break;
+                default:
+                    gameVersion = GameVersion.Unknown;
+                    break;
+            }
+
+            IQueryable<Slot> whereSlots;
+
+            if (gameFilterType == "both")
+            {
+                // Get game versions less than the current version
+                // Needs support for LBP3 ("both" = LBP1+2)
+                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            }
+            else
+            {
+                // Get game versions exactly equal to gamefiltertype
+                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            }
+
+            IEnumerable<Slot> slots = whereSlots
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .AsEnumerable()
@@ -247,8 +279,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/mostUniquePlays")]
         public async Task<IActionResult> MostUniquePlaysSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
         {
-            // v--- not sure of API in LBP3 here, needs testing
-            GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
 
             long oldestTime;
 
@@ -269,13 +299,48 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             Random rand = new();
 
-            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime)
+            GameVersion gameVersion;
+
+            switch (gameFilterType)
+            {
+                case "lbp1":
+                    gameVersion = GameVersion.LittleBigPlanet1;
+                    break;
+                case "lbp2":
+                    gameVersion = GameVersion.LittleBigPlanet2;
+                    break;
+                case "lbp3":
+                    gameVersion = GameVersion.LittleBigPlanet3;
+                    break;
+                case "both": // LBP2 default option
+                    gameVersion = GameVersion.LittleBigPlanet2;
+                    break;
+                default:
+                    gameVersion = GameVersion.Unknown;
+                    break;
+            }
+
+            IQueryable<Slot> whereSlots;
+
+            if (gameFilterType == "both")
+            {
+                // Get game versions less than the current version
+                // Needs support for LBP3 ("both" = LBP1+2)
+                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            }
+            else
+            {
+                // Get game versions exactly equal to gamefiltertype
+                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            }
+
+            IEnumerable<Slot> slots = whereSlots
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .AsEnumerable()
                 .OrderByDescending(s =>
                 {
-                    // probably not the best way to do this
+                    // probably not the best way to do this?
                     switch (gameVersion)
                     {
                         case GameVersion.LittleBigPlanet1:
@@ -302,8 +367,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/mostHearted")]
         public async Task<IActionResult> MostHeartedSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
         {
-            // v--- not sure of API in LBP3 here, needs testing
-            GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
 
             long oldestTime;
 
@@ -322,9 +385,42 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     break;
             }
 
-            Random rand = new();
+            Random rand = new(); GameVersion gameVersion;
 
-            IEnumerable<Slot> slots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime)
+            switch (gameFilterType)
+            {
+                case "lbp1":
+                    gameVersion = GameVersion.LittleBigPlanet1;
+                    break;
+                case "lbp2":
+                    gameVersion = GameVersion.LittleBigPlanet2;
+                    break;
+                case "lbp3":
+                    gameVersion = GameVersion.LittleBigPlanet3;
+                    break;
+                case "both": // LBP2 default option
+                    gameVersion = GameVersion.LittleBigPlanet2;
+                    break;
+                default:
+                    gameVersion = GameVersion.Unknown;
+                    break;
+            }
+
+            IQueryable<Slot> whereSlots;
+
+            if (gameFilterType == "both")
+            {
+                // Get game versions less than the current version
+                // Needs support for LBP3 ("both" = LBP1+2)
+                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            }
+            else
+            {
+                // Get game versions exactly equal to gamefiltertype
+                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            }
+
+            IEnumerable<Slot> slots = whereSlots
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .AsEnumerable()
