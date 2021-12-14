@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -49,8 +48,16 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string ipAddress = remoteIpAddress.ToString();
 
-            GameToken? token = await this.database.AuthenticateUser(loginData, ipAddress, titleId);
-            if (token == null) return this.StatusCode(403, "");
+            // Get an existing token from the IP & username
+            GameToken? token = await this.database.GameTokens.Include
+                    (t => t.User)
+                .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == loginData.Username && t.Approved && !t.Used);
+
+            if (token == null) // If we cant find an existing token, try to generate a new one
+            {
+                token = await this.database.AuthenticateUser(loginData, ipAddress, titleId);
+                if (token == null) return this.StatusCode(403, ""); // If not, then 403.
+            }
 
             User? user = await this.database.UserFromGameToken(token, true);
             if (user == null) return this.StatusCode(403, "");
@@ -72,10 +79,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     }
                 }
 
-                List<UserApprovedIpAddress> approvedIpAddresses = await this.database.UserApprovedIpAddresses.Where(a => a.UserId == user.UserId).ToListAsync();
-                bool ipAddressApproved = approvedIpAddresses.Select(a => a.IpAddress).Contains(ipAddress);
-
-                if (ipAddressApproved) token.Approved = true;
+                if (this.database.UserApprovedIpAddresses.Where
+                        (a => a.UserId == user.UserId)
+                    .Select(a => a.IpAddress)
+                    .Contains(ipAddress)) token.Approved = true;
                 else
                 {
                     AuthenticationAttempt authAttempt = new()
@@ -98,8 +105,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             await this.database.SaveChangesAsync();
 
             if (!token.Approved) return this.StatusCode(403, "");
-
-            Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
 
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
             // After this point we are now considering this session as logged in.

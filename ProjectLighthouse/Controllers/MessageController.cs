@@ -34,23 +34,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
-            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
-
-            if (userAndToken == null) return this.StatusCode(403, "");
-
-            // ReSharper disable once PossibleInvalidOperationException
-            User user = userAndToken.Value.Item1;
-            GameToken gameToken = userAndToken.Value.Item2;
-
-            if (ServerSettings.Instance.UseExternalAuth && !gameToken.Approved)
-                return this.Ok
-                (
-                    "Please stay on this screen.\n" +
-                    $"Before continuing, you must approve this session at {ServerSettings.Instance.ExternalUrl}.\n" +
-                    "Please keep in mind that if the session is denied you may have to wait up to 5-10 minutes to try logging in again.\n" +
-                    "Once approved, you may press X and continue.\n\n" +
-                    ServerSettings.Instance.EulaText
-                );
+            User? user = await this.database.UserFromGameRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
 
             return this.Ok
             (
