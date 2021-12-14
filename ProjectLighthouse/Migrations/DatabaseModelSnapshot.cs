@@ -55,6 +55,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("GameVersion")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Used")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -65,6 +68,8 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("TokenId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("GameTokens");
                 });
@@ -632,6 +637,17 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("GameToken");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
