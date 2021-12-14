@@ -14,6 +14,15 @@ namespace LBPUnion.ProjectLighthouse.Types
     [XmlType("photo")]
     public class Photo
     {
+
+        [NotMapped]
+        private List<PhotoSubject>? _subjects;
+
+        [NotMapped]
+        [XmlArray("subjects")]
+        [XmlArrayItem("subject")]
+        public List<PhotoSubject>? SubjectsXmlDontUseLiterallyEver;
+
         [Key]
         public int PhotoId { get; set; }
 
@@ -32,14 +41,6 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         [XmlElement("plan")]
         public string PlanHash { get; set; } = "";
-
-        [NotMapped]
-        private List<PhotoSubject>? _subjects;
-
-        [NotMapped]
-        [XmlArray("subjects")]
-        [XmlArrayItem("subject")]
-        public List<PhotoSubject>? SubjectsXmlDontUseLiterallyEver;
 
         [NotMapped]
         public List<PhotoSubject> Subjects {
@@ -94,7 +95,7 @@ namespace LBPUnion.ProjectLighthouse.Types
                            LbpSerializer.StringElement("subjects", subjectsAggregate) +
                            slot;
 
-            return LbpSerializer.TaggedStringElement("photo", photo, "timestamp", Timestamp * 1000);
+            return LbpSerializer.TaggedStringElement("photo", photo, "timestamp", this.Timestamp * 1000);
         }
     }
 }

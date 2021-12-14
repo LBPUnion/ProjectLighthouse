@@ -28,13 +28,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("scoreboard/user/{id:int}")]
         public async Task<IActionResult> SubmitScore(int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
         {
-            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
-            Token token = userAndToken.Value.Item2;
+            GameToken gameToken = userAndToken.Value.Item2;
 
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -48,7 +48,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
             if (slot == null) return this.BadRequest();
 
-            switch (token.GameVersion)
+            switch (gameToken.GameVersion)
             {
                 case GameVersion.LittleBigPlanet1:
                     slot.PlaysLBP1Complete++;
@@ -80,7 +80,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             await this.database.SaveChangesAsync();
 
-            string myRanking = GetScores(score.SlotId, score.Type, user);
+            string myRanking = this.GetScores(score.SlotId, score.Type, user);
 
             return this.Ok(myRanking);
         }
@@ -95,11 +95,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
         {
             // Get username
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
 
             if (user == null) return this.StatusCode(403, "");
 
-            return this.Ok(GetScores(slotId, type, user, pageStart, pageSize));
+            return this.Ok(this.GetScores(slotId, type, user, pageStart, pageSize));
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -139,17 +139,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             );
 
             string res;
-            if (myScore == null)
-            {
-                res = LbpSerializer.StringElement("scores", serializedScores);
-            }
+            if (myScore == null) res = LbpSerializer.StringElement("scores", serializedScores);
             else
-            {
                 res = LbpSerializer.TaggedStringElement
                 (
                     "scores",
                     serializedScores,
-                    new Dictionary<string, object>()
+                    new Dictionary<string, object>
                     {
                         {
                             "yourScore", myScore.Score.Points
@@ -162,7 +158,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                         }, // This is the denominator of your position globally in the side menu.
                     }
                 );
-            }
 
             return res;
         }

@@ -4,7 +4,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
 {
     public class RoomSlot
     {
-        public SlotType SlotType;
         public int SlotId;
+        public SlotType SlotType;
     }
 }

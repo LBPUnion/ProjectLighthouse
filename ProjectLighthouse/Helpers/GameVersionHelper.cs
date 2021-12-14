@@ -44,6 +44,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             "BCES01346",
             "BCUS90260",
             "BCET70023",
+            "BCES01694",
             "NPUA80662",
         };
 

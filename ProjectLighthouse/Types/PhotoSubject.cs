@@ -31,9 +31,9 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public string Serialize()
         {
-            string response = LbpSerializer.StringElement("npHandle", User.Username) +
-                              LbpSerializer.StringElement("displayName", User.Username) +
-                              LbpSerializer.StringElement("bounds", Bounds);
+            string response = LbpSerializer.StringElement("npHandle", this.User.Username) +
+                              LbpSerializer.StringElement("displayName", this.User.Username) +
+                              LbpSerializer.StringElement("bounds", this.Bounds);
 
             return LbpSerializer.StringElement("subject", response);
         }

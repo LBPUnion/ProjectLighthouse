@@ -24,13 +24,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("play/user/{slotId}")]
         public async Task<IActionResult> PlayLevel(int slotId)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
             if (slot == null) return this.StatusCode(403, "");
 
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -62,7 +62,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 v = await visited.FirstOrDefaultAsync();
             }
-            
+
             if (v == null) return this.NotFound();
 
             switch (gameVersion)
@@ -94,7 +94,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("enterLevel/{id:int}")]
         public async Task<IActionResult> EnterLevel(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);

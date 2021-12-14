@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectLighthouse.Migrations
 {
-    public partial class LevelReviews : Migration
+    public partial class AddLevelReviews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -21,10 +21,12 @@ namespace ProjectLighthouse.Migrations
                     LabelCollection = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    DeletedBy = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DeletedBy = table.Column<int>(type: "int", nullable: false),
                     Text = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Thumb = table.Column<int>(type: "int", nullable: false),
+                    ThumbsUp = table.Column<int>(type: "int", nullable: false),
+                    ThumbsDown = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

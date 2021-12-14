@@ -1,5 +1,6 @@
 #nullable enable
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Kettu;
@@ -8,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
@@ -46,19 +48,48 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string userLocation = ipAddress.ToString();
 
-            Token? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
+            GameToken? token = await this.database.AuthenticateUser(loginData, userLocation, titleId);
             if (token == null) return this.StatusCode(403, "");
 
-            User? user = await this.database.UserFromToken(token);
+            User? user = await this.database.UserFromGameToken(token, true);
             if (user == null) return this.StatusCode(403, "");
+
+            if (ServerSettings.Instance.UseExternalAuth)
+            {
+                string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
+                if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3)
+                {
+                    this.database.AuthenticationAttempts.RemoveRange
+                        (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
+
+                    DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
+
+                    await this.database.SaveChangesAsync();
+                    return this.StatusCode(403, "");
+                }
+
+                AuthenticationAttempt authAttempt = new()
+                {
+                    GameToken = token,
+                    GameTokenId = token.TokenId,
+                    Timestamp = TimestampHelper.Timestamp,
+                    IPAddress = userLocation,
+                    Platform = token.GameVersion == GameVersion.LittleBigPlanetVita ? Platform.Vita : Platform.PS3, // TODO: properly identify RPCS3
+                };
+
+                this.database.AuthenticationAttempts.Add(authAttempt);
+            }
+            else
+            {
+                token.Approved = true;
+            }
+
+            await this.database.SaveChangesAsync();
 
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
 
             // Create a new room on LBP2+/Vita
-            if (token.GameVersion != GameVersion.LittleBigPlanet1)
-            {
-                RoomHelper.CreateRoom(user);
-            }
+            if (token.GameVersion != GameVersion.LittleBigPlanet1) RoomHelper.CreateRoom(user);
 
             return this.Ok
             (

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Kettu;
@@ -10,7 +9,6 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Match;
-using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,13 +30,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [Produces("text/plain")]
         public async Task<IActionResult> Match()
         {
-            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
-            Token token = userAndToken.Value.Item2;
+            GameToken gameToken = userAndToken.Value.Item2;
 
             #region Parse match data
 
@@ -72,51 +70,28 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             #endregion
 
-            #region Update LastMatch
-
-            LastMatch? lastMatch = await this.database.LastMatches.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
-
-            // below makes it not look like trash
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            if (lastMatch == null)
-            {
-                lastMatch = new LastMatch
-                {
-                    UserId = user.UserId,
-                };
-                this.database.LastMatches.Add(lastMatch);
-            }
-
-            lastMatch.Timestamp = TimestampHelper.Timestamp;
-
-            await this.database.SaveChangesAsync();
-
-            #endregion
+            await LastContactHelper.SetLastContact(user, gameToken.GameVersion);
 
             #region Process match data
 
             if (matchData is UpdateMyPlayerData playerData)
             {
-                MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+                MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
                 Room? room = RoomHelper.FindRoomByUser(user, true);
 
                 if (playerData.RoomState != null)
-                {
-                    if (room != null && Equals(room.Host, user)) room.State = (RoomState)playerData.RoomState;
-                }
+                    if (room != null && Equals(room.Host, user))
+                        room.State = (RoomState)playerData.RoomState;
             }
 
             if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
             {
-                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, token.UserLocation);
+                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.UserLocation);
 
                 if (response == null) return this.NotFound();
 
                 string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
-                foreach (Player player in response.Players)
-                {
-                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
-                }
+                foreach (Player player in response.Players) MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
 
                 return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
             }
@@ -128,10 +103,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 {
                     User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                    if (player != null)
-                    {
-                        users.Add(player);
-                    }
+                    if (player != null) users.Add(player);
                     else return this.BadRequest();
                 }
 

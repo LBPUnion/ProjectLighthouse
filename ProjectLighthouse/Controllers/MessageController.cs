@@ -27,10 +27,20 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
-            User user = await this.database.UserFromRequest(this.Request);
+            User user = await this.database.UserFromGameRequest(this.Request, true);
             if (user == null) return this.StatusCode(403, "");
 
-            return this.Ok($"You are now logged in as user {user.Username} (id {user.UserId}).\n\n" + ServerSettings.Instance.EulaText);
+            if (ServerSettings.Instance.UseExternalAuth)
+                return this.Ok
+                (
+                    "Please stay on this screen.\n" +
+                    $"Before continuing, you must approve this session at {ServerSettings.Instance.ExternalUrl}.\n" +
+                    "Please keep in mind that if the session is denied you may have to wait up to 5-10 minutes to try logging in again.\n" +
+                    "Once approved, you may press X and continue.\n\n" +
+                    ServerSettings.Instance.EulaText
+                );
+
+            return this.Ok($"You are now logged in as {user.Username} (id: {user.UserId}).\n\n" + ServerSettings.Instance.EulaText);
         }
 
         [HttpGet("notification")]
@@ -42,7 +52,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("filter")]
         public async Task<IActionResult> Filter()
         {
-            User user = await this.database.UserFromRequest(this.Request);
+            User user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();

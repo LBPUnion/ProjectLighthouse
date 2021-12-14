@@ -14,8 +14,8 @@ using IOFile = System.IO.File;
 namespace LBPUnion.ProjectLighthouse.Controllers
 {
     [ApiController]
-    [Route("LITTLEBIGPLANETPS3_XML/")]
     [Produces("text/xml")]
+    [Route("LITTLEBIGPLANETPS3_XML")]
     public class ResourcesController : ControllerBase
     {
         [HttpPost("showModerated")]
@@ -39,6 +39,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(LbpSerializer.StringElement("resources", resources));
         }
 
+        [ResponseCache(Duration = 86400)]
+        [HttpGet("/gameAssets/{hash}")]
         [HttpGet("r/{hash}")]
         public IActionResult GetResource(string hash)
         {
@@ -68,9 +70,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 return this.UnprocessableEntity();
             }
 
-            if (HashHelper.Sha1Hash(file.Data) != hash)
+            string calculatedHash = HashHelper.Sha1Hash(file.Data).ToLower();
+            if (calculatedHash != hash)
             {
-                Logger.Log($"File hash does not match the uploaded file! (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
+                Logger.Log
+                (
+                    $"File hash does not match the uploaded file! (hash: {hash}, calculatedHash: {calculatedHash}, type: {file.FileType})",
+                    LoggerLevelResources.Instance
+                );
                 return this.Conflict();
             }
 

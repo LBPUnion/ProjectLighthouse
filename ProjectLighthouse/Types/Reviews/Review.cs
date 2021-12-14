@@ -1,11 +1,11 @@
 #nullable enable
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Serialization;
+using System.IO;
+using System.Xml;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types.Reviews
 {
@@ -43,51 +43,45 @@ namespace LBPUnion.ProjectLighthouse.Types.Reviews
         }
 
         [XmlElement("deleted")]
-        public Boolean Deleted { get; set; }
+        public bool Deleted { get; set; }
 
         [XmlElement("deleted_by")]
-        public string DeletedBy { get; set; } // enum ? Needs testing e.g. Moderated/Author/Level Author? etc.
+        public DeletedBy DeletedBy { get; set; }
 
         [XmlElement("text")]
         public string Text { get; set; }
 
-        [NotMapped]
         [XmlElement("thumb")]
-        public int Thumb { get; set; } // (unused) -- temp value for getting thumb from review upload body for updating level rating
-        
-        [NotMapped]
+        public int Thumb { get; set; }
+
         [XmlElement("thumbsup")]
-        public int ThumbsUp { 
-            get {
-                using Database database = new();
+        public int ThumbsUp { get; set; }
 
-                return database.RatedReviews.Count(r => r.ReviewId == this.ReviewId && r.Thumb == 1);
-            } 
-        }
-        [NotMapped]
         [XmlElement("thumbsdown")]
-        public int ThumbsDown { 
-            get {
-                using Database database = new();
+        public int ThumbsDown { get; set; }
 
-                return database.RatedReviews.Count(r => r.ReviewId == this.ReviewId && r.Thumb == -1);
-            } 
-        }
-
-        public string Serialize(RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null) {
-            return this.Serialize("review", yourLevelRating, yourRatingStats);
-        }
+        public string Serialize
+            (RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null)
+            => this.Serialize("review", yourLevelRating, yourRatingStats);
 
         public string Serialize(string elementOverride, RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null)
         {
 
+            XmlWriterSettings settings = new();
+            settings.OmitXmlDeclaration = true;
+
+            XmlSerializer serializer = new(typeof(DeletedBy));
+            StringWriter stringWriter = new();
+            using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, settings)) serializer.Serialize(xmlWriter, this.DeletedBy);
+            string deletedBy = stringWriter.ToString();
+
             string reviewData = LbpSerializer.TaggedStringElement("slot_id", this.SlotId, "type", this.Slot.Type) +
                                 LbpSerializer.StringElement("reviewer", this.Reviewer.Username) +
-                                LbpSerializer.StringElement("thumb", yourLevelRating?.Rating) +
+                                LbpSerializer.StringElement("thumb", this.Thumb) +
                                 LbpSerializer.StringElement("timestamp", this.Timestamp) +
                                 LbpSerializer.StringElement("labels", this.LabelCollection) +
                                 LbpSerializer.StringElement("deleted", this.Deleted) +
-                                LbpSerializer.StringElement("deleted_by", this.DeletedBy) +
+                                deletedBy +
                                 LbpSerializer.StringElement("text", this.Text) +
                                 LbpSerializer.StringElement("thumbsup", this.ThumbsUp) +
                                 LbpSerializer.StringElement("thumbsdown", this.ThumbsDown) +
@@ -97,5 +91,4 @@ namespace LBPUnion.ProjectLighthouse.Types.Reviews
         }
     }
 
-    
 }

@@ -9,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Tests
 {
@@ -25,9 +26,15 @@ namespace LBPUnion.ProjectLighthouse.Tests
             this.Client = this.Server.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> AuthenticateResponse(int number = 0)
+        public async Task<HttpResponseMessage> AuthenticateResponse(int number = 0, bool createUser = true)
         {
             const string username = "unitTestUser";
+            if (createUser)
+            {
+                await using Database database = new();
+                if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
+                    await database.CreateUser($"{username}{number}", HashHelper.BCryptHash($"unitTestPassword{number}"));
+            }
 
             string stringContent = $"{LoginData.UsernamePrefix}{username}{number}{(char)0x00}";
 

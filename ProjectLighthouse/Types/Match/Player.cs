@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
         public User User { get; set; }
 
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
-        public string PlayerId => User.Username;
+        public string PlayerId => this.User.Username;
 
         [JsonPropertyName("matching_res")]
         public int MatchingRes { get; set; }

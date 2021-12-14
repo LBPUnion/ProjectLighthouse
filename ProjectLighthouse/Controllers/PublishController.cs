@@ -9,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,8 +33,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("startPublish")]
         public async Task<IActionResult> StartPublish()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
+
+            if (user.UsedSlots >= ServerSettings.Instance.EntitledSlots) return this.BadRequest();
 
             Slot? slot = await this.GetSlotFromBody();
             if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
@@ -65,17 +68,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("publish")]
         public async Task<IActionResult> Publish()
         {
-//            User user = await this.database.UserFromRequest(this.Request);
-            (User, Token)? userAndToken = await this.database.UserAndTokenFromRequest(this.Request);
+//            User user = await this.database.UserFromGameRequest(this.Request);
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
 
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
-            Token token = userAndToken.Value.Item2;
+            GameToken gameToken = userAndToken.Value.Item2;
+
+            if (user.UsedSlots >= ServerSettings.Instance.EntitledSlots) return this.BadRequest();
 
             Slot? slot = await this.GetSlotFromBody();
-            if (slot == null || slot.Location == null) return this.BadRequest();
+            if (slot?.Location == null) return this.BadRequest();
 
             // Republish logic
             if (slot.SlotId != 0)
@@ -93,9 +98,35 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 slot.CreatorId = oldSlot.CreatorId;
                 slot.LocationId = oldSlot.LocationId;
                 slot.SlotId = oldSlot.SlotId;
+
+                slot.PlaysLBP1 = oldSlot.PlaysLBP1;
+                slot.PlaysLBP1Complete = oldSlot.PlaysLBP1Complete;
+                slot.PlaysLBP1Unique = oldSlot.PlaysLBP1Unique;
+
+                slot.PlaysLBP2 = oldSlot.PlaysLBP2;
+                slot.PlaysLBP2Complete = oldSlot.PlaysLBP2Complete;
+                slot.PlaysLBP2Unique = oldSlot.PlaysLBP2Unique;
+
+                slot.PlaysLBP3 = oldSlot.PlaysLBP3;
+                slot.PlaysLBP3Complete = oldSlot.PlaysLBP3Complete;
+                slot.PlaysLBP3Unique = oldSlot.PlaysLBP3Unique;
+
+                slot.PlaysLBPVita = oldSlot.PlaysLBPVita;
+                slot.PlaysLBPVitaComplete = oldSlot.PlaysLBPVitaComplete;
+                slot.PlaysLBPVitaUnique = oldSlot.PlaysLBPVitaUnique;
+
                 slot.FirstUploaded = oldSlot.FirstUploaded;
                 slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
-                slot.GameVersion = token.GameVersion;
+
+                slot.TeamPick = oldSlot.TeamPick;
+
+                slot.GameVersion = gameToken.GameVersion;
+
+                if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
+                {
+                    slot.MinimumPlayers = 1;
+                    slot.MaximumPlayers = 4;
+                }
 
                 this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
                 await this.database.SaveChangesAsync();
@@ -114,7 +145,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             slot.CreatorId = user.UserId;
             slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
             slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
-            slot.GameVersion = token.GameVersion;
+            slot.GameVersion = gameToken.GameVersion;
 
             if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
             {
@@ -131,7 +162,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("unpublish/{id:int}")]
         public async Task<IActionResult> Unpublish(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);

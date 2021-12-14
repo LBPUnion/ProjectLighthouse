@@ -8,6 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Logging
 {
     public class InfluxLogger : LoggerBase
     {
+        public override bool AllowMultiple => false;
 
         public override void Send(LoggerLine line)
         {
@@ -22,6 +23,5 @@ namespace LBPUnion.ProjectLighthouse.Logging
 
             writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, point);
         }
-        public override bool AllowMultiple => false;
     }
 }

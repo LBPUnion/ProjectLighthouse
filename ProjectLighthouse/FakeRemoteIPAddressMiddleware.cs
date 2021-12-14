@@ -6,8 +6,8 @@ namespace LBPUnion.ProjectLighthouse
 {
     public class FakeRemoteIPAddressMiddleware
     {
-        private readonly RequestDelegate next;
         private readonly IPAddress fakeIpAddress = IPAddress.Parse("127.0.0.1");
+        private readonly RequestDelegate next;
 
         public FakeRemoteIPAddressMiddleware(RequestDelegate next)
         {

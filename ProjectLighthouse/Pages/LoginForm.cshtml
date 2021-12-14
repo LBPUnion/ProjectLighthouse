@@ -1,0 +1,45 @@
+@page "/login"
+@model LBPUnion.ProjectLighthouse.Pages.LoginForm
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Log in";
+}
+
+<script src="https://geraintluff.github.io/sha256/sha256.min.js"></script>
+
+<script>
+    function onSubmit(form) {
+        const password = form['password'];
+        
+        password.value = sha256(password.value);
+        
+        return true;
+    }
+</script>
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="ui negative message">
+        <div class="header">
+            Uh oh!
+        </div>
+        <p>@Model.Error</p>
+    </div>
+}
+
+<form onsubmit="return onSubmit(this)" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="ui left labeled input">
+        <label for="text" class="ui blue label">Username: </label>
+        <input type="text" name="username" id="text">
+    </div><br><br>
+
+    <div class="ui left labeled input">
+        <label for="password" class="ui blue label">Password: </label>
+        <input type="password" name="password" id="password">
+    </div><br><br><br>
+
+    <input type="submit" value="Log in" id="submit" class="ui green button"><br>
+</form>

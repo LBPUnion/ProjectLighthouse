@@ -1,0 +1,36 @@
+@page "/authentication"
+@using LBPUnion.ProjectLighthouse.Types
+@model LBPUnion.ProjectLighthouse.Pages.ExternalAuth.AuthenticationPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+}
+<h1>Authentication</h1>
+
+@if (Model.AuthenticationAttempts.Count == 0)
+{
+    <p>You have no pending authentication attempts.</p>
+}
+else
+{
+    <p>You have @Model.AuthenticationAttempts.Count authentication attempts pending.</p>
+    <a href="/authentication/denyAll">
+        <button class="ui small red button">Deny all</button>
+    </a>
+}
+
+@foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
+{
+    DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(authAttempt.Timestamp);
+    <div class="ui red segment">
+        <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
+        <div>
+            <a href="/authentication/approve/@authAttempt.AuthenticationAttemptId">
+                <button class="ui tiny green button">Approve</button>
+            </a>
+            <a href="/authentication/deny/@authAttempt.AuthenticationAttemptId">
+                <button class="ui tiny red button">Deny</button>
+            </a>
+        </div>
+    </div>
+}

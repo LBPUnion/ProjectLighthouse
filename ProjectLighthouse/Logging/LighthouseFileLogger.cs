@@ -25,7 +25,7 @@ namespace LBPUnion.ProjectLighthouse.Logging
                 File.AppendAllText(Path.Combine(logsDirectory, line.LoggerLevel.Name.ToFileName() + ".log"), contentFile);
                 File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
             }
-            catch (IOException) { } // windows, ya goofed
+            catch(IOException) {} // windows, ya goofed
 
         }
     }

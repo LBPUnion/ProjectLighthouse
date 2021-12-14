@@ -8,6 +8,15 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
     [SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
     public class FindBestRoom : IMatchData
     {
+        public int BuildVersion;
+        public int HostMood;
+        public int Language;
+        public List<int> Location;
+
+        public List<int> NAT;
+        public int PassedNoJoinPoint;
+        public RoomState RoomState;
+        public string Search;
         public List<string> Players { get; set; }
 
         public List<string> Reservations { get; set; }
@@ -15,14 +24,5 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
 
         [JsonIgnore]
         public IEnumerable<int> FirstSlot => this.Slots[0];
-
-        public List<int> NAT;
-        public RoomState RoomState;
-        public int HostMood;
-        public int PassedNoJoinPoint;
-        public List<int> Location;
-        public int Language;
-        public int BuildVersion;
-        public string Search;
     }
 }

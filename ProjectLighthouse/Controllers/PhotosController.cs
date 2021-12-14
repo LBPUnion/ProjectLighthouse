@@ -9,6 +9,7 @@ using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,8 +30,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("uploadPhoto")]
         public async Task<IActionResult> UploadPhoto()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
+
+            if (user.PhotosByMe >= ServerSettings.Instance.PhotosQuota) return this.BadRequest();
 
             this.Request.Body.Position = 0;
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -38,6 +41,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             XmlSerializer serializer = new(typeof(Photo));
             Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
             if (photo == null) return this.BadRequest();
+
+            foreach (Photo p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
+            {
+                if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uplaoded
+                if (p.MediumHash == photo.MediumHash) return this.Ok();
+                if (p.SmallHash == photo.SmallHash) return this.Ok();
+                if (p.PlanHash == photo.PlanHash) return this.Ok();
+            }
 
             photo.CreatorId = user.UserId;
             photo.Creator = user;
@@ -103,10 +114,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (userFromQuery == null) return this.NotFound();
 
             List<Photo> photos = new();
-            foreach (Photo photo in this.database.Photos.Include(p => p.Creator))
-            {
-                photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
-            }
+            foreach (Photo photo in this.database.Photos.Include
+                         (p => p.Creator)) photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
 
             string response = photos.OrderByDescending
                     (s => s.Timestamp)
@@ -120,7 +129,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("deletePhoto/{id:int}")]
         public async Task<IActionResult> DeletePhoto(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);

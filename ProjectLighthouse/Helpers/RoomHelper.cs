@@ -43,10 +43,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                     {
                         bool gotValue = MatchHelper.UserLocations.TryGetValue(p.UserId, out string? value);
 
-                        if (gotValue && value != null)
-                        {
-                            relevantUserLocations.Add(p.UserId, value);
-                        }
+                        if (gotValue && value != null) relevantUserLocations.Add(p.UserId, value);
                         return gotValue;
                     }
                 );
@@ -138,20 +135,23 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         {
             // Delete old rooms based on host
             if (host != null)
-            {
-                Rooms.RemoveAll(r => r.Host == host);
-            }
+                try
+                {
+                    Rooms.RemoveAll(r => r.Host == host);
+                }
+                catch
+                {
+                    // TODO: detect the room that failed and remove it
+                }
 
             // Remove players in this new room from other rooms
             if (newRoom != null)
-            {
                 foreach (Room room in Rooms)
                 {
                     if (room == newRoom) continue;
 
                     foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
                 }
-            }
         }
     }
 }

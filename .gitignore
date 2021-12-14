@@ -1,3 +1,9 @@
+# LBP resources.
+r/
+
+# rider
+.idea/
+
 r/ # cdn resources folder
 bin/
 obj/
@@ -12,8 +18,14 @@ riderModule.iml
 /ProjectLighthouse/logs/*
 /ProjectLighthouse/ProjectLighthouse.csproj.user
 .vs/
-.vscode/
-.editorconfig
 lighthouse.config.json
 gitBranch.txt
 gitVersion.txt
+ProjectLighthouse/.vscode/tasks.json
+ProjectLighthouse/.vscode/launch.json
+logs/Startup.log
+logs/LoggerInfo.log
+logs/all.log
+.vscode/tasks.json
+.vscode/launch.json
+.editorconfig

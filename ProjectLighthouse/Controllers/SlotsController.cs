@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Settings;
-using LBPUnion.ProjectLighthouse.Types.Reviews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +27,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots/by")]
         public async Task<IActionResult> SlotsBy([FromQuery] string u, [FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -42,7 +42,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     .Include(s => s.Location)
                     .Where(s => s.Creator!.Username == user.Username)
                     .Skip(pageStart - 1)
-                    .Take(Math.Min(pageSize, ServerStatics.EntitledSlots)),
+                    .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
                 string.Empty,
                 (current, slot) => current + slot.Serialize()
             );
@@ -56,7 +56,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     new Dictionary<string, object>
                     {
                         {
-                            "hint_start", pageStart + Math.Min(pageSize, ServerStatics.EntitledSlots)
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
                         },
                         {
                             "total", user.UsedSlots
@@ -69,10 +69,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("s/user/{id:int}")]
         public async Task<IActionResult> SUser(int id)
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -86,13 +86,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
             VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-            Review? yourReview = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == id && r.ReviewerId == user.UserId);
-            return this.Ok(slot.Serialize(ratedLevel, visitedLevel, yourReview));
+            return this.Ok(slot.Serialize(ratedLevel, visitedLevel));
         }
 
         [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] int? page = null) 
+        public async Task<IActionResult> CoolSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] int? page = null)
         {
             int _pageStart = pageStart;
             if (page != null) _pageStart = (int)page * 30;
@@ -103,7 +102,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("slots")]
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -116,13 +115,29 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30));
             string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "slots",
+                    response,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        },
+                        {
+                            "total", await StatisticsHelper.SlotCount()
+                        },
+                    }
+                )
+            );
         }
 
         [HttpGet("slots/mmpicks")]
         public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -136,13 +151,29 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Take(Math.Min(pageSize, 30));
             string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "slots",
+                    response,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        },
+                        {
+                            "total", await StatisticsHelper.MMPicksCount()
+                        },
+                    }
+                )
+            );
         }
 
         [HttpGet("slots/lbp2luckydip")]
         public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             GameVersion gameVersion = token.GameVersion;
@@ -155,15 +186,31 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
-            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "slots",
+                    response,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        },
+                        {
+                            "total", await StatisticsHelper.SlotCount()
+                        },
+                    }
+                )
+            );
         }
 
         [HttpGet("slots/thumbs")]
-        public async Task<IActionResult> ThumbsSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null) 
+        public async Task<IActionResult> ThumbsSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
         {
-                                                        // v--- not sure of API in LBP3 here, needs testing
+            // v--- not sure of API in LBP3 here, needs testing
             GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
-            
+
             long oldestTime;
 
             string _dateFilterType = dateFilterType != null ? dateFilterType : "";
@@ -198,11 +245,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/mostUniquePlays")]
-        public async Task<IActionResult> MostUniquePlaysSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null) 
+        public async Task<IActionResult> MostUniquePlaysSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
         {
-                                                        // v--- not sure of API in LBP3 here, needs testing
+            // v--- not sure of API in LBP3 here, needs testing
             GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
-            
+
             long oldestTime;
 
             string _dateFilterType = dateFilterType != null ? dateFilterType : "";
@@ -226,9 +273,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 .Include(s => s.Creator)
                 .Include(s => s.Location)
                 .AsEnumerable()
-                .OrderByDescending(s => {
+                .OrderByDescending(s =>
+                {
                     // probably not the best way to do this
-                    switch (gameVersion) {
+                    switch (gameVersion)
+                    {
                         case GameVersion.LittleBigPlanet1:
                             return s.PlaysLBP1Unique;
                         case GameVersion.LittleBigPlanet2:
@@ -251,11 +300,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/mostHearted")]
-        public async Task<IActionResult> MostHeartedSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null) 
+        public async Task<IActionResult> MostHeartedSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
         {
-                                                        // v--- not sure of API in LBP3 here, needs testing
+            // v--- not sure of API in LBP3 here, needs testing
             GameVersion gameVersion = gameFilterType == "both" ? GameVersion.LittleBigPlanet2 : GameVersion.LittleBigPlanet1;
-            
+
             long oldestTime;
 
             string _dateFilterType = dateFilterType != null ? dateFilterType : "";

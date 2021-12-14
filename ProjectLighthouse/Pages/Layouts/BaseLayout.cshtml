@@ -1,0 +1,138 @@
+@using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Settings
+@model LBPUnion.ProjectLighthouse.Pages.Layouts.BaseLayout
+
+@{
+    if (Model!.User == null)
+    {
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Log in", "/login", "user alternate"));
+        if (ServerSettings.Instance.RegistrationEnabled)
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem("Register", "/register", "user alternate edit"));
+        }
+    }
+    else
+    {
+        if (ServerSettings.Instance.UseExternalAuth)
+        {
+            Model.NavigationItems.Add(new PageNavigationItem("Authentication", "/authentication", "key"));
+        }
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Profile", "/user/" + Model.User.UserId, "user alternate"));
+
+        @if (Model.User.IsAdmin)
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem("Admin Panel", "/admin", "cogs"));
+        }
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Log out", "/logout", "user alternate slash")); // should always be last
+    }
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @if (Model.Title == string.Empty)
+    {
+        <title>Project Lighthouse</title>
+    }
+    else
+    {
+        <title>Project Lighthouse - @Model.Title</title>
+    }
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
+
+    @* Favicon *@
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    @if (ServerSettings.Instance.GoogleAnalyticsEnabled)
+    {
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=@ServerSettings.Instance.GoogleAnalyticsId"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '@ServerSettings.Instance.GoogleAnalyticsId');
+        </script>
+    }
+</head>
+<body>
+<div class="pageContainer">
+    <header class="lighthouse-header">
+        <div class="ui attached menu">
+            <div class="ui container">
+                @foreach (PageNavigationItem navigationItem in Model!.NavigationItems)
+                {
+                    <a class="item" href="@navigationItem.Url">
+                        @if (navigationItem.Icon != null)
+                        {
+                            <i class="@navigationItem.Icon icon"></i>
+                        }
+                        @navigationItem.Name
+                    </a>
+                }
+                <div class="right menu">
+                    @foreach (PageNavigationItem navigationItem in Model!.NavigationItemsRight)
+                    {
+                        <a class="item" href="@navigationItem.Url">
+                            @if (navigationItem.Icon != null)
+                            {
+                                <i class="@navigationItem.Icon icon"></i>
+                            }
+                            @navigationItem.Name
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <noscript>
+            <div class="ui bottom attached yellow message small">
+                <div class="ui container">
+                    <div style="display: flex; align-items: center; font-size: 1.2rem;">
+                        <i class="warning icon"></i>
+                        <span style="font-size: 1.2rem;">JavaScript not enabled</span>
+                    </div>
+                    <p>
+                        While we intend to have as little JavaScript as possible, we can not
+                        guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.
+                        It's not <i>too</i> bloated, we promise.
+                    </p>
+                </div>
+            </div>
+        </noscript>
+    </header>
+    <div class="main">
+        <div class="ui container">
+            <br>
+            @if (Model.ShowTitleInPage)
+            {
+                <h1>@Model.Title</h1>
+            }
+            @RenderBody()
+            <div style="height: 50px;"></div> @* makes it look nicer *@
+        </div>
+    </div>
+    <footer>
+        <div class="ui black attached inverted segment">
+            <div class="ui container">
+
+                <p>Page generated by @VersionHelper.FullVersion.</p>
+                @if (VersionHelper.IsDirty)
+                {
+                    <p>This page was generated using a modified version of Project Lighthouse. Please make sure you are properly disclosing the source code to any users who may be using this instance.</p>
+                }
+            </div>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

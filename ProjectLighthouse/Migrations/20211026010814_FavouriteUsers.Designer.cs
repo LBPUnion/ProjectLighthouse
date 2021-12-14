@@ -208,7 +208,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Locations");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Token", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
                 {
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()

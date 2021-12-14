@@ -1,3 +1,5 @@
+#nullable enable
+using System.IO;
 using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Types.Files
@@ -19,6 +21,16 @@ namespace LBPUnion.ProjectLighthouse.Types.Files
         {
             this.Data = data;
             this.FileType = FileHelper.DetermineFileType(this.Data);
+        }
+
+        public static LbpFile? FromHash(string hash)
+        {
+            string path = FileHelper.GetResourcePath(hash);
+            if (!File.Exists(path)) return null;
+
+            byte[] data = File.ReadAllBytes(path);
+
+            return new LbpFile(data);
         }
     }
 }

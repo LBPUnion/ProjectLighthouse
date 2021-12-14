@@ -29,18 +29,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<string?> GetSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
             User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
-            if (user == null) return "";
-            return user.Serialize(gameVersion);
+            return user?.Serialize(gameVersion);
         }
 
         [HttpGet("user/{username}")]
         public async Task<IActionResult> GetUser(string username)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             string? user = await this.GetSerializedUser(username, token.GameVersion);
-            if (user == "") return this.NotFound();
+            if (user == null) return this.NotFound();
 
             return this.Ok(user);
         }
@@ -48,15 +47,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
         {
-            Token? token = await this.database.TokenFromRequest(this.Request);
+            GameToken? token = await this.database.GameTokenFromRequest(this.Request);
             if (token == null) return this.StatusCode(403, "");
 
             List<string?> serializedUsers = new();
-            foreach (string username in u)
-            {
-                string? serializedUser = await this.GetSerializedUser(username, token.GameVersion);
-                if (serializedUser != "") serializedUsers.Add(serializedUser);
-            }
+            foreach (string userId in u) serializedUsers.Add(await this.GetSerializedUser(userId, token.GameVersion));
 
             string serialized = serializedUsers.Aggregate(string.Empty, (current, user) => user == null ? current : current + user);
 
@@ -69,7 +64,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             XmlReaderSettings settings = new()
@@ -132,6 +127,21 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                                     user.PlanetHash = await reader.GetValueAsync();
                                     break;
                                 }
+                                case "yay2":
+                                {
+                                    user.YayHash = await reader.GetValueAsync();
+                                    break;
+                                }
+                                case "boo2":
+                                {
+                                    user.BooHash = await reader.GetValueAsync();
+                                    break;
+                                }
+                                case "meh2":
+                                {
+                                    user.MehHash = await reader.GetValueAsync();
+                                    break;
+                                }
                             }
 
                             break;
@@ -146,10 +156,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 Location? l = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == user.LocationId); // find the location in the database again
 
-                if (l == null)
-                {
-                    throw new Exception("this shouldn't happen ever but we handle this");
-                }
+                if (l == null) throw new Exception("this shouldn't happen ever but we handle this");
 
                 // set the location in the database to the one we modified above
                 l.X = user.Location.X;
@@ -165,7 +172,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("update_my_pins")]
         public async Task<IActionResult> UpdateMyPins()
         {
-            User? user = await this.database.UserFromRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             string pinsString = await new StreamReader(this.Request.Body).ReadToEndAsync();

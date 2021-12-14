@@ -6,27 +6,27 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
     public enum RoomState
     {
         /// <summary>
-        /// The room isn't doing anything in particular.
+        ///     The room isn't doing anything in particular.
         /// </summary>
         Idle = 0,
 
         /// <summary>
-        /// The room is looking to join an existing room playing a specific slot.
+        ///     The room is looking to join an existing room playing a specific slot.
         /// </summary>
         DivingIntoLevel = 1,
 
         /// <summary>
-        /// ???
+        ///     ???
         /// </summary>
         Unknown = 2,
 
         /// <summary>
-        /// The room is looking for other rooms to join.
+        ///     The room is looking for other rooms to join.
         /// </summary>
         DivingIn = 3,
 
         /// <summary>
-        /// The room is waiting for players to join their room.
+        ///     The room is waiting for players to join their room.
         /// </summary>
         DivingInWaiting = 4,
     }
