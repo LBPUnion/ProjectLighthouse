@@ -34,8 +34,18 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
+#if !DEBUG
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
+#else
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+
+            if (userAndToken == null) return this.StatusCode(403, "");
+
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            GameToken gameToken = userAndToken.Value.Item2;
+#endif
 
             return this.Ok
             (

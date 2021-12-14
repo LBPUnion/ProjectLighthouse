@@ -51,7 +51,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // Get an existing token from the IP & username
             GameToken? token = await this.database.GameTokens.Include
                     (t => t.User)
-                .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == loginData.Username && t.Approved && !t.Used);
+                .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == loginData.Username && !t.Used);
 
             if (token == null) // If we cant find an existing token, try to generate a new one
             {
@@ -79,10 +79,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     }
                 }
 
-                if (this.database.UserApprovedIpAddresses.Where
-                        (a => a.UserId == user.UserId)
-                    .Select(a => a.IpAddress)
-                    .Contains(ipAddress)) token.Approved = true;
+                if (this.database.UserApprovedIpAddresses.Where(a => a.UserId == user.UserId).Select(a => a.IpAddress).Contains(ipAddress))
+                {
+                    token.Approved = true;
+                }
                 else
                 {
                     AuthenticationAttempt authAttempt = new()
