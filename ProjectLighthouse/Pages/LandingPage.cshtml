@@ -1,5 +1,6 @@
 @page "/"
 @using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.LandingPage
 
 @{
@@ -11,6 +12,12 @@
 @if (Model.User != null)
 {
     <p>You are currently logged in as <b>@Model.User.Username</b>.</p>
+    if (ServerSettings.Instance.UseExternalAuth && Model.AuthenticationAttemptsCount > 0)
+    {
+        <p>
+            <b>You have @Model.AuthenticationAttemptsCount authentication attempts pending. Click <a href="/authentication">here</a> to view them.</b>
+        </p>
+    }
 }
 
 @if (Model.PlayersOnlineCount == 1)
@@ -21,6 +28,7 @@
         <a href="/user/@user.UserId">@user.Username</a>
     }
 }
+
 else if (Model.PlayersOnlineCount == 0)
 {
     <p>There are no users online. Why not hop on?</p>

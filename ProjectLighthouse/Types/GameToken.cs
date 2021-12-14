@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LBPUnion.ProjectLighthouse.Types
 {
@@ -10,12 +11,19 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         public int UserId { get; set; }
 
+        [ForeignKey(nameof(UserId))]
+        public User User { get; set; }
+
         public string UserToken { get; set; }
 
         public string UserLocation { get; set; }
 
         public GameVersion GameVersion { get; set; }
 
-        public bool Approved { get; set; } = false;
+        // Set by /authentication webpage
+        public bool Approved { get; set; }
+
+        // Set to true on login
+        public bool Used { get; set; }
     }
 }
