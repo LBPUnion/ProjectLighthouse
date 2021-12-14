@@ -34,10 +34,33 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
+            #if !DEBUG
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
+            #else
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
-            return this.Ok($"You are now logged in as {user.Username} (id: {user.UserId}).\n\n" + ServerSettings.Instance.EulaText);
+            if (userAndToken == null) return this.StatusCode(403, "");
+
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            GameToken gameToken = userAndToken.Value.Item2;
+            #endif
+
+            return this.Ok
+            (
+                $"You are now logged in as {user.Username}.\n\n" +
+                #if DEBUG
+                "---DEBUG INFO---\n" +
+                $"user.UserId: {user.UserId}\n" +
+                $"token.Approved: {gameToken.Approved}\n" +
+                $"token.Used: {gameToken.Used}\n" +
+                $"token.UserLocation: {gameToken.UserLocation}\n" +
+                $"token.GameVersion: {gameToken.GameVersion}\n" +
+                "---DEBUG INFO---\n\n" +
+                #endif
+                ServerSettings.Instance.EulaText
+            );
         }
 
         [HttpGet("notification")]
@@ -49,7 +72,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("filter")]
         public async Task<IActionResult> Filter()
         {
-            User user = await this.database.UserFromGameRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();
