@@ -2,6 +2,8 @@
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Profiles
 @using LBPUnion.ProjectLighthouse.Types.Settings
+@using System.Web;
+@using System.IO;
 @model LBPUnion.ProjectLighthouse.Pages.UserPage
 
 @{
@@ -92,9 +94,12 @@
     @foreach (Comment comment in Model.Comments!)
     {
         DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
+        StringWriter messageWriter = new StringWriter();
+        HttpUtility.HtmlDecode(comment.Message, messageWriter);
+        String decodedMessage = messageWriter.ToString();
         <div>
             <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
-            <span>@comment.Message</span>
+            <span>@decodedMessage</span>
             <p>
                 <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
             </p>
