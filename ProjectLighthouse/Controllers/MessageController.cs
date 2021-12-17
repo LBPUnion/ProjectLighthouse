@@ -34,10 +34,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
-#if !DEBUG
+            #if !DEBUG
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
-#else
+            #else
             (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
@@ -45,12 +45,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
             GameToken gameToken = userAndToken.Value.Item2;
-#endif
+            #endif
 
             return this.Ok
             (
                 $"You are now logged in as {user.Username}.\n\n" +
-#if DEBUG
+                #if DEBUG
                 "---DEBUG INFO---\n" +
                 $"user.UserId: {user.UserId}\n" +
                 $"token.Approved: {gameToken.Approved}\n" +
@@ -58,7 +58,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 $"token.UserLocation: {gameToken.UserLocation}\n" +
                 $"token.GameVersion: {gameToken.GameVersion}\n" +
                 "---DEBUG INFO---\n\n" +
-#endif
+                #endif
                 ServerSettings.Instance.EulaText
             );
         }
