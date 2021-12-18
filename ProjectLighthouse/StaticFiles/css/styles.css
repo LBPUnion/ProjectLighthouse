@@ -16,3 +16,12 @@ div.statsUnderTitle > span {
     margin-right: 5px;
 }
 
+canvas.photo-subjects {
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+canvas.hide-subjects {
+    opacity: 0;
+}
+
