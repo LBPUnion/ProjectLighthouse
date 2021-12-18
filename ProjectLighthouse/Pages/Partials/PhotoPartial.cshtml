@@ -42,10 +42,10 @@
         const image = document.getElementById("game-image-@Model.PhotoId");
 
         hoverer.addEventListener('mouseenter', function () {
-            canvas.className = "photo-subjects"
+            canvas.className = "photo-subjects";
         });
         hoverer.addEventListener('mouseleave', function () {
-            canvas.className = "photo-subjects hide-subjects"
+            canvas.className = "photo-subjects hide-subjects";
         });
 
         var context = canvas.getContext('2d');
@@ -62,11 +62,11 @@
         const hw = w / 2;
         const hh = h / 2;
 
-        const colors = ["#a5599f", "#477f84", "#5fa559", "#a5595f"];
+        const colours = ["#a5599f", "#477f84", "#5fa559", "#a5595f"];
 
         subjects.forEach((s, si) => {
 
-            const colour = colors[si % 4]
+            const colour = colours[si % 4];
 
             // Bounding box
             const bounds = s.bounds.split(",").map(parseFloat);
