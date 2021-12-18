@@ -6,7 +6,7 @@
 
 <div style="position: relative">
     <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId" width="1920" height="1080"
-        style="position: absolute; /*width: 100%; height: 100%;*/ transform: rotate(180deg)"></canvas>
+        style="position: absolute; transform: rotate(180deg)"></canvas>
     <img id="game-image-@Model.PhotoId" src="/gameAssets/@Model.LargeHash"
         style="width: 100%; height: auto; border-radius: .28571429rem;">
 </div>
@@ -100,16 +100,16 @@
             // Check if the label will flow off the left of the frame
             const overflowLeft = (bounds[2] * hw - tw) < (-hw);
 
+            // Set alignment
+            context.textAlign = overflowLeft ? "start" : "end";
+
             // Text x / y
             const lx = overflowLeft ? -bw + 6 : -6;
             const ly = overflowBottom ? -bh - 6 : 16;
 
             // Label background x / y
-            const lbx = overflowLeft ? -bw : -2;
+            const lbx = overflowLeft ? bw - tw - 12 : -2;
             const lby = overflowBottom ? bh : -24;
-
-            // Set alignment
-            context.textAlign = overflowLeft ? "start" : "end";
 
             // Draw background
             context.fillRect(lbx, lby, tw + 16, th);
