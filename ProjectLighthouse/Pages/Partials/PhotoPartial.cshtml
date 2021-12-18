@@ -33,9 +33,8 @@
 
 
 <script>
-    // set timeout so that the image heights have been calculated
-    // (after document renders)
-    window.setTimeout(function () {
+    // render the page first so that image heights have been calculated
+    window.addEventListener("load", function () {
         var canvas = document.getElementById("canvas-subjects-@Model.PhotoId");
 
         const hoverer = document.getElementById("hover-subjects-@Model.PhotoId");
@@ -123,5 +122,5 @@
             // reset transform
             context.setTransform(1, 0, 0, 1, 0, 0);
         })
-    }, 100)
+    }, false);
 </script>
