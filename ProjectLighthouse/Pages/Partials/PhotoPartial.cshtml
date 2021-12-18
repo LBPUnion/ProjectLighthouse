@@ -1,7 +1,14 @@
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Types.Photo
 
-<img src="/gameAssets/@Model.LargeHash" style="width: 100%; height: auto; border-radius: .28571429rem;">
+
+<div style="position: relative">
+    <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId" width="1920" height="1080"
+            style="position: absolute; transform: rotate(180deg)">
+    </canvas>
+    <img id="game-image-@Model.PhotoId" src="/gameAssets/@Model.LargeHash"
+         style="width: 100%; height: auto; border-radius: .28571429rem;">
+</div>
 <br>
 
 <p>
@@ -16,7 +23,104 @@
 <p>
     <b>Photo contains @Model.Subjects.Count @(Model.Subjects.Count == 1 ? "person" : "people"):</b>
 </p>
-@foreach (PhotoSubject subject in Model.Subjects)
-{
-    <a href="/user/@subject.UserId">@subject.User.Username</a>
+<div id="hover-subjects-@Model.PhotoId">
+    @foreach (PhotoSubject subject in Model.Subjects)
+    {
+        <a href="/user/@subject.UserId">@subject.User.Username</a>
+    }
+</div>
+
+@{
+    PhotoSubject[] subjects = Model.Subjects.ToArray();
+    foreach (PhotoSubject subject in subjects) subject.Username = subject.User.Username;
 }
+
+<script>
+    // render the page first so that image heights have been calculated
+    window.addEventListener("load", function () {
+        const canvas = document.getElementById("canvas-subjects-@Model.PhotoId");
+        const hoverer = document.getElementById("hover-subjects-@Model.PhotoId");
+        const image = document.getElementById("game-image-@Model.PhotoId");
+
+        hoverer.addEventListener('mouseenter', function () {
+            canvas.className = "photo-subjects";
+        });
+        hoverer.addEventListener('mouseleave', function () {
+            canvas.className = "photo-subjects hide-subjects";
+        });
+        
+        const context = canvas.getContext('2d');
+
+        const subjects = @Html.Raw(Json.Serialize(subjects.ToArray()));
+
+        canvas.width = image.offsetWidth;
+        canvas.height = image.clientHeight; // space for names to hang off
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // halfwidth, halfheight
+        const hw = w / 2;
+        const hh = h / 2;
+
+        const colours = ["#96dd3c", "#ceb424", "#cc0a1d", "#c800cc"];
+
+        subjects.forEach((s, si) => {
+            const colour = colours[si % 4];
+
+            // Bounding box
+            const bounds = s.bounds.split(",").map(parseFloat);
+
+            const [x1, y1, x2, y2] = bounds.map(n => Math.min(Math.max(n, -1), 1));
+
+            const bx = hw - (x2 * hw);
+            const by = hh - (y2 * hh);
+            const bw = (x2 - x1) * hw;
+            const bh = (y2 - y1) * hh;
+
+            context.beginPath();
+            context.lineWidth = 3;
+            context.strokeStyle = colour;
+            context.rect(bx, by, bw, bh);
+            context.stroke();
+
+            // Move into relative coordinates from bounding box
+            context.translate(bx, by);
+
+            // Username label
+            context.font = "16px Lato";
+            context.fillStyle = colour;
+
+            // Text width/height for the label background
+            const tw = context.measureText(s.username).width;
+            const th = 24;
+
+            // Check if the label will flow off the bottom of the frame
+            const overflowBottom = (bounds[3] * hh) > (hh - 24);
+            // Check if the label will flow off the left of the frame
+            const overflowLeft = (bounds[2] * hw - tw) < (-hw);
+
+            // Set alignment
+            context.textAlign = overflowLeft ? "start" : "end";
+
+            // Text x / y
+            const lx = overflowLeft ? -bw + 6 : -6;
+            const ly = overflowBottom ? -bh - 6 : 16;
+
+            // Label background x / y
+            const lbx = overflowLeft ? bw - tw - 12 : -2;
+            const lby = overflowBottom ? bh : -24;
+
+            // Draw background
+            context.fillRect(lbx, lby, tw + 16, th);
+
+            // Draw text, rotated back upright (canvas draws rotated 180deg)
+            context.fillStyle = "white";
+            context.rotate(Math.PI);
+            context.fillText(s.username, lx, ly);
+
+            // reset transform
+            context.setTransform(1, 0, 0, 1, 0, 0);
+        })
+    }, false);
+</script>
