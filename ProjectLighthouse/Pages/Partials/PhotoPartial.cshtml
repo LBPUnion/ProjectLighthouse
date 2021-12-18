@@ -1,14 +1,13 @@
 @using LBPUnion.ProjectLighthouse.Types
-
 @model LBPUnion.ProjectLighthouse.Types.Photo
-
 
 
 <div style="position: relative">
     <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId" width="1920" height="1080"
-        style="position: absolute; transform: rotate(180deg)"></canvas>
+            style="position: absolute; transform: rotate(180deg)">
+    </canvas>
     <img id="game-image-@Model.PhotoId" src="/gameAssets/@Model.LargeHash"
-        style="width: 100%; height: auto; border-radius: .28571429rem;">
+         style="width: 100%; height: auto; border-radius: .28571429rem;">
 </div>
 <br>
 
@@ -31,14 +30,16 @@
     }
 </div>
 
+@{
+    PhotoSubject[] subjects = Model.Subjects.ToArray();
+    foreach (PhotoSubject subject in subjects) subject.Username = subject.User.Username;
+}
 
 <script>
     // render the page first so that image heights have been calculated
     window.addEventListener("load", function () {
-        var canvas = document.getElementById("canvas-subjects-@Model.PhotoId");
-
+        const canvas = document.getElementById("canvas-subjects-@Model.PhotoId");
         const hoverer = document.getElementById("hover-subjects-@Model.PhotoId");
-
         const image = document.getElementById("game-image-@Model.PhotoId");
 
         hoverer.addEventListener('mouseenter', function () {
@@ -47,10 +48,10 @@
         hoverer.addEventListener('mouseleave', function () {
             canvas.className = "photo-subjects hide-subjects";
         });
+        
+        const context = canvas.getContext('2d');
 
-        var context = canvas.getContext('2d');
-
-        const subjects = @Html.Raw(Json.Serialize(Model.Subjects.ToArray()));
+        const subjects = @Html.Raw(Json.Serialize(subjects.ToArray()));
 
         canvas.width = image.offsetWidth;
         canvas.height = image.clientHeight; // space for names to hang off
@@ -65,7 +66,6 @@
         const colours = ["#a5599f", "#477f84", "#5fa559", "#a5595f"];
 
         subjects.forEach((s, si) => {
-
             const colour = colours[si % 4];
 
             // Bounding box
@@ -92,7 +92,7 @@
             context.fillStyle = colour;
 
             // Text width/height for the label background
-            const tw = context.measureText(s.user.username).width;
+            const tw = context.measureText(s.username).width;
             const th = 24;
 
             // Check if the label will flow off the bottom of the frame
@@ -117,7 +117,7 @@
             // Draw text, rotated back upright (canvas draws rotated 180deg)
             context.fillStyle = "white";
             context.rotate(Math.PI);
-            context.fillText(s.user.username, lx, ly);
+            context.fillText(s.username, lx, ly);
 
             // reset transform
             context.setTransform(1, 0, 0, 1, 0, 0);
