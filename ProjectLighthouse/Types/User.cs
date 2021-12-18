@@ -125,6 +125,10 @@ namespace LBPUnion.ProjectLighthouse.Types
         }
         #nullable disable
 
+        public bool Banned { get; set; }
+
+        public string BannedReason { get; set; }
+
         public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
         {
             string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +

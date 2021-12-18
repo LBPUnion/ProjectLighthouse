@@ -24,8 +24,9 @@ namespace LBPUnion.ProjectLighthouse.Pages
 
         public async Task<IActionResult> OnGet([FromRoute] int userId)
         {
+            bool canViewBannedUsers = this.User != null && this.User.IsAdmin;
             this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (this.ProfileUser == null) return this.NotFound();
+            if (this.ProfileUser == null || !canViewBannedUsers && this.ProfileUser.Banned) return this.NotFound();
 
             this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(5).ToListAsync();
             this.Comments = await this.Database.Comments.Include

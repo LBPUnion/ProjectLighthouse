@@ -52,7 +52,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (token == null) return this.StatusCode(403, "");
 
             User? user = await this.database.UserFromGameToken(token, true);
-            if (user == null) return this.StatusCode(403, "");
+            if (user == null || user.Banned) return this.StatusCode(403, "");
 
             if (ServerSettings.Instance.UseExternalAuth)
             {
