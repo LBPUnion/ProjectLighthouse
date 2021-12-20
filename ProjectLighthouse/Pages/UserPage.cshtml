@@ -12,17 +12,24 @@
     Model.ShowTitleInPage = false;
 }
 
-@if (Model.User != null && Model.User.IsAdmin && Model.ProfileUser.Banned)
+@if (Model.ProfileUser.Banned)
 {
     <div class="ui inverted red segment">
         <p>
-            <b>User is banned!</b>
+            <b>User is currently banned!</b>
         </p>
-        <p>Reason: @Model.ProfileUser.BannedReason</p>
-        <a class="ui inverted button" href="/admin/user/@Model.ProfileUser.UserId/unban">
-            <i class="ban icon"></i>
-            <span>Unban User</span>
-        </a>
+        @if (Model.User != null && Model.User.IsAdmin)
+        {
+            <p>Reason: @Model.ProfileUser.BannedReason</p>
+            <a class="ui inverted button" href="/admin/user/@Model.ProfileUser.UserId/unban">
+                <i class="ban icon"></i>
+                <span>Unban User</span>
+            </a>
+        }
+        else
+        {
+            <p>For shame...</p>
+        }
     </div>
 }
 
