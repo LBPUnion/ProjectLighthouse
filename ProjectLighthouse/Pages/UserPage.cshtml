@@ -1,9 +1,9 @@
 @page "/user/{userId:int}"
+@using System.IO
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Profiles
 @using LBPUnion.ProjectLighthouse.Types.Settings
-@using System.Web;
-@using System.IO;
 @model LBPUnion.ProjectLighthouse.Pages.UserPage
 
 @{
@@ -98,7 +98,7 @@
             @foreach (Photo photo in Model.Photos)
             {
                 <div class="eight wide column">
-                    @await Html.PartialAsync("Partials/PhotoPartial", photo);
+                    @await Html.PartialAsync("Partials/PhotoPartial", photo)
                 </div>
             }
         </div>
