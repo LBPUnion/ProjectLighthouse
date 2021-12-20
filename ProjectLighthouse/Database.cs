@@ -73,6 +73,7 @@ namespace LBPUnion.ProjectLighthouse
             GameToken gameToken = new()
             {
                 UserToken = HashHelper.GenerateAuthToken(),
+                User = user,
                 UserId = user.UserId,
                 UserLocation = userLocation,
                 GameVersion = GameVersionHelper.FromTitleId(titleId),
