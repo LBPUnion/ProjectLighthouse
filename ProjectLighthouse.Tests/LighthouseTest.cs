@@ -1,7 +1,7 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -25,9 +25,13 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
             this.Client = this.Server.CreateClient();
         }
-
-        public async Task<HttpResponseMessage> AuthenticateResponse(int number = 0, bool createUser = true)
+        public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
         {
+            if (number == -1)
+            {
+                number = new Random().Next();
+            }
+
             const string username = "unitTestUser";
             if (createUser)
             {
@@ -65,8 +69,8 @@ namespace LBPUnion.ProjectLighthouse.Tests
 
         public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(await File.ReadAllTextAsync(filePath));
-            string hash = HashHelper.Sha1Hash(bytes);
+            byte[] bytes = await File.ReadAllBytesAsync(filePath);
+            string hash = HashHelper.Sha1Hash(bytes).ToLower();
 
             return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
         }
