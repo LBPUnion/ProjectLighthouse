@@ -60,6 +60,7 @@ jobs:
 
       - name: Process Test Results
         id: process-trx
+        if: ${{ always() }}
         uses: im-open/process-dotnet-test-results@v2.0.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
