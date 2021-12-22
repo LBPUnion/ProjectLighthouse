@@ -259,7 +259,7 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task RemoveUser(User user)
         {
-            this.Locations.Remove(user.Location);
+            if (user.Location != null) this.Locations.Remove(user.Location);
             LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
             if (lastContact != null) this.LastContacts.Remove(lastContact);
 
