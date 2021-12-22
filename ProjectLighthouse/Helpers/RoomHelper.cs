@@ -26,9 +26,15 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static FindBestRoomResponse? FindBestRoom(User user, string location)
         {
-            bool anyRoomsLookingForPlayers = Rooms.Any(r => r.IsLookingForPlayers);
+            bool anyRoomsLookingForPlayers;
+            List<Room> rooms;
 
-            List<Room> rooms = anyRoomsLookingForPlayers ? Rooms.Where(r => anyRoomsLookingForPlayers && r.IsLookingForPlayers).ToList() : Rooms;
+            lock(Rooms)
+            {
+                anyRoomsLookingForPlayers = Rooms.Any(r => r.IsLookingForPlayers);
+                rooms = anyRoomsLookingForPlayers ? Rooms.Where(r => anyRoomsLookingForPlayers && r.IsLookingForPlayers).ToList() : Rooms;
+            }
+
             foreach (Room room in rooms)
                 // Look for rooms looking for players before moving on to rooms that are idle.
             {
@@ -117,7 +123,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             };
 
             CleanupRooms(room.Host, room);
-            Rooms.Add(room);
+            lock(Rooms) Rooms.Add(room);
             Logger.Log($"Created room (id: {room.RoomId}) for host {room.Host.Username} (id: {room.Host.UserId})", LoggerLevelMatch.Instance);
 
             return room;
@@ -125,7 +131,10 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static Room? FindRoomByUser(User user, bool createIfDoesNotExist = false)
         {
-            foreach (Room room in Rooms.Where(room => room.Players.Any(player => user == player))) return room;
+            lock(Rooms)
+            {
+                foreach (Room room in Rooms.Where(room => room.Players.Any(player => user == player))) return room;
+            }
 
             return createIfDoesNotExist ? CreateRoom(user) : null;
         }
@@ -133,25 +142,28 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         [SuppressMessage("ReSharper", "InvertIf")]
         public static void CleanupRooms(User? host = null, Room? newRoom = null)
         {
-            // Delete old rooms based on host
-            if (host != null)
-                try
-                {
-                    Rooms.RemoveAll(r => r.Host == host);
-                }
-                catch
-                {
-                    // TODO: detect the room that failed and remove it
-                }
+            lock(Rooms)
+            {
+                // Delete old rooms based on host
+                if (host != null)
+                    try
+                    {
+                        Rooms.RemoveAll(r => r.Host == host);
+                    }
+                    catch
+                    {
+                        // TODO: detect the room that failed and remove it
+                    }
 
-            // Remove players in this new room from other rooms
-            if (newRoom != null)
-                foreach (Room room in Rooms)
-                {
-                    if (room == newRoom) continue;
+                // Remove players in this new room from other rooms
+                if (newRoom != null)
+                    foreach (Room room in Rooms)
+                    {
+                        if (room == newRoom) continue;
 
-                    foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
-                }
+                        foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
+                    }
+            }
         }
     }
 }
