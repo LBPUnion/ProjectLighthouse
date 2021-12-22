@@ -64,7 +64,7 @@ jobs:
         uses: im-open/process-dotnet-test-results@v2.0.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          create-status-check: ${{ matrix.os.prettyName == 'Linux' && 'true' || 'false' }}
+          create-status-check: false
           create-pr-comment: false
           update-comment-if-one-exists: false
 
