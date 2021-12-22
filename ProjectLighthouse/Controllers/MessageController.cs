@@ -1,3 +1,4 @@
+#nullable enable
 using System.IO;
 using System.Threading.Tasks;
 using Kettu;
@@ -22,25 +23,44 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("eula")]
-        public IActionResult Eula() => this.Ok(ServerSettings.Instance.EulaText + "\n" + $"{EulaHelper.License}\n");
+        public async Task<IActionResult> Eula()
+        {
+            User? user = await this.database.UserFromGameRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            return this.Ok(ServerSettings.Instance.EulaText + "\n" + $"{EulaHelper.License}\n");
+        }
 
         [HttpGet("announce")]
         public async Task<IActionResult> Announce()
         {
-            User user = await this.database.UserFromGameRequest(this.Request, true);
+            #if !DEBUG
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
+            #else
+            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
-            if (ServerSettings.Instance.UseExternalAuth)
-                return this.Ok
-                (
-                    "Please stay on this screen.\n" +
-                    $"Before continuing, you must approve this session at {ServerSettings.Instance.ExternalUrl}.\n" +
-                    "Please keep in mind that if the session is denied you may have to wait up to 5-10 minutes to try logging in again.\n" +
-                    "Once approved, you may press X and continue.\n\n" +
-                    ServerSettings.Instance.EulaText
-                );
+            if (userAndToken == null) return this.StatusCode(403, "");
 
-            return this.Ok($"You are now logged in as {user.Username} (id: {user.UserId}).\n\n" + ServerSettings.Instance.EulaText);
+            // ReSharper disable once PossibleInvalidOperationException
+            User user = userAndToken.Value.Item1;
+            GameToken gameToken = userAndToken.Value.Item2;
+            #endif
+
+            return this.Ok
+            (
+                $"You are now logged in as {user.Username}.\n\n" +
+                #if DEBUG
+                "---DEBUG INFO---\n" +
+                $"user.UserId: {user.UserId}\n" +
+                $"token.Approved: {gameToken.Approved}\n" +
+                $"token.Used: {gameToken.Used}\n" +
+                $"token.UserLocation: {gameToken.UserLocation}\n" +
+                $"token.GameVersion: {gameToken.GameVersion}\n" +
+                "---DEBUG INFO---\n\n" +
+                #endif
+                ServerSettings.Instance.EulaText
+            );
         }
 
         [HttpGet("notification")]
@@ -52,7 +72,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpPost("filter")]
         public async Task<IActionResult> Filter()
         {
-            User user = await this.database.UserFromGameRequest(this.Request);
+            User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
             string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();

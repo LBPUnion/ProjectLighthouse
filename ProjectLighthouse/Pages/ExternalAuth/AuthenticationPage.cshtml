@@ -4,8 +4,8 @@
 
 @{
     Layout = "Layouts/BaseLayout";
+    Model.Title = "Authentication";
 }
-<h1>Authentication</h1>
 
 @if (Model.AuthenticationAttempts.Count == 0)
 {
@@ -14,10 +14,24 @@
 else
 {
     <p>You have @Model.AuthenticationAttempts.Count authentication attempts pending.</p>
-    <a href="/authentication/denyAll">
-        <button class="ui small red button">Deny all</button>
-    </a>
+    @if (Model.IpAddress != null)
+    {
+        <p>This device's IP address is <b>@(Model.IpAddress.ToString())</b>. If this matches with an authentication attempt below, then it's safe to assume the authentication attempt came from the same network as this device.</p>
+    }
 }
+
+<a href="/authentication/autoApprovals">
+    <button class="ui small blue button">
+        <i class="cog icon"></i>
+        <span>Manage automatically approved IP addresses</span>
+    </button>
+</a>
+<a href="/authentication/denyAll">
+    <button class="ui small red button">
+        <i class="x icon"></i>
+        <span>Deny all</span>
+    </button>
+</a>
 
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
 {
@@ -25,11 +39,23 @@ else
     <div class="ui red segment">
         <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>
+            <a href="/authentication/autoApprove/@authAttempt.AuthenticationAttemptId">
+                <button class="ui tiny green button">
+                    <i class="check icon"></i>
+                    <span>Automatically approve every time</span>
+                </button>
+            </a>
             <a href="/authentication/approve/@authAttempt.AuthenticationAttemptId">
-                <button class="ui tiny green button">Approve</button>
+                <button class="ui tiny yellow button">
+                    <i class="check icon"></i>
+                    <span>Approve this time</span>
+                </button>
             </a>
             <a href="/authentication/deny/@authAttempt.AuthenticationAttemptId">
-                <button class="ui tiny red button">Deny</button>
+                <button class="ui tiny red button">
+                    <i class="x icon"></i>
+                    <span>Deny</span>
+                </button>
             </a>
         </div>
     </div>

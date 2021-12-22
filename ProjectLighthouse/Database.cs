@@ -34,6 +34,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<AuthenticationAttempt> AuthenticationAttempts { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<RatedReview> RatedReviews { get; set; }
+        public DbSet<UserApprovedIpAddress> UserApprovedIpAddresses { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
@@ -66,13 +67,13 @@ namespace LBPUnion.ProjectLighthouse
         #nullable enable
         public async Task<GameToken?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
         {
-            // TODO: don't use psn name to authenticate
             User? user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username);
             if (user == null) return null;
 
             GameToken gameToken = new()
             {
                 UserToken = HashHelper.GenerateAuthToken(),
+                User = user,
                 UserId = user.UserId,
                 UserLocation = userLocation,
                 GameVersion = GameVersionHelper.FromTitleId(titleId),

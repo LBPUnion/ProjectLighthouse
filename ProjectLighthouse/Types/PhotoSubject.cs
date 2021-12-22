@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 
@@ -20,6 +21,7 @@ namespace LBPUnion.ProjectLighthouse.Types
 
         [XmlIgnore]
         [ForeignKey(nameof(UserId))]
+        [JsonIgnore]
         public User User { get; set; }
 
         [NotMapped]

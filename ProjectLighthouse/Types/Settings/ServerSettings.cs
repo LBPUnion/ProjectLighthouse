@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
     public class ServerSettings
     {
 
-        public const int CurrentConfigVersion = 12; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+        public const int CurrentConfigVersion = 13; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
         static ServerSettings()
         {
             if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
@@ -96,6 +96,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public bool GoogleAnalyticsEnabled { get; set; }
 
         public string GoogleAnalyticsId { get; set; } = "";
+
+        public bool BlockDeniedUsers = true;
 
         #region Meta
 

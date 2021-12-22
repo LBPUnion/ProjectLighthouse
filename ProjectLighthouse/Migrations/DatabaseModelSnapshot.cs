@@ -55,6 +55,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("GameVersion")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Used")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -65,6 +68,8 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("TokenId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("GameTokens");
                 });
@@ -587,6 +592,25 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.UserApprovedIpAddress", b =>
+                {
+                    b.Property<int>("UserApprovedIpAddressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserApprovedIpAddressId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserApprovedIpAddresses");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.WebToken", b =>
                 {
                     b.Property<int>("TokenId")
@@ -613,6 +637,17 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("GameToken");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
@@ -828,6 +863,17 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.UserApprovedIpAddress", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -58,15 +58,10 @@ jobs:
           name: lighthouse-test-results-${{matrix.os.prettyName}}
           path: ${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx
 
-      - name: Process Test Results (Control)
-        if: ${{ matrix.os.prettyName == 'Linux' }}
-        uses: im-open/process-dotnet-test-results@v2.0.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Process Test Results
-        if: ${{ matrix.os.prettyName != 'Linux' }}
-        uses: im-open/process-dotnet-test-results@v2.0.1
+        id: process-trx
+        if: ${{ always() }}
+        uses: im-open/process-dotnet-test-results@v2.0.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           create-status-check: false

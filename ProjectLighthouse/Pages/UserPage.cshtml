@@ -1,4 +1,6 @@
 @page "/user/{userId:int}"
+@using System.IO
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Profiles
 @using LBPUnion.ProjectLighthouse.Types.Settings
@@ -74,7 +76,7 @@
             @foreach (Photo photo in Model.Photos)
             {
                 <div class="eight wide column">
-                    @await Html.PartialAsync("Partials/PhotoPartial", photo);
+                    @await Html.PartialAsync("Partials/PhotoPartial", photo)
                 </div>
             }
         </div>
@@ -92,9 +94,12 @@
     @foreach (Comment comment in Model.Comments!)
     {
         DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
+        StringWriter messageWriter = new StringWriter();
+        HttpUtility.HtmlDecode(comment.Message, messageWriter);
+        String decodedMessage = messageWriter.ToString();
         <div>
             <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
-            <span>@comment.Message</span>
+            <span>@decodedMessage</span>
             <p>
                 <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
             </p>

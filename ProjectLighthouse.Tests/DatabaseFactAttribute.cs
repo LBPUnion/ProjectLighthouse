@@ -4,9 +4,11 @@ using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests
 {
-    public sealed class DatabaseFact : FactAttribute
+    public sealed class DatabaseFactAttribute : FactAttribute
     {
-        public DatabaseFact()
+        private static readonly object migrateLock = new();
+
+        public DatabaseFactAttribute()
         {
             ServerSettings.Instance = new ServerSettings();
             ServerSettings.Instance.DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
@@ -16,8 +18,11 @@ namespace LBPUnion.ProjectLighthouse.Tests
             }
             else
             {
-                using Database database = new();
-                database.Database.Migrate();
+                lock(migrateLock)
+                {
+                    using Database database = new();
+                    database.Database.Migrate();
+                }
             }
         }
     }
