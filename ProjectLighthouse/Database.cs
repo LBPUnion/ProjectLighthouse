@@ -256,10 +256,11 @@ namespace LBPUnion.ProjectLighthouse
 
         public async Task<Photo?> PhotoFromSubject(PhotoSubject subject)
             => await this.Photos.FirstOrDefaultAsync(p => p.PhotoSubjectIds.Contains(subject.PhotoSubjectId.ToString()));
-
-        public async Task RemoveUser(User user)
+        public async Task RemoveUser(User? user)
         {
-            this.Locations.Remove(user.Location);
+            if (user == null) return;
+
+            if (user.Location != null) this.Locations.Remove(user.Location);
             LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
             if (lastContact != null) this.LastContacts.Remove(lastContact);
 
@@ -270,12 +271,16 @@ namespace LBPUnion.ProjectLighthouse
             this.PhotoSubjects.RemoveRange(this.PhotoSubjects.Where(s => s.UserId == user.UserId));
             this.HeartedLevels.RemoveRange(this.HeartedLevels.Where(h => h.UserId == user.UserId));
             this.VisitedLevels.RemoveRange(this.VisitedLevels.Where(v => v.UserId == user.UserId));
+            this.RatedReviews.RemoveRange(this.RatedReviews.Where(r => r.UserId == user.UserId));
             this.QueuedLevels.RemoveRange(this.QueuedLevels.Where(q => q.UserId == user.UserId));
             this.RatedLevels.RemoveRange(this.RatedLevels.Where(r => r.UserId == user.UserId));
             this.GameTokens.RemoveRange(this.GameTokens.Where(t => t.UserId == user.UserId));
             this.WebTokens.RemoveRange(this.WebTokens.Where(t => t.UserId == user.UserId));
             this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
+            this.Reviews.RemoveRange(this.Reviews.Where(r => r.ReviewerId == user.UserId));
             this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
+
+            this.Users.Remove(user);
 
             await this.SaveChangesAsync();
         }
