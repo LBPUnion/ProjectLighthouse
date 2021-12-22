@@ -79,8 +79,8 @@ namespace LBPUnion.ProjectLighthouse.Tests
             database.Slots.Remove(slotA);
             database.Slots.Remove(slotB);
 
-            database.Users.Remove(userA);
-            database.Users.Remove(userB);
+            await database.RemoveUser(userA);
+            await database.RemoveUser(userB);
 
             await database.SaveChangesAsync();
         }

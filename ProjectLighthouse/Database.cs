@@ -277,6 +277,8 @@ namespace LBPUnion.ProjectLighthouse
             this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
             this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
 
+            this.Users.Remove(user);
+
             await this.SaveChangesAsync();
         }
 

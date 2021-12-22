@@ -16,8 +16,8 @@ namespace LBPUnion.ProjectLighthouse.Tests
             User userA = await database.CreateUser("createUserTwiceTest" + rand, HashHelper.GenerateAuthToken());
             User userB = await database.CreateUser("createUserTwiceTest" + rand, HashHelper.GenerateAuthToken());
 
-            database.Users.Remove(userA);
-            database.Users.Remove(userB);
+            await database.RemoveUser(userA);
+            await database.RemoveUser(userB);
 
             await database.SaveChangesAsync();
         }
