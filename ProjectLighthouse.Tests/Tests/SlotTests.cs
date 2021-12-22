@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -15,8 +16,10 @@ namespace LBPUnion.ProjectLighthouse.Tests
         {
             await using Database database = new();
 
-            User userA = await database.CreateUser("unitTestUser0", HashHelper.GenerateAuthToken());
-            User userB = await database.CreateUser("unitTestUser1", HashHelper.GenerateAuthToken());
+            Random r = new();
+
+            User userA = await database.CreateUser($"unitTestUser{r.Next()}", HashHelper.GenerateAuthToken());
+            User userB = await database.CreateUser($"unitTestUser{r.Next()}", HashHelper.GenerateAuthToken());
 
             Location l = new()
             {
@@ -57,9 +60,9 @@ namespace LBPUnion.ProjectLighthouse.Tests
             LoginResult loginResult = await this.Authenticate();
 
             HttpResponseMessage respMessageA = await this.AuthenticatedRequest
-                ("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser0&pageStart=1&pageSize=1", loginResult.AuthTicket);
+                ($"LITTLEBIGPLANETPS3_XML/slots/by?u={userA.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
             HttpResponseMessage respMessageB = await this.AuthenticatedRequest
-                ("LITTLEBIGPLANETPS3_XML/slots/by?u=unitTestUser1&pageStart=1&pageSize=1", loginResult.AuthTicket);
+                ($"LITTLEBIGPLANETPS3_XML/slots/by?u={userB.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
 
             Assert.True(respMessageA.IsSuccessStatusCode);
             Assert.True(respMessageB.IsSuccessStatusCode);
@@ -79,8 +82,8 @@ namespace LBPUnion.ProjectLighthouse.Tests
             database.Slots.Remove(slotA);
             database.Slots.Remove(slotB);
 
-            database.Users.Remove(userA);
-            database.Users.Remove(userB);
+            await database.RemoveUser(userA);
+            await database.RemoveUser(userB);
 
             await database.SaveChangesAsync();
         }
