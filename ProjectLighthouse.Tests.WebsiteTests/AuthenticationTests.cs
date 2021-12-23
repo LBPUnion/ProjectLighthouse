@@ -5,43 +5,14 @@ using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Types;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.WebsiteTests
 {
-    public class AuthenticationTests : IDisposable
+    public class AuthenticationTests : LighthouseWebTest
     {
-        public readonly IWebHost WebHost = new WebHostBuilder().UseKestrel().UseStartup<TestStartup>().UseWebRoot("StaticFiles").Build();
-        public readonly string BaseAddress;
-
-        public readonly IWebDriver Driver;
-
-        public AuthenticationTests()
-        {
-            this.WebHost.Start();
-
-            IServerAddressesFeature? serverAddressesFeature = WebHost.ServerFeatures.Get<IServerAddressesFeature>();
-            if (serverAddressesFeature == null) throw new ArgumentNullException();
-
-            this.BaseAddress = serverAddressesFeature.Addresses.First();
-
-            ChromeOptions chromeOptions = new();
-            if (Convert.ToBoolean(Environment.GetEnvironmentVariable("CI") ?? "false"))
-            {
-                chromeOptions.AddArgument("headless");
-                chromeOptions.AddArgument("no-sandbox");
-                chromeOptions.AddArgument("disable-dev-shm-usage");
-                Console.WriteLine("We are in a CI environment, so chrome headless mode has been enabled.");
-            }
-
-            this.Driver = new ChromeDriver(chromeOptions);
-        }
-
         [DatabaseFact]
         public async Task ShouldLoginWithPassword()
         {
@@ -130,15 +101,6 @@ namespace ProjectLighthouse.Tests.WebsiteTests
             Assert.True(this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)).Text == user.Username);
 
             await database.RemoveUser(user);
-        }
-
-        public void Dispose()
-        {
-            this.Driver.Close();
-            this.Driver.Dispose();
-            this.WebHost.Dispose();
-
-            GC.SuppressFinalize(this);
         }
     }
 }
