@@ -14,12 +14,12 @@ using Microsoft.EntityFrameworkCore;
 namespace LBPUnion.ProjectLighthouse.Tests
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public class LighthouseTest
+    public class LighthouseServerTest
     {
         public readonly HttpClient Client;
         public readonly TestServer Server;
 
-        public LighthouseTest()
+        public LighthouseServerTest()
         {
             this.Server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
 

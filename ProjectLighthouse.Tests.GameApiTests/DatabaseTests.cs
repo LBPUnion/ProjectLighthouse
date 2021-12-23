@@ -1,12 +1,14 @@
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Types;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests
+namespace ProjectLighthouse.Tests.GameApiTests
 {
-    public class DatabaseTests : LighthouseTest
+    public class DatabaseTests : LighthouseServerTest
     {
         [DatabaseFact]
         public async Task CanCreateUserTwice()
