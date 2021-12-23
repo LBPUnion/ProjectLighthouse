@@ -34,6 +34,8 @@ namespace ProjectLighthouse.Tests.WebsiteTests
             if (Convert.ToBoolean(Environment.GetEnvironmentVariable("CI") ?? "false"))
             {
                 chromeOptions.AddArgument("headless");
+                chromeOptions.AddArgument("no-sandbox");
+                chromeOptions.AddArgument("disable-dev-shm-usage");
                 Console.WriteLine("We are in a CI environment, so chrome headless mode has been enabled.");
             }
 
