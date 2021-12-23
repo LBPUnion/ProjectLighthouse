@@ -22,7 +22,6 @@ namespace LBPUnion.ProjectLighthouse.Tests
         public LighthouseServerTest()
         {
             this.Server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
-
             this.Client = this.Server.CreateClient();
         }
         public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)

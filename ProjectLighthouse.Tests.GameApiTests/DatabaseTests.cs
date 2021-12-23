@@ -23,8 +23,6 @@ namespace ProjectLighthouse.Tests.GameApiTests
             Assert.NotNull(userB);
 
             await database.RemoveUser(userA); // Only remove userA since userA and userB are the same user
-
-            await database.SaveChangesAsync();
         }
     }
 }
