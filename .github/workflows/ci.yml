@@ -13,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - { prettyName: Windows, fullName: windows-latest, database: true }
-          - { prettyName: macOS, fullName: macos-latest, database: true }
-          - { prettyName: Linux, fullName: ubuntu-latest, database: true }
+          - { prettyName: Windows, fullName: windows-latest, database: true, webTest: false }
+          - { prettyName: macOS, fullName: macos-latest, database: true, webTest: false }
+          - { prettyName: Linux, fullName: ubuntu-latest, database: true, webTest: true }
     timeout-minutes: 10
     env:
       DB_DATABASE: lighthouse
@@ -44,11 +44,19 @@ jobs:
       - name: Compile
         run: dotnet build -c Debug
 
-      - name: Test
+      - name: ProjectLighthouse.Tests
         continue-on-error: true
-        run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx"
+        run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx" ProjectLighthouse.Tests
 
+      - name: ProjectLighthouse.Tests.GameApiTests
+        continue-on-error: true
+        run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx" ProjectLighthouse.Tests.GameApiTests
 
+      - name: ProjectLighthouse.Tests.WebsiteTests
+        if: ${{ matrix.os.webTest }}
+        continue-on-error: true
+        run: dotnet test --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}.trx" ProjectLighthouse.Tests.WebsiteTests
+      
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
