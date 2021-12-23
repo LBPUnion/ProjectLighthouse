@@ -19,7 +19,7 @@ namespace ProjectLighthouse.Tests.WebsiteTests
         public readonly IWebHost WebHost = new WebHostBuilder().UseKestrel().UseStartup<TestStartup>().UseWebRoot("StaticFiles").Build();
         public readonly string BaseAddress;
 
-        public readonly IWebDriver Driver = new ChromeDriver();
+        public readonly IWebDriver Driver;
 
         public AuthenticationTests()
         {
@@ -29,6 +29,15 @@ namespace ProjectLighthouse.Tests.WebsiteTests
             if (serverAddressesFeature == null) throw new ArgumentNullException();
 
             this.BaseAddress = serverAddressesFeature.Addresses.First();
+
+            ChromeOptions chromeOptions = new();
+            if (Convert.ToBoolean(Environment.GetEnvironmentVariable("CI") ?? "false"))
+            {
+                chromeOptions.AddArgument("headless");
+                Console.WriteLine("We are in a CI environment, so chrome headless mode has been enabled.");
+            }
+
+            this.Driver = new ChromeDriver(chromeOptions);
         }
 
         [DatabaseFact]
