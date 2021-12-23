@@ -13,7 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
     {
         private readonly Database database = new();
         public string Name() => "Cleanup Broken Photos";
-        public string Description() => "Deletes all photos that have missing assets.";
+        public string Description() => "Deletes all photos that have missing assets or invalid photo subjects.";
 
         [SuppressMessage("ReSharper", "LoopCanBePartlyConvertedToQuery")]
         public async Task Run()
@@ -23,6 +23,8 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
                 bool hashNullOrEmpty = false;
                 bool noHashesExist = false;
                 bool largeHashIsInvalidFile = false;
+                bool tooManyPhotoSubjects = false;
+                bool duplicatePhotoSubjects = false;
 
                 hashNullOrEmpty = string.IsNullOrEmpty
                                       (photo.LargeHash) ||
@@ -50,6 +52,23 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
                     goto removePhoto;
                 }
 
+                if (photo.Subjects.Count > 4)
+                {
+                    tooManyPhotoSubjects = true;
+                    goto removePhoto;
+                }
+
+                List<int> subjectUserIds = new(4);
+                foreach (PhotoSubject subject in photo.Subjects)
+                {
+                    if (subjectUserIds.Contains(subject.UserId))
+                    {
+                        duplicatePhotoSubjects = true;
+                        goto removePhoto;
+                    }
+                    subjectUserIds.Add(subject.UserId);
+                }
+
                 continue;
 
                 removePhoto:
@@ -59,7 +78,9 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.MaintenanceJobs
                     $"Removing photo (id: {photo.PhotoId}): " +
                     $"{nameof(hashNullOrEmpty)}: {hashNullOrEmpty}, " +
                     $"{nameof(noHashesExist)}: {noHashesExist}, " +
-                    $"{nameof(largeHashIsInvalidFile)}: {largeHashIsInvalidFile}"
+                    $"{nameof(largeHashIsInvalidFile)}: {largeHashIsInvalidFile}, " +
+                    $"{nameof(tooManyPhotoSubjects)}: {tooManyPhotoSubjects}" +
+                    $"{nameof(duplicatePhotoSubjects)}: {duplicatePhotoSubjects}"
                 );
 
                 this.database.Photos.Remove(photo);
