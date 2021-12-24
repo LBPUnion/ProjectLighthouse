@@ -63,6 +63,8 @@
         <meta content="@Model.Description" property="og:description">
     }
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     @* Google Analytics *@
     @if (ServerSettings.Instance.GoogleAnalyticsEnabled)
     {
@@ -93,14 +95,21 @@
     <header class="lighthouse-header">
         <div class="ui attached menu">
             <div class="ui container">
+                @{
+                    string mobileIconStyle = Model.IsMobile ? "margin-right: 0;" : "";
+                }
                 @foreach (PageNavigationItem navigationItem in Model!.NavigationItems)
                 {
                     <a class="item" href="@navigationItem.Url">
                         @if (navigationItem.Icon != null)
                         {
-                            <i class="@navigationItem.Icon icon"></i>
+                            <i class="@navigationItem.Icon icon" style="@mobileIconStyle"></i>
                         }
-                        @navigationItem.Name
+
+                        @if (!Model.IsMobile)
+                        {
+                            @navigationItem.Name
+                        }
                     </a>
                 }
                 <div class="right menu">
@@ -109,9 +118,13 @@
                         <a class="item" href="@navigationItem.Url">
                             @if (navigationItem.Icon != null)
                             {
-                                <i class="@navigationItem.Icon icon"></i>
+                                <i class="@navigationItem.Icon icon" style="@mobileIconStyle"></i>
                             }
-                            @navigationItem.Name
+
+                            @if (!Model.IsMobile)
+                            {
+                                @navigationItem.Name
+                            }
                         </a>
                     }
                 </div>
@@ -163,10 +176,12 @@
                         <b>Show/Hide Debug Info</b>
                     </button>
 
-                    <div style="display:none">
+                    <div style="display:none" id="lighthouse-debug-info">
+                        <br>
                         <p>Model.IsMobile: @Model.IsMobile</p>
                         <p>Model.Title: @Model.Title</p>
                         <p>Model.Description: @Model.Description</p>
+                        <p>Model.User.UserId: @(Model.User?.UserId.ToString() ?? "(not logged in)")</p>
                         <p>Render time: ~@(TimestampHelper.TimestampMillis - timeStarted)ms</p>
                     </div>
                 </div>

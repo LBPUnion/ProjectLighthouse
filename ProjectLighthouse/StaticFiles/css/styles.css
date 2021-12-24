@@ -16,3 +16,6 @@ div.statsUnderTitle > span {
     margin-right: 5px;
 }
 
+#lighthouse-debug-info > p {
+    margin-bottom: 1px;
+}
