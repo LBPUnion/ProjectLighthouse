@@ -1,4 +1,5 @@
 @using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.Layouts.BaseLayout
@@ -26,6 +27,9 @@
         }
         Model.NavigationItemsRight.Add(new PageNavigationItem("Log out", "/logout", "user alternate slash")); // should always be last
     }
+
+    Model.IsMobile = Model.Request.IsMobile();
+    long timeStarted = TimestampHelper.TimestampMillis;
 }
 
 <!DOCTYPE html>
@@ -151,6 +155,44 @@
                 }
             </div>
         </div>
+        @if (ServerStatics.IsDebug)
+        {
+            <div class="ui red attached inverted segment">
+                <div class="ui container">
+                    <button type="button" class="ui inverted button collapsible">
+                        <b>Show/Hide Debug Info</b>
+                    </button>
+
+                    <div style="display:none">
+                        <p>Model.IsMobile: @Model.IsMobile</p>
+                        <p>Model.Title: @Model.Title</p>
+                        <p>Model.Description: @Model.Description</p>
+                        <p>Render time: ~@(TimestampHelper.TimestampMillis - timeStarted)ms</p>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const collapsible = document.getElementsByClassName("collapsible");
+                
+                for (let i = 0; i < collapsible.length; i++) 
+                {
+                  collapsible[i].addEventListener("click", function() 
+                  {
+                    this.classList.toggle("active");
+                    const content = this.nextElementSibling;
+                    if (content.style.display === "block") 
+                    {
+                      content.style.display = "none";
+                    } 
+                    else 
+                    {
+                      content.style.display = "block";
+                    }
+                  });
+                }
+            </script>
+        }
     </footer>
 </div>
 </body>

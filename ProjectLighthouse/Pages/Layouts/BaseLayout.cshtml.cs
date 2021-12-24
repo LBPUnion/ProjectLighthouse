@@ -7,6 +7,13 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
 {
     public class BaseLayout : PageModel
     {
+        public BaseLayout(Database database)
+        {
+            this.Database = database;
+        }
+
+        public bool IsMobile;
+
         public readonly Database Database;
 
         public readonly List<PageNavigationItem> NavigationItems = new()
@@ -24,11 +31,6 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
         public string Description = string.Empty;
 
         private User? user;
-
-        public BaseLayout(Database database)
-        {
-            this.Database = database;
-        }
 
         public new User? User {
             get {
