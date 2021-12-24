@@ -21,6 +21,7 @@ namespace LBPUnion.ProjectLighthouse.Pages.Layouts
         public bool ShowTitleInPage = true;
 
         public string Title = string.Empty;
+        public string Description = string.Empty;
 
         private User? user;
 

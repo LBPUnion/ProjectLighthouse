@@ -48,10 +48,18 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#008cff">
+    <meta name="msapplication-TileColor" content="#008cff">
 
+    @* Embed Stuff *@
+    <meta name="theme-color" data-react-helmet="true" content="#008cff">
+    <meta content="Project Lighthouse - @Model.Title" property="og:title">
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <meta content="@Model.Description" property="og:description">
+    }
+
+    @* Google Analytics *@
     @if (ServerSettings.Instance.GoogleAnalyticsEnabled)
     {
         <!-- Global site tag (gtag.js) - Google Analytics -->
