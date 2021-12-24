@@ -27,5 +27,11 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         }
 
         public static bool IsUnitTesting => AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.FullName.StartsWith("xunit"));
+
+        #if DEBUG
+        public static readonly bool IsDebug = true;
+        #else
+        public static readonly bool IsDebug = false;
+        #endif
     }
 }

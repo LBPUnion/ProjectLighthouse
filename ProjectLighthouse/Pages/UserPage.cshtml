@@ -8,8 +8,10 @@
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = Model.ProfileUser!.Username + "'s user page";
     Model.ShowTitleInPage = false;
+
+    Model.Title = Model.ProfileUser!.Username + "'s user page";
+    Model.Description = Model.ProfileUser!.Biography;
 }
 
 <div class="ui grid">
