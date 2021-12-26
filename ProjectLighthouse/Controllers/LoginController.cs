@@ -41,10 +41,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             {
                 loginData = null;
             }
-            if (loginData == null) return this.BadRequest();
+
+            if (loginData == null)
+            {
+                Logger.Log("loginData was null, rejecting login", LoggerLevelLogin.Instance);
+                return this.BadRequest();
+            }
 
             IPAddress? remoteIpAddress = this.HttpContext.Connection.RemoteIpAddress;
-            if (remoteIpAddress == null) return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
+            if (remoteIpAddress == null)
+            {
+                Logger.Log("unable to determine ip, rejecting login", LoggerLevelLogin.Instance);
+                return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
+            }
 
             string ipAddress = remoteIpAddress.ToString();
 
@@ -56,11 +65,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (token == null) // If we cant find an existing token, try to generate a new one
             {
                 token = await this.database.AuthenticateUser(loginData, ipAddress, titleId);
-                if (token == null) return this.StatusCode(403, ""); // If not, then 403.
+                if (token == null)
+                {
+                    Logger.Log("unable to find/generate a token, rejecting login", LoggerLevelLogin.Instance);
+                    return this.StatusCode(403, ""); // If not, then 403.
+                }
             }
 
             User? user = await this.database.UserFromGameToken(token, true);
-            if (user == null) return this.StatusCode(403, "");
+            if (user == null)
+            {
+                Logger.Log("unable to find a user from a token, rejecting login", LoggerLevelLogin.Instance);
+                return this.StatusCode(403, "");
+            }
 
             if (ServerSettings.Instance.UseExternalAuth)
             {
@@ -75,6 +92,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                         DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
 
                         await this.database.SaveChangesAsync();
+                        Logger.Log("too many denied logins, rejecting login", LoggerLevelLogin.Instance);
                         return this.StatusCode(403, "");
                     }
                 }
@@ -104,7 +122,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             await this.database.SaveChangesAsync();
 
-            if (!token.Approved) return this.StatusCode(403, "");
+            if (!token.Approved)
+            {
+                Logger.Log("token unapproved, rejecting login", LoggerLevelLogin.Instance);
+                return this.StatusCode(403, "");
+            }
 
             Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
             // After this point we are now considering this session as logged in.
