@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+#nullable enable
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -28,11 +27,17 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
             set => this.Endpoint = value.Replace("/searches/", "");
         }
 
-        public abstract IEnumerable<Slot> Slots(Database database);
+        public abstract Slot? GetPreviewSlot(Database database);
 
         public string Serialize(Database database)
         {
-            string slots = this.Slots(database).Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+            Slot? previewSlot = this.GetPreviewSlot(database);
+
+            string previewResults = "";
+            if (previewSlot != null)
+            {
+                previewResults = LbpSerializer.StringElement("results", LbpSerializer.StringElement("slots", previewSlot.Serialize()));
+            }
 
             return LbpSerializer.StringElement
             (
@@ -40,7 +45,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
                 LbpSerializer.StringElement("name", this.Name) +
                 LbpSerializer.StringElement("description", this.Description) +
                 LbpSerializer.StringElement("url", this.IngameEndpoint) +
-                LbpSerializer.StringElement("results", slots) +
+                (previewSlot == null ? "" : previewResults) +
                 LbpSerializer.StringElement("icon", IconHash)
             );
         }

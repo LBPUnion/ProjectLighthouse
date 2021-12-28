@@ -1,7 +1,9 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Categories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,12 +28,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         [HttpGet("genres")]
         public async Task<IActionResult> GenresAndSearches()
         {
+            User? user = await this.database.UserFromGameRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
             List<Category> categories = new()
             {
                 new TeamPicksCategory(),
-                new TeamPicksCategory(),
                 new NewestLevelsCategory(),
-                new NewestLevelsCategory(),
+                new QueueCategory(user),
             };
 
             string categoriesSerialized = categories.Aggregate(string.Empty, (current, category) => current + category.Serialize(this.database));
