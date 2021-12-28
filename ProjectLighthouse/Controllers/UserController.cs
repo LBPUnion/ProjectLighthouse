@@ -58,9 +58,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(LbpSerializer.StringElement("users", serialized));
         }
 
-        [HttpGet("user/{username}/playlists")]
-        public IActionResult GetUserPlaylists(string username) => this.Ok();
-
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser()
         {
