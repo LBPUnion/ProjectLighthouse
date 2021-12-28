@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -29,6 +30,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
 
         public abstract Slot? GetPreviewSlot(Database database);
 
+        public abstract int GetTotalSlots(Database database);
+
         public string Serialize(Database database)
         {
             Slot? previewSlot = this.GetPreviewSlot(database);
@@ -36,7 +39,20 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
             string previewResults = "";
             if (previewSlot != null)
             {
-                previewResults = LbpSerializer.StringElement("results", LbpSerializer.StringElement("slots", previewSlot.Serialize()));
+                previewResults = LbpSerializer.TaggedStringElement
+                (
+                    "results",
+                    previewSlot.Serialize(),
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "total", this.GetTotalSlots(database)
+                        },
+                        {
+                            "hint_start", "2"
+                        },
+                    }
+                );
             }
 
             return LbpSerializer.StringElement

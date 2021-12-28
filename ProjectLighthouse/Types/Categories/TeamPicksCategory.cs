@@ -11,5 +11,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
         public override string IconHash { get; set; } = "g820626";
         public override string Endpoint { get; set; } = "team_picks";
         public override Slot? GetPreviewSlot(Database database) => database.Slots.OrderByDescending(s => s.FirstUploaded).FirstOrDefault(s => s.TeamPick);
+        public override int GetTotalSlots(Database database) => database.Slots.Count(s => s.TeamPick);
     }
 }

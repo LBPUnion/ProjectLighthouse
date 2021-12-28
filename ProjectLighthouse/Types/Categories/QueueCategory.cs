@@ -25,8 +25,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
             }
         }
 
-        public override Slot? GetPreviewSlot
-            (Database database)
+        public override Slot? GetPreviewSlot(Database database)
             => database.QueuedLevels.Include(q => q.Slot).FirstOrDefault(q => q.UserId == this.user.UserId)?.Slot;
+
+        public override int GetTotalSlots(Database database) => database.QueuedLevels.Count(q => q.UserId == this.user.UserId);
     }
 }
