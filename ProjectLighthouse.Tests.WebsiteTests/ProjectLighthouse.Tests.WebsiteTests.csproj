@@ -1,15 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
 
         <IsPackable>false</IsPackable>
-
-        <TargetFramework>net6.0</TargetFramework>
-
-        <AssemblyName>LBPUnion.ProjectLighthouse.Tests</AssemblyName>
-
-        <RootNamespace>LBPUnion.ProjectLighthouse.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +15,8 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0"/>
+        <PackageReference Include="Selenium.WebDriver" Version="4.1.0"/>
+        <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="96.0.4664.4500"/>
         <PackageReference Include="xunit" Version="2.4.1"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -32,9 +29,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="ExampleFiles\**">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        <ProjectReference Include="..\ProjectLighthouse.Tests\ProjectLighthouse.Tests.csproj"/>
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj"/>
     </ItemGroup>
+
 </Project>

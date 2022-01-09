@@ -3,11 +3,12 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Tests;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests
+namespace ProjectLighthouse.Tests.GameApiTests
 {
-    public class UploadTests : LighthouseTest
+    public class UploadTests : LighthouseServerTest
     {
         public UploadTests()
         {

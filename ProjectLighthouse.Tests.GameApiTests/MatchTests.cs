@@ -4,12 +4,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Types;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests
+namespace ProjectLighthouse.Tests.GameApiTests
 {
-    public class MatchTests : LighthouseTest
+    public class MatchTests : LighthouseServerTest
     {
         private static readonly SemaphoreSlim semaphore = new(1, 1);
 
