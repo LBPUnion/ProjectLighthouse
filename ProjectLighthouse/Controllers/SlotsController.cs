@@ -91,7 +91,15 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] int? page = null)
+        public async Task<IActionResult> CoolSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] int? page = null
+        )
         {
             int _pageStart = pageStart;
             if (page != null) _pageStart = (int)page * 30;
@@ -206,65 +214,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/thumbs")]
-        public async Task<IActionResult> ThumbsSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
+        public async Task<IActionResult> ThumbsSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] string? dateFilterType = null
+        )
         {
+            Random rand = new();
 
-
-            long oldestTime;
-
-            string _dateFilterType = dateFilterType != null ? dateFilterType : "";
-
-            switch (_dateFilterType)
-            {
-                case "thisWeek":
-                    oldestTime = DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds();
-                    break;
-                case "thisMonth":
-                    oldestTime = DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds();
-                    break;
-                default:
-                    oldestTime = 0;
-                    break;
-            }
-
-            Random rand = new(); GameVersion gameVersion;
-
-            switch (gameFilterType)
-            {
-                case "lbp1":
-                    gameVersion = GameVersion.LittleBigPlanet1;
-                    break;
-                case "lbp2":
-                    gameVersion = GameVersion.LittleBigPlanet2;
-                    break;
-                case "lbp3":
-                    gameVersion = GameVersion.LittleBigPlanet3;
-                    break;
-                case "both": // LBP2 default option
-                    gameVersion = GameVersion.LittleBigPlanet2;
-                    break;
-                default:
-                    gameVersion = GameVersion.Unknown;
-                    break;
-            }
-
-            IQueryable<Slot> whereSlots;
-
-            if (gameFilterType == "both")
-            {
-                // Get game versions less than the current version
-                // Needs support for LBP3 ("both" = LBP1+2)
-                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
-            }
-            else
-            {
-                // Get game versions exactly equal to gamefiltertype
-                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
-            }
-
-            IEnumerable<Slot> slots = whereSlots
-                .Include(s => s.Creator)
-                .Include(s => s.Location)
+            IEnumerable<Slot> slots = FilterByRequest(gameFilterType, dateFilterType)
                 .AsEnumerable()
                 .OrderByDescending(s => s.Thumbsup)
                 .ThenBy(_ => rand.Next())
@@ -277,84 +239,35 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/mostUniquePlays")]
-        public async Task<IActionResult> MostUniquePlaysSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
+        public async Task<IActionResult> MostUniquePlaysSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] string? dateFilterType = null
+        )
         {
-
-            long oldestTime;
-
-            string _dateFilterType = dateFilterType != null ? dateFilterType : "";
-
-            switch (_dateFilterType)
-            {
-                case "thisWeek":
-                    oldestTime = DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds();
-                    break;
-                case "thisMonth":
-                    oldestTime = DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds();
-                    break;
-                default:
-                    oldestTime = 0;
-                    break;
-            }
-
             Random rand = new();
 
-            GameVersion gameVersion;
-
-            switch (gameFilterType)
-            {
-                case "lbp1":
-                    gameVersion = GameVersion.LittleBigPlanet1;
-                    break;
-                case "lbp2":
-                    gameVersion = GameVersion.LittleBigPlanet2;
-                    break;
-                case "lbp3":
-                    gameVersion = GameVersion.LittleBigPlanet3;
-                    break;
-                case "both": // LBP2 default option
-                    gameVersion = GameVersion.LittleBigPlanet2;
-                    break;
-                default:
-                    gameVersion = GameVersion.Unknown;
-                    break;
-            }
-
-            IQueryable<Slot> whereSlots;
-
-            if (gameFilterType == "both")
-            {
-                // Get game versions less than the current version
-                // Needs support for LBP3 ("both" = LBP1+2)
-                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
-            }
-            else
-            {
-                // Get game versions exactly equal to gamefiltertype
-                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
-            }
-
-            IEnumerable<Slot> slots = whereSlots
-                .Include(s => s.Creator)
-                .Include(s => s.Location)
+            IEnumerable<Slot> slots = FilterByRequest(gameFilterType, dateFilterType)
                 .AsEnumerable()
-                .OrderByDescending(s =>
-                {
-                    // probably not the best way to do this?
-                    switch (gameVersion)
+                .OrderByDescending
+                (
+                    s =>
                     {
-                        case GameVersion.LittleBigPlanet1:
-                            return s.PlaysLBP1Unique;
-                        case GameVersion.LittleBigPlanet2:
-                            return s.PlaysLBP2Unique;
-                        case GameVersion.LittleBigPlanet3:
-                            return s.PlaysLBP3Unique;
-                        case GameVersion.LittleBigPlanetVita:
-                            return s.PlaysLBPVitaUnique;
-                        default:
-                            return s.PlaysUnique;
+                        // probably not the best way to do this?
+                        return GetGameFilter(gameFilterType) switch
+                        {
+                            GameVersion.LittleBigPlanet1 => s.PlaysLBP1Unique,
+                            GameVersion.LittleBigPlanet2 => s.PlaysLBP2Unique,
+                            GameVersion.LittleBigPlanet3 => s.PlaysLBP3Unique,
+                            GameVersion.LittleBigPlanetVita => s.PlaysLBPVitaUnique,
+                            _ => s.PlaysUnique,
+                        };
                     }
-                })
+                )
                 .ThenBy(_ => rand.Next())
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, 30));
@@ -365,64 +278,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         }
 
         [HttpGet("slots/mostHearted")]
-        public async Task<IActionResult> MostHeartedSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] string gameFilterType, [FromQuery] int players, [FromQuery] Boolean move, [FromQuery] string? dateFilterType = null)
+        public async Task<IActionResult> MostHeartedSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] string? dateFilterType = null
+        )
         {
+            Random rand = new();
 
-            long oldestTime;
-
-            string _dateFilterType = dateFilterType != null ? dateFilterType : "";
-
-            switch (_dateFilterType)
-            {
-                case "thisWeek":
-                    oldestTime = DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds();
-                    break;
-                case "thisMonth":
-                    oldestTime = DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds();
-                    break;
-                default:
-                    oldestTime = 0;
-                    break;
-            }
-
-            Random rand = new(); GameVersion gameVersion;
-
-            switch (gameFilterType)
-            {
-                case "lbp1":
-                    gameVersion = GameVersion.LittleBigPlanet1;
-                    break;
-                case "lbp2":
-                    gameVersion = GameVersion.LittleBigPlanet2;
-                    break;
-                case "lbp3":
-                    gameVersion = GameVersion.LittleBigPlanet3;
-                    break;
-                case "both": // LBP2 default option
-                    gameVersion = GameVersion.LittleBigPlanet2;
-                    break;
-                default:
-                    gameVersion = GameVersion.Unknown;
-                    break;
-            }
-
-            IQueryable<Slot> whereSlots;
-
-            if (gameFilterType == "both")
-            {
-                // Get game versions less than the current version
-                // Needs support for LBP3 ("both" = LBP1+2)
-                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
-            }
-            else
-            {
-                // Get game versions exactly equal to gamefiltertype
-                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
-            }
-
-            IEnumerable<Slot> slots = whereSlots
-                .Include(s => s.Creator)
-                .Include(s => s.Location)
+            IEnumerable<Slot> slots = FilterByRequest(gameFilterType, dateFilterType)
                 .AsEnumerable()
                 .OrderByDescending(s => s.Hearts)
                 .ThenBy(_ => rand.Next())
@@ -434,5 +302,47 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
         }
 
+        public GameVersion GetGameFilter(string gameFilterType)
+        {
+            return gameFilterType switch
+            {
+                "lbp1" => GameVersion.LittleBigPlanet1,
+                "lbp2" => GameVersion.LittleBigPlanet2,
+                "lbp3" => GameVersion.LittleBigPlanet3,
+                "both" => GameVersion.LittleBigPlanet2, // LBP2 default option
+                _ => GameVersion.Unknown,
+            };
+        }
+
+        public IQueryable<Slot> FilterByRequest(string gameFilterType, string? dateFilterType)
+        {
+            string _dateFilterType = dateFilterType ?? "";
+
+            long oldestTime = _dateFilterType switch
+            {
+                "thisWeek" => DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds(),
+                "thisMonth" => DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds(),
+                _ => 0,
+            };
+
+            GameVersion gameVersion = GetGameFilter(gameFilterType);
+
+            IQueryable<Slot> whereSlots;
+
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (gameFilterType == "both")
+            {
+                // Get game versions less than the current version
+                // Needs support for LBP3 ("both" = LBP1+2)
+                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            }
+            else
+            {
+                // Get game versions exactly equal to gamefiltertype
+                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            }
+
+            return whereSlots.Include(s => s.Creator).Include(s => s.Location);
+        }
     }
 }
