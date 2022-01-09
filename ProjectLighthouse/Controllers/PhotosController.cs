@@ -53,6 +53,11 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             photo.CreatorId = user.UserId;
             photo.Creator = user;
 
+            if (photo.Subjects.Count > 4)
+            {
+                return this.BadRequest();
+            }
+
             foreach (PhotoSubject subject in photo.Subjects)
             {
                 subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
@@ -66,6 +71,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             await this.database.SaveChangesAsync();
+
+            // Check for duplicate photo subjects
+            List<int> subjectUserIds = new(4);
+            foreach (PhotoSubject subject in photo.Subjects)
+            {
+                if (subjectUserIds.Contains(subject.UserId))
+                {
+                    return this.BadRequest();
+                }
+                subjectUserIds.Add(subject.UserId);
+            }
 
             photo.PhotoSubjectIds = photo.Subjects.Select(subject => subject.PhotoSubjectId.ToString()).ToArray();
 
