@@ -4,7 +4,7 @@ using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests
 {
-    public class SerializerTests : LighthouseTest
+    public class SerializerTests
     {
         [Fact]
         public void BlankElementWorks()

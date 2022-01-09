@@ -1,15 +1,17 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests
+namespace ProjectLighthouse.Tests.GameApiTests
 {
-    public class SlotTests : LighthouseTest
+    public class SlotTests : LighthouseServerTest
     {
         [DatabaseFact]
         public async Task ShouldOnlyShowUsersLevels()
