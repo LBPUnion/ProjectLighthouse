@@ -91,7 +91,21 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
         [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
-        public async Task<IActionResult> CoolSlots([FromQuery] int page) => await this.LuckyDipSlots(30 * page, 30, 69);
+        public async Task<IActionResult> CoolSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] int? page = null
+        )
+        {
+            int _pageStart = pageStart;
+            if (page != null) _pageStart = (int)page * 30;
+            // bit of a better placeholder until we can track average user interaction with /stream endpoint
+            return await ThumbsSlots(_pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisWeek");
+        }
 
         [HttpGet("slots")]
         public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
@@ -197,6 +211,138 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     }
                 )
             );
+        }
+
+        [HttpGet("slots/thumbs")]
+        public async Task<IActionResult> ThumbsSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] string? dateFilterType = null
+        )
+        {
+            Random rand = new();
+
+            IEnumerable<Slot> slots = FilterByRequest(gameFilterType, dateFilterType)
+                .AsEnumerable()
+                .OrderByDescending(s => s.Thumbsup)
+                .ThenBy(_ => rand.Next())
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30));
+
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        }
+
+        [HttpGet("slots/mostUniquePlays")]
+        public async Task<IActionResult> MostUniquePlaysSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] string? dateFilterType = null
+        )
+        {
+            Random rand = new();
+
+            IEnumerable<Slot> slots = FilterByRequest(gameFilterType, dateFilterType)
+                .AsEnumerable()
+                .OrderByDescending
+                (
+                    s =>
+                    {
+                        // probably not the best way to do this?
+                        return GetGameFilter(gameFilterType) switch
+                        {
+                            GameVersion.LittleBigPlanet1 => s.PlaysLBP1Unique,
+                            GameVersion.LittleBigPlanet2 => s.PlaysLBP2Unique,
+                            GameVersion.LittleBigPlanet3 => s.PlaysLBP3Unique,
+                            GameVersion.LittleBigPlanetVita => s.PlaysLBPVitaUnique,
+                            _ => s.PlaysUnique,
+                        };
+                    }
+                )
+                .ThenBy(_ => rand.Next())
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30));
+
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        }
+
+        [HttpGet("slots/mostHearted")]
+        public async Task<IActionResult> MostHeartedSlots
+        (
+            [FromQuery] int pageStart,
+            [FromQuery] int pageSize,
+            [FromQuery] string gameFilterType,
+            [FromQuery] int players,
+            [FromQuery] Boolean move,
+            [FromQuery] string? dateFilterType = null
+        )
+        {
+            Random rand = new();
+
+            IEnumerable<Slot> slots = FilterByRequest(gameFilterType, dateFilterType)
+                .AsEnumerable()
+                .OrderByDescending(s => s.Hearts)
+                .ThenBy(_ => rand.Next())
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30));
+
+            string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        }
+
+        public GameVersion GetGameFilter(string gameFilterType)
+        {
+            return gameFilterType switch
+            {
+                "lbp1" => GameVersion.LittleBigPlanet1,
+                "lbp2" => GameVersion.LittleBigPlanet2,
+                "lbp3" => GameVersion.LittleBigPlanet3,
+                "both" => GameVersion.LittleBigPlanet2, // LBP2 default option
+                _ => GameVersion.Unknown,
+            };
+        }
+
+        public IQueryable<Slot> FilterByRequest(string gameFilterType, string? dateFilterType)
+        {
+            string _dateFilterType = dateFilterType ?? "";
+
+            long oldestTime = _dateFilterType switch
+            {
+                "thisWeek" => DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds(),
+                "thisMonth" => DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds(),
+                _ => 0,
+            };
+
+            GameVersion gameVersion = GetGameFilter(gameFilterType);
+
+            IQueryable<Slot> whereSlots;
+
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (gameFilterType == "both")
+            {
+                // Get game versions less than the current version
+                // Needs support for LBP3 ("both" = LBP1+2)
+                whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            }
+            else
+            {
+                // Get game versions exactly equal to gamefiltertype
+                whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            }
+
+            return whereSlots.Include(s => s.Creator).Include(s => s.Location);
         }
     }
 }
