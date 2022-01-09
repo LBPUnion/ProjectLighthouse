@@ -3,8 +3,10 @@
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = Model.Slot.Name;
     Model.ShowTitleInPage = false;
+
+    Model.Title = Model.Slot.Name;
+    Model.Description = Model.Slot.Description;
 }
 
 @await Html.PartialAsync("Partials/SlotCardPartial", Model.Slot, new ViewDataDictionary(ViewData)
