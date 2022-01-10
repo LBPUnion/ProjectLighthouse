@@ -87,11 +87,34 @@ namespace LBPUnion.ProjectLighthouse
                     Stopwatch requestStopwatch = new();
                     requestStopwatch.Start();
 
+                    context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
+
                     // Log all headers.
 //                    foreach (KeyValuePair<string, StringValues> header in context.Request.Headers) Logger.Log($"{header.Key}: {header.Value}");
 
-                    context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
+                    await next(context); // Handle the request so we can get the status code from it
 
+                    requestStopwatch.Stop();
+
+                    Logger.Log
+                    (
+                        $"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}",
+                        LoggerLevelHttp.Instance
+                    );
+
+                    if (context.Request.Method == "POST")
+                    {
+                        context.Request.Body.Position = 0;
+                        Logger.Log(await new StreamReader(context.Request.Body).ReadToEndAsync(), LoggerLevelHttp.Instance);
+                    }
+                }
+            );
+
+            // Digest check
+            app.Use
+            (
+                async (context, next) =>
+                {
                     // Client digest check.
                     if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string authCookie)) authCookie = string.Empty;
                     string digestPath = context.Request.Path;
@@ -119,7 +142,7 @@ namespace LBPUnion.ProjectLighthouse
                     Stream oldResponseStream = context.Response.Body;
                     context.Response.Body = responseBuffer;
 
-                    await next(); // Handle the request so we can get the status code from it
+                    await next(context); // Handle the request so we can get the server digest hash
 
                     // Compute the server digest hash.
                     if (computeDigests)
@@ -138,7 +161,13 @@ namespace LBPUnion.ProjectLighthouse
                     responseBuffer.Position = 0;
                     await responseBuffer.CopyToAsync(oldResponseStream);
                     context.Response.Body = oldResponseStream;
+                }
+            );
 
+            app.Use
+            (
+                async (context, next) =>
+                {
                     #nullable enable
                     // Log LastContact for LBP1. This is done on LBP2/3/V on a Match request.
                     if (context.Request.Path.ToString().StartsWith("/LITTLEBIGPLANETPS3_XML"))
@@ -153,19 +182,7 @@ namespace LBPUnion.ProjectLighthouse
                     }
                     #nullable disable
 
-                    requestStopwatch.Stop();
-
-                    Logger.Log
-                    (
-                        $"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}",
-                        LoggerLevelHttp.Instance
-                    );
-
-                    if (context.Request.Method == "POST")
-                    {
-                        context.Request.Body.Position = 0;
-                        Logger.Log(await new StreamReader(context.Request.Body).ReadToEndAsync(), LoggerLevelHttp.Instance);
-                    }
+                    await next(context);
                 }
             );
 

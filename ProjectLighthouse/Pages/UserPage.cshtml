@@ -14,12 +14,34 @@
     Model.Description = Model.ProfileUser!.Biography;
 }
 
+@if (Model.ProfileUser.Banned)
+{
+    <div class="ui inverted red segment">
+        <p>
+            <b>User is currently banned!</b>
+        </p>
+        @if (Model.User != null && Model.User.IsAdmin)
+        {
+            <p>Reason: @Model.ProfileUser.BannedReason</p>
+            <a class="ui inverted button" href="/admin/user/@Model.ProfileUser.UserId/unban">
+                <i class="ban icon"></i>
+                <span>Unban User</span>
+            </a>
+        }
+        else
+        {
+            <p>For shame...</p>
+        }
+    </div>
+}
+
 <div class="ui grid">
     <div class="eight wide column">
         <h1>@Model.Title</h1>
         <p>
             <i>@Model.ProfileUser!.Status</i>
         </p>
+
         <div class="statsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
             <i class="blue comment icon" title="Comments"></i> <span>@Model.ProfileUser.Comments</span>
@@ -51,6 +73,13 @@
             <a class="ui blue button" href="/passwordReset">
                 <i class="key icon"></i>
                 <span>Reset Password</span>
+            </a>
+        }
+        @if (Model.User != null && Model.User.IsAdmin && !Model.ProfileUser.Banned)
+        {
+            <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/ban">
+                <i class="ban icon"></i>
+                <span>Ban User</span>
             </a>
         }
     </div>

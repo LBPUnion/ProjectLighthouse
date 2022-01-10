@@ -546,6 +546,12 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<bool>("Banned")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("BannedReason")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Biography")
                         .HasColumnType("longtext");
 
