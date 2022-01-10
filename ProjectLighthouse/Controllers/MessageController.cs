@@ -28,7 +28,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            return this.Ok(ServerSettings.Instance.EulaText + "\n" + $"{EulaHelper.License}\n");
+            return this.Ok($"{EulaHelper.License}\n{ServerSettings.Instance.EulaText}");
         }
 
         [HttpGet("announce")]
@@ -47,19 +47,24 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             GameToken gameToken = userAndToken.Value.Item2;
             #endif
 
+            string announceText = ServerSettings.Instance.AnnounceText;
+
+            announceText = announceText.Replace("%user", user.Username);
+            announceText = announceText.Replace("%id", user.UserId.ToString());
+
             return this.Ok
             (
-                $"You are now logged in as {user.Username}.\n\n" +
+                announceText +
                 #if DEBUG
-                "---DEBUG INFO---\n" +
+                "\n\n---DEBUG INFO---\n" +
                 $"user.UserId: {user.UserId}\n" +
                 $"token.Approved: {gameToken.Approved}\n" +
                 $"token.Used: {gameToken.Used}\n" +
                 $"token.UserLocation: {gameToken.UserLocation}\n" +
                 $"token.GameVersion: {gameToken.GameVersion}\n" +
-                "---DEBUG INFO---\n\n" +
+                "---DEBUG INFO---" +
                 #endif
-                ServerSettings.Instance.EulaText
+                "\n"
             );
         }
 
