@@ -11,11 +11,11 @@ namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
     public class DeleteUserCommand : ICommand
     {
         private readonly Database database = new();
-        public string Name() => "Delete/Ban User";
+        public string Name() => "Delete User";
         public string[] Aliases()
             => new[]
             {
-                "deleteUser", "wipeUser", "banUser",
+                "deleteUser", "wipeUser",
             };
         public string Arguments() => "<username/userId>";
         public int RequiredArgs() => 1;
