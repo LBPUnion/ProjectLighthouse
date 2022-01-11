@@ -1,15 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
 
         <IsPackable>false</IsPackable>
-
-        <TargetFramework>net6.0</TargetFramework>
-
-        <AssemblyName>LBPUnion.ProjectLighthouse.Tests</AssemblyName>
-
-        <RootNamespace>LBPUnion.ProjectLighthouse.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -32,9 +27,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="ExampleFiles\**">
+        <ProjectReference Include="..\ProjectLighthouse.Tests\ProjectLighthouse.Tests.csproj"/>
+        <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="..\ProjectLighthouse.Tests\ExampleFiles\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj"/>
     </ItemGroup>
+
 </Project>

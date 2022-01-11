@@ -1,0 +1,20 @@
+@page "/admin/user/{id:int}/ban"
+@model LBPUnion.ProjectLighthouse.Pages.Admin.AdminBanUserPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Ban " + Model.TargetedUser!.Username + "?";
+}
+
+<p>Are you sure you want to ban this user?</p>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="ui left labeled input">
+        <label for="text" class="ui blue label">Reason: </label>
+        <input type="text" name="reason" id="text">
+    </div><br><br>
+
+    <input type="submit" value="Yes, ban @Model.TargetedUser.Username!" id="submit" class="ui red button"><br>
+</form>

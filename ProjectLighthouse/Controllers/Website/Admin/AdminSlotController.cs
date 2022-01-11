@@ -19,7 +19,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.Website.Admin
             this.database = database;
         }
 
-        [Route("teamPick")]
+        [HttpGet("teamPick")]
         public async Task<IActionResult> TeamPick([FromRoute] int id)
         {
             User? user = this.database.UserFromWebRequest(this.Request);
@@ -35,7 +35,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.Website.Admin
             return this.Ok();
         }
 
-        [Route("removeTeamPick")]
+        [HttpGet("removeTeamPick")]
         public async Task<IActionResult> RemoveTeamPick([FromRoute] int id)
         {
             User? user = this.database.UserFromWebRequest(this.Request);
@@ -51,7 +51,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.Website.Admin
             return this.Ok();
         }
 
-        [Route("delete")]
+        [HttpGet("delete")]
         public async Task<IActionResult> DeleteLevel([FromRoute] int id)
         {
             User? user = this.database.UserFromWebRequest(this.Request);

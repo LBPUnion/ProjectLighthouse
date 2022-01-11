@@ -73,7 +73,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
 
             User? user = await this.database.UserFromGameToken(token, true);
-            if (user == null)
+
+            if (user == null || user.Banned)
             {
                 Logger.Log("unable to find a user from a token, rejecting login", LoggerLevelLogin.Instance);
                 return this.StatusCode(403, "");

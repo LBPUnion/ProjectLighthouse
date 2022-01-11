@@ -1,13 +1,14 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests
+namespace ProjectLighthouse.Tests.GameApiTests
 {
-    public class AuthenticationTests : LighthouseTest
+    public class AuthenticationTests : LighthouseServerTest
     {
         [Fact]
         public async Task ShouldReturnErrorOnNoPostData()

@@ -4,6 +4,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse", "Projec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse.Tests", "ProjectLighthouse.Tests\ProjectLighthouse.Tests.csproj", "{AFC74569-B289-4ACC-B21C-313A3A62C017}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D360C08E-EA47-43AC-A566-FDF413442980}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse.Tests.GameApiTests", "ProjectLighthouse.Tests.GameApiTests\ProjectLighthouse.Tests.GameApiTests.csproj", "{200EED99-FE3E-45C6-A51E-76ED9819CA2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse.Tests.WebsiteTests", "ProjectLighthouse.Tests.WebsiteTests\ProjectLighthouse.Tests.WebsiteTests.csproj", "{CF65EB5B-5364-4D2A-8639-F147A67F08E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +23,16 @@ Global
 		{AFC74569-B289-4ACC-B21C-313A3A62C017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AFC74569-B289-4ACC-B21C-313A3A62C017}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFC74569-B289-4ACC-B21C-313A3A62C017}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AFC74569-B289-4ACC-B21C-313A3A62C017}.Release|Any CPU.Build.0 = Release|Any CPU
+		{200EED99-FE3E-45C6-A51E-76ED9819CA2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{200EED99-FE3E-45C6-A51E-76ED9819CA2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{200EED99-FE3E-45C6-A51E-76ED9819CA2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF65EB5B-5364-4D2A-8639-F147A67F08E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF65EB5B-5364-4D2A-8639-F147A67F08E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF65EB5B-5364-4D2A-8639-F147A67F08E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AFC74569-B289-4ACC-B21C-313A3A62C017} = {D360C08E-EA47-43AC-A566-FDF413442980}
+		{200EED99-FE3E-45C6-A51E-76ED9819CA2B} = {D360C08E-EA47-43AC-A566-FDF413442980}
+		{CF65EB5B-5364-4D2A-8639-F147A67F08E7} = {D360C08E-EA47-43AC-A566-FDF413442980}
 	EndGlobalSection
 EndGlobal

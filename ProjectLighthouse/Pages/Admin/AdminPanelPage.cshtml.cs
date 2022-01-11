@@ -7,7 +7,7 @@ using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Pages
+namespace LBPUnion.ProjectLighthouse.Pages.Admin
 {
     public class AdminPanelPage : BaseLayout
     {

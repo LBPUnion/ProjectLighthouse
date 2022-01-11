@@ -8,7 +8,7 @@
       <jdbc-url>jdbc:mysql://localhost:3306/lighthouse</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="Lighthouse Production" uuid="b323608d-d984-40d0-942e-2c2ea35006d8">
+    <data-source source="LOCAL" name="Lighthouse Production" read-only="true" uuid="b323608d-d984-40d0-942e-2c2ea35006d8">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>

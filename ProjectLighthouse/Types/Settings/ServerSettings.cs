@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
     public class ServerSettings
     {
 
-        public const int CurrentConfigVersion = 13; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+        public const int CurrentConfigVersion = 14; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
         static ServerSettings()
         {
             if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
@@ -73,6 +73,12 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings
         public string InfluxUrl { get; set; } = "http://localhost:8086";
 
         public string EulaText { get; set; } = "";
+
+        #if !DEBUG
+        public string AnnounceText { get; set; } = "You are now logged in as %user.";
+        #else
+        public string AnnounceText { get; set; } = "You are now logged in as %user (id: %id).";
+        #endif
 
         public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
 
