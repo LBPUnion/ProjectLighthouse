@@ -12,20 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             Categories.Add(new TeamPicksCategory());
             Categories.Add(new NewestLevelsCategory());
             Categories.Add(new QueueCategory());
-            Categories.Add
-            (
-                new CustomCategory
-                (
-                    "Custom Category",
-                    "This is a custom category!",
-                    "custom1",
-                    "g820614",
-                    new[]
-                    {
-                        35, 37, 2979, 3042,
-                    }
-                )
-            );
+            Categories.Add(new HeartedCategory());
         }
     }
 }
