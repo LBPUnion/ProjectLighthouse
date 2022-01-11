@@ -72,4 +72,10 @@ namespace LBPUnion.ProjectLighthouse.Logging
         }
         public override string Name => "AspNet";
     }
+
+    public class LoggerLevelCategory : LoggerLevel
+    {
+        public static readonly LoggerLevelCategory Instance = new();
+        public override string Name => "Category";
+    }
 }

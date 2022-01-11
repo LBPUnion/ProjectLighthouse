@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Categories;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Controllers
@@ -31,14 +35,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             User? user = await this.database.UserFromGameRequest(this.Request);
             if (user == null) return this.StatusCode(403, "");
 
-            List<Category> categories = new()
-            {
-                new TeamPicksCategory(),
-                new NewestLevelsCategory(),
-                new QueueCategory(user),
-            };
+            string categoriesSerialized = CollectionHelper.Categories.Aggregate
+            (
+                string.Empty,
+                (current, category) =>
+                {
+                    string serialized;
 
-            string categoriesSerialized = categories.Aggregate(string.Empty, (current, category) => current + category.Serialize(this.database));
+                    if (category is CategoryWithUser categoryWithUser) serialized = categoryWithUser.Serialize(this.database, user);
+                    else serialized = category.Serialize(this.database);
+
+                    return current + serialized;
+                }
+            );
 
             return this.Ok
             (
@@ -55,7 +64,41 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                             "hint_start", 1
                         },
                         {
-                            "total", categories.Count
+                            "total", CollectionHelper.Categories.Count
+                        },
+                    }
+                )
+            );
+        }
+
+        [HttpGet("searches/{endpointName}")]
+        public async Task<IActionResult> GetCategorySlots(string endpointName, [FromQuery] int pageStart, [FromQuery] int pageSize)
+        {
+            User? user = await this.database.UserFromGameRequest(this.Request);
+            if (user == null) return this.StatusCode(403, "");
+
+            Category? category = CollectionHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
+            if (category == null) return this.NotFound();
+
+            Logger.Log("Found category " + category, LoggerLevelCategory.Instance);
+
+            List<Slot> slots = category.GetSlots(this.database, pageStart, pageSize).ToList();
+
+            string slotsSerialized = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+
+            return this.Ok
+            (
+                LbpSerializer.TaggedStringElement
+                (
+                    "results",
+                    slotsSerialized,
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "total", category.GetTotalSlots(this.database)
+                        },
+                        {
+                            "hint_start", pageStart + pageSize
                         },
                     }
                 )

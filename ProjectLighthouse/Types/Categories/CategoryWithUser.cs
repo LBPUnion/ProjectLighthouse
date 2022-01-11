@@ -1,0 +1,72 @@
+#nullable enable
+using System.Collections.Generic;
+using System.Diagnostics;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+
+namespace LBPUnion.ProjectLighthouse.Types.Categories;
+
+public abstract class CategoryWithUser : Category
+{
+    public abstract Slot? GetPreviewSlot(Database database, User user);
+    public override Slot? GetPreviewSlot(Database database)
+    {
+        #if DEBUG
+        Logger.Log("tried to get preview slot without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        if (Debugger.IsAttached) Debugger.Break();
+        #endif
+        return null;
+    }
+
+    public abstract int GetTotalSlots(Database database, User user);
+    public override int GetTotalSlots(Database database)
+    {
+        #if DEBUG
+        Logger.Log("tried to get total slots without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        if (Debugger.IsAttached) Debugger.Break();
+        #endif
+        return -1;
+    }
+
+    public new string Serialize(Database database)
+    {
+        Logger.Log("tried to serialize without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        return string.Empty;
+    }
+
+    public string Serialize(Database database, User user)
+    {
+        Slot? previewSlot = this.GetPreviewSlot(database, user);
+
+        string previewResults = "";
+        if (previewSlot != null)
+        {
+            previewResults = LbpSerializer.TaggedStringElement
+            (
+                "results",
+                previewSlot.Serialize(),
+                new Dictionary<string, object>
+                {
+                    {
+                        "total", this.GetTotalSlots(database, user)
+                    },
+                    {
+                        "hint_start", "2"
+                    },
+                }
+            );
+        }
+
+        return LbpSerializer.StringElement
+        (
+            "category",
+            LbpSerializer.StringElement("name", this.Name) +
+            LbpSerializer.StringElement("description", this.Description) +
+            LbpSerializer.StringElement("url", this.IngameEndpoint) +
+            (previewSlot == null ? "" : previewResults) +
+            LbpSerializer.StringElement("icon", IconHash)
+        );
+    }
+}

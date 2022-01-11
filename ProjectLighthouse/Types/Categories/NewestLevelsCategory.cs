@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
@@ -11,6 +13,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
         public override string IconHash { get; set; } = "g820623";
         public override string Endpoint { get; set; } = "newest";
         public override Slot? GetPreviewSlot(Database database) => database.Slots.OrderByDescending(s => s.FirstUploaded).FirstOrDefault();
+        public override IEnumerable<Slot> GetSlots
+            (Database database, int pageStart, int pageSize)
+            => database.Slots.OrderByDescending(s => s.FirstUploaded).Skip(pageStart).Take(Math.Min(pageSize, 20));
         public override int GetTotalSlots(Database database) => database.Slots.Count();
     }
 }

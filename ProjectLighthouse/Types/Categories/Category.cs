@@ -30,6 +30,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
 
         public abstract Slot? GetPreviewSlot(Database database);
 
+        public abstract IEnumerable<Slot> GetSlots(Database database, int pageStart, int pageSize);
+
         public abstract int GetTotalSlots(Database database);
 
         public string Serialize(Database database)
