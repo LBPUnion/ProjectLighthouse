@@ -15,7 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
         public override Slot? GetPreviewSlot(Database database) => database.Slots.OrderByDescending(s => s.FirstUploaded).FirstOrDefault();
         public override IEnumerable<Slot> GetSlots
             (Database database, int pageStart, int pageSize)
-            => database.Slots.OrderByDescending(s => s.FirstUploaded).Skip(pageStart).Take(Math.Min(pageSize, 20));
+            => database.Slots.OrderByDescending(s => s.FirstUploaded).Skip(pageStart - 1).Take(Math.Min(pageSize, 20));
         public override int GetTotalSlots(Database database) => database.Slots.Count();
     }
 }

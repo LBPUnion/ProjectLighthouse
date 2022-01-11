@@ -30,6 +30,16 @@ public abstract class CategoryWithUser : Category
         return -1;
     }
 
+    public abstract IEnumerable<Slot> GetSlots(Database database, User user, int pageStart, int pageSize);
+    public override IEnumerable<Slot> GetSlots(Database database, int pageStart, int pageSize)
+    {
+        #if DEBUG
+        Logger.Log("tried to get slots without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        if (Debugger.IsAttached) Debugger.Break();
+        #endif
+        return new List<Slot>();
+    }
+
     public new string Serialize(Database database)
     {
         Logger.Log("tried to serialize without user on CategoryWithUser", LoggerLevelCategory.Instance);

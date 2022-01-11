@@ -82,7 +82,19 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             Logger.Log("Found category " + category, LoggerLevelCategory.Instance);
 
-            List<Slot> slots = category.GetSlots(this.database, pageStart, pageSize).ToList();
+            List<Slot> slots;
+            int totalSlots;
+
+            if (category is CategoryWithUser categoryWithUser)
+            {
+                slots = categoryWithUser.GetSlots(this.database, user, pageStart, pageSize).ToList();
+                totalSlots = categoryWithUser.GetTotalSlots(this.database, user);
+            }
+            else
+            {
+                slots = category.GetSlots(this.database, pageStart, pageSize).ToList();
+                totalSlots = category.GetTotalSlots(this.database);
+            }
 
             string slotsSerialized = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
@@ -95,7 +107,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     new Dictionary<string, object>
                     {
                         {
-                            "total", category.GetTotalSlots(this.database)
+                            "total", totalSlots
                         },
                         {
                             "hint_start", pageStart + pageSize
