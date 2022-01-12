@@ -21,7 +21,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 $"TelemetryServer {hostname}\n" +
                 $"CDNHostName {hostname}\n" +
                 $"ShowLevelBoos {ServerSettings.Instance.BooingEnabled}\n" +
-                $"OnlineCreateMode {ServerSettings.Instance.VitaCreateMode}\n"
+                $"AllowOnlineCreate {ServerSettings.Instance.VitaCreateMode}\n"
             );
         }
 
