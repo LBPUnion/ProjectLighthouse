@@ -5,6 +5,7 @@ using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Categories;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
@@ -35,6 +36,7 @@ namespace LBPUnion.ProjectLighthouse
         public DbSet<Review> Reviews { get; set; }
         public DbSet<RatedReview> RatedReviews { get; set; }
         public DbSet<UserApprovedIpAddress> UserApprovedIpAddresses { get; set; }
+        public DbSet<DatabaseCategory> CustomCategories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);

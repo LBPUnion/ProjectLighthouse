@@ -13,6 +13,9 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             Categories.Add(new NewestLevelsCategory());
             Categories.Add(new QueueCategory());
             Categories.Add(new HeartedCategory());
+
+            using Database database = new();
+            foreach (DatabaseCategory category in database.CustomCategories) Categories.Add(new CustomCategory(category));
         }
     }
 }

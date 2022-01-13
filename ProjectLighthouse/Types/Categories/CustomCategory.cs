@@ -17,6 +17,16 @@ namespace LBPUnion.ProjectLighthouse.Types.Categories
             this.SlotIds = slotIds.ToList();
         }
 
+        public CustomCategory(DatabaseCategory category)
+        {
+            this.Name = category.Name;
+            this.Description = category.Description;
+            this.IconHash = category.IconHash;
+            this.Endpoint = category.Endpoint;
+
+            this.SlotIds = category.SlotIds.ToList();
+        }
+
         public List<int> SlotIds;
 
         public sealed override string Name { get; set; }

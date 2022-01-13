@@ -43,6 +43,32 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("AuthenticationAttempts");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Categories.DatabaseCategory", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Endpoint")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("IconHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SlotIdsCollection")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("CustomCategories");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
                 {
                     b.Property<int>("TokenId")
