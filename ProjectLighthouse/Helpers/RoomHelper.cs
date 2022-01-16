@@ -24,8 +24,10 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         internal static int RoomIdIncrement => roomIdIncrement++;
 
-        public static FindBestRoomResponse? FindBestRoom(User user, string location)
+        public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, string location)
         {
+            if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP) return null;
+
             bool anyRoomsLookingForPlayers;
             List<Room> rooms;
 
@@ -35,10 +37,12 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 rooms = anyRoomsLookingForPlayers ? Rooms.Where(r => anyRoomsLookingForPlayers && r.IsLookingForPlayers).ToList() : Rooms;
             }
 
+            rooms = rooms.Where(r => r.RoomVersion == roomVersion).ToList();
+
             foreach (Room room in rooms)
                 // Look for rooms looking for players before moving on to rooms that are idle.
             {
-                if (MatchHelper.DidUserRecentlyDiveInWith(user.UserId, room.Host.UserId)) continue;
+                if (user != null && MatchHelper.DidUserRecentlyDiveInWith(user.UserId, room.Host.UserId)) continue;
 
                 Dictionary<int, string> relevantUserLocations = new();
 
@@ -77,14 +81,17 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                     response.Locations.Add(relevantUserLocations.GetValueOrDefault(player.UserId)); // Already validated to exist
                 }
 
-                response.Players.Add
-                (
-                    new Player
-                    {
-                        MatchingRes = 1,
-                        User = user,
-                    }
-                );
+                if (user != null)
+                {
+                    response.Players.Add
+                    (
+                        new Player
+                        {
+                            MatchingRes = 1,
+                            User = user,
+                        }
+                    );
+                }
 
                 response.Locations.Add(location);
 
@@ -103,16 +110,17 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             return null;
         }
 
-        public static Room CreateRoom(User user, RoomSlot? slot = null)
+        public static Room CreateRoom(User user, GameVersion roomVersion, RoomSlot? slot = null)
             => CreateRoom
             (
                 new List<User>
                 {
                     user,
                 },
+                roomVersion,
                 slot
             );
-        public static Room CreateRoom(List<User> users, RoomSlot? slot = null)
+        public static Room CreateRoom(List<User> users, GameVersion roomVersion, RoomSlot? slot = null)
         {
             Room room = new()
             {
@@ -120,6 +128,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 Players = users,
                 State = RoomState.Idle,
                 Slot = slot ?? PodSlot,
+                RoomVersion = roomVersion,
             };
 
             CleanupRooms(room.Host, room);
@@ -129,14 +138,14 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             return room;
         }
 
-        public static Room? FindRoomByUser(User user, bool createIfDoesNotExist = false)
+        public static Room? FindRoomByUser(User user, GameVersion roomVersion, bool createIfDoesNotExist = false)
         {
             lock(Rooms)
             {
                 foreach (Room room in Rooms.Where(room => room.Players.Any(player => user == player))) return room;
             }
 
-            return createIfDoesNotExist ? CreateRoom(user) : null;
+            return createIfDoesNotExist ? CreateRoom(user, roomVersion) : null;
         }
 
         [SuppressMessage("ReSharper", "InvertIf")]

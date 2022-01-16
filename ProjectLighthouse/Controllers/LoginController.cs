@@ -139,7 +139,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             await this.database.SaveChangesAsync();
 
             // Create a new room on LBP2/3/Vita
-            if (token.GameVersion != GameVersion.LittleBigPlanet1) RoomHelper.CreateRoom(user);
+            if (token.GameVersion != GameVersion.LittleBigPlanet1) RoomHelper.CreateRoom(user, token.GameVersion);
 
             return this.Ok
             (

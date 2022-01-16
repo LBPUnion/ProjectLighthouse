@@ -18,7 +18,7 @@
 {
     <div class="ui blue inverted segment">
         <h2>Room @room.RoomId</h2>
-        <p>@room.Players.Count players, State is @room.State</p>
+        <p>@room.Players.Count players, state is @room.State, version is @room.RoomVersion.ToPrettyString()</p>
         <p>Slot type: @room.Slot.SlotType, slot id: @room.Slot.SlotId</p>
         @foreach (User player in room.Players)
         {

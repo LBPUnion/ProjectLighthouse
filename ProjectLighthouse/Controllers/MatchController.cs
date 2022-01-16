@@ -77,7 +77,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (matchData is UpdateMyPlayerData playerData)
             {
                 MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
-                Room? room = RoomHelper.FindRoomByUser(user, true);
+                Room? room = RoomHelper.FindRoomByUser(user, gameToken.GameVersion, true);
 
                 if (playerData.RoomState != null)
                     if (room != null && Equals(room.Host, user))
@@ -86,7 +86,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
             {
-                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.UserLocation);
+                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.GameVersion, gameToken.UserLocation);
 
                 if (response == null) return this.NotFound();
 
@@ -108,7 +108,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 }
 
                 // Create a new one as requested
-                RoomHelper.CreateRoom(users, createRoom.RoomSlot);
+                RoomHelper.CreateRoom(users, gameToken.GameVersion, createRoom.RoomSlot);
             }
 
             #endregion

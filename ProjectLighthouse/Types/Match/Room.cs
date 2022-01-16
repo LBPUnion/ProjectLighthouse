@@ -6,16 +6,17 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
 {
     public class Room
     {
-
         public List<User> Players;
         public int RoomId;
         public RoomSlot Slot;
         public RoomState State;
 
         public bool IsInPod => this.Slot.SlotType == SlotType.Pod;
-        public bool IsLookingForPlayers => this.State == RoomState.DivingIntoLevel || this.State == RoomState.DivingInWaiting;
+        public bool IsLookingForPlayers => this.State == RoomState.PlayingLevel || this.State == RoomState.DivingInWaiting;
 
         public User Host => this.Players[0];
+
+        public GameVersion RoomVersion;
 
         #nullable enable
         public override bool Equals(object? obj)

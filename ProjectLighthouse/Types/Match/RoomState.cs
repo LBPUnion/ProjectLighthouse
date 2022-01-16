@@ -11,9 +11,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
         Idle = 0,
 
         /// <summary>
-        ///     The room is looking to join an existing room playing a specific slot.
+        ///     The room is hosting a room on a slot for others to join.
         /// </summary>
-        DivingIntoLevel = 1,
+        PlayingLevel = 1,
 
         /// <summary>
         ///     ???
