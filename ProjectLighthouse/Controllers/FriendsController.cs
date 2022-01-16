@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -36,13 +37,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             NPData? npData = (NPData?)serializer.Deserialize(new StringReader(bodyString));
             if (npData == null) return this.BadRequest();
 
-            List<int> friends = new();
+            List<User> friends = new();
             foreach (string friendName in npData.Friends)
             {
                 User? friend = await this.database.Users.FirstOrDefaultAsync(u => u.Username == friendName);
                 if (friend == null) continue;
 
-                friends.Add(friend.UserId);
+                friends.Add(friend);
             }
 
             List<int> blockedUsers = new();
@@ -60,10 +61,12 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 FriendHelper.BlockedIdsByUserId.Remove(user.UserId);
             }
 
-            FriendHelper.FriendIdsByUserId.Add(user.UserId, friends.ToArray());
+            FriendHelper.FriendIdsByUserId.Add(user.UserId, friends.Select(u => u.UserId).ToArray());
             FriendHelper.BlockedIdsByUserId.Add(user.UserId, blockedUsers.ToArray());
 
-            return this.Ok();
+            string friendsSerialized = friends.Aggregate(string.Empty, (current, user1) => current + LbpSerializer.StringElement("npHandle", user1.Username));
+
+            return this.Ok(LbpSerializer.StringElement("npdata", LbpSerializer.StringElement("friends", friendsSerialized)));
         }
 
         [HttpGet("myFriends")]
