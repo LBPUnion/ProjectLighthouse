@@ -24,7 +24,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         internal static int RoomIdIncrement => roomIdIncrement++;
 
-        public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, string location)
+        public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, string? location)
         {
             if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP) return null;
 
@@ -64,6 +64,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 // If we got here then it should be a valid room.
 
                 FindBestRoomResponse response = new();
+                response.RoomId = room.RoomId;
 
                 response.Players = new List<Player>();
                 response.Locations = new List<string>();
@@ -93,7 +94,10 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                     );
                 }
 
-                response.Locations.Add(location);
+                if (location == null)
+                {
+                    response.Locations.Add(location);
+                }
 
                 response.Slots = new List<List<int>>
                 {

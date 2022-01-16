@@ -6,6 +6,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
 {
     public class FindBestRoomResponse
     {
+        public int RoomId;
+
         public List<Player> Players { get; set; }
 
         public List<List<int>> Slots { get; set; }

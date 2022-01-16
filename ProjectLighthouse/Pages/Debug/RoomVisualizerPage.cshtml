@@ -14,10 +14,23 @@
 <p>This page will automatically refresh every 5 seconds.</p>
 <p>@RoomHelper.Rooms.Count rooms</p>
 
+<h2>Best rooms for each game version</h2>
+@foreach (GameVersion version in Enum.GetValues<GameVersion>())
+{
+    if (version == GameVersion.LittleBigPlanet1 || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown) continue;
+
+    FindBestRoomResponse? response = RoomHelper.FindBestRoom(null, version, null);
+    string text = response == null ? "No room found." : "Room " + response.RoomId;
+
+    <p><b>Best room for @version.ToPrettyString()</b>: @text</p>
+}
+
+<h2>Room display</h2>
+
 @foreach (Room room in RoomHelper.Rooms)
 {
     <div class="ui blue inverted segment">
-        <h2>Room @room.RoomId</h2>
+        <h3>Room @room.RoomId</h3>
         <p>@room.Players.Count players, state is @room.State, version is @room.RoomVersion.ToPrettyString()</p>
         <p>Slot type: @room.Slot.SlotType, slot id: @room.Slot.SlotId</p>
         @foreach (User player in room.Players)
