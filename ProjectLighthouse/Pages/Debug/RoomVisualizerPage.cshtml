@@ -1,0 +1,28 @@
+@page "/debug/roomVisualizer"
+@using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Match
+@model LBPUnion.ProjectLighthouse.Pages.Debug.RoomVisualizerPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Debug - Room Visualizer";
+}
+
+<meta http-equiv="refresh" content="1"> @* Refresh page every second *@
+
+<p>The page will automatically refresh once a second.</p>
+<p>@RoomHelper.Rooms.Count rooms</p>
+
+@foreach (Room room in RoomHelper.Rooms)
+{
+    <div class="ui blue inverted segment">
+        <h2>Room @room.RoomId</h2>
+        <p>@room.Players.Count players, State is @room.State</p>
+        <p>Slot type: @room.Slot.SlotType, slot id: @room.Slot.SlotId</p>
+        @foreach (User player in room.Players)
+        {
+            <div class="ui segment">@player.Username</div>
+        }
+    </div>
+}
