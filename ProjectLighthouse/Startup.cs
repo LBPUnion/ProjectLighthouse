@@ -102,11 +102,14 @@ namespace LBPUnion.ProjectLighthouse
                         LoggerLevelHttp.Instance
                     );
 
+                    #if DEBUG
+                    // Log post body
                     if (context.Request.Method == "POST")
                     {
                         context.Request.Body.Position = 0;
                         Logger.Log(await new StreamReader(context.Request.Body).ReadToEndAsync(), LoggerLevelHttp.Instance);
                     }
+                    #endif
                 }
             );
 
