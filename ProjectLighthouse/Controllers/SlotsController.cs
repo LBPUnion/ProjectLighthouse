@@ -93,7 +93,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
         public async Task<IActionResult> Lbp1CoolSlots([FromQuery] int page)
         {
             const int pageSize = 30;
-            return await CoolSlots(page * pageSize, pageSize);
+            return await CoolSlots((page - 1) * pageSize, pageSize);
         }
 
         [HttpGet("slots/lbp2cool")]
