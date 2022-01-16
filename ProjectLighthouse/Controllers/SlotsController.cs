@@ -89,8 +89,14 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             return this.Ok(slot.Serialize(ratedLevel, visitedLevel));
         }
 
-        [HttpGet("slots/lbp2cool")]
         [HttpGet("slots/cool")]
+        public async Task<IActionResult> Lbp1CoolSlots([FromQuery] int page)
+        {
+            const int pageSize = 30;
+            return await CoolSlots(page * pageSize, pageSize);
+        }
+
+        [HttpGet("slots/lbp2cool")]
         public async Task<IActionResult> CoolSlots
         (
             [FromQuery] int pageStart,
