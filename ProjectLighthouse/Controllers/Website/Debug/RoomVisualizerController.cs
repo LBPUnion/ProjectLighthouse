@@ -27,6 +27,11 @@ public class RoomVisualizerController : ControllerBase
         #else
         List<User> users = await this.database.Users.OrderByDescending(_ => EF.Functions.Random()).Take(2).ToListAsync();
         RoomHelper.CreateRoom(users, GameVersion.LittleBigPlanet2);
+
+        foreach (User user in users)
+        {
+            MatchHelper.SetUserLocation(user.UserId, "127.0.0.1");
+        }
         return this.Redirect("/debug/roomVisualizer");
         #endif
     }
