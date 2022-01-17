@@ -7,6 +7,8 @@
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = "Debug - Room Visualizer";
+
+    const int refreshSeconds = 5;
 }
 
 <script>
@@ -14,7 +16,7 @@
     
     setTimeout(() => {
         if (shouldRefresh) window.location.reload();
-    }, 5000);
+    }, @(refreshSeconds * 1000));
     
     function stopRefreshing() {
         shouldRefresh = false;
@@ -26,7 +28,13 @@
     }
 </script>
 
-<p>This page will automatically refresh every 5 seconds.</p>
+<p>This page will automatically refresh every @refreshSeconds seconds.</p>
+@* workaround for users w/o js*@
+<noscript>
+    <b>You will not be able to disable auto-refresh without JavaScript. Please enable JavaScript for this functionality.</b><br>
+    <meta http-equiv="refresh" content="@refreshSeconds">
+</noscript>
+
 <p>@RoomHelper.Rooms.Count rooms</p>
 
 <a href="/debug/roomVisualizer/createFakeRoom">
