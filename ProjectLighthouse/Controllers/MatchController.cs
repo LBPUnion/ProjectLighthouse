@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Match;
@@ -53,8 +54,10 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             }
             catch(Exception e)
             {
-                Logger.Log("Exception while parsing MatchData: " + e, LoggerLevelMatch.Instance);
-                Logger.Log("Data: " + bodyString, LoggerLevelMatch.Instance);
+                Logger.Log("Exception while parsing matchData: ", LoggerLevelMatch.Instance);
+                string[] lines = e.ToDetailedException().Split("\n");
+                foreach (string line in lines) Logger.Log(line, LoggerLevelMatch.Instance);
+                Logger.Log("Associated matchData: " + bodyString, LoggerLevelMatch.Instance);
 
                 return this.BadRequest();
             }
@@ -62,7 +65,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (matchData == null)
             {
                 Logger.Log("Could not parse match data: matchData is null", LoggerLevelMatch.Instance);
-                Logger.Log("Data: " + bodyString, LoggerLevelMatch.Instance);
+                Logger.Log("Associated matchData: " + bodyString, LoggerLevelMatch.Instance);
                 return this.BadRequest();
             }
 
