@@ -21,6 +21,7 @@ riderModule.iml
 lighthouse.config.json
 gitBranch.txt
 gitVersion.txt
+gitRemotes.txt
 ProjectLighthouse/.vscode/tasks.json
 ProjectLighthouse/.vscode/launch.json
 logs/Startup.log

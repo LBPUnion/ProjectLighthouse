@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -14,6 +15,17 @@ namespace LBPUnion.ProjectLighthouse.Helpers
             {
                 CommitHash = readManifestFile("gitVersion.txt");
                 Branch = readManifestFile("gitBranch.txt");
+
+                string remotesFile = readManifestFile("gitRemotes.txt");
+
+                string[] lines = remotesFile.Split('\n');
+
+                // line[0] line[1]                                        line[2]
+                // origin  git@github.com:LBPUnion/project-lighthouse.git (fetch)
+
+                // linq is a serious and painful catastrophe but its useful so i'm gonna keep using it
+                Remotes = lines.Select(line => line.Split("\t")[1]).ToArray();
+
                 CanCheckForUpdates = true;
             }
             catch
@@ -54,6 +66,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         public static string FullVersion => $"{ServerStatics.ServerName} {Branch}@{CommitHash} {Build}";
         public static bool IsDirty => CommitHash.EndsWith("-dirty");
         public static bool CanCheckForUpdates { get; set; }
+        public static string[] Remotes { get; set; }
 
         public const string Build =
             #if DEBUG

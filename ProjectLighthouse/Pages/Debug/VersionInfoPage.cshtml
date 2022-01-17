@@ -1,0 +1,24 @@
+@page "/debug/version"
+@using LBPUnion.ProjectLighthouse.Helpers
+@model LBPUnion.ProjectLighthouse.Pages.Debug.VersionInfoPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Debug - Version Information";
+    Model.Description = VersionHelper.FullVersion;
+}
+
+<h2>Build specific information</h2>
+<p><b>FullVersion</b>: @VersionHelper.FullVersion</p>
+<br>
+<p><b>Branch</b>: @VersionHelper.Branch</p>
+<p><b>Build</b>: @VersionHelper.Build</p>
+<p><b>CommitHash</b>: @VersionHelper.CommitHash</p>
+<p><b>IsDirty</b>: @VersionHelper.IsDirty</p>
+<p><b>CanCheckForUpdates</b>: @VersionHelper.CanCheckForUpdates</p>
+
+<h2>Remotes</h2>
+@foreach (string remote in VersionHelper.Remotes)
+{
+    <p>@remote</p>
+}
