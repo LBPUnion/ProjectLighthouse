@@ -26,7 +26,11 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
         public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, string? location)
         {
-            if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP) return null;
+            if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
+            {
+                Logger.Log($"Returning null for FindBestRoom, game ({roomVersion}) does not support dive in", LoggerLevelMatch.Instance);
+                return null;
+            }
 
             bool anyRoomsLookingForPlayers;
             List<Room> rooms;
@@ -107,6 +111,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                         room.Slot.SlotId,
                     },
                 };
+
+                Logger.Log($"Found a room (id: {room.RoomId}) for user {user?.Username ?? "null"} (id: {user?.UserId ?? -1})", LoggerLevelMatch.Instance);
 
                 return response;
             }
