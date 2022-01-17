@@ -14,6 +14,14 @@
 <p>This page will automatically refresh every 5 seconds.</p>
 <p>@RoomHelper.Rooms.Count rooms</p>
 
+<a href="/debug/roomVisualizer/createFakeRoom">
+    <div class="ui blue button">Create Fake Room</div>
+</a>
+
+<a href="/debug/roomVisualizer/deleteRooms">
+    <div class="ui red button">Nuke all rooms</div>
+</a>
+
 <h2>Best rooms for each game version</h2>
 @foreach (GameVersion version in Enum.GetValues<GameVersion>())
 {
@@ -29,8 +37,16 @@
 
 @foreach (Room room in RoomHelper.Rooms)
 {
-    <div class="ui blue inverted segment">
+    bool userInRoom = room.Players.Select(p => p.Username).Contains(Model.User?.Username);
+    string color = userInRoom ? "green" : "blue";
+    <div class="ui @color inverted segment">
         <h3>Room @room.RoomId</h3>
+        @if (userInRoom)
+        {
+            <p>
+                <b>You are currently in this room.</b>
+            </p>
+        }
         <p>@room.Players.Count players, state is @room.State, version is @room.RoomVersion.ToPrettyString()</p>
         <p>Slot type: @room.Slot.SlotType, slot id: @room.Slot.SlotId</p>
         @foreach (User player in room.Players)
