@@ -9,7 +9,22 @@
     Model.Title = "Debug - Room Visualizer";
 }
 
-<meta http-equiv="refresh" content="5">
+<script>
+    let shouldRefresh = true;
+    
+    setTimeout(() => {
+        if (shouldRefresh) window.location.reload();
+    }, 5000);
+    
+    function stopRefreshing() {
+        shouldRefresh = false;
+        console.log("Stopped refresh");
+        
+        const stopRefreshButton = document.getElementById("stop-refresh-button");
+        stopRefreshButton.parentElement.removeChild(stopRefreshButton);
+        console.log("Removed stop refresh button");
+    }
+</script>
 
 <p>This page will automatically refresh every 5 seconds.</p>
 <p>@RoomHelper.Rooms.Count rooms</p>
@@ -21,6 +36,8 @@
 <a href="/debug/roomVisualizer/deleteRooms">
     <div class="ui red button">Nuke all rooms</div>
 </a>
+
+<button class="ui blue button" onclick="stopRefreshing()" id="stop-refresh-button">Stop refreshing</button>
 
 <h2>Best rooms for each game version</h2>
 @foreach (GameVersion version in Enum.GetValues<GameVersion>())
