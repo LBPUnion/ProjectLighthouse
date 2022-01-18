@@ -39,7 +39,7 @@ you can follow at your own discretion.
 *Note: This requires a modified copy of RPCS3. You can find a working
 version [on our GitHub](https://github.com/LBPUnion/rpcs3).*
 
-Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do extra steps for it to not crash). It can be digital (NPUA80472/NPUA80662) or disc (BCUS98148/BCUS98245). For those
+Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do extra steps for your game to not crash when entering pod). It can be digital (NPUA80472/NPUA80662) or disc (BCUS98148/BCUS98245). For those
 that don't, the [RPCS3 Quickstart Guide](https://rpcs3.net/quickstart) should cover it.
 
 Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the README.md
