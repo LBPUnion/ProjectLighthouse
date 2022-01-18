@@ -39,7 +39,7 @@ you can follow at your own discretion.
 *Note: This requires a modified copy of RPCS3. You can find a working
 version [on our GitHub](https://github.com/LBPUnion/rpcs3).*
 
-Start by getting a copy of LittleBigPlanet 2 installed. It can be digital (NPUA80662) or disc (BCUS98245). For those
+Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section since you'll need to do extra steps for it to work). It can be digital (NPUA80472/NPUA80662) or disc (BCUS98148/BCUS98245). For those
 that don't, the [RPCS3 Quickstart Guide](https://rpcs3.net/quickstart) should cover it.
 
 Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the README.md
@@ -62,6 +62,10 @@ To launch the game with the patched EBOOT, open up RPCS3, go to File, Boot SELF/
 
 Assuming you are running the patched version of RPCS3, you patched the file correctly, the database is migrated, and
 Lighthouse is running, the game should now connect.
+
+### LittleBigPlanet 1
+
+For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2. First, download [HXD](https://mh-nexus.de/downloads/HxDSetup.zip). Once HXD is set up, open your `EBOOTlocalhost.elf` file and press "ctrl+f" and look for "sceNpCommerce2" (without the "s) then replace the string with periods. After that press "ctrl+s" and save the file.
 
 Finally, take a break. Chances are that took a while.
 
