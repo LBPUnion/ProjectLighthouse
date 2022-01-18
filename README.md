@@ -65,7 +65,7 @@ Lighthouse is running, the game should now connect.
 
 ### LittleBigPlanet 1
 
-For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2. First, download [HXD](https://mh-nexus.de/downloads/HxDSetup.zip). Once HXD is set up, open your `EBOOTlocalhost.elf` file and press "ctrl+f" and look for "sceNpCommerce2" (without the "s) then replace the string with periods. After that press "ctrl+s" and save the file.
+For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2. First, download [HXD](https://mh-nexus.de/downloads/HxDSetup.zip). Once HXD is set up, open your `EBOOTlocalhost.elf` file with HXD and click on Search -> Find and look for `sceNpCommerce2` then replace `sceNpCommerce2` with periods. After that go to File -> Save.
 
 Finally, take a break. Chances are that took a while.
 
