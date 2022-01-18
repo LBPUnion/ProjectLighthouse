@@ -65,7 +65,7 @@ Lighthouse is running, the game should now connect.
 
 ### LittleBigPlanet 1
 
-For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2. First, download [HXD](https://mh-nexus.de/downloads/HxDSetup.zip). Once HXD is set up, open your `EBOOTlocalhost.elf` file with HXD and click on Search -> Replace and click on the `Hex-values` tab. In the `Search for` section put `73 63 65 4E 70 43 6F 6D 6D 65 72 63 65 32`, then in the `Replace with` section put `00 00 00 00 00 00 00 00 00 00 00 00 00 00`, and then click `Replace all`. After that go to File -> Save.
+For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2. First, open your favourite hex editor. We recommend [HxD](https://mh-nexus.de/downloads/HxDSetup.zip). Once you have a hex editor open, open your `EBOOTlocalhost.elf` file and search for the hex values `73 63 65 4E 70 43 6F 6D 6D 65 72 63 65 32`. In HxD, this would be done by clicking on Search -> Replace, clicking on the `Hex-values` tab, and entering the hex there. Then, you can zero it out all references by replacing it with `00 00 00 00 00 00 00 00 00 00 00 00 00 00`. Save the file, and your LBP1 EBOOT can now be used with RPCS3.
 
 Finally, take a break. Chances are that took a while.
 
