@@ -97,7 +97,7 @@ Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNEC
 
 | Game     | Console (PS3/Vita/PSP)                | Emulator (RPCS3/Vita3k/PPSSPP)                           | Next-Gen (PS4/PS5/Vita) |
 |----------|---------------------------------------|----------------------------------------------------------|-------------------------|
-| LBP1     | Compatible                            | Incompatible, crashes on entering pod computer           | N/A                     |
+| LBP1     | Compatible                            | Compatible with patched RPCS3 (https://bit.ly/3rn8q7a)   | N/A                     |
 | LBP2     | Compatible                            | Compatible with patched RPCS3                            | N/A                     |
 | LBP3     | Somewhat compatible, frequent crashes | Somewhat compatible with patched RPCS3, frequent crashes | Incompatible            |
 | LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k             | N/A                     |
