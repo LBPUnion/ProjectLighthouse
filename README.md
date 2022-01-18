@@ -39,7 +39,7 @@ you can follow at your own discretion.
 *Note: This requires a modified copy of RPCS3. You can find a working
 version [on our GitHub](https://github.com/LBPUnion/rpcs3).*
 
-Start by getting a copy of LittleBigPlanet 2 installed. It can be digital (NPUA80662) or disc (BCUS98245). For those
+Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do extra steps for your game to not crash upon entering pod computer). It can be digital (NPUA80472/NPUA80662) or disc (BCUS98148/BCUS98245). For those
 that don't, the [RPCS3 Quickstart Guide](https://rpcs3.net/quickstart) should cover it.
 
 Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the README.md
@@ -62,6 +62,10 @@ To launch the game with the patched EBOOT, open up RPCS3, go to File, Boot SELF/
 
 Assuming you are running the patched version of RPCS3, you patched the file correctly, the database is migrated, and
 Lighthouse is running, the game should now connect.
+
+### LittleBigPlanet 1
+
+For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2. First, open your favourite hex editor. We recommend [HxD](https://mh-nexus.de/downloads/HxDSetup.zip). Once you have a hex editor open, open your `EBOOTlocalhost.elf` file and search for the hex values `73 63 65 4E 70 43 6F 6D 6D 65 72 63 65 32`. In HxD, this would be done by clicking on Search -> Replace, clicking on the `Hex-values` tab, and entering the hex there. Then, you can zero it out all references by replacing it with `00 00 00 00 00 00 00 00 00 00 00 00 00 00`. What this does is remove all the references to the sceNpCommerce2 function. The function is used for purchasing DLC, which is impossible on Lighthouse. The reason why it must be patched out is because RPCS3 doesn't support the function at this moment. Then save the file, and your LBP1 EBOOT can now be used with RPCS3.
 
 Finally, take a break. Chances are that took a while.
 
@@ -95,13 +99,13 @@ Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNEC
 
 ## Compatibility across games and platforms
 
-| Game     | Console (PS3/Vita/PSP)                | Emulator (RPCS3/Vita3k/PPSSPP)                           | Next-Gen (PS4/PS5/Vita) |
-|----------|---------------------------------------|----------------------------------------------------------|-------------------------|
-| LBP1     | Compatible                            | Incompatible, crashes on entering pod computer           | N/A                     |
-| LBP2     | Compatible                            | Compatible with patched RPCS3                            | N/A                     |
-| LBP3     | Somewhat compatible, frequent crashes | Somewhat compatible with patched RPCS3, frequent crashes | Incompatible            |
-| LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k             | N/A                     |
-| LBP PSP  | Potentially compatible                | Incompatible, PSN not supported on PPSSPP                | Potentially Compatible  |
+| Game     | Console (PS3/Vita/PSP)                | Emulator (RPCS3/Vita3k/PPSSPP)                                         | Next-Gen (PS4/PS5/Vita) |
+|----------|---------------------------------------|------------------------------------------------------------------------|-------------------------|
+| LBP1     | Compatible                            | Compatible with patched RPCS3 and sceNpCommerce2 patched out of EBOOT  | N/A                     |
+| LBP2     | Compatible                            | Compatible with patched RPCS3                                          | N/A                     |
+| LBP3     | Somewhat compatible, frequent crashes | Somewhat compatible with patched RPCS3, frequent crashes               | Incompatible            |
+| LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k                           | N/A                     |
+| LBP PSP  | Potentially compatible                | Incompatible, PSN not supported on PPSSPP                              | Potentially Compatible  |
 
 While LBP Vita and LBP PSP can be supported, they are not properly seperated from the mainline games at this time. We
 recommend you run seperate instances for these games to avoid problems.
