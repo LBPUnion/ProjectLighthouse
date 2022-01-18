@@ -99,13 +99,13 @@ Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNEC
 
 ## Compatibility across games and platforms
 
-| Game     | Console (PS3/Vita/PSP)                | Emulator (RPCS3/Vita3k/PPSSPP)                           | Next-Gen (PS4/PS5/Vita) |
-|----------|---------------------------------------|----------------------------------------------------------|-------------------------|
-| LBP1     | Compatible                            | Compatible with patched RPCS3 and EBOOT                  | N/A                     |
-| LBP2     | Compatible                            | Compatible with patched RPCS3                            | N/A                     |
-| LBP3     | Somewhat compatible, frequent crashes | Somewhat compatible with patched RPCS3, frequent crashes | Incompatible            |
-| LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k             | N/A                     |
-| LBP PSP  | Potentially compatible                | Incompatible, PSN not supported on PPSSPP                | Potentially Compatible  |
+| Game     | Console (PS3/Vita/PSP)                | Emulator (RPCS3/Vita3k/PPSSPP)                                         | Next-Gen (PS4/PS5/Vita) |
+|----------|---------------------------------------|------------------------------------------------------------------------|-------------------------|
+| LBP1     | Compatible                            | Compatible with patched RPCS3 and sceNpCommerce2 patched out of EBOOT  | N/A                     |
+| LBP2     | Compatible                            | Compatible with patched RPCS3                                          | N/A                     |
+| LBP3     | Somewhat compatible, frequent crashes | Somewhat compatible with patched RPCS3, frequent crashes               | Incompatible            |
+| LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k                           | N/A                     |
+| LBP PSP  | Potentially compatible                | Incompatible, PSN not supported on PPSSPP                              | Potentially Compatible  |
 
 While LBP Vita and LBP PSP can be supported, they are not properly seperated from the mainline games at this time. We
 recommend you run seperate instances for these games to avoid problems.
