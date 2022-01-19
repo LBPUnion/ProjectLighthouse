@@ -14,7 +14,7 @@ ProjectLighthouse/.vscode/launch.json
 .vscode/tasks.json
 .vscode/launch.json
 .editorconfig
-
+launchSettings.json
 
 # Lighthouse junk
 riderModule.iml
@@ -32,3 +32,14 @@ logs/*
 bin/
 obj/
 /packages/
+
+# Misc
+*.bak
+*.old
+BACKUP*
+backup*
+
+*.tmp
+*.bin
+*.png
+*.jpg
