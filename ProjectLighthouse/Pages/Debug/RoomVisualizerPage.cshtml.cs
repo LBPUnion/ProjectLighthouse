@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
@@ -13,7 +14,10 @@ public class RoomVisualizerPage : BaseLayout
     public async Task<IActionResult> OnGet()
     {
         #if !DEBUG
-        return this.NotFound();
+        User? user = this.Database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsAdmin) return this.NotFound();
+
+        return this.Page();
         #else
         return this.Page();
         #endif
