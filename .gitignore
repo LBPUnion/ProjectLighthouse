@@ -1,33 +1,34 @@
-# LBP resources.
-r/
-
-# rider
+# Jetbrains Rider / Visual Studio junk
 .idea/
-
-r/ # cdn resources folder
-bin/
-obj/
-/packages/
-riderModule.iml
 /_ReSharper.Caches/
 /.idea/.idea.ProjectLighthouse/.idea/workspace.xml
 /.idea/.idea.ProjectLighthouse/.idea/dataSources/
 /.idea/.idea.ProjectLighthouse/.idea/dataSources.local.xml
+/ProjectLighthouse/ProjectLighthouse.csproj.user
 *.sln.DotSettings.user
+.vs/
+
+# Visual Studio Code junk
+ProjectLighthouse/.vscode/tasks.json
+ProjectLighthouse/.vscode/launch.json
+.vscode/tasks.json
+.vscode/launch.json
+.editorconfig
+
+
+# Lighthouse junk
+riderModule.iml
+r/
 /ProjectLighthouse/r/*
 /ProjectLighthouse/logs/*
-/ProjectLighthouse/ProjectLighthouse.csproj.user
-.vs/
 lighthouse.config.json
 gitBranch.txt
 gitVersion.txt
 gitRemotes.txt
 gitUnpushed.txt
-ProjectLighthouse/.vscode/tasks.json
-ProjectLighthouse/.vscode/launch.json
-logs/Startup.log
-logs/LoggerInfo.log
-logs/all.log
-.vscode/tasks.json
-.vscode/launch.json
-.editorconfig
+logs/*
+
+# MSBuild stuff
+bin/
+obj/
+/packages/
