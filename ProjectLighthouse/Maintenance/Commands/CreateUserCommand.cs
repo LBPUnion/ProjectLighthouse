@@ -7,48 +7,47 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Maintenance.Commands
+namespace LBPUnion.ProjectLighthouse.Maintenance.Commands;
+
+[UsedImplicitly]
+public class CreateUserCommand : ICommand
 {
-    [UsedImplicitly]
-    public class CreateUserCommand : ICommand
+    private readonly Database _database = new();
+
+    public async Task Run(string[] args)
     {
-        private readonly Database _database = new();
+        string onlineId = args[0];
+        string password = args[1];
 
-        public async Task Run(string[] args)
+        password = HashHelper.Sha256Hash(password);
+
+        User? user = await this._database.Users.FirstOrDefaultAsync(u => u.Username == onlineId);
+        if (user == null)
         {
-            string onlineId = args[0];
-            string password = args[1];
+            user = await this._database.CreateUser(onlineId, HashHelper.BCryptHash(password));
+            Logger.Log($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LoggerLevelLogin.Instance);
 
-            password = HashHelper.Sha256Hash(password);
+            user.PasswordResetRequired = true;
+            Logger.Log("This user will need to reset their password when they log in.", LoggerLevelLogin.Instance);
 
-            User? user = await this._database.Users.FirstOrDefaultAsync(u => u.Username == onlineId);
-            if (user == null)
-            {
-                user = await this._database.CreateUser(onlineId, HashHelper.BCryptHash(password));
-                Logger.Log($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LoggerLevelLogin.Instance);
-
-                user.PasswordResetRequired = true;
-                Logger.Log("This user will need to reset their password when they log in.", LoggerLevelLogin.Instance);
-
-                await this._database.SaveChangesAsync();
-                Logger.Log("Database changes saved.", LoggerLevelDatabase.Instance);
-            }
-            else
-            {
-                Logger.Log("A user with this username already exists.", LoggerLevelLogin.Instance);
-            }
+            await this._database.SaveChangesAsync();
+            Logger.Log("Database changes saved.", LoggerLevelDatabase.Instance);
         }
-
-        public string Name() => "Create New User";
-
-        public string[] Aliases()
-            => new[]
-            {
-                "useradd", "adduser", "newuser", "createUser",
-            };
-
-        public string Arguments() => "<OnlineID> <Password>";
-
-        public int RequiredArgs() => 2;
+        else
+        {
+            Logger.Log("A user with this username already exists.", LoggerLevelLogin.Instance);
+        }
     }
+
+    public string Name() => "Create New User";
+
+    public string[] Aliases()
+        => new[]
+        {
+            "useradd", "adduser", "newuser", "createUser",
+        };
+
+    public string Arguments() => "<OnlineID> <Password>";
+
+    public int RequiredArgs() => 2;
 }

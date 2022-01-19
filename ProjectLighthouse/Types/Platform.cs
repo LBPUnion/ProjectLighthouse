@@ -1,9 +1,8 @@
-namespace LBPUnion.ProjectLighthouse.Types
+namespace LBPUnion.ProjectLighthouse.Types;
+
+public enum Platform
 {
-    public enum Platform
-    {
-        PS3 = 0,
-        RPCS3 = 1,
-        Vita = 2,
-    }
+    PS3 = 0,
+    RPCS3 = 1,
+    Vita = 2,
 }

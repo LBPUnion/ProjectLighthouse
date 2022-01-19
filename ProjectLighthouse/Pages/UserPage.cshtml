@@ -125,9 +125,9 @@
     @foreach (Comment comment in Model.Comments!)
     {
         DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
-        StringWriter messageWriter = new StringWriter();
+        StringWriter messageWriter = new();
         HttpUtility.HtmlDecode(comment.Message, messageWriter);
-        String decodedMessage = messageWriter.ToString();
+        string decodedMessage = messageWriter.ToString();
         <div>
             <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
             <span>@decodedMessage</span>

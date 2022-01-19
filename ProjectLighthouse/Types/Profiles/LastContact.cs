@@ -1,14 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace LBPUnion.ProjectLighthouse.Types.Profiles
+namespace LBPUnion.ProjectLighthouse.Types.Profiles;
+
+public class LastContact
 {
-    public class LastContact
-    {
-        [Key]
-        public int UserId { get; set; }
+    [Key]
+    public int UserId { get; set; }
 
-        public long Timestamp { get; set; }
+    public long Timestamp { get; set; }
 
-        public GameVersion GameVersion { get; set; } = GameVersion.Unknown;
-    }
+    public GameVersion GameVersion { get; set; } = GameVersion.Unknown;
 }

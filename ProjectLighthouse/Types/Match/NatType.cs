@@ -1,9 +1,8 @@
-namespace LBPUnion.ProjectLighthouse.Types.Match
+namespace LBPUnion.ProjectLighthouse.Types.Match;
+
+public enum NatType
 {
-    public enum NatType
-    {
-        Open = 1,
-        Moderate = 2,
-        Strict = 3,
-    }
+    Open = 1,
+    Moderate = 2,
+    Strict = 3,
 }

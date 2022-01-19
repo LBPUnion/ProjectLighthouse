@@ -5,22 +5,21 @@ using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Pages
+namespace LBPUnion.ProjectLighthouse.Pages;
+
+public class PasswordResetRequiredPage : BaseLayout
 {
-    public class PasswordResetRequiredPage : BaseLayout
+    public PasswordResetRequiredPage([NotNull] Database database) : base(database)
+    {}
+
+    public bool WasResetRequest { get; private set; }
+
+    public async Task<IActionResult> OnGet()
     {
-        public PasswordResetRequiredPage([NotNull] Database database) : base(database)
-        {}
+        User? user = this.Database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+        if (!user.PasswordResetRequired) return this.Redirect("~/passwordReset");
 
-        public bool WasResetRequest { get; private set; }
-
-        public async Task<IActionResult> OnGet()
-        {
-            User? user = this.Database.UserFromWebRequest(this.Request);
-            if (user == null) return this.Redirect("~/login");
-            if (!user.PasswordResetRequired) return this.Redirect("~/passwordReset");
-
-            return this.Page();
-        }
+        return this.Page();
     }
 }

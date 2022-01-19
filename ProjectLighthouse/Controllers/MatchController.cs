@@ -14,96 +14,115 @@ using LBPUnion.ProjectLighthouse.Types.Match;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Controllers
-{
-    [ApiController]
-    [Route("LITTLEBIGPLANETPS3_XML/")]
-    [Produces("text/xml")]
-    public class MatchController : ControllerBase
-    {
-        private readonly Database database;
+namespace LBPUnion.ProjectLighthouse.Controllers;
 
-        public MatchController(Database database)
+[ApiController]
+[Route("LITTLEBIGPLANETPS3_XML/")]
+[Produces("text/xml")]
+public class MatchController : ControllerBase
+{
+    private readonly Database database;
+
+    public MatchController(Database database)
+    {
+        this.database = database;
+    }
+
+    [HttpPost("match")]
+    [Produces("text/plain")]
+    public async Task<IActionResult> Match()
+    {
+        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+
+        if (userAndToken == null) return this.StatusCode(403, "");
+
+        // ReSharper disable once PossibleInvalidOperationException
+        User user = userAndToken.Value.Item1;
+        GameToken gameToken = userAndToken.Value.Item2;
+
+        #region Parse match data
+
+        // Example POST /match: [UpdateMyPlayerData,["Player":"FireGamer9872"]]
+
+        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+
+        if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
+
+        Logger.Log("Received match data: " + bodyString, LoggerLevelMatch.Instance);
+
+        IMatchData? matchData;
+        try
         {
-            this.database = database;
+            matchData = MatchHelper.Deserialize(bodyString);
+        }
+        catch(Exception e)
+        {
+            Logger.Log("Exception while parsing matchData: ", LoggerLevelMatch.Instance);
+            string[] lines = e.ToDetailedException().Split("\n");
+            foreach (string line in lines) Logger.Log(line, LoggerLevelMatch.Instance);
+
+            return this.BadRequest();
         }
 
-        [HttpPost("match")]
-        [Produces("text/plain")]
-        public async Task<IActionResult> Match()
+        if (matchData == null)
         {
-            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+            Logger.Log("Could not parse match data: matchData is null", LoggerLevelMatch.Instance);
+            return this.BadRequest();
+        }
 
-            if (userAndToken == null) return this.StatusCode(403, "");
+        Logger.Log($"Parsed match from {user.Username} (type: {matchData.GetType()})", LoggerLevelMatch.Instance);
 
-            // ReSharper disable once PossibleInvalidOperationException
-            User user = userAndToken.Value.Item1;
-            GameToken gameToken = userAndToken.Value.Item2;
+        #endregion
 
-            #region Parse match data
+        await LastContactHelper.SetLastContact(user, gameToken.GameVersion);
 
-            // Example POST /match: [UpdateMyPlayerData,["Player":"FireGamer9872"]]
+        #region Process match data
 
-            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        if (matchData is UpdateMyPlayerData playerData)
+        {
+            MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
+            Room? room = RoomHelper.FindRoomByUser(user, gameToken.GameVersion, true);
 
-            if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
+            if (playerData.RoomState != null)
+                if (room != null && Equals(room.Host, user))
+                    room.State = (RoomState)playerData.RoomState;
+        }
 
-            Logger.Log("Received match data: " + bodyString, LoggerLevelMatch.Instance);
+        if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
+        {
+            FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.GameVersion, gameToken.UserLocation);
 
-            IMatchData? matchData;
-            try
+            if (response == null) return this.NotFound();
+
+            string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
+            foreach (Player player in response.Players) MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
+
+            return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
+        }
+
+        if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
+        {
+            List<User> users = new();
+            foreach (string playerUsername in createRoom.Players)
             {
-                matchData = MatchHelper.Deserialize(bodyString);
-            }
-            catch(Exception e)
-            {
-                Logger.Log("Exception while parsing matchData: ", LoggerLevelMatch.Instance);
-                string[] lines = e.ToDetailedException().Split("\n");
-                foreach (string line in lines) Logger.Log(line, LoggerLevelMatch.Instance);
-
-                return this.BadRequest();
-            }
-
-            if (matchData == null)
-            {
-                Logger.Log("Could not parse match data: matchData is null", LoggerLevelMatch.Instance);
-                return this.BadRequest();
-            }
-
-            Logger.Log($"Parsed match from {user.Username} (type: {matchData.GetType()})", LoggerLevelMatch.Instance);
-
-            #endregion
-
-            await LastContactHelper.SetLastContact(user, gameToken.GameVersion);
-
-            #region Process match data
-
-            if (matchData is UpdateMyPlayerData playerData)
-            {
-                MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
-                Room? room = RoomHelper.FindRoomByUser(user, gameToken.GameVersion, true);
-
-                if (playerData.RoomState != null)
-                    if (room != null && Equals(room.Host, user))
-                        room.State = (RoomState)playerData.RoomState;
+                User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                if (player != null) users.Add(player);
+                else return this.BadRequest();
             }
 
-            if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
-            {
-                FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.GameVersion, gameToken.UserLocation);
+            // Create a new one as requested
+            RoomHelper.CreateRoom(users, gameToken.GameVersion, createRoom.RoomSlot);
+        }
 
-                if (response == null) return this.NotFound();
+        if (matchData is UpdatePlayersInRoom updatePlayersInRoom)
+        {
+            Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.Host == user);
 
-                string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
-                foreach (Player player in response.Players) MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
-
-                return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
-            }
-
-            if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
+            if (room != null)
             {
                 List<User> users = new();
-                foreach (string playerUsername in createRoom.Players)
+                foreach (string playerUsername in updatePlayersInRoom.Players)
                 {
                     User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
@@ -111,33 +130,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     else return this.BadRequest();
                 }
 
-                // Create a new one as requested
-                RoomHelper.CreateRoom(users, gameToken.GameVersion, createRoom.RoomSlot);
+                room.Players = users;
+                RoomHelper.CleanupRooms(null, room);
             }
-
-            if (matchData is UpdatePlayersInRoom updatePlayersInRoom)
-            {
-                Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.Host == user);
-
-                if (room != null)
-                {
-                    List<User> users = new();
-                    foreach (string playerUsername in updatePlayersInRoom.Players)
-                    {
-                        User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
-                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                        if (player != null) users.Add(player);
-                        else return this.BadRequest();
-                    }
-
-                    room.Players = users;
-                    RoomHelper.CleanupRooms(null, room);
-                }
-            }
-
-            #endregion
-
-            return this.Ok("[{\"StatusCode\":200}]");
         }
+
+        #endregion
+
+        return this.Ok("[{\"StatusCode\":200}]");
     }
 }

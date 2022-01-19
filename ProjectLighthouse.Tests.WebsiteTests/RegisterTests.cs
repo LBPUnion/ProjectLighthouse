@@ -9,76 +9,75 @@ using Microsoft.EntityFrameworkCore;
 using OpenQA.Selenium;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.WebsiteTests
+namespace ProjectLighthouse.Tests.WebsiteTests;
+
+public class RegisterTests : LighthouseWebTest
 {
-    public class RegisterTests : LighthouseWebTest
+    [DatabaseFact]
+    public async Task ShouldRegister()
     {
-        [DatabaseFact]
-        public async Task ShouldRegister()
-        {
-            await using Database database = new();
+        await using Database database = new();
 
-            string username = "unitTestUser" + new Random().Next();
-            string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
+        string username = "unitTestUser" + new Random().Next();
+        string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
 
-            this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
+        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
 
-            this.Driver.FindElement(By.Id("text")).SendKeys(username);
+        this.Driver.FindElement(By.Id("text")).SendKeys(username);
 
-            this.Driver.FindElement(By.Id("password")).SendKeys(password);
-            this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
+        this.Driver.FindElement(By.Id("password")).SendKeys(password);
+        this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
 
-            this.Driver.FindElement(By.Id("submit")).Click();
+        this.Driver.FindElement(By.Id("submit")).Click();
 
-            User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
-            Assert.NotNull(user);
+        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        Assert.NotNull(user);
 
-            await database.RemoveUser(user);
-        }
+        await database.RemoveUser(user);
+    }
 
-        [DatabaseFact]
-        public async Task ShouldNotRegisterWithMismatchingPasswords()
-        {
-            await using Database database = new();
+    [DatabaseFact]
+    public async Task ShouldNotRegisterWithMismatchingPasswords()
+    {
+        await using Database database = new();
 
-            string username = "unitTestUser" + new Random().Next();
-            string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
+        string username = "unitTestUser" + new Random().Next();
+        string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
 
-            this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
+        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
 
-            this.Driver.FindElement(By.Id("text")).SendKeys(username);
+        this.Driver.FindElement(By.Id("text")).SendKeys(username);
 
-            this.Driver.FindElement(By.Id("password")).SendKeys(password);
-            this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password + "a");
+        this.Driver.FindElement(By.Id("password")).SendKeys(password);
+        this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password + "a");
 
-            this.Driver.FindElement(By.Id("submit")).Click();
+        this.Driver.FindElement(By.Id("submit")).Click();
 
-            User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
-            Assert.Null(user);
-        }
+        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        Assert.Null(user);
+    }
 
-        [DatabaseFact]
-        public async Task ShouldNotRegisterWithTakenUsername()
-        {
-            await using Database database = new();
+    [DatabaseFact]
+    public async Task ShouldNotRegisterWithTakenUsername()
+    {
+        await using Database database = new();
 
-            string username = "unitTestUser" + new Random().Next();
-            string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
+        string username = "unitTestUser" + new Random().Next();
+        string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
 
-            await database.CreateUser(username, HashHelper.BCryptHash(password));
-            User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
-            Assert.NotNull(user);
+        await database.CreateUser(username, HashHelper.BCryptHash(password));
+        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        Assert.NotNull(user);
 
-            this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
+        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
 
-            this.Driver.FindElement(By.Id("text")).SendKeys(username);
+        this.Driver.FindElement(By.Id("text")).SendKeys(username);
 
-            this.Driver.FindElement(By.Id("password")).SendKeys(password);
-            this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
+        this.Driver.FindElement(By.Id("password")).SendKeys(password);
+        this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
 
-            this.Driver.FindElement(By.Id("submit")).Click();
+        this.Driver.FindElement(By.Id("submit")).Click();
 
-            Assert.Contains("The username you've chosen is already taken.", this.Driver.PageSource);
-        }
+        Assert.Contains("The username you've chosen is already taken.", this.Driver.PageSource);
     }
 }

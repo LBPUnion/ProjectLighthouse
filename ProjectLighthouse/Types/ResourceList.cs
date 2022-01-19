@@ -1,12 +1,11 @@
 using System.Xml.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Types
+namespace LBPUnion.ProjectLighthouse.Types;
+
+[XmlRoot("resources")]
+[XmlType("resources")]
+public class ResourceList
 {
-    [XmlRoot("resources")]
-    [XmlType("resources")]
-    public class ResourceList
-    {
-        [XmlElement("resource")]
-        public string[] Resources;
-    }
+    [XmlElement("resource")]
+    public string[] Resources;
 }

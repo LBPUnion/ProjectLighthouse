@@ -11,89 +11,84 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Tests
+namespace LBPUnion.ProjectLighthouse.Tests;
+
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+public class LighthouseServerTest
 {
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public class LighthouseServerTest
+    public readonly HttpClient Client;
+    public readonly TestServer Server;
+
+    public LighthouseServerTest()
     {
-        public readonly HttpClient Client;
-        public readonly TestServer Server;
+        this.Server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
+        this.Client = this.Server.CreateClient();
+    }
+    public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
+    {
+        if (number == -1) number = new Random().Next();
 
-        public LighthouseServerTest()
+        const string username = "unitTestUser";
+        if (createUser)
         {
-            this.Server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
-            this.Client = this.Server.CreateClient();
-        }
-        public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
-        {
-            if (number == -1)
-            {
-                number = new Random().Next();
-            }
-
-            const string username = "unitTestUser";
-            if (createUser)
-            {
-                await using Database database = new();
-                if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
-                    await database.CreateUser($"{username}{number}", HashHelper.BCryptHash($"unitTestPassword{number}"));
-            }
-
-            string stringContent = $"{LoginData.UsernamePrefix}{username}{number}{(char)0x00}";
-
-            HttpResponseMessage response = await this.Client.PostAsync
-                ($"/LITTLEBIGPLANETPS3_XML/login?titleID={GameVersionHelper.LittleBigPlanet2TitleIds[0]}", new StringContent(stringContent));
-            return response;
+            await using Database database = new();
+            if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
+                await database.CreateUser($"{username}{number}", HashHelper.BCryptHash($"unitTestPassword{number}"));
         }
 
-        public async Task<LoginResult> Authenticate(int number = 0)
-        {
-            HttpResponseMessage response = await this.AuthenticateResponse(number);
+        string stringContent = $"{LoginData.UsernamePrefix}{username}{number}{(char)0x00}";
 
-            string responseContent = LbpSerializer.StringElement("loginResult", await response.Content.ReadAsStringAsync());
+        HttpResponseMessage response = await this.Client.PostAsync
+            ($"/LITTLEBIGPLANETPS3_XML/login?titleID={GameVersionHelper.LittleBigPlanet2TitleIds[0]}", new StringContent(stringContent));
+        return response;
+    }
 
-            XmlSerializer serializer = new(typeof(LoginResult));
-            return (LoginResult)serializer.Deserialize(new StringReader(responseContent))!;
-        }
+    public async Task<LoginResult> Authenticate(int number = 0)
+    {
+        HttpResponseMessage response = await this.AuthenticateResponse(number);
 
-        public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
+        string responseContent = LbpSerializer.StringElement("loginResult", await response.Content.ReadAsStringAsync());
 
-        public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
-        {
-            using HttpRequestMessage requestMessage = new(method, endpoint);
-            requestMessage.Headers.Add("Cookie", mmAuth);
+        XmlSerializer serializer = new(typeof(LoginResult));
+        return (LoginResult)serializer.Deserialize(new StringReader(responseContent))!;
+    }
 
-            return this.Client.SendAsync(requestMessage);
-        }
+    public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
 
-        public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
-        {
-            byte[] bytes = await File.ReadAllBytesAsync(filePath);
-            string hash = HashHelper.Sha1Hash(bytes).ToLower();
+    public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
+    {
+        using HttpRequestMessage requestMessage = new(method, endpoint);
+        requestMessage.Headers.Add("Cookie", mmAuth);
 
-            return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
-        }
+        return this.Client.SendAsync(requestMessage);
+    }
 
-        public async Task<HttpResponseMessage> UploadFileRequest(string endpoint, string filePath)
-            => await this.Client.PostAsync(endpoint, new StringContent(await File.ReadAllTextAsync(filePath)));
+    public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
+    {
+        byte[] bytes = await File.ReadAllBytesAsync(filePath);
+        string hash = HashHelper.Sha1Hash(bytes).ToLower();
 
-        public async Task<HttpResponseMessage> UploadDataRequest(string endpoint, byte[] data)
-            => await this.Client.PostAsync(endpoint, new ByteArrayContent(data));
+        return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
+    }
 
-        public async Task<HttpResponseMessage> AuthenticatedUploadFileRequest(string endpoint, string filePath, string mmAuth)
-        {
-            using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
-            requestMessage.Headers.Add("Cookie", mmAuth);
-            requestMessage.Content = new StringContent(await File.ReadAllTextAsync(filePath));
-            return await this.Client.SendAsync(requestMessage);
-        }
+    public async Task<HttpResponseMessage> UploadFileRequest(string endpoint, string filePath)
+        => await this.Client.PostAsync(endpoint, new StringContent(await File.ReadAllTextAsync(filePath)));
 
-        public async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth)
-        {
-            using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
-            requestMessage.Headers.Add("Cookie", mmAuth);
-            requestMessage.Content = new ByteArrayContent(data);
-            return await this.Client.SendAsync(requestMessage);
-        }
+    public async Task<HttpResponseMessage> UploadDataRequest(string endpoint, byte[] data) => await this.Client.PostAsync(endpoint, new ByteArrayContent(data));
+
+    public async Task<HttpResponseMessage> AuthenticatedUploadFileRequest(string endpoint, string filePath, string mmAuth)
+    {
+        using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
+        requestMessage.Headers.Add("Cookie", mmAuth);
+        requestMessage.Content = new StringContent(await File.ReadAllTextAsync(filePath));
+        return await this.Client.SendAsync(requestMessage);
+    }
+
+    public async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth)
+    {
+        using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
+        requestMessage.Headers.Add("Cookie", mmAuth);
+        requestMessage.Content = new ByteArrayContent(data);
+        return await this.Client.SendAsync(requestMessage);
     }
 }

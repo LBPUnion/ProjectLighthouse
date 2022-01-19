@@ -5,31 +5,30 @@ using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Helpers
+namespace LBPUnion.ProjectLighthouse.Helpers;
+
+public static class LastContactHelper
 {
-    public static class LastContactHelper
+    private static readonly Database database = new();
+
+    public static async Task SetLastContact(User user, GameVersion gameVersion)
     {
-        private static readonly Database database = new();
+        LastContact? lastContact = await database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
 
-        public static async Task SetLastContact(User user, GameVersion gameVersion)
+        // below makes it not look like trash
+        // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
+        if (lastContact == null)
         {
-            LastContact? lastContact = await database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
-
-            // below makes it not look like trash
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            if (lastContact == null)
+            lastContact = new LastContact
             {
-                lastContact = new LastContact
-                {
-                    UserId = user.UserId,
-                };
-                database.LastContacts.Add(lastContact);
-            }
-
-            lastContact.Timestamp = TimestampHelper.Timestamp;
-            lastContact.GameVersion = gameVersion;
-
-            await database.SaveChangesAsync();
+                UserId = user.UserId,
+            };
+            database.LastContacts.Add(lastContact);
         }
+
+        lastContact.Timestamp = TimestampHelper.Timestamp;
+        lastContact.GameVersion = gameVersion;
+
+        await database.SaveChangesAsync();
     }
 }

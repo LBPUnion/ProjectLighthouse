@@ -11,12 +11,12 @@ namespace LBPUnion.ProjectLighthouse.Pages.Admin;
 
 public class AdminPanelUsersPage : BaseLayout
 {
-    public AdminPanelUsersPage(Database database) : base(database)
-    {}
 
     public int UserCount;
 
     public List<User> Users;
+    public AdminPanelUsersPage(Database database) : base(database)
+    {}
 
     public async Task<IActionResult> OnGet()
     {

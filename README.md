@@ -1,6 +1,11 @@
 # Project Lighthouse
 
-Project Lighthouse is a clean-room, open-source custom server for LittleBigPlanet. This is a project conducted by the [LBP Union Ministry of Technology Research and Development team.](https://www.lbpunion.com/technology) For concerns and inquiries about the project, please [contact us here.](https://www.lbpunion.com/contact) For general questions and discussion about Project Lighthouse, please see the [megathread](https://www.lbpunion.com/forum/union-hall/project-lighthouse-littlebigplanet-private-servers-megathread) on our forum. 
+Project Lighthouse is a clean-room, open-source custom server for LittleBigPlanet. This is a project conducted by
+the [LBP Union Ministry of Technology Research and Development team.](https://www.lbpunion.com/technology) For concerns
+and inquiries about the project, please [contact us here.](https://www.lbpunion.com/contact) For general questions and
+discussion about Project Lighthouse, please see
+the [megathread](https://www.lbpunion.com/forum/union-hall/project-lighthouse-littlebigplanet-private-servers-megathread)
+on our forum.
 
 ## WARNING!
 
@@ -39,8 +44,9 @@ you can follow at your own discretion.
 *Note: This requires a modified copy of RPCS3. You can find a working
 version [on our GitHub](https://github.com/LBPUnion/rpcs3).*
 
-Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do extra steps for your game to not crash upon entering pod computer). It can be digital (NPUA80472/NPUA80662) or disc (BCUS98148/BCUS98245). For those
-that don't, the [RPCS3 Quickstart Guide](https://rpcs3.net/quickstart) should cover it.
+Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do
+extra steps for your game to not crash upon entering pod computer). It can be digital (NPUA80472/NPUA80662) or disc (
+BCUS98148/BCUS98245). For those that don't, the [RPCS3 Quickstart Guide](https://rpcs3.net/quickstart) should cover it.
 
 Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the README.md
 file.
@@ -69,11 +75,15 @@ For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2
 
 First, open your favourite hex editor. We recommend [HxD](https://mh-nexus.de/downloads/HxDSetup.zip).
 
-Once you have a hex editor open, open your `EBOOTlocalhost.elf` file and search for the hex values `73 63 65 4E 70 43 6F 6D 6D 65 72 63 65 32`. In HxD, this would be done by clicking on Search -> Replace, clicking on the `Hex-values` tab, and entering the hex there.
+Once you have a hex editor open, open your `EBOOTlocalhost.elf` file and search for the hex
+values `73 63 65 4E 70 43 6F 6D 6D 65 72 63 65 32`. In HxD, this would be done by clicking on Search -> Replace,
+clicking on the `Hex-values` tab, and entering the hex there.
 
 Then, you can zero it out by replacing it with `00 00 00 00 00 00 00 00 00 00 00 00 00 00`.
 
-What this does is remove all the references to the sceNpCommerce2 function. The function is used for purchasing DLC, which is impossible on Lighthouse. The reason why it must be patched out is because RPCS3 doesn't support the function at this moment.
+What this does is remove all the references to the sceNpCommerce2 function. The function is used for purchasing DLC,
+which is impossible on Lighthouse. The reason why it must be patched out is because RPCS3 doesn't support the function
+at this moment.
 
 Then save the file, and your LBP1 EBOOT can now be used with RPCS3.
 

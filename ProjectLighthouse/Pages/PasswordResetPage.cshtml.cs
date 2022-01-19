@@ -6,48 +6,47 @@ using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Pages
+namespace LBPUnion.ProjectLighthouse.Pages;
+
+public class PasswordResetPage : BaseLayout
 {
-    public class PasswordResetPage : BaseLayout
+    public PasswordResetPage(Database database) : base(database)
+    {}
+
+    public string Error { get; private set; }
+
+    [UsedImplicitly]
+    public async Task<IActionResult> OnPost(string password, string confirmPassword)
     {
-        public PasswordResetPage(Database database) : base(database)
-        {}
+        User? user = this.Database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
 
-        public string Error { get; private set; }
-
-        [UsedImplicitly]
-        public async Task<IActionResult> OnPost(string password, string confirmPassword)
+        if (string.IsNullOrWhiteSpace(password))
         {
-            User? user = this.Database.UserFromWebRequest(this.Request);
-            if (user == null) return this.Redirect("~/login");
-
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                this.Error = "The password field is required.";
-                return this.Page();
-            }
-
-            if (password != confirmPassword)
-            {
-                this.Error = "Passwords do not match!";
-                return this.Page();
-            }
-
-            user.Password = HashHelper.BCryptHash(password);
-            user.PasswordResetRequired = false;
-
-            await this.Database.SaveChangesAsync();
-
-            return this.Redirect("~/");
-        }
-
-        [UsedImplicitly]
-        public IActionResult OnGet()
-        {
-            User? user = this.Database.UserFromWebRequest(this.Request);
-            if (user == null) return this.Redirect("~/login");
-
+            this.Error = "The password field is required.";
             return this.Page();
         }
+
+        if (password != confirmPassword)
+        {
+            this.Error = "Passwords do not match!";
+            return this.Page();
+        }
+
+        user.Password = HashHelper.BCryptHash(password);
+        user.PasswordResetRequired = false;
+
+        await this.Database.SaveChangesAsync();
+
+        return this.Redirect("~/");
+    }
+
+    [UsedImplicitly]
+    public IActionResult OnGet()
+    {
+        User? user = this.Database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+
+        return this.Page();
     }
 }

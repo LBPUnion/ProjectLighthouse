@@ -7,23 +7,22 @@ using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth
+namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth;
+
+public class ManageUserApprovedIpAddressesPage : BaseLayout
 {
-    public class ManageUserApprovedIpAddressesPage : BaseLayout
+
+    public List<UserApprovedIpAddress> ApprovedIpAddresses;
+    public ManageUserApprovedIpAddressesPage(Database database) : base(database)
+    {}
+
+    public async Task<IActionResult> OnGet()
     {
-        public ManageUserApprovedIpAddressesPage(Database database) : base(database)
-        {}
+        User? user = this.Database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("/login");
 
-        public List<UserApprovedIpAddress> ApprovedIpAddresses;
+        this.ApprovedIpAddresses = await this.Database.UserApprovedIpAddresses.Where(a => a.UserId == user.UserId).ToListAsync();
 
-        public async Task<IActionResult> OnGet()
-        {
-            User? user = this.Database.UserFromWebRequest(this.Request);
-            if (user == null) return this.Redirect("/login");
-
-            this.ApprovedIpAddresses = await this.Database.UserApprovedIpAddresses.Where(a => a.UserId == user.UserId).ToListAsync();
-
-            return this.Page();
-        }
+        return this.Page();
     }
 }

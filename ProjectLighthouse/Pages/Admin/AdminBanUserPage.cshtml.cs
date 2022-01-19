@@ -10,10 +10,10 @@ namespace LBPUnion.ProjectLighthouse.Pages.Admin;
 
 public class AdminBanUserPage : BaseLayout
 {
-    public AdminBanUserPage(Database database) : base(database)
-    {}
 
     public User? TargetedUser;
+    public AdminBanUserPage(Database database) : base(database)
+    {}
 
     public async Task<IActionResult> OnGet([FromRoute] int id)
     {

@@ -7,58 +7,57 @@ using LBPUnion.ProjectLighthouse.Types;
 using OpenQA.Selenium;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.WebsiteTests
+namespace ProjectLighthouse.Tests.WebsiteTests;
+
+public class AdminTests : LighthouseWebTest
 {
-    public class AdminTests : LighthouseWebTest
+    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]";
+
+    [DatabaseFact]
+    public async Task ShouldShowAdminPanelButtonWhenAdmin()
     {
-        public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]";
+        await using Database database = new();
+        Random random = new();
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
 
-        [DatabaseFact]
-        public async Task ShouldShowAdminPanelButtonWhenAdmin()
+        WebToken webToken = new()
         {
-            await using Database database = new();
-            Random random = new();
-            User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
+            UserId = user.UserId,
+            UserToken = HashHelper.GenerateAuthToken(),
+        };
 
-            WebToken webToken = new()
-            {
-                UserId = user.UserId,
-                UserToken = HashHelper.GenerateAuthToken(),
-            };
+        database.WebTokens.Add(webToken);
+        user.IsAdmin = true;
+        await database.SaveChangesAsync();
 
-            database.WebTokens.Add(webToken);
-            user.IsAdmin = true;
-            await database.SaveChangesAsync();
+        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
+        this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
+        this.Driver.Navigate().Refresh();
 
-            this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
-            this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
-            this.Driver.Navigate().Refresh();
+        Assert.Contains("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
+    }
 
-            Assert.Contains("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
-        }
+    [DatabaseFact]
+    public async Task ShouldNotShowAdminPanelButtonWhenNotAdmin()
+    {
+        await using Database database = new();
+        Random random = new();
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
 
-        [DatabaseFact]
-        public async Task ShouldNotShowAdminPanelButtonWhenNotAdmin()
+        WebToken webToken = new()
         {
-            await using Database database = new();
-            Random random = new();
-            User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
+            UserId = user.UserId,
+            UserToken = HashHelper.GenerateAuthToken(),
+        };
 
-            WebToken webToken = new()
-            {
-                UserId = user.UserId,
-                UserToken = HashHelper.GenerateAuthToken(),
-            };
+        database.WebTokens.Add(webToken);
+        user.IsAdmin = false;
+        await database.SaveChangesAsync();
 
-            database.WebTokens.Add(webToken);
-            user.IsAdmin = false;
-            await database.SaveChangesAsync();
+        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
+        this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
+        this.Driver.Navigate().Refresh();
 
-            this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
-            this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
-            this.Driver.Navigate().Refresh();
-
-            Assert.DoesNotContain("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
-        }
+        Assert.DoesNotContain("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
     }
 }

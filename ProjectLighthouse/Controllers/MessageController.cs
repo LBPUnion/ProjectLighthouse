@@ -8,36 +8,36 @@ using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Controllers
+namespace LBPUnion.ProjectLighthouse.Controllers;
+
+[ApiController]
+[Route("LITTLEBIGPLANETPS3_XML/")]
+[Produces("text/plain")]
+public class MessageController : ControllerBase
 {
-    [ApiController]
-    [Route("LITTLEBIGPLANETPS3_XML/")]
-    [Produces("text/plain")]
-    public class MessageController : ControllerBase
+    private readonly Database database;
+
+    public MessageController(Database database)
     {
-        private readonly Database database;
+        this.database = database;
+    }
 
-        public MessageController(Database database)
-        {
-            this.database = database;
-        }
+    [HttpGet("eula")]
+    public async Task<IActionResult> Eula()
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
 
-        [HttpGet("eula")]
-        public async Task<IActionResult> Eula()
-        {
-            User? user = await this.database.UserFromGameRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+        return this.Ok($"{EulaHelper.License}\n{ServerSettings.Instance.EulaText}");
+    }
 
-            return this.Ok($"{EulaHelper.License}\n{ServerSettings.Instance.EulaText}");
-        }
-
-        [HttpGet("announce")]
-        public async Task<IActionResult> Announce()
-        {
-            #if !DEBUG
-            User? user = await this.database.UserFromGameRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
-            #else
+    [HttpGet("announce")]
+    public async Task<IActionResult> Announce()
+    {
+        #if !DEBUG
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+        #else
             (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
             if (userAndToken == null) return this.StatusCode(403, "");
@@ -45,17 +45,17 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             // ReSharper disable once PossibleInvalidOperationException
             User user = userAndToken.Value.Item1;
             GameToken gameToken = userAndToken.Value.Item2;
-            #endif
+        #endif
 
-            string announceText = ServerSettings.Instance.AnnounceText;
+        string announceText = ServerSettings.Instance.AnnounceText;
 
-            announceText = announceText.Replace("%user", user.Username);
-            announceText = announceText.Replace("%id", user.UserId.ToString());
+        announceText = announceText.Replace("%user", user.Username);
+        announceText = announceText.Replace("%id", user.UserId.ToString());
 
-            return this.Ok
-            (
-                announceText +
-                #if DEBUG
+        return this.Ok
+        (
+            announceText +
+            #if DEBUG
                 "\n\n---DEBUG INFO---\n" +
                 $"user.UserId: {user.UserId}\n" +
                 $"token.Approved: {gameToken.Approved}\n" +
@@ -63,27 +63,26 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 $"token.UserLocation: {gameToken.UserLocation}\n" +
                 $"token.GameVersion: {gameToken.GameVersion}\n" +
                 "---DEBUG INFO---" +
-                #endif
-                "\n"
-            );
-        }
+            #endif
+            "\n"
+        );
+    }
 
-        [HttpGet("notification")]
-        public IActionResult Notification() => this.Ok();
-        /// <summary>
-        ///     Filters chat messages sent by a user.
-        ///     The reponse sent is the text that will appear in-game.
-        /// </summary>
-        [HttpPost("filter")]
-        public async Task<IActionResult> Filter()
-        {
-            User? user = await this.database.UserFromGameRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+    [HttpGet("notification")]
+    public IActionResult Notification() => this.Ok();
+    /// <summary>
+    ///     Filters chat messages sent by a user.
+    ///     The reponse sent is the text that will appear in-game.
+    /// </summary>
+    [HttpPost("filter")]
+    public async Task<IActionResult> Filter()
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
 
-            string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-            Logger.Log($"{user.Username}: {loggedText}", LoggerLevelFilter.Instance);
-            return this.Ok(loggedText);
-        }
+        Logger.Log($"{user.Username}: {loggedText}", LoggerLevelFilter.Instance);
+        return this.Ok(loggedText);
     }
 }

@@ -13,148 +13,142 @@ using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Controllers
+namespace LBPUnion.ProjectLighthouse.Controllers;
+
+[ApiController]
+[Route("LITTLEBIGPLANETPS3_XML/")]
+[Produces("text/xml")]
+public class PhotosController : ControllerBase
 {
-    [ApiController]
-    [Route("LITTLEBIGPLANETPS3_XML/")]
-    [Produces("text/xml")]
-    public class PhotosController : ControllerBase
+    private readonly Database database;
+
+    public PhotosController(Database database)
     {
-        private readonly Database database;
+        this.database = database;
+    }
 
-        public PhotosController(Database database)
+    [HttpPost("uploadPhoto")]
+    public async Task<IActionResult> UploadPhoto()
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        if (user.PhotosByMe >= ServerSettings.Instance.PhotosQuota) return this.BadRequest();
+
+        this.Request.Body.Position = 0;
+        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+
+        XmlSerializer serializer = new(typeof(Photo));
+        Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
+        if (photo == null) return this.BadRequest();
+
+        foreach (Photo p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
         {
-            this.database = database;
+            if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uplaoded
+            if (p.MediumHash == photo.MediumHash) return this.Ok();
+            if (p.SmallHash == photo.SmallHash) return this.Ok();
+            if (p.PlanHash == photo.PlanHash) return this.Ok();
         }
 
-        [HttpPost("uploadPhoto")]
-        public async Task<IActionResult> UploadPhoto()
+        photo.CreatorId = user.UserId;
+        photo.Creator = user;
+
+        if (photo.Subjects.Count > 4) return this.BadRequest();
+
+        foreach (PhotoSubject subject in photo.Subjects)
         {
-            User? user = await this.database.UserFromGameRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+            subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
 
-            if (user.PhotosByMe >= ServerSettings.Instance.PhotosQuota) return this.BadRequest();
+            if (subject.User == null) continue;
 
-            this.Request.Body.Position = 0;
-            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+            subject.UserId = subject.User.UserId;
+            Logger.Log($"Adding PhotoSubject (userid {subject.UserId}) to db", LoggerLevelPhotos.Instance);
 
-            XmlSerializer serializer = new(typeof(Photo));
-            Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
-            if (photo == null) return this.BadRequest();
-
-            foreach (Photo p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
-            {
-                if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uplaoded
-                if (p.MediumHash == photo.MediumHash) return this.Ok();
-                if (p.SmallHash == photo.SmallHash) return this.Ok();
-                if (p.PlanHash == photo.PlanHash) return this.Ok();
-            }
-
-            photo.CreatorId = user.UserId;
-            photo.Creator = user;
-
-            if (photo.Subjects.Count > 4)
-            {
-                return this.BadRequest();
-            }
-
-            foreach (PhotoSubject subject in photo.Subjects)
-            {
-                subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
-
-                if (subject.User == null) continue;
-
-                subject.UserId = subject.User.UserId;
-                Logger.Log($"Adding PhotoSubject (userid {subject.UserId}) to db", LoggerLevelPhotos.Instance);
-
-                this.database.PhotoSubjects.Add(subject);
-            }
-
-            await this.database.SaveChangesAsync();
-
-            // Check for duplicate photo subjects
-            List<int> subjectUserIds = new(4);
-            foreach (PhotoSubject subject in photo.Subjects)
-            {
-                if (subjectUserIds.Contains(subject.UserId))
-                {
-                    return this.BadRequest();
-                }
-                subjectUserIds.Add(subject.UserId);
-            }
-
-            photo.PhotoSubjectIds = photo.Subjects.Select(subject => subject.PhotoSubjectId.ToString()).ToArray();
-
-            //            photo.Slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId);
-
-            Logger.Log($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LoggerLevelPhotos.Instance);
-
-            this.database.Photos.Add(photo);
-
-            await this.database.SaveChangesAsync();
-
-            return this.Ok();
+            this.database.PhotoSubjects.Add(subject);
         }
 
-        [HttpGet("photos/user/{id:int}")]
-        public async Task<IActionResult> SlotPhotos(int id)
+        await this.database.SaveChangesAsync();
+
+        // Check for duplicate photo subjects
+        List<int> subjectUserIds = new(4);
+        foreach (PhotoSubject subject in photo.Subjects)
         {
-            List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Take(10).ToListAsync();
-            string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id));
-            return this.Ok(LbpSerializer.StringElement("photos", response));
+            if (subjectUserIds.Contains(subject.UserId)) return this.BadRequest();
+
+            subjectUserIds.Add(subject.UserId);
         }
 
-        [HttpGet("photos/by")]
-        public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
-        {
-            User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (userFromQuery == null) return this.NotFound();
+        photo.PhotoSubjectIds = photo.Subjects.Select(subject => subject.PhotoSubjectId.ToString()).ToArray();
 
-            List<Photo> photos = await this.database.Photos.Include
-                    (p => p.Creator)
-                .Where(p => p.CreatorId == userFromQuery.UserId)
-                .OrderByDescending(s => s.Timestamp)
-                .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30))
-                .ToListAsync();
-            string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
-            return this.Ok(LbpSerializer.StringElement("photos", response));
-        }
+        //            photo.Slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId);
 
-        [HttpGet("photos/with")]
-        public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
-        {
-            User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (userFromQuery == null) return this.NotFound();
+        Logger.Log($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LoggerLevelPhotos.Instance);
 
-            List<Photo> photos = new();
-            foreach (Photo photo in this.database.Photos.Include
-                         (p => p.Creator)) photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
+        this.database.Photos.Add(photo);
 
-            string response = photos.OrderByDescending
-                    (s => s.Timestamp)
-                .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, 30))
-                .Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
+        await this.database.SaveChangesAsync();
 
-            return this.Ok(LbpSerializer.StringElement("photos", response));
-        }
+        return this.Ok();
+    }
 
-        [HttpPost("deletePhoto/{id:int}")]
-        public async Task<IActionResult> DeletePhoto(int id)
-        {
-            User? user = await this.database.UserFromGameRequest(this.Request);
-            if (user == null) return this.StatusCode(403, "");
+    [HttpGet("photos/user/{id:int}")]
+    public async Task<IActionResult> SlotPhotos(int id)
+    {
+        List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Take(10).ToListAsync();
+        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id));
+        return this.Ok(LbpSerializer.StringElement("photos", response));
+    }
 
-            Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
-            if (photo == null) return this.NotFound();
-            if (photo.CreatorId != user.UserId) return this.StatusCode(401, "");
+    [HttpGet("photos/by")]
+    public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    {
+        User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        if (userFromQuery == null) return this.NotFound();
 
-            this.database.Photos.Remove(photo);
-            await this.database.SaveChangesAsync();
-            return this.Ok();
-        }
+        List<Photo> photos = await this.database.Photos.Include
+                (p => p.Creator)
+            .Where(p => p.CreatorId == userFromQuery.UserId)
+            .OrderByDescending(s => s.Timestamp)
+            .Skip(pageStart - 1)
+            .Take(Math.Min(pageSize, 30))
+            .ToListAsync();
+        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
+        return this.Ok(LbpSerializer.StringElement("photos", response));
+    }
+
+    [HttpGet("photos/with")]
+    public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    {
+        User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        if (userFromQuery == null) return this.NotFound();
+
+        List<Photo> photos = new();
+        foreach (Photo photo in this.database.Photos.Include
+                     (p => p.Creator)) photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
+
+        string response = photos.OrderByDescending
+                (s => s.Timestamp)
+            .Skip(pageStart - 1)
+            .Take(Math.Min(pageSize, 30))
+            .Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
+
+        return this.Ok(LbpSerializer.StringElement("photos", response));
+    }
+
+    [HttpPost("deletePhoto/{id:int}")]
+    public async Task<IActionResult> DeletePhoto(int id)
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
+        if (photo == null) return this.NotFound();
+        if (photo.CreatorId != user.UserId) return this.StatusCode(401, "");
+
+        this.database.Photos.Remove(photo);
+        await this.database.SaveChangesAsync();
+        return this.Ok();
     }
 }

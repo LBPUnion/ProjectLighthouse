@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-namespace LBPUnion.ProjectLighthouse.Serialization
+namespace LBPUnion.ProjectLighthouse.Serialization;
+
+public class JsonOutputFormatter : StringOutputFormatter
 {
-    public class JsonOutputFormatter : StringOutputFormatter
+    public JsonOutputFormatter()
     {
-        public JsonOutputFormatter()
-        {
-            this.SupportedMediaTypes.Add("text/json");
-            this.SupportedMediaTypes.Add("application/json");
-        }
+        this.SupportedMediaTypes.Add("text/json");
+        this.SupportedMediaTypes.Add("application/json");
     }
 }
