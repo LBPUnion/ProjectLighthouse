@@ -47,6 +47,8 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
             if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
 
+            Logger.Log("Received match data: " + bodyString, LoggerLevelMatch.Instance);
+
             IMatchData? matchData;
             try
             {
@@ -57,7 +59,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                 Logger.Log("Exception while parsing matchData: ", LoggerLevelMatch.Instance);
                 string[] lines = e.ToDetailedException().Split("\n");
                 foreach (string line in lines) Logger.Log(line, LoggerLevelMatch.Instance);
-                Logger.Log("Associated matchData: " + bodyString, LoggerLevelMatch.Instance);
 
                 return this.BadRequest();
             }
@@ -65,7 +66,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers
             if (matchData == null)
             {
                 Logger.Log("Could not parse match data: matchData is null", LoggerLevelMatch.Instance);
-                Logger.Log("Associated matchData: " + bodyString, LoggerLevelMatch.Instance);
                 return this.BadRequest();
             }
 
