@@ -131,7 +131,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers
                     }
 
                     room.Players = users;
-                    RoomHelper.CleanupRooms(user, room);
+                    RoomHelper.CleanupRooms(null, room);
                 }
             }
 
