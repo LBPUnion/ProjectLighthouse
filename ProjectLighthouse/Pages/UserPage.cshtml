@@ -17,12 +17,14 @@
 @if (Model.ProfileUser.Banned)
 {
     <div class="ui inverted red segment">
-        <p>
-            <b>User is currently banned!</b>
-        </p>
+        <h2>User is currently banned!</h2>
         @if (Model.User != null && Model.User.IsAdmin)
         {
-            <p>Reason: @Model.ProfileUser.BannedReason</p>
+            <b>Reason:</b>
+            <span>"@Model.ProfileUser.BannedReason"</span>
+            <p>
+                <i>Note: Only you and other admins may view the ban reason.</i>
+            </p>
             <a class="ui inverted button" href="/admin/user/@Model.ProfileUser.UserId/unban">
                 <i class="ban icon"></i>
                 <span>Unban User</span>
