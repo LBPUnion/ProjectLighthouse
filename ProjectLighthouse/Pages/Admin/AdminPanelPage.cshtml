@@ -1,6 +1,7 @@
 @page "/admin"
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Maintenance
+@using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.Admin.AdminPanelPage
 
 @{
@@ -13,6 +14,14 @@
         View Users
     </div>
 </a>
+@if (ServerSettings.Instance.DiscordWebhookEnabled)
+{
+    <a href="/admin/testWebhook">
+        <div class="ui blue button">
+            Test Discord Webhook
+        </div>
+    </a>
+}
 
 <h2>Commands</h2>
 <div class="ui grid">

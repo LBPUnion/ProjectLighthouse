@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Discord;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
@@ -87,6 +89,17 @@ public class PhotosController : ControllerBase
         this.database.Photos.Add(photo);
 
         await this.database.SaveChangesAsync();
+
+        await WebhookHelper.SendWebhook
+        (
+            new EmbedBuilder
+            {
+                Title = "New photo uploaded!",
+                Description = $"{user.Username} uploaded a new photo.",
+                ImageUrl = $"{ServerSettings.Instance.ExternalUrl}/gameAssets/{photo.LargeHash}",
+                Color = WebhookHelper.UnionColor,
+            }
+        );
 
         return this.Ok();
     }

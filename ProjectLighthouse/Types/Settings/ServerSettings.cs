@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings;
 public class ServerSettings
 {
 
-    public const int CurrentConfigVersion = 16; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    public const int CurrentConfigVersion = 17; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     static ServerSettings()
     {
         if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
@@ -77,7 +77,7 @@ public class ServerSettings
     #if !DEBUG
     public string AnnounceText { get; set; } = "You are now logged in as %user.";
     #else
-        public string AnnounceText { get; set; } = "You are now logged in as %user (id: %id).";
+    public string AnnounceText { get; set; } = "You are now logged in as %user (id: %id).";
     #endif
 
     public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
@@ -106,6 +106,10 @@ public class ServerSettings
     public bool BlockDeniedUsers { get; set; } = true;
 
     public bool BooingEnabled { get; set; } = true;
+
+    public bool DiscordWebhookEnabled { get; set; }
+
+    public string DiscordWebhookUrl { get; set; } = "";
 
     public bool VitaCreateMode { get; set; }
 

@@ -61,14 +61,14 @@ public static class Program
         }
 
         #if DEBUG
-            Logger.Log
-            (
-                "This is a debug build, so performance may suffer! " +
-                "If you are running Lighthouse in a production environment, " +
-                "it is highly recommended to run a release build. ",
-                LoggerLevelStartup.Instance
-            );
-            Logger.Log("You can do so by running any dotnet command with the flag: \"-c Release\". ", LoggerLevelStartup.Instance);
+        Logger.Log
+        (
+            "This is a debug build, so performance may suffer! " +
+            "If you are running Lighthouse in a production environment, " +
+            "it is highly recommended to run a release build. ",
+            LoggerLevelStartup.Instance
+        );
+        Logger.Log("You can do so by running any dotnet command with the flag: \"-c Release\". ", LoggerLevelStartup.Instance);
         #endif
 
         if (args.Length != 0)
