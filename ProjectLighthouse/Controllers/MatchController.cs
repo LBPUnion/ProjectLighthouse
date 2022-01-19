@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Kettu;
@@ -112,6 +113,25 @@ namespace LBPUnion.ProjectLighthouse.Controllers
 
                 // Create a new one as requested
                 RoomHelper.CreateRoom(users, gameToken.GameVersion, createRoom.RoomSlot);
+            }
+
+            if (matchData is UpdatePlayersInRoom updatePlayersInRoom)
+            {
+                Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.Host == user);
+
+                if (room != null)
+                {
+                    List<User> users = new();
+                    foreach (string playerUsername in updatePlayersInRoom.Players)
+                    {
+                        User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                        if (player != null) users.Add(player);
+                        else return this.BadRequest();
+                    }
+
+                    room.Players = users;
+                }
             }
 
             #endregion
