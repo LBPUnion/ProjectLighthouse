@@ -39,14 +39,23 @@ public class ResourcesController : ControllerBase
         return this.Ok(LbpSerializer.StringElement("resources", resources));
     }
 
-    [ResponseCache(Duration = 86400)]
-    [HttpGet("/gameAssets/{hash}")]
     [HttpGet("r/{hash}")]
     public IActionResult GetResource(string hash)
     {
         string path = FileHelper.GetResourcePath(hash);
 
         if (FileHelper.ResourceExists(hash)) return this.File(IOFile.OpenRead(path), "application/octet-stream");
+
+        return this.NotFound();
+    }
+
+    [ResponseCache(Duration = 86400)]
+    [HttpGet("/gameAssets/{hash}")]
+    public IActionResult GetWebResource(string hash)
+    {
+        string path = FileHelper.GetResourcePath(hash);
+
+        if (FileHelper.ResourceExists(hash) && LbpFile.FromHash(hash)?.FileType == LbpFileType.Jpeg) return this.File(IOFile.OpenRead(path), "image/jpeg");
 
         return this.NotFound();
     }
