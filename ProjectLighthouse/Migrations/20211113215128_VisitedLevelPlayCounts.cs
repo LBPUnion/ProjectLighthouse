@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211113215128_VisitedLevelPlayCounts")]
     public partial class VisitedLevelPlayCounts : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

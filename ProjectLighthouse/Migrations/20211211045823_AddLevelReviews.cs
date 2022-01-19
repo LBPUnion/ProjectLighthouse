@@ -1,10 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211211045823_AddLevelReviews")]
     public partial class AddLevelReviews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

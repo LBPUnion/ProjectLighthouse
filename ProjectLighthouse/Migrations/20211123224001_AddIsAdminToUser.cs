@@ -1,9 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 #nullable disable
 
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211123224001_AddIsAdminToUser")]
     public partial class AddIsAdminToUser : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

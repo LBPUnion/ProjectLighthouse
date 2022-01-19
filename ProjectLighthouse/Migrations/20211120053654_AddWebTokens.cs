@@ -1,10 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 #nullable disable
 
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211120053654_AddWebTokens")]
     public partial class AddWebTokens : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

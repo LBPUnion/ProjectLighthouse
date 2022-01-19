@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211108054552_RemoveCountsFromDatabase")]
     public partial class RemoveCountsFromDatabase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

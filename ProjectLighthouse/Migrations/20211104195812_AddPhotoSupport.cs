@@ -1,8 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211104195812_AddPhotoSupport")]
     public partial class AddPhotoSupport : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

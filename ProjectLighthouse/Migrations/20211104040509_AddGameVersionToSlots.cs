@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211104040509_AddGameVersionToSlots")]
     public partial class AddGameVersionToSlots : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

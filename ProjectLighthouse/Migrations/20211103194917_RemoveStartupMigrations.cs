@@ -1,8 +1,11 @@
 ﻿using LBPUnion.ProjectLighthouse.Helpers;
 using Microsoft.EntityFrameworkCore.Migrations;
-
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211103194917_RemoveStartupMigrations")]
     public partial class RemoveStartupMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

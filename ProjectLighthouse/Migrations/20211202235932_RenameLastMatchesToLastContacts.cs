@@ -1,10 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 #nullable disable
 
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20211202235932_RenameLastMatchesToLastContacts")]
     public partial class RenameLastMatchesToLastContacts : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
