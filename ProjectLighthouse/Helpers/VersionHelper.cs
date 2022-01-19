@@ -66,7 +66,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         public static string CommitHash { get; set; }
         public static string Branch { get; set; }
         public static string FullVersion => $"{ServerStatics.ServerName} {Branch}@{CommitHash} {Build}";
-        public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 0 || CommitHash == "invalid" || Branch == "invalid";
+        public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
         public static int CommitsOutOfDate { get; set; }
         public static bool CanCheckForUpdates { get; set; }
         public static string[] Remotes { get; set; }
