@@ -7,11 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Types;
 public class HeartedProfile
 {
     // ReSharper disable once UnusedMember.Global
-    #if NET6_0_OR_GREATER
     [Obsolete($"Use {nameof(HeartedUserId)} instead, this is a key which you should never need to use.")]
-    #else
-        [Obsolete("Use HeartedUserId instead, this is a key which you should never need to use.")]
-    #endif
     [Key]
     public int HeartedProfileId { get; set; }
 
