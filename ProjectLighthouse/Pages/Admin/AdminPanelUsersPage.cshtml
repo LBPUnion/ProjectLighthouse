@@ -1,0 +1,40 @@
+@page "/admin/users"
+@using LBPUnion.ProjectLighthouse.Types
+@model LBPUnion.ProjectLighthouse.Pages.Admin.AdminPanelUsersPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Users";
+}
+
+<p>There are currently @Model.UserCount users registered to your instance.</p>
+<p><b>Note:</b> Users are ordered by most-recent-first.</p>
+
+<div class="ui grid">
+    @foreach (User user in Model.Users)
+    {
+        string color = "blue";
+        string subtitle = "User";
+        if (user.IsAdmin)
+        {
+            color = "yellow";
+            subtitle = "Admin";
+        }
+        if (user.Banned)
+        {
+            color = "red";
+            subtitle = $"Banned user! Reason: {user.BannedReason}";
+        }
+
+        subtitle += $" (id: {user.UserId})";
+
+        <div class="eight wide column">
+            <div class="ui @color segment">
+                <h2>
+                    <a href="/user/@user.UserId">@user.Username</a>
+                </h2>
+                <h3>@subtitle</h3>
+            </div>
+        </div>
+    }
+</div>
