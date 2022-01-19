@@ -6,7 +6,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Match
     [SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
     public class UpdatePlayersInRoom : IMatchData
     {
-        public List<string> Players;
-        public List<string> Reservations;
+        public List<string> Players { get; set; }
+        public List<string> Reservations { get; set; }
     }
 }
