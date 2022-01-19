@@ -182,6 +182,9 @@ namespace LBPUnion.ProjectLighthouse.Helpers
 
                         foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
                     }
+
+                Rooms.RemoveAll(r => r.Players.Count == 0); // Remove empty rooms
+                Rooms.RemoveAll(r => r.Players.Count > 4); // Remove obviously bogus rooms
             }
         }
     }
