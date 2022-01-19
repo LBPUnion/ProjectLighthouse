@@ -1,0 +1,32 @@
+@page "/users/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Types
+@model LBPUnion.ProjectLighthouse.Pages.UsersPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Users";
+}
+
+<p>There are @Model.UserCount total users.</p>
+
+@foreach (User user in Model.Users)
+{
+    <div class="ui segment">
+        @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)
+        {
+            {
+                "ShowLink", true
+            },
+        })
+    </div>
+}
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/users/@(Model.PageNumber - 1)">Previous Page</a>
+}
+@(Model.PageNumber + 1) / @(Model.PageAmount)
+@if (Model.PageNumber < Model.PageAmount - 1)
+{
+    <a href="/users/@(Model.PageNumber + 1)">Next Page</a>
+}

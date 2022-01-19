@@ -13,6 +13,7 @@ public class BaseLayout : PageModel
     public readonly List<PageNavigationItem> NavigationItems = new()
     {
         new PageNavigationItem("Home", "/", "home"),
+        new PageNavigationItem("Users", "/users/0", "user friends"),
         new PageNavigationItem("Photos", "/photos/0", "camera"),
         new PageNavigationItem("Levels", "/slots/0", "certificate"),
     };
