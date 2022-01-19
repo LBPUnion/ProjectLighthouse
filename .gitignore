@@ -22,6 +22,7 @@ lighthouse.config.json
 gitBranch.txt
 gitVersion.txt
 gitRemotes.txt
+gitUnpushed.txt
 ProjectLighthouse/.vscode/tasks.json
 ProjectLighthouse/.vscode/launch.json
 logs/Startup.log

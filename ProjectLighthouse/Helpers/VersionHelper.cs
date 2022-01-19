@@ -26,6 +26,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers
                 // linq is a serious and painful catastrophe but its useful so i'm gonna keep using it
                 Remotes = lines.Select(line => line.Split("\t")[1]).ToArray();
 
+                CommitsOutOfDate = readManifestFile("gitUnpushed.txt").Split('\n').Length;
+
                 CanCheckForUpdates = true;
             }
             catch
@@ -64,7 +66,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers
         public static string CommitHash { get; set; }
         public static string Branch { get; set; }
         public static string FullVersion => $"{ServerStatics.ServerName} {Branch}@{CommitHash} {Build}";
-        public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitHash == "invalid" || Branch == "invalid";
+        public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 0 || CommitHash == "invalid" || Branch == "invalid";
+        public static int CommitsOutOfDate { get; set; }
         public static bool CanCheckForUpdates { get; set; }
         public static string[] Remotes { get; set; }
 
