@@ -73,7 +73,7 @@ Lighthouse is running, the game should now connect.
 
 For LittleBigPlanet 1 to work with RPCS3, follow the steps for LittleBigPlanet 2.
 
-First, open your favourite hex editor. We recommend [HxD](https://mh-nexus.de/downloads/HxDSetup.zip).
+First, open your favourite hex editor. We recommend [HxD](https://mh-nexus.de/en/hxd/).
 
 Once you have a hex editor open, open your `EBOOTlocalhost.elf` file and search for the hex
 values `73 63 65 4E 70 43 6F 6D 6D 65 72 63 65 32`. In HxD, this would be done by clicking on Search -> Replace,
@@ -108,7 +108,7 @@ The new migrations will automatically be applied upon starting Lighthouse.
 
 You can run tests either through your IDE or by running `dotnet tests`.
 
-Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNECTION_STRING` set.
+Keep in mind while running database tests (which most tests are) you need to have `LIGHTHOUSE_DB_CONNECTION_STRING` set.
 
 ### Continuous Integration (CI) Tips
 
@@ -119,15 +119,15 @@ Keep in mind while running database tests you need to have `LIGHTHOUSE_DB_CONNEC
 
 ## Compatibility across games and platforms
 
-| Game     | Console (PS3/Vita/PSP)                | Emulator (RPCS3/Vita3k/PPSSPP)                                         | Next-Gen (PS4/PS5/Vita) |
-|----------|---------------------------------------|------------------------------------------------------------------------|-------------------------|
-| LBP1     | Compatible                            | Compatible with patched RPCS3 and sceNpCommerce2 patched out of EBOOT  | N/A                     |
-| LBP2     | Compatible                            | Compatible with patched RPCS3                                          | N/A                     |
-| LBP3     | Somewhat compatible, frequent crashes | Somewhat compatible with patched RPCS3, frequent crashes               | Incompatible            |
-| LBP Vita | Compatible                            | Incompatible, marked as "bootable" on Vita3k                           | N/A                     |
-| LBP PSP  | Potentially compatible                | Incompatible, PSN not supported on PPSSPP                              | Potentially Compatible  |
+| Game     | Console (PS3/Vita/PSP)              | Emulator (RPCS3/Vita3k/PPSSPP)                                        | Next-Gen (PS4/PS5/Vita) |
+|----------|-------------------------------------|-----------------------------------------------------------------------|-------------------------|
+| LBP1     | Compatible                          | Compatible with patched RPCS3 and sceNpCommerce2 patched out of EBOOT | N/A                     |
+| LBP2     | Compatible                          | Compatible with patched RPCS3                                         | N/A                     |
+| LBP3     | Mostly compatible, frequent crashes | Mostly compatible with patched RPCS3, frequent crashes                | Incompatible            |
+| LBP Vita | Compatible                          | Incompatible, marked as "Intro" on Vita3k                             | N/A                     |
+| LBP PSP  | Potentially compatible              | Incompatible, PSN not supported on PPSSPP                             | Potentially Compatible  |
 
 While LBP Vita and LBP PSP can be supported, they are not properly seperated from the mainline games at this time. We
-recommend you run seperate instances for these games to avoid problems.
+recommend you run separate instances for these games to avoid problems.
 
 Project Lighthouse is still a heavy work in progress, so this chart is subject to change at any point.
