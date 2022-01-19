@@ -30,23 +30,32 @@
     </div>
 }
 
-<form onsubmit="return onSubmit(this)" method="post">
-    <div class="ui left labeled input">
-        @Html.AntiForgeryToken()
+<form class="ui form" onsubmit="return onSubmit(this)" method="post">
+    @Html.AntiForgeryToken()
 
-        <label for="text" class="ui blue label">Username: </label>
-        <input type="text" name="username" id="text">
-    </div><br><br>
+    <div class="field">
+        <label>Username</label>
+        <div class="ui left icon input">
+            <input type="text" name="username" id="text" placeholder="Username">
+            <i class="user icon"></i>
+        </div>
+    </div>
 
-    <div class="ui left labeled input">
-        <label for="password" class="ui blue label">Password: </label>
-        <input type="password" name="password" id="password">
-    </div><br><br>
+    <div class="field">
+        <label>Password</label>
+        <div class="ui left icon input">
+            <input type="password" name="password" id="password" placeholder="Password">
+            <i class="lock icon"></i>
+        </div>
+    </div>
 
-    <div class="ui left labeled input">
-        <label for="password" class="ui blue label">Confirm Password: </label>
-        <input type="password" name="confirmPassword" id="confirmPassword">
-    </div><br><br><br>
+    <div class="field">
+        <label>Confirm Password</label>
+        <div class="ui left icon input">
+            <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password">
+            <i class="lock icon"></i>
+        </div>
+    </div>
 
-    <input type="submit" value="Register" id="submit" class="ui green button"><br>
+    <input type="submit" value="Register" id="submit" class="ui green button">
 </form>

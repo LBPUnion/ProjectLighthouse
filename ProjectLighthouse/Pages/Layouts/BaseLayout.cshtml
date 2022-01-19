@@ -7,11 +7,7 @@
 @{
     if (Model!.User == null)
     {
-        Model.NavigationItemsRight.Add(new PageNavigationItem("Log in", "/login", "user alternate"));
-        if (ServerSettings.Instance.RegistrationEnabled)
-        {
-            Model.NavigationItemsRight.Add(new PageNavigationItem("Register", "/register", "user alternate edit"));
-        }
+        Model.NavigationItemsRight.Add(new PageNavigationItem("Login / Register", "/login", "sign in"));
     }
     else
     {
