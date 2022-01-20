@@ -1,4 +1,7 @@
+#nullable enable
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +13,20 @@ namespace LBPUnion.ProjectLighthouse.Controllers;
 [Produces("text/plain")]
 public class ClientConfigurationController : ControllerBase
 {
+    private readonly Database database;
+
+    public ClientConfigurationController(Database database)
+    {
+        this.database = database;
+    }
+
     [HttpGet("network_settings.nws")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public IActionResult NetworkSettings()
+    public async Task<IActionResult> NetworkSettings()
     {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return null;
+
         HostString hostname = this.Request.Host;
         return this.Ok
         (
@@ -21,7 +34,7 @@ public class ClientConfigurationController : ControllerBase
             $"TelemetryServer {hostname}\n" +
             $"CDNHostName {hostname}\n" +
             $"ShowLevelBoos {ServerSettings.Instance.BooingEnabled.ToString().ToLower()}\n" +
-            $"AllowOnlineCreate {ServerSettings.Instance.VitaCreateMode.ToString().ToLower()}\n"
+            $"AllowOnlineCreate {(token.GameVersion != GameVersion.LittleBigPlanetVita || ServerSettings.Instance.VitaCreateMode).ToString().ToLower()}\n"
         );
     }
 
