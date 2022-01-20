@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,11 +12,13 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings;
 [Serializable]
 public class ServerSettings
 {
-
     public const int CurrentConfigVersion = 17; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    private static FileSystemWatcher fileWatcher;
     static ServerSettings()
     {
         if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
+
+        Logger.Log("Loading config...", LoggerLevelConfig.Instance);
 
         if (File.Exists(ConfigFileName))
         {
@@ -23,21 +26,22 @@ public class ServerSettings
 
             Instance = JsonSerializer.Deserialize<ServerSettings>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
 
-            if (Instance.ConfigVersion >= CurrentConfigVersion) return;
+            if (Instance.ConfigVersion < CurrentConfigVersion)
+            {
+                Logger.Log($"Upgrading config file from version {Instance.ConfigVersion} to version {CurrentConfigVersion}", LoggerLevelConfig.Instance);
+                Instance.ConfigVersion = CurrentConfigVersion;
+                configFile = JsonSerializer.Serialize
+                (
+                    Instance,
+                    typeof(ServerSettings),
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    }
+                );
 
-            Logger.Log($"Upgrading config file from version {Instance.ConfigVersion} to version {CurrentConfigVersion}", LoggerLevelConfig.Instance);
-            Instance.ConfigVersion = CurrentConfigVersion;
-            configFile = JsonSerializer.Serialize
-            (
-                Instance,
-                typeof(ServerSettings),
-                new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                }
-            );
-
-            File.WriteAllText(ConfigFileName, configFile);
+                File.WriteAllText(ConfigFileName, configFile);
+            }
         }
         else
         {
@@ -63,6 +67,29 @@ public class ServerSettings
 
             Environment.Exit(1);
         }
+
+        // Set up reloading
+        Logger.Log("Setting up config reloading...", LoggerLevelConfig.Instance);
+        fileWatcher = new FileSystemWatcher
+        {
+            Path = Environment.CurrentDirectory,
+            Filter = ConfigFileName,
+            NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
+        };
+
+        fileWatcher.Changed += onConfigChanged; // add event handler
+
+        fileWatcher.EnableRaisingEvents = true; // begin watching
+    }
+
+    private static void onConfigChanged(object sender, FileSystemEventArgs e)
+    {
+        Debug.Assert(e.Name == ConfigFileName);
+        Logger.Log("Configuration file modified, reloading config.", LoggerLevelConfig.Instance);
+        Logger.Log("Some changes may not apply, in which case may require a restart of Project Lighthouse.", LoggerLevelConfig.Instance);
+
+        string configFile = File.ReadAllText(ConfigFileName);
+        Instance = JsonSerializer.Deserialize<ServerSettings>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
     }
 
     public bool InfluxEnabled { get; set; }
