@@ -69,17 +69,20 @@ public class ServerSettings
         }
 
         // Set up reloading
-        Logger.Log("Setting up config reloading...", LoggerLevelConfig.Instance);
-        fileWatcher = new FileSystemWatcher
+        if (Instance.ConfigReloading)
         {
-            Path = Environment.CurrentDirectory,
-            Filter = ConfigFileName,
-            NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
-        };
+            Logger.Log("Setting up config reloading...", LoggerLevelConfig.Instance);
+            fileWatcher = new FileSystemWatcher
+            {
+                Path = Environment.CurrentDirectory,
+                Filter = ConfigFileName,
+                NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
+            };
 
-        fileWatcher.Changed += onConfigChanged; // add event handler
+            fileWatcher.Changed += onConfigChanged; // add event handler
 
-        fileWatcher.EnableRaisingEvents = true; // begin watching
+            fileWatcher.EnableRaisingEvents = true; // begin watching
+        }
     }
 
     private static void onConfigChanged(object sender, FileSystemEventArgs e)
@@ -139,6 +142,8 @@ public class ServerSettings
     public string DiscordWebhookUrl { get; set; } = "";
 
     public bool VitaCreateMode { get; set; }
+
+    public bool ConfigReloading { get; set; } = true;
 
     #region Meta
 
