@@ -207,6 +207,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("CrossControllerRequired")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
