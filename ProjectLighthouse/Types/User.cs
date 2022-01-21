@@ -30,7 +30,7 @@ public class User
         get {
             string avatarHash = this.IconHash;
 
-            if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.YayHash;
+            if (string.IsNullOrWhiteSpace(avatarHash) || this.IconHash.StartsWith('g')) avatarHash = this.YayHash;
             if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.MehHash;
             if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.BooHash;
 
