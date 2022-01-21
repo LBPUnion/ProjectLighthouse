@@ -205,6 +205,9 @@ public class Slot
     [XmlElement("leveltype")]
     public string LevelType { get; set; } = "";
 
+    [XmlElement("vitaCrossControlRequired")]
+    public bool CrossControllerRequired { get; set; }
+
     public string SerializeResources()
     {
         return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource)) +
@@ -251,6 +254,7 @@ public class Slot
                           LbpSerializer.StringElement("lbpvitaPlayCount", this.PlaysLBPVita) +
                           LbpSerializer.StringElement("lbpvitaCompletionCount", this.PlaysLBPVitaComplete) +
                           LbpSerializer.StringElement("lbpvitaUniquePlayCount", this.PlaysLBPVitaUnique) +
+                          LbpSerializer.StringElement("vitaCrossControlRequired", CrossControllerRequired) +
                           LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
                           LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
                           LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
