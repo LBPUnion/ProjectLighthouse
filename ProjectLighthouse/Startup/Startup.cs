@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 
 namespace LBPUnion.ProjectLighthouse.Startup;
@@ -53,6 +54,12 @@ public class Startup
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             }
         );
+
+        #if DEBUG
+        services.AddSingleton<IHostLifetime, DebugWarmupLifetime>();
+        #else
+        services.AddSingleton<IHostLifetime, ConsoleLifetime>();
+        #endif
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
