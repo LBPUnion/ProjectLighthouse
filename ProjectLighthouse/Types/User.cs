@@ -26,6 +26,19 @@ public class User
     public string Biography { get; set; }
 
     [NotMapped]
+    public string WebsiteAvatarHash {
+        get {
+            string avatarHash = this.IconHash;
+
+            if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.YayHash;
+            if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.MehHash;
+            if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.BooHash;
+
+            return avatarHash;
+        }
+    }
+
+    [NotMapped]
     public int Reviews {
         get {
             using Database database = new();
