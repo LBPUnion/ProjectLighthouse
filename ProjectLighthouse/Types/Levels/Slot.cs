@@ -221,6 +221,7 @@ public class Slot
                           LbpSerializer.StringElement("description", this.Description) +
                           LbpSerializer.StringElement("icon", this.IconHash) +
                           LbpSerializer.StringElement("rootLevel", this.RootLevel) +
+                          LbpSerializer.StringElement("authorLabels", this.AuthorLabels) +
                           this.SerializeResources() +
                           LbpSerializer.StringElement("location", this.Location?.Serialize()) +
                           LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
