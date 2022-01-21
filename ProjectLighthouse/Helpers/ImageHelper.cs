@@ -1,9 +1,12 @@
 #nullable enable
+using System;
 using System.IO;
 using DDSReader;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Files;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -15,12 +18,27 @@ public static class ImageHelper
     {
         if (type != LbpFileType.Jpeg && type != LbpFileType.Png && type != LbpFileType.Texture) return false;
 
+        if (File.Exists($"png/{hash}.png")) return true;
+
         using MemoryStream ms = new(data);
         using BinaryReader reader = new(ms);
 
-        if (type == LbpFileType.Texture) return TextureToPNG(hash, reader);
-
-        return false;
+        try
+        {
+            return type switch
+            {
+                LbpFileType.Texture => TextureToPNG(hash, reader),
+                LbpFileType.Png => PNGToPNG(hash),
+                LbpFileType.Jpeg => JPGToPNG(hash, data),
+                _ => false,
+            };
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine($"Error while converting {hash}:");
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
     private static bool TextureToPNG(string hash, BinaryReader reader)
@@ -81,6 +99,24 @@ public static class ImageHelper
 
         Directory.CreateDirectory("png");
         File.WriteAllBytes($"png/{hash}.png", stream.ToArray());
+        return true;
+    }
+
+    private static bool JPGToPNG(string hash, byte[] data)
+    {
+        using Image<Rgba32> image = Image.Load(data);
+        using MemoryStream ms = new();
+        image.SaveAsPng(ms);
+
+        File.WriteAllBytes($"png/{hash}.png", ms.ToArray());
+        return true;
+    }
+
+    // it sounds dumb i know but hear me out:
+    // you're completely correct
+    private static bool PNGToPNG(string hash)
+    {
+        File.Copy(FileHelper.GetResourcePath(hash), $"png/{hash}.png");
         return true;
     }
 }
