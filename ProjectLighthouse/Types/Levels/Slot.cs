@@ -251,9 +251,6 @@ public class Slot
                           LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                           LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
                           LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
-                          LbpSerializer.StringElement("lbpvitaPlayCount", this.PlaysLBPVita) +
-                          LbpSerializer.StringElement("lbpvitaCompletionCount", this.PlaysLBPVitaComplete) +
-                          LbpSerializer.StringElement("lbpvitaUniquePlayCount", this.PlaysLBPVitaUnique) +
                           LbpSerializer.StringElement("vitaCrossControlRequired", CrossControllerRequired) +
                           LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
                           LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
