@@ -1,3 +1,4 @@
+#nullable enable
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,11 +52,23 @@ public class ResourcesController : ControllerBase
 
     [ResponseCache(Duration = 86400)]
     [HttpGet("/gameAssets/{hash}")]
-    public IActionResult GetWebResource(string hash)
+    public IActionResult GetGameImage(string hash)
     {
-        string path = FileHelper.GetResourcePath(hash);
+        string path = $"png/{hash}.png";
 
-        if (FileHelper.ResourceExists(hash) && LbpFile.FromHash(hash)?.FileType == LbpFileType.Jpeg) return this.File(IOFile.OpenRead(path), "image/jpeg");
+        if (IOFile.Exists(path))
+        {
+            return this.File(IOFile.OpenRead(path), "image/png");
+        }
+
+        LbpFile? file = LbpFile.FromHash(hash);
+        if (file != null)
+        {
+            if (ImageHelper.LbpFileToPNG(file))
+            {
+                return this.File(IOFile.OpenRead(path), "image/png");
+            }
+        }
 
         return this.NotFound();
     }
@@ -79,7 +92,7 @@ public class ResourcesController : ControllerBase
             return this.UnprocessableEntity();
         }
 
-        string calculatedHash = HashHelper.Sha1Hash(file.Data).ToLower();
+        string calculatedHash = file.Hash;
         if (calculatedHash != hash)
         {
             Logger.Log

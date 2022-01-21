@@ -15,12 +15,16 @@ public class LbpFile
     /// <summary>
     ///     The type of file.
     /// </summary>
-    public LbpFileType FileType;
+    public readonly LbpFileType FileType;
 
-    public LbpFile(byte[] data)
+    public readonly string Hash;
+
+    public LbpFile(byte[] data, string? hash = null)
     {
         this.Data = data;
+
         this.FileType = FileHelper.DetermineFileType(this.Data);
+        this.Hash = HashHelper.Sha1Hash(this.Data).ToLower();
     }
 
     public static LbpFile? FromHash(string hash)
@@ -30,6 +34,6 @@ public class LbpFile
 
         byte[] data = File.ReadAllBytes(path);
 
-        return new LbpFile(data);
+        return new LbpFile(data, hash);
     }
 }

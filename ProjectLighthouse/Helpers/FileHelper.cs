@@ -17,7 +17,7 @@ public static class FileHelper
     {
         if (!ServerSettings.Instance.CheckForUnsafeFiles) return true;
 
-        if (file.FileType == LbpFileType.Unknown) file.FileType = DetermineFileType(file.Data);
+        if (file.FileType == LbpFileType.Unknown) return false;
 
         return file.FileType switch
         {
@@ -32,7 +32,7 @@ public static class FileHelper
             LbpFileType.Jpeg => true,
             LbpFileType.Png => true,
             #if DEBUG
-                _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
+            _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
             #else
             _ => false,
             #endif

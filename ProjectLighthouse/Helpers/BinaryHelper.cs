@@ -28,6 +28,8 @@ public static class BinaryHelper
         while (readByte != byteToReadTo);
     }
 
+    public static byte[] ReadToEnd(BinaryReader reader) => reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
+
     public static byte[] ReadLastBytes(BinaryReader reader, int count, bool restoreOldPosition = true)
     {
         long oldPosition = reader.BaseStream.Position;

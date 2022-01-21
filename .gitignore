@@ -19,6 +19,7 @@ launchSettings.json
 # Lighthouse junk
 riderModule.iml
 r/
+png/
 /ProjectLighthouse/r/*
 /ProjectLighthouse/logs/*
 lighthouse.config.json
