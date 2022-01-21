@@ -1,8 +1,9 @@
+using LBPUnion.ProjectLighthouse.Helpers.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
-namespace LBPUnion.ProjectLighthouse;
+namespace LBPUnion.ProjectLighthouse.Startup;
 
 public class TestStartup : Startup
 {

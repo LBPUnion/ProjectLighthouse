@@ -14,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 
-namespace LBPUnion.ProjectLighthouse;
+namespace LBPUnion.ProjectLighthouse.Startup;
 
 public class Startup
 {
@@ -30,7 +30,7 @@ public class Startup
     {
         services.AddControllers();
         #if DEBUG
-            services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation();
+        services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation();
         #else
         services.AddRazorPages().WithRazorPagesAtContentRoot();
         #endif
@@ -72,7 +72,7 @@ public class Startup
         }
 
         #if DEBUG
-            app.UseDeveloperExceptionPage();
+        app.UseDeveloperExceptionPage();
         #endif
 
         app.UseForwardedHeaders();
@@ -103,12 +103,12 @@ public class Startup
                 );
 
                 #if DEBUG
-                    // Log post body
-                    if (context.Request.Method == "POST")
-                    {
-                        context.Request.Body.Position = 0;
-                        Logger.Log(await new StreamReader(context.Request.Body).ReadToEndAsync(), LoggerLevelHttp.Instance);
-                    }
+                // Log post body
+                if (context.Request.Method == "POST")
+                {
+                    context.Request.Body.Position = 0;
+                    Logger.Log(await new StreamReader(context.Request.Body).ReadToEndAsync(), LoggerLevelHttp.Instance);
+                }
                 #endif
             }
         );

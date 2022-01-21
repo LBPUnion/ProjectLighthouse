@@ -100,7 +100,7 @@ public static class Program
             (
                 webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup.Startup>();
                     webBuilder.UseWebRoot("StaticFiles");
                 }
             )

@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Startup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using OpenQA.Selenium;
