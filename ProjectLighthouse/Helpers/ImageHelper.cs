@@ -28,7 +28,7 @@ public static class ImageHelper
             return type switch
             {
                 LbpFileType.Texture => TextureToPNG(hash, reader),
-                LbpFileType.Png => PNGToPNG(hash),
+                LbpFileType.Png => PNGToPNG(hash, data),
                 LbpFileType.Jpeg => JPGToPNG(hash, data),
                 _ => false,
             };
@@ -114,9 +114,9 @@ public static class ImageHelper
 
     // it sounds dumb i know but hear me out:
     // you're completely correct
-    private static bool PNGToPNG(string hash)
+    private static bool PNGToPNG(string hash, byte[] data)
     {
-        File.Copy(FileHelper.GetResourcePath(hash), $"png/{hash}.png");
+        File.WriteAllBytes($"png/{hash}.png", data);
         return true;
     }
 }
