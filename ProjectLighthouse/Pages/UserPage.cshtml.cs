@@ -27,7 +27,7 @@ public class UserPage : BaseLayout
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
 
-        this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(5).ToListAsync();
+        this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
         this.Comments = await this.Database.Comments.Include
                 (p => p.Poster)
             .Include(p => p.Target)
