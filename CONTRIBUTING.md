@@ -1,6 +1,6 @@
 # Contributing
 
-## Running
+## Setting up MySQL
 
 Project Lighthouse requires a MySQL database. For Linux users running docker, one can be set up using
 the `docker-compose.yml` file in the root of the project folder.
@@ -17,25 +17,24 @@ Once you've gotten MySQL running you can run Lighthouse. It will take care of th
 PS3 is difficult to set up, so I will be going over how to set up RPCS3 instead. A guide will be coming for PS3 closer
 to release. You can also follow this guide if you want to learn how to modify your EBOOT.
 
-There are also community-provided guides in [the official LBP Union Discord](https://www.lbpunion.com/discord), which
-you can follow at your own discretion.
-
-*Note: This requires a modified copy of RPCS3. You can find a working
+*Note: This requires a patched copy of RPCS3. You can find a working
 version [on our GitHub](https://github.com/LBPUnion/rpcs3).*
 
 Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do
-extra steps for your game to not crash upon entering pod computer). It can be digital (NPUA80472/NPUA80662) or disc (
-BCUS98148/BCUS98245). For those that don't, the [RPCS3 Quickstart Guide](https://rpcs3.net/quickstart) should cover it.
+extra steps for your game to not crash upon entering pod computer). 
 
-Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the README.md
+The game can be a digital copy (NPUA80472/NPUA80662) or a disc copy (
+BCUS98148/BCUS98245).
+
+Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the `README.md`
 file.
 
 You should have everything you need now, so open up RPCS3 and go to Utilities -> Decrypt PS3 Binaries. Point this
 to `rpcs3/dev_hdd0/game/(title id)/USRDIR/EBOOT.BIN`. You can grab your title id by right clicking the game in RPCS3 and
 clicking Copy Info -> Copy Serial.
 
-This should give you a file named `EBOOT.elf` in the same folder. Next, fire up UnionPatcher (making sure to select the
-correct project to start, e.g. on Mac launch `UnionPatcher.Gui.MacOS`.)
+
+This should give you a file named `EBOOT.elf` in the same folder. This is your decrypted eboot.
 
 Now that you have your decrypted eboot, open UnionPatcher and select the `EBOOT.elf` you got earlier in the top box,
 enter `http://localhost:10060/LITTLEBIGPLANETPS3_XML` in the second, and the output filename in the third. For this
@@ -46,7 +45,7 @@ Now, copy the `EBOOTlocalhost.elf` file to where you got your `EBOOT.elf` file f
 To launch the game with the patched EBOOT, open up RPCS3, go to File, Boot SELF/ELF, and open up `EBOOTlocalhost.elf`.
 
 Assuming you are running the patched version of RPCS3, you patched the file correctly, the database is migrated, and
-Lighthouse is running, the game should now connect.
+Project Lighthouse is running, the game should now connect and you may begin contributing!
 
 ### LittleBigPlanet 1
 
@@ -60,13 +59,10 @@ clicking on the `Hex-values` tab, and entering the hex there.
 
 Then, you can zero it out by replacing it with `00 00 00 00 00 00 00 00 00 00 00 00 00 00`.
 
-What this does is remove all the references to the sceNpCommerce2 function. The function is used for purchasing DLC,
-which is impossible on Lighthouse. The reason why it must be patched out is because RPCS3 doesn't support the function
-at this moment.
+What this does is remove all the references to the `sceNpCommerce2` function. The function is used for purchasing DLC,
+which at this moment in time crashes RPCS3.
 
-Then save the file, and your LBP1 EBOOT can now be used with RPCS3.
-
-Finally, take a break. Chances are that took a while.
+After saving the file your LBP1 EBOOT can be used with RPCS3.
 
 ## Contributing Tips
 
