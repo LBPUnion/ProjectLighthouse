@@ -3,7 +3,6 @@
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Profiles
-@using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.UserPage
 
 @{
@@ -38,22 +37,13 @@
 }
 
 <div class="ui grid">
-    <div class="eight wide column" style="display: flex">
-        <div style="margin-right: 10px; background-image: url('/gameAssets/@Model.ProfileUser.WebsiteAvatarHash'); height: 100px; width: 100px; background-size: cover; background-position: center; border-radius: .28571429rem;">
-        </div>
-        <div style="height: fit-content; vertical-align: center; align-self: center">
-            <h1>@Model.Title</h1>
-            <p>
-                <i>@Model.ProfileUser!.Status</i>
-            </p>
-
-            <div class="statsUnderTitle">
-                <i class="pink heart icon" title="Hearts"></i> <span>@Model.ProfileUser.Hearts</span>
-                <i class="blue comment icon" title="Comments"></i> <span>@Model.ProfileUser.Comments</span>
-                <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.ProfileUser.UsedSlots / @ServerSettings.Instance.EntitledSlots</span>
-                <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.ProfileUser.PhotosByMe</span>
-            </div>
-        </div>
+    <div class="eight wide column">
+        @await Html.PartialAsync("Partials/UserCardPartial", Model.ProfileUser, new ViewDataDictionary(ViewData)
+        {
+            {
+                "ShowLink", false
+            },
+        })
     </div>
     <div class="eight wide right aligned column">
         <br>

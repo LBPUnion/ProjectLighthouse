@@ -5,32 +5,30 @@
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
 }
 
-<div class="ui grid">
-    <div class="eight wide column" style="display: flex;">
-        <div style="margin-right: 10px; background-image: url('/gameAssets/@Model.WebsiteAvatarHash'); height: 100px; width: 100px; background-size: cover; background-position: center; border-radius: .28571429rem;">
-        </div>
-        <div style="height: fit-content; vertical-align: center; align-self: center">
-            @if (showLink)
-            {
-                <h2 style="margin-bottom: 2px;">
-                    <a href="~/user/@Model.UserId">@Model.Username</a>
-                </h2>
-            }
-            else
-            {
-                <h1 style="margin-bottom: 2px;">
-                    @Model.Username
-                </h1>
-            }
-            <p>
-                <i>@Model.Status</i>
-            </p>
-            <div class="statsUnderTitle">
-                <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
-                <i class="blue comment icon" title="Comments"></i> <span>@Model.Comments</span>
-                <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.UsedSlots / @ServerSettings.Instance.EntitledSlots</span>
-                <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.PhotosByMe</span>
-            </div>
+<div style="display: flex;">
+    <div style="margin-right: 10px; background-image: url('/gameAssets/@Model.WebsiteAvatarHash'); height: 100px; width: 100px; background-size: cover; background-position: center; border-radius: .28571429rem;">
+    </div>
+    <div style="height: fit-content; vertical-align: center; align-self: center">
+        @if (showLink)
+        {
+            <h2 style="margin-bottom: 2px;">
+                <a href="~/user/@Model.UserId">@Model.Username</a>
+            </h2>
+        }
+        else
+        {
+            <h1 style="margin-bottom: 2px;">
+                @Model.Username
+            </h1>
+        }
+        <p>
+            <i>@Model.Status</i>
+        </p>
+        <div class="statsUnderTitle">
+            <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@Model.Comments</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.UsedSlots / @ServerSettings.Instance.EntitledSlots</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.PhotosByMe</span>
         </div>
     </div>
 </div>
