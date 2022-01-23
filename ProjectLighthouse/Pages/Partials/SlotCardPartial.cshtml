@@ -1,5 +1,6 @@
 @using LBPUnion.ProjectLighthouse
 @using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Settings
 @using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Types.Levels.Slot
 
@@ -22,9 +23,12 @@
 
     string callbackUrl = (string)ViewData["CallbackUrl"];
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
+
+    string iconHash = Model.IconHash;
+    if (string.IsNullOrWhiteSpace(iconHash) || iconHash.StartsWith('g')) iconHash = ServerSettings.Instance.MissingIconHash;
 }
 <div style="display: flex; width: 100%;">
-    <div style="margin-right: 10px; background-image: url('/gameAssets/@Model.IconHash'); height: 100px; width: 100px; background-size: cover; background-position: center; border-radius: 100%;">
+    <div style="margin-right: 10px; background-image: url('/gameAssets/@iconHash'); height: 100px; width: 100px; background-size: cover; background-position: center; border-radius: 100%;">
     </div>
     <div style="height: fit-content; vertical-align: center; align-self: center">
         @if (showLink)

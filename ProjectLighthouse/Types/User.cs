@@ -33,6 +33,7 @@ public class User
             if (string.IsNullOrWhiteSpace(avatarHash) || this.IconHash.StartsWith('g')) avatarHash = this.YayHash;
             if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.MehHash;
             if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.BooHash;
+            if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = ServerSettings.Instance.MissingIconHash;
 
             return avatarHash;
         }
