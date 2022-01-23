@@ -244,7 +244,23 @@ public class SlotsController : ControllerBase
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
-        return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        return this.Ok
+        (
+            LbpSerializer.TaggedStringElement
+            (
+                "slots",
+                response,
+                new Dictionary<string, object>
+                {
+                    {
+                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                    },
+                    {
+                        "total", await StatisticsHelper.SlotCount()
+                    },
+                }
+            )
+        );
     }
 
     [HttpGet("slots/mostUniquePlays")]
@@ -286,7 +302,23 @@ public class SlotsController : ControllerBase
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
-        return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        return this.Ok
+        (
+            LbpSerializer.TaggedStringElement
+            (
+                "slots",
+                response,
+                new Dictionary<string, object>
+                {
+                    {
+                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                    },
+                    {
+                        "total", await StatisticsHelper.SlotCount()
+                    },
+                }
+            )
+        );
     }
 
     [HttpGet("slots/mostHearted")]
@@ -314,7 +346,23 @@ public class SlotsController : ControllerBase
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
 
-        return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
+        return this.Ok
+        (
+            LbpSerializer.TaggedStringElement
+            (
+                "slots",
+                response,
+                new Dictionary<string, object>
+                {
+                    {
+                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                    },
+                    {
+                        "total", await StatisticsHelper.SlotCount()
+                    },
+                }
+            )
+        );
     }
 
     public GameVersion GetGameFilter(string? gameFilterType, GameVersion version)
