@@ -230,9 +230,12 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
         Random rand = new();
 
-        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType)
+        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending(s => s.Thumbsup)
             .ThenBy(_ => rand.Next())
@@ -255,16 +258,19 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
         Random rand = new();
 
-        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType)
+        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending
             (
+                // probably not the best way to do this?
                 s =>
                 {
-                    // probably not the best way to do this?
-                    return this.GetGameFilter(gameFilterType) switch
+                    return this.GetGameFilter(gameFilterType, token.GameVersion) switch
                     {
                         GameVersion.LittleBigPlanet1 => s.PlaysLBP1Unique,
                         GameVersion.LittleBigPlanet2 => s.PlaysLBP2Unique,
@@ -294,9 +300,12 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
         Random rand = new();
 
-        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType)
+        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending(s => s.Hearts)
             .ThenBy(_ => rand.Next())
@@ -308,8 +317,11 @@ public class SlotsController : ControllerBase
         return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "hint_start", pageStart + Math.Min(pageSize, 30)));
     }
 
-    public GameVersion GetGameFilter(string? gameFilterType)
+    public GameVersion GetGameFilter(string? gameFilterType, GameVersion version)
     {
+        if (version == GameVersion.LittleBigPlanetVita) return GameVersion.LittleBigPlanetVita;
+        if (version == GameVersion.LittleBigPlanetPSP) return GameVersion.LittleBigPlanetPSP;
+
         return gameFilterType switch
         {
             "lbp1" => GameVersion.LittleBigPlanet1,
@@ -321,7 +333,7 @@ public class SlotsController : ControllerBase
         };
     }
 
-    public IQueryable<Slot> FilterByRequest(string? gameFilterType, string? dateFilterType)
+    public IQueryable<Slot> FilterByRequest(string? gameFilterType, string? dateFilterType, GameVersion version)
     {
         string _dateFilterType = dateFilterType ?? "";
 
@@ -332,7 +344,7 @@ public class SlotsController : ControllerBase
             _ => 0,
         };
 
-        GameVersion gameVersion = this.GetGameFilter(gameFilterType);
+        GameVersion gameVersion = this.GetGameFilter(gameFilterType, version);
 
         IQueryable<Slot> whereSlots;
 
