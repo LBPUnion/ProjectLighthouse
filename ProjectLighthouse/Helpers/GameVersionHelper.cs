@@ -26,7 +26,7 @@ public class GameVersionHelper
         "NPEA00147",
         "NPHG00033",
         "NPHG00035",
-	"NPEA00241",
+        "NPEA00241",
     };
 
     // https://serialstation.com/games/35e69aba-1872-4fd7-9d39-11ce75924040
@@ -78,7 +78,7 @@ public class GameVersionHelper
         "CUSA01077",
         "CUSA01304",
         "NPUA81116",
-	"NPEA00515",
+        "NPEA00515",
     };
 
     public static readonly string[] LittleBigPlanetVitaTitleIds =
