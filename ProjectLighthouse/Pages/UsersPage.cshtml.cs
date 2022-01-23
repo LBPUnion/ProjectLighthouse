@@ -36,6 +36,7 @@ public class UsersPage : BaseLayout
         this.Users = await this.Database.Users.Where
                 (u => !u.Banned)
             .Skip(pageNumber * ServerStatics.PageSize)
+            .OrderByDescending(u => u.UserId)
             .Take(ServerStatics.PageSize)
             .ToAsyncEnumerable()
             .OrderBy(u => u.Status)
