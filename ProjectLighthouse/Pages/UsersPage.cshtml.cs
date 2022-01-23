@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Pages;
 
@@ -35,11 +36,9 @@ public class UsersPage : BaseLayout
 
         this.Users = await this.Database.Users.Where
                 (u => !u.Banned)
+            .OrderByDescending(b => b.UserId)
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)
-            .ToAsyncEnumerable()
-            .OrderBy(u => u.Status)
-            .ThenByDescending(u => u.UserId)
             .ToListAsync();
 
         return this.Page();
