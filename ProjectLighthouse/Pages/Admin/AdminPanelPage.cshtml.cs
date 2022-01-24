@@ -15,11 +15,17 @@ public class AdminPanelPage : BaseLayout
     public AdminPanelPage(Database database) : base(database)
     {}
 
+    public List<AdminPanelStatistic> Statistics = new();
+
     public async Task<IActionResult> OnGet([FromQuery] string? args, [FromQuery] string? command, [FromQuery] string? maintenanceJob)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
+
+        this.Statistics.Add(new AdminPanelStatistic("Users", await StatisticsHelper.UserCount(), "users"));
+        this.Statistics.Add(new AdminPanelStatistic("Slots", await StatisticsHelper.SlotCount()));
+        this.Statistics.Add(new AdminPanelStatistic("Photos", await StatisticsHelper.PhotoCount()));
 
         if (!string.IsNullOrEmpty(command))
         {
