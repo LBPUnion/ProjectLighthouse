@@ -1,15 +1,14 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Categories;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
 using LBPUnion.ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Types.Tickets;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,9 +66,9 @@ public class Database : DbContext
     }
 
     #nullable enable
-    public async Task<GameToken?> AuthenticateUser(LoginData loginData, string userLocation, string titleId = "")
+    public async Task<GameToken?> AuthenticateUser(NPTicket npTicket, string userLocation)
     {
-        User? user = await this.Users.FirstOrDefaultAsync(u => u.Username == loginData.Username);
+        User? user = await this.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
         if (user == null) return null;
 
         GameToken gameToken = new()
@@ -78,14 +77,8 @@ public class Database : DbContext
             User = user,
             UserId = user.UserId,
             UserLocation = userLocation,
-            GameVersion = GameVersionHelper.FromTitleId(titleId),
+            GameVersion = npTicket.GameVersion,
         };
-
-        if (gameToken.GameVersion == GameVersion.Unknown)
-        {
-            Logger.Log($"Unknown GameVersion for TitleId {titleId}", LoggerLevelLogin.Instance);
-            return null;
-        }
 
         this.GameTokens.Add(gameToken);
         await this.SaveChangesAsync();

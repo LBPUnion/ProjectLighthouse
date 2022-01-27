@@ -8,8 +8,10 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Types.Tickets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using IOFile = System.IO.File;
 
 namespace LBPUnion.ProjectLighthouse.Controllers;
 
@@ -26,25 +28,29 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login([FromQuery] string? titleId)
+    public async Task<IActionResult> Login()
     {
-        titleId ??= "";
+        MemoryStream ms = new();
+        await this.Request.Body.CopyToAsync(ms);
+        byte[] loginData = ms.ToArray();
 
-        string body = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        #if DEBUG
+        await IOFile.WriteAllBytesAsync($"npTicket-{TimestampHelper.TimestampMillis}.txt", loginData);
+        #endif
 
-        LoginData? loginData;
+        NPTicket? npTicket;
         try
         {
-            loginData = LoginData.CreateFromString(body);
+            npTicket = NPTicket.CreateFromBytes(loginData);
         }
         catch
         {
-            loginData = null;
+            npTicket = null;
         }
 
-        if (loginData == null)
+        if (npTicket == null)
         {
-            Logger.Log("loginData was null, rejecting login", LoggerLevelLogin.Instance);
+            Logger.Log("npTicket was null, rejecting login", LoggerLevelLogin.Instance);
             return this.BadRequest();
         }
 
@@ -60,11 +66,11 @@ public class LoginController : ControllerBase
         // Get an existing token from the IP & username
         GameToken? token = await this.database.GameTokens.Include
                 (t => t.User)
-            .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == loginData.Username && !t.Used);
+            .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == npTicket.Username && !t.Used);
 
         if (token == null) // If we cant find an existing token, try to generate a new one
         {
-            token = await this.database.AuthenticateUser(loginData, ipAddress, titleId);
+            token = await this.database.AuthenticateUser(npTicket, ipAddress);
             if (token == null)
             {
                 Logger.Log("unable to find/generate a token, rejecting login", LoggerLevelLogin.Instance);
@@ -129,7 +135,7 @@ public class LoginController : ControllerBase
             return this.StatusCode(403, "");
         }
 
-        Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client ({titleId})", LoggerLevelLogin.Instance);
+        Logger.Log($"Successfully logged in user {user.Username} as {token.GameVersion} client", LoggerLevelLogin.Instance);
         // After this point we are now considering this session as logged in.
 
         // We just logged in with the token. Mark it as used so someone else doesnt try to use it,
