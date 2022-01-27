@@ -116,7 +116,7 @@ public class LoginController : ControllerBase
                     GameTokenId = token.TokenId,
                     Timestamp = TimestampHelper.Timestamp,
                     IPAddress = ipAddress,
-                    Platform = token.GameVersion == GameVersion.LittleBigPlanetVita ? Platform.Vita : Platform.PS3, // TODO: properly identify RPCS3
+                    Platform = npTicket.Platform,
                 };
 
                 this.database.AuthenticationAttempts.Add(authAttempt);
