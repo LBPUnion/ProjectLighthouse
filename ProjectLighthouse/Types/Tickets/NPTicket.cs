@@ -111,7 +111,13 @@ public class NPTicket
 
             if (npTicket.Platform == Platform.Unknown)
             {
-                Logger.Log($"", LoggerLevelLogin.Instance);
+                Logger.Log($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LoggerLevelLogin.Instance);
+                return null;
+            }
+
+            if (npTicket.GameVersion == GameVersion.Unknown)
+            {
+                Logger.Log($"Could not determine game version from title id {titleId}", LoggerLevelLogin.Instance);
                 return null;
             }
 
