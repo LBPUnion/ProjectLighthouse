@@ -19,3 +19,41 @@ div.statsUnderTitle > span {
 #lighthouse-debug-info > p {
     margin-bottom: 1px;
 }
+
+/*#region Slot cards*/
+
+.slotCard {
+    display: flex;
+    width: 100%;
+}
+
+.slotCardIcon {
+    margin-right: 10px;
+    height: 100px;
+    width: 100px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 100%;
+}
+
+.slotCardStats {
+    height: fit-content;
+    vertical-align: center;
+    align-self: center
+}
+
+.slotCardStats > .statsUnderTitle {
+    margin-bottom: 10px;
+}
+
+.slotCardStats > h1,
+.slotCardStats > h2 {
+    margin-bottom: 2px;
+}
+
+.slotCardButtons {
+    height: 100px;
+    margin-left: auto;
+}
+
+/*#endregion Slot cards*/
