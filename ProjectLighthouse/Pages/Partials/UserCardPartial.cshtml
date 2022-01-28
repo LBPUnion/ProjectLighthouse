@@ -3,12 +3,16 @@
 
 @{
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
+    bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
 }
 
-<div style="display: flex;">
-    <div style="margin-right: 10px; background-image: url('/gameAssets/@Model.WebsiteAvatarHash'); height: 100px; width: 100px; background-size: cover; background-position: center; border-radius: .28571429rem;">
+<div class="card">
+    @{
+        int size = isMobile ? 50 : 100;
+    }
+    <div class="cardIcon userCardIcon" style="background-image: url('/gameAssets/@Model.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px">
     </div>
-    <div style="height: fit-content; vertical-align: center; align-self: center">
+    <div class="cardStats">
         @if (showLink)
         {
             <h2 style="margin-bottom: 2px;">
@@ -24,7 +28,7 @@
         <p>
             <i>@Model.Status</i>
         </p>
-        <div class="statsUnderTitle">
+        <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
             <i class="blue comment icon" title="Comments"></i> <span>@Model.Comments</span>
             <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.UsedSlots / @ServerSettings.Instance.EntitledSlots</span>

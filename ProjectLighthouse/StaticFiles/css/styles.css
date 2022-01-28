@@ -8,48 +8,36 @@ div.main {
     flex: 1;
 }
 
-div.statsUnderTitle > i {
-    margin-right: 2px;
-}
-
-div.statsUnderTitle > span {
-    margin-right: 5px;
-}
-
 #lighthouse-debug-info > p {
     margin-bottom: 1px;
 }
 
-/*#region Slot cards*/
+/*#region Cards*/
 
-.slotCard {
+.card {
     display: flex;
     width: 100%;
 }
 
-.slotCardIcon {
+.cardIcon {
     margin-right: 10px;
     background-size: cover;
     background-position: center;
     border-radius: 100%;
 }
 
-.slotCardStats {
+.cardStats {
     height: fit-content;
     vertical-align: center;
     align-self: center
 }
 
-.slotCardStats > .statsUnderTitle {
-    margin-bottom: 10px;
-}
-
-.slotCardStats > h1,
-.slotCardStats > h2 {
+.cardStats > h1,
+.cardStats > h2 {
     margin-bottom: 2px;
 }
 
-.slotCardButtons {
+.cardButtons {
     height: 100px;
     display: flex;
     flex-direction: column;
@@ -57,9 +45,38 @@ div.statsUnderTitle > span {
     margin-left: auto;
 }
 
-.slotCardButtons > a {
+.cardButtons > a {
     margin-bottom: 5px !important;
     vertical-align: center;
 }
 
+.cardStatsUnderTitle {
+    margin-bottom: 10px;
+}
+
+div.cardStatsUnderTitle > i {
+    margin-right: 2px;
+}
+
+div.cardStatsUnderTitle > span {
+    margin-right: 5px;
+}
+
+/*#region Slot cards*/
+
+.slotCardIcon {
+    border-radius: 100%;
+}
+
 /*#endregion Slot cards*/
+
+/*#region User cards*/
+
+.userCardIcon {
+    border-radius: .28571429rem;
+}
+
+
+/*#endregion User cards*/
+
+/*#endregion Cards*/

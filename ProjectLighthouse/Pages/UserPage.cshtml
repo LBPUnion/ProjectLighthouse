@@ -1,6 +1,7 @@
 @page "/user/{userId:int}"
 @using System.IO
 @using System.Web
+@using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Profiles
 @model LBPUnion.ProjectLighthouse.Pages.UserPage
@@ -42,6 +43,9 @@
         {
             {
                 "ShowLink", false
+            },
+            {
+                "IsMobile", Model.Request.IsMobile()
             },
         })
     </div>

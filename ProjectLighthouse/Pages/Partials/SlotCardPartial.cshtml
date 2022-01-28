@@ -28,13 +28,13 @@
     string iconHash = Model.IconHash;
     if (string.IsNullOrWhiteSpace(iconHash) || iconHash.StartsWith('g')) iconHash = ServerSettings.Instance.MissingIconHash;
 }
-<div class="slotCard">
+<div class="card">
     @{
         int size = isMobile ? 50 : 100;
     }
-    <div class="slotCardIcon" style="background-image: url('/gameAssets/@iconHash'); min-width: @(size)px; width: @(size)px; height: @(size)px">
+    <div class="cardIcon slotCardIcon" style="background-image: url('/gameAssets/@iconHash'); min-width: @(size)px; width: @(size)px; height: @(size)px">
     </div>
-    <div class="slotCardStats">
+    <div class="cardStats">
         @if (showLink)
         {
             <h2>
@@ -47,7 +47,7 @@
                 @slotName
             </h1>
         }
-        <div class="statsUnderTitle">
+        <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
             <i class="blue play icon" title="Plays"></i> <span>@Model.Plays</span>
             <i class="green thumbs up icon" title="Yays"></i> <span>@Model.Thumbsup</span>
@@ -63,7 +63,7 @@
             <i>Created by <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a> for @Model.GameVersion.ToPrettyString()</i>
         </p>
     </div>
-    <div class="slotCardButtons">
+    <div class="cardButtons">
         <br>
         @if (user != null)
         {

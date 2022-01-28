@@ -12,6 +12,7 @@
 
 @foreach (Slot slot in Model.Slots)
 {
+    bool isMobile = Model.Request.IsMobile();
     <div class="ui segment">
         @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
         {
@@ -25,7 +26,7 @@
                 "ShowLink", true
             },
             {
-                "IsMobile", Model.Request.IsMobile()
+                "IsMobile", isMobile
             },
         })
     </div>
