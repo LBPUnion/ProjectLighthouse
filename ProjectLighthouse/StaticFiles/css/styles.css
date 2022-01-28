@@ -29,8 +29,6 @@ div.statsUnderTitle > span {
 
 .slotCardIcon {
     margin-right: 10px;
-    height: 100px;
-    width: 100px;
     background-size: cover;
     background-position: center;
     border-radius: 100%;
@@ -53,7 +51,15 @@ div.statsUnderTitle > span {
 
 .slotCardButtons {
     height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-left: auto;
+}
+
+.slotCardButtons > a {
+    margin-bottom: 5px !important;
+    vertical-align: center;
 }
 
 /*#endregion Slot cards*/

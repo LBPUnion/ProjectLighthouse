@@ -1,4 +1,5 @@
 @page "/slot/{id:int}"
+@using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @model LBPUnion.ProjectLighthouse.Pages.SlotPage
 
 @{
@@ -19,6 +20,9 @@
     },
     {
         "ShowLink", false
+    },
+    {
+        "IsMobile", Model.Request.IsMobile()
     },
 })
 <br>
