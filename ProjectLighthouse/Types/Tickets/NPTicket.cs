@@ -26,7 +26,33 @@ public class NPTicket
     public ulong IssuedDate { get; set; }
     public ulong ExpireDate { get; set; }
 
+    private string titleId { get; set; }
+
     public GameVersion GameVersion { get; set; }
+
+    private static void Read21Ticket(NPTicket npTicket, TicketReader reader)
+    {
+        reader.ReadTicketString(); // "Serial id", but its apparently not what we're looking for
+
+        npTicket.IssuerId = reader.ReadTicketUInt32();
+        npTicket.IssuedDate = reader.ReadTicketUInt64();
+        npTicket.ExpireDate = reader.ReadTicketUInt64();
+
+        reader.ReadTicketUInt64(); // PSN User id, we don't care about this
+
+        npTicket.Username = reader.ReadTicketString();
+
+        reader.ReadTicketString(); // Country
+        reader.ReadTicketString(); // Domain
+
+        npTicket.titleId = reader.ReadTicketString();
+    }
+
+    // Function is here for future use incase we ever need to read more from the ticket
+    private static void Read30Ticket(NPTicket npTicket, TicketReader reader)
+    {
+        Read21Ticket(npTicket, reader);
+    }
 
     /// <summary>
     ///     https://www.psdevwiki.com/ps3/X-I-5-Ticket
@@ -67,7 +93,16 @@ public class NPTicket
 
             reader.ReadUInt16BE(); // Ticket length, we don't care about this
 
-            if (npTicket.ticketVersion != "2.1") throw new NotImplementedException();
+            switch (npTicket.ticketVersion)
+            {
+                case "2.1":
+                    Read21Ticket(npTicket, reader);
+                    break;
+                case "3.0":
+                    Read30Ticket(npTicket, reader);
+                    break;
+                default: throw new NotImplementedException();
+            }
 
             #if DEBUG
             SectionHeader bodyHeader = reader.ReadSectionHeader();
@@ -76,31 +111,30 @@ public class NPTicket
             reader.ReadSectionHeader();
             #endif
 
-            reader.ReadTicketString(); // "Serial id", but its apparently not what we're looking for
+            if (npTicket.Platform == Platform.Unknown)
+            {
+                Logger.Log($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LoggerLevelLogin.Instance);
+                return null;
+            }
 
-            npTicket.IssuerId = reader.ReadTicketUInt32();
-            npTicket.IssuedDate = reader.ReadTicketUInt64();
-            npTicket.ExpireDate = reader.ReadTicketUInt64();
-
-            reader.ReadTicketUInt64(); // PSN User id, we don't care about this
-
-            npTicket.Username = reader.ReadTicketString();
-
-            reader.ReadTicketString(); // Country
-            reader.ReadTicketString(); // Domain
-
-            // Title ID, kinda..
-            // Data: UP9000-BCUS98245_00
+            // We already read the title id, however we need to do some post-processing to get what we want.
+            // Current data: UP9000-BCUS98245_00
             // We need to chop this to get the titleId we're looking for 
-            string titleId = reader.ReadTicketString(); // Read the string
-            titleId = titleId.Substring(7); // Trim UP9000-
-            titleId = titleId.Substring(0, titleId.Length - 3); // Trim _00 at the end
+            npTicket.titleId = npTicket.titleId.Substring(7); // Trim UP9000-
+            npTicket.titleId = npTicket.titleId.Substring(0, npTicket.titleId.Length - 3); // Trim _00 at the end
+            // Data now (hopefully): BCUS98245
 
             #if DEBUG
-            Logger.Log($"titleId is {titleId}", LoggerLevelLogin.Instance);
+            Logger.Log($"titleId is {npTicket.titleId}", LoggerLevelLogin.Instance);
             #endif
 
-            npTicket.GameVersion = GameVersionHelper.FromTitleId(titleId); // Finally, convert it to GameVersion
+            npTicket.GameVersion = GameVersionHelper.FromTitleId(npTicket.titleId); // Finally, convert it to GameVersion
+
+            if (npTicket.GameVersion == GameVersion.Unknown)
+            {
+                Logger.Log($"Could not determine game version from title id {npTicket.titleId}", LoggerLevelLogin.Instance);
+                return null;
+            }
 
             // Production PSN Issuer ID: 0x100
             // RPCN Issuer ID:           0x33333333
@@ -110,18 +144,6 @@ public class NPTicket
                 0x33333333 => Platform.RPCS3,
                 _ => Platform.Unknown,
             };
-
-            if (npTicket.Platform == Platform.Unknown)
-            {
-                Logger.Log($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LoggerLevelLogin.Instance);
-                return null;
-            }
-
-            if (npTicket.GameVersion == GameVersion.Unknown)
-            {
-                Logger.Log($"Could not determine game version from title id {titleId}", LoggerLevelLogin.Instance);
-                return null;
-            }
 
             #if DEBUG
             Logger.Log("npTicket data:", LoggerLevelLogin.Instance);
