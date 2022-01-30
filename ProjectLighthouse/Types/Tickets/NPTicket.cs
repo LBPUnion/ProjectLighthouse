@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -112,12 +111,6 @@ public class NPTicket
                 default: throw new NotImplementedException();
             }
 
-            if (npTicket.Platform == Platform.Unknown)
-            {
-                Logger.Log($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LoggerLevelLogin.Instance);
-                return null;
-            }
-
             // We already read the title id, however we need to do some post-processing to get what we want.
             // Current data: UP9000-BCUS98245_00
             // We need to chop this to get the titleId we're looking for 
@@ -146,10 +139,18 @@ public class NPTicket
                 _ => Platform.Unknown,
             };
 
+            if (npTicket.Platform == Platform.Unknown)
+            {
+                Logger.Log($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LoggerLevelLogin.Instance);
+                return null;
+            }
+
+            #if DEBUG
             if (npTicket.GameVersion == GameVersion.LittleBigPlanetVita)
             {
-                Debug.Assert(npTicket.Platform == Platform.Vita);
+                Logger.Log($"Platform for vita ticket is {npTicket.Platform}", LoggerLevelLogin.Instance);
             }
+            #endif
 
             #if DEBUG
             Logger.Log("npTicket data:", LoggerLevelLogin.Instance);
