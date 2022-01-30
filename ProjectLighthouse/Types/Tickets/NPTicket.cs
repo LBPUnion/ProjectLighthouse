@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -144,6 +145,11 @@ public class NPTicket
                 0x33333333 => Platform.RPCS3,
                 _ => Platform.Unknown,
             };
+
+            if (npTicket.GameVersion == GameVersion.LittleBigPlanetVita)
+            {
+                Debug.Assert(npTicket.Platform == Platform.Vita);
+            }
 
             #if DEBUG
             Logger.Log("npTicket data:", LoggerLevelLogin.Instance);
