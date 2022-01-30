@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Helpers.Extensions;
@@ -89,8 +90,9 @@ public class NPTicket
             reader.ReadTicketString(); // Domain
 
             // Title ID, kinda..
-            // Data: "UP9000-BCUS98245_00
-            string titleId = reader.ReadTicketString();
+            // Data: UP9000-BCUS98245_00
+            // We need to chop this to get the titleId we're looking for 
+            string titleId = reader.ReadTicketString(); // Read the string
             titleId = titleId.Substring(7); // Trim UP9000-
             titleId = titleId.Substring(0, titleId.Length - 3); // Trim _00 at the end
 
@@ -121,10 +123,30 @@ public class NPTicket
                 return null;
             }
 
+            #if DEBUG
+            Logger.Log("npTicket data:", LoggerLevelLogin.Instance);
+            foreach (string line in JsonSerializer.Serialize(npTicket).Split('\n'))
+            {
+                Logger.Log(line, LoggerLevelLogin.Instance);
+            }
+            #endif
+
             return npTicket;
         }
-        catch
+        catch(Exception e)
         {
+            Logger.Log("Failed to read npTicket!", LoggerLevelLogin.Instance);
+            Logger.Log("Either this is spam data, or the more likely that this is a bug.", LoggerLevelLogin.Instance);
+            Logger.Log
+            (
+                "Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues",
+                LoggerLevelLogin.Instance
+            );
+
+            foreach (string line in e.ToDetailedException().Split('\n'))
+            {
+                Logger.Log(line, LoggerLevelLogin.Instance);
+            }
             return null;
         }
     }
