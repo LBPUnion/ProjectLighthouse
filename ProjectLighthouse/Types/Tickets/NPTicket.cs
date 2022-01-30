@@ -139,18 +139,13 @@ public class NPTicket
                 _ => Platform.Unknown,
             };
 
+            if (npTicket.Platform == Platform.PS3 && npTicket.GameVersion == GameVersion.LittleBigPlanetVita) npTicket.Platform = Platform.Vita;
+
             if (npTicket.Platform == Platform.Unknown)
             {
                 Logger.Log($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LoggerLevelLogin.Instance);
                 return null;
             }
-
-            #if DEBUG
-            if (npTicket.GameVersion == GameVersion.LittleBigPlanetVita)
-            {
-                Logger.Log($"Platform for vita ticket is {npTicket.Platform}", LoggerLevelLogin.Instance);
-            }
-            #endif
 
             #if DEBUG
             Logger.Log("npTicket data:", LoggerLevelLogin.Instance);
