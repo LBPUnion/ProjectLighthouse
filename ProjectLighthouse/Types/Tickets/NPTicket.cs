@@ -33,13 +33,14 @@ public class NPTicket
     /// </summary>
     public static NPTicket? CreateFromBytes(byte[] data)
     {
+        NPTicket npTicket = new();
         #if DEBUG
         if (data[0] == 'u' && ServerStatics.IsUnitTesting)
         {
             string dataStr = Encoding.UTF8.GetString(data);
             if (dataStr.StartsWith("unitTestTicket"))
             {
-                NPTicket npTicket = new()
+                npTicket = new NPTicket
                 {
                     IssuerId = 0,
                     ticketVersion = new Version(0, 0),
@@ -57,7 +58,6 @@ public class NPTicket
         #endif
         try
         {
-            NPTicket npTicket = new();
             using MemoryStream ms = new(data);
             using TicketReader reader = new(ms);
 
@@ -133,13 +133,24 @@ public class NPTicket
 
             return npTicket;
         }
+        catch(NotImplementedException)
+        {
+            Logger.Log($"The ticket version {npTicket.ticketVersion} is not implemented yet.", LoggerLevelLogin.Instance);
+            Logger.Log
+            (
+                "Please let us know that this is a ticket version that is actually used on our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues !",
+                LoggerLevelLogin.Instance
+            );
+
+            return null;
+        }
         catch(Exception e)
         {
             Logger.Log("Failed to read npTicket!", LoggerLevelLogin.Instance);
             Logger.Log("Either this is spam data, or the more likely that this is a bug.", LoggerLevelLogin.Instance);
             Logger.Log
             (
-                "Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues",
+                "Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues!",
                 LoggerLevelLogin.Instance
             );
 
