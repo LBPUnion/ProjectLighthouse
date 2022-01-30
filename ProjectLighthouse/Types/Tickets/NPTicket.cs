@@ -94,6 +94,13 @@ public class NPTicket
 
             reader.ReadUInt16BE(); // Ticket length, we don't care about this
 
+            #if DEBUG
+            SectionHeader bodyHeader = reader.ReadSectionHeader();
+            Logger.Log($"bodyHeader.Type is {bodyHeader.Type}", LoggerLevelLogin.Instance);
+            #else
+            reader.ReadSectionHeader();
+            #endif
+
             switch (npTicket.ticketVersion)
             {
                 case "2.1":
@@ -104,13 +111,6 @@ public class NPTicket
                     break;
                 default: throw new NotImplementedException();
             }
-
-            #if DEBUG
-            SectionHeader bodyHeader = reader.ReadSectionHeader();
-            Logger.Log($"bodyHeader.Type is {bodyHeader.Type}", LoggerLevelLogin.Instance);
-            #else
-            reader.ReadSectionHeader();
-            #endif
 
             if (npTicket.Platform == Platform.Unknown)
             {
