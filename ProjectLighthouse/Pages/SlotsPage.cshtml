@@ -10,6 +10,14 @@
 
 <p>There are @Model.SlotCount total levels!</p>
 
+<form action="/slots/0">
+    <div class="ui icon input">
+        <input type="text" name="name" placeholder="Search levels..." value="@Model.SearchValue">
+        <i class="search icon"></i>
+    </div>
+</form>
+<div class="ui divider"></div>
+
 @foreach (Slot slot in Model.Slots)
 {
     bool isMobile = Model.Request.IsMobile();
@@ -34,10 +42,10 @@
 
 @if (Model.PageNumber != 0)
 {
-    <a href="/slots/@(Model.PageNumber - 1)">Previous Page</a>
+    <a href="/slots/@(Model.PageNumber - 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Previous Page</a>
 }
 @(Model.PageNumber + 1) / @(Model.PageAmount)
 @if (Model.PageNumber < Model.PageAmount - 1)
 {
-    <a href="/slots/@(Model.PageNumber + 1)">Next Page</a>
+    <a href="/slots/@(Model.PageNumber + 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Next Page</a>
 }

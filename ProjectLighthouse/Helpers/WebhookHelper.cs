@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class WebhookHelper
 {
-    private static readonly DiscordWebhookClient client = new(ServerSettings.Instance.DiscordWebhookUrl);
+    private static readonly DiscordWebhookClient client = (ServerSettings.Instance.DiscordWebhookEnabled ? new DiscordWebhookClient(ServerSettings.Instance.DiscordWebhookUrl) : null);
     public static readonly Color UnionColor = new(0, 140, 255);
 
     public static Task SendWebhook(EmbedBuilder builder) => SendWebhook(builder.Build());

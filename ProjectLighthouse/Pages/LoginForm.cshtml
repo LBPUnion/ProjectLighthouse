@@ -11,9 +11,9 @@
 
 <script>
     function onSubmit(form) {
-        const password = form['password'];
-        
-        password.value = sha256(password.value);
+        const passwordHashed = document.getElementById("password");
+        const passwordOriginal = document.getElementById("password-original");
+        passwordHashed.value = sha256(passwordOriginal.value);
         
         return true;
     }
@@ -43,7 +43,8 @@
     <div class="field">
         <label>Password</label>
         <div class="ui left icon input">
-            <input type="password" name="password" id="password" placeholder="Password">
+            <input type="password" id="password-original" placeholder="Password">
+            <input type="hidden" name="password" id="password">
             <i class="lock icon"></i>
         </div>
     </div>
