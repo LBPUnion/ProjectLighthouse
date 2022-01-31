@@ -12,10 +12,10 @@
     function onSubmit(form) {
         const passwordInput = document.getElementById("password");
         const confirmPasswordInput = document.getElementById("confirmPassword");
-        const password = document.getElementById("password-submit");
-        const confirmPassword = document.getElementById("confirm-submit");
-        password.value = sha256(passwordInput.value);
-        confirmPassword.value = sha256(confirmPasswordInput.value);
+        const passwordSubmit = document.getElementById("password-submit");
+        const confirmPasswordSubmit = document.getElementById("confirm-submit");
+        passwordSubmit.value = sha256(passwordInput.value);
+        confirmPasswordSubmit.value = sha256(confirmPasswordInput.value);
         
         return true;
     }

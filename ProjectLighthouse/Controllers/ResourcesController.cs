@@ -57,10 +57,6 @@ public class ResourcesController : ControllerBase
     {
         string path = $"png/{hash}.png";
 
-        if (!IOFile.Exists("png"))
-        {
-             FileHelper.EnsureDirectoryCreated(Path.Combine(Environment.CurrentDirectory, "png"));
-        }
         if (IOFile.Exists(path))
         {
             return this.File(IOFile.OpenRead(path), "image/png");

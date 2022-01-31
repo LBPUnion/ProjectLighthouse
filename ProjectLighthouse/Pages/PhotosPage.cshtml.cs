@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ public class PhotosPage : BaseLayout
     public PhotosPage([NotNull] Database database) : base(database)
     {}
 
-    public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string name)
+    public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
     {
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
