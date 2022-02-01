@@ -10,17 +10,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Controllers.Api;
 
-public class GetSlotsEndpoint : ApiEndpoint
+public class SlotEndpoints : ApiEndpointController
 {
     private readonly Database database;
 
-    public GetSlotsEndpoint(Database database)
+    public SlotEndpoints(Database database)
     {
         this.database = database;
     }
 
     [HttpGet("slots")]
-    public async Task<IActionResult> OnGet([FromQuery] int limit = 20, [FromQuery] int skip = 0)
+    public async Task<IActionResult> GetSlots([FromQuery] int limit = 20, [FromQuery] int skip = 0)
     {
         limit = Math.Min(ServerStatics.PageSize, limit);
 
@@ -28,5 +28,14 @@ public class GetSlotsEndpoint : ApiEndpoint
             (MinimalSlot.FromSlot);
 
         return this.Ok(minimalSlots);
+    }
+
+    [HttpGet("slot/{id:int}")]
+    public async Task<IActionResult> GetSlot(int id)
+    {
+        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(u => u.SlotId == id);
+        if (slot == null) return this.NotFound();
+
+        return this.Ok(slot);
     }
 }

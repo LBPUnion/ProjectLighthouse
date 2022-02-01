@@ -235,7 +235,7 @@ public class SlotsController : ControllerBase
 
         Random rand = new();
 
-        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+        IEnumerable<Slot> slots = this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending(s => s.Thumbsup)
             .ThenBy(_ => rand.Next())
@@ -279,14 +279,14 @@ public class SlotsController : ControllerBase
 
         Random rand = new();
 
-        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+        IEnumerable<Slot> slots = this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending
             (
                 // probably not the best way to do this?
                 s =>
                 {
-                    return this.GetGameFilter(gameFilterType, token.GameVersion) switch
+                    return this.getGameFilter(gameFilterType, token.GameVersion) switch
                     {
                         GameVersion.LittleBigPlanet1 => s.PlaysLBP1Unique,
                         GameVersion.LittleBigPlanet2 => s.PlaysLBP2Unique,
@@ -337,7 +337,7 @@ public class SlotsController : ControllerBase
 
         Random rand = new();
 
-        IEnumerable<Slot> slots = this.FilterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+        IEnumerable<Slot> slots = this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending(s => s.Hearts)
             .ThenBy(_ => rand.Next())
@@ -365,7 +365,7 @@ public class SlotsController : ControllerBase
         );
     }
 
-    public GameVersion GetGameFilter(string? gameFilterType, GameVersion version)
+    private GameVersion getGameFilter(string? gameFilterType, GameVersion version)
     {
         if (version == GameVersion.LittleBigPlanetVita) return GameVersion.LittleBigPlanetVita;
         if (version == GameVersion.LittleBigPlanetPSP) return GameVersion.LittleBigPlanetPSP;
@@ -381,7 +381,7 @@ public class SlotsController : ControllerBase
         };
     }
 
-    public IQueryable<Slot> FilterByRequest(string? gameFilterType, string? dateFilterType, GameVersion version)
+    private IQueryable<Slot> filterByRequest(string? gameFilterType, string? dateFilterType, GameVersion version)
     {
         string _dateFilterType = dateFilterType ?? "";
 
@@ -392,7 +392,7 @@ public class SlotsController : ControllerBase
             _ => 0,
         };
 
-        GameVersion gameVersion = this.GetGameFilter(gameFilterType, version);
+        GameVersion gameVersion = this.getGameFilter(gameFilterType, version);
 
         IQueryable<Slot> whereSlots;
 

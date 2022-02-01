@@ -38,7 +38,7 @@ public class PublishController : ControllerBase
 
         if (user.UsedSlots >= ServerSettings.Instance.EntitledSlots) return this.BadRequest();
 
-        Slot? slot = await this.GetSlotFromBody();
+        Slot? slot = await this.getSlotFromBody();
         if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
         if (string.IsNullOrEmpty(slot.RootLevel)) return this.BadRequest();
@@ -79,7 +79,7 @@ public class PublishController : ControllerBase
 
         if (user.UsedSlots >= ServerSettings.Instance.EntitledSlots) return this.BadRequest();
 
-        Slot? slot = await this.GetSlotFromBody();
+        Slot? slot = await this.getSlotFromBody();
         if (slot?.Location == null) return this.BadRequest();
 
         // Republish logic
@@ -186,7 +186,7 @@ public class PublishController : ControllerBase
         return this.Ok();
     }
 
-    public async Task<Slot?> GetSlotFromBody()
+    private async Task<Slot?> getSlotFromBody()
     {
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();

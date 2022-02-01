@@ -91,7 +91,7 @@ public class ReviewController : ControllerBase
         if (user == null) return this.StatusCode(403, "");
 
         Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
-        Review? newReview = await this.GetReviewFromBody();
+        Review? newReview = await this.getReviewFromBody();
         if (newReview == null) return this.BadRequest();
 
         if (review == null)
@@ -317,7 +317,7 @@ public class ReviewController : ControllerBase
         return this.Ok();
     }
 
-    public async Task<Review?> GetReviewFromBody()
+    private async Task<Review?> getReviewFromBody()
     {
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();

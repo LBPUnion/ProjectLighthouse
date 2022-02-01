@@ -80,7 +80,7 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        string myRanking = this.GetScores(score.SlotId, score.Type, user);
+        string myRanking = this.getScores(score.SlotId, score.Type, user);
 
         return this.Ok(myRanking);
     }
@@ -99,11 +99,11 @@ public class ScoreController : ControllerBase
 
         if (user == null) return this.StatusCode(403, "");
 
-        return this.Ok(this.GetScores(slotId, type, user, pageStart, pageSize));
+        return this.Ok(this.getScores(slotId, type, user, pageStart, pageSize));
     }
 
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    public string GetScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
+    private string getScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
     {
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT

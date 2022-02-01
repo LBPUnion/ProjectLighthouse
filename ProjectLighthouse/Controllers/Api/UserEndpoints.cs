@@ -6,17 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Controllers.Api;
 
-public class GetUserEndpoint : ApiEndpoint
+public class UserEndpoints : ApiEndpointController
 {
     private readonly Database database;
 
-    public GetUserEndpoint(Database database)
+    public UserEndpoints(Database database)
     {
         this.database = database;
     }
 
     [HttpGet("user/{id:int}")]
-    public async Task<IActionResult> OnGet(int id)
+    public async Task<IActionResult> GetUser(int id)
     {
         User? user = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (user == null) return this.NotFound();

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Controllers.Api;
 
-public class StatisticsEndpoint : ApiEndpoint
+public class StatisticsEndpoints : ApiEndpointController
 {
     [HttpGet("statistics")]
     public async Task<IActionResult> OnGet()

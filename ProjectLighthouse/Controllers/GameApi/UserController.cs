@@ -26,7 +26,7 @@ public class UserController : ControllerBase
         this.database = database;
     }
 
-    public async Task<string?> GetSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
+    private async Task<string?> getSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
         User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
         return user?.Serialize(gameVersion);
@@ -38,7 +38,7 @@ public class UserController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        string? user = await this.GetSerializedUser(username, token.GameVersion);
+        string? user = await this.getSerializedUser(username, token.GameVersion);
         if (user == null) return this.NotFound();
 
         return this.Ok(user);
@@ -51,7 +51,7 @@ public class UserController : ControllerBase
         if (token == null) return this.StatusCode(403, "");
 
         List<string?> serializedUsers = new();
-        foreach (string userId in u) serializedUsers.Add(await this.GetSerializedUser(userId, token.GameVersion));
+        foreach (string userId in u) serializedUsers.Add(await this.getSerializedUser(userId, token.GameVersion));
 
         string serialized = serializedUsers.Aggregate(string.Empty, (current, user) => user == null ? current : current + user);
 
