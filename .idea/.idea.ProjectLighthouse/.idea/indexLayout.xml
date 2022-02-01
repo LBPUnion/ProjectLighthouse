@@ -6,6 +6,7 @@
       <Path>.github</Path>
       <Path>.gitignore</Path>
       <Path>.idea</Path>
+      <Path>CONTRIBUTING.md</Path>
       <Path>DatabaseMigrations</Path>
       <Path>ProjectLighthouse.sln.DotSettings</Path>
       <Path>ProjectLighthouse.sln.DotSettings.user</Path>

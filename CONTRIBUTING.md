@@ -91,3 +91,10 @@ Keep in mind while running database tests (which most tests are) you need to hav
   formatting changes, etc.
 - When creating your first pull request, CI will not run initially. A team member will have to approve you for use of
   running CI on a pull request. This is because of GitHub policy.
+
+### API Documentation
+
+You can access API documentation by looking at the XMLDoc in the controllers under `ProjectLighthouse.Controllers.Api`
+
+You can also access an interactive version by starting Lighthouse and accessing Swagger
+at `http://localhost:10060/swagger/index.html`.
