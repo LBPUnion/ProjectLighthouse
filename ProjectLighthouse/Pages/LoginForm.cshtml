@@ -14,7 +14,7 @@
         const passwordInput = document.getElementById("password");
         const passwordSubmit = document.getElementById("password-submit");
         
-        passwordSubmit.value = sha256(passwordInput);
+        passwordSubmit.value = sha256(passwordInput.value);
         
         return true;
     }
