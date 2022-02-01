@@ -2,7 +2,7 @@ using System;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Controllers;
+namespace LBPUnion.ProjectLighthouse.Controllers.GameApi.Slots;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/tags")]

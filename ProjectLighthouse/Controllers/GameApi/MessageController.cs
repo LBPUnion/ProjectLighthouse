@@ -8,7 +8,7 @@ using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Controllers;
+namespace LBPUnion.ProjectLighthouse.Controllers.GameApi;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/")]
@@ -38,13 +38,13 @@ public class MessageController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
         #else
-            (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
-            if (userAndToken == null) return this.StatusCode(403, "");
+        if (userAndToken == null) return this.StatusCode(403, "");
 
-            // ReSharper disable once PossibleInvalidOperationException
-            User user = userAndToken.Value.Item1;
-            GameToken gameToken = userAndToken.Value.Item2;
+        // ReSharper disable once PossibleInvalidOperationException
+        User user = userAndToken.Value.Item1;
+        GameToken gameToken = userAndToken.Value.Item2;
         #endif
 
         string announceText = ServerSettings.Instance.AnnounceText;
@@ -56,13 +56,13 @@ public class MessageController : ControllerBase
         (
             announceText +
             #if DEBUG
-                "\n\n---DEBUG INFO---\n" +
-                $"user.UserId: {user.UserId}\n" +
-                $"token.Approved: {gameToken.Approved}\n" +
-                $"token.Used: {gameToken.Used}\n" +
-                $"token.UserLocation: {gameToken.UserLocation}\n" +
-                $"token.GameVersion: {gameToken.GameVersion}\n" +
-                "---DEBUG INFO---" +
+            "\n\n---DEBUG INFO---\n" +
+            $"user.UserId: {user.UserId}\n" +
+            $"token.Approved: {gameToken.Approved}\n" +
+            $"token.Used: {gameToken.Used}\n" +
+            $"token.UserLocation: {gameToken.UserLocation}\n" +
+            $"token.GameVersion: {gameToken.GameVersion}\n" +
+            "---DEBUG INFO---" +
             #endif
             "\n"
         );

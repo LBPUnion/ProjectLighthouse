@@ -12,7 +12,7 @@ using LBPUnion.ProjectLighthouse.Types.Files;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
 
-namespace LBPUnion.ProjectLighthouse.Controllers;
+namespace LBPUnion.ProjectLighthouse.Controllers.GameApi.Resources;
 
 [ApiController]
 [Produces("text/xml")]

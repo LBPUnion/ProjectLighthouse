@@ -14,7 +14,7 @@ using LBPUnion.ProjectLighthouse.Types.Match;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Controllers;
+namespace LBPUnion.ProjectLighthouse.Controllers.GameApi.Matching;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/")]
