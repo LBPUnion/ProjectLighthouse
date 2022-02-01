@@ -17,6 +17,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
+#if RELEASE
+using Microsoft.Extensions.Hosting.Internal;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Startup;
 
