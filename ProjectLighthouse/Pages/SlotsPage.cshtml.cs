@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,20 +23,26 @@ public class SlotsPage : BaseLayout
     public int SlotCount;
 
     public List<Slot> Slots;
+
+    public string SearchValue;
+
     public SlotsPage([NotNull] Database database) : base(database)
     {}
 
-    public async Task<IActionResult> OnGet([FromRoute] int pageNumber)
+    public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
     {
-        this.SlotCount = await StatisticsHelper.SlotCount();
+        if (string.IsNullOrWhiteSpace(name)) name = "";
 
+        this.SlotCount = await this.Database.Slots.CountAsync(p => p.Name.Contains(name));
+
+        this.SearchValue = name;
         this.PageNumber = pageNumber;
-        this.PageAmount = (int)Math.Ceiling((double)this.SlotCount / ServerStatics.PageSize);
+        this.PageAmount = Math.Max(1, (int) Math.Ceiling((double) this.SlotCount / ServerStatics.PageSize));
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount) return this.Redirect($"/slots/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
-        this.Slots = await this.Database.Slots.Include
-                (p => p.Creator)
+        this.Slots = await this.Database.Slots.Where
+                (p => p.Name.Contains(name))
             .OrderByDescending(p => p.FirstUploaded)
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)

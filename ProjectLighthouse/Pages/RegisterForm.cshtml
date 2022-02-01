@@ -10,11 +10,12 @@
 
 <script>
     function onSubmit(form) {
-        const password = form['password'];
-        const confirmPassword = form['confirmPassword'];
-        
-        password.value = sha256(password.value);
-        confirmPassword.value = sha256(confirmPassword.value);
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const passwordSubmit = document.getElementById("password-submit");
+        const confirmPasswordSubmit = document.getElementById("confirm-submit");
+        passwordSubmit.value = sha256(passwordInput.value);
+        confirmPasswordSubmit.value = sha256(confirmPasswordInput.value);
         
         return true;
     }
@@ -44,7 +45,8 @@
     <div class="field">
         <label>Password</label>
         <div class="ui left icon input">
-            <input type="password" name="password" id="password" placeholder="Password">
+            <input type="password" id="password" placeholder="Password">
+            <input type="hidden" name="password" id="password-submit">
             <i class="lock icon"></i>
         </div>
     </div>
@@ -52,7 +54,8 @@
     <div class="field">
         <label>Confirm Password</label>
         <div class="ui left icon input">
-            <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <input type="hidden" name="confirmPassword" id="confirm-submit">
             <i class="lock icon"></i>
         </div>
     </div>
