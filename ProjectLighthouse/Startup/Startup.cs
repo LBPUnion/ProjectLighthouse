@@ -1,5 +1,7 @@
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -60,6 +62,7 @@ public class Startup
         (
             c =>
             {
+                // Give swagger the name and version of our project
                 c.SwaggerDoc
                 (
                     "v1",
@@ -69,7 +72,13 @@ public class Startup
                         Version = "v1",
                     }
                 );
+
+                // Filter out endpoints not in /api/v1
                 c.DocumentFilter<SwaggerFilter>();
+
+                // Add XMLDoc to swagger
+                string xmlDocs = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlDocs));
             }
         );
 
