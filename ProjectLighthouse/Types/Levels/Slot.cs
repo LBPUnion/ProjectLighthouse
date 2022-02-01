@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -19,6 +20,7 @@ public class Slot
 {
     [XmlAttribute("type")]
     [NotMapped]
+    [JsonIgnore]
     public string Type { get; set; } = "user";
 
     [Key]
@@ -35,24 +37,29 @@ public class Slot
     public string IconHash { get; set; } = "";
 
     [XmlElement("rootLevel")]
+    [JsonIgnore]
     public string RootLevel { get; set; } = "";
 
+    [JsonIgnore]
     public string ResourceCollection { get; set; } = "";
 
     [NotMapped]
     [XmlElement("resource")]
+    [JsonIgnore]
     public string[] Resources {
         get => this.ResourceCollection.Split(",");
         set => this.ResourceCollection = string.Join(',', value);
     }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int LocationId { get; set; }
 
     [XmlIgnore]
     public int CreatorId { get; set; }
 
     [ForeignKey(nameof(CreatorId))]
+    [JsonIgnore]
     public User? Creator { get; set; }
 
     /// <summary>
@@ -60,6 +67,7 @@ public class Slot
     /// </summary>
     [XmlElement("location")]
     [ForeignKey(nameof(LocationId))]
+    [JsonIgnore]
     public Location? Location { get; set; }
 
     [XmlElement("initiallyLocked")]
@@ -78,6 +86,7 @@ public class Slot
     public string AuthorLabels { get; set; } = "";
 
     [XmlElement("background")]
+    [JsonIgnore]
     public string BackgroundHash { get; set; } = "";
 
     [XmlElement("minPlayers")]
@@ -103,6 +112,7 @@ public class Slot
 
     [XmlIgnore]
     [NotMapped]
+    [JsonIgnore]
     public int Hearts {
         get {
             using Database database = new();
@@ -124,42 +134,55 @@ public class Slot
     public int PlaysComplete => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete + this.PlaysLBPVitaComplete;
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP1 { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP1Complete { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP1Unique { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP2 { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP2Complete { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP2Unique { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP3 { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP3Complete { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBP3Unique { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBPVita { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBPVitaComplete { get; set; }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int PlaysLBPVitaUnique { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     [XmlElement("thumbsup")]
     public int Thumbsup {
         get {
@@ -170,6 +193,7 @@ public class Slot
     }
 
     [NotMapped]
+    [JsonIgnore]
     [XmlElement("thumbsdown")]
     public int Thumbsdown {
         get {
@@ -180,6 +204,7 @@ public class Slot
     }
 
     [NotMapped]
+    [JsonPropertyName("averageRating")]
     [XmlElement("averageRating")]
     public double RatingLBP1 {
         get {
@@ -193,6 +218,7 @@ public class Slot
     }
 
     [NotMapped]
+    [JsonIgnore]
     [XmlElement("reviewCount")]
     public int ReviewCount {
         get {

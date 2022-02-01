@@ -24,7 +24,7 @@ public class StatisticsController : ControllerBase
     public async Task<IActionResult> PlanetStats()
     {
         int totalSlotCount = await StatisticsHelper.SlotCount();
-        int mmPicksCount = await StatisticsHelper.MMPicksCount();
+        int mmPicksCount = await StatisticsHelper.TeamPickCount();
 
         return this.Ok
         (

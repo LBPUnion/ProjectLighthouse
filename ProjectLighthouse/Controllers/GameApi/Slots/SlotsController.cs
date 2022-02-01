@@ -177,7 +177,7 @@ public class SlotsController : ControllerBase
                         "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
                     },
                     {
-                        "total", await StatisticsHelper.MMPicksCount()
+                        "total", await StatisticsHelper.TeamPickCount()
                     },
                 }
             )
