@@ -9,6 +9,14 @@
 
 <p>There are @Model.PhotoCount total photos!</p>
 
+<form action="/photos/0">
+    <div class="ui icon input">
+        <input type="text" name="name" placeholder="Search photos..." value="@Model.SearchValue">
+        <i class="search icon"></i>
+    </div>
+</form>
+<div class="ui divider"></div>
+
 @foreach (Photo photo in Model.Photos)
 {
     <div class="ui segment">
@@ -18,10 +26,10 @@
 
 @if (Model.PageNumber != 0)
 {
-    <a href="/photos/@(Model.PageNumber - 1)">Previous Page</a>
+    <a href="/photos/@(Model.PageNumber - 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Previous Page</a>
 }
 @(Model.PageNumber + 1) / @(Model.PageAmount)
 @if (Model.PageNumber < Model.PageAmount - 1)
 {
-    <a href="/photos/@(Model.PageNumber + 1)">Next Page</a>
+    <a href="/photos/@(Model.PageNumber + 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Next Page</a>
 }
