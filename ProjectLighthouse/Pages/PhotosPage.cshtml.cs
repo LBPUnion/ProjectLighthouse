@@ -39,8 +39,7 @@ public class PhotosPage : BaseLayout
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount) return this.Redirect($"/photos/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
-        this.Photos = await this.Database.Photos.Include
-                (p => p.Creator)
+        this.Photos = await this.Database.Photos.Include(p => p.Creator)
             .Where(p => p.Creator.Username.Contains(name) || p.PhotoSubjectCollection.Contains(name))
             .OrderByDescending(p => p.Timestamp)
             .Skip(pageNumber * ServerStatics.PageSize)
