@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.Json.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -13,11 +14,17 @@ public class User
     public readonly ClientsConnected ClientsConnected = new();
     public int UserId { get; set; }
     public string Username { get; set; }
+
+    [JsonIgnore]
     public string Password { get; set; }
+
     public string IconHash { get; set; }
+
+    [JsonIgnore]
     public int Game { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public int Lists => 0;
 
     /// <summary>
@@ -26,6 +33,7 @@ public class User
     public string Biography { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public string WebsiteAvatarHash {
         get {
             string avatarHash = this.IconHash;
@@ -40,6 +48,7 @@ public class User
     }
 
     [NotMapped]
+    [JsonIgnore]
     public int Reviews {
         get {
             using Database database = new();
@@ -48,6 +57,7 @@ public class User
     }
 
     [NotMapped]
+    [JsonIgnore]
     public int Comments {
         get {
             using Database database = new();
@@ -56,6 +66,7 @@ public class User
     }
 
     [NotMapped]
+    [JsonIgnore]
     public int PhotosByMe {
         get {
             using Database database = new();
@@ -64,6 +75,7 @@ public class User
     }
 
     [NotMapped]
+    [JsonIgnore]
     public int PhotosWithMe {
         get {
             using Database database = new();
@@ -71,15 +83,18 @@ public class User
         }
     }
 
+    [JsonIgnore]
     public int LocationId { get; set; }
 
     /// <summary>
     ///     The location of the profile card on the user's earth
     /// </summary>
     [ForeignKey("LocationId")]
+    [JsonIgnore]
     public Location Location { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public int HeartedLevels {
         get {
             using Database database = new();
@@ -88,6 +103,7 @@ public class User
     }
 
     [NotMapped]
+    [JsonIgnore]
     public int HeartedUsers {
         get {
             using Database database = new();
@@ -96,6 +112,7 @@ public class User
     }
 
     [NotMapped]
+    [JsonIgnore]
     public int QueuedLevels {
         get {
             using Database database = new();
@@ -103,10 +120,13 @@ public class User
         }
     }
 
+    [JsonIgnore]
     public string Pins { get; set; } = "";
 
+    [JsonIgnore]
     public string PlanetHash { get; set; } = "";
 
+    [JsonIgnore]
     public int Hearts {
         get {
             using Database database = new();
@@ -115,8 +135,10 @@ public class User
         }
     }
 
+    [JsonIgnore]
     public bool IsAdmin { get; set; } = false;
 
+    [JsonIgnore]
     public bool PasswordResetRequired { get; set; }
 
     public string YayHash { get; set; } = "";
@@ -125,6 +147,7 @@ public class User
 
     #nullable enable
     [NotMapped]
+    [JsonIgnore]
     public string Status {
         get {
             using Database database = new();
@@ -139,8 +162,10 @@ public class User
     }
     #nullable disable
 
+    [JsonIgnore]
     public bool Banned { get; set; }
 
+    [JsonIgnore]
     public string BannedReason { get; set; }
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
@@ -178,6 +203,7 @@ public class User
     ///     The number of used slots on the earth
     /// </summary>
     [NotMapped]
+    [JsonIgnore]
     public int UsedSlots {
         get {
             using Database database = new();
@@ -194,6 +220,7 @@ public class User
     /// <summary>
     ///     The number of slots remaining on the earth
     /// </summary>
+    [JsonIgnore]
     public int FreeSlots => ServerSettings.Instance.EntitledSlots - this.UsedSlots;
 
     private static readonly string[] slotTypes =

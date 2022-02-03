@@ -10,6 +10,7 @@
     await using Database database = new();
 
     string slotName = string.IsNullOrEmpty(Model.Name) ? "Unnamed Level" : Model.Name;
+    bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
 
     bool isQueued = false;
     bool isHearted = false;
@@ -27,23 +28,26 @@
     string iconHash = Model.IconHash;
     if (string.IsNullOrWhiteSpace(iconHash) || iconHash.StartsWith('g')) iconHash = ServerSettings.Instance.MissingIconHash;
 }
-<div style="display: flex; width: 100%;">
-    <div style="margin-right: 10px; background-image: url('/gameAssets/@iconHash'); height: 100px; width: 100px; background-size: cover; background-position: center; border-radius: 100%;">
+<div class="card">
+    @{
+        int size = isMobile ? 50 : 100;
+    }
+    <div class="cardIcon slotCardIcon" style="background-image: url('/gameAssets/@iconHash'); min-width: @(size)px; width: @(size)px; height: @(size)px">
     </div>
-    <div style="height: fit-content; vertical-align: center; align-self: center">
+    <div class="cardStats">
         @if (showLink)
         {
-            <h2 style="margin-bottom: 2px;">
+            <h2>
                 <a href="~/slot/@Model.SlotId">@slotName</a>
             </h2>
         }
         else
         {
-            <h1 style="margin-bottom: 2px;">
+            <h1>
                 @slotName
             </h1>
         }
-        <div class="statsUnderTitle" style="margin-bottom: 10px;">
+        <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
             <i class="blue play icon" title="Plays"></i> <span>@Model.Plays</span>
             <i class="green thumbs up icon" title="Yays"></i> <span>@Model.Thumbsup</span>
@@ -59,7 +63,7 @@
             <i>Created by <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a> for @Model.GameVersion.ToPrettyString()</i>
         </p>
     </div>
-    <div style="height: 100px; margin-left: auto">
+    <div class="cardButtons">
         <br>
         @if (user != null)
         {

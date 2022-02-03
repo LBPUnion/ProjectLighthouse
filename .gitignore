@@ -28,6 +28,7 @@ gitVersion.txt
 gitRemotes.txt
 gitUnpushed.txt
 logs/*
+npTicket*
 
 # MSBuild stuff
 bin/

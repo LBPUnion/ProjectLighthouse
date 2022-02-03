@@ -1,7 +1,8 @@
 @page "/admin"
 @using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Maintenance
-@using LBPUnion.ProjectLighthouse.Types.Settings
+@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Pages.Admin.AdminPanelPage
 
 @{
@@ -9,61 +10,63 @@
     Model.Title = "Admin Panel";
 }
 
-<a href="/admin/users">
-    <div class="ui blue button">
-        View Users
-    </div>
-</a>
-@if (ServerSettings.Instance.DiscordWebhookEnabled)
+@if (!this.Request.IsMobile())
 {
-    <a href="/admin/testWebhook">
-        <div class="ui blue button">
-            Test Discord Webhook
-        </div>
-    </a>
+    <div class="ui center aligned grid">
+        @foreach (AdminPanelStatistic statistic in Model.Statistics)
+        {
+            @await Html.PartialAsync("Partials/AdminPanelStatisticPartial", statistic)
+        }
+    </div>
+    <br>
+}
+else
+{
+    @foreach (AdminPanelStatistic statistic in Model.Statistics)
+    {
+        @await Html.PartialAsync("Partials/AdminPanelStatisticPartial", statistic)
+        <br>
+    }
 }
 
 <h2>Commands</h2>
-<div class="ui grid">
-    @foreach (ICommand command in MaintenanceHelper.Commands)
-    {
-        <div class="four wide column">
-            <div class="ui blue segment">
-                <h3>@command.Name()</h3>
-                <form>
-                    <div class="ui input" style="width: 100%;">
-                        <input type="text" name="args" placeholder="@command.Arguments()">
-                    </div><br><br>
-                    <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
-                    <button type="submit" class="ui green button" style="width: 100%;">
-                        <i class="play icon"></i>
-                        Execute
-                    </button>
-                </form>
-            </div>
-        </div>
-    }
-</div>
+@foreach (ICommand command in MaintenanceHelper.Commands)
+{
+    <div class="ui blue segment">
+        <h3>@command.Name()</h3>
+        <form>
+            @if (command.RequiredArgs() > 0)
+            {
+                <div class="ui input" style="width: @(Model.Request.IsMobile() ? 100 : 30)%;">
+                    <input type="text" name="args" placeholder="@command.Arguments()">
+                </div>
+                <br>
+                <br>
+            }
+            <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
+            <button type="submit" class="ui green button">
+                <i class="play icon"></i>
+                Execute
+            </button>
+        </form>
+    </div>
+}
 <h2>Maintenance Jobs</h2>
 <p>
     <b>Warning: Interrupting Lighthouse during maintenance may leave the database in an unclean state.</b>
 </p>
 
-<div class="ui grid">
-    @foreach (IMaintenanceJob job in MaintenanceHelper.MaintenanceJobs)
-    {
-        <div class="four wide column">
-            <div class="ui red segment">
-                <h3>@job.Name()</h3>
-                <p>@job.Description()</p>
-                <form>
-                    <input type="text" name="maintenanceJob" style="display: none;" value="@job.GetType().Name">
-                    <button type="submit" class="ui green button" style="width: 100%;">
-                        <i class="play icon"></i>
-                        Execute
-                    </button>
-                </form>
-            </div>
-        </div>
-    }
-</div>
+@foreach (IMaintenanceJob job in MaintenanceHelper.MaintenanceJobs)
+{
+    <div class="ui red segment">
+        <h3>@job.Name()</h3>
+        <p>@job.Description()</p>
+        <form>
+            <input type="text" name="maintenanceJob" style="display: none;" value="@job.GetType().Name">
+            <button type="submit" class="ui green button">
+                <i class="play icon"></i>
+                Run Job
+            </button>
+        </form>
+    </div>
+}

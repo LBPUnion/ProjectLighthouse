@@ -23,6 +23,10 @@ public static class BinaryReaderExtensions
 
     public static int ReadInt32BE(this BinaryReader binRdr) => BitConverter.ToInt32(binRdr.ReadBytesRequired(sizeof(int)).Reverse(), 0);
 
+    public static ulong ReadUInt64BE(this BinaryReader binRdr) => BitConverter.ToUInt32(binRdr.ReadBytesRequired(sizeof(ulong)).Reverse(), 0);
+
+    public static long ReadInt64BE(this BinaryReader binRdr) => BitConverter.ToInt32(binRdr.ReadBytesRequired(sizeof(long)).Reverse(), 0);
+
     public static byte[] ReadBytesRequired(this BinaryReader binRdr, int byteCount)
     {
         byte[] result = binRdr.ReadBytes(byteCount);

@@ -14,7 +14,7 @@ public static class StatisticsHelper
 
     public static async Task<int> UserCount() => await database.Users.CountAsync(u => !u.Banned);
 
-    public static async Task<int> MMPicksCount() => await database.Slots.CountAsync(s => s.TeamPick);
+    public static async Task<int> TeamPickCount() => await database.Slots.CountAsync(s => s.TeamPick);
 
     public static async Task<int> PhotoCount() => await database.Photos.CountAsync();
 }

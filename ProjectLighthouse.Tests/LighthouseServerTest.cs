@@ -37,7 +37,8 @@ public class LighthouseServerTest
                 await database.CreateUser($"{username}{number}", HashHelper.BCryptHash($"unitTestPassword{number}"));
         }
 
-        string stringContent = $"{LoginData.UsernamePrefix}{username}{number}{(char)0x00}";
+        //TODO: generate actual tickets
+        string stringContent = $"unitTestTicket{username}{number}";
 
         HttpResponseMessage response = await this.Client.PostAsync
             ($"/LITTLEBIGPLANETPS3_XML/login?titleID={GameVersionHelper.LittleBigPlanet2TitleIds[0]}", new StringContent(stringContent));

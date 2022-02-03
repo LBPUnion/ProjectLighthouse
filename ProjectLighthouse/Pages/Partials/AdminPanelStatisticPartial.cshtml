@@ -1,0 +1,17 @@
+@model LBPUnion.ProjectLighthouse.Types.AdminPanelStatistic
+
+<div class="three wide column">
+    <div class="ui center aligned blue segment">
+        @if (Model.ViewAllEndpoint != null)
+        {
+            <h2>
+                <a href="/admin/@Model.ViewAllEndpoint">@Model.StatisticNamePlural</a>
+            </h2>
+        }
+        else
+        {
+            <h2>@Model.StatisticNamePlural</h2>
+        }
+        <h3>@Model.Count</h3>
+    </div>
+</div>

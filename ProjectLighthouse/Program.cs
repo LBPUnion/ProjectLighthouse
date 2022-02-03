@@ -82,6 +82,7 @@ public static class Program
             return;
         }
 
+        FileHelper.EnsureDirectoryCreated(Path.Combine(Environment.CurrentDirectory, "png"));
         if (Directory.Exists("r"))
         {
             Logger.Log

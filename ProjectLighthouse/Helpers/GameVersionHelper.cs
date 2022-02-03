@@ -99,6 +99,6 @@ public class GameVersionHelper
         if (LittleBigPlanetVitaTitleIds.Contains(titleId)) return GameVersion.LittleBigPlanetVita;
         if (LittleBigPlanetPSPTitleIds.Contains(titleId)) return GameVersion.LittleBigPlanetPSP;
 
-        return GameVersion.LittleBigPlanet1;
+        return GameVersion.Unknown;
     }
 }

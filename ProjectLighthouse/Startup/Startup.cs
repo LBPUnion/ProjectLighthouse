@@ -1,5 +1,7 @@
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -13,8 +15,11 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Primitives;
+using Microsoft.OpenApi.Models;
+#if RELEASE
+using Microsoft.Extensions.Hosting.Internal;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Startup;
 
@@ -56,6 +61,30 @@ public class Startup
             }
         );
 
+        services.AddSwaggerGen
+        (
+            c =>
+            {
+                // Give swagger the name and version of our project
+                c.SwaggerDoc
+                (
+                    "v1",
+                    new OpenApiInfo
+                    {
+                        Title = "Project Lighthouse API",
+                        Version = "v1",
+                    }
+                );
+
+                // Filter out endpoints not in /api/v1
+                c.DocumentFilter<SwaggerFilter>();
+
+                // Add XMLDoc to swagger
+                string xmlDocs = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlDocs));
+            }
+        );
+
         #if DEBUG
         services.AddSingleton<IHostLifetime, DebugWarmupLifetime>();
         #else
@@ -84,6 +113,15 @@ public class Startup
         #endif
 
         app.UseForwardedHeaders();
+
+        app.UseSwagger();
+        app.UseSwaggerUI
+        (
+            c =>
+            {
+                c.SwaggerEndpoint("v1/swagger.json", "Project Lighthouse API");
+            }
+        );
 
         // Logs every request and the response to it
         // Example: "200, 13ms: GET /LITTLEBIGPLANETPS3_XML/news"
