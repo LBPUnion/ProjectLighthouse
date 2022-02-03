@@ -83,7 +83,7 @@ public class GameVersionHelper
 
     public static readonly string[] LittleBigPlanetVitaTitleIds =
     {
-        "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549", "PCSF00516",
+        "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549", "PCSF00516", "PCSA22018",
     };
 
     public static readonly string[] LittleBigPlanetPSPTitleIds =
