@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings;
@@ -22,6 +23,8 @@ public class ServerSettings
 
         if (File.Exists(ConfigFileName))
         {
+            if (!(StartupConfigCheck = ConfigCheck())) return;
+
             string configFile = File.ReadAllText(ConfigFileName);
 
             Instance = JsonSerializer.Deserialize<ServerSettings>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
@@ -156,6 +159,34 @@ public class ServerSettings
     public int ConfigVersion { get; set; } = CurrentConfigVersion;
 
     public const string ConfigFileName = "lighthouse.config.json";
+
+    public static bool StartupConfigCheck;
+    public static bool ConfigCheck()
+    {
+        #if !DEBUG
+        if (VersionHelper.IsDirty)
+        {
+            string dirtyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".lighthouse");
+            string dirtyFile = Path.Combine(dirtyPath, ".dirty-date");
+            if (File.Exists(dirtyFile))
+            {
+                long timestamp = long.Parse(File.ReadAllText(dirtyFile));
+                if (timestamp + 604800 < TimestampHelper.Timestamp)
+                {
+                    Instance = new ServerSettings();
+                    return false;
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(dirtyPath);
+                File.WriteAllText(dirtyFile, TimestampHelper.Timestamp.ToString());
+            }
+        }
+        #endif
+
+        return true;
+    }
 
     #endregion Meta
 

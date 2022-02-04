@@ -48,6 +48,25 @@
         <EmbeddedResource Include="gitUnpushed.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\outline-icons.woff2"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\outline-icons.woff"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\outline-icons.ttf"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\outline-icons.svg"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\outline-icons.eot"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\icons.woff2"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\icons.woff"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\icons.ttf"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\icons.svg"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\icons.eot"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\brand-icons.woff2"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\brand-icons.woff"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\brand-icons.ttf"/>
+        <None Remove="StaticFiles\css\themes\default\assets\fonts\brand-icons.svg"/>
+        <None Remove="StaticFiles\css\semantic.min.css"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="StaticFiles\css\themes\default\assets\fonts"/>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
