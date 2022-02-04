@@ -11,6 +11,7 @@ using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Match;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -86,6 +87,8 @@ public class MatchController : ControllerBase
             if (playerData.RoomState != null)
                 if (room != null && Equals(room.Host, user))
                     room.State = (RoomState)playerData.RoomState;
+
+            if (ServerSettings.StartupConfigCheck && !ServerSettings.ConfigCheck()) Environment.Exit(0);
         }
 
         if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
