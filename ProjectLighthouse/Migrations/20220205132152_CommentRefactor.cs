@@ -24,7 +24,7 @@ namespace ProjectLighthouse.Migrations
             migrationBuilder.RenameColumn(
                 name: "TargetUserId",
                 table: "Comments",
-                newName: "Type");
+                newName: "TargetId");
 
             migrationBuilder.AddColumn<bool>(
                 name: "Deleted",
@@ -48,7 +48,7 @@ namespace ProjectLighthouse.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.AddColumn<int>(
-                name: "TargetId",
+                name: "Type",
                 table: "Comments",
                 type: "int",
                 nullable: false,
@@ -89,11 +89,11 @@ namespace ProjectLighthouse.Migrations
                 table: "Comments");
 
             migrationBuilder.DropColumn(
-                name: "TargetId",
+                name: "Type",
                 table: "Comments");
 
             migrationBuilder.RenameColumn(
-                name: "Type",
+                name: "TargetId",
                 table: "Comments",
                 newName: "TargetUserId");
 
