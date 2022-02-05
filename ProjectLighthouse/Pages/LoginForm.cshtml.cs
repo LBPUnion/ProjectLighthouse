@@ -6,8 +6,10 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 
 namespace LBPUnion.ProjectLighthouse.Pages;
 
@@ -17,8 +19,6 @@ public class LoginForm : BaseLayout
     {}
 
     public string Error { get; private set; }
-
-    public bool WasLoginRequest { get; private set; }
 
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string username, string password)
@@ -33,6 +33,19 @@ public class LoginForm : BaseLayout
         {
             this.Error = "The password field is required.";
             return this.Page();
+        }
+
+        if (ServerSettings.Instance.HCaptchaEnabled)
+        {
+            // && (!this.Request.Form.TryGetValue("h-captcha-response", out StringValues values) || !await CaptchaHelper.Verify(values[0])))
+            bool gotCaptcha = this.Request.Form.TryGetValue("h-captcha-response", out StringValues values);
+            string? token = gotCaptcha ? values[0] : null;
+
+            if (token == null || !await CaptchaHelper.Verify(token))
+            {
+                this.Error = "You must solve the captcha correctly.";
+                return this.Page();
+            }
         }
 
         User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -67,6 +80,8 @@ public class LoginForm : BaseLayout
         await this.Database.SaveChangesAsync();
 
         this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
+
+        Logger.Log($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LoggerLevelLogin.Instance);
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 

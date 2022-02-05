@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Kettu;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings;
@@ -13,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings;
 [Serializable]
 public class ServerSettings
 {
-    public const int CurrentConfigVersion = 18; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    public const int CurrentConfigVersion = 19; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     private static FileSystemWatcher fileWatcher;
     static ServerSettings()
     {
@@ -149,6 +148,12 @@ public class ServerSettings
     public bool ConfigReloading { get; set; } = true;
 
     public string MissingIconHash { get; set; } = "";
+
+    public bool HCaptchaEnabled { get; set; }
+
+    public string HCaptchaSiteKey { get; set; } = "";
+
+    public string HCaptchaSecret { get; set; } = "";
 
     #region Meta
 

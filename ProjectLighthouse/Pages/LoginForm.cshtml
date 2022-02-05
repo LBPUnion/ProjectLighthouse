@@ -50,6 +50,11 @@
         </div>
     </div>
 
+    @if (ServerSettings.Instance.HCaptchaEnabled)
+    {
+        @await Html.PartialAsync("Partials/CaptchaPartial")
+    }
+
     <input type="submit" value="Log in" id="submit" class="ui blue button">
     @if (ServerSettings.Instance.RegistrationEnabled)
     {
