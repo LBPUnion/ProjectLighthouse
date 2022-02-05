@@ -48,15 +48,13 @@ public class Comment
         {
             return "This comment has been deleted by the author.";
         }
-        else
-        {
-            using Database database = new();
-            User deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
 
-            if (deletedBy != null && deletedBy.UserId == this.TargetId)
-            {
-                return "This comment has been deleted by the player.";
-            }
+        using Database database = new();
+        User deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
+
+        if (deletedBy != null && deletedBy.UserId == this.TargetId)
+        {
+            return "This comment has been deleted by the player.";
         }
 
         return "This comment has been deleted.";
