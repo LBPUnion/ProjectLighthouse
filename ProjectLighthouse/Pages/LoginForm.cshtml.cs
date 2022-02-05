@@ -3,13 +3,12 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 
 namespace LBPUnion.ProjectLighthouse.Pages;
 
@@ -35,17 +34,10 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        if (ServerSettings.Instance.HCaptchaEnabled)
+        if (!await Request.CheckCaptchaValidity())
         {
-            // && (!this.Request.Form.TryGetValue("h-captcha-response", out StringValues values) || !await CaptchaHelper.Verify(values[0])))
-            bool gotCaptcha = this.Request.Form.TryGetValue("h-captcha-response", out StringValues values);
-            string? token = gotCaptcha ? values[0] : null;
-
-            if (token == null || !await CaptchaHelper.Verify(token))
-            {
-                this.Error = "You must solve the captcha correctly.";
-                return this.Page();
-            }
+            this.Error = "You must complete the captcha correctly.";
+            return this.Page();
         }
 
         User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
