@@ -13,7 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings;
 [Serializable]
 public class ServerSettings
 {
-    public const int CurrentConfigVersion = 18; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    public const int CurrentConfigVersion = 19; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     private static FileSystemWatcher fileWatcher;
     static ServerSettings()
     {
@@ -131,6 +131,12 @@ public class ServerSettings
     public int ListsQuota { get; set; } = 50;
 
     public int PhotosQuota { get; set; } = 500;
+
+    public bool ProfileCommentsEnabled { get; set; } = true;
+
+    public bool LevelCommentsEnabled { get; set; } = true;
+
+    public bool LevelReviewsEnabled { get; set; } = true;
 
     public bool GoogleAnalyticsEnabled { get; set; }
 

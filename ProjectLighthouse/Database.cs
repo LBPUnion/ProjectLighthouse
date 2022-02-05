@@ -36,6 +36,7 @@ public class Database : DbContext
     public DbSet<RatedReview> RatedReviews { get; set; }
     public DbSet<UserApprovedIpAddress> UserApprovedIpAddresses { get; set; }
     public DbSet<DatabaseCategory> CustomCategories { get; set; }
+    public DbSet<Reaction> Reactions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
@@ -272,6 +273,7 @@ public class Database : DbContext
         this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
         this.Reviews.RemoveRange(this.Reviews.Where(r => r.ReviewerId == user.UserId));
         this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
+        this.Reactions.RemoveRange(this.Reactions.Where(p => p.UserId == user.UserId));
 
         this.Users.Remove(user);
 
