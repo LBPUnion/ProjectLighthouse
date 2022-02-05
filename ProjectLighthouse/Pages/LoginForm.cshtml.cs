@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
@@ -18,8 +19,6 @@ public class LoginForm : BaseLayout
 
     public string Error { get; private set; }
 
-    public bool WasLoginRequest { get; private set; }
-
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string username, string password)
     {
@@ -32,6 +31,12 @@ public class LoginForm : BaseLayout
         if (string.IsNullOrWhiteSpace(password))
         {
             this.Error = "The password field is required.";
+            return this.Page();
+        }
+
+        if (!await Request.CheckCaptchaValidity())
+        {
+            this.Error = "You must complete the captcha correctly.";
             return this.Page();
         }
 
@@ -67,6 +72,8 @@ public class LoginForm : BaseLayout
         await this.Database.SaveChangesAsync();
 
         this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
+
+        Logger.Log($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LoggerLevelLogin.Instance);
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 

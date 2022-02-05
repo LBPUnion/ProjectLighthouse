@@ -1,4 +1,5 @@
 @page "/register"
+@using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.RegisterForm
 
 @{
@@ -59,6 +60,11 @@
             <i class="lock icon"></i>
         </div>
     </div>
+
+    @if (ServerSettings.Instance.HCaptchaEnabled)
+    {
+        @await Html.PartialAsync("Partials/CaptchaPartial")
+    }
 
     <input type="submit" value="Register" id="submit" class="ui green button">
 </form>

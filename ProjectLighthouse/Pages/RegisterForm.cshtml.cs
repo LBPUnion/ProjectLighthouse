@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -42,10 +43,15 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        bool userExists = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null;
-        if (userExists)
+        if (await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null)
         {
             this.Error = "The username you've chosen is already taken.";
+            return this.Page();
+        }
+
+        if (!await Request.CheckCaptchaValidity())
+        {
+            this.Error = "You must complete the captcha correctly.";
             return this.Page();
         }
 
