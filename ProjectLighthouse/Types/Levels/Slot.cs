@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Types.Levels;
 
@@ -118,6 +119,19 @@ public class Slot
             using Database database = new();
 
             return database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
+        }
+    }
+
+    [XmlIgnore]
+    [NotMapped]
+    [JsonIgnore]
+    public int Comments
+    {
+        get
+        {
+            using Database database = new();
+
+            return database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
         }
     }
 
@@ -251,6 +265,7 @@ public class Slot
                           LbpSerializer.StringElement("icon", this.IconHash) +
                           LbpSerializer.StringElement("rootLevel", this.RootLevel) +
                           LbpSerializer.StringElement("authorLabels", this.AuthorLabels) +
+                          LbpSerializer.StringElement("labels", this.AuthorLabels) +
                           this.SerializeResources() +
                           LbpSerializer.StringElement("location", this.Location?.Serialize()) +
                           LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
@@ -266,6 +281,7 @@ public class Slot
                           LbpSerializer.StringElement("mmpick", this.TeamPick) +
                           LbpSerializer.StringElement("heartCount", this.Hearts) +
                           LbpSerializer.StringElement("playCount", this.Plays) +
+                          LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
                           LbpSerializer.StringElement("completionCount", this.PlaysComplete) +
                           LbpSerializer.StringElement("lbp1PlayCount", this.PlaysLBP1) +
@@ -277,7 +293,7 @@ public class Slot
                           LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                           LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
                           LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
-                          LbpSerializer.StringElement("vitaCrossControlRequired", CrossControllerRequired) +
+                          LbpSerializer.StringElement("vitaCrossControlRequired", this.CrossControllerRequired) +
                           LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
                           LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
                           LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
@@ -290,8 +306,8 @@ public class Slot
                           LbpSerializer.StringElement
                               ("yourLBPVitaPlayCount", yourVisitedStats?.PlaysLBPVita) + // i doubt this is the right name but we'll go with it
                           yourReview?.Serialize("yourReview") +
-                          LbpSerializer.StringElement("reviewsEnabled", true) +
-                          LbpSerializer.StringElement("commentsEnabled", false) +
+                          LbpSerializer.StringElement("reviewsEnabled", ServerSettings.Instance.LevelReviewsEnabled) +
+                          LbpSerializer.StringElement("commentsEnabled", ServerSettings.Instance.LevelCommentsEnabled) +
                           LbpSerializer.StringElement("reviewCount", this.ReviewCount);
 
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");

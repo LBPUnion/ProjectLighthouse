@@ -131,6 +131,12 @@ public class ServerSettings
 
     public int PhotosQuota { get; set; } = 500;
 
+    public bool ProfileCommentsEnabled { get; set; } = true;
+
+    public bool LevelCommentsEnabled { get; set; } = true;
+
+    public bool LevelReviewsEnabled { get; set; } = true;
+
     public bool GoogleAnalyticsEnabled { get; set; }
 
     public string GoogleAnalyticsId { get; set; } = "";

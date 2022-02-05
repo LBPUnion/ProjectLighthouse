@@ -30,9 +30,8 @@ public class UserPage : BaseLayout
         this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
         this.Comments = await this.Database.Comments.Include
                 (p => p.Poster)
-            .Include(p => p.Target)
             .OrderByDescending(p => p.Timestamp)
-            .Where(p => p.TargetUserId == userId)
+            .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
             .Take(50)
             .ToListAsync();
 
