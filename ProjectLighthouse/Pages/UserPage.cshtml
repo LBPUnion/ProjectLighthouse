@@ -126,11 +126,19 @@
     {
         DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
         StringWriter messageWriter = new();
-        HttpUtility.HtmlDecode(comment.Message, messageWriter);
+        HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
         string decodedMessage = messageWriter.ToString();
         <div>
             <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
-            <span>@decodedMessage</span>
+            @if (comment.Deleted)
+            {
+                <i><span>@decodedMessage</span></i>
+            }
+            else
+            {
+                <span>@decodedMessage</span>
+            }
+            
             <p>
                 <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
             </p>
