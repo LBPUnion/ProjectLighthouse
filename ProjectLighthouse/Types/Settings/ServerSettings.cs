@@ -6,6 +6,9 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
+#if RELEASE
+using LBPUnion.ProjectLighthouse.Helpers;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings;
 
