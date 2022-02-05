@@ -61,7 +61,7 @@ public class User
     public int Comments {
         get {
             using Database database = new();
-            return database.Comments.Count(c => c.TargetUserId == this.UserId);
+            return database.Comments.Count(c => c.Type == CommentType.Profile && c.TargetId == this.UserId);
         }
     }
 
@@ -180,7 +180,7 @@ public class User
                       LbpSerializer.StringElement("commentCount", this.Comments) +
                       LbpSerializer.StringElement("photosByMeCount", this.PhotosByMe) +
                       LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMe) +
-                      LbpSerializer.StringElement("commentsEnabled", "true") +
+                      LbpSerializer.StringElement("commentsEnabled", ServerSettings.Instance.ProfileCommentsEnabled) +
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
                       LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels) +
                       LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +

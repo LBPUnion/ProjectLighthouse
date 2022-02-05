@@ -412,13 +412,22 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DeletedType")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Message")
                         .HasColumnType("longtext");
 
                     b.Property<int>("PosterUserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TargetUserId")
+                    b.Property<int>("TargetId")
                         .HasColumnType("int");
 
                     b.Property<int>("ThumbsDown")
@@ -430,11 +439,12 @@ namespace ProjectLighthouse.Migrations
                     b.Property<long>("Timestamp")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("CommentId");
 
                     b.HasIndex("PosterUserId");
-
-                    b.HasIndex("TargetUserId");
 
                     b.ToTable("Comments");
                 });
@@ -471,6 +481,26 @@ namespace ProjectLighthouse.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reaction", b =>
+                {
+                    b.Property<int>("RatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RatingId");
+
+                    b.ToTable("Reactions");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.RatedReview", b =>
@@ -829,15 +859,7 @@ namespace ProjectLighthouse.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Target")
-                        .WithMany()
-                        .HasForeignKey("TargetUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Poster");
-
-                    b.Navigation("Target");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.RatedReview", b =>
