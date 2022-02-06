@@ -12,6 +12,17 @@ div.main {
     margin-bottom: 1px;
 }
 
+canvas.photo-subjects {
+    opacity: 1;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+canvas.hide-subjects {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /*#region Cards*/
 
 .card {
