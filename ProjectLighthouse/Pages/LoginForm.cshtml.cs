@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Kettu;
@@ -7,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -71,7 +73,15 @@ public class LoginForm : BaseLayout
         this.Database.WebTokens.Add(webToken);
         await this.Database.SaveChangesAsync();
 
-        this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
+        this.Response.Cookies.Append
+        (
+            "LighthouseToken",
+            webToken.UserToken,
+            new CookieOptions
+            {
+                Expires = DateTimeOffset.Now.AddDays(7),
+            }
+        );
 
         Logger.Log($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LoggerLevelLogin.Instance);
 
