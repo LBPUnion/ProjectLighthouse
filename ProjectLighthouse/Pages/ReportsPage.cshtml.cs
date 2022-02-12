@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Reports;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,10 @@ public class ReportsPage : BaseLayout
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
     {
+        User? user = this.Database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+        if (!user.IsAdmin) return this.NotFound();
+
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
         this.SearchValue = name.Replace(" ", string.Empty);

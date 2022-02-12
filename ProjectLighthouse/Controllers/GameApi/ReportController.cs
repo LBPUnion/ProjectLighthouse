@@ -43,7 +43,7 @@ public class ReportController : ControllerBase
 
         report.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
         report.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));
-        report.VisiblePlayers = JsonSerializer.Serialize(report.XmlVisiblePlayers, typeof(VisiblePlayer[]));
+        // report.VisiblePlayers = JsonSerializer.Serialize(report.XmlVisiblePlayers, typeof(VisiblePlayer[]));
         report.Timestamp = TimeHelper.UnixTimeMilliseconds();
         report.ReportingPlayerId = user.UserId;
 

@@ -46,6 +46,9 @@
         <div><b>Level type:</b> @report.LevelType</div>
         <div><b>Level owner:</b> @report.LevelOwner</div>
         <div id="hover-bounds-@report.ReportId" class="hover-region"><b>Hover to see reported region</b></div>
+        <a class="ui red tiny button" href="/admin/report/@report.ReportId/remove" title="Delete">
+            <i class="trash icon" style="margin: 0"></i>
+        </a>
     </div>
     <script>
         subjects[@report.ReportId] = @Html.Raw(report.Players)
