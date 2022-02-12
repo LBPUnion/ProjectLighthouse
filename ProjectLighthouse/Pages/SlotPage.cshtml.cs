@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,8 @@ namespace LBPUnion.ProjectLighthouse.Pages;
 public class SlotPage : BaseLayout
 {
     public List<Comment> Comments;
+
+    public bool CommentsEnabled = ServerSettings.Instance.LevelCommentsEnabled;
 
     public Slot Slot;
     public SlotPage([NotNull] Database database) : base(database)
@@ -32,6 +35,15 @@ public class SlotPage : BaseLayout
             .ToListAsync();
 
         this.Slot = slot;
+
+        if (this.User == null) return this.Page();
+        
+        foreach (Comment c in this.Comments)
+        {
+            Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r =>
+                r.UserId == this.User.UserId && r.TargetId == c.CommentId);
+            if (reaction != null) c.YourThumb = reaction.Rating;
+        }
 
         return this.Page();
     }

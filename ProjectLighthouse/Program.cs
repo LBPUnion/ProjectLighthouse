@@ -100,7 +100,7 @@ public static class Program
                     {
                         while (fileQueue.TryDequeue(out string? filename))
                         {
-                            LbpFile? file = LbpFile.FromHash(filename.Replace("r/", ""));
+                            LbpFile? file = LbpFile.FromHash(filename.Replace("r" + Path.DirectorySeparatorChar, ""));
                             if (file == null) continue;
 
                             if (file.FileType == LbpFileType.Jpeg || file.FileType == LbpFileType.Png || file.FileType == LbpFileType.Texture)

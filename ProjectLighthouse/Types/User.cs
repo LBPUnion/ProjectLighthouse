@@ -190,8 +190,8 @@ public class User
                       LbpSerializer.BlankElement("photos") +
                       LbpSerializer.StringElement("heartCount", this.Hearts) +
                       LbpSerializer.StringElement("yay2", this.YayHash) +
-                      LbpSerializer.StringElement("boo2", this.YayHash) +
-                      LbpSerializer.StringElement("meh2", this.YayHash);
+                      LbpSerializer.StringElement("boo2", this.BooHash) +
+                      LbpSerializer.StringElement("meh2", this.MehHash);
         this.ClientsConnected.Serialize();
 
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");

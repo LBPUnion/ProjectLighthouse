@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class HashHelper
 {
-    private static readonly SHA1 sha1 = SHA1.Create();
+    // private static readonly SHA1 sha1 = SHA1.Create();
     private static readonly SHA256 sha256 = SHA256.Create();
     private static readonly Random random = new();
 
@@ -71,7 +72,7 @@ public static class HashHelper
 
     public static string Sha1Hash(string str) => Sha1Hash(Encoding.UTF8.GetBytes(str));
 
-    public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(sha1.ComputeHash(bytes)).Replace("-", "");
+    public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(SHA1.Create().ComputeHash(bytes)).Replace("-","");
 
     public static string BCryptHash(string str) => BCrypt.Net.BCrypt.HashPassword(str);
 

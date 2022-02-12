@@ -31,15 +31,16 @@ public class UsersPage : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
-        this.UserCount = await this.Database.Users.CountAsync(u => !u.Banned && u.Username.Contains(name));
+        this.SearchValue = name.Replace(" ", string.Empty);
 
-        this.SearchValue = name;
+        this.UserCount = await this.Database.Users.CountAsync(u => !u.Banned && u.Username.Contains(this.SearchValue));
+
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.UserCount / ServerStatics.PageSize));
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount) return this.Redirect($"/users/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
-        this.Users = await this.Database.Users.Where(u => !u.Banned && u.Username.Contains(name))
+        this.Users = await this.Database.Users.Where(u => !u.Banned && u.Username.Contains(this.SearchValue))
             .OrderByDescending(b => b.UserId)
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)

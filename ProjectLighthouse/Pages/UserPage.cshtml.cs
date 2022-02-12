@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,8 @@ namespace LBPUnion.ProjectLighthouse.Pages;
 public class UserPage : BaseLayout
 {
     public List<Comment>? Comments;
+
+    public bool CommentsEnabled = ServerSettings.Instance.ProfileCommentsEnabled;
 
     public bool IsProfileUserHearted;
 
@@ -34,11 +37,19 @@ public class UserPage : BaseLayout
             .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
             .Take(50)
             .ToListAsync();
-
         if (this.User != null)
-            this.IsProfileUserHearted = await this.Database.HeartedProfiles.FirstOrDefaultAsync
-                                            (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId) !=
+        {
+            foreach (Comment c in this.Comments)
+            {
+                Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r =>
+                    r.UserId == this.User.UserId && r.TargetId == c.CommentId);
+                if (reaction != null) c.YourThumb = reaction.Rating;
+            }
+            this.IsProfileUserHearted = await this.Database.HeartedProfiles.FirstOrDefaultAsync(u =>
+                                            u.UserId == this.User.UserId &&
+                                            u.HeartedUserId == this.ProfileUser.UserId) !=
                                         null;
+        }
 
         return this.Page();
     }

@@ -33,49 +33,9 @@ public class CommentController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        Comment? comment = await this.database.Comments.Include(c => c.Poster).FirstOrDefaultAsync(c => commentId == c.CommentId);
+        bool success = await this.database.RateComment(user, commentId, rating);
+        if (!success) return this.BadRequest();
 
-        if (comment == null) return this.BadRequest();
-
-        Reaction? reaction = await this.database.Reactions.FirstOrDefaultAsync(r => r.UserId == user.UserId && r.TargetId == commentId);
-        if (reaction == null)
-        {
-            Reaction newReaction = new Reaction()
-            {
-                UserId = user.UserId,
-                TargetId = commentId,
-                Rating = 0,
-            };
-            this.database.Reactions.Add(newReaction);
-            await this.database.SaveChangesAsync();
-            reaction = newReaction;
-        }
-        int oldRating = reaction.Rating;
-        if (oldRating == rating) return this.Ok();
-
-        reaction.Rating = rating;
-        // if rating changed then we count the number of reactions to ensure accuracy
-        List<Reaction> reactions = await this.database.Reactions
-        .Where(c => c.TargetId == commentId)
-        .ToListAsync();
-        int yay = 0;
-        int boo = 0;
-        foreach (Reaction r in reactions)
-        {
-            switch (r.Rating)
-            {
-                case -1:
-                    boo++;
-                    break;
-                case 1: 
-                    yay++;
-                    break;
-            }
-        }
-
-        comment.ThumbsDown = boo;
-        comment.ThumbsUp = yay;
-        await this.database.SaveChangesAsync();
         return this.Ok();
     }
 
@@ -135,27 +95,12 @@ public class CommentController : ControllerBase
 
         int targetId = slotId.GetValueOrDefault();
 
-        if (type == CommentType.Profile)
-        {
-            User? target = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (target == null) return this.BadRequest();
-            targetId = target.UserId;
-        }
-        else
-        {
-            Slot? target = await this.database.Slots.FirstOrDefaultAsync(u => u.SlotId == slotId);
-            if (target == null) return this.BadRequest();
-        }
+        if (type == CommentType.Profile) targetId = this.database.Users.First(u => u.Username == username).UserId;
 
-        comment.PosterUserId = poster.UserId;
-        comment.TargetId = targetId;
-        comment.Type = type;
+        bool success = await this.database.PostComment(poster, targetId, type, comment.Message);
+        if (success) return this.Ok();
 
-        comment.Timestamp = TimeHelper.UnixTimeMilliseconds();
-
-        this.database.Comments.Add(comment);
-        await this.database.SaveChangesAsync();
-        return this.Ok();
+        return this.BadRequest();
     }
 
     [HttpPost("deleteUserComment/{username}")]

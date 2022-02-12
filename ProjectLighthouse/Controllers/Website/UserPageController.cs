@@ -1,7 +1,10 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Controllers.Website;
@@ -27,6 +30,30 @@ public class UserPageController : ControllerBase
         if (heartedUser == null) return this.NotFound();
 
         await this.database.HeartUser(user, heartedUser);
+
+        return this.Redirect("~/user/" + id);
+    }
+
+    [HttpGet("rateComment")]
+    public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int commentId, [FromQuery] int rating)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+
+        await this.database.RateComment(user, commentId, rating);
+
+        return this.Redirect("~/user/" + id + "#" + commentId);
+    }
+
+    [HttpGet("postComment")]
+    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string msg)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+
+        bool success = await this.database.PostComment(user, id, CommentType.Profile, msg);
+
+        if (!success) return this.NotFound();
 
         return this.Redirect("~/user/" + id);
     }
