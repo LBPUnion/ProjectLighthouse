@@ -32,7 +32,7 @@ public class SlotsPage : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
-        this.SearchValue = name.Replace(" ", string.Empty);
+        this.SearchValue = name.Trim();
 
         this.SlotCount = await this.Database.Slots.CountAsync(p => p.Name.Contains(this.SearchValue));
 
