@@ -542,9 +542,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<string>("VisiblePlayers")
-                        .HasColumnType("longtext");
-
                     b.HasKey("ReportId");
 
                     b.HasIndex("ReportingPlayerId");

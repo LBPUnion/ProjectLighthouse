@@ -15,12 +15,6 @@ public class GriefReport
 
     public long Timestamp { get; set; }
 
-    [NotMapped]
-    // [XmlElement("visibleBadge")]
-    // public VisiblePlayer[] XmlVisiblePlayers { get; set; }
-
-    public string VisiblePlayers { get; set; }
-
     public int ReportingPlayerId { get; set; }
 
     [ForeignKey(nameof(ReportingPlayerId))]

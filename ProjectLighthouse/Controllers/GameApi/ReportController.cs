@@ -1,15 +1,11 @@
 ﻿#nullable enable
-using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Reports;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Controllers.GameApi;
@@ -35,7 +31,6 @@ public class ReportController : ControllerBase
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-        Console.WriteLine(bodyString);
         XmlSerializer serializer = new(typeof(GriefReport));
         GriefReport? report = (GriefReport?) serializer.Deserialize(new StringReader(bodyString));
 
@@ -43,7 +38,6 @@ public class ReportController : ControllerBase
 
         report.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
         report.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));
-        // report.VisiblePlayers = JsonSerializer.Serialize(report.XmlVisiblePlayers, typeof(VisiblePlayer[]));
         report.Timestamp = TimeHelper.UnixTimeMilliseconds();
         report.ReportingPlayerId = user.UserId;
 
