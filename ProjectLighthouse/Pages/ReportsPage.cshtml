@@ -115,17 +115,16 @@
                 const bw = (x2 - x1) / scaleX;
                 const bh = (y2 - y1) / scaleY;
                 context.beginPath();
-                context.lineWidth = 3;
                 context.globalAlpha = 0.6;
                 context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
                 context.clearRect(bx, by, bw, bh);
-                context.globalAlpha = 1.0;
                 context.beginPath();
-                context.lineWidth = 3;
-                context.strokeStyle = "#cc0a1d";
+                context.lineWidth = 2;
+                context.strokeStyle = "#957a24";
                 context.rect(bx, by, bw, bh);
                 context.stroke();
+                context.globalAlpha = 1.0;
                 break;
             }
             case 1: {
