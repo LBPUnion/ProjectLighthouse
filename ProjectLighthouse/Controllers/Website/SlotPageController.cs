@@ -37,14 +37,14 @@ public class SlotPageController : ControllerBase
     }
 
     [HttpGet("postComment")]
-    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string msg)
+    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string? msg)
     {
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        bool success = await this.database.PostComment(user, id, CommentType.Level, msg);
+        if (msg == null) return this.Redirect("~/slot/" + id);
 
-        if (!success) return this.NotFound();
+        await this.database.PostComment(user, id, CommentType.Level, msg);
 
         return this.Redirect("~/slot/" + id);
     }

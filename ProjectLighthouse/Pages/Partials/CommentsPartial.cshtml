@@ -62,7 +62,7 @@
             </div>
         </div>
     }
-    @if(Model.CommentsEnabled){
+    @if(Model.CommentsEnabled && Model.User != null){
         <div class="ui divider"></div>
         <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment">
             <div class="field">

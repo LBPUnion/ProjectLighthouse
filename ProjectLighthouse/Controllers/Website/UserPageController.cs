@@ -35,25 +35,25 @@ public class UserPageController : ControllerBase
     }
 
     [HttpGet("rateComment")]
-    public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int commentId, [FromQuery] int rating)
+    public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int? commentId, [FromQuery] int? rating)
     {
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        await this.database.RateComment(user, commentId, rating);
+        await this.database.RateComment(user, commentId.GetValueOrDefault(), rating.GetValueOrDefault());
 
         return this.Redirect("~/user/" + id + "#" + commentId);
     }
 
     [HttpGet("postComment")]
-    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string msg)
+    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string? msg)
     {
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        bool success = await this.database.PostComment(user, id, CommentType.Profile, msg);
+        if (msg == null) return this.Redirect("~/user/" + id);
 
-        if (!success) return this.NotFound();
+        await this.database.PostComment(user, id, CommentType.Profile, msg);
 
         return this.Redirect("~/user/" + id);
     }
