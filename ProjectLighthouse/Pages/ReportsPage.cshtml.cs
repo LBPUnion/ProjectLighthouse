@@ -46,7 +46,7 @@ public class ReportsPage : BaseLayout
         this.PageAmount = Math.Max(1, (int) Math.Ceiling((double) this.ReportCount / ServerStatics.PageSize));
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount)
-            return this.Redirect($"/reports/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
+            return this.Redirect($"/admin/reports/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
         this.Reports = await this.Database.Reports.Include(r => r.ReportingPlayer)
             .Where(r => r.ReportingPlayer.Username.Contains(this.SearchValue))

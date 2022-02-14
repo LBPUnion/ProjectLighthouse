@@ -37,19 +37,19 @@ public class AdminReportController : ControllerBase
         };
         foreach (string hash in hashes)
         {
-            if (System.IO.File.Exists($"png{Path.DirectorySeparatorChar}{hash}"))
+            if (System.IO.File.Exists(Path.Combine("png", $"{hash}.png")))
             {
-                System.IO.File.Delete($"png{Path.DirectorySeparatorChar}{hash}");
+                System.IO.File.Delete(Path.Combine("png", $"{hash}.png"));
             }
-            if (System.IO.File.Exists($"r{Path.DirectorySeparatorChar}{hash}"))
+            if (System.IO.File.Exists(Path.Combine("r", hash)))
             {
-                System.IO.File.Delete($"r{Path.DirectorySeparatorChar}{hash}");
+                System.IO.File.Delete(Path.Combine("r", hash));
             }
         }
         this.database.Reports.Remove(report);
 
         await this.database.SaveChangesAsync();
 
-        return this.Redirect("~/reports/0");
+        return this.Redirect("~/admin/reports/0");
     }
 }

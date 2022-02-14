@@ -29,11 +29,9 @@ public class SlotPageController : ControllerBase
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        await this.database.RateComment(user,
-            commentId,
-            rating);
+        await this.database.RateComment(user, commentId, rating);
 
-        return this.Redirect("~/slot/" + id + "#" + commentId);
+        return this.Redirect($"~/slot/{id}#{commentId}");
     }
 
     [HttpGet("postComment")]

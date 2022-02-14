@@ -19,7 +19,6 @@
 
         @if (Model.User.IsAdmin)
         {
-            Model.NavigationItems.Add(new PageNavigationItem("Reports", "/reports/0", "exclamation circle"));
             Model.NavigationItemsRight.Add(new PageNavigationItem("Admin Panel", "/admin", "cogs"));
         }
         Model.NavigationItemsRight.Add(new PageNavigationItem("Log out", "/logout", "user alternate slash")); // should always be last

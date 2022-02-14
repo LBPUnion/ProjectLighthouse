@@ -31,25 +31,28 @@ public class UserPage : BaseLayout
         if (this.ProfileUser == null) return this.NotFound();
 
         this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
-        this.Comments = await this.Database.Comments.Include
-                (p => p.Poster)
-            .OrderByDescending(p => p.Timestamp)
-            .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
-            .Take(50)
-            .ToListAsync();
-        if (this.User != null)
+        if (this.CommentsEnabled)
         {
-            foreach (Comment c in this.Comments)
-            {
-                Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r =>
-                    r.UserId == this.User.UserId && r.TargetId == c.CommentId);
-                if (reaction != null) c.YourThumb = reaction.Rating;
-            }
-            this.IsProfileUserHearted = await this.Database.HeartedProfiles.FirstOrDefaultAsync(u =>
-                                            u.UserId == this.User.UserId &&
-                                            u.HeartedUserId == this.ProfileUser.UserId) !=
-                                        null;
+            this.Comments = await this.Database.Comments.Include(p => p.Poster)
+                .OrderByDescending(p => p.Timestamp)
+                .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
+                .Take(50)
+                .ToListAsync();
         }
+        else
+        {
+            this.Comments = new List<Comment>();
+        }
+
+        if (this.User == null) return this.Page();
+        
+        foreach (Comment c in this.Comments)
+        {
+           Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.TargetId == c.CommentId);
+           if (reaction != null) c.YourThumb = reaction.Rating;
+        }
+        this.IsProfileUserHearted = await this.Database.HeartedProfiles.FirstOrDefaultAsync
+            (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId) != null;        
 
         return this.Page();
     }

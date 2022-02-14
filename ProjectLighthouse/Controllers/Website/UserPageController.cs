@@ -42,7 +42,7 @@ public class UserPageController : ControllerBase
 
         await this.database.RateComment(user, commentId.GetValueOrDefault(), rating.GetValueOrDefault());
 
-        return this.Redirect("~/user/" + id + "#" + commentId);
+        return this.Redirect($"~/user/{id}#{commentId}");
     }
 
     [HttpGet("postComment")]
