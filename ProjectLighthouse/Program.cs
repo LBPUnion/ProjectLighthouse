@@ -43,9 +43,9 @@ public static class Program
         Logger.AddLogger(new LighthouseFileLogger());
 
         Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
-        Logger.Log($"Running {VersionHelper.FullVersion}", LoggerLevelStartup.Instance);
+        Logger.Log($"You are running version {VersionHelper.FullVersion}", LoggerLevelStartup.Instance);
 
-        // This loads the config, see ServerSettings.cs for more information
+        // Referencing ServerSettings.Instance here loads the config, see ServerSettings.cs for more information
         Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);
 
         Logger.Log("Determining if the database is available...", LoggerLevelStartup.Instance);
@@ -143,6 +143,7 @@ public static class Program
                 {
                     webBuilder.UseStartup<Startup.Startup>();
                     webBuilder.UseWebRoot("StaticFiles");
+                    webBuilder.UseUrls(ServerSettings.Instance.ServerListenUrl);
                 }
             )
             .ConfigureLogging

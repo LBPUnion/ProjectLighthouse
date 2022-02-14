@@ -6,16 +6,13 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
-#if RELEASE
-using LBPUnion.ProjectLighthouse.Helpers;
-#endif
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings;
 
 [Serializable]
 public class ServerSettings
 {
-    public const int CurrentConfigVersion = 20; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    public const int CurrentConfigVersion = 21; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     private static FileSystemWatcher fileWatcher;
     static ServerSettings()
     {
@@ -25,8 +22,6 @@ public class ServerSettings
 
         if (File.Exists(ConfigFileName))
         {
-            if (!(StartupConfigCheck = ConfigCheck())) return;
-
             string configFile = File.ReadAllText(ConfigFileName);
 
             Instance = JsonSerializer.Deserialize<ServerSettings>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
@@ -164,6 +159,8 @@ public class ServerSettings
 
     public string HCaptchaSecret { get; set; } = "";
 
+    public string ServerListenUrl { get; set; } = "http://localhost:10060";
+
     #region Meta
 
     [NotNull]
@@ -173,34 +170,6 @@ public class ServerSettings
     public int ConfigVersion { get; set; } = CurrentConfigVersion;
 
     public const string ConfigFileName = "lighthouse.config.json";
-
-    public static bool StartupConfigCheck;
-    public static bool ConfigCheck()
-    {
-        #if !DEBUG
-        if (VersionHelper.IsDirty)
-        {
-            string dirtyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".lighthouse");
-            string dirtyFile = Path.Combine(dirtyPath, ".dirty-date");
-            if (File.Exists(dirtyFile))
-            {
-                long timestamp = long.Parse(File.ReadAllText(dirtyFile));
-                if (timestamp + 604800 < TimestampHelper.Timestamp)
-                {
-                    Instance = new ServerSettings();
-                    return false;
-                }
-            }
-            else
-            {
-                Directory.CreateDirectory(dirtyPath);
-                File.WriteAllText(dirtyFile, TimestampHelper.Timestamp.ToString());
-            }
-        }
-        #endif
-
-        return true;
-    }
 
     #endregion Meta
 

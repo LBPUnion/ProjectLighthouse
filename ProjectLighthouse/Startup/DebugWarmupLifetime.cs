@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,7 @@ public class DebugWarmupLifetime : IHostLifetime
         using HttpClient client = new();
 
         Logger.Log("Warming up Hot Reload...", LoggerLevelStartup.Instance);
-        client.GetAsync("http://localhost:10060/").Wait();
+        client.GetAsync(ServerSettings.Instance.ServerListenUrl).Wait();
         Logger.Log("Hot Reload is ready to go!", LoggerLevelStartup.Instance);
     }
 
