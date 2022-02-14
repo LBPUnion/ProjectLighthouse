@@ -31,16 +31,17 @@ public class PhotosPage : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
-        this.PhotoCount = await this.Database.Photos.CountAsync(p => p.Creator.Username.Contains(name) || p.PhotoSubjectCollection.Contains(name));
+        this.SearchValue = name.Replace(" ", string.Empty);
 
-        this.SearchValue = name;
+        this.PhotoCount = await this.Database.Photos.CountAsync(p => p.Creator.Username.Contains(this.SearchValue) || p.PhotoSubjectCollection.Contains(this.SearchValue));
+
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.PhotoCount / ServerStatics.PageSize));
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount) return this.Redirect($"/photos/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
         this.Photos = await this.Database.Photos.Include(p => p.Creator)
-            .Where(p => p.Creator.Username.Contains(name) || p.PhotoSubjectCollection.Contains(name))
+            .Where(p => p.Creator.Username.Contains(this.SearchValue) || p.PhotoSubjectCollection.Contains(this.SearchValue))
             .OrderByDescending(p => p.Timestamp)
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)

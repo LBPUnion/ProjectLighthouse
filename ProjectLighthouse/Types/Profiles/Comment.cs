@@ -37,6 +37,10 @@ public class Comment
     public int ThumbsUp { get; set; }
     public int ThumbsDown { get; set; }
 
+    [NotMapped]
+    [XmlIgnore]
+    public int YourThumb;
+
     public string getComment()
     {
         if (!this.Deleted)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -6,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Categories;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Reports;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using LBPUnion.ProjectLighthouse.Types.Tickets;
@@ -37,6 +39,7 @@ public class Database : DbContext
     public DbSet<UserApprovedIpAddress> UserApprovedIpAddresses { get; set; }
     public DbSet<DatabaseCategory> CustomCategories { get; set; }
     public DbSet<Reaction> Reactions { get; set; }
+    public DbSet<GriefReport> Reports { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
@@ -88,6 +91,83 @@ public class Database : DbContext
     }
 
     #region Hearts & Queues
+
+    public async Task<bool> RateComment(User user, int commentId, int rating)
+    {
+        Comment? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
+
+        if (comment == null) return false;
+
+        if (comment.PosterUserId == user.UserId) return false;
+
+        Reaction? reaction = await this.Reactions.FirstOrDefaultAsync(r => r.UserId == user.UserId && r.TargetId == commentId);
+        if (reaction == null)
+        {
+            Reaction newReaction = new()
+            {
+                UserId = user.UserId,
+                TargetId = commentId,
+                Rating = 0,
+            };
+            this.Reactions.Add(newReaction);
+            await this.SaveChangesAsync();
+            reaction = newReaction;
+        }
+
+        int oldRating = reaction.Rating;
+        if (oldRating == rating) return true;
+
+        reaction.Rating = rating;
+        // if rating changed then we count the number of reactions to ensure accuracy
+        List<Reaction> reactions = await this.Reactions.Where(c => c.TargetId == commentId).ToListAsync();
+        int yay = 0;
+        int boo = 0;
+        foreach (Reaction r in reactions)
+        {
+            switch (r.Rating)
+            {
+                case -1:
+                    boo++;
+                    break;
+                case 1:
+                    yay++;
+                    break;
+            }
+        }
+
+        comment.ThumbsDown = boo;
+        comment.ThumbsUp = yay;
+        await this.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> PostComment(User user, int targetId, CommentType type, string message)
+    {
+        if (type == CommentType.Profile)
+        {
+            User? targetUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == targetId);
+            if (targetUser == null) return false;
+        }
+        else
+        {
+            Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
+            if(targetSlot == null) return false;
+        }
+
+        this.Comments.Add
+        (
+            new Comment
+            {
+                PosterUserId = user.UserId,
+                TargetId = targetId,
+                Type = type,
+                Message = message,
+                Timestamp = TimeHelper.UnixTimeMilliseconds(),
+            }
+        );
+        await this.SaveChangesAsync();
+        return true;
+    }
 
     public async Task HeartUser(User user, User heartedUser)
     {

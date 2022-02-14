@@ -18,7 +18,7 @@ public static class ImageHelper
     {
         if (type != LbpFileType.Jpeg && type != LbpFileType.Png && type != LbpFileType.Texture) return false;
 
-        if (File.Exists($"png/{hash}.png")) return true;
+        if (File.Exists(Path.Combine("png", $"{hash}.png"))) return true;
 
         using MemoryStream ms = new(data);
         using BinaryReader reader = new(ms);

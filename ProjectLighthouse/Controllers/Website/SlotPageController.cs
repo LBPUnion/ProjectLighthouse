@@ -23,6 +23,30 @@ public class SlotPageController : ControllerBase
         this.database = database;
     }
 
+    [HttpGet("rateComment")]
+    public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int commentId, [FromQuery] int rating)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+
+        await this.database.RateComment(user, commentId, rating);
+
+        return this.Redirect($"~/slot/{id}#{commentId}");
+    }
+
+    [HttpGet("postComment")]
+    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string? msg)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+
+        if (msg == null) return this.Redirect("~/slot/" + id);
+
+        await this.database.PostComment(user, id, CommentType.Level, msg);
+
+        return this.Redirect("~/slot/" + id);
+    }
+
     [HttpGet("heart")]
     public async Task<IActionResult> HeartLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
     {

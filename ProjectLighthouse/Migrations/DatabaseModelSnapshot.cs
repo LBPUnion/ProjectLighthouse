@@ -15,7 +15,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "6.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.AuthenticationAttempt", b =>
@@ -503,6 +503,52 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Reactions");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reports.GriefReport", b =>
+                {
+                    b.Property<int>("ReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Bounds")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("GriefStateHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("InitialStateHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("JpegHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("LevelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LevelOwner")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LevelType")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Players")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReportingPlayerId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReportId");
+
+                    b.HasIndex("ReportingPlayerId");
+
+                    b.ToTable("Reports");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.RatedReview", b =>
                 {
                     b.Property<int>("RatedReviewId")
@@ -860,6 +906,17 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("Poster");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reports.GriefReport", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "ReportingPlayer")
+                        .WithMany()
+                        .HasForeignKey("ReportingPlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportingPlayer");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.RatedReview", b =>

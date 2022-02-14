@@ -55,7 +55,7 @@ public class ResourcesController : ControllerBase
     [HttpGet("/gameAssets/{hash}")]
     public IActionResult GetGameImage(string hash)
     {
-        string path = $"png/{hash}.png";
+        string path = Path.Combine("png", $"{hash}.png");
 
         if (IOFile.Exists(path))
         {

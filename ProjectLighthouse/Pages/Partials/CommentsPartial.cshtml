@@ -1,0 +1,78 @@
+﻿@using System.IO
+@using System.Web
+@using LBPUnion.ProjectLighthouse.Types.Profiles
+
+<div class="ui yellow segment" id="comments">
+    <style>
+        .comment {
+          width:  100%;
+          display: inline-block;
+          text-align: left;
+        }
+        .voting {
+          text-align: center;
+          display: inline-block;
+          float: left;
+          margin-right: 0.5em;
+        }
+    </style>
+    <h1>Comments</h1>
+    @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
+    {
+        <p>There are no comments.</p>
+    }
+    else if (!Model.CommentsEnabled)
+    {
+        <b><i>Comments are disabled</i></b>
+    }
+
+    @for (int i = 0; i < Model.Comments.Count; i++)
+    {
+        Comment comment = Model.Comments[i];
+        DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
+        StringWriter messageWriter = new();
+        HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
+        string decodedMessage = messageWriter.ToString();
+        string url = Url.RouteUrl(ViewContext.RouteData.Values);
+        int rating = comment.ThumbsUp - comment.ThumbsDown;
+        <div style="display: flex" id="@comment.CommentId">
+            <div class="voting">
+                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == 1 ? 0 : 1)">
+                    <i class="fitted @(comment.YourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
+                </a>
+                <span style="text-align: center; margin: auto; @(rating < 0 ? "margin-left: -5px" : "")">@(rating)</span>
+                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == -1 ? 0 : -1)">
+                    <i class="fitted @(comment.YourThumb == -1 ? "red" : "grey") arrow down link icon" style="display: block"></i>
+                </a>
+            </div>
+
+            <div class="comment">
+                <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
+                @if (comment.Deleted)
+                {
+                    <i><span>@decodedMessage</span></i>
+                }
+                else
+                {
+                    <span>@decodedMessage</span>
+                }
+                <p>
+                    <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
+                </p>
+                @if (i != Model.Comments.Count - 1)
+                {
+                    <div class="ui divider"></div>
+                }
+            </div>
+        </div>
+    }
+    @if(Model.CommentsEnabled && Model.User != null){
+        <div class="ui divider"></div>
+        <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment">
+            <div class="field">
+                <textarea style="min-height: 70px; height: 70px; max-height:120px" name="msg"></textarea>
+            </div>
+            <input type="submit" class="ui blue button">
+        </form>
+    }
+</div>

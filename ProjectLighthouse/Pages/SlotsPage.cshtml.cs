@@ -32,16 +32,17 @@ public class SlotsPage : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
-        this.SlotCount = await this.Database.Slots.CountAsync(p => p.Name.Contains(name));
+        this.SearchValue = name.Trim();
 
-        this.SearchValue = name;
+        this.SlotCount = await this.Database.Slots.CountAsync(p => p.Name.Contains(this.SearchValue));
+
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.SlotCount / ServerStatics.PageSize));
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount) return this.Redirect($"/slots/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
         this.Slots = await this.Database.Slots.Include(p => p.Creator)
-            .Where(p => p.Name.Contains(name))
+            .Where(p => p.Name.Contains(this.SearchValue))
             .OrderByDescending(p => p.FirstUploaded)
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)

@@ -1,0 +1,208 @@
+﻿@page "/admin/reports/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Types.Reports
+@model LBPUnion.ProjectLighthouse.Pages.ReportsPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Reports";
+}
+
+<p>There are @Model.ReportCount total reports!</p>
+
+<form action="/admin/reports/0">
+    <div class="ui icon input">
+        <input type="text" name="name" placeholder="Search reports..." value="@Model.SearchValue">
+        <i class="search icon"></i>
+    </div>
+</form>
+<div class="ui divider"></div>
+<script>
+    let subjects = [];
+    let bounds = [];
+    let canvases = [];
+    let ctx = [];
+    let images = [];
+</script>
+@foreach (GriefReport report in Model.Reports)
+{
+    <div class="ui segment">
+        <div>
+            <canvas class="hide-subjects" id="canvas-subjects-@report.ReportId" width="1920" height="1080"
+                    style="position: absolute; transform: rotate(180deg)">
+            </canvas>
+            <img id="game-image-@report.ReportId" src="/gameAssets/@report.JpegHash" alt="Grief report picture" style="width: 100%; height: auto; border-radius: .28571429rem;">
+        </div>
+        <p><i>Report submitted by <b><a href="/user/@report.ReportingPlayerId">@report.ReportingPlayer.Username</a></b></i></p>
+        <b class="hover-players" id="hover-subjects-2-@report.ReportId">Report contains @report.XmlPlayers.Length @(report.XmlPlayers.Length == 1 ? "player" : "players")</b>
+        @foreach (ReportPlayer player in report.XmlPlayers)
+        {
+            <div id="hover-subjects-@report.ReportId" class="hover-players">
+                <a href="/">@player.Name</a>
+            </div>
+        }
+        <div><b>Report time: </b>@(DateTimeOffset.FromUnixTimeMilliseconds(report.Timestamp).ToString("R"))</div>
+        <div><b>Report reason: </b>@report.Type</div>
+        <div><b>Level ID:</b> @report.LevelId</div>
+        <div><b>Level type:</b> @report.LevelType</div>
+        <div><b>Level owner:</b> @report.LevelOwner</div>
+        <div id="hover-bounds-@report.ReportId" class="hover-region"><b>Hover to see reported region</b></div>
+        <a class="ui red tiny button" href="/admin/report/@report.ReportId/remove" title="Delete">
+            <i class="trash icon" style="margin: 0"></i>
+        </a>
+    </div>
+    <script>
+        subjects[@report.ReportId] = @Html.Raw(report.Players)
+        bounds[@report.ReportId] = @Html.Raw(report.Bounds)
+        images[@report.ReportId] = document.getElementById("game-image-@report.ReportId")
+        canvases[@report.ReportId] = document.getElementById("canvas-subjects-@report.ReportId")
+        canvases[@report.ReportId].width = images[@report.ReportId].offsetWidth;
+        canvases[@report.ReportId].height = images[@report.ReportId].clientHeight;
+        ctx[@report.ReportId] = canvases[@report.ReportId].getContext('2d');
+    </script>
+}
+<script>
+    function getReportId(name){
+        let split = name.split("-");
+        return split[split.length-1];
+    }
+    const colours = ["#96dd3c", "#ceb424", "#cc0a1d", "#c800cc"];
+    let displayType;
+    window.addEventListener("load", function () {
+        document.querySelectorAll(".hover-players").forEach(item => {
+            item.addEventListener('mouseenter', function () {
+                let reportId = getReportId(item.id);
+                displayType = 1;
+                canvases[reportId].className = "photo-subjects";
+                redraw(reportId);
+            });
+        });
+        document.querySelectorAll(".hover-region").forEach(item => {
+            item.addEventListener('mouseenter', function () {
+                let reportId = getReportId(item.id);
+                displayType = 0;
+                canvases[reportId].className = "photo-subjects";
+                redraw(reportId);
+            });
+        });                
+        document.querySelectorAll(".hover-region, .hover-players").forEach(item => {
+            item.addEventListener('mouseleave', function () {
+                canvases[getReportId(item.id)].className = "photo-subjects hide-subjects";
+            });
+        });
+    }, false);
+    function redraw(reportId){
+        let context = ctx[reportId];
+        let canvas = canvases[reportId];
+        let image = images[reportId];
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        let w = canvas.width;
+        let h = canvas.height;
+                                    
+        // halfwidth, halfheight
+        const hw = w / 2;
+        const hh = h / 2;
+        switch (displayType){
+            case 0: {
+                let imageBounds = bounds[reportId];
+                const x1 = imageBounds.Left;
+                const x2 = imageBounds.Right;
+                const y1 = imageBounds.Top;
+                const y2 = imageBounds.Bottom;
+                const scaleX = image.naturalWidth / canvas.width;
+                const scaleY = image.naturalHeight / canvas.height;
+                const bx = canvas.width-(x2/scaleX);
+                const by = canvas.height-(y2/scaleY);
+                const bw = (x2 - x1) / scaleX;
+                const bh = (y2 - y1) / scaleY;
+                context.beginPath();
+                context.globalAlpha = 0.6;
+                context.fillStyle = "black";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.clearRect(bx, by, bw, bh);
+                context.beginPath();
+                context.lineWidth = 2;
+                context.strokeStyle = "#957a24";
+                context.rect(bx, by, bw, bh);
+                context.stroke();
+                context.globalAlpha = 1.0;
+                break;
+            }
+            case 1: {
+                let subject = subjects[reportId]; 
+                subject.forEach((s, si) => {
+                    const colour = colours[si % 4];
+                
+                    // Bounding box
+                    const x1 = s.Location.Left;
+                    const x2 = s.Location.Right;
+                    const y1 = s.Location.Top;
+                    const y2 = s.Location.Bottom;
+                            
+                    const scaleX = image.naturalWidth / canvas.width;
+                    const scaleY = image.naturalHeight / canvas.height;
+                
+                
+                    const bx = canvas.width-(x2/scaleX);
+                    const by = canvas.height-(y2/scaleY);
+                    const bw = (x2 - x1) / scaleX;
+                    const bh = (y2 - y1) / scaleY;
+                
+                    context.beginPath();
+                    context.lineWidth = 3;
+                    context.strokeStyle = colour;
+                    context.rect(bx, by, bw, bh);
+                    context.stroke();
+                
+                    // Move into relative coordinates from bounding box
+                    context.translate(bx, by);
+                
+                    // Username label
+                    context.font = "16px Lato";
+                    context.fillStyle = colour;
+                
+                    // Text width/height for the label background
+                    const tw = context.measureText(s.Name).width;
+                    const th = 24;
+                
+                    // Check if the label will flow off the bottom of the frame
+                    const overflowBottom = (y2+tw - 24) > (canvas.width);
+                    // Check if the label will flow off the left of the frame
+                    const overflowLeft = (x2) < (24);
+                
+                    // Set alignment
+                    context.textAlign = overflowLeft ? "start" : "end";
+                
+                    // Text x / y
+                    const lx = overflowLeft ? -bw + 6 : -6;
+                    const ly = overflowBottom ? -bh - 6 : 16;
+                
+                    // Label background x / y
+                    const lbx = overflowLeft ? bw - tw - 12 : 0;
+                    const lby = overflowBottom ? bh : -24;
+                
+                    // Draw background
+                    context.fillRect(lbx, lby, tw+8, th);
+                
+                    // Draw text, rotated back upright (canvas draws rotated 180deg)
+                    context.fillStyle = "white";
+                    context.rotate(Math.PI);
+                    context.fillText(s.Name, lx, ly);
+                
+                    // reset transform
+                    context.setTransform(1, 0, 0, 1, 0, 0);            
+                });                                
+                break;
+            }
+        }
+    }
+</script>
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/admin/reports/@(Model.PageNumber - 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Previous Page</a>
+}
+@(Model.PageNumber + 1) / @(Model.PageAmount)
+@if (Model.PageNumber < Model.PageAmount - 1)
+{
+    <a href="/admin/reports/@(Model.PageNumber + 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Next Page</a>
+}

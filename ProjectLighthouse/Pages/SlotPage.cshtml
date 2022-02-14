@@ -1,8 +1,5 @@
 @page "/slot/{id:int}"
-@using System.IO
-@using System.Web
 @using LBPUnion.ProjectLighthouse.Helpers.Extensions
-@using LBPUnion.ProjectLighthouse.Types.Profiles
 @model LBPUnion.ProjectLighthouse.Pages.SlotPage
 
 @{
@@ -57,36 +54,9 @@
         </div>
     </div>
 </div>
-<div class="ui yellow segment">
-    <h1>Comments</h1>
-    @if (Model.Comments.Count == 0)
-    {
-        <p>There are no comments.</p>
-    }
 
-    @foreach (Comment comment in Model.Comments!)
-    {
-        DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
-        StringWriter messageWriter = new();
-        HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
-        string decodedMessage = messageWriter.ToString();
-        <div>
-            <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
-            @if (comment.Deleted)
-            {
-                <i><span>@decodedMessage</span></i>
-            }
-            else
-            {
-                <span>@decodedMessage</span>
-            }
-            <p>
-                <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
-            </p>
-            <div class="ui divider"></div>
-        </div>
-    }
-</div>
+@await Html.PartialAsync("Partials/CommentsPartial")
+
 @if (Model.User != null && Model.User.IsAdmin)
 {
     <div class="ui yellow segment">
