@@ -27,6 +27,7 @@ public class GameVersionHelper
         "NPHG00033",
         "NPHG00035",
         "NPEA00241",
+        "NPUA98208",
     };
 
     // https://serialstation.com/games/35e69aba-1872-4fd7-9d39-11ce75924040
@@ -48,6 +49,7 @@ public class GameVersionHelper
         "BCES01694",
         "NPUA80662",
         "NPEA00324",
+        "NPUA70117",
     };
 
     // https://www.serialstation.com/games/b62d53d9-fdff-4463-8134-64b81e1cbd50
@@ -83,7 +85,7 @@ public class GameVersionHelper
 
     public static readonly string[] LittleBigPlanetVitaTitleIds =
     {
-        "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549", "PCSF00516", "PCSA22018",
+        "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549", "PCSF00516", "PCSA22018", "PCSF00021"
     };
 
     public static readonly string[] LittleBigPlanetPSPTitleIds =
