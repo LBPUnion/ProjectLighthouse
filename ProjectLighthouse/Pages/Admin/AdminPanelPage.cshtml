@@ -35,19 +35,24 @@ else
     <div class="ui blue segment">
         <h3>@command.Name()</h3>
         <form>
+            <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
             @if (command.RequiredArgs() > 0)
             {
-                <div class="ui input" style="width: @(Model.Request.IsMobile() ? 100 : 30)%;">
+                <div class="ui left action input" style="width: 100%">
+                    <button type="submit" class="ui green button">
+                        <i class="play icon"></i>
+                        Execute
+                    </button>
                     <input type="text" name="args" placeholder="@command.Arguments()">
                 </div>
-                <br>
-                <br>
             }
-            <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
-            <button type="submit" class="ui green button">
-                <i class="play icon"></i>
-                Execute
-            </button>
+            else
+            {
+                <button type="submit" class="ui green button">
+                    <i class="play icon"></i>
+                    Execute
+                </button>
+            }
         </form>
     </div>
 }

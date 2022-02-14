@@ -21,6 +21,7 @@ public static class FileHelper
 
         return file.FileType switch
         {
+            LbpFileType.MotionRecording => true,
             LbpFileType.FileArchive => false,
             LbpFileType.Painting => true,
             LbpFileType.Unknown => false,
@@ -56,17 +57,18 @@ public static class FileHelper
 
         return Encoding.ASCII.GetString(header) switch
         {
+            "REC" => LbpFileType.MotionRecording,
             "PTG" => LbpFileType.Painting,
             "TEX" => LbpFileType.Texture,
             "FSH" => LbpFileType.Script,
             "VOP" => LbpFileType.Voice,
             "LVL" => LbpFileType.Level,
             "PLN" => LbpFileType.Plan,
-            _ => determineFileTypePartTwoWeirdName(reader),
+            _ => readAlternateHeader(reader),
         };
     }
 
-    private static LbpFileType determineFileTypePartTwoWeirdName(BinaryReader reader)
+    private static LbpFileType readAlternateHeader(BinaryReader reader)
     {
         reader.BaseStream.Position = 0;
 

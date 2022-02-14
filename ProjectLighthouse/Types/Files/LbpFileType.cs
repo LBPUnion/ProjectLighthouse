@@ -8,6 +8,7 @@ public enum LbpFileType
     FileArchive, // .farc, (ends with FARC)
     Plan, // PLN, uploaded with levels
     Voice, // VOP, voice data
+    MotionRecording, // used in LBP2+/V for the motion recorder
     Painting, // PTG, paintings
     Jpeg, // JFIF / FIF, used in sticker switches,
     Png, // used in LBP Vita

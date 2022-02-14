@@ -74,7 +74,7 @@ public class ReviewController : ControllerBase
             this.database.RatedLevels.Add(ratedLevel);
         }
 
-        ratedLevel.Rating = Math.Max(Math.Min(1, rating), -1);
+        ratedLevel.Rating = Math.Clamp(rating, -1, 1);
 
         Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
         if (review != null) review.Thumb = ratedLevel.Rating;
@@ -161,12 +161,12 @@ public class ReviewController : ControllerBase
             yourReview = new Review();
             yourReview.ReviewerId = user.UserId;
             yourReview.Reviewer = user;
-            yourReview.Thumb = ratedLevel?.Rating == null ? 0 : ratedLevel.Rating;
+            yourReview.Thumb = ratedLevel?.Rating ?? 0;
             yourReview.Slot = slot;
             yourReview.SlotId = slotId;
             yourReview.Deleted = false;
             yourReview.DeletedBy = DeletedBy.None;
-            yourReview.Text = "You haven't reviewed this level yet. Edit this blank review to upload one!";
+            yourReview.Text = "You haven't reviewed this level yet. Edit this to write one!";
             yourReview.LabelCollection = "";
             yourReview.Timestamp = TimeHelper.UnixTimeMilliseconds();
         }

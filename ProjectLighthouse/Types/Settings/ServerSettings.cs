@@ -5,15 +5,17 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Kettu;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+#if RELEASE
+using LBPUnion.ProjectLighthouse.Helpers;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings;
 
 [Serializable]
 public class ServerSettings
 {
-    public const int CurrentConfigVersion = 18; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    public const int CurrentConfigVersion = 20; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     private static FileSystemWatcher fileWatcher;
     static ServerSettings()
     {
@@ -132,6 +134,12 @@ public class ServerSettings
 
     public int PhotosQuota { get; set; } = 500;
 
+    public bool ProfileCommentsEnabled { get; set; } = true;
+
+    public bool LevelCommentsEnabled { get; set; } = true;
+
+    public bool LevelReviewsEnabled { get; set; } = true;
+
     public bool GoogleAnalyticsEnabled { get; set; }
 
     public string GoogleAnalyticsId { get; set; } = "";
@@ -149,6 +157,12 @@ public class ServerSettings
     public bool ConfigReloading { get; set; } = true;
 
     public string MissingIconHash { get; set; } = "";
+
+    public bool HCaptchaEnabled { get; set; }
+
+    public string HCaptchaSiteKey { get; set; } = "";
+
+    public string HCaptchaSecret { get; set; } = "";
 
     #region Meta
 

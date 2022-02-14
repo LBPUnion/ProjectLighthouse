@@ -32,7 +32,9 @@
     @{
         int size = isMobile ? 50 : 100;
     }
-    <div class="cardIcon slotCardIcon" style="background-image: url('/gameAssets/@iconHash'); min-width: @(size)px; width: @(size)px; height: @(size)px">
+    <div>
+        <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute">
+        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
     </div>
     <div class="cardStats">
         @if (showLink)
