@@ -381,6 +381,11 @@ public class SlotsController : ControllerBase
 
     private IQueryable<Slot> filterByRequest(string? gameFilterType, string? dateFilterType, GameVersion version)
     {
+        if (version == GameVersion.LittleBigPlanetVita || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown)
+        {
+            return this.getSlots(version);
+        }
+
         string _dateFilterType = dateFilterType ?? "";
 
         long oldestTime = _dateFilterType switch
