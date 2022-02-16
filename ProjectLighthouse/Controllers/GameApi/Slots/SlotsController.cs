@@ -30,7 +30,7 @@ public class SlotsController : ControllerBase
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {
-            return query.Where(s => s.GameVersion == gameVersion);
+            return query.Where(s => s.GameVersion == gameVersion && !s.SubLevel);
         }
 
         return query.Where(s => s.GameVersion <= gameVersion && !s.SubLevel);
