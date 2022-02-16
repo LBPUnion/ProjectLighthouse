@@ -33,7 +33,7 @@ public class SlotsController : ControllerBase
             return query.Where(s => s.GameVersion == gameVersion);
         }
 
-        return query.Where(s => s.GameVersion <= gameVersion);
+        return query.Where(s => s.GameVersion <= gameVersion && !s.SubLevel);
     }
 
     [HttpGet("slots/by")]
