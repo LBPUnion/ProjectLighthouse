@@ -183,9 +183,18 @@ public class Startup
                             // If we got here, the normal ServerDigestKey failed to validate. Lets try again with the alternate digest key.
                             usedAlternateDigestKey = true;
 
+                            // Reset the body stream
+                            body.Position = 0;
+
                             clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, ServerSettings.Instance.AlternateDigestKey);
                             if (clientRequestDigest != sentDigest)
                             {
+                                #if DEBUG
+                                Console.WriteLine("Digest failed");
+                                Console.WriteLine("digestKey: " + ServerSettings.Instance.ServerDigestKey);
+                                Console.WriteLine("altDigestKey: " + ServerSettings.Instance.AlternateDigestKey);
+                                Console.WriteLine("computed digest: " + clientRequestDigest);
+                                #endif
                                 // We still failed to validate. Abort the request.
                                 context.Response.StatusCode = 403;
                                 context.Abort();
