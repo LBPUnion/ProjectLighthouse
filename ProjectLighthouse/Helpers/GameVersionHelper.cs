@@ -95,6 +95,7 @@ public class GameVersionHelper
 	//Debug, Beta and Demo
         "NPEA90128",
         "NPUA81174",
+        "BCES01663",
 	//PS4
         "CUSA00693",
         "CUSA00810",
