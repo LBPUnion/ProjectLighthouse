@@ -687,7 +687,13 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Pins")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("PlanetHash")
+                    b.Property<string>("PlanetHashLBP2")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PlanetHashLBP3")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PlanetHashLBPVita")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Username")

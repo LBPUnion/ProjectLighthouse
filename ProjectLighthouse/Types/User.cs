@@ -123,7 +123,13 @@ public class User
     public string Pins { get; set; } = "";
 
     [JsonIgnore]
-    public string PlanetHash { get; set; } = "";
+    public string PlanetHashLBP2 { get; set; } = "";
+
+    [JsonIgnore]
+    public string PlanetHashLBP3 { get; set; } = "";
+
+    [JsonIgnore]
+    public string PlanetHashLBPVita { get; set; } = "";
 
     [JsonIgnore]
     public int Hearts {
@@ -170,8 +176,8 @@ public class User
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
-                      LbpSerializer.StringElement("game", this.Game) +
-                      this.SerializeSlots(gameVersion) +
+                      LbpSerializer.StringElement("game", (int)gameVersion) +
+                      this.serializeSlots(gameVersion) +
                       LbpSerializer.StringElement("lists", this.Lists) +
                       LbpSerializer.StringElement("lists_quota", ServerSettings.Instance.ListsQuota) + // technically not a part of the user but LBP expects it
                       LbpSerializer.StringElement("biography", this.Biography) +
@@ -185,7 +191,7 @@ public class User
                       LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +
                       LbpSerializer.StringElement("lolcatftwCount", this.QueuedLevels) +
                       LbpSerializer.StringElement("pins", this.Pins) +
-                      LbpSerializer.StringElement("planets", this.PlanetHash) +
+                      serializeEarth(gameVersion) +
                       LbpSerializer.BlankElement("photos") +
                       LbpSerializer.StringElement("heartCount", this.Hearts) +
                       LbpSerializer.StringElement("yay2", this.YayHash) +
@@ -193,6 +199,21 @@ public class User
                       LbpSerializer.StringElement("meh2", this.MehHash);
 
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
+    }
+
+    private string serializeEarth(GameVersion gameVersion)
+    {
+        return LbpSerializer.StringElement
+        (
+            "planets",
+            gameVersion switch
+            {
+                GameVersion.LittleBigPlanet2 => PlanetHashLBP2,
+                GameVersion.LittleBigPlanet3 => PlanetHashLBP3,
+                GameVersion.LittleBigPlanetVita => PlanetHashLBPVita,
+                _ => "", // other versions do not have custom planets
+            }
+        );
     }
 
     #region Slots
@@ -226,7 +247,7 @@ public class User
         "lbp2", "lbp3", "crossControl",
     };
 
-    private string SerializeSlots(GameVersion gameVersion)
+    private string serializeSlots(GameVersion gameVersion)
     {
         string slots = string.Empty;
 

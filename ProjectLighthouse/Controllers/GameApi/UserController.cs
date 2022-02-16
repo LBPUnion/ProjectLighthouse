@@ -61,8 +61,13 @@ public class UserController : ControllerBase
     [HttpPost("updateUser")]
     public async Task<IActionResult> UpdateUser()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+
+        if (userAndToken == null) return this.StatusCode(403, "");
+
+        // ReSharper disable once PossibleInvalidOperationException
+        User user = userAndToken.Value.Item1;
+        GameToken gameToken = userAndToken.Value.Item2;
 
         XmlReaderSettings settings = new()
         {
@@ -121,7 +126,32 @@ public class UserController : ControllerBase
                             }
                             case "planets":
                             {
-                                user.PlanetHash = await reader.GetValueAsync();
+                                switch (gameToken.GameVersion)
+                                {
+                                    case GameVersion.LittleBigPlanet2: // LBP2 planets will apply to LBP3
+                                    {
+                                        user.PlanetHashLBP2 = await reader.GetValueAsync();
+                                        user.PlanetHashLBP3 = await reader.GetValueAsync();
+                                        break;
+                                    }
+                                    case GameVersion.LittleBigPlanet3: // LBP3 and vita can only apply to their own games, only set 1 here
+                                    {
+                                        user.PlanetHashLBP3 = await reader.GetValueAsync();
+                                        break;
+                                    }
+                                    case GameVersion.LittleBigPlanetVita:
+                                    {
+                                        user.PlanetHashLBPVita = await reader.GetValueAsync();
+                                        break;
+                                    }
+                                    case GameVersion.LittleBigPlanet1:
+                                    case GameVersion.LittleBigPlanetPSP:
+                                    case GameVersion.Unknown:
+                                    default: // The rest do not support custom earths.
+                                    {
+                                        throw new ArgumentException($"invalid gameVersion {gameToken.GameVersion} for setting earth");
+                                    }
+                                }
                                 break;
                             }
                             case "yay2":
@@ -129,14 +159,14 @@ public class UserController : ControllerBase
                                 user.YayHash = await reader.GetValueAsync();
                                 break;
                             }
-                            case "boo2":
-                            {
-                                user.BooHash = await reader.GetValueAsync();
-                                break;
-                            }
                             case "meh2":
                             {
                                 user.MehHash = await reader.GetValueAsync();
+                                break;
+                            }
+                            case "boo2":
+                            {
+                                user.BooHash = await reader.GetValueAsync();
                                 break;
                             }
                         }
