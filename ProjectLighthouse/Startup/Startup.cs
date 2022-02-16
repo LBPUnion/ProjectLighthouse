@@ -96,9 +96,8 @@ public class Startup
     public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         bool computeDigests = true;
-        string serverDigestKey = ServerSettings.Instance.ServerDigestKey;
-        string alternateDigestKey = ServerSettings.Instance.AlternateDigestKey;
-        if (string.IsNullOrEmpty(serverDigestKey))
+
+        if (string.IsNullOrEmpty(ServerSettings.Instance.ServerDigestKey))
         {
             Logger.Log
             (
@@ -170,9 +169,11 @@ public class Startup
                 string digestPath = context.Request.Path;
                 Stream body = context.Request.Body;
 
+                bool usedAlternateDigestKey = false;
+
                 if (computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
                 {
-                    string clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, serverDigestKey);
+                    string clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, ServerSettings.Instance.ServerDigestKey);
 
                     // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
                     if (context.Request.Headers.TryGetValue("X-Digest-A", out StringValues sentDigest))
@@ -180,7 +181,9 @@ public class Startup
                         if (clientRequestDigest != sentDigest)
                         {
                             // If we got here, the normal ServerDigestKey failed to validate. Lets try again with the alternate digest key.
-                            clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, alternateDigestKey);
+                            usedAlternateDigestKey = true;
+
+                            clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, ServerSettings.Instance.AlternateDigestKey);
                             if (clientRequestDigest != sentDigest)
                             {
                                 // We still failed to validate. Abort the request.
@@ -207,8 +210,10 @@ public class Startup
                 {
                     responseBuffer.Position = 0;
 
+                    string digestKey = usedAlternateDigestKey ? ServerSettings.Instance.AlternateDigestKey : ServerSettings.Instance.ServerDigestKey;
+
                     // Compute the digest for the response.
-                    string serverDigest = await HashHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer, serverDigestKey);
+                    string serverDigest = await HashHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer, digestKey);
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
 
