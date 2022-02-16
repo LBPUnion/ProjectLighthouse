@@ -17,17 +17,24 @@ public class GameVersionHelper
         "BCUS98148",
         "BCAS20058",
         "BCJS30018",
-        "UCAS40262",
         "BCET70011",
         "BCUS98199",
         "BCJB95003",
-        "NPUA70045",
-        "NPEA00241",
-        "NPEA00147",
-        "NPHG00033",
-        "NPHG00035",
         "NPEA00241",
         "NPUA98208",
+        "NPHA80092",
+        "BCKS10059",
+        "BCKS10088",
+        "BCUS70030",
+        "NPJA00052",
+        "NPUA80472",
+	//Debug, Beta and Demo
+        "BCET70011",
+        "NPUA70045",
+        "NPEA00147",
+        "BCET70002",
+        "NPHA80067",
+        "NPJA90074",
     };
 
     // https://serialstation.com/games/35e69aba-1872-4fd7-9d39-11ce75924040
@@ -45,54 +52,104 @@ public class GameVersionHelper
         "BCES00850",
         "BCES01346",
         "BCUS90260",
-        "BCET70023",
         "BCES01694",
         "NPUA80662",
         "NPEA00324",
-        "NPUA70117",
         "NPEA00437",
         "BCES01693",
+        "BCKS10150",
+	//Debug, Beta and Demo
+        "NPUA70117",
+        "BCET70023",
+        "BCET70035",
+        "NPEA90077",
+        "NPEA90098",
+        "NPHA80113",
+        "NPHA80125",
+        "NPJA90152",
+        "NPUA70127",
+        "NPUA70169",
+        "NPUA70174",
+	//HUB
+        "BCET70055",
+        "NPEA00449",
+        "NPHA80261",
     };
 
     // https://www.serialstation.com/games/b62d53d9-fdff-4463-8134-64b81e1cbd50
     // includes PS4 games
     public static readonly string[] LittleBigPlanet3TitleIds =
     {
-        "CUSA00063",
-        "CUSA00693",
-        "CUSA00473",
-        "CUSA00810",
-        "CUSA00473",
-        "CUSA01072",
-        "CUSA00738",
-        "PCJS50003",
+	//PS3
         "BCES02068",
         "BCAS20322",
         "BCJS30095",
         "BCES01663",
-        "CUSA00063",
         "BCUS98362",
+        "NPUA81116",
+        "NPEA00515",
+        "BCUS81138",
+        "NPJA00123",
+        "NPHO00189",
+        "NPHA80277",
+	//Debug, Beta and Demo
+        "NPEA90128",
+        "NPUA81174",
+	//PS4
+        "CUSA00693",
+        "CUSA00810",
+        "CUSA00738",
+        "PCJS50003",
+        "CUSA00063",
         "PCKS90007",
         "PCAS00012",
         "CUSA00601",
-        "CUSA00810",
         "CUSA00762",
         "PCAS20007",
         "CUSA00473",
+	//Debug, Beta and Demo
+        "CUSA01072",
         "CUSA01077",
         "CUSA01304",
-        "NPUA81116",
-        "NPEA00515",
     };
 
     public static readonly string[] LittleBigPlanetVitaTitleIds =
     {
-        "PCSF00021", "PCSA00017", "PCSC00013", "PCSD00006", "PCSA00549", "PCSF00516", "PCSA22018",
+        "PCSF00021",
+        "PCSA00017",
+        "PCSC00013",
+        "PCSD00006",
+        "PCSA00549",
+        "PCSF00516",
+        "PCSA22018",
+        "PCSA22106",
+        "PCSD00039",
+        "VCAS32010",
+        "VCJS10006",
+        "VCKS62003",
+	//Debug, Beta and Demo
+        "PCSA00061",
+        "PCSA00078",
+        "PCSA00081",
+        "PCSF00152",
+        "PCSF00188",
+        "PCSF00211",
     };
 
     public static readonly string[] LittleBigPlanetPSPTitleIds =
     {
-        "NPWR00500", "UCAS40262", "UCES01264", "UCUS98744", "UCJS10107",
+        "NPWR00500",
+        "UCAS40262",
+        "UCES01264",
+        "UCUS98744",
+        "UCJS10107",
+        "NPHG00033",
+        "NPJG00073",
+        "NPJG90072",
+	//Debug, Beta and Demo
+        "NPHG00035",
+        "NPUG70064",
+        "NPEG90019",
     };
 
     public static GameVersion FromTitleId(string titleId)
