@@ -97,6 +97,7 @@ public class Startup
     {
         bool computeDigests = true;
         string serverDigestKey = ServerSettings.Instance.ServerDigestKey;
+        string alternateDigestKey = ServerSettings.Instance.AlternateDigestKey;
         if (string.IsNullOrEmpty(serverDigestKey))
         {
             Logger.Log
@@ -175,12 +176,20 @@ public class Startup
 
                     // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
                     if (context.Request.Headers.TryGetValue("X-Digest-A", out StringValues sentDigest))
+                    {
                         if (clientRequestDigest != sentDigest)
                         {
-                            context.Response.StatusCode = 403;
-                            context.Abort();
-                            return;
+                            // If we got here, the normal ServerDigestKey failed to validate. Lets try again with the alternate digest key.
+                            clientRequestDigest = await HashHelper.ComputeDigest(digestPath, authCookie, body, alternateDigestKey);
+                            if (clientRequestDigest != sentDigest)
+                            {
+                                // We still failed to validate. Abort the request.
+                                context.Response.StatusCode = 403;
+                                context.Abort();
+                                return;
+                            }
                         }
+                    }
 
                     context.Response.Headers.Add("X-Digest-B", clientRequestDigest);
                     context.Request.Body.Position = 0;
