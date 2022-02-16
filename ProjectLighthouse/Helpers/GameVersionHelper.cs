@@ -80,7 +80,7 @@ public class GameVersionHelper
     // includes PS4 games
     public static readonly string[] LittleBigPlanet3TitleIds =
     {
-	    //PS3
+        //PS3
         "BCES02068",
         "BCAS20322",
         "BCJS30095",
