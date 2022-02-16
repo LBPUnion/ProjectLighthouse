@@ -28,7 +28,7 @@ public class GameVersionHelper
         "BCUS70030",
         "NPJA00052",
         "NPUA80472",
-		//Debug, Beta and Demo
+	    //Debug, Beta and Demo
         "BCET70011",
         "NPUA70045",
         "NPEA00147",
@@ -58,7 +58,7 @@ public class GameVersionHelper
         "NPEA00437",
         "BCES01693",
         "BCKS10150",
-		//Debug, Beta and Demo
+	    //Debug, Beta and Demo
         "NPUA70117",
         "BCET70023",
         "BCET70035",
@@ -70,7 +70,7 @@ public class GameVersionHelper
         "NPUA70127",
         "NPUA70169",
         "NPUA70174",
-		//HUB
+	    //HUB
         "BCET70055",
         "NPEA00449",
         "NPHA80261",
@@ -80,7 +80,7 @@ public class GameVersionHelper
     // includes PS4 games
     public static readonly string[] LittleBigPlanet3TitleIds =
     {
-		//PS3
+	    //PS3
         "BCES02068",
         "BCAS20322",
         "BCJS30095",
@@ -92,11 +92,11 @@ public class GameVersionHelper
         "NPJA00123",
         "NPHO00189",
         "NPHA80277",
-		//Debug, Beta and Demo
+	    //Debug, Beta and Demo
         "NPEA90128",
         "NPUA81174",
         "BCES01663",
-		//PS4
+	    //PS4
         "CUSA00693",
         "CUSA00810",
         "CUSA00738",
@@ -108,7 +108,7 @@ public class GameVersionHelper
         "CUSA00762",
         "PCAS20007",
         "CUSA00473",
-		//Debug, Beta and Demo
+	    //Debug, Beta and Demo
         "CUSA01072",
         "CUSA01077",
         "CUSA01304",
@@ -128,7 +128,7 @@ public class GameVersionHelper
         "VCAS32010",
         "VCJS10006",
         "VCKS62003",
-		//Debug, Beta and Demo
+	    //Debug, Beta and Demo
         "PCSA00061",
         "PCSA00078",
         "PCSA00081",
@@ -147,7 +147,7 @@ public class GameVersionHelper
         "NPHG00033",
         "NPJG00073",
         "NPJG90072",
-		//Debug, Beta and Demo
+	    //Debug, Beta and Demo
         "NPHG00035",
         "NPUG70064",
         "NPEG90019",
