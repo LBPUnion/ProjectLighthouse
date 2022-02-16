@@ -11,7 +11,6 @@ namespace LBPUnion.ProjectLighthouse.Types;
 
 public class User
 {
-    public readonly ClientsConnected ClientsConnected = new();
     public int UserId { get; set; }
     public string Username { get; set; }
 
@@ -172,7 +171,7 @@ public class User
     {
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                       LbpSerializer.StringElement("game", this.Game) +
-                      this.SerializeSlots(gameVersion == GameVersion.LittleBigPlanetVita) +
+                      this.SerializeSlots(gameVersion) +
                       LbpSerializer.StringElement("lists", this.Lists) +
                       LbpSerializer.StringElement("lists_quota", ServerSettings.Instance.ListsQuota) + // technically not a part of the user but LBP expects it
                       LbpSerializer.StringElement("biography", this.Biography) +
@@ -192,7 +191,6 @@ public class User
                       LbpSerializer.StringElement("yay2", this.YayHash) +
                       LbpSerializer.StringElement("boo2", this.BooHash) +
                       LbpSerializer.StringElement("meh2", this.MehHash);
-        this.ClientsConnected.Serialize();
 
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }
@@ -225,17 +223,16 @@ public class User
 
     private static readonly string[] slotTypes =
     {
-//            "lbp1",
         "lbp2", "lbp3", "crossControl",
     };
 
-    private string SerializeSlots(bool isVita = false)
+    private string SerializeSlots(GameVersion gameVersion)
     {
         string slots = string.Empty;
 
         string[] slotTypesLocal;
 
-        if (isVita)
+        if (gameVersion == GameVersion.LittleBigPlanetVita)
         {
             slots += LbpSerializer.StringElement("lbp2UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanetVita));
             slotTypesLocal = new[]

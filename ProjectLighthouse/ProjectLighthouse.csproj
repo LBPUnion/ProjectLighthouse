@@ -48,6 +48,7 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
         <None Remove="recent-activity.xml"/>
+        <None Remove="r.tar.gz"/>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
