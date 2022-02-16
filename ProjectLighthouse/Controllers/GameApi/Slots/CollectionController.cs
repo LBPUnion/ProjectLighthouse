@@ -74,8 +74,13 @@ public class CollectionController : ControllerBase
     [HttpGet("searches/{endpointName}")]
     public async Task<IActionResult> GetCategorySlots(string endpointName, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+
+        if (userAndToken == null) return this.StatusCode(403, "");
+
+        // ReSharper disable once PossibleInvalidOperationException
+        User user = userAndToken.Value.Item1;
+        GameToken gameToken = userAndToken.Value.Item2;
 
         Category? category = CollectionHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();
@@ -96,7 +101,7 @@ public class CollectionController : ControllerBase
             totalSlots = category.GetTotalSlots(this.database);
         }
 
-        string slotsSerialized = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+        string slotsSerialized = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(gameToken.GameVersion));
 
         return this.Ok
         (

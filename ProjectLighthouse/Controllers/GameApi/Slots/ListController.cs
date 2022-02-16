@@ -44,7 +44,7 @@ public class ListController : ControllerBase
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
-        string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
+        string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize(gameVersion));
 
         return this.Ok
         (
@@ -116,7 +116,7 @@ public class ListController : ControllerBase
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
-        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize());
+        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize(gameVersion));
 
         return this.Ok
         (

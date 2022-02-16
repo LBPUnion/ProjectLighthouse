@@ -55,7 +55,7 @@ public class SlotsController : ControllerBase
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
             string.Empty,
-            (current, slot) => current + slot.Serialize()
+            (current, slot) => current + slot.Serialize(token.GameVersion)
         );
 
         return this.Ok
@@ -94,7 +94,7 @@ public class SlotsController : ControllerBase
 
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
         VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-        return this.Ok(slot.Serialize(ratedLevel, visitedLevel));
+        return this.Ok(slot.Serialize(gameVersion, ratedLevel, visitedLevel));
     }
 
     [HttpGet("slots/cool")]
@@ -131,7 +131,7 @@ public class SlotsController : ControllerBase
 
         IQueryable<Slot> slots = this.getSlots(gameVersion).OrderByDescending(s => s.FirstUploaded).Skip(pageStart - 1).Take(Math.Min(pageSize, 30));
 
-        string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
+        string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
 
         return this.Ok
         (
@@ -165,7 +165,7 @@ public class SlotsController : ControllerBase
             .OrderByDescending(s => s.LastUpdated)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30));
-        string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
+        string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
 
         return this.Ok
         (
@@ -196,7 +196,7 @@ public class SlotsController : ControllerBase
 
         IEnumerable<Slot> slots = this.getSlots(gameVersion).OrderBy(_ => EF.Functions.Random()).Take(Math.Min(pageSize, 30));
 
-        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
 
         return this.Ok
         (
@@ -240,7 +240,7 @@ public class SlotsController : ControllerBase
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30));
 
-        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
 
         return this.Ok
         (
@@ -298,7 +298,7 @@ public class SlotsController : ControllerBase
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30));
 
-        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
 
         return this.Ok
         (
@@ -342,7 +342,7 @@ public class SlotsController : ControllerBase
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30));
 
-        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize());
+        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
 
         return this.Ok
         (

@@ -130,7 +130,7 @@ public class PublishController : ControllerBase
 
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
-            return this.Ok(oldSlot.Serialize());
+            return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
         //TODO: parse location in body
@@ -162,7 +162,7 @@ public class PublishController : ControllerBase
             $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerSettings.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}"
         );
 
-        return this.Ok(slot.Serialize());
+        return this.Ok(slot.Serialize(gameToken.GameVersion));
     }
 
     [HttpPost("unpublish/{id:int}")]

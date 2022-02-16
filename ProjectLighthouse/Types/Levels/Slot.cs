@@ -125,10 +125,8 @@ public class Slot
     [XmlIgnore]
     [NotMapped]
     [JsonIgnore]
-    public int Comments
-    {
-        get
-        {
+    public int Comments {
+        get {
             using Database database = new();
 
             return database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
@@ -254,9 +252,14 @@ public class Slot
                LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
     }
 
-    public string Serialize(RatedLevel? yourRatingStats = null, VisitedLevel? yourVisitedStats = null, Review? yourReview = null)
+    public string Serialize
+    (
+        GameVersion gameVersion = GameVersion.LittleBigPlanet1,
+        RatedLevel? yourRatingStats = null,
+        VisitedLevel? yourVisitedStats = null,
+        Review? yourReview = null
+    )
     {
-
         string slotData = LbpSerializer.StringElement("name", this.Name) +
                           LbpSerializer.StringElement("id", this.SlotId) +
                           LbpSerializer.StringElement("game", (int)this.GameVersion) +
@@ -287,13 +290,9 @@ public class Slot
                           LbpSerializer.StringElement("lbp1PlayCount", this.PlaysLBP1) +
                           LbpSerializer.StringElement("lbp1CompletionCount", this.PlaysLBP1Complete) +
                           LbpSerializer.StringElement("lbp1UniquePlayCount", this.PlaysLBP1Unique) +
-                          LbpSerializer.StringElement("lbp2PlayCount", this.PlaysLBP2) +
-                          LbpSerializer.StringElement("lbp2CompletionCount", this.PlaysLBP2Complete) +
-                          LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBP2Unique) + // not actually used ingame, as per above comment
                           LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                           LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
                           LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
-                          LbpSerializer.StringElement("vitaCrossControlRequired", this.CrossControllerRequired) +
                           LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
                           LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
                           LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
@@ -303,12 +302,25 @@ public class Slot
                           LbpSerializer.StringElement("yourLBP1PlayCount", yourVisitedStats?.PlaysLBP1) +
                           LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBP2) +
                           LbpSerializer.StringElement("yourLBP3PlayCount", yourVisitedStats?.PlaysLBP3) +
-                          LbpSerializer.StringElement
-                              ("yourLBPVitaPlayCount", yourVisitedStats?.PlaysLBPVita) + // i doubt this is the right name but we'll go with it
                           yourReview?.Serialize("yourReview") +
                           LbpSerializer.StringElement("reviewsEnabled", ServerSettings.Instance.LevelReviewsEnabled) +
                           LbpSerializer.StringElement("commentsEnabled", ServerSettings.Instance.LevelCommentsEnabled) +
                           LbpSerializer.StringElement("reviewCount", this.ReviewCount);
+
+        if (gameVersion == GameVersion.LittleBigPlanetVita)
+        {
+            slotData += LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBPVita) +
+                        LbpSerializer.StringElement("lbp2PlayCount", this.PlaysLBPVita) +
+                        LbpSerializer.StringElement("lbp2CompletionCount", this.PlaysLBPVitaComplete) +
+                        LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBPVitaUnique);
+        }
+        else
+        {
+            slotData += LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBPVita) +
+                        LbpSerializer.StringElement("lbp2PlayCount", this.PlaysLBP2) +
+                        LbpSerializer.StringElement("lbp2CompletionCount", this.PlaysLBP2Complete) +
+                        LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBP2Unique); // not actually used ingame, as per above comment
+        }
 
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
     }
