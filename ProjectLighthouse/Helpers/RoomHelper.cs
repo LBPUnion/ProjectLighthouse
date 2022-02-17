@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Match;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -166,6 +167,15 @@ public class RoomHelper
     {
         lock(Rooms)
         {
+            // Remove offline players from rooms
+            foreach (Room room in Rooms)
+            {
+                foreach (User player in room.Players.Where(player => player.Status.StatusType == StatusType.Offline))
+                {
+                    room.Players.Remove(player);
+                }
+            }
+
             // Delete old rooms based on host
             if (host != null)
                 try
