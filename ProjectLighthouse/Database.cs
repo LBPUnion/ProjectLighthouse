@@ -82,6 +82,7 @@ public class Database : DbContext
             UserId = user.UserId,
             UserLocation = userLocation,
             GameVersion = npTicket.GameVersion,
+            Platform = npTicket.Platform,
         };
 
         this.GameTokens.Add(gameToken);
@@ -151,7 +152,7 @@ public class Database : DbContext
         else
         {
             Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
-            if(targetSlot == null) return false;
+            if (targetSlot == null) return false;
         }
 
         this.Comments.Add

@@ -250,7 +250,8 @@ public class Startup
 
                     if (gameToken != null && gameToken.GameVersion == GameVersion.LittleBigPlanet1)
                         // Ignore UserFromGameToken null because user must exist for a token to exist
-                        await LastContactHelper.SetLastContact((await database.UserFromGameToken(gameToken))!, GameVersion.LittleBigPlanet1);
+                        await LastContactHelper.SetLastContact
+                            ((await database.UserFromGameToken(gameToken))!, GameVersion.LittleBigPlanet1, gameToken.Platform);
                 }
                 #nullable disable
 

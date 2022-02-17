@@ -81,6 +81,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("GameVersion")
                         .HasColumnType("int");
 
+                    b.Property<int>("Platform")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Used")
                         .HasColumnType("tinyint(1)");
 
@@ -456,6 +459,9 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("GameVersion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Platform")
                         .HasColumnType("int");
 
                     b.Property<long>("Timestamp")

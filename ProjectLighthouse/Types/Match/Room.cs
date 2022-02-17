@@ -1,22 +1,33 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types.Match;
 
 public class Room
 {
-    public List<User> Players;
-    public int RoomId;
+    [JsonIgnore]
+    public List<User> Players { get; set; }
 
-    public GameVersion RoomVersion;
-    public RoomSlot Slot;
-    public RoomState State;
+    public int RoomId { get; set; }
 
+    [JsonIgnore]
+    public GameVersion RoomVersion { get; set; }
+
+    public RoomSlot Slot { get; set; }
+    public RoomState State { get; set; }
+
+    [JsonIgnore]
     public bool IsInPod => this.Slot.SlotType == SlotType.Pod;
+
+    [JsonIgnore]
     public bool IsLookingForPlayers => this.State == RoomState.PlayingLevel || this.State == RoomState.DivingInWaiting;
 
+    [JsonIgnore]
     public User Host => this.Players[0];
+
+    public int PlayerCount => this.Players.Count;
 
     #nullable enable
     public override bool Equals(object? obj)

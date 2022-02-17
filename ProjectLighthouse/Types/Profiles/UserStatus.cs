@@ -1,6 +1,7 @@
 #nullable enable
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Types.Match;
 
 namespace LBPUnion.ProjectLighthouse.Types.Profiles;
 
@@ -8,6 +9,8 @@ public class UserStatus
 {
     public StatusType StatusType { get; set; }
     public GameVersion? CurrentVersion { get; set; }
+    public Platform? CurrentPlatform { get; set; }
+    public Room? CurrentRoom { get; set; }
 
     public UserStatus()
     {}
@@ -25,16 +28,19 @@ public class UserStatus
         {
             StatusType = StatusType.Online;
             CurrentVersion = lastContact.GameVersion;
+            CurrentPlatform = lastContact.Platform;
         }
+
+        CurrentRoom = RoomHelper.FindRoomByUserId(userId);
     }
 
     public override string ToString()
     {
         CurrentVersion ??= GameVersion.Unknown;
-
+        CurrentPlatform ??= Platform.Unknown;
         return this.StatusType switch
         {
-            StatusType.Online => $"Currently online on {((GameVersion)this.CurrentVersion).ToPrettyString()}",
+            StatusType.Online => $"Currently online on {((GameVersion)this.CurrentVersion).ToPrettyString()} on {((Platform)this.CurrentPlatform)}",
             StatusType.Offline => "Offline",
             _ => "Unknown",
         };

@@ -74,7 +74,7 @@ public class MatchController : ControllerBase
 
         #endregion
 
-        await LastContactHelper.SetLastContact(user, gameToken.GameVersion);
+        await LastContactHelper.SetLastContact(user, gameToken.GameVersion, gameToken.Platform);
 
         #region Process match data
 

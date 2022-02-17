@@ -152,6 +152,15 @@ public class RoomHelper
         return createIfDoesNotExist ? CreateRoom(user, roomVersion) : null;
     }
 
+    public static Room? FindRoomByUserId(int userId)
+    {
+        lock(Rooms)
+            foreach (Room room in Rooms.Where(room => room.Players.Any(player => player.UserId == userId)))
+                return room;
+
+        return null;
+    }
+
     [SuppressMessage("ReSharper", "InvertIf")]
     public static void CleanupRooms(User? host = null, Room? newRoom = null)
     {
