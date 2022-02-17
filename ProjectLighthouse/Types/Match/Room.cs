@@ -15,6 +15,9 @@ public class Room
     [JsonIgnore]
     public GameVersion RoomVersion { get; set; }
 
+    [JsonIgnore]
+    public Platform RoomPlatform { get; set; }
+
     public RoomSlot Slot { get; set; }
     public RoomState State { get; set; }
 

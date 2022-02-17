@@ -42,7 +42,7 @@ public class RoomHelper
 
     internal static int RoomIdIncrement => roomIdIncrement++;
 
-    public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, string? location)
+    public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, Platform? platform, string? location)
     {
         if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
         {
@@ -60,6 +60,7 @@ public class RoomHelper
         }
 
         rooms = rooms.Where(r => r.RoomVersion == roomVersion).ToList();
+        if (platform != null) rooms = rooms.Where(r => r.RoomPlatform == platform).ToList();
 
         foreach (Room room in rooms)
             // Look for rooms looking for players before moving on to rooms that are idle.
@@ -133,7 +134,7 @@ public class RoomHelper
         return null;
     }
 
-    public static Room CreateRoom(User user, GameVersion roomVersion, RoomSlot? slot = null)
+    public static Room CreateRoom(User user, GameVersion roomVersion, Platform roomPlatform, RoomSlot? slot = null)
         => CreateRoom
         (
             new List<User>
@@ -141,9 +142,10 @@ public class RoomHelper
                 user,
             },
             roomVersion,
+            roomPlatform,
             slot
         );
-    public static Room CreateRoom(List<User> users, GameVersion roomVersion, RoomSlot? slot = null)
+    public static Room CreateRoom(List<User> users, GameVersion roomVersion, Platform roomPlatform, RoomSlot? slot = null)
     {
         Room room = new()
         {
@@ -152,6 +154,7 @@ public class RoomHelper
             State = RoomState.Idle,
             Slot = slot ?? PodSlot,
             RoomVersion = roomVersion,
+            RoomPlatform = roomPlatform,
         };
 
         CleanupRooms(room.Host, room);
@@ -161,13 +164,13 @@ public class RoomHelper
         return room;
     }
 
-    public static Room? FindRoomByUser(User user, GameVersion roomVersion, bool createIfDoesNotExist = false)
+    public static Room? FindRoomByUser(User user, GameVersion roomVersion, Platform roomPlatform, bool createIfDoesNotExist = false)
     {
         lock(Rooms)
             foreach (Room room in Rooms.Where(room => room.Players.Any(player => user == player)))
                 return room;
 
-        return createIfDoesNotExist ? CreateRoom(user, roomVersion) : null;
+        return createIfDoesNotExist ? CreateRoom(user, roomVersion, roomPlatform) : null;
     }
 
     public static Room? FindRoomByUserId(int userId)

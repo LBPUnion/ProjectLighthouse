@@ -26,7 +26,7 @@ public class RoomVisualizerController : ControllerBase
         return this.NotFound();
         #else
         List<User> users = await this.database.Users.OrderByDescending(_ => EF.Functions.Random()).Take(2).ToListAsync();
-        RoomHelper.CreateRoom(users, GameVersion.LittleBigPlanet2);
+        RoomHelper.CreateRoom(users, GameVersion.LittleBigPlanet2, Platform.PS3);
 
         foreach (User user in users)
         {
