@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -153,16 +152,10 @@ public class User
     #nullable enable
     [NotMapped]
     [JsonIgnore]
-    public string Status {
+    public UserStatus Status {
         get {
             using Database database = new();
-            LastContact? lastMatch = database.LastContacts.Where
-                    (l => l.UserId == this.UserId)
-                .FirstOrDefault(l => TimestampHelper.Timestamp - l.Timestamp < 300);
-
-            if (lastMatch == null) return "Offline";
-
-            return "Currently online on " + lastMatch.GameVersion.ToPrettyString();
+            return new UserStatus(database, this.UserId);
         }
     }
     #nullable disable
