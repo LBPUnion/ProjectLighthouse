@@ -34,10 +34,6 @@ public class LoginController : ControllerBase
         await this.Request.Body.CopyToAsync(ms);
         byte[] loginData = ms.ToArray();
 
-        #if DEBUG
-        await IOFile.WriteAllBytesAsync($"npTicket-{TimestampHelper.TimestampMillis}.txt", loginData);
-        #endif
-
         NPTicket? npTicket;
         try
         {
