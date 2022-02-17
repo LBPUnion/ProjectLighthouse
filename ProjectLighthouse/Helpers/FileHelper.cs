@@ -1,7 +1,13 @@
+#nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Files;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 
@@ -101,4 +107,44 @@ public static class FileHelper
     }
 
     public static string[] ResourcesNotUploaded(params string[] hashes) => hashes.Where(hash => !ResourceExists(hash)).ToArray();
+
+    public static void ConvertAllTexturesToPng()
+    {
+        EnsureDirectoryCreated(Path.Combine(Environment.CurrentDirectory, "png"));
+        if (Directory.Exists("r"))
+        {
+            Logger.Log
+                ("Converting all textures to PNG. This may take a while if this is the first time running this operation...", LoggerLevelStartup.Instance);
+
+            ConcurrentQueue<string> fileQueue = new();
+
+            foreach (string filename in Directory.GetFiles("r")) fileQueue.Enqueue(filename);
+
+            for(int i = 0; i < Environment.ProcessorCount; i++)
+            {
+                Task.Factory.StartNew
+                (
+                    () =>
+                    {
+                        while (fileQueue.TryDequeue(out string? filename))
+                        {
+                            LbpFile? file = LbpFile.FromHash(filename.Replace("r" + Path.DirectorySeparatorChar, ""));
+                            if (file == null) continue;
+
+                            if (file.FileType == LbpFileType.Jpeg || file.FileType == LbpFileType.Png || file.FileType == LbpFileType.Texture)
+                            {
+                                ImageHelper.LbpFileToPNG(file);
+                            }
+                        }
+                    }
+                );
+            }
+
+            while (!fileQueue.IsEmpty)
+            {
+                Thread.Sleep(100);
+            }
+        }
+    }
+
 }
