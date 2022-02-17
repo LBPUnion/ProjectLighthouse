@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
@@ -22,6 +23,22 @@ public class RoomHelper
     };
 
     private static int roomIdIncrement;
+
+    public static void StartCleanupThread()
+    {
+        // ReSharper disable once FunctionNeverReturns
+        Task.Factory.StartNew
+        (
+            async () =>
+            {
+                while (true)
+                {
+                    CleanupRooms();
+                    await Task.Delay(10000);
+                }
+            }
+        );
+    }
 
     internal static int RoomIdIncrement => roomIdIncrement++;
 
@@ -167,6 +184,8 @@ public class RoomHelper
     {
         lock(Rooms)
         {
+            int roomCountBeforeCleanup = Rooms.Count;
+
             // Remove offline players from rooms
             foreach (Room room in Rooms)
             {
@@ -198,6 +217,13 @@ public class RoomHelper
 
             Rooms.RemoveAll(r => r.Players.Count == 0); // Remove empty rooms
             Rooms.RemoveAll(r => r.Players.Count > 4); // Remove obviously bogus rooms
+
+            int roomCountAfterCleanup = Rooms.Count;
+
+            if (roomCountBeforeCleanup != roomCountAfterCleanup)
+            {
+                Logger.Log($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.", LoggerLevelMatch.Instance);
+            }
         }
     }
 }

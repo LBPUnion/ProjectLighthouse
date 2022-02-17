@@ -80,6 +80,9 @@ public static class Program
 
         FileHelper.ConvertAllTexturesToPng();
 
+        Logger.Log("Starting room cleanup thread...", LoggerLevelStartup.Instance);
+        RoomHelper.StartCleanupThread();
+
         stopwatch.Stop();
         Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
 
