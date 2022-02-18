@@ -24,16 +24,22 @@ public class SlotsController : ControllerBase
         this.database = database;
     }
 
-    private IQueryable<Slot> getSlots(GameVersion gameVersion)
+    private IQueryable<Slot> getSlots(GameVersion gameVersion, bool includeSublevels = false)
     {
         IQueryable<Slot> query = this.database.Slots.Include(s => s.Creator).Include(s => s.Location);
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {
-            return query.Where(s => s.GameVersion == gameVersion && !s.SubLevel);
+            query = query.Where(s => s.GameVersion == gameVersion);
+        }
+        else
+        {
+            query = query.Where(s => s.GameVersion <= gameVersion);
         }
 
-        return query.Where(s => s.GameVersion <= gameVersion && !s.SubLevel);
+        if (!includeSublevels) query = query.Where(s => !s.SubLevel);
+
+        return query;
     }
 
     [HttpGet("slots/by")]
@@ -49,8 +55,7 @@ public class SlotsController : ControllerBase
 
         string response = Enumerable.Aggregate
         (
-            this.getSlots
-                    (gameVersion)
+            this.getSlots(gameVersion, token.UserId == user.UserId)
                 .Where(s => s.Creator!.Username == user.Username)
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
