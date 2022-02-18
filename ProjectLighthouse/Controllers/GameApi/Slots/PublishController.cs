@@ -33,10 +33,18 @@ public class PublishController : ControllerBase
     [HttpPost("startPublish")]
     public async Task<IActionResult> StartPublish()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
-        if (user.UsedSlots >= ServerSettings.Instance.EntitledSlots) return this.BadRequest();
+        if (userAndToken == null) return this.StatusCode(403, "");
+
+        // ReSharper disable once PossibleInvalidOperationException
+        User user = userAndToken.Value.Item1;
+        GameToken gameToken = userAndToken.Value.Item2;
+
+        if (user.GetUsedSlotsForGame(gameToken.GameVersion, database) > 50)
+        {
+            return this.StatusCode(403, "");
+        }
 
         Slot? slot = await this.getSlotFromBody();
         if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded

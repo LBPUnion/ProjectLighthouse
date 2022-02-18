@@ -223,11 +223,14 @@ public class User
         }
     }
 
-    public int GetUsedSlotsForGame(GameVersion version)
+    #nullable enable
+    public int GetUsedSlotsForGame(GameVersion version, Database? database = null)
     {
-        using Database database = new();
+        database ??= new Database();
+
         return database.Slots.Count(s => s.CreatorId == this.UserId && s.GameVersion == version);
     }
+    #nullable disable
 
     /// <summary>
     ///     The number of slots remaining on the earth
