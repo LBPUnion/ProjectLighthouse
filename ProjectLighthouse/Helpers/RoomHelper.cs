@@ -192,10 +192,9 @@ public class RoomHelper
             // Remove offline players from rooms
             foreach (Room room in Rooms)
             {
-                foreach (User player in room.Players.Where(player => player.Status.StatusType == StatusType.Offline))
-                {
-                    room.Players.Remove(player);
-                }
+                // do not shorten, this prevents collection modified errors
+                List<User> playersToRemove = room.Players.Where(player => player.Status.StatusType == StatusType.Offline).ToList();
+                foreach (User user in playersToRemove) room.Players.Remove(user);
             }
 
             // Delete old rooms based on host
