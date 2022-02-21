@@ -17,7 +17,7 @@ namespace LBPUnion.ProjectLighthouse.Controllers.GameApi.Slots;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/")]
-[Produces("text/plain")]
+[Produces("text/xml")]
 public class ReviewController : ControllerBase
 {
     private readonly Database database;
@@ -141,51 +141,19 @@ public class ReviewController : ControllerBase
 
         GameVersion gameVersion = gameToken.GameVersion;
 
-        Random rand = new();
-
-        Review? yourReview = await this.database.Reviews.FirstOrDefaultAsync
-            (r => r.ReviewerId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
-
-        VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync
-            (v => v.UserId == user.UserId && v.SlotId == slotId && v.Slot.GameVersion <= gameVersion);
-
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.BadRequest();
-
-        bool canNowReviewLevel = slot.CreatorId != user.UserId && visitedLevel != null && yourReview == null;
-        if (canNowReviewLevel)
-        {
-            RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync
-                (r => r.UserId == user.UserId && r.SlotId == slotId && r.Slot.GameVersion <= gameVersion);
-
-            yourReview = new Review();
-            yourReview.ReviewerId = user.UserId;
-            yourReview.Reviewer = user;
-            yourReview.Thumb = ratedLevel?.Rating ?? 0;
-            yourReview.Slot = slot;
-            yourReview.SlotId = slotId;
-            yourReview.Deleted = false;
-            yourReview.DeletedBy = DeletedBy.None;
-            yourReview.Text = "You haven't reviewed this level yet. Edit this to write one!";
-            yourReview.LabelCollection = "";
-            yourReview.Timestamp = TimeHelper.UnixTimeMilliseconds();
-        }
 
         IQueryable<Review?> reviews = this.database.Reviews.Where(r => r.SlotId == slotId && r.Slot.GameVersion <= gameVersion)
             .Include(r => r.Reviewer)
             .Include(r => r.Slot)
             .OrderByDescending(r => r.ThumbsUp)
-            .ThenByDescending(_ => EF.Functions.Random())
+            .ThenByDescending(r => r.Timestamp)
             .Skip(pageStart - 1)
             .Take(pageSize);
 
-        IEnumerable<Review?> prependedReviews;
-        if (canNowReviewLevel) // this can only be true if you have not posted a review but have visited the level
-            // prepend the fake review to the top of the list to be easily edited
-            prependedReviews = reviews.ToList().Prepend(yourReview);
-        else prependedReviews = reviews.ToList();
 
-        string inner = prependedReviews.Aggregate
+        string inner = reviews.ToList().Aggregate
         (
             string.Empty,
             (current, review) =>
