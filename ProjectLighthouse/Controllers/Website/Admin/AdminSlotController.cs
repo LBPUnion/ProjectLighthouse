@@ -62,10 +62,7 @@ public class AdminSlotController : ControllerBase
 
         if (slot.Location == null) throw new ArgumentNullException();
 
-        this.database.Locations.Remove(slot.Location);
-        this.database.Slots.Remove(slot);
-
-        await this.database.SaveChangesAsync();
+        await this.database.RemoveSlot(slot);
 
         return this.Ok();
     }
