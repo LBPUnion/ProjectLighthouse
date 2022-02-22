@@ -1,10 +1,9 @@
 #nullable enable
-using System;
 using System.Threading.Tasks;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Controllers.Website;
@@ -20,20 +19,6 @@ public class UserPageController : ControllerBase
         this.database = database;
     }
 
-    [HttpGet("heart")]
-    public async Task<IActionResult> HeartUser([FromRoute] int id)
-    {
-        User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null) return this.Redirect("~/login");
-
-        User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
-        if (heartedUser == null) return this.NotFound();
-
-        await this.database.HeartUser(user, heartedUser);
-
-        return this.Redirect("~/user/" + id);
-    }
-
     [HttpGet("rateComment")]
     public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int? commentId, [FromQuery] int? rating)
     {
@@ -45,15 +30,34 @@ public class UserPageController : ControllerBase
         return this.Redirect($"~/user/{id}#{commentId}");
     }
 
-    [HttpGet("postComment")]
-    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string? msg)
+    [HttpPost("postComment")]
+    public async Task<IActionResult> PostComment([FromRoute] int id, [FromForm] string? msg)
     {
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        if (msg == null) return this.Redirect("~/user/" + id);
+        if (msg == null)
+        {
+            Logger.Log($"Refusing to post comment from {user.UserId} on user {id}, {nameof(msg)} is null", LoggerLevelComments.Instance);
+            return this.Redirect("~/user/" + id);
+        }
 
         await this.database.PostComment(user, id, CommentType.Profile, msg);
+        Logger.Log($"Posted comment from {user.UserId}: \"{msg}\" on user {id}", LoggerLevelComments.Instance);
+
+        return this.Redirect("~/user/" + id);
+    }
+
+    [HttpGet("heart")]
+    public async Task<IActionResult> HeartUser([FromRoute] int id)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
+
+        User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (heartedUser == null) return this.NotFound();
+
+        await this.database.HeartUser(user, heartedUser);
 
         return this.Redirect("~/user/" + id);
     }

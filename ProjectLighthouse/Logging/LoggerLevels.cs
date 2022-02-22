@@ -63,6 +63,12 @@ public class LoggerLevelInflux : LoggerLevel
     public override string Name => "Influx";
 }
 
+public class LoggerLevelComments : LoggerLevel
+{
+    public static readonly LoggerLevelComments Instance = new();
+    public override string Name => "Comments";
+}
+
 public class LoggerLevelAspNet : LoggerLevel
 {
 

@@ -1,5 +1,7 @@
 #nullable enable
 using System.Threading.Tasks;
+using Kettu;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
@@ -34,15 +36,20 @@ public class SlotPageController : ControllerBase
         return this.Redirect($"~/slot/{id}#{commentId}");
     }
 
-    [HttpGet("postComment")]
-    public async Task<IActionResult> PostComment([FromRoute] int id, [FromQuery] string? msg)
+    [HttpPost("postComment")]
+    public async Task<IActionResult> PostComment([FromRoute] int id, [FromForm] string? msg)
     {
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        if (msg == null) return this.Redirect("~/slot/" + id);
+        if (msg == null)
+        {
+            Logger.Log($"Refusing to post comment from {user.UserId} on user {id}, {nameof(msg)} is null", LoggerLevelComments.Instance);
+            return this.Redirect("~/slot/" + id);
+        }
 
         await this.database.PostComment(user, id, CommentType.Level, msg);
+        Logger.Log($"Posted comment from {user.UserId}: \"{msg}\" on user {id}", LoggerLevelComments.Instance);
 
         return this.Redirect("~/slot/" + id);
     }
