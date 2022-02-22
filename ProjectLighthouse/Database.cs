@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
@@ -50,6 +51,10 @@ public class Database : DbContext
 
         // 16 is PSN max, 3 is PSN minimum
         if (username.Length > 16 || username.Length < 3) throw new ArgumentException(nameof(username) + " is either too long or too short");
+
+        Regex regex = new("^[a-zA-Z0-9_.-]*$");
+
+        if (!regex.IsMatch(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
 
         User user;
         if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;
