@@ -46,7 +46,10 @@ public class Database : DbContext
 
     public async Task<User> CreateUser(string username, string password)
     {
-        if (!password.StartsWith("$")) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
+        if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
+
+        // 16 is PSN max, 3 is PSN minimum
+        if (username.Length > 16 || username.Length < 3) throw new ArgumentException(nameof(username) + " is either too long or too short");
 
         User user;
         if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;
