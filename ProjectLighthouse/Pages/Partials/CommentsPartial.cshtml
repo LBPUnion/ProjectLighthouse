@@ -1,7 +1,6 @@
 ﻿@using System.IO
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Types.Profiles
-
 <div class="ui yellow segment" id="comments">
     <style>
         .comment {
@@ -23,10 +22,23 @@
     }
     else if (!Model.CommentsEnabled)
     {
-        <b><i>Comments are disabled</i></b>
+        <b>
+            <i>Comments are disabled.</i>
+        </b>
     }
 
-    @for (int i = 0; i < Model.Comments.Count; i++)
+    @if (Model.CommentsEnabled && Model.User != null)
+    {
+        <div class="ui divider"></div>
+        <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment">
+            <div class="field">
+                <textarea style="min-height: 70px; height: 70px; max-height:120px" name="msg"></textarea>
+            </div>
+            <input type="submit" class="ui blue button">
+        </form>
+    }
+
+    @for(int i = 0; i < Model.Comments.Count; i++)
     {
         Comment comment = Model.Comments[i];
         DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
@@ -50,7 +62,9 @@
                 <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
                 @if (comment.Deleted)
                 {
-                    <i><span>@decodedMessage</span></i>
+                    <i>
+                        <span>@decodedMessage</span>
+                    </i>
                 }
                 else
                 {
@@ -65,14 +79,5 @@
                 }
             </div>
         </div>
-    }
-    @if(Model.CommentsEnabled && Model.User != null){
-        <div class="ui divider"></div>
-        <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment">
-            <div class="field">
-                <textarea style="min-height: 70px; height: 70px; max-height:120px" name="msg"></textarea>
-            </div>
-            <input type="submit" class="ui blue button">
-        </form>
     }
 </div>
