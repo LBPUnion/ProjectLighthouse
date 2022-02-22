@@ -144,6 +144,8 @@ public class Database : DbContext
 
     public async Task<bool> PostComment(User user, int targetId, CommentType type, string message)
     {
+        if (message.Length > 100) return false;
+
         if (type == CommentType.Profile)
         {
             User? targetUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == targetId);
