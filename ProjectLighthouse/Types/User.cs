@@ -201,9 +201,9 @@ public class User
             "planets",
             gameVersion switch
             {
-                GameVersion.LittleBigPlanet2 => PlanetHashLBP2,
-                GameVersion.LittleBigPlanet3 => PlanetHashLBP3,
-                GameVersion.LittleBigPlanetVita => PlanetHashLBPVita,
+                GameVersion.LittleBigPlanet2 => this.PlanetHashLBP2,
+                GameVersion.LittleBigPlanet3 => this.PlanetHashLBP3,
+                GameVersion.LittleBigPlanetVita => this.PlanetHashLBPVita,
                 _ => "", // other versions do not have custom planets
             }
         );
