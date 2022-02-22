@@ -64,7 +64,9 @@ public class ScoreController : ControllerBase
                 break;
         }
 
-        IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId && s.PlayerIdCollection == score.PlayerIdCollection);
+        IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId)
+            .Where(s => s.PlayerIdCollection == score.PlayerIdCollection)
+            .Where(s => s.Type == score.Type);
 
         if (existingScore.Any())
         {
