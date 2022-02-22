@@ -41,11 +41,6 @@ public class PublishController : ControllerBase
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 
-        if (user.GetUsedSlotsForGame(gameToken.GameVersion, database) > 50)
-        {
-            return this.StatusCode(403, "");
-        }
-
         Slot? slot = await this.getSlotFromBody();
         if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
 
@@ -59,6 +54,10 @@ public class PublishController : ControllerBase
             Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
             if (oldSlot == null) return this.NotFound();
             if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
+        }
+        else if (user.GetUsedSlotsForGame(gameToken.GameVersion, database) > ServerSettings.Instance.EntitledSlots)
+        {
+            return this.StatusCode(403, "");
         }
 
         slot.ResourceCollection += "," + slot.IconHash; // tells LBP to upload icon after we process resources here
@@ -84,9 +83,6 @@ public class PublishController : ControllerBase
         // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
-
-        if (user.UsedSlots >= ServerSettings.Instance.EntitledSlots) return this.BadRequest();
-
         Slot? slot = await this.getSlotFromBody();
         if (slot?.Location == null) return this.BadRequest();
 
@@ -139,6 +135,11 @@ public class PublishController : ControllerBase
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
+        }
+
+        if (user.GetUsedSlotsForGame(gameToken.GameVersion, database) > ServerSettings.Instance.EntitledSlots)
+        {
+            return this.StatusCode(403, "");
         }
 
         //TODO: parse location in body
