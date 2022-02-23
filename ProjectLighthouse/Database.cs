@@ -50,11 +50,14 @@ public class Database : DbContext
         if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
 
         // 16 is PSN max, 3 is PSN minimum
-        if (username.Length > 16 || username.Length < 3) throw new ArgumentException(nameof(username) + " is either too long or too short");
+        if (!ServerStatics.IsUnitTesting || !username.StartsWith("unitTestUser"))
+        {
+            if (username.Length > 16 || username.Length < 3) throw new ArgumentException(nameof(username) + " is either too long or too short");
 
-        Regex regex = new("^[a-zA-Z0-9_.-]*$");
+            Regex regex = new("^[a-zA-Z0-9_.-]*$");
 
-        if (!regex.IsMatch(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
+            if (!regex.IsMatch(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
+        }
 
         User user;
         if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;

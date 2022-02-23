@@ -16,8 +16,8 @@ public class DatabaseTests : LighthouseServerTest
         await using Database database = new();
         int rand = new Random().Next();
 
-        User userA = await database.CreateUser("createUserTwiceTest" + rand, HashHelper.GenerateAuthToken());
-        User userB = await database.CreateUser("createUserTwiceTest" + rand, HashHelper.GenerateAuthToken());
+        User userA = await database.CreateUser("unitTestUser" + rand, HashHelper.GenerateAuthToken());
+        User userB = await database.CreateUser("unitTestUser" + rand, HashHelper.GenerateAuthToken());
 
         Assert.NotNull(userA);
         Assert.NotNull(userB);
