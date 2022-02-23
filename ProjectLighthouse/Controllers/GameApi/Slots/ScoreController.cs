@@ -82,7 +82,7 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        string myRanking = this.getScores(score.SlotId, score.Type, user);
+        string myRanking = this.getScores(score.SlotId, score.Type, user, -1, 5, "scoreboardSegment");
 
         return this.Ok(myRanking);
     }
@@ -105,7 +105,7 @@ public class ScoreController : ControllerBase
     }
 
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    private string getScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5)
+    private string getScores(int slotId, int type, User user, int pageStart = -1, int pageSize = 5, string rootName = "scores")
     {
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
@@ -138,11 +138,11 @@ public class ScoreController : ControllerBase
         );
 
         string res;
-        if (myScore == null) res = LbpSerializer.StringElement("scores", serializedScores);
+        if (myScore == null) res = LbpSerializer.StringElement(rootName, serializedScores);
         else
             res = LbpSerializer.TaggedStringElement
             (
-                "scores",
+                rootName,
                 serializedScores,
                 new Dictionary<string, object>
                 {
