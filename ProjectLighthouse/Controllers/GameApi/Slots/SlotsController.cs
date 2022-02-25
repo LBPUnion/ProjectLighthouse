@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -25,24 +26,6 @@ public class SlotsController : ControllerBase
         this.database = database;
     }
 
-    private IQueryable<Slot> getSlots(GameVersion gameVersion, bool includeSublevels = false)
-    {
-        IQueryable<Slot> query = this.database.Slots.Include(s => s.Creator).Include(s => s.Location);
-
-        if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
-        {
-            query = query.Where(s => s.GameVersion == gameVersion);
-        }
-        else
-        {
-            query = query.Where(s => s.GameVersion <= gameVersion);
-        }
-
-        if (!includeSublevels) query = query.Where(s => !s.SubLevel);
-
-        return query;
-    }
-
     [HttpGet("slots/by")]
     public async Task<IActionResult> SlotsBy([FromQuery] string u, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
@@ -56,7 +39,7 @@ public class SlotsController : ControllerBase
 
         string response = Enumerable.Aggregate
         (
-            this.getSlots(gameVersion, token.UserId == user.UserId)
+            this.database.Slots.ByGameVersion(gameVersion, token.UserId == user.UserId)
                 .Where(s => s.Creator!.Username == user.Username)
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
@@ -94,7 +77,7 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        Slot? slot = await this.getSlots(gameVersion).FirstOrDefaultAsync(s => s.SlotId == id);
+        Slot? slot = await this.database.Slots.ByGameVersion(gameVersion).FirstOrDefaultAsync(s => s.SlotId == id);
 
         if (slot == null) return this.NotFound();
 
@@ -136,7 +119,11 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IQueryable<Slot> slots = this.getSlots(gameVersion).OrderByDescending(s => s.FirstUploaded).Skip(pageStart - 1).Take(Math.Min(pageSize, 30));
+        IQueryable<Slot> slots = this.database.Slots.ByGameVersion
+                (gameVersion)
+            .OrderByDescending(s => s.FirstUploaded)
+            .Skip(pageStart - 1)
+            .Take(Math.Min(pageSize, 30));
 
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
 
@@ -167,7 +154,7 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IQueryable<Slot> slots = this.getSlots(gameVersion)
+        IQueryable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion)
             .Where(s => s.TeamPick)
             .OrderByDescending(s => s.LastUpdated)
             .Skip(pageStart - 1)
@@ -201,7 +188,7 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<Slot> slots = this.getSlots(gameVersion).OrderBy(_ => EF.Functions.Random()).Take(Math.Min(pageSize, 30));
+        IEnumerable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion).OrderBy(_ => EF.Functions.Random()).Take(Math.Min(pageSize, 30));
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
 
@@ -390,7 +377,7 @@ public class SlotsController : ControllerBase
     {
         if (version == GameVersion.LittleBigPlanetVita || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown)
         {
-            return this.getSlots(version);
+            return this.database.Slots.ByGameVersion(version);
         }
 
         string _dateFilterType = dateFilterType ?? "";

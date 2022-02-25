@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types.Categories;
@@ -34,6 +35,8 @@ public class CustomCategory : Category
     public sealed override string IconHash { get; set; }
     public sealed override string Endpoint { get; set; }
     public override Slot? GetPreviewSlot(Database database) => database.Slots.FirstOrDefault(s => s.SlotId == this.SlotIds[0]);
-    public override IEnumerable<Slot> GetSlots(Database database, int pageStart, int pageSize) => database.Slots.Where(s => this.SlotIds.Contains(s.SlotId));
+    public override IEnumerable<Slot> GetSlots
+        (Database database, int pageStart, int pageSize)
+        => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3).Where(s => this.SlotIds.Contains(s.SlotId));
     public override int GetTotalSlots(Database database) => this.SlotIds.Count;
 }
