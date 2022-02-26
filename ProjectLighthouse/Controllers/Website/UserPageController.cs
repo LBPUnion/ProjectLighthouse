@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,7 +43,7 @@ public class UserPageController : ControllerBase
             return this.Redirect("~/user/" + id);
         }
 
-        await this.database.PostComment(user, id, CommentType.Profile, msg);
+        await this.database.PostComment(user, id, CommentType.Profile, SlotType.User, msg);
         Logger.Log($"Posted comment from {user.UserId}: \"{msg}\" on user {id}", LoggerLevelComments.Instance);
 
         return this.Redirect("~/user/" + id);

@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -40,6 +42,7 @@ public class ListController : ControllerBase
             .Include(q => q.Slot.Creator)
             .Where(q => q.Slot.GameVersion <= gameVersion)
             .Where(q => q.User.Username == username)
+            .OrderByDescending(q => q.Timestamp)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
@@ -106,49 +109,77 @@ public class ListController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<HeartedLevel> heartedLevels = this.database.HeartedLevels.Include(q => q.User)
-            .Include(q => q.Slot)
-            .Include(q => q.Slot.Location)
-            .Include(q => q.Slot.Creator)
-            .Where(q => q.Slot.GameVersion <= gameVersion)
+        // don't include story levels in the 1 slot preview because otherwise invalid story levels could cause the slot to not display
+        bool isProfilePreview = (pageSize == 1 && pageStart == 1);
+
+        List<HeartedLevel> heartedLevels = await this.database.HeartedLevels.Include(q => q.User)
             .Where(q => q.User.Username == username)
+            .Where(q => !isProfilePreview || q.SlotType == SlotType.User)
+            .OrderByDescending(q => q.Timestamp)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
-            .AsEnumerable();
-
-        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize(gameVersion));
+            .ToListAsync();
+        StringBuilder responseBuilder = new();
+        foreach (HeartedLevel level in heartedLevels)
+        {
+            if (level.SlotType == SlotType.User)
+            {
+                Slot? slot = await this.database.Slots.Include(s => s.Location)
+                    .Include(s => s.Creator)
+                    .Where(s => level.SlotId == s.SlotId)
+                    .Where(s => s.GameVersion <= gameVersion)
+                    .FirstOrDefaultAsync();
+                responseBuilder.Append(slot?.Serialize());
+            }
+            else
+            {
+                string devSlot = await SlotTypeHelper.serializeDeveloperSlot(this.database, level.SlotId);
+                responseBuilder.Append(devSlot);
+            }
+        }
 
         return this.Ok
         (
             LbpSerializer.TaggedStringElement
-                ("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+                ("favouriteSlots", responseBuilder.ToString(), "total", heartedLevels.Count)
         );
     }
 
     [HttpPost("favourite/slot/user/{id:int}")]
+    [HttpPost("favourite/slot/developer/{id:int}")]
     public async Task<IActionResult> AddFavouriteSlot(int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
-        if (slot == null) return this.NotFound();
+        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        if (slotType == SlotType.User)
+        {
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            if (slot == null) return this.NotFound();
+        }
 
-        await this.database.HeartLevel(user, slot);
+        await this.database.HeartLevel(user, id, slotType);
 
         return this.Ok();
     }
 
     [HttpPost("unfavourite/slot/user/{id:int}")]
+    [HttpPost("unfavourite/slot/developer/{id:int}")]
     public async Task<IActionResult> RemoveFavouriteSlot(int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
-        if (slot == null) return this.NotFound();
+        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
 
-        await this.database.UnheartLevel(user, slot);
+        if (slotType == SlotType.User)
+        {
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+            if (slot == null) return this.NotFound();
+        }
+
+        await this.database.UnheartLevel(user, id, slotType);
 
         return this.Ok();
     }

@@ -66,6 +66,15 @@ public class SlotsController : ControllerBase
         );
     }
 
+    [HttpGet("s/developer/{id:int}")]
+    public async Task<IActionResult> SDev(int id)
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+        string response = await SlotTypeHelper.serializeDeveloperSlot(this.database, id);
+        return this.Ok(response);
+    }
+
     [HttpGet("s/user/{id:int}")]
     public async Task<IActionResult> SUser(int id)
     {

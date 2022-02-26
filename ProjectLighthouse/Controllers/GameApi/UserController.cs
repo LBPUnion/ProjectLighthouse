@@ -32,6 +32,12 @@ public class UserController : ControllerBase
         return user?.Serialize(gameVersion);
     }
 
+    private async Task<string?> getSerializedUserPicture(string username)
+    {
+        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        return user?.SerializeProfilePicture();
+    }
+
     [HttpGet("user/{username}")]
     public async Task<IActionResult> GetUser(string username)
     {
@@ -51,7 +57,7 @@ public class UserController : ControllerBase
         if (token == null) return this.StatusCode(403, "");
 
         List<string?> serializedUsers = new();
-        foreach (string userId in u) serializedUsers.Add(await this.getSerializedUser(userId, token.GameVersion));
+        foreach (string userId in u) serializedUsers.Add(await this.getSerializedUserPicture(userId));
 
         string serialized = serializedUsers.Aggregate(string.Empty, (current, user) => user == null ? current : current + user);
 

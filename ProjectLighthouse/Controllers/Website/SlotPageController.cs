@@ -48,7 +48,7 @@ public class SlotPageController : ControllerBase
             return this.Redirect("~/slot/" + id);
         }
 
-        await this.database.PostComment(user, id, CommentType.Level, msg);
+        await this.database.PostComment(user, id, CommentType.Level, SlotType.User, msg);
         Logger.Log($"Posted comment from {user.UserId}: \"{msg}\" on user {id}", LoggerLevelComments.Instance);
 
         return this.Redirect("~/slot/" + id);
@@ -65,7 +65,7 @@ public class SlotPageController : ControllerBase
         Slot? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (heartedSlot == null) return this.NotFound();
 
-        await this.database.HeartLevel(user, heartedSlot);
+        await this.database.HeartLevel(user, heartedSlot.SlotId, SlotType.User);
 
         return this.Redirect(callbackUrl);
     }
@@ -81,7 +81,7 @@ public class SlotPageController : ControllerBase
         Slot? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (heartedSlot == null) return this.NotFound();
 
-        await this.database.UnheartLevel(user, heartedSlot);
+        await this.database.UnheartLevel(user, heartedSlot.SlotId, SlotType.User);
 
         return this.Redirect(callbackUrl);
     }

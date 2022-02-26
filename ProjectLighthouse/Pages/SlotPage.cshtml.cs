@@ -17,6 +17,8 @@ public class SlotPage : BaseLayout
 {
     public List<Comment> Comments;
 
+    public List<Photo> Photos;
+
     public bool CommentsEnabled = ServerSettings.Instance.LevelCommentsEnabled;
 
     public Slot Slot;
@@ -34,7 +36,9 @@ public class SlotPage : BaseLayout
         {
             this.Comments = await this.Database.Comments.Include(p => p.Poster)
                 .OrderByDescending(p => p.Timestamp)
-                .Where(c => c.TargetId == id && c.Type == CommentType.Level)
+                .Where(c => c.TargetId == id)
+                .Where(c => c.Type == CommentType.Level)
+                .Where(c => c.SlotType == SlotType.User)
                 .Take(50)
                 .ToListAsync();
         }
@@ -42,6 +46,10 @@ public class SlotPage : BaseLayout
         {
             this.Comments = new List<Comment>();
         }
+
+        this.Photos = await this.Database.Photos.Include(p => p.Creator)
+            .Where(p => p.SlotId == id && p.SlotType == SlotType.User)
+            .ToListAsync();
 
         if (this.User == null) return this.Page();
 

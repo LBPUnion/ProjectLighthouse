@@ -153,7 +153,7 @@ public class Database : DbContext
         return true;
     }
 
-    public async Task<bool> PostComment(User user, int targetId, CommentType type, string message)
+    public async Task<bool> PostComment(User user, int targetId, CommentType type, SlotType slotType, string message)
     {
         if (message.Length > 100) return false;
 
@@ -164,8 +164,11 @@ public class Database : DbContext
         }
         else
         {
-            Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
-            if (targetSlot == null) return false;
+            if (slotType == SlotType.User)
+            {
+                Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
+                if (targetSlot == null) return false;
+            }
         }
 
         this.Comments.Add
@@ -176,6 +179,7 @@ public class Database : DbContext
                 TargetId = targetId,
                 Type = type,
                 Message = message,
+                SlotType = slotType,
                 Timestamp = TimeHelper.UnixTimeMilliseconds(),
             }
         );
@@ -208,26 +212,28 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
-    public async Task HeartLevel(User user, Slot heartedSlot)
+    public async Task HeartLevel(User user, int slotId, SlotType slotType)
     {
-        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == heartedSlot.SlotId);
+        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == slotId && q.SlotType == slotType);
         if (heartedLevel != null) return;
 
         this.HeartedLevels.Add
         (
             new HeartedLevel
             {
-                SlotId = heartedSlot.SlotId,
+                SlotId = slotId,
+                SlotType = slotType,
                 UserId = user.UserId,
+                Timestamp = TimeHelper.UnixTimeMilliseconds(),
             }
         );
 
         await this.SaveChangesAsync();
     }
 
-    public async Task UnheartLevel(User user, Slot heartedSlot)
+    public async Task UnheartLevel(User user, int slotId, SlotType slotType)
     {
-        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == heartedSlot.SlotId);
+        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == slotId && q.SlotType == slotType);
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
 
         await this.SaveChangesAsync();
@@ -244,6 +250,7 @@ public class Database : DbContext
             {
                 SlotId = queuedSlot.SlotId,
                 UserId = user.UserId,
+                Timestamp = TimeHelper.UnixTimeMilliseconds(),
             }
         );
 

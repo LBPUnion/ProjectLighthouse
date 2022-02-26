@@ -194,6 +194,12 @@ public class User
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }
 
+    public string SerializeProfilePicture()
+    {
+        string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash);
+        return LbpSerializer.TaggedStringElement("user", user, "type", "user");
+    }
+
     private string serializeEarth(GameVersion gameVersion)
     {
         return LbpSerializer.StringElement

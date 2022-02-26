@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -27,6 +28,7 @@ public class CommentController : ControllerBase
 
     [HttpPost("rateUserComment/{username}")]
     [HttpPost("rateComment/user/{slotId:int}")]
+    [HttpPost("rateComment/developer/{slotId:int}")]
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, int? slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
@@ -39,6 +41,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet("comments/user/{slotId:int}")]
+    [HttpGet("comments/developer/{slotId:int}")]
     [HttpGet("userComments/{username}")]
     public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, int? slotId)
     {
@@ -53,9 +56,11 @@ public class CommentController : ControllerBase
             type = CommentType.Profile;
         }
 
+        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+
         List<Comment> comments = await this.database.Comments.Include
                 (c => c.Poster)
-            .Where(c => c.TargetId == targetId && c.Type == type)
+            .Where(c => c.TargetId == targetId && c.Type == type && c.SlotType == slotType)
             .OrderByDescending(c => c.Timestamp)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
@@ -76,6 +81,7 @@ public class CommentController : ControllerBase
 
     [HttpPost("postUserComment/{username}")]
     [HttpPost("postComment/user/{slotId:int}")]
+    [HttpPost("postComment/developer/{slotId:int}")]
     public async Task<IActionResult> PostComment(string? username, int? slotId)
     {
         this.Request.Body.Position = 0;
@@ -95,7 +101,9 @@ public class CommentController : ControllerBase
 
         if (type == CommentType.Profile) targetId = this.database.Users.First(u => u.Username == username).UserId;
 
-        bool success = await this.database.PostComment(poster, targetId, type, comment.Message);
+        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+
+        bool success = await this.database.PostComment(poster, targetId, type, slotType, comment.Message);
         if (success) return this.Ok();
 
         return this.BadRequest();
@@ -103,6 +111,7 @@ public class CommentController : ControllerBase
 
     [HttpPost("deleteUserComment/{username}")]
     [HttpPost("deleteComment/user/{slotId:int}")]
+    [HttpPost("deleteComment/developer/{slotId:int}")]
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, int? slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);

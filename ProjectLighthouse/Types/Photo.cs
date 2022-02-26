@@ -5,7 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types;
@@ -22,6 +24,10 @@ public class Photo
     [XmlArray("subjects")]
     [XmlArrayItem("subject")]
     public List<PhotoSubject>? SubjectsXmlDontUseLiterallyEver;
+
+    [NotMapped]
+    [XmlElement("slot")]
+    public PhotoSlot? XmlLevelInfo;
 
     [Key]
     public int PhotoId { get; set; }
@@ -41,6 +47,10 @@ public class Photo
 
     [XmlElement("plan")]
     public string PlanHash { get; set; } = "";
+
+    public int SlotId { get; set; }
+
+    public SlotType SlotType { get; set; }
 
     [NotMapped]
     public List<PhotoSubject> Subjects {
@@ -68,6 +78,18 @@ public class Photo
 
     [NotMapped]
     [XmlIgnore]
+    public string SlotName
+    {
+        get
+        {
+            using Database database = new();
+
+            return database.Slots.First(s => s.SlotId == this.SlotId).Name;
+        }
+    }
+
+    [NotMapped]
+    [XmlIgnore]
     public string[] PhotoSubjectIds {
         get => this.PhotoSubjectCollection.Split(",");
         set => this.PhotoSubjectCollection = string.Join(',', value);
@@ -82,7 +104,7 @@ public class Photo
 
     public string Serialize(int slotId)
     {
-        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", "user");
+        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", SlotTypeHelper.slotTypeToString(this.SlotType));
 
         string subjectsAggregate = this.Subjects.Aggregate(string.Empty, (s, subject) => s + subject.Serialize());
 
@@ -93,7 +115,7 @@ public class Photo
                        LbpSerializer.StringElement("plan", this.PlanHash) +
                        LbpSerializer.StringElement("author", this.Creator?.Username) +
                        LbpSerializer.StringElement("subjects", subjectsAggregate) +
-                       slot;
+                       (slotId == 0 ? slot : "");
 
         return LbpSerializer.TaggedStringElement("photo", photo, "timestamp", this.Timestamp * 1000);
     }

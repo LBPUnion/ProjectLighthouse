@@ -17,9 +17,7 @@ public class Score
     [XmlIgnore]
     public int SlotId { get; set; }
 
-    [XmlIgnore]
-    [ForeignKey(nameof(SlotId))]
-    public Slot Slot { get; set; }
+    public SlotType SlotType { get; set; }
 
     [XmlElement("type")]
     public int Type { get; set; }

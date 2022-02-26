@@ -11,6 +11,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,29 @@ public class PhotosController : ControllerBase
 
         photo.CreatorId = user.UserId;
         photo.Creator = user;
+
+        if (photo.XmlLevelInfo != null)
+        {
+            bool validLevel = false;
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.XmlLevelInfo.SlotId);
+            if (photo.XmlLevelInfo.SlotType.Equals("user") && slot != null)
+            {
+                if (slot.RootLevel == photo.XmlLevelInfo.RootLevel)
+                {
+                    validLevel = true;
+                }
+            }
+            else
+            {
+                //TODO check if the photo has a valid story mode level id
+                validLevel = true;
+            }
+            if (validLevel)
+            {
+                photo.SlotType = SlotTypeHelper.getSlotTypeFromString(photo.XmlLevelInfo.SlotType);
+                photo.SlotId = photo.XmlLevelInfo.SlotId;
+            }
+        }
 
         if (photo.Subjects.Count > 4) return this.BadRequest();
 
@@ -104,10 +128,17 @@ public class PhotosController : ControllerBase
         return this.Ok();
     }
 
+    [HttpGet("photos/developer/{id:int}")]
     [HttpGet("photos/user/{id:int}")]
-    public async Task<IActionResult> SlotPhotos(int id)
+    public async Task<IActionResult> SlotPhotos(int id, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Take(10).ToListAsync();
+        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        List<Photo> photos = await this.database.Photos.Include(p => p.Creator)
+            .Where(p => p.SlotId == id && p.SlotType == slotType)
+            .OrderByDescending(s => s.Timestamp)
+            .Skip(pageStart - 1)
+            .Take(Math.Min(pageSize, 30))
+            .ToListAsync();
         string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id));
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }

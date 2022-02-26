@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
@@ -33,9 +34,9 @@ public class UserPage : BaseLayout
         this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
         if (this.CommentsEnabled)
         {
-            this.Comments = await this.Database.Comments.Include(p => p.Poster)
-                .OrderByDescending(p => p.Timestamp)
-                .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
+            this.Comments = await this.Database.Comments.Include(c => c.Poster)
+                .OrderByDescending(c => c.Timestamp)
+                .Where(c => c.TargetId == userId && c.Type == CommentType.Profile && c.SlotType == SlotType.User)
                 .Take(50)
                 .ToListAsync();
         }

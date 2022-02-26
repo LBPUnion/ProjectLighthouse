@@ -118,7 +118,7 @@ public class Slot
         get {
             using Database database = new();
 
-            return database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
+            return database.HeartedLevels.Count(s => s.SlotId == this.SlotId && s.SlotType == SlotType.User);
         }
     }
 
@@ -129,7 +129,7 @@ public class Slot
         get {
             using Database database = new();
 
-            return database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
+            return database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId && c.SlotType == SlotType.User);
         }
     }
 
@@ -240,6 +240,30 @@ public class Slot
         }
     }
 
+    [NotMapped]
+    [JsonIgnore]
+    public int PhotoCount
+    {
+        get
+        {
+            using Database database = new();
+
+            return database.Photos.Count(p => p.SlotId == this.SlotId && p.SlotType == SlotType.User);
+        }
+    }
+
+    [NotMapped]
+    [JsonIgnore]
+    public int AuthorPhotoCount
+    {
+        get
+        {
+            using Database database = new();
+
+            return database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId && p.SlotType == SlotType.User);
+        }
+    }
+
     [XmlElement("leveltype")]
     public string LevelType { get; set; } = "";
 
@@ -284,6 +308,8 @@ public class Slot
                           LbpSerializer.StringElement("mmpick", this.TeamPick) +
                           LbpSerializer.StringElement("heartCount", this.Hearts) +
                           LbpSerializer.StringElement("playCount", this.Plays) +
+                          LbpSerializer.StringElement("photoCount", this.PhotoCount) +
+                          LbpSerializer.StringElement("authorPhotoCount", this.AuthorPhotoCount) +
                           LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
                           LbpSerializer.StringElement("completionCount", this.PlaysComplete) +

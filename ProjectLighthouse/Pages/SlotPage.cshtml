@@ -1,5 +1,6 @@
 @page "/slot/{id:int}"
 @using LBPUnion.ProjectLighthouse.Helpers.Extensions
+@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Pages.SlotPage
 
 @{
@@ -53,7 +54,23 @@
             }
         </div>
     </div>
-</div>
+</div>                     
+
+@if (Model.Photos != null && Model.Photos.Count != 0)
+{
+    <div class="ui purple segment">
+        <h2>Most recent photos</h2>
+
+        <div class="ui center aligned grid">
+            @foreach (Photo photo in Model.Photos)
+            {
+                <div class="eight wide column">
+                    @await Html.PartialAsync("Partials/PhotoPartial", photo)
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @await Html.PartialAsync("Partials/CommentsPartial")
 
