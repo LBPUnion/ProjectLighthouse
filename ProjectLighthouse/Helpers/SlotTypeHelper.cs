@@ -11,33 +11,29 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 public static class SlotTypeHelper
 {
 
-    public static SlotType getSlotTypeFromRequest(HttpRequest request) => getSlotTypeFromString(request.Path.ToString());
-
-    public static SlotType getSlotTypeFromString(string str)
+    public static SlotType ParseSlotType(string str)
     {
         return str switch
         {
-            _ when str.Contains("developer") => SlotType.Developer,
-            _ when str.Contains("user") => SlotType.User,
-            _ when str.Contains("pod") => SlotType.Pod,
+            "developer" => SlotType.Developer,
+            "user" => SlotType.User,
             _ => SlotType.Unknown,
         };
     }
 
-    public static bool isValidStoryLevel(int id) => StoryModeIds.Contains(id);
+    public static bool IsValidStoryLevel(int id) => storyModeIds.Contains(id);
 
-    public static string slotTypeToString(SlotType type)
+    public static string SlotTypeToString(SlotType type)
     {
         return type switch
         {
             SlotType.Developer => "developer",
             SlotType.User => "user",
-            SlotType.Pod => "pod",
             _ => "unknown",
         };
     }
 
-    public static async Task<string> serializeDeveloperSlot(Database db, int id)
+    public static async Task<string> SerializeDeveloperSlot(Database db, int id)
     {
         int comments = await db.Comments.CountAsync(c => c.Type == CommentType.Level && c.TargetId == id && c.SlotType == SlotType.Developer);
 
@@ -52,7 +48,7 @@ public static class SlotTypeHelper
     }
 
     // this may not actually be feasible
-    private static int[] StoryModeIds =
+    private static int[] storyModeIds =
     {
         -1,
     };

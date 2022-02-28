@@ -35,7 +35,7 @@ public class UserController : ControllerBase
     private async Task<string?> getSerializedUserPicture(string username)
     {
         User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-        return user?.SerializeProfilePicture();
+        return user?.SerializeMini();
     }
 
     [HttpGet("user/{username}")]

@@ -26,9 +26,8 @@ public class ScoreController : ControllerBase
         this.database = database;
     }
 
-    [HttpPost("scoreboard/user/{id:int}")]
-    [HttpPost("scoreboard/developer/{id:int}")]
-    public async Task<IActionResult> SubmitScore(int id)
+    [HttpPost("scoreboard/{levelType}/{id:int}")]
+    public async Task<IActionResult> SubmitScore(string levelType, int id)
     {
         (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
@@ -45,7 +44,9 @@ public class ScoreController : ControllerBase
         Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
         if (score == null) return this.BadRequest();
 
-        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+
+        if (slotType == SlotType.Unknown) return this.BadRequest();
 
         score.SlotId = id;
 
@@ -94,22 +95,22 @@ public class ScoreController : ControllerBase
         return this.Ok(myRanking);
     }
 
-    [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
-    public IActionResult FriendScores(int slotId, int type)
+    [HttpGet("friendscores/{levelType}/{slotId:int}/{type:int}")]
+    public IActionResult FriendScores(string levelType, int slotId, int type)
         //=> await TopScores(slotId, type);
         => this.Ok(LbpSerializer.BlankElement("scores"));
 
-    [HttpGet("topscores/user/{slotId:int}/{type:int}")]
-    [HttpGet("topscores/developer/{slotId:int}/{type:int}")]
+    [HttpGet("topscores/{levelType}/{slotId:int}/{type:int}")]
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+    public async Task<IActionResult> TopScores(string levelType, int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
         // Get username
         User? user = await this.database.UserFromGameRequest(this.Request);
 
         if (user == null) return this.StatusCode(403, "");
 
-        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+        if (slotType == SlotType.Unknown) return this.BadRequest();
 
         return this.Ok(this.getScores(slotId, slotType, type, user, pageStart, pageSize));
     }

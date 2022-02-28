@@ -74,7 +74,7 @@ public class PhotosController : ControllerBase
             }
             if (validLevel)
             {
-                photo.SlotType = SlotTypeHelper.getSlotTypeFromString(photo.XmlLevelInfo.SlotType);
+                photo.SlotType = SlotTypeHelper.ParseSlotType(photo.XmlLevelInfo.SlotType);
                 photo.SlotId = photo.XmlLevelInfo.SlotId;
             }
         }
@@ -128,11 +128,11 @@ public class PhotosController : ControllerBase
         return this.Ok();
     }
 
-    [HttpGet("photos/developer/{id:int}")]
-    [HttpGet("photos/user/{id:int}")]
-    public async Task<IActionResult> SlotPhotos(int id, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    [HttpGet("photos/{levelType}/{id:int}")]
+    public async Task<IActionResult> SlotPhotos(string levelType, int id, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+        if (slotType == SlotType.Unknown) return this.BadRequest();
         List<Photo> photos = await this.database.Photos.Include(p => p.Creator)
             .Where(p => p.SlotId == id && p.SlotType == slotType)
             .OrderByDescending(s => s.Timestamp)

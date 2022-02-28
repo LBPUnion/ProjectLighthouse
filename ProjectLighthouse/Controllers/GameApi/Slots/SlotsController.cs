@@ -71,7 +71,7 @@ public class SlotsController : ControllerBase
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
-        string response = await SlotTypeHelper.serializeDeveloperSlot(this.database, id);
+        string response = await SlotTypeHelper.SerializeDeveloperSlot(this.database, id);
         return this.Ok(response);
     }
 

@@ -194,7 +194,7 @@ public class User
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }
 
-    public string SerializeProfilePicture()
+    public string SerializeMini()
     {
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash);
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");

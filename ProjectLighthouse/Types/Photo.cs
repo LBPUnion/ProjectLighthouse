@@ -104,7 +104,7 @@ public class Photo
 
     public string Serialize(int slotId)
     {
-        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", SlotTypeHelper.slotTypeToString(this.SlotType));
+        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", SlotTypeHelper.SlotTypeToString(this.SlotType));
 
         string subjectsAggregate = this.Subjects.Aggregate(string.Empty, (s, subject) => s + subject.Serialize());
 

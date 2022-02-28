@@ -27,12 +27,14 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost("rateUserComment/{username}")]
-    [HttpPost("rateComment/user/{slotId:int}")]
-    [HttpPost("rateComment/developer/{slotId:int}")]
-    public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, int? slotId)
+    [HttpPost("rateComment/{levelType}/{slotId:int}")]
+    public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string levelType, string? username, int? slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
+
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+        if (slotType == SlotType.Unknown) return this.BadRequest();
 
         bool success = await this.database.RateComment(user, commentId, rating);
         if (!success) return this.BadRequest();
@@ -40,10 +42,9 @@ public class CommentController : ControllerBase
         return this.Ok();
     }
 
-    [HttpGet("comments/user/{slotId:int}")]
-    [HttpGet("comments/developer/{slotId:int}")]
+    [HttpGet("comments/{levelType}/{slotId:int}")]
     [HttpGet("userComments/{username}")]
-    public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, int? slotId)
+    public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string levelType, string? username, int? slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
@@ -56,7 +57,9 @@ public class CommentController : ControllerBase
             type = CommentType.Profile;
         }
 
-        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+
+        if (slotType == SlotType.Unknown) return this.BadRequest();
 
         List<Comment> comments = await this.database.Comments.Include
                 (c => c.Poster)
@@ -80,10 +83,12 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost("postUserComment/{username}")]
-    [HttpPost("postComment/user/{slotId:int}")]
-    [HttpPost("postComment/developer/{slotId:int}")]
-    public async Task<IActionResult> PostComment(string? username, int? slotId)
+    [HttpPost("postComment/{levelType}/{slotId:int}")]
+    public async Task<IActionResult> PostComment(string levelType, string? username, int? slotId)
     {
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+        if (slotType == SlotType.Unknown) return this.BadRequest();
+
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
@@ -101,8 +106,6 @@ public class CommentController : ControllerBase
 
         if (type == CommentType.Profile) targetId = this.database.Users.First(u => u.Username == username).UserId;
 
-        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
-
         bool success = await this.database.PostComment(poster, targetId, type, slotType, comment.Message);
         if (success) return this.Ok();
 
@@ -110,12 +113,14 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost("deleteUserComment/{username}")]
-    [HttpPost("deleteComment/user/{slotId:int}")]
-    [HttpPost("deleteComment/developer/{slotId:int}")]
-    public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, int? slotId)
+    [HttpPost("deleteComment/{levelType}/{slotId:int}")]
+    public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string levelType, string? username, int? slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
+
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+        if (slotType == SlotType.Unknown) return this.BadRequest();
 
         Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.NotFound();

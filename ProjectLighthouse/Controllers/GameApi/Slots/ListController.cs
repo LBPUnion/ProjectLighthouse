@@ -110,7 +110,7 @@ public class ListController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         // don't include story levels in the 1 slot preview because otherwise invalid story levels could cause the slot to not display
-        bool isProfilePreview = (pageSize == 1 && pageStart == 1);
+        bool isProfilePreview = pageSize == 1 && pageStart == 1;
 
         List<HeartedLevel> heartedLevels = await this.database.HeartedLevels.Include(q => q.User)
             .Where(q => q.User.Username == username)
@@ -133,7 +133,7 @@ public class ListController : ControllerBase
             }
             else
             {
-                string devSlot = await SlotTypeHelper.serializeDeveloperSlot(this.database, level.SlotId);
+                string devSlot = await SlotTypeHelper.SerializeDeveloperSlot(this.database, level.SlotId);
                 responseBuilder.Append(devSlot);
             }
         }
@@ -145,14 +145,15 @@ public class ListController : ControllerBase
         );
     }
 
-    [HttpPost("favourite/slot/user/{id:int}")]
-    [HttpPost("favourite/slot/developer/{id:int}")]
-    public async Task<IActionResult> AddFavouriteSlot(int id)
+    [HttpPost("favourite/slot/{levelType}/{id:int}")]
+    public async Task<IActionResult> AddFavouriteSlot(string levelType, int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+        if (slotType == SlotType.Unknown) return this.BadRequest();
+
         if (slotType == SlotType.User)
         {
             Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
@@ -164,14 +165,14 @@ public class ListController : ControllerBase
         return this.Ok();
     }
 
-    [HttpPost("unfavourite/slot/user/{id:int}")]
-    [HttpPost("unfavourite/slot/developer/{id:int}")]
-    public async Task<IActionResult> RemoveFavouriteSlot(int id)
+    [HttpPost("unfavourite/slot/{levelType}/{id:int}")]
+    public async Task<IActionResult> RemoveFavouriteSlot(string levelType, int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        SlotType slotType = SlotTypeHelper.getSlotTypeFromRequest(this.Request);
+        SlotType slotType = SlotTypeHelper.ParseSlotType(levelType);
+        if (slotType == SlotType.Unknown) return this.BadRequest();
 
         if (slotType == SlotType.User)
         {
