@@ -39,7 +39,8 @@ public class SlotsController : ControllerBase
 
         string response = Enumerable.Aggregate
         (
-            this.database.Slots.ByGameVersion(gameVersion, token.UserId == user.UserId)
+            this.database.Slots.ByGameVersion
+                    (gameVersion)
                 .Where(s => s.Creator!.Username == user.Username)
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
