@@ -18,15 +18,15 @@ public class RegisterTests : LighthouseWebTest
     {
         await using Database database = new();
 
-        string username = "unitTestUser" + new Random().Next();
-        string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
+        string username = "unitTestUser" + new Random().Next(1, 9999);
+        string passwordPlaintext = Convert.ToHexString(HashHelper.GenerateRandomBytes(16).ToArray());
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
 
         this.Driver.FindElement(By.Id("text")).SendKeys(username);
 
-        this.Driver.FindElement(By.Id("password")).SendKeys(password);
-        this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
+        this.Driver.FindElement(By.Id("password")).SendKeys(passwordPlaintext);
+        this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(passwordPlaintext);
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
@@ -41,15 +41,15 @@ public class RegisterTests : LighthouseWebTest
     {
         await using Database database = new();
 
-        string username = "unitTestUser" + new Random().Next();
-        string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
+        string username = "unitTestUser" + new Random().Next(1, 9999);
+        string passwordPlaintext = Convert.ToHexString(HashHelper.GenerateRandomBytes(16).ToArray());
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
 
         this.Driver.FindElement(By.Id("text")).SendKeys(username);
 
-        this.Driver.FindElement(By.Id("password")).SendKeys(password);
-        this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password + "a");
+        this.Driver.FindElement(By.Id("password")).SendKeys(passwordPlaintext);
+        this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(passwordPlaintext + "a");
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
@@ -62,7 +62,7 @@ public class RegisterTests : LighthouseWebTest
     {
         await using Database database = new();
 
-        string username = "unitTestUser" + new Random().Next();
+        string username = "unitTestUser" + new Random().Next(1, 9999);
         string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
 
         await database.CreateUser(username, HashHelper.BCryptHash(password));
@@ -79,5 +79,6 @@ public class RegisterTests : LighthouseWebTest
         this.Driver.FindElement(By.Id("submit")).Click();
 
         Assert.Contains("The username you've chosen is already taken.", this.Driver.PageSource);
+        await database.RemoveUser(user);
     }
 }
