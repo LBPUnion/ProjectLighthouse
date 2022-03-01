@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Categories;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Types.Reports;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -41,6 +42,8 @@ public class Database : DbContext
     public DbSet<DatabaseCategory> CustomCategories { get; set; }
     public DbSet<Reaction> Reactions { get; set; }
     public DbSet<GriefReport> Reports { get; set; }
+    public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
+    public DbSet<EmailSetToken> EmailSetTokens { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);

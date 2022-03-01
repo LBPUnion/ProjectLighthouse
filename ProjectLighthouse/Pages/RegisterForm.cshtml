@@ -43,13 +43,16 @@
         </div>
     </div>
 
-    <div class="field">
-        <label>Email address</label>
-        <div class="ui left icon input">
-            <input type="email" name="emailAddress" id="emailAddress" placeholder="Email Address">
-            <i class="mail icon"></i>
+    @if (ServerSettings.Instance.SMTPEnabled)
+    {
+        <div class="field">
+            <label>Email address</label>
+            <div class="ui left icon input">
+                <input type="email" name="emailAddress" id="emailAddress" placeholder="Email Address">
+                <i class="mail icon"></i>
+            </div>
         </div>
-    </div>
+    }
 
     <div class="field">
         <label>Password</label>

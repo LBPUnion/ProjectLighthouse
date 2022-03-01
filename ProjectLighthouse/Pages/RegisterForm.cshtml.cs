@@ -17,7 +17,6 @@ public class RegisterForm : BaseLayout
     {}
 
     public string Error { get; private set; }
-    public bool WasRegisterRequest { get; private set; }
 
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
@@ -37,7 +36,7 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        if (string.IsNullOrWhiteSpace(emailAddress))
+        if (string.IsNullOrWhiteSpace(emailAddress) && ServerSettings.Instance.SMTPEnabled)
         {
             this.Error = "Email address field is required.";
             return this.Page();

@@ -1,0 +1,29 @@
+@page "/login/setEmail"
+@using LBPUnion.ProjectLighthouse.Types.Settings
+@model LBPUnion.ProjectLighthouse.Pages.SetEmailForm
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Set an Email Address";
+}
+
+<p>This instance requires email verification. As your account was created before this was a requirement, you must now set an email for your account before continuing.</p>
+
+<form class="ui form" onsubmit="return onSubmit(this)" method="post">
+    @Html.AntiForgeryToken()
+
+    @if (ServerSettings.Instance.SMTPEnabled)
+    {
+        <div class="field">
+            <label>Please type a valid email address and verify it:</label>
+            <div class="ui left icon input">
+                <input type="email" name="emailAddress" id="emailAddress" placeholder="Email Address">
+                <i class="mail icon"></i>
+            </div>
+
+            <input type="hidden" name="token" id="token" value="@Model.EmailToken.EmailToken">
+        </div>
+    }
+
+    <input type="submit" value="Verify Email Address" id="submit" class="ui blue button">
+</form>

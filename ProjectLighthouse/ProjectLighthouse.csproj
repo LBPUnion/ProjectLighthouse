@@ -51,6 +51,10 @@
         <None Remove="r.tar.gz"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs"/>
+    </ItemGroup>
+
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;"/>
         <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;"/>

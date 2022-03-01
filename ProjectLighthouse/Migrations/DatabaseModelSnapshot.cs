@@ -452,6 +452,44 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailSetToken", b =>
+                {
+                    b.Property<int>("EmailSetTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmailToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmailSetTokenId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailSetTokens");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailVerificationToken", b =>
+                {
+                    b.Property<int>("EmailVerificationTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmailToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmailVerificationTokenId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailVerificationTokens");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.LastContact", b =>
                 {
                     b.Property<int>("UserId")
@@ -921,6 +959,28 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("Poster");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailSetToken", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailVerificationToken", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reports.GriefReport", b =>
