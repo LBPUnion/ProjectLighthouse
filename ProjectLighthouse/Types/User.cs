@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -153,16 +152,10 @@ public class User
     #nullable enable
     [NotMapped]
     [JsonIgnore]
-    public string Status {
+    public UserStatus Status {
         get {
             using Database database = new();
-            LastContact? lastMatch = database.LastContacts.Where
-                    (l => l.UserId == this.UserId)
-                .FirstOrDefault(l => TimestampHelper.Timestamp - l.Timestamp < 300);
-
-            if (lastMatch == null) return "Offline";
-
-            return "Currently online on " + lastMatch.GameVersion.ToPrettyString();
+            return new UserStatus(database, this.UserId);
         }
     }
     #nullable disable
@@ -208,9 +201,9 @@ public class User
             "planets",
             gameVersion switch
             {
-                GameVersion.LittleBigPlanet2 => PlanetHashLBP2,
-                GameVersion.LittleBigPlanet3 => PlanetHashLBP3,
-                GameVersion.LittleBigPlanetVita => PlanetHashLBPVita,
+                GameVersion.LittleBigPlanet2 => this.PlanetHashLBP2,
+                GameVersion.LittleBigPlanet3 => this.PlanetHashLBP3,
+                GameVersion.LittleBigPlanetVita => this.PlanetHashLBPVita,
                 _ => "", // other versions do not have custom planets
             }
         );
@@ -230,11 +223,14 @@ public class User
         }
     }
 
-    public int GetUsedSlotsForGame(GameVersion version)
+    #nullable enable
+    public int GetUsedSlotsForGame(GameVersion version, Database? database = null)
     {
-        using Database database = new();
+        database ??= new Database();
+
         return database.Slots.Count(s => s.CreatorId == this.UserId && s.GameVersion == version);
     }
+    #nullable disable
 
     /// <summary>
     ///     The number of slots remaining on the earth

@@ -1,7 +1,6 @@
 ﻿@using System.IO
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Types.Profiles
-
 <div class="ui yellow segment" id="comments">
     <style>
         .comment {
@@ -23,18 +22,35 @@
     }
     else if (!Model.CommentsEnabled)
     {
-        <b><i>Comments are disabled</i></b>
+        <b>
+            <i>Comments are disabled.</i>
+        </b>
     }
 
-    @for (int i = 0; i < Model.Comments.Count; i++)
+    @if (Model.CommentsEnabled && Model.User != null)
+    {
+        <div class="ui divider"></div>
+        <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment" method="post">
+            <div class="field">
+                <textarea style="min-height: 70px; height: 70px; max-height:120px" name="msg"></textarea>
+            </div>
+            <input type="submit" class="ui blue button">
+        </form>
+        <br>
+    }
+
+    @for(int i = 0; i < Model.Comments.Count; i++)
     {
         Comment comment = Model.Comments[i];
         DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000);
         StringWriter messageWriter = new();
         HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
+
         string decodedMessage = messageWriter.ToString();
         string url = Url.RouteUrl(ViewContext.RouteData.Values);
+
         int rating = comment.ThumbsUp - comment.ThumbsDown;
+
         <div style="display: flex" id="@comment.CommentId">
             <div class="voting">
                 <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == 1 ? 0 : 1)">
@@ -50,7 +66,9 @@
                 <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
                 @if (comment.Deleted)
                 {
-                    <i><span>@decodedMessage</span></i>
+                    <i>
+                        <span>@decodedMessage</span>
+                    </i>
                 }
                 else
                 {
@@ -65,14 +83,5 @@
                 }
             </div>
         </div>
-    }
-    @if(Model.CommentsEnabled && Model.User != null){
-        <div class="ui divider"></div>
-        <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment">
-            <div class="field">
-                <textarea style="min-height: 70px; height: 70px; max-height:120px" name="msg"></textarea>
-            </div>
-            <input type="submit" class="ui blue button">
-        </form>
     }
 </div>

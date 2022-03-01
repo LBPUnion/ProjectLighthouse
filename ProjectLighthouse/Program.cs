@@ -1,14 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types.Files;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -82,41 +78,10 @@ public static class Program
             return;
         }
 
-        FileHelper.EnsureDirectoryCreated(Path.Combine(Environment.CurrentDirectory, "png"));
-        if (Directory.Exists("r"))
-        {
-            Logger.Log
-                ("Converting all textures to PNG. This may take a while if this is the first time running this operation...", LoggerLevelStartup.Instance);
+        FileHelper.ConvertAllTexturesToPng();
 
-            ConcurrentQueue<string> fileQueue = new();
-
-            foreach (string filename in Directory.GetFiles("r")) fileQueue.Enqueue(filename);
-
-            for(int i = 0; i < Environment.ProcessorCount; i++)
-            {
-                Task.Factory.StartNew
-                (
-                    () =>
-                    {
-                        while (fileQueue.TryDequeue(out string? filename))
-                        {
-                            LbpFile? file = LbpFile.FromHash(filename.Replace("r" + Path.DirectorySeparatorChar, ""));
-                            if (file == null) continue;
-
-                            if (file.FileType == LbpFileType.Jpeg || file.FileType == LbpFileType.Png || file.FileType == LbpFileType.Texture)
-                            {
-                                ImageHelper.LbpFileToPNG(file);
-                            }
-                        }
-                    }
-                );
-            }
-
-            while (!fileQueue.IsEmpty)
-            {
-                Thread.Sleep(100);
-            }
-        }
+        Logger.Log("Starting room cleanup thread...", LoggerLevelStartup.Instance);
+        RoomHelper.StartCleanupThread();
 
         stopwatch.Stop();
         Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);

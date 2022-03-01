@@ -20,6 +20,8 @@ public class GameToken
 
     public GameVersion GameVersion { get; set; }
 
+    public Platform Platform { get; set; }
+
     // Set by /authentication webpage
     public bool Approved { get; set; }
 

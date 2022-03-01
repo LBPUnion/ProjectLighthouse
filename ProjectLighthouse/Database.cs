@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
@@ -46,7 +47,17 @@ public class Database : DbContext
 
     public async Task<User> CreateUser(string username, string password)
     {
-        if (!password.StartsWith("$")) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
+        if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
+
+        // 16 is PSN max, 3 is PSN minimum
+        if (!ServerStatics.IsUnitTesting || !username.StartsWith("unitTestUser"))
+        {
+            if (username.Length > 16 || username.Length < 3) throw new ArgumentException(nameof(username) + " is either too long or too short");
+
+            Regex regex = new("^[a-zA-Z0-9_.-]*$");
+
+            if (!regex.IsMatch(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
+        }
 
         User user;
         if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;
@@ -82,6 +93,7 @@ public class Database : DbContext
             UserId = user.UserId,
             UserLocation = userLocation,
             GameVersion = npTicket.GameVersion,
+            Platform = npTicket.Platform,
         };
 
         this.GameTokens.Add(gameToken);
@@ -143,6 +155,8 @@ public class Database : DbContext
 
     public async Task<bool> PostComment(User user, int targetId, CommentType type, string message)
     {
+        if (message.Length > 100) return false;
+
         if (type == CommentType.Profile)
         {
             User? targetUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == targetId);
@@ -151,7 +165,7 @@ public class Database : DbContext
         else
         {
             Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
-            if(targetSlot == null) return false;
+            if (targetSlot == null) return false;
         }
 
         this.Comments.Add

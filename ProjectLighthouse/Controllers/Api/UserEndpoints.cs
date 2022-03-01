@@ -1,9 +1,12 @@
 #nullable enable
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+// ReSharper disable RouteTemplates.ActionRoutePrefixCanBeExtractedToControllerRoute
 
 namespace LBPUnion.ProjectLighthouse.Controllers.Api;
 
@@ -35,5 +38,22 @@ public class UserEndpoints : ApiEndpointController
         if (user == null) return this.NotFound();
 
         return this.Ok(user);
+    }
+
+    /// <summary>
+    /// Gets a user and their information from the database.
+    /// </summary>
+    /// <param name="id">The ID of the user</param>
+    /// <returns>The user's status</returns>
+    /// <response code="200">The user's status, if successful.</response>
+    /// <response code="404">The user could not be found.</response>
+    [HttpGet("user/{id:int}/status")]
+    [ProducesResponseType(typeof(UserStatus), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUserStatus(int id)
+    {
+        UserStatus userStatus = new(this.database, id);
+
+        return this.Ok(userStatus);
     }
 }

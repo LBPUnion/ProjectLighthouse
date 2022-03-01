@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,5 +17,11 @@ public class HeartedCategory : CategoryWithUser
     public override Slot? GetPreviewSlot(Database database, User user) => database.HeartedLevels.FirstOrDefault(h => h.UserId == user.UserId)?.Slot;
     public override int GetTotalSlots(Database database, User user) => database.HeartedLevels.Count(h => h.UserId == user.UserId);
     public override IEnumerable<Slot> GetSlots(Database database, User user, int pageStart, int pageSize)
-        => database.HeartedLevels.Where(h => h.UserId == user.UserId).Include(h => h.Slot).Select(h => h.Slot).Skip(pageStart).Take(Math.Min(pageSize, 20));
+        => database.HeartedLevels.Where
+                (h => h.UserId == user.UserId)
+            .Include(h => h.Slot)
+            .Select(h => h.Slot)
+            .ByGameVersion(GameVersion.LittleBigPlanet3)
+            .Skip(pageStart)
+            .Take(Math.Min(pageSize, 20));
 }

@@ -74,14 +74,14 @@ public class MatchController : ControllerBase
 
         #endregion
 
-        await LastContactHelper.SetLastContact(user, gameToken.GameVersion);
+        await LastContactHelper.SetLastContact(user, gameToken.GameVersion, gameToken.Platform);
 
         #region Process match data
 
         if (matchData is UpdateMyPlayerData playerData)
         {
             MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
-            Room? room = RoomHelper.FindRoomByUser(user, gameToken.GameVersion, true);
+            Room? room = RoomHelper.FindRoomByUser(user, gameToken.GameVersion, gameToken.Platform, true);
 
             if (playerData.RoomState != null)
                 if (room != null && Equals(room.Host, user))
@@ -90,7 +90,7 @@ public class MatchController : ControllerBase
 
         if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
         {
-            FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.GameVersion, gameToken.UserLocation);
+            FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.GameVersion, gameToken.Platform, gameToken.UserLocation);
 
             if (response == null) return this.NotFound();
 
@@ -112,7 +112,7 @@ public class MatchController : ControllerBase
             }
 
             // Create a new one as requested
-            RoomHelper.CreateRoom(users, gameToken.GameVersion, createRoom.RoomSlot);
+            RoomHelper.CreateRoom(users, gameToken.GameVersion, gameToken.Platform, createRoom.RoomSlot);
         }
 
         if (matchData is UpdatePlayersInRoom updatePlayersInRoom)

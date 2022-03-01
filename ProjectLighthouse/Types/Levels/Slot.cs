@@ -299,28 +299,40 @@ public class Slot
                           LbpSerializer.StringElement("leveltype", this.LevelType) +
                           LbpSerializer.StringElement("yourRating", yourRatingStats?.RatingLBP1) +
                           LbpSerializer.StringElement("yourDPadRating", yourRatingStats?.Rating) +
-                          LbpSerializer.StringElement("yourLBP1PlayCount", yourVisitedStats?.PlaysLBP1) +
-                          LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBP2) +
-                          LbpSerializer.StringElement("yourLBP3PlayCount", yourVisitedStats?.PlaysLBP3) +
+                          LbpSerializer.StringElement("yourlbpPlayCount", yourVisitedStats?.PlaysLBP1) +
+                          LbpSerializer.StringElement("yourlbp3PlayCount", yourVisitedStats?.PlaysLBP3) +
                           yourReview?.Serialize("yourReview") +
                           LbpSerializer.StringElement("reviewsEnabled", ServerSettings.Instance.LevelReviewsEnabled) +
                           LbpSerializer.StringElement("commentsEnabled", ServerSettings.Instance.LevelCommentsEnabled) +
                           LbpSerializer.StringElement("reviewCount", this.ReviewCount);
 
+        int yourPlays;
+        int plays;
+        int playsComplete;
+        int playsUnique;
+
         if (gameVersion == GameVersion.LittleBigPlanetVita)
         {
-            slotData += LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBPVita) +
-                        LbpSerializer.StringElement("lbp2PlayCount", this.PlaysLBPVita) +
-                        LbpSerializer.StringElement("lbp2CompletionCount", this.PlaysLBPVitaComplete) +
-                        LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBPVitaUnique);
+            yourPlays = yourVisitedStats?.PlaysLBPVita ?? 0;
+            plays = this.PlaysLBPVita;
+            playsComplete = this.PlaysLBPVitaComplete;
+            playsUnique = this.PlaysLBPVitaUnique;
         }
         else
         {
-            slotData += LbpSerializer.StringElement("yourLBP2PlayCount", yourVisitedStats?.PlaysLBPVita) +
-                        LbpSerializer.StringElement("lbp2PlayCount", this.PlaysLBP2) +
-                        LbpSerializer.StringElement("lbp2CompletionCount", this.PlaysLBP2Complete) +
-                        LbpSerializer.StringElement("lbp2UniquePlayCount", this.PlaysLBP2Unique); // not actually used ingame, as per above comment
+            yourPlays = yourVisitedStats?.PlaysLBP2 ?? 0;
+            plays = this.PlaysLBP2;
+            playsComplete = this.PlaysLBP2Complete;
+            playsUnique = this.PlaysLBP2Unique;
         }
+
+        slotData += LbpSerializer.StringElement("yourlbp2PlayCount", yourPlays) +
+                    LbpSerializer.StringElement("lbp2PlayCount", plays) +
+                    LbpSerializer.StringElement("playCount", plays) +
+                    LbpSerializer.StringElement("lbp2CompletionCount", playsComplete) +
+                    LbpSerializer.StringElement("completionCount", playsComplete) +
+                    LbpSerializer.StringElement("lbp2UniquePlayCount", playsUnique) + // not actually used ingame, as per above comment
+                    LbpSerializer.StringElement("uniquePlayCount", playsUnique);
 
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
     }

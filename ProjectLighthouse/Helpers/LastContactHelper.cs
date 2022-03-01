@@ -11,7 +11,7 @@ public static class LastContactHelper
 {
     private static readonly Database database = new();
 
-    public static async Task SetLastContact(User user, GameVersion gameVersion)
+    public static async Task SetLastContact(User user, GameVersion gameVersion, Platform platform)
     {
         LastContact? lastContact = await database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
 
@@ -28,6 +28,7 @@ public static class LastContactHelper
 
         lastContact.Timestamp = TimestampHelper.Timestamp;
         lastContact.GameVersion = gameVersion;
+        lastContact.Platform = platform;
 
         await database.SaveChangesAsync();
     }

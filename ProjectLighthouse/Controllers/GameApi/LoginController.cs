@@ -34,10 +34,6 @@ public class LoginController : ControllerBase
         await this.Request.Body.CopyToAsync(ms);
         byte[] loginData = ms.ToArray();
 
-        #if DEBUG
-        await IOFile.WriteAllBytesAsync($"npTicket-{TimestampHelper.TimestampMillis}.txt", loginData);
-        #endif
-
         NPTicket? npTicket;
         try
         {
@@ -145,7 +141,7 @@ public class LoginController : ControllerBase
         await this.database.SaveChangesAsync();
 
         // Create a new room on LBP2/3/Vita
-        if (token.GameVersion != GameVersion.LittleBigPlanet1) RoomHelper.CreateRoom(user, token.GameVersion);
+        if (token.GameVersion != GameVersion.LittleBigPlanet1) RoomHelper.CreateRoom(user, token.GameVersion, token.Platform);
 
         return this.Ok
         (

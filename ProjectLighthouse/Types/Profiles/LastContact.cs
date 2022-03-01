@@ -10,4 +10,6 @@ public class LastContact
     public long Timestamp { get; set; }
 
     public GameVersion GameVersion { get; set; } = GameVersion.Unknown;
+
+    public Platform Platform { get; set; } = Platform.Unknown;
 }
