@@ -86,7 +86,7 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        Slot? slot = await this.database.Slots.ByGameVersion(gameVersion).FirstOrDefaultAsync(s => s.SlotId == id);
+        Slot? slot = await this.database.Slots.ByGameVersion(gameVersion, true).FirstOrDefaultAsync(s => s.SlotId == id);
 
         if (slot == null) return this.NotFound();
 
