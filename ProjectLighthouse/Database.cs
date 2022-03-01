@@ -45,7 +45,8 @@ public class Database : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerSettings.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
-    public async Task<User> CreateUser(string username, string password)
+    #nullable enable
+    public async Task<User> CreateUser(string username, string password, string? emailAddress = null)
     {
         if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
 
@@ -59,8 +60,8 @@ public class Database : DbContext
             if (!regex.IsMatch(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
         }
 
-        User user;
-        if ((user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync()) != null) return user;
+        User? user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
+        if (user != null) return user;
 
         Location l = new(); // store to get id after submitting
         this.Locations.Add(l); // add to table
@@ -77,10 +78,17 @@ public class Database : DbContext
 
         await this.SaveChangesAsync();
 
+        if (emailAddress != null && ServerSettings.Instance.SMTPEnabled)
+        {
+            string body = "An account for Project Lighthouse has been registered with this email address.\n\n" +
+                          $"You can login at {ServerSettings.Instance.ExternalUrl}.";
+
+            SMTPHelper.SendEmail(emailAddress, "Account Created: " + username, body);
+        }
+
         return user;
     }
 
-    #nullable enable
     public async Task<GameToken?> AuthenticateUser(NPTicket npTicket, string userLocation)
     {
         User? user = await this.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);

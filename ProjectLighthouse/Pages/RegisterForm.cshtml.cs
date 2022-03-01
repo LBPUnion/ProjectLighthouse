@@ -21,7 +21,7 @@ public class RegisterForm : BaseLayout
 
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
-    public async Task<IActionResult> OnPost(string username, string password, string confirmPassword)
+    public async Task<IActionResult> OnPost(string username, string password, string confirmPassword, string emailAddress)
     {
         if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
 
@@ -34,6 +34,12 @@ public class RegisterForm : BaseLayout
         if (string.IsNullOrWhiteSpace(password))
         {
             this.Error = "Password field is required.";
+            return this.Page();
+        }
+
+        if (string.IsNullOrWhiteSpace(emailAddress))
+        {
+            this.Error = "Email address field is required.";
             return this.Page();
         }
 
@@ -55,7 +61,7 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        User user = await this.Database.CreateUser(username, HashHelper.BCryptHash(password));
+        User user = await this.Database.CreateUser(username, HashHelper.BCryptHash(password), emailAddress);
 
         WebToken webToken = new()
         {
