@@ -710,6 +710,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("EmailAddress")
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("EmailAddressVerified")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("Game")
                         .HasColumnType("int");
 

@@ -18,6 +18,8 @@ public class User
     public string? EmailAddress { get; set; } = null;
     #nullable disable
 
+    public bool EmailAddressVerified { get; set; } = false;
+
     [JsonIgnore]
     public string Password { get; set; }
 

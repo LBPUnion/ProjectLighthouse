@@ -86,7 +86,7 @@ public class Database : DbContext
             string body = "An account for Project Lighthouse has been registered with this email address.\n\n" +
                           $"You can login at {ServerSettings.Instance.ExternalUrl}.";
 
-            SMTPHelper.SendEmail(emailAddress, "Account Created: " + username, body);
+            SMTPHelper.SendEmail(emailAddress, "Project Lighthouse Account Created: " + username, body);
         }
 
         return user;

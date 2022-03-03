@@ -7,23 +7,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20220301195426_AddEmailAddressToUser")]
-    public partial class AddEmailAddressToUser : Migration
+    [Migration("20220302003658_AddEmailVerifiedToUser")]
+    public partial class AddEmailVerifiedToUser : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "EmailAddress",
+            migrationBuilder.AddColumn<bool>(
+                name: "EmailAddressVerified",
                 table: "Users",
-                type: "longtext",
-                nullable: true)
-                .Annotation("MySql:CharSet", "utf8mb4");
+                type: "tinyint(1)",
+                nullable: false,
+                defaultValue: false);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "EmailAddress",
+                name: "EmailAddressVerified",
                 table: "Users");
         }
     }
