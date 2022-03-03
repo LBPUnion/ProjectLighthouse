@@ -16,7 +16,10 @@
 
 @if (Model.Error != null)
 {
-    <p>@Model.Error</p>
+    <p>
+        <b>Reason:</b> @Model.Error
+    </p>
+    <p>Please try again. If the error persists, please contact the instance administrator.</p>
     <a href="/login/sendVerificationEmail">
         <div class="ui blue button">Resend email</div>
     </a>
