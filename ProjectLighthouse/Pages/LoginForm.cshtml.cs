@@ -105,7 +105,7 @@ public class LoginForm : BaseLayout
         Logger.Log($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LoggerLevelLogin.Instance);
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
-        if (!user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
+        if (ServerSettings.Instance.SMTPEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
 
         return this.RedirectToPage(nameof(LandingPage));
     }

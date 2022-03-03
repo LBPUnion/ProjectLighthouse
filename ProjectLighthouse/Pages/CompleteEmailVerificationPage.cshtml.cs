@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles.Email;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,8 @@ public class CompleteEmailVerificationPage : BaseLayout
 
     public async Task<IActionResult> OnGet(string token)
     {
+        if (!ServerSettings.Instance.SMTPEnabled) return this.NotFound();
+
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 

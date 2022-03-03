@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles.Email;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ public class SetEmailForm : BaseLayout
 
     public async Task<IActionResult> OnGet(string? token = null)
     {
+        if (!ServerSettings.Instance.SMTPEnabled) return this.NotFound();
         if (token == null) return this.Redirect("/login");
 
         EmailSetToken? emailToken = await this.Database.EmailSetTokens.FirstOrDefaultAsync(t => t.EmailToken == token);
@@ -34,6 +36,8 @@ public class SetEmailForm : BaseLayout
 
     public async Task<IActionResult> OnPost(string emailAddress, string token)
     {
+        if (!ServerSettings.Instance.SMTPEnabled) return this.NotFound();
+
         EmailSetToken? emailToken = await this.Database.EmailSetTokens.Include(t => t.User).FirstOrDefaultAsync(t => t.EmailToken == token);
         if (emailToken == null) return this.Redirect("/login");
 

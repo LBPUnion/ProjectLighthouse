@@ -17,6 +17,8 @@ public class SendVerificationEmailPage : BaseLayout
 
     public async Task<IActionResult> OnGet()
     {
+        if (!ServerSettings.Instance.SMTPEnabled) return this.NotFound();
+
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
