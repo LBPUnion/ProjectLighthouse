@@ -73,6 +73,8 @@ public class RegisterForm : BaseLayout
 
         this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
 
+        if (ServerSettings.Instance.SMTPEnabled) return this.Redirect("~/login/sendVerificationEmail");
+
         return this.RedirectToPage(nameof(LandingPage));
     }
 
