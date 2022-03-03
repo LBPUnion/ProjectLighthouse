@@ -20,6 +20,18 @@ public class SendVerificationEmailPage : BaseLayout
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
+        // `using` weirdness here. I tried to fix it, but I couldn't.
+        // The user should never see this page once they've been verified, so assert here.
+        System.Diagnostics.Debug.Assert(!user.EmailAddressVerified);
+
+        // Othewise, on a release build, just silently redirect them to the landing page.
+        #if !DEBUG
+        if (user.EmailAddressVerified)
+        {
+            return this.Redirect("/");
+        }
+        #endif
+
         EmailVerificationToken verifyToken = new()
         {
             UserId = user.UserId,
