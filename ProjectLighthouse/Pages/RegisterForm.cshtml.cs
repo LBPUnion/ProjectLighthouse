@@ -54,6 +54,13 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
+        if (ServerSettings.Instance.SMTPEnabled &&
+            await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress.ToLower() == emailAddress.ToLower()) != null)
+        {
+            this.Error = "The email address you've chosen is already taken.";
+            return this.Page();
+        }
+
         if (!await Request.CheckCaptchaValidity())
         {
             this.Error = "You must complete the captcha correctly.";
