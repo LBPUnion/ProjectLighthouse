@@ -78,13 +78,13 @@ public class Photo
 
     [NotMapped]
     [XmlIgnore]
-    public string SlotName
+    public string? SlotName
     {
         get
         {
             using Database database = new();
 
-            return database.Slots.First(s => s.SlotId == this.SlotId).Name;
+            return database.Slots.FirstOrDefault(s => s.SlotId == this.SlotId)?.Name;
         }
     }
 

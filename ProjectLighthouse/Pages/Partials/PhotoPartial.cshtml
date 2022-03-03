@@ -18,7 +18,7 @@
         <b>
             <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a>
         </b>
-        @if (Model.SlotId != 0 && Model.SlotType == SlotType.User)
+        @if (Model.SlotId != 0 && Model.SlotType == SlotType.User && Model.SlotName != null)
         {
             <span>
                  in level

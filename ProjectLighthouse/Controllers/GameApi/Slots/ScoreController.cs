@@ -49,6 +49,7 @@ public class ScoreController : ControllerBase
         if (slotType == SlotType.Unknown) return this.BadRequest();
 
         score.SlotId = id;
+        score.SlotType = slotType;
 
         if (slotType == SlotType.User)
         {
@@ -79,7 +80,6 @@ public class ScoreController : ControllerBase
         {
             Score first = existingScore.First(s => s.SlotId == score.SlotId && s.SlotType == slotType);
             score.ScoreId = first.ScoreId;
-            score.SlotType = slotType;
             score.Points = Math.Max(first.Points, score.Points);
             this.database.Entry(first).CurrentValues.SetValues(score);
         }
