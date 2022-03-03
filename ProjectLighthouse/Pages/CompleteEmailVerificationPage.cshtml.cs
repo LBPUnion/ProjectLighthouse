@@ -28,6 +28,12 @@ public class CompleteEmailVerificationPage : BaseLayout
             return this.Page();
         }
 
+        if (emailVerifyToken.UserId != user.UserId)
+        {
+            this.Error = "This token doesn't belong to you!";
+            return this.Page();
+        }
+
         this.Database.EmailVerificationTokens.Remove(emailVerifyToken);
 
         user.EmailAddressVerified = true;
