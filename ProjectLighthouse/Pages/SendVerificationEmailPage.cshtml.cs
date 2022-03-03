@@ -46,8 +46,9 @@ public class SendVerificationEmailPage : BaseLayout
         await this.Database.SaveChangesAsync();
 
         string body = "Hello,\n\n" +
-                      $"A request to verify this email for your Project Lighthouse account ({user.Username}).\n\n" +
-                      $"To verify your account, click this link: {ServerSettings.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}";
+                      $"This email is a request to verify this email for your (likely new!) Project Lighthouse account ({user.Username}).\n\n" +
+                      $"To verify your account, click the following link: {ServerSettings.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}\n\n\n" +
+                      "If this wasn't you, feel free to ignore this email.";
 
         if (SMTPHelper.SendEmail(user.EmailAddress, "Project Lighthouse Email Verification", body))
         {
