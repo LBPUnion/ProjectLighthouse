@@ -17,11 +17,10 @@ public class RegisterForm : BaseLayout
     {}
 
     public string Error { get; private set; }
-    public bool WasRegisterRequest { get; private set; }
 
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
-    public async Task<IActionResult> OnPost(string username, string password, string confirmPassword)
+    public async Task<IActionResult> OnPost(string username, string password, string confirmPassword, string emailAddress)
     {
         if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
 
@@ -37,6 +36,12 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
+        if (string.IsNullOrWhiteSpace(emailAddress) && ServerSettings.Instance.SMTPEnabled)
+        {
+            this.Error = "Email address field is required.";
+            return this.Page();
+        }
+
         if (password != confirmPassword)
         {
             this.Error = "Passwords do not match!";
@@ -49,13 +54,20 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
+        if (ServerSettings.Instance.SMTPEnabled &&
+            await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress.ToLower() == emailAddress.ToLower()) != null)
+        {
+            this.Error = "The email address you've chosen is already taken.";
+            return this.Page();
+        }
+
         if (!await Request.CheckCaptchaValidity())
         {
             this.Error = "You must complete the captcha correctly.";
             return this.Page();
         }
 
-        User user = await this.Database.CreateUser(username, HashHelper.BCryptHash(password));
+        User user = await this.Database.CreateUser(username, HashHelper.BCryptHash(password), emailAddress);
 
         WebToken webToken = new()
         {
@@ -67,6 +79,8 @@ public class RegisterForm : BaseLayout
         await this.Database.SaveChangesAsync();
 
         this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
+
+        if (ServerSettings.Instance.SMTPEnabled) return this.Redirect("~/login/sendVerificationEmail");
 
         return this.RedirectToPage(nameof(LandingPage));
     }

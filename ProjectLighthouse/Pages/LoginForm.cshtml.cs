@@ -8,6 +8,8 @@ using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Profiles.Email;
+using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +66,23 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
+        if (user.EmailAddress == null && ServerSettings.Instance.SMTPEnabled)
+        {
+            Logger.Log($"User {user.Username} (id: {user.UserId}) failed to login; email not set", LoggerLevelLogin.Instance);
+
+            EmailSetToken emailSetToken = new()
+            {
+                UserId = user.UserId,
+                User = user,
+                EmailToken = HashHelper.GenerateAuthToken(),
+            };
+
+            this.Database.EmailSetTokens.Add(emailSetToken);
+            await this.Database.SaveChangesAsync();
+
+            return this.Redirect("/login/setEmail?token=" + emailSetToken.EmailToken);
+        }
+
         WebToken webToken = new()
         {
             UserId = user.UserId,
@@ -86,6 +105,7 @@ public class LoginForm : BaseLayout
         Logger.Log($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LoggerLevelLogin.Instance);
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
+        if (ServerSettings.Instance.SMTPEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
 
         return this.RedirectToPage(nameof(LandingPage));
     }

@@ -1,0 +1,30 @@
+@page "/verifyEmail"
+@model LBPUnion.ProjectLighthouse.Pages.CompleteEmailVerificationPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+
+    if (Model.Error == null)
+    {
+        Model.Title = "Email Address Verified";
+    }
+    else
+    {
+        Model.Title = "Couldn't verify email address";
+    }
+}
+
+@if (Model.Error != null)
+{
+    <p>
+        <b>Reason:</b> @Model.Error
+    </p>
+    <p>Please try again. If the error persists, please contact the instance administrator.</p>
+    <a href="/login/sendVerificationEmail">
+        <div class="ui blue button">Resend email</div>
+    </a>
+}
+else
+{
+    <p>Your email has been successfully verified. You may now close this tab.</p>
+}

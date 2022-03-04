@@ -43,6 +43,17 @@
         </div>
     </div>
 
+    @if (ServerSettings.Instance.SMTPEnabled)
+    {
+        <div class="field">
+            <label>Email address</label>
+            <div class="ui left icon input">
+                <input type="email" name="emailAddress" id="emailAddress" placeholder="Email Address">
+                <i class="mail icon"></i>
+            </div>
+        </div>
+    }
+
     <div class="field">
         <label>Password</label>
         <div class="ui left icon input">
@@ -68,3 +79,30 @@
 
     <input type="submit" value="Register" id="submit" class="ui green button">
 </form>
+
+<br><br>
+
+@if (ServerStatics.IsDebug)
+{
+    <button class="ui red button" onclick="fill()">DEBUG: Fill with everything but email</button>
+
+    <script>
+        const usernameField = document.getElementById("text");
+        const emailField = document.getElementById("emailAddress");
+        const passwordField = document.getElementById("password");
+        const confirmPasswordField = document.getElementById("confirmPassword");
+        
+        function fill() {
+            const min = 100;
+            const max = 99999999;
+            
+            const rand = Math.floor(Math.random() * (max - min + 1) + min);
+            
+            usernameField.value = rand.toString();
+            passwordField.value = rand.toString();
+            confirmPasswordField.value = rand.toString();
+            
+            emailField.focus();
+        }
+    </script>
+}

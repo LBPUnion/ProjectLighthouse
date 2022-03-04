@@ -12,9 +12,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BCrypt.Net-Next" Version="4.0.2"/>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
         <PackageReference Include="DDSReader" Version="1.0.8-pre"/>
-        <PackageReference Include="Discord.Net.Webhook" Version="3.3.2"/>
+        <PackageReference Include="Discord.Net.Webhook" Version="3.4.0"/>
         <PackageReference Include="InfluxDB.Client" Version="3.3.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
         <PackageReference Include="Kettu" Version="1.2.2"/>
@@ -49,6 +49,10 @@
         </EmbeddedResource>
         <None Remove="recent-activity.xml"/>
         <None Remove="r.tar.gz"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs"/>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

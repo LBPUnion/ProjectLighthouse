@@ -18,7 +18,7 @@ public class RegisterTests : LighthouseWebTest
     {
         await using Database database = new();
 
-        string username = "unitTestUser" + new Random().Next(1, 9999);
+        string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
         string passwordPlaintext = Convert.ToHexString(HashHelper.GenerateRandomBytes(16).ToArray());
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
@@ -41,7 +41,7 @@ public class RegisterTests : LighthouseWebTest
     {
         await using Database database = new();
 
-        string username = "unitTestUser" + new Random().Next(1, 9999);
+        string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
         string passwordPlaintext = Convert.ToHexString(HashHelper.GenerateRandomBytes(16).ToArray());
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
@@ -62,7 +62,7 @@ public class RegisterTests : LighthouseWebTest
     {
         await using Database database = new();
 
-        string username = "unitTestUser" + new Random().Next(1, 9999);
+        string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
         string passwordPlaintext = Convert.ToHexString(HashHelper.GenerateRandomBytes(16).ToArray());
         string passwordSha256 = HashHelper.Sha256Hash(passwordPlaintext);
 

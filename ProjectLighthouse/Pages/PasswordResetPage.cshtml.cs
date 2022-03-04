@@ -38,6 +38,8 @@ public class PasswordResetPage : BaseLayout
 
         await this.Database.SaveChangesAsync();
 
+        if (!user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
+
         return this.Redirect("~/");
     }
 

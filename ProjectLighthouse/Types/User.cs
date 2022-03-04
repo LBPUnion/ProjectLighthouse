@@ -13,6 +13,13 @@ public class User
     public int UserId { get; set; }
     public string Username { get; set; }
 
+    #nullable enable
+    [JsonIgnore]
+    public string? EmailAddress { get; set; } = null;
+    #nullable disable
+
+    public bool EmailAddressVerified { get; set; } = false;
+
     [JsonIgnore]
     public string Password { get; set; }
 
