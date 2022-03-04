@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings;
 [Serializable]
 public class ServerSettings
 {
-    public const int CurrentConfigVersion = 23; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    public const int CurrentConfigVersion = 24; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     private static FileSystemWatcher fileWatcher;
     static ServerSettings()
     {
@@ -147,8 +147,6 @@ public class ServerSettings
     public bool DiscordWebhookEnabled { get; set; }
 
     public string DiscordWebhookUrl { get; set; } = "";
-
-    public bool VitaCreateMode { get; set; }
 
     public bool ConfigReloading { get; set; } = true;
 
