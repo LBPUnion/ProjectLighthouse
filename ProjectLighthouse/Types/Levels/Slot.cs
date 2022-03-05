@@ -260,6 +260,8 @@ public class Slot
         Review? yourReview = null
     )
     {
+        int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
+
         string slotData = LbpSerializer.StringElement("name", this.Name) +
                           LbpSerializer.StringElement("id", this.SlotId) +
                           LbpSerializer.StringElement("game", (int)this.GameVersion) +
@@ -304,6 +306,7 @@ public class Slot
                           yourReview?.Serialize("yourReview") +
                           LbpSerializer.StringElement("reviewsEnabled", ServerSettings.Instance.LevelReviewsEnabled) +
                           LbpSerializer.StringElement("commentsEnabled", ServerSettings.Instance.LevelCommentsEnabled) +
+                          LbpSerializer.StringElement("playerCount", playerCount) +
                           LbpSerializer.StringElement("reviewCount", this.ReviewCount);
 
         int yourPlays;
