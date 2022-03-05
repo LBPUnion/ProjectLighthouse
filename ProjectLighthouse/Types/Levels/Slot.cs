@@ -19,6 +19,23 @@ namespace LBPUnion.ProjectLighthouse.Types.Levels;
 [XmlType("slot")]
 public class Slot
 {
+    [NotMapped]
+    [JsonIgnore]
+    [XmlIgnore]
+    private Database? _database;
+
+    [NotMapped]
+    [JsonIgnore]
+    [XmlIgnore]
+    private Database database {
+        get {
+            if (this._database != null) return this._database;
+
+            return this._database = new Database();
+        }
+        set => this._database = value;
+    }
+
     [XmlAttribute("type")]
     [NotMapped]
     [JsonIgnore]
@@ -114,24 +131,12 @@ public class Slot
     [XmlIgnore]
     [NotMapped]
     [JsonIgnore]
-    public int Hearts {
-        get {
-            using Database database = new();
-
-            return database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
-        }
-    }
+    public int Hearts => database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
 
     [XmlIgnore]
     [NotMapped]
     [JsonIgnore]
-    public int Comments {
-        get {
-            using Database database = new();
-
-            return database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
-        }
-    }
+    public int Comments => database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
 
     [XmlIgnore]
     [NotMapped]
@@ -196,32 +201,18 @@ public class Slot
     [NotMapped]
     [JsonIgnore]
     [XmlElement("thumbsup")]
-    public int Thumbsup {
-        get {
-            using Database database = new();
-
-            return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
-        }
-    }
+    public int Thumbsup => database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
 
     [NotMapped]
     [JsonIgnore]
     [XmlElement("thumbsdown")]
-    public int Thumbsdown {
-        get {
-            using Database database = new();
-
-            return database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
-        }
-    }
+    public int Thumbsdown => database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
 
     [NotMapped]
     [JsonPropertyName("averageRating")]
     [XmlElement("averageRating")]
     public double RatingLBP1 {
         get {
-            using Database database = new();
-
             IQueryable<RatedLevel> ratedLevels = database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
             if (!ratedLevels.Any()) return 3.0;
 
@@ -232,13 +223,7 @@ public class Slot
     [NotMapped]
     [JsonIgnore]
     [XmlElement("reviewCount")]
-    public int ReviewCount {
-        get {
-            using Database database = new();
-
-            return database.Reviews.Count(r => r.SlotId == this.SlotId);
-        }
-    }
+    public int ReviewCount => database.Reviews.Count(r => r.SlotId == this.SlotId);
 
     [XmlElement("leveltype")]
     public string LevelType { get; set; } = "";

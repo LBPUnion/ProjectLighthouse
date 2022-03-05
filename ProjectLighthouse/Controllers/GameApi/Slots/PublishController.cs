@@ -55,7 +55,7 @@ public class PublishController : ControllerBase
             if (oldSlot == null) return this.NotFound();
             if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
         }
-        else if (user.GetUsedSlotsForGame(gameToken.GameVersion, database) > ServerSettings.Instance.EntitledSlots)
+        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerSettings.Instance.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
@@ -137,7 +137,7 @@ public class PublishController : ControllerBase
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
-        if (user.GetUsedSlotsForGame(gameToken.GameVersion, database) > ServerSettings.Instance.EntitledSlots)
+        if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerSettings.Instance.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }

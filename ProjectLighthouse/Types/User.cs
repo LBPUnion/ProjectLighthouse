@@ -10,6 +10,21 @@ namespace LBPUnion.ProjectLighthouse.Types;
 
 public class User
 {
+    [NotMapped]
+    [JsonIgnore]
+    private Database? _database;
+
+    [NotMapped]
+    [JsonIgnore]
+    private Database database {
+        get {
+            if (this._database != null) return this._database;
+
+            return this._database = new Database();
+        }
+        set => this._database = value;
+    }
+
     public int UserId { get; set; }
     public string Username { get; set; }
 
@@ -54,39 +69,19 @@ public class User
 
     [NotMapped]
     [JsonIgnore]
-    public int Reviews {
-        get {
-            using Database database = new();
-            return database.Reviews.Count(r => r.ReviewerId == this.UserId);
-        }
-    }
+    public int Reviews => database.Reviews.Count(r => r.ReviewerId == this.UserId);
 
     [NotMapped]
     [JsonIgnore]
-    public int Comments {
-        get {
-            using Database database = new();
-            return database.Comments.Count(c => c.Type == CommentType.Profile && c.TargetId == this.UserId);
-        }
-    }
+    public int Comments => database.Comments.Count(c => c.Type == CommentType.Profile && c.TargetId == this.UserId);
 
     [NotMapped]
     [JsonIgnore]
-    public int PhotosByMe {
-        get {
-            using Database database = new();
-            return database.Photos.Count(p => p.CreatorId == this.UserId);
-        }
-    }
+    public int PhotosByMe => database.Photos.Count(p => p.CreatorId == this.UserId);
 
     [NotMapped]
     [JsonIgnore]
-    public int PhotosWithMe {
-        get {
-            using Database database = new();
-            return Enumerable.Sum(database.Photos, photo => photo.Subjects.Count(subject => subject.User.UserId == this.UserId));
-        }
-    }
+    public int PhotosWithMe => Enumerable.Sum(database.Photos, photo => photo.Subjects.Count(subject => subject.User.UserId == this.UserId));
 
     [JsonIgnore]
     public int LocationId { get; set; }
@@ -100,30 +95,15 @@ public class User
 
     [NotMapped]
     [JsonIgnore]
-    public int HeartedLevels {
-        get {
-            using Database database = new();
-            return database.HeartedLevels.Count(p => p.UserId == this.UserId);
-        }
-    }
+    public int HeartedLevels => database.HeartedLevels.Count(p => p.UserId == this.UserId);
 
     [NotMapped]
     [JsonIgnore]
-    public int HeartedUsers {
-        get {
-            using Database database = new();
-            return database.HeartedProfiles.Count(p => p.UserId == this.UserId);
-        }
-    }
+    public int HeartedUsers => database.HeartedProfiles.Count(p => p.UserId == this.UserId);
 
     [NotMapped]
     [JsonIgnore]
-    public int QueuedLevels {
-        get {
-            using Database database = new();
-            return database.QueuedLevels.Count(p => p.UserId == this.UserId);
-        }
-    }
+    public int QueuedLevels => database.QueuedLevels.Count(p => p.UserId == this.UserId);
 
     [JsonIgnore]
     public string Pins { get; set; } = "";
@@ -138,13 +118,7 @@ public class User
     public string PlanetHashLBPVita { get; set; } = "";
 
     [JsonIgnore]
-    public int Hearts {
-        get {
-            using Database database = new();
-
-            return database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
-        }
-    }
+    public int Hearts => database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
 
     [JsonIgnore]
     public bool IsAdmin { get; set; } = false;
@@ -156,16 +130,9 @@ public class User
     public string BooHash { get; set; } = "";
     public string MehHash { get; set; } = "";
 
-    #nullable enable
     [NotMapped]
     [JsonIgnore]
-    public UserStatus Status {
-        get {
-            using Database database = new();
-            return new UserStatus(database, this.UserId);
-        }
-    }
-    #nullable disable
+    public UserStatus Status => new(database, this.UserId);
 
     [JsonIgnore]
     public bool Banned { get; set; }
@@ -223,18 +190,11 @@ public class User
     /// </summary>
     [NotMapped]
     [JsonIgnore]
-    public int UsedSlots {
-        get {
-            using Database database = new();
-            return database.Slots.Count(s => s.CreatorId == this.UserId);
-        }
-    }
+    public int UsedSlots => database.Slots.Count(s => s.CreatorId == this.UserId);
 
     #nullable enable
-    public int GetUsedSlotsForGame(GameVersion version, Database? database = null)
+    public int GetUsedSlotsForGame(GameVersion version)
     {
-        database ??= new Database();
-
         return database.Slots.Count(s => s.CreatorId == this.UserId && s.GameVersion == version);
     }
     #nullable disable
