@@ -13,10 +13,10 @@ public static class VersionHelper
     {
         try
         {
-            CommitHash = readManifestFile("gitVersion.txt");
-            Branch = readManifestFile("gitBranch.txt");
+            CommitHash = ResourceHelper.readManifestFile("gitVersion.txt");
+            Branch = ResourceHelper.readManifestFile("gitBranch.txt");
 
-            string remotesFile = readManifestFile("gitRemotes.txt");
+            string remotesFile = ResourceHelper.readManifestFile("gitRemotes.txt");
 
             string[] lines = remotesFile.Split('\n');
 
@@ -26,7 +26,7 @@ public static class VersionHelper
             // linq is a serious and painful catastrophe but its useful so i'm gonna keep using it
             Remotes = lines.Select(line => line.Split("\t")[1]).ToArray();
 
-            CommitsOutOfDate = readManifestFile("gitUnpushed.txt").Split('\n').Length;
+            CommitsOutOfDate = ResourceHelper.readManifestFile("gitUnpushed.txt").Split('\n').Length;
 
             CanCheckForUpdates = true;
         }
@@ -53,14 +53,6 @@ public static class VersionHelper
             );
             CanCheckForUpdates = false;
         }
-    }
-
-    private static string readManifestFile(string fileName)
-    {
-        using Stream stream = typeof(Program).Assembly.GetManifestResourceStream($"{typeof(Program).Namespace}.{fileName}");
-        using StreamReader reader = new(stream ?? throw new Exception("The assembly or manifest resource is null."));
-
-        return reader.ReadToEnd().Trim();
     }
 
     public static string CommitHash { get; set; }

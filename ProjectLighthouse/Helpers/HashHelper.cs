@@ -14,7 +14,6 @@ public static class HashHelper
 {
     // private static readonly SHA1 sha1 = SHA1.Create();
     private static readonly SHA256 sha256 = SHA256.Create();
-    private static readonly Random random = new();
 
     /// <summary>
     ///     Generates a specified amount of random bytes in an array.
@@ -24,8 +23,12 @@ public static class HashHelper
     public static IEnumerable<byte> GenerateRandomBytes(int count)
     {
         byte[] b = new byte[count];
-        random.NextBytes(b);
-
+        
+        lock (RandomHelper.random)
+        {
+            RandomHelper.random.NextBytes(b);
+        }
+        
         return b;
     }
 
