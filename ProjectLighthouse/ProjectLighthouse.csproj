@@ -12,53 +12,57 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
-        <PackageReference Include="DDSReader" Version="1.0.8-pre"/>
-        <PackageReference Include="Discord.Net.Webhook" Version="3.4.0"/>
-        <PackageReference Include="InfluxDB.Client" Version="3.3.0"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
-        <PackageReference Include="Kettu" Version="1.2.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2"/>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="DDSReader" Version="1.0.8-pre" />
+        <PackageReference Include="Discord.Net.Webhook" Version="3.4.0" />
+        <PackageReference Include="InfluxDB.Client" Version="3.3.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+        <PackageReference Include="Kettu" Version="1.2.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1"/>
-        <PackageReference Include="SharpZipLib" Version="1.3.3"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
+        <PackageReference Include="SharpZipLib" Version="1.3.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="gitVersion.txt"/>
+        <None Remove="gitVersion.txt" />
         <EmbeddedResource Include="gitVersion.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="gitBranch.txt"/>
+        <None Remove="gitBranch.txt" />
         <EmbeddedResource Include="gitBranch.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="gitRemotes.txt"/>
+        <None Remove="gitRemotes.txt" />
         <EmbeddedResource Include="gitRemotes.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="gitUnpushed.txt"/>
+        <None Remove="gitUnpushed.txt" />
         <EmbeddedResource Include="gitUnpushed.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="recent-activity.xml"/>
-        <None Remove="r.tar.gz"/>
+        <None Remove="chatCensoredList.txt" />
+        <EmbeddedResource Include="chatCensoredList.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="recent-activity.xml" />
+        <None Remove="r.tar.gz" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs"/>
+        <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs" />
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;"/>
-        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;"/>
-        <Exec Command="git remote -v &gt; &quot;$(ProjectDir)/gitRemotes.txt&quot;"/>
-        <Exec Command="git log --branches --not --remotes --oneline &gt; &quot;$(ProjectDir)/gitUnpushed.txt&quot;"/>
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;" />
+        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;" />
+        <Exec Command="git remote -v &gt; &quot;$(ProjectDir)/gitRemotes.txt&quot;" />
+        <Exec Command="git log --branches --not --remotes --oneline &gt; &quot;$(ProjectDir)/gitUnpushed.txt&quot;" />
     </Target>
 </Project>

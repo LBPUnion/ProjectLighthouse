@@ -78,11 +78,15 @@ public class MessageController : ControllerBase
     public async Task<IActionResult> Filter()
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
+        
         if (user == null) return this.StatusCode(403, "");
 
-        string loggedText = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        string response = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        
+        string scannedText = CensorHelper.ScanMessage(response);
 
-        Logger.Log($"{user.Username}: {loggedText}", LoggerLevelFilter.Instance);
-        return this.Ok(loggedText);
+        Logger.Log($"{user.Username}: {response} / {scannedText}", LoggerLevelFilter.Instance);
+        
+        return this.Ok(scannedText);
     }
 }
