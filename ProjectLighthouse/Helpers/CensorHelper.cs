@@ -1,16 +1,9 @@
 using System;
 using System.Text;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
-
-public enum FilterMode
-{
-    None,
-    Asterisks,
-    Random,
-    Furry,
-}
 
 public static class CensorHelper
 {
