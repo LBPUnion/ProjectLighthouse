@@ -35,7 +35,7 @@ public static class CensorHelper
         foreach (string profanity in censorList)
             do
             {
-                profaneIndex = message.ToLower().IndexOf(profanity);
+                profaneIndex = message.ToLower().IndexOf(profanity, StringComparison.Ordinal);
                 if (profaneIndex != -1) message = Censor(profaneIndex, profanity.Length, message);
             }
             while (profaneIndex != -1);
@@ -47,8 +47,6 @@ public static class CensorHelper
     {
         StringBuilder sb = new();
 
-        string randomWord;
-        char randomChar;
         char prevRandomChar = '\0';
 
         sb.Append(message.AsSpan(0, profanityIndex));
@@ -65,7 +63,7 @@ public static class CensorHelper
                         }
                         else
                         {
-                            randomChar = randomCharacters[RandomHelper.random.Next(0, randomCharacters.Length - 1)];
+                            char randomChar = randomCharacters[RandomHelper.random.Next(0, randomCharacters.Length - 1)];
                             if (randomChar == prevRandomChar) randomChar = randomCharacters[RandomHelper.random.Next(0, randomCharacters.Length - 1)];
 
                             prevRandomChar = randomChar;
@@ -92,7 +90,7 @@ public static class CensorHelper
             case FilterMode.Furry:
                 lock(RandomHelper.random)
                 {
-                    randomWord = randomFurry[RandomHelper.random.Next(0, randomFurry.Length - 1)];
+                    string randomWord = randomFurry[RandomHelper.random.Next(0, randomFurry.Length - 1)];
                     sb.Append(randomWord);
                 }
 
