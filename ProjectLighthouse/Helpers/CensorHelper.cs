@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 
@@ -50,7 +51,7 @@ public static class CensorHelper
         char randomChar;
         char prevRandomChar = '\0';
 
-        sb.Append(message.Substring(0, profanityIndex));
+        sb.Append(message.AsSpan(0, profanityIndex));
 
         switch (ServerSettings.Instance.UserInputFilterMode)
         {
@@ -98,7 +99,7 @@ public static class CensorHelper
                 break;
         }
 
-        sb.Append(message.Substring(profanityIndex + profanityLength));
+        sb.Append(message.AsSpan(profanityIndex + profanityLength));
 
         return sb.ToString();
     }
