@@ -1,5 +1,6 @@
 using System.Text;
 using LBPUnion.ProjectLighthouse.Types.Settings;
+using Microsoft.Extensions.Primitives;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -109,20 +110,38 @@ public static class CensorHelper
                 for (int i = 0; i < profanityLength; i++)
                     lock (RandomHelper.random)
                     {
-                        randomChar = _randomCharacters[RandomHelper.random.Next(0,
-                            _randomCharacters.Length - 1)];
-                        if (randomChar == prevRandomChar)
+                        if (message[i] == ' ')
+                        {
+                            sb.Append(' ');
+                        }
+                        else
+                        {
                             randomChar = _randomCharacters[RandomHelper.random.Next(0,
                                 _randomCharacters.Length - 1)];
+                            if (randomChar == prevRandomChar)
+                                randomChar = _randomCharacters[RandomHelper.random.Next(0,
+                                    _randomCharacters.Length - 1)];
 
-                        prevRandomChar = randomChar;
+                            prevRandomChar = randomChar;
 
-                        sb.Append(randomChar);
+                            sb.Append(randomChar);   
+                        }
                     }
 
                 break;
             case FilterMode.Asterisks:
-                for (int i = 0; i < profanityLength; i++) sb.Append('*');
+                for (int i = 0; i < profanityLength; i++)
+                {
+                    if (message[i] == ' ')
+                    {
+                        sb.Append(' ');
+                    }
+                    else
+                    {
+                        sb.Append('*');
+                    }
+                }
+
                 break;
             case FilterMode.Furry:
                 lock (RandomHelper.random)
@@ -131,7 +150,7 @@ public static class CensorHelper
                         _randomFurry.Length - 1)];
                     sb.Append(randomWord);
                 }
-
+                
                 break;
         }
 
