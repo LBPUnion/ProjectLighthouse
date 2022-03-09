@@ -13,17 +13,17 @@ public enum FilterMode
 
 public static class CensorHelper
 {
-    private static readonly char[] _randomCharacters =
+    private static readonly char[] randomCharacters =
     {
         '!', '@', '#', '$', '&', '%', '-', '_',
     };
 
-    private static readonly string[] _randomFurry =
+    private static readonly string[] randomFurry =
     {
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
 
-    private static readonly string[] _censorList = ResourceHelper.readManifestFile("chatCensoredList.txt").Split("\n");
+    private static readonly string[] censorList = ResourceHelper.readManifestFile("chatCensoredList.txt").Split("\n");
 
     public static string ScanMessage(string message)
     {
@@ -31,7 +31,7 @@ public static class CensorHelper
 
         int profaneIndex = -1;
 
-        foreach (string profanity in _censorList)
+        foreach (string profanity in censorList)
             do
             {
                 profaneIndex = message.ToLower().IndexOf(profanity);
@@ -64,8 +64,8 @@ public static class CensorHelper
                         }
                         else
                         {
-                            randomChar = _randomCharacters[RandomHelper.random.Next(0, _randomCharacters.Length - 1)];
-                            if (randomChar == prevRandomChar) randomChar = _randomCharacters[RandomHelper.random.Next(0, _randomCharacters.Length - 1)];
+                            randomChar = randomCharacters[RandomHelper.random.Next(0, randomCharacters.Length - 1)];
+                            if (randomChar == prevRandomChar) randomChar = randomCharacters[RandomHelper.random.Next(0, randomCharacters.Length - 1)];
 
                             prevRandomChar = randomChar;
 
@@ -91,7 +91,7 @@ public static class CensorHelper
             case FilterMode.Furry:
                 lock(RandomHelper.random)
                 {
-                    randomWord = _randomFurry[RandomHelper.random.Next(0, _randomFurry.Length - 1)];
+                    randomWord = randomFurry[RandomHelper.random.Next(0, randomFurry.Length - 1)];
                     sb.Append(randomWord);
                 }
 
