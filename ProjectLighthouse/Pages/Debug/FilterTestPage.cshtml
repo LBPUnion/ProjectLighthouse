@@ -1,0 +1,22 @@
+@page "/debug/filter"
+@model LBPUnion.ProjectLighthouse.Pages.Debug.FilterTestPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Debug - Filter Test";
+}
+
+@if (Model.FilteredText != null)
+{
+    <p>@Model.FilteredText</p>
+}
+
+<form>
+    <div class="ui right action input">
+        <input type="text" name="text" placeholder="Text to be filtered" value="@(Model.Text ?? "")">
+        <button type="submit" class="ui blue button">
+            <i class="pen icon"></i>
+            Filter
+        </button>
+    </div>
+</form>
