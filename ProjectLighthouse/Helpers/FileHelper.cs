@@ -29,6 +29,7 @@ public static class FileHelper
         {
             LbpFileType.MotionRecording => true,
             LbpFileType.FileArchive => false,
+            LbpFileType.CrossLevel => true,
             LbpFileType.Painting => true,
             LbpFileType.Unknown => false,
             LbpFileType.Texture => true,
@@ -64,6 +65,7 @@ public static class FileHelper
         return Encoding.ASCII.GetString(header) switch
         {
             "REC" => LbpFileType.MotionRecording,
+            "PRF" => LbpFileType.CrossLevel,
             "PTG" => LbpFileType.Painting,
             "TEX" => LbpFileType.Texture,
             "FSH" => LbpFileType.Script,
