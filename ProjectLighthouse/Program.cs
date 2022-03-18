@@ -78,7 +78,7 @@ public static class Program
             return;
         }
 
-        FileHelper.ConvertAllTexturesToPng();
+        if (ServerSettings.Instance.ConvertAssetsOnStartup) FileHelper.ConvertAllTexturesToPng();
 
         Logger.Log("Starting room cleanup thread...", LoggerLevelStartup.Instance);
         RoomHelper.StartCleanupThread();

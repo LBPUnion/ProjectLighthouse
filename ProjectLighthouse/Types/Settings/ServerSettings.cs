@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Kettu;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings;
@@ -13,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Settings;
 [Serializable]
 public class ServerSettings
 {
-    public const int CurrentConfigVersion = 25; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    public const int CurrentConfigVersion = 26; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     private static FileSystemWatcher fileWatcher;
     static ServerSettings()
     {
@@ -162,6 +161,8 @@ public class ServerSettings
     public string HCaptchaSecret { get; set; } = "";
 
     public string ServerListenUrl { get; set; } = "http://localhost:10060";
+
+    public bool ConvertAssetsOnStartup { get; set; } = true;
 
     #region SMTP
 
