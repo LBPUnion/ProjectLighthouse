@@ -82,7 +82,8 @@ public class ResourcesController : ControllerBase
         string path = FileHelper.GetResourcePath(hash);
 
         FileHelper.EnsureDirectoryCreated(assetsDirectory);
-        if (FileHelper.ResourceExists(hash)) this.Ok(); // no reason to fail if it's already uploaded
+        // lbp treats code 409 as success and as an indicator that the file is already present
+        if (FileHelper.ResourceExists(hash)) this.Conflict();
 
         Logger.Log($"Processing resource upload (hash: {hash})", LoggerLevelResources.Instance);
         LbpFile file = new(await BinaryHelper.ReadFromPipeReader(this.Request.BodyReader));
@@ -90,7 +91,7 @@ public class ResourcesController : ControllerBase
         if (!FileHelper.IsFileSafe(file))
         {
             Logger.Log($"File is unsafe (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
-            return this.UnprocessableEntity();
+            return this.Conflict();
         }
 
         string calculatedHash = file.Hash;

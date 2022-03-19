@@ -83,7 +83,14 @@
     <div class="eight wide column">
         <div class="ui blue segment">
             <h2>Biography</h2>
-            <p>@Model.ProfileUser.Biography</p>
+            @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
+            {
+                <p>@Model.ProfileUser.Username hasn't introduced themselves yet</p>
+            }
+            else
+            {
+                <p>@Model.ProfileUser.Biography</p>
+            }
         </div>
     </div>
     <div class="eight wide column">
