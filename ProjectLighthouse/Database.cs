@@ -75,7 +75,7 @@ public class Database : DbContext
             Username = username,
             Password = password,
             LocationId = l.Id,
-            Biography = username + " hasn't introduced themselves yet.",
+            Biography = "",
             EmailAddress = emailAddress,
         };
         this.Users.Add(user);
