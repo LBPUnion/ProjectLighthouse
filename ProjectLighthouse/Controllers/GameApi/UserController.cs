@@ -41,7 +41,7 @@ public class UserController : ControllerBase
                 u.Username,
                 u.IconHash,
             }).FirstOrDefaultAsync();
-        if (partialUser == null) return "";
+        if (partialUser == null) return null;
         string user = LbpSerializer.TaggedStringElement("npHandle", partialUser.Username, "icon", partialUser.IconHash);
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }
