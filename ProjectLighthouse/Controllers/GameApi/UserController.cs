@@ -32,6 +32,20 @@ public class UserController : ControllerBase
         return user?.Serialize(gameVersion);
     }
 
+    private async Task<string?> getSerializedUserPicture(string username)
+    {
+        // use an anonymous type to only fetch certain columns
+        var partialUser = await this.database.Users.Where(u => u.Username == username)
+            .Select(u => new
+            {
+                u.Username,
+                u.IconHash,
+            }).FirstOrDefaultAsync();
+        if (partialUser == null) return "";
+        string user = LbpSerializer.TaggedStringElement("npHandle", partialUser.Username, "icon", partialUser.IconHash);
+        return LbpSerializer.TaggedStringElement("user", user, "type", "user");
+    }
+
     [HttpGet("user/{username}")]
     public async Task<IActionResult> GetUser(string username)
     {
@@ -51,7 +65,7 @@ public class UserController : ControllerBase
         if (token == null) return this.StatusCode(403, "");
 
         List<string?> serializedUsers = new();
-        foreach (string userId in u) serializedUsers.Add(await this.getSerializedUser(userId, token.GameVersion));
+        foreach (string userId in u) serializedUsers.Add(await this.getSerializedUserPicture(userId));
 
         string serialized = serializedUsers.Aggregate(string.Empty, (current, user) => user == null ? current : current + user);
 
