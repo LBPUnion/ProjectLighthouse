@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -59,8 +58,6 @@ public class AdminSlotController : ControllerBase
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.Ok();
-
-        if (slot.Location == null) throw new ArgumentNullException();
 
         await this.database.RemoveSlot(slot);
 
