@@ -86,6 +86,11 @@ public class PublishController : ControllerBase
         Slot? slot = await this.getSlotFromBody();
         if (slot?.Location == null) return this.BadRequest();
 
+        foreach (string resource in slot.Resources)
+        {
+            if (!FileHelper.ResourceExists(resource)) return this.BadRequest();
+        }
+
         // Republish logic
         if (slot.SlotId != 0)
         {
