@@ -26,23 +26,32 @@ public static class InfluxHelper
 
     public static async void Log()
     {
-        using WriteApi writeApi = Client.GetWriteApi();
-        PointData point = PointData.Measurement("lighthouse")
-            .Field("playerCount", await StatisticsHelper.RecentMatches())
-            .Field("slotCount", await StatisticsHelper.SlotCount());
-
-        foreach (GameVersion gameVersion in gameVersions)
+        try
         {
-            PointData gamePoint = PointData.Measurement("lighthouse")
-                .Tag("game", gameVersion.ToString())
-                .Field("playerCountGame", await StatisticsHelper.RecentMatchesForGame(gameVersion));
+            using WriteApi writeApi = Client.GetWriteApi();
+            PointData point = PointData.Measurement("lighthouse")
+                .Field("playerCount", await StatisticsHelper.RecentMatches())
+                .Field("slotCount", await StatisticsHelper.SlotCount());
 
-            writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, gamePoint);
+            foreach (GameVersion gameVersion in gameVersions)
+            {
+                PointData gamePoint = PointData.Measurement("lighthouse")
+                    .Tag("game", gameVersion.ToString())
+                    .Field("playerCountGame", await StatisticsHelper.RecentMatchesForGame(gameVersion));
+
+                writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, gamePoint);
+            }
+
+            writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, point);
+
+            writeApi.Flush();
         }
+        catch(Exception e)
+        {
+            Logger.Log("Exception while logging: ", LoggerLevelInflux.Instance);
 
-        writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, point);
-
-        writeApi.Flush();
+            foreach (string line in e.ToString().Split("\n")) Logger.Log(line, LoggerLevelInflux.Instance);
+        }
     }
 
     public static async Task StartLogging()
@@ -61,7 +70,7 @@ public static class InfluxHelper
                     }
                     catch(Exception e)
                     {
-                        Logger.Log("Exception while logging: ", LoggerLevelInflux.Instance);
+                        Logger.Log("Exception while running log thread: ", LoggerLevelInflux.Instance);
 
                         foreach (string line in e.ToString().Split("\n")) Logger.Log(line, LoggerLevelInflux.Instance);
                     }
