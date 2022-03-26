@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -144,7 +145,7 @@ public class ReviewController : ControllerBase
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.BadRequest();
 
-        IQueryable<Review?> reviews = this.database.Reviews.Where(r => r.SlotId == slotId && r.Slot.GameVersion <= gameVersion)
+        IQueryable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)
             .Include(r => r.Reviewer)
             .Include(r => r.Slot)
             .OrderByDescending(r => r.ThumbsUp)
@@ -152,17 +153,17 @@ public class ReviewController : ControllerBase
             .Skip(pageStart - 1)
             .Take(pageSize);
 
+        string inner = reviews.ToList()
+            .Aggregate
+            (
+                string.Empty,
+                (current, review) =>
+                {
+                    if (review == null) return current;
 
-        string inner = reviews.ToList().Aggregate
-        (
-            string.Empty,
-            (current, review) =>
-            {
-                if (review == null) return current;
-
-                return current + review.Serialize();
-            }
-        );
+                    return current + review.Serialize();
+                }
+            );
 
         string response = LbpSerializer.TaggedStringElement
         (
@@ -194,12 +195,14 @@ public class ReviewController : ControllerBase
 
         GameVersion gameVersion = gameToken.GameVersion;
 
-        IEnumerable<Review> reviews = this.database.Reviews.Where(r => r.Reviewer.Username == username && r.Slot.GameVersion <= gameVersion)
+        IEnumerable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)
+            .Where(r => r.Reviewer.Username == username)
             .Include(r => r.Reviewer)
             .Include(r => r.Slot)
             .OrderByDescending(r => r.Timestamp)
             .Skip(pageStart - 1)
-            .Take(pageSize);
+            .Take(pageSize)
+            .AsEnumerable();
 
         string inner = reviews.Aggregate
         (
