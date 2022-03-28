@@ -146,6 +146,7 @@ public class ReviewController : ControllerBase
         if (slot == null) return this.BadRequest();
 
         IQueryable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)
+            .Where(r => r.SlotId == slotId)
             .Include(r => r.Reviewer)
             .Include(r => r.Slot)
             .OrderByDescending(r => r.ThumbsUp)
