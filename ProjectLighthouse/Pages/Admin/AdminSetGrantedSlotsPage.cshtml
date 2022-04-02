@@ -1,0 +1,19 @@
+@page "/admin/user/{id:int}/setGrantedSlots"
+@model LBPUnion.ProjectLighthouse.Pages.Admin.AdminSetGrantedSlotsPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Set granted slots for " + Model.TargetedUser!.Username;
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="ui left action input">
+        <button type="submit" class="ui blue button">
+            <i class="pencil icon"></i>
+            <span>Set Granted Slots</span>
+        </button>
+        <input type="text" name="grantedSlotCount" placeholder="Granted Slots" value="@Model.TargetedUser.AdminGrantedSlots">
+    </div><br><br>
+</form>

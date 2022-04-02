@@ -15,7 +15,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "6.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.AuthenticationAttempt", b =>
@@ -693,6 +693,9 @@ namespace ProjectLighthouse.Migrations
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AdminGrantedSlots")
                         .HasColumnType("int");
 
                     b.Property<bool>("Banned")

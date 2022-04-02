@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -199,11 +200,19 @@ public class User
     }
     #nullable disable
 
+    [JsonIgnore]
+    [XmlIgnore]
+    public int EntitledSlots => ServerSettings.Instance.EntitledSlots + this.AdminGrantedSlots;
+
     /// <summary>
     ///     The number of slots remaining on the earth
     /// </summary>
     [JsonIgnore]
-    public int FreeSlots => ServerSettings.Instance.EntitledSlots - this.UsedSlots;
+    public int FreeSlots => this.EntitledSlots - this.UsedSlots;
+
+    [JsonIgnore]
+    [XmlIgnore]
+    public int AdminGrantedSlots { get; set; }
 
     private static readonly string[] slotTypes =
     {
@@ -232,12 +241,12 @@ public class User
             slotTypesLocal = slotTypes;
         }
 
-        slots += LbpSerializer.StringElement("entitledSlots", ServerSettings.Instance.EntitledSlots);
+        slots += LbpSerializer.StringElement("entitledSlots", this.EntitledSlots);
         slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
 
         foreach (string slotType in slotTypesLocal)
         {
-            slots += LbpSerializer.StringElement(slotType + "EntitledSlots", ServerSettings.Instance.EntitledSlots);
+            slots += LbpSerializer.StringElement(slotType + "EntitledSlots", this.EntitledSlots);
             // ReSharper disable once StringLiteralTypo
             slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
             slots += LbpSerializer.StringElement(slotType + "FreeSlots", this.FreeSlots);
