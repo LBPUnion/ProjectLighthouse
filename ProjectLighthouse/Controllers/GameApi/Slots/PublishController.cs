@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Files;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -90,6 +91,12 @@ public class PublishController : ControllerBase
         {
             if (!FileHelper.ResourceExists(resource)) return this.BadRequest();
         }
+
+        LbpFile? rootLevel = LbpFile.FromHash(slot.RootLevel);
+
+        if (rootLevel == null) return this.BadRequest();
+
+        if (rootLevel.FileType != LbpFileType.Level) return this.BadRequest();
 
         // Republish logic
         if (slot.SlotId != 0)
