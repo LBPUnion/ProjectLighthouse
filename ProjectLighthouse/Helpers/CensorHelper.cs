@@ -17,7 +17,7 @@ public static class CensorHelper
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
 
-    private static readonly string[] censorList = ResourceHelper.readManifestFile("chatCensoredList.txt").Split("\n");
+    private static readonly string[] censorList = ResourceHelper.readManifestFile("chatCensoredList.txt").Replace("\r", "").Split("\n");
 
     public static string ScanMessage(string message)
     {
