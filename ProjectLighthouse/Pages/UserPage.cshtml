@@ -125,19 +125,10 @@
                 <i class="ban icon"></i>
                 <span>Ban User</span>
             </a>
+        
         <br><br>
         }
 
-        <form method="post" action="/admin/user/@Model.ProfileUser.UserId/setGrantedSlots">
-            @Html.AntiForgeryToken()
-            <div class="ui left action input">
-                <button type="submit" class="ui blue button">
-                    <i class="pencil icon"></i>
-                    <span>Set Granted Slots</span>
-                </button>
-                <input type="text" name="grantedSlotCount" placeholder="Granted Slots" value="@Model.ProfileUser.AdminGrantedSlots">
-            </div>
-        </form>
+        @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
     </div>
         }
-    
