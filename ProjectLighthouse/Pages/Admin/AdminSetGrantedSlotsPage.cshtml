@@ -1,0 +1,9 @@
+@page "/admin/user/{id:int}/setGrantedSlots"
+@model LBPUnion.ProjectLighthouse.Pages.Admin.AdminSetGrantedSlotsPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Set granted slots for " + Model.TargetedUser!.Username;
+}
+
+@await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.TargetedUser)

@@ -1,0 +1,12 @@
+@model LBPUnion.ProjectLighthouse.Types.User
+
+<form method="post" action="/admin/user/@Model.UserId/setGrantedSlots">
+    @Html.AntiForgeryToken()
+    <div class="ui left action input">
+        <button type="submit" class="ui blue button">
+            <i class="pencil icon"></i>
+            <span>Set Granted Slots</span>
+        </button>
+        <input type="text" name="grantedSlotCount" placeholder="Granted Slots" value="@Model.AdminGrantedSlots">
+    </div>
+</form>

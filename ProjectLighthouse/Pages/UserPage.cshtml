@@ -72,13 +72,6 @@
                 <span>Reset Password</span>
             </a>
         }
-        @if (Model.User != null && Model.User.IsAdmin && !Model.ProfileUser.Banned)
-        {
-            <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/ban">
-                <i class="ban icon"></i>
-                <span>Ban User</span>
-            </a>
-        }
     </div>
     <div class="eight wide column">
         <div class="ui blue segment">
@@ -119,3 +112,22 @@
 }
 
 @await Html.PartialAsync("Partials/CommentsPartial")
+
+@if (Model.User != null && Model.User.IsAdmin)
+{
+    <div class="ui yellow segment">
+        <h2>Admin Options</h2>
+
+        @if (!Model.ProfileUser.Banned)
+        {
+            <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/ban">
+                <i class="ban icon"></i>
+                <span>Ban User</span>
+            </a>
+        
+        <br><br>
+        }
+
+        @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
+    </div>
+        }
