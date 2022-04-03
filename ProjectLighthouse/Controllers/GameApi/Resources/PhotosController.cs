@@ -57,6 +57,8 @@ public class PhotosController : ControllerBase
 
         if (photo.Subjects.Count > 4) return this.BadRequest();
 
+        if (photo.Timestamp > TimestampHelper.Timestamp) return this.BadRequest();
+
         foreach (PhotoSubject subject in photo.Subjects)
         {
             subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);

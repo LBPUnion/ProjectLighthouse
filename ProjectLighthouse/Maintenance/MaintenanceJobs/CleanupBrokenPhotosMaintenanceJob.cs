@@ -25,6 +25,21 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
             bool largeHashIsInvalidFile = false;
             bool tooManyPhotoSubjects = false;
             bool duplicatePhotoSubjects = false;
+            bool takenInTheFuture = true;
+
+            // Checks should generally be ordered in least computationally expensive to most.
+
+            if (photo.Subjects.Count > 4)
+            {
+                tooManyPhotoSubjects = true;
+                goto removePhoto;
+            }
+
+            if (photo.Timestamp > TimestampHelper.Timestamp)
+            {
+                takenInTheFuture = true;
+                goto removePhoto;
+            }
 
             hashNullOrEmpty = string.IsNullOrEmpty
                                   (photo.LargeHash) ||
@@ -41,23 +56,6 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
                 photo.PlanHash,
             };
 
-            noHashesExist = FileHelper.ResourcesNotUploaded(hashes.ToArray()).Length != 0;
-            if (noHashesExist) goto removePhoto;
-
-            LbpFile? file = LbpFile.FromHash(photo.LargeHash);
-//                Console.WriteLine(file.FileType, );
-            if (file == null || file.FileType != LbpFileType.Jpeg && file.FileType != LbpFileType.Png)
-            {
-                largeHashIsInvalidFile = true;
-                goto removePhoto;
-            }
-
-            if (photo.Subjects.Count > 4)
-            {
-                tooManyPhotoSubjects = true;
-                goto removePhoto;
-            }
-
             List<int> subjectUserIds = new(4);
             foreach (PhotoSubject subject in photo.Subjects)
             {
@@ -68,6 +66,17 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
                 }
                 subjectUserIds.Add(subject.UserId);
             }
+
+            LbpFile? file = LbpFile.FromHash(photo.LargeHash);
+//                Console.WriteLine(file.FileType, );
+            if (file == null || file.FileType != LbpFileType.Jpeg && file.FileType != LbpFileType.Png)
+            {
+                largeHashIsInvalidFile = true;
+                goto removePhoto;
+            }
+
+            noHashesExist = FileHelper.ResourcesNotUploaded(hashes.ToArray()).Length != 0;
+            if (noHashesExist) goto removePhoto;
 
             continue;
 
