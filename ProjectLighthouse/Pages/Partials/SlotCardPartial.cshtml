@@ -12,6 +12,8 @@
     string slotName = string.IsNullOrEmpty(Model.Name) ? "Unnamed Level" : Model.Name;
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
 
+    bool mini = (bool?)ViewData["IsMini"] ?? false;
+
     bool isQueued = false;
     bool isHearted = false;
 
@@ -30,25 +32,44 @@
 }
 <div class="card">
     @{
-        int size = isMobile ? 50 : 100;
+        int size = isMobile || mini ? 50 : 100;
     }
     <div>
         <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute">
         <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
     </div>
     <div class="cardStats">
-        @if (showLink)
+        @if (!mini)
         {
-            <h2>
-                <a href="~/slot/@Model.SlotId">@slotName</a>
-            </h2>
+            @if (showLink)
+            {
+                <h2>
+                    <a href="~/slot/@Model.SlotId">@slotName</a>
+                </h2>
+            }
+            else
+            {
+                <h1>
+                    @slotName
+                </h1>
+            }
         }
         else
         {
-            <h1>
-                @slotName
-            </h1>
+            @if (showLink)
+            {
+                <h3>
+                    <a href="~/slot/@Model.SlotId">@slotName</a>
+                </h3>
+            }
+            else
+            {
+                <h3>
+                    @slotName
+                </h3>
+            }
         }
+
         <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
             <i class="blue play icon" title="Plays"></i> <span>@Model.Plays</span>
@@ -61,13 +82,14 @@
                 <span>@Model.RatingLBP1</span>
             }
         </div>
+
         <p>
             <i>Created by <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a> for @Model.GameVersion.ToPrettyString()</i>
         </p>
     </div>
     <div class="cardButtons">
         <br>
-        @if (user != null)
+        @if (user != null && !mini)
         {
             if (isHearted)
             {

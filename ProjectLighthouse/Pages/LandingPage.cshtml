@@ -1,11 +1,14 @@
 @page "/"
+@using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Levels
 @using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.LandingPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.ShowTitleInPage = false;
+    bool isMobile = this.Request.IsMobile();
 }
 <h1>Welcome to <b>Project Lighthouse</b>!</h1>
 
@@ -41,3 +44,36 @@ else
         <a href="/user/@user.UserId" title="@user.Status.ToString()">@user.Username</a>
     }
 }
+
+<div class="@(isMobile ? "" : "ui center aligned grid")">
+    <div class="eight wide column">
+        <div class="ui pink segment">
+            <h1>Latest Team Picks</h1>
+            <div class="ui divider"></div>
+            <div class="ui left aligned segment">
+                @foreach (Slot slot in Model.LatestTeamPicks)
+                {
+                    @await Html.PartialAsync("Partials/SlotCardPartial", slot, Model.GetSlotViewData(slot.SlotId, isMobile))
+                    <br>
+                }
+            </div>
+        </div>
+    </div>
+    @if (isMobile)
+    {
+        <br>
+    }
+    <div class="eight wide column">
+        <div class="ui orange segment">
+            <h1>Trending Levels</h1>
+            <div class="ui divider"></div>
+            <div class="ui left aligned segment">
+                @foreach (Slot slot in Model.TrendingLevels)
+                {
+                    @await Html.PartialAsync("Partials/SlotCardPartial", slot, Model.GetSlotViewData(slot.SlotId, isMobile))
+                    <br>
+                }
+            </div>
+        </div>
+    </div>
+</div>
