@@ -52,4 +52,20 @@ public class AdminReportController : ControllerBase
 
         return this.Redirect("~/admin/reports/0");
     }
+
+    [HttpGet("dismiss")]
+    public async Task<IActionResult> DismissReport([FromRoute] int id)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsAdmin) return this.StatusCode(403, "");
+
+        GriefReport? report = await this.database.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
+        if (report == null) return this.NotFound();
+
+        this.database.Reports.Remove(report);
+
+        await this.database.SaveChangesAsync();
+
+        return this.Redirect("~/admin/reports/0");
+    }
 }

@@ -15,7 +15,9 @@
         <i class="search icon"></i>
     </div>
 </form>
+
 <div class="ui divider"></div>
+
 <script>
     let subjects = [];
     let bounds = [];
@@ -23,6 +25,7 @@
     let ctx = [];
     let images = [];
 </script>
+
 @foreach (GriefReport report in Model.Reports)
 {
     <div class="ui segment">
@@ -30,9 +33,16 @@
             <canvas class="hide-subjects" id="canvas-subjects-@report.ReportId" width="1920" height="1080"
                     style="position: absolute; transform: rotate(180deg)">
             </canvas>
-            <img id="game-image-@report.ReportId" src="/gameAssets/@report.JpegHash" alt="Grief report picture" style="width: 100%; height: auto; border-radius: .28571429rem;">
+            <img class="hover-region" id="game-image-@report.ReportId" src="/gameAssets/@report.JpegHash" alt="Grief report picture" style="width: 100%; height: auto; border-radius: .28571429rem;">
         </div>
-        <p><i>Report submitted by <b><a href="/user/@report.ReportingPlayerId">@report.ReportingPlayer.Username</a></b></i></p>
+        <p>
+            <i>
+                Report submitted by
+                <b>
+                    <a href="/user/@report.ReportingPlayerId">@report.ReportingPlayer.Username</a>
+                </b>
+            </i>
+        </p>
         <b class="hover-players" id="hover-subjects-2-@report.ReportId">Report contains @report.XmlPlayers.Length @(report.XmlPlayers.Length == 1 ? "player" : "players")</b>
         @foreach (ReportPlayer player in report.XmlPlayers)
         {
@@ -40,14 +50,32 @@
                 <a href="/">@player.Name</a>
             </div>
         }
-        <div><b>Report time: </b>@(DateTimeOffset.FromUnixTimeMilliseconds(report.Timestamp).ToString("R"))</div>
-        <div><b>Report reason: </b>@report.Type</div>
-        <div><b>Level ID:</b> @report.LevelId</div>
-        <div><b>Level type:</b> @report.LevelType</div>
-        <div><b>Level owner:</b> @report.LevelOwner</div>
-        <div id="hover-bounds-@report.ReportId" class="hover-region"><b>Hover to see reported region</b></div>
-        <a class="ui red tiny button" href="/admin/report/@report.ReportId/remove" title="Delete">
-            <i class="trash icon" style="margin: 0"></i>
+
+        <br>
+        <div>
+            <b>Report time: </b>@(DateTimeOffset.FromUnixTimeMilliseconds(report.Timestamp).ToString("R"))
+        </div>
+        <div>
+            <b>Report reason: </b>@report.Type
+        </div>
+        <div>
+            <b>Level ID:</b> @report.LevelId
+        </div>
+        <div>
+            <b>Level type:</b> @report.LevelType
+        </div>
+        <div>
+            <b>Level owner:</b> @report.LevelOwner
+        </div>
+        <br>
+
+        <a class="ui green small button" href="/admin/report/@report.ReportId/dismiss">
+            <i class="checkmark icon"></i>
+            <span>Dismiss</span>
+        </a>
+        <a class="ui red small button" href="/admin/report/@report.ReportId/remove">
+            <i class="trash icon"></i>
+            <span>Remove all related assets</span>
         </a>
     </div>
     <script>
@@ -60,6 +88,7 @@
         ctx[@report.ReportId] = canvases[@report.ReportId].getContext('2d');
     </script>
 }
+
 <script>
     function getReportId(name){
         let split = name.split("-");
@@ -71,16 +100,26 @@
         document.querySelectorAll(".hover-players").forEach(item => {
             item.addEventListener('mouseenter', function () {
                 let reportId = getReportId(item.id);
+                const canvas = canvases[reportId];
                 displayType = 1;
-                canvases[reportId].className = "photo-subjects";
+                
+                canvas.className = "photo-subjects";
+                
                 redraw(reportId);
             });
         });
         document.querySelectorAll(".hover-region").forEach(item => {
             item.addEventListener('mouseenter', function () {
                 let reportId = getReportId(item.id);
+                const canvas = canvases[reportId];
+                const image = document.getElementById("game-image-" + reportId.toString());
                 displayType = 0;
-                canvases[reportId].className = "photo-subjects";
+                
+                canvas.className = "photo-subjects";
+                
+                canvas.width = image.offsetWidth;
+                canvas.height = image.clientHeight; // space for names to hang off
+                
                 redraw(reportId);
             });
         });                
@@ -90,6 +129,7 @@
             });
         });
     }, false);
+    
     function redraw(reportId){
         let context = ctx[reportId];
         let canvas = canvases[reportId];
