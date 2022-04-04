@@ -62,6 +62,15 @@ public class AdminReportController : ControllerBase
         GriefReport? report = await this.database.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
         if (report == null) return this.NotFound();
 
+        if (System.IO.File.Exists(Path.Combine("png", $"{report.JpegHash}.png")))
+        {
+            System.IO.File.Delete(Path.Combine("png", $"{report.JpegHash}.png"));
+        }
+        if (System.IO.File.Exists(Path.Combine("r", report.JpegHash)))
+        {
+            System.IO.File.Delete(Path.Combine("r", report.JpegHash));
+        }
+
         this.database.Reports.Remove(report);
 
         await this.database.SaveChangesAsync();
