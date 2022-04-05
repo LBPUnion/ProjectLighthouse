@@ -70,6 +70,12 @@ public class RoomHelper
             rooms = rooms.Where(r => r.Slot.SlotType == slot.SlotType && r.Slot.SlotId == slot.SlotId).ToList();
         }
 
+        // Don't attempt to dive into the current room the player is in.
+        if (user != null)
+        {
+            rooms = rooms.Where(r => !r.Players.Contains(user)).ToList();
+        }
+
         foreach (Room room in rooms)
             // Look for rooms looking for players before moving on to rooms that are idle.
         {
