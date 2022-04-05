@@ -56,19 +56,17 @@ It is recommended to build with `Release` if you plan to use Lighthouse in a pro
 
 ## Contributing
 
-Please see `CONTRIBUTING.md` for more information.
+Please see [`CONTRIBUTING.md`](https://github.com/LBPUnion/ProjectLighthouse/blob/main/CONTRIBUTING.md) for more
+information.
 
 ## Compatibility across games and platforms
 
-| Game     | Console (PS3/Vita/PSP)              | Emulator (RPCS3/Vita3k/PPSSPP)                                        | Next-Gen (PS4/PS5/Vita) |
-|----------|-------------------------------------|-----------------------------------------------------------------------|-------------------------|
-| LBP1     | Compatible                          | Compatible with patched RPCS3 and sceNpCommerce2 patched out of EBOOT | N/A                     |
-| LBP2     | Compatible                          | Compatible with patched RPCS3                                         | N/A                     |
-| LBP3     | Mostly compatible, frequent crashes | Mostly compatible with patched RPCS3, frequent crashes                | Incompatible            |
-| LBP Vita | Compatible                          | Incompatible, marked as "Intro" on Vita3k                             | N/A                     |
-| LBP PSP  | Potentially compatible              | Incompatible, PSN not supported on PPSSPP                             | Potentially Compatible  |
+| Game     | Console (PS3/Vita/PSP)              | Emulator (RPCS3/Vita3k/PPSSPP)                               | Next-Gen (PS4/PS5/Vita) |
+|----------|-------------------------------------|--------------------------------------------------------------|-------------------------|
+| LBP1     | Compatible                          | Compatible with patched RPCS3 build                          | No next-gen equivalent  |
+| LBP2     | Compatible                          | Compatible with patched RPCS3 build                          | No next-gen equivalent  |
+| LBP3     | Mostly compatible, frequent crashes | Mostly compatible with patched RPCS3 build, frequent crashes | Incompatible            |
+| LBP Vita | Compatible                          | Incompatible, marked as "Intro" on Vita3k                    | No next-gen equivalent  |
+| LBP PSP  | Potentially compatible              | Incompatible, PSN not supported on PPSSPP                    | Potentially Compatible  |
 
-While LBP Vita and LBP PSP can be supported, they are not properly seperated from the mainline games at this time. We
-recommend you run separate instances for these games to avoid problems.
-
-Project Lighthouse is still a heavy work in progress, so this chart is subject to change at any point.
+Project Lighthouse is mostly a work in progress, so this chart is subject to change at any point.
