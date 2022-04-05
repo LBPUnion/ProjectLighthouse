@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types.Match;
 
@@ -24,4 +25,11 @@ public class FindBestRoom : IMatchData
 
     [JsonIgnore]
     public IEnumerable<int> FirstSlot => this.Slots[0];
+
+    public RoomSlot RoomSlot
+        => new()
+        {
+            SlotType = (SlotType)this.Slots[0][0],
+            SlotId = this.Slots[0][1],
+        };
 }
