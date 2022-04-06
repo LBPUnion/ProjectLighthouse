@@ -48,7 +48,8 @@ public class SlotPage : BaseLayout
         if (this.ReviewsEnabled)
         {
             this.Reviews = await this.Database.Reviews.Include(r => r.Reviewer)
-                .OrderByDescending(r => r.Timestamp)
+                .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
+                .ThenByDescending(r => r.Timestamp)
                 .Where(r => r.SlotId == id)
                 .Take(50)
                 .ToListAsync();
