@@ -37,7 +37,7 @@ public class FriendsController : ControllerBase
         NPData? npData = (NPData?)serializer.Deserialize(new StringReader(bodyString));
         if (npData == null) return this.BadRequest();
 
-        ReflectionHelper.sanitizeStringsInClass(npData);
+        SanitizationHelper.SanitizeStringsInClass(npData);
 
         List<User> friends = new();
         foreach (string friendName in npData.Friends)

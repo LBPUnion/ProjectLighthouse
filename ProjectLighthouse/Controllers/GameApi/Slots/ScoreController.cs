@@ -44,7 +44,7 @@ public class ScoreController : ControllerBase
         Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
         if (score == null) return this.BadRequest();
 
-        ReflectionHelper.sanitizeStringsInClass(score);
+        SanitizationHelper.SanitizeStringsInClass(score);
 
         score.SlotId = id;
 

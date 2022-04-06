@@ -1,4 +1,5 @@
 @page "/user/{userId:int}"
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Pages.UserPage
@@ -82,7 +83,7 @@
             }
             else
             {
-                <p>@Html.Raw(Model.ProfileUser.Biography)</p>
+                <p>@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
             }
         </div>
     </div>

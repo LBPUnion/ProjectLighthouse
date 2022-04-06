@@ -326,7 +326,7 @@ public class ReviewController : ControllerBase
 
         XmlSerializer serializer = new(typeof(Review));
         Review? review = (Review?)serializer.Deserialize(new StringReader(bodyString));
-        ReflectionHelper.sanitizeStringsInClass(review);
+        SanitizationHelper.SanitizeStringsInClass(review);
         return review;
     }
 }

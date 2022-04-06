@@ -36,7 +36,7 @@ public class ReportController : ControllerBase
 
         if (report == null) return this.BadRequest();
 
-        ReflectionHelper.sanitizeStringsInClass(report);
+        SanitizationHelper.SanitizeStringsInClass(report);
 
         report.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
         report.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));

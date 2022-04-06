@@ -227,7 +227,7 @@ public class PublishController : ControllerBase
         XmlSerializer serializer = new(typeof(Slot));
         Slot? slot = (Slot?)serializer.Deserialize(new StringReader(bodyString));
         
-        ReflectionHelper.sanitizeStringsInClass(slot);
+        SanitizationHelper.SanitizeStringsInClass(slot);
 
         return slot;
     }

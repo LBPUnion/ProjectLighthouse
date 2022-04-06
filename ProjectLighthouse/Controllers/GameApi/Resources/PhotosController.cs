@@ -44,7 +44,7 @@ public class PhotosController : ControllerBase
         Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
         if (photo == null) return this.BadRequest();
 
-        ReflectionHelper.sanitizeStringsInClass(photo);
+        SanitizationHelper.SanitizeStringsInClass(photo);
 
         foreach (Photo p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
         {

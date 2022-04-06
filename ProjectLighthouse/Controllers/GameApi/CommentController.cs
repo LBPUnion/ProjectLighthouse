@@ -88,7 +88,7 @@ public class CommentController : ControllerBase
         XmlSerializer serializer = new(typeof(Comment));
         Comment? comment = (Comment?)serializer.Deserialize(new StringReader(bodyString));
 
-        ReflectionHelper.sanitizeStringsInClass(comment);
+        SanitizationHelper.SanitizeStringsInClass(comment);
 
         CommentType type = (slotId.GetValueOrDefault() == 0 ? CommentType.Profile : CommentType.Level);
 

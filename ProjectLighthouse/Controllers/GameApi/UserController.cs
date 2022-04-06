@@ -94,7 +94,7 @@ public class UserController : ControllerBase
 
         if (update == null) return this.BadRequest();
 
-        ReflectionHelper.sanitizeStringsInClass(update);
+        SanitizationHelper.SanitizeStringsInClass(update);
 
         if (update.Biography != null)
         {
