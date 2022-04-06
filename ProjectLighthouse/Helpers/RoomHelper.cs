@@ -42,11 +42,11 @@ public class RoomHelper
 
     internal static int RoomIdIncrement => roomIdIncrement++;
 
-    public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, Platform? platform, string? location)
+    public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform, string? location)
     {
         if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
         {
-            Logger.Log($"Returning null for FindBestRoom, game ({roomVersion}) does not support dive in", LoggerLevelMatch.Instance);
+            Logger.Log($"Returning null for FindBestRoom, game ({roomVersion}) does not support dive in (should never happen?)", LoggerLevelMatch.Instance);
             return null;
         }
 
@@ -61,6 +61,20 @@ public class RoomHelper
 
         rooms = rooms.Where(r => r.RoomVersion == roomVersion).ToList();
         if (platform != null) rooms = rooms.Where(r => r.RoomPlatform == platform).ToList();
+
+        // If the user is in the pod while trying to look for a room, then they're diving in.
+        // Otherwise they're looking for people to play with in a particular level.
+        // We handle that here:
+        if (slot != null && slot.SlotType != SlotType.Pod && slot.SlotId != 0)
+        {
+            rooms = rooms.Where(r => r.Slot.SlotType == slot.SlotType && r.Slot.SlotId == slot.SlotId).ToList();
+        }
+
+        // Don't attempt to dive into the current room the player is in.
+        if (user != null)
+        {
+            rooms = rooms.Where(r => !r.Players.Contains(user)).ToList();
+        }
 
         foreach (Room room in rooms)
             // Look for rooms looking for players before moving on to rooms that are idle.

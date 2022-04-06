@@ -52,7 +52,7 @@
 {
     if (version == GameVersion.LittleBigPlanet1 || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown) continue;
 
-    FindBestRoomResponse? response = RoomHelper.FindBestRoom(null, version, null, null);
+    FindBestRoomResponse? response = RoomHelper.FindBestRoom(null, version, null, null, null);
     string text = response == null ? "No room found." : "Room " + response.RoomId;
 
     <p><b>Best room for @version.ToPrettyString()</b>: @text</p>

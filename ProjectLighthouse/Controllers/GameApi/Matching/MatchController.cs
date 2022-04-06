@@ -88,9 +88,15 @@ public class MatchController : ControllerBase
                     room.State = (RoomState)playerData.RoomState;
         }
 
-        if (matchData is FindBestRoom && MatchHelper.UserLocations.Count > 1)
+        // Check how many people are online in release builds, disabled for debug for ..well debugging.
+        #if DEBUG
+        if (matchData is FindBestRoom diveInData)
+            #else
+        if (matchData is FindBestRoom diveInData && MatchHelper.UserLocations.Count > 1)
+            #endif
         {
-            FindBestRoomResponse? response = RoomHelper.FindBestRoom(user, gameToken.GameVersion, gameToken.Platform, gameToken.UserLocation);
+            FindBestRoomResponse? response = RoomHelper.FindBestRoom
+                (user, gameToken.GameVersion, diveInData.RoomSlot, gameToken.Platform, gameToken.UserLocation);
 
             if (response == null) return this.NotFound();
 
