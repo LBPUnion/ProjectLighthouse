@@ -1,4 +1,5 @@
 @page "/slot/{id:int}"
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Types.Reviews
 @using LBPUnion.ProjectLighthouse.Types.Settings
@@ -35,7 +36,7 @@
     <div class="eight wide column">
         <div class="ui blue segment">
             <h2>Description</h2>
-            <p>@(string.IsNullOrEmpty(Model.Slot.Description) ? "This level has no description." : Model.Slot.Description)</p>
+            <p>@HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model.Slot.Description) ? "This level has no description." : Model.Slot.Description)</p>
         </div>
     </div>
     <div class="eight wide column">

@@ -1,4 +1,5 @@
 @page "/user/{userId:int}"
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Pages.UserPage
@@ -82,7 +83,7 @@
             }
             else
             {
-                <p>@Model.ProfileUser.Biography</p>
+                <p>@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
             }
         </div>
     </div>
@@ -120,14 +121,14 @@
 
         @if (!Model.ProfileUser.Banned)
         {
-            <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/ban">
-                <i class="ban icon"></i>
-                <span>Ban User</span>
-            </a>
-        
-        <br><br>
+            <div>
+                <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/ban">
+                    <i class="ban icon"></i>
+                    <span>Ban User</span>
+                </a>
+            </div>
+            <div class="ui fitted hidden divider"></div>
         }
-
         @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
     </div>
-        }
+}

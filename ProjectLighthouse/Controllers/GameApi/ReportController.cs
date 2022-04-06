@@ -36,6 +36,8 @@ public class ReportController : ControllerBase
 
         if (report == null) return this.BadRequest();
 
+        SanitizationHelper.SanitizeStringsInClass(report);
+
         report.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
         report.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));
         report.Timestamp = TimeHelper.UnixTimeMilliseconds();

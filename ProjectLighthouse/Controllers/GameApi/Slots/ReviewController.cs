@@ -41,10 +41,12 @@ public class ReviewController : ControllerBase
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
         if (ratedLevel == null)
         {
-            ratedLevel = new RatedLevel();
-            ratedLevel.SlotId = slotId;
-            ratedLevel.UserId = user.UserId;
-            ratedLevel.Rating = 0;
+            ratedLevel = new RatedLevel
+            {
+                SlotId = slotId,
+                UserId = user.UserId,
+                Rating = 0,
+            };
             this.database.RatedLevels.Add(ratedLevel);
         }
 
@@ -68,10 +70,12 @@ public class ReviewController : ControllerBase
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
         if (ratedLevel == null)
         {
-            ratedLevel = new RatedLevel();
-            ratedLevel.SlotId = slotId;
-            ratedLevel.UserId = user.UserId;
-            ratedLevel.RatingLBP1 = 0;
+            ratedLevel = new RatedLevel
+            {
+                SlotId = slotId,
+                UserId = user.UserId,
+                RatingLBP1 = 0,
+            };
             this.database.RatedLevels.Add(ratedLevel);
         }
 
@@ -91,18 +95,23 @@ public class ReviewController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
         Review? newReview = await this.getReviewFromBody();
         if (newReview == null) return this.BadRequest();
 
+        if (newReview.Text.Length > 100) return this.BadRequest();
+
+        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
+
         if (review == null)
         {
-            review = new Review();
-            review.SlotId = slotId;
-            review.ReviewerId = user.UserId;
-            review.DeletedBy = DeletedBy.None;
-            review.ThumbsUp = 0;
-            review.ThumbsDown = 0;
+            review = new Review
+            {
+                SlotId = slotId,
+                ReviewerId = user.UserId,
+                DeletedBy = DeletedBy.None,
+                ThumbsUp = 0,
+                ThumbsDown = 0,
+            };
             this.database.Reviews.Add(review);
         }
         review.Thumb = newReview.Thumb;
@@ -115,10 +124,12 @@ public class ReviewController : ControllerBase
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == user.UserId);
         if (ratedLevel == null)
         {
-            ratedLevel = new RatedLevel();
-            ratedLevel.SlotId = slotId;
-            ratedLevel.UserId = user.UserId;
-            ratedLevel.RatingLBP1 = 0;
+            ratedLevel = new RatedLevel
+            {
+                SlotId = slotId,
+                UserId = user.UserId,
+                RatingLBP1 = 0,
+            };
             this.database.RatedLevels.Add(ratedLevel);
         }
 
@@ -149,12 +160,14 @@ public class ReviewController : ControllerBase
             .Where(r => r.SlotId == slotId)
             .Include(r => r.Reviewer)
             .Include(r => r.Slot)
-            .OrderByDescending(r => r.ThumbsUp)
+            .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
             .ThenByDescending(r => r.Timestamp)
             .Skip(pageStart - 1)
             .Take(pageSize);
 
-        string inner = reviews.ToList()
+        List<Review?> reviewList = reviews.ToList();
+
+        string inner = reviewList
             .Aggregate
             (
                 string.Empty,
@@ -162,10 +175,10 @@ public class ReviewController : ControllerBase
                 {
                     if (review == null) return current;
 
-                    return current + review.Serialize();
+                    RatedReview? yourThumb = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
+                    return current + review.Serialize(null, yourThumb);
                 }
             );
-
         string response = LbpSerializer.TaggedStringElement
         (
             "reviews",
@@ -176,7 +189,7 @@ public class ReviewController : ControllerBase
                     "hint_start", pageStart + pageSize
                 },
                 {
-                    "hint", pageStart // not sure
+                    "hint", reviewList.LastOrDefault()!.Timestamp // not sure
                 },
             }
         );
@@ -197,22 +210,24 @@ public class ReviewController : ControllerBase
         GameVersion gameVersion = gameToken.GameVersion;
 
         IEnumerable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)
-            .Where(r => r.Reviewer.Username == username)
             .Include(r => r.Reviewer)
             .Include(r => r.Slot)
+            .Where(r => r.Reviewer!.Username == username)
             .OrderByDescending(r => r.Timestamp)
             .Skip(pageStart - 1)
-            .Take(pageSize)
-            .AsEnumerable();
+            .Take(pageSize);
 
-        string inner = reviews.Aggregate
+        List<Review?> reviewList = reviews.ToList();
+
+        string inner = reviewList.Aggregate
         (
             string.Empty,
             (current, review) =>
             {
-                //RatedLevel? ratedLevel = this.database.RatedLevels.FirstOrDefault(r => r.SlotId == review.SlotId && r.UserId == user.UserId);
-                //RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
-                return current + review.Serialize( /*, ratedReview*/);
+                if (review == null) return current;
+
+                RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
+                return current + review.Serialize(null, ratedReview);
             }
         );
 
@@ -226,7 +241,7 @@ public class ReviewController : ControllerBase
                     "hint_start", pageStart
                 },
                 {
-                    "hint", reviews.Last().Timestamp // Seems to be the timestamp of oldest
+                    "hint", reviewList.LastOrDefault()!.Timestamp // Seems to be the timestamp of oldest
                 },
             }
         );
@@ -249,24 +264,39 @@ public class ReviewController : ControllerBase
         RatedReview? ratedReview = await this.database.RatedReviews.FirstOrDefaultAsync(r => r.ReviewId == review.ReviewId && r.UserId == user.UserId);
         if (ratedReview == null)
         {
-            ratedReview = new RatedReview();
-            ratedReview.ReviewId = review.ReviewId;
-            ratedReview.UserId = user.UserId;
-            ratedReview.Thumb = 0;
+            ratedReview = new RatedReview
+            {
+                ReviewId = review.ReviewId,
+                UserId = user.UserId,
+                Thumb = 0,
+            };
             this.database.RatedReviews.Add(ratedReview);
+            await this.database.SaveChangesAsync();
         }
 
-        int oldThumb = ratedReview.Thumb;
-        ratedReview.Thumb = Math.Max(Math.Min(1, rating), -1);
+        int oldRating = ratedReview.Thumb;
+        ratedReview.Thumb = Math.Clamp(rating, -1, 1);
+        if (oldRating == ratedReview.Thumb) return this.Ok();
 
-        if (oldThumb != ratedReview.Thumb)
+        // if the user's rating changed then we recount the review's ratings to ensure accuracy
+        List<RatedReview> reactions = await this.database.RatedReviews.Where(r => r.ReviewId == review.ReviewId).ToListAsync();
+        int yay = 0;
+        int boo = 0;
+        foreach (RatedReview r in reactions)
         {
-            if (oldThumb == -1) review.ThumbsDown--;
-            else if (oldThumb == 1) review.ThumbsUp--;
-
-            if (ratedReview.Thumb == -1) review.ThumbsDown++;
-            else if (ratedReview.Thumb == 1) review.ThumbsUp++;
+            switch (r.Thumb)
+            {
+                case -1:
+                    boo++;
+                    break;
+                case 1:
+                    yay++;
+                    break;
+            }
         }
+
+        review.ThumbsDown = boo;
+        review.ThumbsUp = yay;
 
         await this.database.SaveChangesAsync();
 
@@ -296,7 +326,7 @@ public class ReviewController : ControllerBase
 
         XmlSerializer serializer = new(typeof(Review));
         Review? review = (Review?)serializer.Deserialize(new StringReader(bodyString));
-
+        SanitizationHelper.SanitizeStringsInClass(review);
         return review;
     }
 }
