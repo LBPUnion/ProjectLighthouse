@@ -85,7 +85,14 @@ public class PublishController : ControllerBase
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
         Slot? slot = await this.getSlotFromBody();
-        if (slot?.Location == null) return this.BadRequest();
+
+        if (slot == null) return this.BadRequest();
+
+        if (slot.Location == null) return this.BadRequest();
+
+        if (slot.Description.Length > 200) return this.BadRequest();
+
+        if (slot.Name.Length > 100) return this.BadRequest();
 
         foreach (string resource in slot.Resources)
         {
@@ -219,6 +226,8 @@ public class PublishController : ControllerBase
 
         XmlSerializer serializer = new(typeof(Slot));
         Slot? slot = (Slot?)serializer.Deserialize(new StringReader(bodyString));
+        
+        SanitizationHelper.SanitizeStringsInClass(slot);
 
         return slot;
     }

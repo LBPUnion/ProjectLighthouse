@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
@@ -93,7 +94,19 @@ public class UserController : ControllerBase
 
         if (update == null) return this.BadRequest();
 
-        if (update.Biography != null) user.Biography = update.Biography;
+        SanitizationHelper.SanitizeStringsInClass(update);
+
+        if (update.Biography != null)
+        {
+            if (update.Biography.Length > 100) return this.BadRequest();
+
+            user.Biography = update.Biography;
+        }
+
+        foreach (string? resource in new[] {update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
+        {
+            if (resource != null && !FileHelper.ResourceExists(resource)) return this.BadRequest();
+        }
         
         if (update.IconHash != null) user.IconHash = update.IconHash;
 

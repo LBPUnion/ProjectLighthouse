@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -42,6 +43,8 @@ public class ScoreController : ControllerBase
         XmlSerializer serializer = new(typeof(Score));
         Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
         if (score == null) return this.BadRequest();
+
+        SanitizationHelper.SanitizeStringsInClass(score);
 
         score.SlotId = id;
 

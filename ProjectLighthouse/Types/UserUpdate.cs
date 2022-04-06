@@ -7,23 +7,23 @@ namespace LBPUnion.ProjectLighthouse.Types;
 public class UserUpdate
 {
     [XmlElement("location")]
-    public Location? Location;
+    public Location? Location { get; set; }
 
     [XmlElement("biography")]
-    public string? Biography;
+    public string? Biography { get; set; }
 
     [XmlElement("icon")]
-    public string? IconHash;
+    public string? IconHash { get; set; }
 
     [XmlElement("planets")]
-    public string? PlanetHash;
+    public string? PlanetHash { get; set; }
 
     [XmlElement("yay2")]
-    public string? YayHash;
+    public string? YayHash { get; set; }
 
     [XmlElement("meh2")]
-    public string? MehHash;
+    public string? MehHash { get; set; }
 
     [XmlElement("boo2")]
-    public string? BooHash;
+    public string? BooHash { get; set; }
 }

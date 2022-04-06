@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -78,16 +79,18 @@ public class CommentController : ControllerBase
     [HttpPost("postComment/user/{slotId:int}")]
     public async Task<IActionResult> PostComment(string? username, int? slotId)
     {
+        User? poster = await this.database.UserFromGameRequest(this.Request);
+        if (poster == null) return this.StatusCode(403, "");
+
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
         XmlSerializer serializer = new(typeof(Comment));
         Comment? comment = (Comment?)serializer.Deserialize(new StringReader(bodyString));
 
-        CommentType type = (slotId.GetValueOrDefault() == 0 ? CommentType.Profile : CommentType.Level);
+        SanitizationHelper.SanitizeStringsInClass(comment);
 
-        User? poster = await this.database.UserFromGameRequest(this.Request);
-        if (poster == null) return this.StatusCode(403, "");
+        CommentType type = (slotId.GetValueOrDefault() == 0 ? CommentType.Profile : CommentType.Level);
 
         if (comment == null) return this.BadRequest();
 

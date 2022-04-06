@@ -30,7 +30,7 @@ public class ResourcesController : ControllerBase
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
         XmlSerializer serializer = new(typeof(ResourceList));
-        ResourceList resourceList = (ResourceList)serializer.Deserialize(new StringReader(bodyString));
+        ResourceList? resourceList = (ResourceList?)serializer.Deserialize(new StringReader(bodyString));
 
         if (resourceList == null) return this.BadRequest();
 
