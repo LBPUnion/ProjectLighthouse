@@ -17,7 +17,7 @@ public class TeamPicksCategory : Category
     public override IEnumerable<Slot> GetSlots
         (Database database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion
-                (GameVersion.LittleBigPlanet3)
+                (GameVersion.LittleBigPlanet3, false, true)
             .OrderByDescending(s => s.FirstUploaded)
             .Where(s => s.TeamPick)
             .Skip(pageStart - 1)

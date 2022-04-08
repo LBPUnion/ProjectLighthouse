@@ -9,12 +9,16 @@ namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
 public static class DatabaseExtensions
 {
     public static IQueryable<Slot> ByGameVersion
-        (this DbSet<Slot> set, GameVersion gameVersion, bool includeSublevels = false)
-        => set.AsQueryable().ByGameVersion(gameVersion, includeSublevels);
+        (this DbSet<Slot> set, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
+        => set.AsQueryable().ByGameVersion(gameVersion, includeSublevels, includeCreatorAndLocation);
 
-    public static IQueryable<Slot> ByGameVersion(this IQueryable<Slot> queryable, GameVersion gameVersion, bool includeSublevels = false)
+    public static IQueryable<Slot> ByGameVersion
+        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
     {
-        IQueryable<Slot> query = queryable.Include(s => s.Creator).Include(s => s.Location);
+        if (includeCreatorAndLocation)
+        {
+            query = query.Include(s => s.Creator).Include(s => s.Location);
+        }
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {
