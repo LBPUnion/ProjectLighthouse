@@ -24,7 +24,7 @@ public class LandingPage : BaseLayout
     public int PlayersOnlineCount;
 
     public List<Slot> LatestTeamPicks;
-    public List<Slot> TrendingLevels;
+    public List<Slot> NewestLevels;
 
     [UsedImplicitly]
     public async Task<IActionResult> OnGet()
@@ -47,17 +47,12 @@ public class LandingPage : BaseLayout
 
         this.LatestTeamPicks = await this.Database.Slots.Where
                 (s => s.TeamPick)
-            .OrderBy(s => s.FirstUploaded)
+            .OrderByDescending(s => s.FirstUploaded)
             .Take(maxShownLevels)
             .Include(s => s.Creator)
             .ToListAsync();
 
-        this.TrendingLevels = await this.Database.Slots.OrderByDescending
-                (s => s.PlaysLBP1Unique + s.PlaysLBP2Unique + s.PlaysLBP3Unique + s.PlaysLBPVitaUnique)
-            .ThenBy(s => s.FirstUploaded)
-            .Take(maxShownLevels)
-            .Include(s => s.Creator)
-            .ToListAsync();
+        this.NewestLevels = await this.Database.Slots.OrderByDescending(s => s.FirstUploaded).Take(maxShownLevels).Include(s => s.Creator).ToListAsync();
 
         return this.Page();
     }

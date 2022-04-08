@@ -45,10 +45,12 @@ else
     }
 }
 
+<br>
+
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
         <div class="ui pink segment">
-            <h1>Latest Team Picks</h1>
+            <h1><i class="ribbon icon"></i>Latest Team Picks</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
                 @foreach (Slot slot in Model.LatestTeamPicks)
@@ -64,11 +66,11 @@ else
         <br>
     }
     <div class="eight wide column">
-        <div class="ui orange segment">
-            <h1>Trending Levels</h1>
+        <div class="ui blue segment">
+            <h1><i class="certificate icon"></i>Newest Levels</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
-                @foreach (Slot slot in Model.TrendingLevels)
+                @foreach (Slot slot in Model.NewestLevels)
                 {
                     @await Html.PartialAsync("Partials/SlotCardPartial", slot, Model.GetSlotViewData(slot.SlotId, isMobile))
                     <br>
