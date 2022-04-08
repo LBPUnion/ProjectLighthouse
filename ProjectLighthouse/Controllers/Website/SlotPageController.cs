@@ -1,6 +1,7 @@
 #nullable enable
 using System.Threading.Tasks;
 using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -47,6 +48,8 @@ public class SlotPageController : ControllerBase
             Logger.Log($"Refusing to post comment from {user.UserId} on user {id}, {nameof(msg)} is null", LoggerLevelComments.Instance);
             return this.Redirect("~/slot/" + id);
         }
+
+        msg = SanitizationHelper.SanitizeString(msg);
 
         await this.database.PostComment(user, id, CommentType.Level, msg);
         Logger.Log($"Posted comment from {user.UserId}: \"{msg}\" on user {id}", LoggerLevelComments.Instance);

@@ -131,12 +131,12 @@ public class Slot
     [XmlIgnore]
     [NotMapped]
     [JsonIgnore]
-    public int Hearts => database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
+    public int Hearts => this.database.HeartedLevels.Count(s => s.SlotId == this.SlotId);
 
     [XmlIgnore]
     [NotMapped]
     [JsonIgnore]
-    public int Comments => database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
+    public int Comments => this.database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
 
     [XmlIgnore]
     [NotMapped]
@@ -201,19 +201,19 @@ public class Slot
     [NotMapped]
     [JsonIgnore]
     [XmlElement("thumbsup")]
-    public int Thumbsup => database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
+    public int Thumbsup => this.database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
 
     [NotMapped]
     [JsonIgnore]
     [XmlElement("thumbsdown")]
-    public int Thumbsdown => database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
+    public int Thumbsdown => this.database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
 
     [NotMapped]
     [JsonPropertyName("averageRating")]
     [XmlElement("averageRating")]
     public double RatingLBP1 {
         get {
-            IQueryable<RatedLevel> ratedLevels = database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
+            IQueryable<RatedLevel> ratedLevels = this.database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
             if (!ratedLevels.Any()) return 3.0;
 
             return Enumerable.Average(ratedLevels, r => r.RatingLBP1);
@@ -223,7 +223,7 @@ public class Slot
     [NotMapped]
     [JsonIgnore]
     [XmlElement("reviewCount")]
-    public int ReviewCount => database.Reviews.Count(r => r.SlotId == this.SlotId);
+    public int ReviewCount => this.database.Reviews.Count(r => r.SlotId == this.SlotId);
 
     [XmlElement("leveltype")]
     public string LevelType { get; set; } = "";

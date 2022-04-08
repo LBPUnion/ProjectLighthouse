@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Reviews;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +16,13 @@ namespace LBPUnion.ProjectLighthouse.Pages;
 public class SlotPage : BaseLayout
 {
     public List<Comment> Comments;
+    public List<Review> Reviews;
 
-    public bool CommentsEnabled = ServerSettings.Instance.LevelCommentsEnabled;
+    public readonly bool CommentsEnabled = ServerSettings.Instance.LevelCommentsEnabled;
+    public readonly bool ReviewsEnabled = ServerSettings.Instance.LevelReviewsEnabled;
 
     public Slot Slot;
-    public SlotPage([NotNull] Database database) : base(database)
+    public SlotPage(Database database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet([FromRoute] int id)
@@ -41,6 +43,20 @@ public class SlotPage : BaseLayout
         else
         {
             this.Comments = new List<Comment>();
+        }
+
+        if (this.ReviewsEnabled)
+        {
+            this.Reviews = await this.Database.Reviews.Include(r => r.Reviewer)
+                .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
+                .ThenByDescending(r => r.Timestamp)
+                .Where(r => r.SlotId == id)
+                .Take(50)
+                .ToListAsync();
+        }
+        else
+        {
+            this.Reviews = new List<Review>();
         }
 
         if (this.User == null) return this.Page();

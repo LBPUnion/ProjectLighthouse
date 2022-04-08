@@ -85,7 +85,14 @@ public class PublishController : ControllerBase
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
         Slot? slot = await this.getSlotFromBody();
-        if (slot?.Location == null) return this.BadRequest();
+
+        if (slot == null) return this.BadRequest();
+
+        if (slot.Location == null) return this.BadRequest();
+
+        if (slot.Description.Length > 200) return this.BadRequest();
+
+        if (slot.Name.Length > 100) return this.BadRequest();
 
         foreach (string resource in slot.Resources)
         {
@@ -115,6 +122,8 @@ public class PublishController : ControllerBase
             slot.LocationId = oldSlot.LocationId;
             slot.SlotId = oldSlot.SlotId;
 
+            #region Set plays
+
             slot.PlaysLBP1 = oldSlot.PlaysLBP1;
             slot.PlaysLBP1Complete = oldSlot.PlaysLBP1Complete;
             slot.PlaysLBP1Unique = oldSlot.PlaysLBP1Unique;
@@ -131,12 +140,15 @@ public class PublishController : ControllerBase
             slot.PlaysLBPVitaComplete = oldSlot.PlaysLBPVitaComplete;
             slot.PlaysLBPVitaUnique = oldSlot.PlaysLBPVitaUnique;
 
+            #endregion
+
             slot.FirstUploaded = oldSlot.FirstUploaded;
             slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
 
             slot.TeamPick = oldSlot.TeamPick;
 
-            slot.GameVersion = gameToken.GameVersion;
+            // Only update a slot's gameVersion if the level was actually change
+            if (oldSlot.RootLevel != slot.RootLevel) slot.GameVersion = gameToken.GameVersion;
 
             if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
             {
@@ -214,6 +226,8 @@ public class PublishController : ControllerBase
 
         XmlSerializer serializer = new(typeof(Slot));
         Slot? slot = (Slot?)serializer.Deserialize(new StringReader(bodyString));
+        
+        SanitizationHelper.SanitizeStringsInClass(slot);
 
         return slot;
     }

@@ -138,6 +138,8 @@ public class Database : DbContext
             reaction = newReaction;
         }
 
+        rating = Math.Clamp(rating, -1, 1);
+
         int oldRating = reaction.Rating;
         if (oldRating == rating) return true;
 
