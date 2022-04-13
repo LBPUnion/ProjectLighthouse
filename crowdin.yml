@@ -10,29 +10,30 @@ files: [
     # Source files filter
     # e.g. "/resources/en/*.json"
     #
-    "source": "/ProjectLighthouse.Localisation/*.resx",
+      "source": "/ProjectLighthouse.Localization/*.resx",
     
     #
     # Where translations will be placed
     # e.g. "/resources/%two_letters_code%/%original_file_name%"
     #
-    "translation": "/ProjectLighthouse.Localisation/%file_name%.%locale%.%file_extension%",
+      "translation": "/ProjectLighthouse.Localization/%file_name%.%locale%.%file_extension%",
     
     #
     # Files or directories for ignore
     # e.g. ["/**/?.txt", "/**/[0-9].txt", "/**/*\?*.txt"]
     #
-    #"ignore" : [],
-    
-    #
-    # The dest allows you to specify a file name in Crowdin
-    # e.g. "/messages.json"
-    #
-    #"dest" : "",
-    
-    #
-    # File type
-    # e.g. "json"
+      ignore:
+          - "/ProjectLighthouse.Localization/%file_name%.*.%file_extension%"
+          
+          #
+          # The dest allows you to specify a file name in Crowdin
+          # e.g. "/messages.json"
+          #
+          #"dest" : "",
+          
+          #
+          # File type
+          # e.g. "json"
     #
     #"type" : "",
     

@@ -1,4 +1,4 @@
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
-public static class LocalisationHelper
+public static class LocalizationHelper
 {}
