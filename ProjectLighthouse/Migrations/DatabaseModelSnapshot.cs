@@ -15,7 +15,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("ProductVersion", "6.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.AuthenticationAttempt", b =>
@@ -493,7 +493,6 @@ namespace ProjectLighthouse.Migrations
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.LastContact", b =>
                 {
                     b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<int>("GameVersion")
@@ -979,6 +978,17 @@ namespace ProjectLighthouse.Migrations
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailVerificationToken", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.LastContact", b =>
                 {
                     b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
                         .WithMany()
