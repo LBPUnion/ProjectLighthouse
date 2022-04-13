@@ -1,14 +1,22 @@
+using System.Reflection;
+
 namespace LBPUnion.ProjectLighthouse.Localization;
 
 public static class Program
 {
     public static void Main()
     {
-        Console.WriteLine(LocalizationManager.GetLocalizedString(TranslationAreas.BaseLayout, "en-UD", "header_home"));
-        Console.WriteLine("Available languages:");
+        Console.WriteLine("Resource files loaded:");
+        foreach (string resourceFile in Assembly.GetExecutingAssembly().GetManifestResourceNames())
+        {
+            Console.WriteLine("  " + resourceFile);
+        }
+
+        Console.Write('\n');
+
         foreach (string language in LocalizationManager.GetAvailableLanguages(TranslationAreas.BaseLayout))
         {
-            Console.WriteLine(language);
+            Console.WriteLine(LocalizationManager.GetLocalizedString(TranslationAreas.BaseLayout, language, "header_home"));
         }
     }
 }

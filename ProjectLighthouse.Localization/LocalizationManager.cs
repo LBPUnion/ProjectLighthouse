@@ -7,14 +7,24 @@ namespace LBPUnion.ProjectLighthouse.Localization;
 public static class LocalizationManager
 {
     private static readonly string namespaceStr = typeof(LocalizationManager).Namespace ?? "";
+    private const string defaultLang = "en-US";
 
     public static string GetLocalizedString(TranslationAreas translationArea, string language, string key)
     {
         #if DEBUG
-        Console.WriteLine($"Attempting to load '{key}' for '{language}' ");
+        Console.WriteLine($"Attempting to load '{key}' for '{language}'");
         #endif
 
-        string resourceBasename = $"{namespaceStr}.{translationArea.ToString()}.{language}";
+        string resourceBasename;
+        if (language == defaultLang)
+        {
+            resourceBasename = $"{namespaceStr}.{translationArea.ToString()}";
+        }
+        else
+        {
+            resourceBasename = $"{namespaceStr}.{translationArea.ToString()}.lang-{language}";
+        }
+
         ResourceManager resourceManager = new(resourceBasename, Assembly.GetExecutingAssembly());
 
         string? localizedString = resourceManager.GetString(key);
@@ -31,6 +41,20 @@ public static class LocalizationManager
 
     public static IEnumerable<string> GetAvailableLanguages(TranslationAreas translationArea)
     {
-        return Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(r => r.StartsWith($"{namespaceStr}.{translationArea.ToString()}"));
+        string area = translationArea.ToString();
+
+        // scuffed but it will work for now
+        List<string> langs = Assembly.GetExecutingAssembly()
+            .GetManifestResourceNames()
+            .Where(r => r.StartsWith($"{namespaceStr}.{area}"))
+            .Select(r => r.Substring(r.IndexOf(area), r.Length - r.IndexOf(area)).Substring(area.Length + 1))
+            .Select(r => r.Replace(".resources", string.Empty)) // Remove .resources
+            .Select(r => r.Replace("lang-", string.Empty)) // Remove 'lang-' prefix from languages
+            .Where(r => r != "resources")
+            .ToList();
+
+        langs.Add(defaultLang);
+
+        return langs;
     }
 }
