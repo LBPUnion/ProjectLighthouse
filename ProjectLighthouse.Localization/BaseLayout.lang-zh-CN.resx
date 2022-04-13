@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
         <xsd:element name="root" msdata:IsDataSet="true">
 
         </xsd:element>
@@ -29,17 +28,17 @@
     </data>
 
     <data name="header_users" xml:space="preserve">
-    <value>Users</value>
+    <value>用户</value>
         <comment>A button on the header that takes you to the user listing.</comment>
     </data>
 
     <data name="header_photos" xml:space="preserve">
-    <value>Photos</value>
+    <value>图片</value>
         <comment>A button on the header that takes you to a list of user-uploaded photos.</comment>
     </data>
 
     <data name="header_slots" xml:space="preserve">
-    <value>Levels</value>
+    <value>追踪</value>
         <comment>A button on the header that takes you to a list of user-uploaded levels. Levels are internally referred to as "slots".</comment>
     </data>
 </root>
