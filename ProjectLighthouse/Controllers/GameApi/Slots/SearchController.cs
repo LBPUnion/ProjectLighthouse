@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,23 +25,20 @@ public class SearchController : ControllerBase
     [HttpGet("slots/search")]
     public async Task<IActionResult> SearchSlots([FromQuery] string query, [FromQuery] int pageSize, [FromQuery] int pageStart)
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken? gameToken = await this.database.GameTokenFromRequest(this.Request);
+        if (gameToken == null) return this.StatusCode(403, "");
 
-        if (userAndToken == null) return this.StatusCode(403, "");
-
-        // ReSharper disable once PossibleInvalidOperationException
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
-
-        if (query == null) return this.BadRequest();
+        if (string.IsNullOrWhiteSpace(query)) return this.BadRequest();
 
         query = query.ToLower();
 
         string[] keywords = query.Split(" ");
 
-        IQueryable<Slot> dbQuery = this.database.Slots
-            .Include(s => s.Creator)
+        IQueryable<Slot> dbQuery = this.database.Slots.Include
+                (s => s.Creator)
             .Include(s => s.Location)
+            .OrderBy(s => !s.TeamPick)
+            .ThenByDescending(s => s.FirstUploaded)
             .Where(s => s.SlotId >= 0); // dumb query to conv into IQueryable
 
         // ReSharper disable once LoopCanBeConvertedToQuery
