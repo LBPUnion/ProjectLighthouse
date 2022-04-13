@@ -73,6 +73,16 @@ public class LighthouseServerTest
         return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
     }
 
+    public async Task<HttpResponseMessage> AuthenticatedUploadFileEndpointRequest(string filePath, string mmAuth)
+    {
+        byte[] bytes = await File.ReadAllBytesAsync(filePath);
+        string hash = HashHelper.Sha1Hash(bytes).ToLower();
+        using HttpRequestMessage requestMessage = new(HttpMethod.Post, $"/LITTLEBIGPLANETPS3_XML/upload/{hash}");
+        requestMessage.Headers.Add("Cookie", mmAuth);
+        requestMessage.Content = new ByteArrayContent(bytes);
+        return await this.Client.SendAsync(requestMessage);
+    }
+
     public async Task<HttpResponseMessage> UploadFileRequest(string endpoint, string filePath)
         => await this.Client.PostAsync(endpoint, new StringContent(await File.ReadAllTextAsync(filePath)));
 
