@@ -76,7 +76,6 @@ public class PublishController : ControllerBase
     [HttpPost("publish")]
     public async Task<IActionResult> Publish()
     {
-//            User user = await this.database.UserFromGameRequest(this.Request);
         (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
         if (userAndToken == null) return this.StatusCode(403, "");
@@ -94,9 +93,9 @@ public class PublishController : ControllerBase
 
         if (slot.Name.Length > 100) return this.BadRequest();
 
-        foreach (string resource in slot.Resources)
+        if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
         {
-            if (!FileHelper.ResourceExists(resource)) return this.BadRequest();
+            return this.BadRequest();
         }
 
         LbpFile? rootLevel = LbpFile.FromHash(slot.RootLevel);
@@ -148,7 +147,14 @@ public class PublishController : ControllerBase
             slot.TeamPick = oldSlot.TeamPick;
 
             // Only update a slot's gameVersion if the level was actually change
-            if (oldSlot.RootLevel != slot.RootLevel) slot.GameVersion = gameToken.GameVersion;
+            if (oldSlot.RootLevel != slot.RootLevel)
+            {
+                slot.GameVersion = gameToken.GameVersion;
+            }
+            else
+            {
+                slot.GameVersion = oldSlot.GameVersion;
+            }
 
             if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
             {

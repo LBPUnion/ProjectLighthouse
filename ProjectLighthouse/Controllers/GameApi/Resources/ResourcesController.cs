@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +19,13 @@ namespace LBPUnion.ProjectLighthouse.Controllers.GameApi.Resources;
 [Route("LITTLEBIGPLANETPS3_XML")]
 public class ResourcesController : ControllerBase
 {
+    private readonly Database database;
+
+    public ResourcesController(Database database)
+    {
+        this.database = database;
+    }
+
     [HttpPost("showModerated")]
     public IActionResult ShowModerated() => this.Ok(LbpSerializer.BlankElement("resources"));
 
@@ -27,6 +33,9 @@ public class ResourcesController : ControllerBase
     [HttpPost("showNotUploaded")]
     public async Task<IActionResult> FilterResources()
     {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
         XmlSerializer serializer = new(typeof(ResourceList));
@@ -42,8 +51,11 @@ public class ResourcesController : ControllerBase
     }
 
     [HttpGet("r/{hash}")]
-    public IActionResult GetResource(string hash)
+    public async Task<IActionResult> GetResource(string hash)
     {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
         string path = FileHelper.GetResourcePath(hash);
 
         if (FileHelper.ResourceExists(hash)) return this.File(IOFile.OpenRead(path), "application/octet-stream");
@@ -63,21 +75,21 @@ public class ResourcesController : ControllerBase
         }
 
         LbpFile? file = LbpFile.FromHash(hash);
-        if (file != null)
+        if (file != null && ImageHelper.LbpFileToPNG(file))
         {
-            if (ImageHelper.LbpFileToPNG(file))
-            {
-                return this.File(IOFile.OpenRead(path), "image/png");
-            }
+            return this.File(IOFile.OpenRead(path), "image/png");
         }
-
         return this.NotFound();
     }
 
     // TODO: check if this is a valid hash
+    [HttpPost("upload/{hash}/unattributed")]
     [HttpPost("upload/{hash}")]
     public async Task<IActionResult> UploadResource(string hash)
     {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
         string assetsDirectory = FileHelper.ResourcePath;
         string path = FileHelper.GetResourcePath(hash);
 

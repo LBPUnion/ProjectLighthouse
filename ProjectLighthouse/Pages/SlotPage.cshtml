@@ -1,6 +1,7 @@
 @page "/slot/{id:int}"
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Helpers.Extensions
+@using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Reviews
 @using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.SlotPage
@@ -81,15 +82,22 @@
             }
             <div class="ui divider"></div>
 
-            @foreach (Review review in Model.Reviews)
+            @for (int i = 0; i < Model.Reviews.Count; i++)
             {
+                Review review = Model.Reviews[i];
                 string faceHash = review.Thumb switch {
-                    -1 => review.Reviewer.BooHash,
-                    0 => review.Reviewer.MehHash,
-                    1 => review.Reviewer.YayHash,
+                    -1 => review.Reviewer?.BooHash,
+                    0 => review.Reviewer?.MehHash,
+                    1 => review.Reviewer?.YayHash,
                     
                     _ => throw new ArgumentOutOfRangeException(),
                     };
+
+                if (string.IsNullOrWhiteSpace(faceHash))
+                {
+                    faceHash = ServerSettings.Instance.MissingIconHash;
+                }
+
 
                 string faceAlt = review.Thumb switch {
                     -1 => "Boo!",
@@ -106,27 +114,50 @@
                         <img class="cardIcon slotCardIcon" src="@ServerSettings.Instance.ExternalUrl/gameAssets/@faceHash" alt="@faceAlt" title="@faceAlt" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
                     </div>
                     <div class="cardStats">
-                        <h3 style="margin-bottom: 5px;">@review.Reviewer.Username</h3>
-                        @if (review.Labels.Length > 1)
+                        <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                        @if (review.Deleted)
                         {
-                            @foreach (string reviewLabel in review.Labels)
+                            if (review.DeletedBy == DeletedBy.LevelAuthor)
                             {
-                                <div class="ui blue label">@reviewLabel.Replace("LABEL_", "")</div>
+                                <p>
+                                    <i>This review has been deleted by the level author.</i>
+                                </p>
                             }
-                        }
-                        @if (string.IsNullOrWhiteSpace(review.Text))
-                        {
-                            <p>
-                                <i>This review contains no text.</i>
-                            </p>
+                            else
+                            {
+                                <p>
+                                    <i>This review has been deleted by a moderator.</i>
+                                </p>
+                            }
                         }
                         else
                         {
-                            <p>@review.Text</p>
+                            @if (review.Labels.Length > 1)
+                            {
+                                @foreach (string reviewLabel in review.Labels)
+                                {
+                                    <div class="ui blue label">@reviewLabel.Replace("LABEL_", "")</div>
+                                }
+                            }
+                            @if (string.IsNullOrWhiteSpace(review.Text))
+                            {
+                                <p>
+                                    <i>This review contains no text.</i>
+                                </p>
+                            }
+                            else
+                            {
+                                {
+                                    <p>@review.Text</p>
+                                }
+                            }
                         }
                     </div>
                 </div>
-                <br>
+                @if (i != Model.Reviews.Count - 1)
+                {
+                    <div class="ui divider"></div>
+                }
             }
         </div>
     </div>
