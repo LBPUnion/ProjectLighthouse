@@ -22,7 +22,7 @@ files: [
     # Files or directories for ignore
     # e.g. ["/**/?.txt", "/**/[0-9].txt", "/**/*\?*.txt"]
     #
-      "ignore": "/ProjectLighthouse.Localization/%file_name%.*.%file_extension%",
+      "ignore": [ "/ProjectLighthouse.Localization/%file_name%.*.%file_extension%" ],
     
     #
     # The dest allows you to specify a file name in Crowdin
