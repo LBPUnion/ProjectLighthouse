@@ -51,18 +51,22 @@
         <EmbeddedResource Include="chatCensoredList.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="recent-activity.xml" />
-        <None Remove="r.tar.gz" />
+        <None Remove="recent-activity.xml"/>
+        <None Remove="r.tar.gz"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs" />
+        <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ProjectLighthouse.Localisation\ProjectLighthouse.Localisation.csproj"/>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;" />
-        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;" />
-        <Exec Command="git remote -v &gt; &quot;$(ProjectDir)/gitRemotes.txt&quot;" />
-        <Exec Command="git log --branches --not --remotes --oneline &gt; &quot;$(ProjectDir)/gitUnpushed.txt&quot;" />
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;"/>
+        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;"/>
+        <Exec Command="git remote -v &gt; &quot;$(ProjectDir)/gitRemotes.txt&quot;"/>
+        <Exec Command="git log --branches --not --remotes --oneline &gt; &quot;$(ProjectDir)/gitUnpushed.txt&quot;"/>
     </Target>
 </Project>

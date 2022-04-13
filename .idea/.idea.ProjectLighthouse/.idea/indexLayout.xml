@@ -12,6 +12,7 @@
       <Path>ProjectLighthouse.sln.DotSettings.user</Path>
       <Path>README.md</Path>
       <Path>create-migration.sh</Path>
+      <Path>crowdin.yml</Path>
       <Path>docker-compose.yml</Path>
       <Path>global.json</Path>
     </explicitIncludes>
