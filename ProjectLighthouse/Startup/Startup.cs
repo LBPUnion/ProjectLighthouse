@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
@@ -12,6 +16,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -85,6 +90,19 @@ public class Startup
             }
         );
 
+        services.Configure<RequestLocalizationOptions>
+        (
+            config =>
+            {
+                List<CultureInfo> languages = LocalizationManager.GetAvailableLanguages().Select(l => new CultureInfo(l)).ToList();
+
+                config.DefaultRequestCulture = new RequestCulture(new CultureInfo("en-US"));
+
+                config.SupportedCultures = languages;
+                config.SupportedUICultures = languages;
+            }
+        );
+
         #if DEBUG
         services.AddSingleton<IHostLifetime, DebugWarmupLifetime>();
         #else
@@ -122,6 +140,8 @@ public class Startup
                 c.SwaggerEndpoint("v1/swagger.json", "Project Lighthouse API");
             }
         );
+
+        app.UseRequestLocalization();
 
         // Logs every request and the response to it
         // Example: "200, 13ms: GET /LITTLEBIGPLANETPS3_XML/news"

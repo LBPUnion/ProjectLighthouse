@@ -1,22 +1,19 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
+using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Types;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace LBPUnion.ProjectLighthouse.Pages.Layouts;
 
 public class BaseLayout : PageModel
 {
-
     public readonly Database Database;
 
-    public readonly List<PageNavigationItem> NavigationItems = new()
-    {
-        new PageNavigationItem("Home", "/", "home"),
-        new PageNavigationItem("Users", "/users/0", "user friends"),
-        new PageNavigationItem("Photos", "/photos/0", "camera"),
-        new PageNavigationItem("Levels", "/slots/0", "certificate"),
-    };
+    public readonly List<PageNavigationItem> NavigationItems = new();
 
     public readonly List<PageNavigationItem> NavigationItemsRight = new();
     public string Description = string.Empty;
@@ -31,6 +28,11 @@ public class BaseLayout : PageModel
     public BaseLayout(Database database)
     {
         this.Database = database;
+
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderHome, "/", "home"));
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderUsers, "/users/0", "user friends"));
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderPhotos, "/photos/0", "camera"));
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderSlots, "/slots/0", "certificate"));
     }
 
     public new User? User {
@@ -40,5 +42,21 @@ public class BaseLayout : PageModel
             return this.user = this.Database.UserFromWebRequest(this.Request);
         }
         set => this.user = value;
+    }
+
+    public string Translate(TranslatableString translatableString)
+    {
+        string lang;
+        IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
+
+        if (requestCulture == null) lang = "en-UD"; // TODO: change to en-US when i can verify this is working 
+        else
+        {
+            lang = requestCulture.RequestCulture.UICulture.Name;
+        }
+
+        Console.WriteLine(lang);
+
+        return translatableString.Translate(lang);
     }
 }

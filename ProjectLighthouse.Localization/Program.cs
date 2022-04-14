@@ -14,7 +14,7 @@ public static class Program
 
         Console.Write('\n');
 
-        foreach (string language in LocalizationManager.GetAvailableLanguages(TranslationAreas.BaseLayout))
+        foreach (string language in LocalizationManager.GetAvailableLanguages())
         {
             Console.WriteLine(LocalizationManager.GetLocalizedString(TranslationAreas.BaseLayout, language, "header_home"));
         }
