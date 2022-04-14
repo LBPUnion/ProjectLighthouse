@@ -39,7 +39,7 @@ public class SlotsController : ControllerBase
 
         string response = Enumerable.Aggregate
         (
-            this.database.Slots.ByGameVersion(gameVersion, token.UserId == user.UserId)
+            this.database.Slots.ByGameVersion(gameVersion, token.UserId == user.UserId, true)
                 .Where(s => s.Creator!.Username == user.Username)
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
@@ -77,7 +77,7 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        Slot? slot = await this.database.Slots.ByGameVersion(gameVersion, true).FirstOrDefaultAsync(s => s.SlotId == id);
+        Slot? slot = await this.database.Slots.ByGameVersion(gameVersion, true, true).FirstOrDefaultAsync(s => s.SlotId == id);
 
         if (slot == null) return this.NotFound();
 
