@@ -1,6 +1,6 @@
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Helpers.Extensions
-@using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Pages.Layouts.BaseLayout
@@ -8,21 +8,21 @@
 @{
     if (Model!.User == null)
     {
-        Model.NavigationItemsRight.Add(new PageNavigationItem(new TranslatableString(TranslationAreas.BaseLayout, "Login / Register"), "/login", "sign in"));
+        Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLoginRegister, "/login", "sign in"));
     }
     else
     {
         if (ServerSettings.Instance.UseExternalAuth)
         {
-            Model.NavigationItems.Add(new PageNavigationItem(new TranslatableString(TranslationAreas.BaseLayout, "Authentication"), "/authentication", "key"));
+            Model.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAuthentication, "/authentication", "key"));
         }
-        Model.NavigationItemsRight.Add(new PageNavigationItem(new TranslatableString(TranslationAreas.BaseLayout, "Profile"), "/user/" + Model.User.UserId, "user alternate"));
+        Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderProfile, "/user/" + Model.User.UserId, "user alternate"));
 
         @if (Model.User.IsAdmin)
         {
-            Model.NavigationItemsRight.Add(new PageNavigationItem(new TranslatableString(TranslationAreas.BaseLayout, "Admin Panel"), "/admin", "cogs"));
+            Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAdminPanel, "/admin", "cogs"));
         }
-        Model.NavigationItemsRight.Add(new PageNavigationItem(new TranslatableString(TranslationAreas.BaseLayout, "Log out"), "/logout", "user alternate slash")); // should always be last
+        Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLogout, "/logout", "user alternate slash")); // should always be last
     }
 
     Model.IsMobile = Model.Request.IsMobile();
