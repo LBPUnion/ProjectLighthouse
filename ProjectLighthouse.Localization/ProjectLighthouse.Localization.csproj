@@ -8,4 +8,11 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Update="LandingPage.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>LandingPage.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
 </Project>
