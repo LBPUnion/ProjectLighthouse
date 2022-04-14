@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Localization;
 public static class LocalizationManager
 {
     private static readonly string namespaceStr = typeof(LocalizationManager).Namespace ?? "";
-    private const string defaultLang = "en-US";
+    public const string DefaultLang = "en-US";
 
     public static string GetLocalizedString(TranslationAreas translationArea, string language, string key)
     {
@@ -20,7 +20,7 @@ public static class LocalizationManager
         // We don't have an en-US .resx, so if we aren't using en-US then we need to add the appropriate language.
         // Otherwise, keep it to the normal .resx file
         // e.g. BaseLayout.resx as opposed to BaseLayout.lang-da-DK.resx.
-        if (language != defaultLang) resourceBasename += $".lang-{language}";
+        if (language != DefaultLang) resourceBasename += $".lang-{language}";
 
         ResourceManager resourceManager = new(resourceBasename, Assembly.GetExecutingAssembly());
 
@@ -50,7 +50,7 @@ public static class LocalizationManager
             .Where(r => r != "resources")
             .ToList();
 
-        languages.Add(defaultLang);
+        languages.Add(DefaultLang);
 
         return languages;
     }

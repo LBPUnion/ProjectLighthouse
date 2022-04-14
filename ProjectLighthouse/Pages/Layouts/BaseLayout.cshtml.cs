@@ -49,7 +49,7 @@ public class BaseLayout : PageModel
         string lang;
         IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
 
-        if (requestCulture == null) lang = "en-UD"; // TODO: change to en-US when i can verify this is working 
+        if (requestCulture == null) lang = LocalizationManager.DefaultLang;
         else
         {
             lang = requestCulture.RequestCulture.UICulture.Name;
