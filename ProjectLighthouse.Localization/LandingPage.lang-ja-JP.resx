@@ -48,7 +48,7 @@
     </data>
 
     <data name="authAttemptsPending" xml:space="preserve">
-        <value>You have {0} authentication attempts pending. Click here to view them.</value>
+        <value>{0} の認証が保留中です。ここをクリックして確認してください。</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 </root>
