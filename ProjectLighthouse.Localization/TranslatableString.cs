@@ -13,8 +13,12 @@ public class TranslatableString
 
     public string Translate(string language) => LocalizationManager.GetLocalizedString(this.Area, language, this.Key);
 
+    // CS0809 is a warning about obsolete methods overriding non-obsoleted methods.
+    // That works against what we're trying to do here, so we disable the warning here.
+    #pragma warning disable CS0809
     [Obsolete("Do not translate by using ToString. Use TranslatableString.Translate().", true)]
     public override string ToString() => "NOT TRANSLATED CORRECTLY!";
+    #pragma warning restore CS0809
 
     [Obsolete("Do not translate by using ToString. Use TranslatableString.Translate().", true)]
     public static implicit operator string(TranslatableString _) => "NOT TRANSLATED CORRECTLY!";

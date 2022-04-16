@@ -94,7 +94,9 @@ public class Startup
         (
             config =>
             {
-                List<CultureInfo> languages = LocalizationManager.GetAvailableLanguages().Select(l => new CultureInfo(l)).ToList();
+                List<CultureInfo> languages = LocalizationManager.GetAvailableLanguages()
+                    .Select(l => new CultureInfo(LocalizationManager.MapLanguage(l)))
+                    .ToList();
 
                 config.DefaultRequestCulture = new RequestCulture(new CultureInfo("en-US"));
 

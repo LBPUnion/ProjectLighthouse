@@ -11,5 +11,5 @@ public static class LandingPageStrings
 
     public static readonly TranslatableString AuthAttemptsPending = create("authAttemptsPending");
 
-    private static TranslatableString create(string key) => new(TranslationAreas.BaseLayout, key);
+    private static TranslatableString create(string key) => new(TranslationAreas.LandingPage, key);
 }
