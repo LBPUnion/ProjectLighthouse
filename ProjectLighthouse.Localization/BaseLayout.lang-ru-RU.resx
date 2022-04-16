@@ -43,24 +43,24 @@
     </data>
 
     <data name="header_authentication" xml:space="preserve">
-        <value>Authentication</value>
+        <value>Аутентификация</value>
         <comment>A button on the header that takes you to a list of authentication attempts.</comment>
     </data>
 
     <data name="header_loginRegister" xml:space="preserve">
-        <value>Login / Register</value>
+        <value>Вход / Регистрация</value>
         <comment>A button on the header that lets you log in or register.</comment>
     </data>
     <data name="header_profile" xml:space="preserve">
-        <value>Profile</value>
+        <value>Профиль</value>
         <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
     <data name="header_adminPanel" xml:space="preserve">
-        <value>Admin Panel</value>
+        <value>Админпанель</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
     <data name="header_logout" xml:space="preserve">
-        <value>Log out</value>
+        <value>Выйти</value>
         <comment>A shortcut to log you out of your account.</comment>
     </data>
 </root>
