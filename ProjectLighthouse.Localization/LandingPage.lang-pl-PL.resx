@@ -43,7 +43,7 @@
     </data>
 
     <data name="users_multiple" xml:space="preserve">
-        <value>Jest {0} graczy online:</value>
+        <value>Obecnie jest {0} graczy online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 

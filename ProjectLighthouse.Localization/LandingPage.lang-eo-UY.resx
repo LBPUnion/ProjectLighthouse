@@ -23,32 +23,32 @@
     </resheader>
 
     <data name="welcome" xml:space="preserve">
-        <value>Welcome to Project Lighthouse!</value>
+        <value>Bonvenon al Projekto Lighthouse!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
     <data name="loggedInAs" xml:space="preserve">
-        <value>You are currently logged in as {0}.</value>
+        <value>Vi ensalutinta kiel {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
     <data name="users_none" xml:space="preserve">
-        <value>There are no users online. Why not hop on?</value>
+        <value>Ne estas uzantoj enretaj. Kial ne sursalti?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
     <data name="users_single" xml:space="preserve">
-        <value>There is 1 user currently online:</value>
+        <value>Estas 1 uzanto enreta:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
     <data name="users_multiple" xml:space="preserve">
-        <value>There are currently {0} users online:</value>
+        <value>Estas {0} uzantoj enretaj:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
     <data name="authAttemptsPending" xml:space="preserve">
-        <value>You have {0} authentication attempts pending. Click here to view them.</value>
+        <value>Vi havas {0} pritraktatajn aŭtentigajn provojn. Klaku ĉi tie por vidi ilin.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 </root>
