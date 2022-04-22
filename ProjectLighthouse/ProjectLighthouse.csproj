@@ -15,7 +15,7 @@
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
         <PackageReference Include="DDSReader" Version="1.0.8-pre"/>
         <PackageReference Include="Discord.Net.Webhook" Version="3.5.0"/>
-        <PackageReference Include="InfluxDB.Client" Version="3.3.0"/>
+        <PackageReference Include="InfluxDB.Client" Version="4.1.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2022.1.0"/>
         <PackageReference Include="Kettu" Version="1.2.4"/>
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.4"/>
