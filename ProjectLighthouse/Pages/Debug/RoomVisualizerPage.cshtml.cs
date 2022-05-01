@@ -1,6 +1,10 @@
 #nullable enable
+
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
+#if !DEBUG
+using LBPUnion.ProjectLighthouse.Types;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Pages.Debug;
 
