@@ -102,7 +102,7 @@ public class Startup
             (
                 "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will also prevent LBP 1, LBP 2, and LBP Vita from working. " +
                 "To increase security, it is recommended that you find and set this variable.",
-                "Startup"
+                LogArea.Startup
             );
             computeDigests = false;
         }
@@ -144,7 +144,7 @@ public class Startup
                 Logger.LogInfo
                 (
                     $"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}",
-                    "HTTP"
+                    LogArea.HTTP
                 );
 
                 #if DEBUG
@@ -152,7 +152,7 @@ public class Startup
                 if (context.Request.Method == "POST")
                 {
                     context.Request.Body.Position = 0;
-                    Logger.LogDebug(await new StreamReader(context.Request.Body).ReadToEndAsync(), "HTTP");
+                    Logger.LogDebug(await new StreamReader(context.Request.Body).ReadToEndAsync(), LogArea.HTTP);
                 }
                 #endif
             }

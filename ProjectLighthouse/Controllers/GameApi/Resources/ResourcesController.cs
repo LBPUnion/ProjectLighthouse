@@ -96,23 +96,24 @@ public class ResourcesController : ControllerBase
         // lbp treats code 409 as success and as an indicator that the file is already present
         if (FileHelper.ResourceExists(hash)) this.Conflict();
 
-        Logger.LogInfo($"Processing resource upload (hash: {hash})", "Resources");
+        Logger.LogInfo($"Processing resource upload (hash: {hash})", LogArea.Resources);
         LbpFile file = new(await BinaryHelper.ReadFromPipeReader(this.Request.BodyReader));
 
         if (!FileHelper.IsFileSafe(file))
         {
-            Logger.LogWarn($"File is unsafe (hash: {hash}, type: {file.FileType})", "Resources");
+            Logger.LogWarn($"File is unsafe (hash: {hash}, type: {file.FileType})", LogArea.Resources);
             return this.Conflict();
         }
 
         string calculatedHash = file.Hash;
         if (calculatedHash != hash)
         {
-            Logger.LogWarn($"File hash does not match the uploaded file! (hash: {hash}, calculatedHash: {calculatedHash}, type: {file.FileType})", "Resources");
+            Logger.LogWarn
+                ($"File hash does not match the uploaded file! (hash: {hash}, calculatedHash: {calculatedHash}, type: {file.FileType})", LogArea.Resources);
             return this.Conflict();
         }
 
-        Logger.LogSuccess($"File is OK! (hash: {hash}, type: {file.FileType})", "Resources");
+        Logger.LogSuccess($"File is OK! (hash: {hash}, type: {file.FileType})", LogArea.Resources);
         await IOFile.WriteAllBytesAsync(path, file.Data);
         return this.Ok();
     }

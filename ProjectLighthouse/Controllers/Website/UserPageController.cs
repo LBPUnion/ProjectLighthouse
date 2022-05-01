@@ -38,14 +38,14 @@ public class UserPageController : ControllerBase
 
         if (msg == null)
         {
-            Logger.LogError($"Refusing to post comment from {user.UserId} on user {id}, {nameof(msg)} is null", "Comments");
+            Logger.LogError($"Refusing to post comment from {user.UserId} on user {id}, {nameof(msg)} is null", LogArea.Comments);
             return this.Redirect("~/user/" + id);
         }
 
         msg = SanitizationHelper.SanitizeString(msg);
 
         await this.database.PostComment(user, id, CommentType.Profile, msg);
-        Logger.LogSuccess($"Posted comment from {user.UserId}: \"{msg}\" on user {id}", "Comments");
+        Logger.LogSuccess($"Posted comment from {user.UserId}: \"{msg}\" on user {id}", LogArea.Comments);
 
         return this.Redirect("~/user/" + id);
     }

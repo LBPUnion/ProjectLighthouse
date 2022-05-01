@@ -84,7 +84,7 @@ public class CollectionController : ControllerBase
         Category? category = CollectionHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();
 
-        Logger.LogDebug("Found category " + category, "Category");
+        Logger.LogDebug("Found category " + category, LogArea.Category);
 
         List<Slot> slots;
         int totalSlots;

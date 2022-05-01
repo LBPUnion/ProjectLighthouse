@@ -46,28 +46,28 @@ public class LoginForm : BaseLayout
         User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null)
         {
-            Logger.LogWarn($"User {username} failed to login on web due to invalid username", "Login");
+            Logger.LogWarn($"User {username} failed to login on web due to invalid username", LogArea.Login);
             this.Error = "The username or password you entered is invalid.";
             return this.Page();
         }
 
         if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
         {
-            Logger.LogWarn($"User {user.Username} (id: {user.UserId}) failed to login on web due to invalid password", "Login");
+            Logger.LogWarn($"User {user.Username} (id: {user.UserId}) failed to login on web due to invalid password", LogArea.Login);
             this.Error = "The username or password you entered is invalid.";
             return this.Page();
         }
 
         if (user.Banned)
         {
-            Logger.LogWarn($"User {user.Username} (id: {user.UserId}) failed to login on web due to being banned", "Login");
+            Logger.LogWarn($"User {user.Username} (id: {user.UserId}) failed to login on web due to being banned", LogArea.Login);
             this.Error = "You have been banned. Please contact an administrator for more information.\nReason: " + user.BannedReason;
             return this.Page();
         }
 
         if (user.EmailAddress == null && ServerSettings.Instance.SMTPEnabled)
         {
-            Logger.LogWarn($"User {user.Username} (id: {user.UserId}) failed to login; email not set", "Login");
+            Logger.LogWarn($"User {user.Username} (id: {user.UserId}) failed to login; email not set", LogArea.Login);
 
             EmailSetToken emailSetToken = new()
             {
@@ -101,7 +101,7 @@ public class LoginForm : BaseLayout
             }
         );
 
-        Logger.LogSuccess($"User {user.Username} (id: {user.UserId}) successfully logged in on web", "Login");
+        Logger.LogSuccess($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LogArea.Login);
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
         if (ServerSettings.Instance.SMTPEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");

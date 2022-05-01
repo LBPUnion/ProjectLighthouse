@@ -93,7 +93,7 @@ public class NPTicket
             reader.ReadUInt16BE(); // Ticket length, we don't care about this
 
             SectionHeader bodyHeader = reader.ReadSectionHeader();
-            Logger.LogDebug($"bodyHeader.Type is {bodyHeader.Type}", "Login");
+            Logger.LogDebug($"bodyHeader.Type is {bodyHeader.Type}", LogArea.Login);
 
             switch (npTicket.ticketVersion)
             {
@@ -115,13 +115,13 @@ public class NPTicket
             npTicket.titleId = npTicket.titleId.Substring(0, npTicket.titleId.Length - 3); // Trim _00 at the end
             // Data now (hopefully): BCUS98245
 
-            Logger.LogDebug($"titleId is {npTicket.titleId}", "Login");
+            Logger.LogDebug($"titleId is {npTicket.titleId}", LogArea.Login);
 
             npTicket.GameVersion = GameVersionHelper.FromTitleId(npTicket.titleId); // Finally, convert it to GameVersion
 
             if (npTicket.GameVersion == GameVersion.Unknown)
             {
-                Logger.LogWarn($"Could not determine game version from title id {npTicket.titleId}", "Login");
+                Logger.LogWarn($"Could not determine game version from title id {npTicket.titleId}", LogArea.Login);
                 return null;
             }
 
@@ -138,34 +138,35 @@ public class NPTicket
 
             if (npTicket.Platform == Platform.Unknown)
             {
-                Logger.LogWarn($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", "Login");
+                Logger.LogWarn($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LogArea.Login);
                 return null;
             }
 
             #if DEBUG
-            Logger.LogDebug("npTicket data:", "Login");
-            Logger.LogDebug(JsonSerializer.Serialize(npTicket), "Login");
+            Logger.LogDebug("npTicket data:", LogArea.Login);
+            Logger.LogDebug(JsonSerializer.Serialize(npTicket), LogArea.Login);
             #endif
 
             return npTicket;
         }
         catch(NotImplementedException)
         {
-            Logger.LogError($"The ticket version {npTicket.ticketVersion} is not implemented yet.", "Login");
+            Logger.LogError($"The ticket version {npTicket.ticketVersion} is not implemented yet.", LogArea.Login);
             Logger.LogError
             (
                 "Please let us know that this is a ticket version that is actually used on our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues !",
-                "Login"
+                LogArea.Login
             );
 
             return null;
         }
         catch(Exception e)
         {
-            Logger.LogError("Failed to read npTicket!", "Login");
-            Logger.LogError("Either this is spam data, or the more likely that this is a bug.", "Login");
-            Logger.LogError("Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues!", "Login");
-            Logger.LogError(e.ToDetailedException(), "Login");
+            Logger.LogError("Failed to read npTicket!", LogArea.Login);
+            Logger.LogError("Either this is spam data, or the more likely that this is a bug.", LogArea.Login);
+            Logger.LogError
+                ("Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues!", LogArea.Login);
+            Logger.LogError(e.ToDetailedException(), LogArea.Login);
             return null;
         }
     }

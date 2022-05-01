@@ -45,7 +45,7 @@ public class RoomHelper
     {
         if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
         {
-            Logger.LogError($"Returning null for FindBestRoom, game ({roomVersion}) does not support dive in (should never happen?)", "Match");
+            Logger.LogError($"Returning null for FindBestRoom, game ({roomVersion}) does not support dive in (should never happen?)", LogArea.Match);
             return null;
         }
 
@@ -139,7 +139,7 @@ public class RoomHelper
                 },
             };
 
-            Logger.LogSuccess($"Found a room (id: {room.RoomId}) for user {user?.Username ?? "null"} (id: {user?.UserId ?? -1})", "Match");
+            Logger.LogSuccess($"Found a room (id: {room.RoomId}) for user {user?.Username ?? "null"} (id: {user?.UserId ?? -1})", LogArea.Match);
 
             return response;
         }
@@ -172,7 +172,7 @@ public class RoomHelper
 
         CleanupRooms(room.Host, room);
         lock(Rooms) Rooms.Add(room);
-        Logger.LogInfo($"Created room (id: {room.RoomId}) for host {room.Host.Username} (id: {room.Host.UserId})", "Match");
+        Logger.LogInfo($"Created room (id: {room.RoomId}) for host {room.Host.Username} (id: {room.Host.UserId})", LogArea.Match);
 
         return room;
     }
@@ -237,7 +237,7 @@ public class RoomHelper
 
             if (roomCountBeforeCleanup != roomCountAfterCleanup)
             {
-                Logger.LogDebug($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.", "Match");
+                Logger.LogDebug($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.", LogArea.Match);
             }
         }
     }

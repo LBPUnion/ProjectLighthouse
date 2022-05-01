@@ -45,14 +45,14 @@ public class LoginController : ControllerBase
 
         if (npTicket == null)
         {
-            Logger.LogWarn("npTicket was null, rejecting login", "Login");
+            Logger.LogWarn("npTicket was null, rejecting login", LogArea.Login);
             return this.BadRequest();
         }
 
         IPAddress? remoteIpAddress = this.HttpContext.Connection.RemoteIpAddress;
         if (remoteIpAddress == null)
         {
-            Logger.LogWarn("unable to determine ip, rejecting login", "Login");
+            Logger.LogWarn("unable to determine ip, rejecting login", LogArea.Login);
             return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
         }
 
@@ -68,7 +68,7 @@ public class LoginController : ControllerBase
             token = await this.database.AuthenticateUser(npTicket, ipAddress);
             if (token == null)
             {
-                Logger.LogWarn($"Unable to find/generate a token for username {npTicket.Username}", "Login");
+                Logger.LogWarn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
                 return this.StatusCode(403, ""); // If not, then 403.
             }
         }
@@ -77,7 +77,7 @@ public class LoginController : ControllerBase
 
         if (user == null || user.Banned)
         {
-            Logger.LogError($"Unable to find user {npTicket.Username} from token", "Login");
+            Logger.LogError($"Unable to find user {npTicket.Username} from token", LogArea.Login);
             return this.StatusCode(403, "");
         }
 
@@ -94,7 +94,7 @@ public class LoginController : ControllerBase
                     DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
 
                     await this.database.SaveChangesAsync();
-                    Logger.LogWarn($"Too many recent denied logins from user {user.Username}, rejecting login", "Login");
+                    Logger.LogWarn($"Too many recent denied logins from user {user.Username}, rejecting login", LogArea.Login);
                     return this.StatusCode(403, "");
                 }
             }
@@ -126,11 +126,11 @@ public class LoginController : ControllerBase
 
         if (!token.Approved)
         {
-            Logger.LogWarn($"Token unapproved for user {user.Username}, rejecting login", "Login");
+            Logger.LogWarn($"Token unapproved for user {user.Username}, rejecting login", LogArea.Login);
             return this.StatusCode(403, "");
         }
 
-        Logger.LogSuccess($"Successfully logged in user {user.Username} as {token.GameVersion} client", "Login");
+        Logger.LogSuccess($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);
         // After this point we are now considering this session as logged in.
 
         // We just logged in with the token. Mark it as used so someone else doesnt try to use it,

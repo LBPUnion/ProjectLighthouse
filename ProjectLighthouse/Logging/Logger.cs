@@ -28,7 +28,7 @@ public static class Logger
     public static void AddLogger(ILogger logger)
     {
         loggers.Add(logger);
-        LogSuccess("Initialized " + logger.GetType().Name, "Logger");
+        LogSuccess("Initialized " + logger.GetType().Name, LogArea.Logger);
     }
 
     private static LogTrace getTrace(int extraTraceLines = 0)
@@ -144,31 +144,31 @@ public static class Logger
 
     #region Logging functions
 
-    public static void LogDebug(string text, string area = "")
+    public static void LogDebug(string text, LogArea logArea)
     {
         #if DEBUG
-        Log(text, area, LogLevel.Debug);
+        Log(text, logArea.ToString(), LogLevel.Debug);
         #endif
     }
 
-    public static void LogSuccess(string text, string area = "")
+    public static void LogSuccess(string text, LogArea logArea)
     {
-        Log(text, area, LogLevel.Success);
+        Log(text, logArea.ToString(), LogLevel.Success);
     }
 
-    public static void LogInfo(string text, string area = "")
+    public static void LogInfo(string text, LogArea logArea)
     {
-        Log(text, area, LogLevel.Info);
+        Log(text, logArea.ToString(), LogLevel.Info);
     }
 
-    public static void LogWarn(string text, string area = "")
+    public static void LogWarn(string text, LogArea logArea)
     {
-        Log(text, area, LogLevel.Warning);
+        Log(text, logArea.ToString(), LogLevel.Warning);
     }
 
-    public static void LogError(string text, string area = "")
+    public static void LogError(string text, LogArea logArea)
     {
-        Log(text, area, LogLevel.Error);
+        Log(text, logArea.ToString(), LogLevel.Error);
     }
 
     public static void Log(string text, string area, LogLevel level, int extraTraceLines = 0)

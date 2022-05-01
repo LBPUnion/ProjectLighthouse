@@ -33,7 +33,7 @@ public static class VersionHelper
             (
                 "Project Lighthouse was built incorrectly. Please make sure git is available when building. " +
                 "Because of this, you will not be notified of updates.",
-                "Startup"
+                LogArea.Startup
             );
             CommitHash = "invalid";
             Branch = "invalid";
@@ -46,7 +46,7 @@ public static class VersionHelper
             (
                 "This is a modified version of Project Lighthouse. " +
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
-                "Startup"
+                LogArea.Startup
             );
             CanCheckForUpdates = false;
         }

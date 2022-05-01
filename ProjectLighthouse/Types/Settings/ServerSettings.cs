@@ -19,7 +19,7 @@ public class ServerSettings
     {
         if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
-        Logger.LogInfo("Loading config...", "Config");
+        Logger.LogInfo("Loading config...", LogArea.Config);
 
         if (File.Exists(ConfigFileName))
         {
@@ -29,7 +29,7 @@ public class ServerSettings
 
             if (Instance.ConfigVersion < CurrentConfigVersion)
             {
-                Logger.LogInfo($"Upgrading config file from version {Instance.ConfigVersion} to version {CurrentConfigVersion}", "Config");
+                Logger.LogInfo($"Upgrading config file from version {Instance.ConfigVersion} to version {CurrentConfigVersion}", LogArea.Config);
                 Instance.ConfigVersion = CurrentConfigVersion;
                 configFile = JsonSerializer.Serialize
                 (
@@ -63,7 +63,7 @@ public class ServerSettings
                 "The configuration file was not found. " +
                 "A blank configuration file has been created for you at " +
                 $"{Path.Combine(Environment.CurrentDirectory, ConfigFileName)}",
-                "Config"
+                LogArea.Config
             );
 
             Environment.Exit(1);
@@ -72,7 +72,7 @@ public class ServerSettings
         // Set up reloading
         if (Instance.ConfigReloading)
         {
-            Logger.LogInfo("Setting up config reloading...", "Config");
+            Logger.LogInfo("Setting up config reloading...", LogArea.Config);
             fileWatcher = new FileSystemWatcher
             {
                 Path = Environment.CurrentDirectory,
@@ -89,8 +89,8 @@ public class ServerSettings
     private static void onConfigChanged(object sender, FileSystemEventArgs e)
     {
         Debug.Assert(e.Name == ConfigFileName);
-        Logger.LogInfo("Configuration file modified, reloading config.", "Config");
-        Logger.LogWarn("Some changes may not apply, in which case may require a restart of Project Lighthouse.", "Config");
+        Logger.LogInfo("Configuration file modified, reloading config.", LogArea.Config);
+        Logger.LogWarn("Some changes may not apply, in which case may require a restart of Project Lighthouse.", LogArea.Config);
 
         string configFile = File.ReadAllText(ConfigFileName);
         Instance = JsonSerializer.Deserialize<ServerSettings>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
