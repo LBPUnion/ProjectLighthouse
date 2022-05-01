@@ -69,7 +69,7 @@ public class LoginController : ControllerBase
             token = await this.database.AuthenticateUser(npTicket, ipAddress);
             if (token == null)
             {
-                Logger.Log("unable to find/generate a token, rejecting login", LoggerLevelLogin.Instance);
+                Logger.Log($"Unable to find/generate a token for username {npTicket.Username}", LoggerLevelLogin.Instance);
                 return this.StatusCode(403, ""); // If not, then 403.
             }
         }
@@ -78,7 +78,7 @@ public class LoginController : ControllerBase
 
         if (user == null || user.Banned)
         {
-            Logger.Log("unable to find a user from a token, rejecting login", LoggerLevelLogin.Instance);
+            Logger.Log($"Unable to find user {npTicket.Username} from token", LoggerLevelLogin.Instance);
             return this.StatusCode(403, "");
         }
 
@@ -95,7 +95,7 @@ public class LoginController : ControllerBase
                     DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
 
                     await this.database.SaveChangesAsync();
-                    Logger.Log("too many denied logins, rejecting login", LoggerLevelLogin.Instance);
+                    Logger.Log($"Too many recent denied logins from user {user.Username}, rejecting login", LoggerLevelLogin.Instance);
                     return this.StatusCode(403, "");
                 }
             }
@@ -127,7 +127,7 @@ public class LoginController : ControllerBase
 
         if (!token.Approved)
         {
-            Logger.Log("token unapproved, rejecting login", LoggerLevelLogin.Instance);
+            Logger.Log($"Token unapproved for user {user.Username}, rejecting login", LoggerLevelLogin.Instance);
             return this.StatusCode(403, "");
         }
 
