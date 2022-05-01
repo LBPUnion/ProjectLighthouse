@@ -21,10 +21,10 @@ public class AspNetToLighthouseLogger : Microsoft.Extensions.Logging.ILogger
     {
         LogLevel level = logLevel.ToLighthouseLevel();
 
-        Logger.Log(state.ToString(), this.Category, level);
+        Logger.Log(state.ToString(), this.Category, level, 4);
 
         if (exception == null) return;
 
-        Logger.Log(exception.ToDetailedException(), this.Category, level);
+        Logger.Log(exception.ToDetailedException(), this.Category, level, 4);
     }
 }

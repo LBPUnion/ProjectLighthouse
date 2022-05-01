@@ -1,9 +1,9 @@
-using System;
+#nullable enable
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,35 +31,51 @@ public static class Logger
         LogSuccess("Initialized " + logger.GetType().Name, "Logger");
     }
 
-    private static LogTrace getTrace()
+    private static LogTrace getTrace(int extraTraceLines = 0)
     {
-        const int depth = 6;
+        const int depth = 5;
         const int skipDepth = depth - 2;
 
-        // Get the stacktrace for logging...
-        string trace = Environment.StackTrace.Split('\n', depth, StringSplitOptions.RemoveEmptyEntries).Skip(skipDepth).First();
+//        // Get the stacktrace for logging...
+//        string trace = Environment.StackTrace
+//            .Split('\n', depth + extraTraceLines, StringSplitOptions.RemoveEmptyEntries)
+//            .Skip(skipDepth + extraTraceLines)
+//            .First();
+//
+//        trace = trace.TrimEnd('\r');
+//        trace = trace.Substring(trace.LastIndexOf(Path.DirectorySeparatorChar) + 1); // Try splitting by the filename.
+//        if (trace.StartsWith("   at ")) // If we still havent split properly...
+//        {
+//            trace = trace.Substring(trace.LastIndexOf('.') + 1); // Try splitting by the last dot.
+//        }
+//        trace = trace.Replace(".cs:line ", ":");
 
-        trace = trace.TrimEnd('\r');
-        trace = trace.Substring(trace.LastIndexOf(Path.DirectorySeparatorChar) + 1);
-        trace = trace.Replace(".cs:line ", ":");
+        StackTrace stackTrace = new(true);
+        StackFrame? frame = stackTrace.GetFrame(skipDepth + extraTraceLines);
+        Debug.Assert(frame != null);
 
-        string[] traceSplit = trace.Split(':'); // Split for formatting!
+        string? name;
+        string? section;
 
-        short lineNumber;
-
-        try
+        string? fileName = frame.GetFileName();
+        if (fileName == null)
         {
-            lineNumber = short.Parse(traceSplit[1]);
+            name = frame.GetMethod()?.DeclaringType?.Name;
+            section = frame.GetMethod()?.Name;
         }
-        catch
+        else
         {
-            lineNumber = -1;
+            name = Path.GetFileNameWithoutExtension(Path.GetFileName(fileName));
+            int lineNumber = frame.GetFileLineNumber();
+            if (lineNumber == 0) lineNumber = -1;
+
+            section = lineNumber.ToString();
         }
 
         return new LogTrace
         {
-            Name = traceSplit[0],
-            Line = lineNumber,
+            Name = name,
+            Section = section,
         };
     }
 
@@ -155,7 +171,7 @@ public static class Logger
         Log(text, area, LogLevel.Error);
     }
 
-    public static void Log(string text, string area, LogLevel level)
+    public static void Log(string text, string area, LogLevel level, int extraTraceLines = 0)
     {
         queueLog
         (
@@ -164,7 +180,7 @@ public static class Logger
                 Level = level,
                 Message = text,
                 Area = area,
-                Trace = getTrace(),
+                Trace = getTrace(extraTraceLines),
             }
         );
     }
