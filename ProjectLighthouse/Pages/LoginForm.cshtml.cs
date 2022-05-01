@@ -74,7 +74,7 @@ public class LoginForm : BaseLayout
             {
                 UserId = user.UserId,
                 User = user,
-                EmailToken = HashHelper.GenerateAuthToken(),
+                EmailToken = CryptoHelper.GenerateAuthToken(),
             };
 
             this.Database.EmailSetTokens.Add(emailSetToken);
@@ -86,7 +86,7 @@ public class LoginForm : BaseLayout
         WebToken webToken = new()
         {
             UserId = user.UserId,
-            UserToken = HashHelper.GenerateAuthToken(),
+            UserToken = CryptoHelper.GenerateAuthToken(),
         };
 
         this.Database.WebTokens.Add(webToken);

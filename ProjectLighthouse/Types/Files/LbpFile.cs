@@ -24,7 +24,7 @@ public class LbpFile
         this.Data = data;
 
         this.FileType = FileHelper.DetermineFileType(this.Data);
-        this.Hash = HashHelper.Sha1Hash(this.Data).ToLower();
+        this.Hash = CryptoHelper.Sha1Hash(this.Data).ToLower();
     }
 
     public static LbpFile? FromHash(string hash)

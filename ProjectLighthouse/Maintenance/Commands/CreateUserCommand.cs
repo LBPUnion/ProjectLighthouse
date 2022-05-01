@@ -19,12 +19,12 @@ public class CreateUserCommand : ICommand
         string onlineId = args[0];
         string password = args[1];
 
-        password = HashHelper.Sha256Hash(password);
+        password = CryptoHelper.Sha256Hash(password);
 
         User? user = await this._database.Users.FirstOrDefaultAsync(u => u.Username == onlineId);
         if (user == null)
         {
-            user = await this._database.CreateUser(onlineId, HashHelper.BCryptHash(password));
+            user = await this._database.CreateUser(onlineId, CryptoHelper.BCryptHash(password));
             Logger.Log($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LoggerLevelLogin.Instance);
 
             user.PasswordResetRequired = true;

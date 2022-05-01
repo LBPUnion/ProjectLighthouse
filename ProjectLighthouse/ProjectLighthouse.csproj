@@ -57,6 +57,7 @@
 
     <ItemGroup>
         <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs" />
+        <Compile Remove="Helpers\EulaHelper.cs"/>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

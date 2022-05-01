@@ -100,7 +100,7 @@ public class Database : DbContext
 
         GameToken gameToken = new()
         {
-            UserToken = HashHelper.GenerateAuthToken(),
+            UserToken = CryptoHelper.GenerateAuthToken(),
             User = user,
             UserId = user.UserId,
             UserLocation = userLocation,

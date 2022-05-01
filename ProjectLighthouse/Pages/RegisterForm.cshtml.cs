@@ -67,12 +67,12 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        User user = await this.Database.CreateUser(username, HashHelper.BCryptHash(password), emailAddress);
+        User user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
 
         WebToken webToken = new()
         {
             UserId = user.UserId,
-            UserToken = HashHelper.GenerateAuthToken(),
+            UserToken = CryptoHelper.GenerateAuthToken(),
         };
 
         this.Database.WebTokens.Add(webToken);

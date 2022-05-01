@@ -20,8 +20,8 @@ public class SlotTests : LighthouseServerTest
 
         Random r = new();
 
-        User userA = await database.CreateUser($"unitTestUser{r.Next()}", HashHelper.GenerateAuthToken());
-        User userB = await database.CreateUser($"unitTestUser{r.Next()}", HashHelper.GenerateAuthToken());
+        User userA = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
+        User userB = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
 
         Location l = new()
         {

@@ -19,8 +19,8 @@ public class AuthenticationTests : LighthouseWebTest
         await using Database database = new();
         Random random = new();
 
-        string password = HashHelper.Sha256Hash(HashHelper.GenerateRandomBytes(64).ToArray());
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash(HashHelper.Sha256Hash(password)));
+        string password = CryptoHelper.Sha256Hash(RandomHelper.GenerateRandomBytes(64).ToArray());
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -40,7 +40,7 @@ public class AuthenticationTests : LighthouseWebTest
     {
         await using Database database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("just like the hindenberg,"));
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("just like the hindenberg,"));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -59,7 +59,7 @@ public class AuthenticationTests : LighthouseWebTest
     {
         await using Database database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -81,12 +81,12 @@ public class AuthenticationTests : LighthouseWebTest
 
         await using Database database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         WebToken webToken = new()
         {
             UserId = user.UserId,
-            UserToken = HashHelper.GenerateAuthToken(),
+            UserToken = CryptoHelper.GenerateAuthToken(),
         };
 
         database.WebTokens.Add(webToken);

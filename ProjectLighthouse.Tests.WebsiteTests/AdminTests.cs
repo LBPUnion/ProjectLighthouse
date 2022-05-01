@@ -18,12 +18,12 @@ public class AdminTests : LighthouseWebTest
     {
         await using Database database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         WebToken webToken = new()
         {
             UserId = user.UserId,
-            UserToken = HashHelper.GenerateAuthToken(),
+            UserToken = CryptoHelper.GenerateAuthToken(),
         };
 
         database.WebTokens.Add(webToken);
@@ -42,12 +42,12 @@ public class AdminTests : LighthouseWebTest
     {
         await using Database database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", HashHelper.BCryptHash("i'm an engineering failure"));
+        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         WebToken webToken = new()
         {
             UserId = user.UserId,
-            UserToken = HashHelper.GenerateAuthToken(),
+            UserToken = CryptoHelper.GenerateAuthToken(),
         };
 
         database.WebTokens.Add(webToken);

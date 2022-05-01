@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
@@ -9,27 +8,10 @@ using System.Threading.Tasks;
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-public static class HashHelper
+public static class CryptoHelper
 {
     // private static readonly SHA1 sha1 = SHA1.Create();
     private static readonly SHA256 sha256 = SHA256.Create();
-
-    /// <summary>
-    ///     Generates a specified amount of random bytes in an array.
-    /// </summary>
-    /// <param name="count">The amount of bytes to generate.</param>
-    /// <returns>The bytes generated</returns>
-    public static IEnumerable<byte> GenerateRandomBytes(int count)
-    {
-        byte[] b = new byte[count];
-
-        lock(RandomHelper.random)
-        {
-            RandomHelper.random.NextBytes(b);
-        }
-
-        return b;
-    }
 
     /// <summary>
     ///     Generates a random SHA256 and BCrypted token
@@ -37,7 +19,7 @@ public static class HashHelper
     /// <returns>The token as a string.</returns>
     public static string GenerateAuthToken()
     {
-        byte[] bytes = (byte[])GenerateRandomBytes(256);
+        byte[] bytes = (byte[])RandomHelper.GenerateRandomBytes(256);
 
         return BCryptHash(Sha256Hash(bytes));
     }

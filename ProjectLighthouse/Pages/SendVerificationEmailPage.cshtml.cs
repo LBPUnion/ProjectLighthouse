@@ -38,7 +38,7 @@ public class SendVerificationEmailPage : BaseLayout
         {
             UserId = user.UserId,
             User = user,
-            EmailToken = HashHelper.GenerateAuthToken(),
+            EmailToken = CryptoHelper.GenerateAuthToken(),
         };
 
         this.Database.EmailVerificationTokens.Add(verifyToken);

@@ -34,7 +34,7 @@ public class LighthouseServerTest
         {
             await using Database database = new();
             if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
-                await database.CreateUser($"{username}{number}", HashHelper.BCryptHash($"unitTestPassword{number}"));
+                await database.CreateUser($"{username}{number}", CryptoHelper.BCryptHash($"unitTestPassword{number}"));
         }
 
         //TODO: generate actual tickets
@@ -68,7 +68,7 @@ public class LighthouseServerTest
     public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
     {
         byte[] bytes = await File.ReadAllBytesAsync(filePath);
-        string hash = HashHelper.Sha1Hash(bytes).ToLower();
+        string hash = CryptoHelper.Sha1Hash(bytes).ToLower();
 
         return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
     }
@@ -76,7 +76,7 @@ public class LighthouseServerTest
     public async Task<HttpResponseMessage> AuthenticatedUploadFileEndpointRequest(string filePath, string mmAuth)
     {
         byte[] bytes = await File.ReadAllBytesAsync(filePath);
-        string hash = HashHelper.Sha1Hash(bytes).ToLower();
+        string hash = CryptoHelper.Sha1Hash(bytes).ToLower();
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, $"/LITTLEBIGPLANETPS3_XML/upload/{hash}");
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(bytes);

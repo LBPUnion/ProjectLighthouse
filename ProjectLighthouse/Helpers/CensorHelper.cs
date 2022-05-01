@@ -48,7 +48,7 @@ public static class CensorHelper
         {
             case FilterMode.Random:
                 for(int i = 0; i < profanityLength; i++)
-                    lock(RandomHelper.random)
+                    lock(RandomHelper.Random)
                     {
                         if (message[i] == ' ')
                         {
@@ -56,8 +56,8 @@ public static class CensorHelper
                         }
                         else
                         {
-                            char randomChar = randomCharacters[RandomHelper.random.Next(0, randomCharacters.Length - 1)];
-                            if (randomChar == prevRandomChar) randomChar = randomCharacters[RandomHelper.random.Next(0, randomCharacters.Length - 1)];
+                            char randomChar = randomCharacters[RandomHelper.Random.Next(0, randomCharacters.Length - 1)];
+                            if (randomChar == prevRandomChar) randomChar = randomCharacters[RandomHelper.Random.Next(0, randomCharacters.Length - 1)];
 
                             prevRandomChar = randomChar;
 
@@ -81,9 +81,9 @@ public static class CensorHelper
 
                 break;
             case FilterMode.Furry:
-                lock(RandomHelper.random)
+                lock(RandomHelper.Random)
                 {
-                    string randomWord = randomFurry[RandomHelper.random.Next(0, randomFurry.Length - 1)];
+                    string randomWord = randomFurry[RandomHelper.Random.Next(0, randomFurry.Length - 1)];
                     sb.Append(randomWord);
                 }
 

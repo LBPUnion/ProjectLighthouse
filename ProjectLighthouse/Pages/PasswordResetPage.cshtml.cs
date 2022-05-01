@@ -33,7 +33,7 @@ public class PasswordResetPage : BaseLayout
             return this.Page();
         }
 
-        user.Password = HashHelper.BCryptHash(password);
+        user.Password = CryptoHelper.BCryptHash(password);
         user.PasswordResetRequired = false;
 
         await this.Database.SaveChangesAsync();

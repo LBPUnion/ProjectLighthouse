@@ -50,7 +50,7 @@ public class SetEmailForm : BaseLayout
         {
             UserId = user.UserId,
             User = user,
-            EmailToken = HashHelper.GenerateAuthToken(),
+            EmailToken = CryptoHelper.GenerateAuthToken(),
         };
 
         this.Database.EmailVerificationTokens.Add(emailVerifyToken);
@@ -59,7 +59,7 @@ public class SetEmailForm : BaseLayout
         WebToken webToken = new()
         {
             UserId = user.UserId,
-            UserToken = HashHelper.GenerateAuthToken(),
+            UserToken = CryptoHelper.GenerateAuthToken(),
         };
 
         this.Response.Cookies.Append

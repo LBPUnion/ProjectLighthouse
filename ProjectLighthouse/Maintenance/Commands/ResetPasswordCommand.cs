@@ -36,9 +36,9 @@ public class ResetPasswordCommand : ICommand
                 return;
             }
         string password = args[1];
-        if (password.Length != 64) password = HashHelper.Sha256Hash(password);
+        if (password.Length != 64) password = CryptoHelper.Sha256Hash(password);
 
-        user.Password = HashHelper.BCryptHash(password);
+        user.Password = CryptoHelper.BCryptHash(password);
         user.PasswordResetRequired = true;
 
         await this.database.SaveChangesAsync();
