@@ -21,6 +21,6 @@ public class InfluxLogger : LoggerBase
 
         PointData point = PointData.Measurement("lighthouseLog").Field("level", level).Field("content", content);
 
-        writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, point);
+        writeApi.WritePoint(point, ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg);
     }
 }

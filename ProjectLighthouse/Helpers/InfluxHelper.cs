@@ -39,10 +39,10 @@ public static class InfluxHelper
                     .Tag("game", gameVersion.ToString())
                     .Field("playerCountGame", await StatisticsHelper.RecentMatchesForGame(gameVersion));
 
-                writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, gamePoint);
+                writeApi.WritePoint(gamePoint, ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg);
             }
 
-            writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, point);
+            writeApi.WritePoint(point, ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg);
 
             writeApi.Flush();
         }
