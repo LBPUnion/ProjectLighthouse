@@ -12,14 +12,12 @@ public class LighthouseFileLogger : ILogger
     {
         FileHelper.EnsureDirectoryCreated(logsDirectory);
 
-        string channel = string.IsNullOrEmpty(line.Area) ? "" : $"[{line.Area}] ";
-
-        string contentFile = $"{channel}{line.Message}\n";
-        string contentAll = $"[{$"{line.Level} {channel}".TrimEnd()}] {line.Message}\n";
+        string contentFile = $"[{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
+        string contentAll = $"[{line.Area}:{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
 
         try
         {
-            File.AppendAllText(Path.Combine(logsDirectory, line.Level + ".log"), contentFile);
+            File.AppendAllText(Path.Combine(logsDirectory, line.Area + ".log"), contentFile);
             File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
         }
         catch(IOException) {} // windows, ya goofed
