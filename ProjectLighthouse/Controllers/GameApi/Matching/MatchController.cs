@@ -68,7 +68,7 @@ public class MatchController : ControllerBase
             return this.BadRequest();
         }
 
-        Logger.LogError($"Parsed match from {user.Username} (type: {matchData.GetType()})", LogArea.Match);
+        Logger.LogInfo($"Parsed match from {user.Username} (type: {matchData.GetType()})", LogArea.Match);
 
         #endregion
 
