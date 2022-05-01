@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,17 +22,17 @@ public static class HashHelper
     public static IEnumerable<byte> GenerateRandomBytes(int count)
     {
         byte[] b = new byte[count];
-        
-        lock (RandomHelper.random)
+
+        lock(RandomHelper.random)
         {
             RandomHelper.random.NextBytes(b);
         }
-        
+
         return b;
     }
 
     /// <summary>
-    ///     Generates a random SHA256 & BCrypted token
+    ///     Generates a random SHA256 and BCrypted token
     /// </summary>
     /// <returns>The token as a string.</returns>
     public static string GenerateAuthToken()
@@ -75,7 +74,7 @@ public static class HashHelper
 
     public static string Sha1Hash(string str) => Sha1Hash(Encoding.UTF8.GetBytes(str));
 
-    public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(SHA1.Create().ComputeHash(bytes)).Replace("-","");
+    public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(SHA1.Create().ComputeHash(bytes)).Replace("-", "");
 
     public static string BCryptHash(string str) => BCrypt.Net.BCrypt.HashPassword(str);
 

@@ -47,7 +47,7 @@ public class SearchController : ControllerBase
             (
                 s => s.Name.ToLower().Contains(keyword) ||
                      s.Description.ToLower().Contains(keyword) ||
-                     s.Creator.Username.ToLower().Contains(keyword) ||
+                     s.Creator!.Username.ToLower().Contains(keyword) ||
                      s.SlotId.ToString().Equals(keyword)
             );
 

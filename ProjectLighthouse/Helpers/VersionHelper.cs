@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Linq;
 using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -65,8 +63,8 @@ public static class VersionHelper
 
     public const string Build =
         #if DEBUG
-            "Debug";
-        #elif RELEASE
+        "Debug";
+    #elif RELEASE
         "Release";
     #else
             "Unknown";

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -21,11 +20,11 @@ public class SlotsPage : BaseLayout
 
     public int SlotCount;
 
-    public List<Slot> Slots;
+    public List<Slot> Slots = new();
 
-    public string SearchValue;
+    public string? SearchValue;
 
-    public SlotsPage([NotNull] Database database) : base(database)
+    public SlotsPage(Database database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)

@@ -11,9 +11,11 @@ namespace LBPUnion.ProjectLighthouse.Types;
 
 public class User
 {
+    #nullable enable
     [NotMapped]
     [JsonIgnore]
     private Database? _database;
+    #nullable disable
 
     [NotMapped]
     [JsonIgnore]

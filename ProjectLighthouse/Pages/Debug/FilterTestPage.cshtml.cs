@@ -1,5 +1,4 @@
 #nullable enable
-using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +10,10 @@ public class FilterTestPage : BaseLayout
     public FilterTestPage(Database database) : base(database)
     {}
 
-    public string? FilteredText = null;
-    public string? Text = null;
+    public string? FilteredText;
+    public string? Text;
 
-    public async Task<IActionResult> OnGet(string? text = null)
+    public IActionResult OnGet(string? text = null)
     {
         #if !DEBUG
         return this.NotFound();

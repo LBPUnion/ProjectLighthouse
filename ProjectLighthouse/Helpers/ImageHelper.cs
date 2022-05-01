@@ -30,6 +30,7 @@ public static class ImageHelper
                 LbpFileType.Texture => TextureToPNG(hash, reader),
                 LbpFileType.Png => PNGToPNG(hash, data),
                 LbpFileType.Jpeg => JPGToPNG(hash, data),
+                // ReSharper disable once UnreachableSwitchArmDueToIntegerAnalysis
                 _ => false,
             };
         }
@@ -57,16 +58,10 @@ public static class ImageHelper
         int[] compressed = new int[chunks];
         int[] decompressed = new int[chunks];
 
-        int decompressedSize = 0;
-        int compressedSize = 0;
-
         for(int i = 0; i < chunks; ++i)
         {
             compressed[i] = reader.ReadUInt16BE();
             decompressed[i] = reader.ReadUInt16BE();
-
-            decompressedSize += decompressed[i];
-            compressedSize += compressed[i];
         }
 
         using MemoryStream ms = new();

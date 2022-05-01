@@ -24,7 +24,7 @@ public class AdminUserController : ControllerBase
         if (user == null || !user.IsAdmin) return this.NotFound();
 
         User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
-        ;
+
         if (targetedUser == null) return this.NotFound();
 
         targetedUser.Banned = false;

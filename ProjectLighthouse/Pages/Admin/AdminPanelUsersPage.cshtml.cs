@@ -11,10 +11,9 @@ namespace LBPUnion.ProjectLighthouse.Pages.Admin;
 
 public class AdminPanelUsersPage : BaseLayout
 {
-
     public int UserCount;
 
-    public List<User> Users;
+    public List<User> Users = new();
     public AdminPanelUsersPage(Database database) : base(database)
     {}
 

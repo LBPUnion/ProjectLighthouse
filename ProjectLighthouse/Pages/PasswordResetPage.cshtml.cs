@@ -13,7 +13,7 @@ public class PasswordResetPage : BaseLayout
     public PasswordResetPage(Database database) : base(database)
     {}
 
-    public string Error { get; private set; }
+    public string? Error { get; private set; }
 
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string password, string confirmPassword)

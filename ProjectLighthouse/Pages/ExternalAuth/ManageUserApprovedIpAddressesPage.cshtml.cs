@@ -11,8 +11,8 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth;
 
 public class ManageUserApprovedIpAddressesPage : BaseLayout
 {
+    public List<UserApprovedIpAddress> ApprovedIpAddresses = new();
 
-    public List<UserApprovedIpAddress> ApprovedIpAddresses;
     public ManageUserApprovedIpAddressesPage(Database database) : base(database)
     {}
 

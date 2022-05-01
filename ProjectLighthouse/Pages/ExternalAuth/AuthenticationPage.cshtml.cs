@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -14,13 +13,13 @@ namespace LBPUnion.ProjectLighthouse.Pages.ExternalAuth;
 public class AuthenticationPage : BaseLayout
 {
 
-    public List<AuthenticationAttempt> AuthenticationAttempts;
+    public List<AuthenticationAttempt> AuthenticationAttempts = new();
 
     public IPAddress? IpAddress;
     public AuthenticationPage(Database database) : base(database)
     {}
 
-    public async Task<IActionResult> OnGet()
+    public IActionResult OnGet()
     {
         if (!ServerSettings.Instance.UseExternalAuth) return this.NotFound();
         if (this.User == null) return this.StatusCode(403, "");

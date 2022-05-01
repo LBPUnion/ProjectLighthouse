@@ -16,9 +16,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Tickets;
 /// </summary>
 public class NPTicket
 {
-    public string Username { get; set; }
+    public string? Username { get; set; }
 
-    private Version ticketVersion { get; set; }
+    private Version? ticketVersion { get; set; }
 
     public Platform Platform { get; set; }
 
@@ -26,7 +26,7 @@ public class NPTicket
     public ulong IssuedDate { get; set; }
     public ulong ExpireDate { get; set; }
 
-    private string titleId { get; set; }
+    private string? titleId { get; set; }
 
     public GameVersion GameVersion { get; set; }
 
@@ -111,9 +111,11 @@ public class NPTicket
                 default: throw new NotImplementedException();
             }
 
+            if (npTicket.titleId == null) throw new ArgumentNullException($"{nameof(npTicket)}.{nameof(npTicket.titleId)}");
+
             // We already read the title id, however we need to do some post-processing to get what we want.
             // Current data: UP9000-BCUS98245_00
-            // We need to chop this to get the titleId we're looking for 
+            // We need to chop this to get the titleId we're looking for
             npTicket.titleId = npTicket.titleId.Substring(7); // Trim UP9000-
             npTicket.titleId = npTicket.titleId.Substring(0, npTicket.titleId.Length - 3); // Trim _00 at the end
             // Data now (hopefully): BCUS98245

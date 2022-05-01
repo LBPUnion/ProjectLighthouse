@@ -47,7 +47,7 @@ public class AuthenticationTests : LighthouseServerTest
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/enterLevel/420", loginResult.AuthTicket);
-        string responseContent = await response.Content.ReadAsStringAsync();
+        await response.Content.ReadAsStringAsync();
 
         Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
     }

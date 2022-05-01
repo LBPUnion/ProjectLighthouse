@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
-using Newtonsoft.Json;
+﻿using System.Xml.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Reports;
 

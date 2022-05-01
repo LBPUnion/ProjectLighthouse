@@ -10,12 +10,6 @@ namespace LBPUnion.ProjectLighthouse.Controllers.GameApi;
 [Produces("text/plain")]
 public class StatisticsController : ControllerBase
 {
-    private readonly Database database;
-    public StatisticsController(Database database)
-    {
-        this.database = database;
-    }
-
     [HttpGet("playersInPodCount")]
     [HttpGet("totalPlayerCount")]
     public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatches()).ToString()!);

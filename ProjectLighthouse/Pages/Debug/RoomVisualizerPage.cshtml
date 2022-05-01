@@ -50,6 +50,7 @@
 <h2>Best rooms for each game version</h2>
 @foreach (GameVersion version in Enum.GetValues<GameVersion>())
 {
+#nullable enable
     if (version == GameVersion.LittleBigPlanet1 || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown) continue;
 
     FindBestRoomResponse? response = RoomHelper.FindBestRoom(null, version, null, null, null);

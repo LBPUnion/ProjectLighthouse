@@ -14,6 +14,8 @@ public class ServerSettings
 {
     public const int CurrentConfigVersion = 26; // MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
     private static FileSystemWatcher fileWatcher;
+
+    // ReSharper disable once NotNullMemberIsNotInitialized
     static ServerSettings()
     {
         if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own

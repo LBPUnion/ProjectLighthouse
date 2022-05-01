@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using InfluxDB.Client;
@@ -54,6 +55,7 @@ public static class InfluxHelper
         }
     }
 
+    [SuppressMessage("ReSharper", "FunctionNeverReturns")]
     public static async Task StartLogging()
     {
         await Client.ReadyAsync();

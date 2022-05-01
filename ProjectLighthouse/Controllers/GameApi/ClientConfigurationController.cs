@@ -25,7 +25,7 @@ public class ClientConfigurationController : ControllerBase
     public async Task<IActionResult> NetworkSettings()
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return null;
+        if (token == null) return this.StatusCode(403, "");
 
         HostString hostname = this.Request.Host;
         return this.Ok

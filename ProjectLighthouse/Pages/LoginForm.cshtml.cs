@@ -21,7 +21,7 @@ public class LoginForm : BaseLayout
     public LoginForm(Database database) : base(database)
     {}
 
-    public string Error { get; private set; }
+    public string? Error { get; private set; }
 
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string username, string password)
@@ -111,9 +111,5 @@ public class LoginForm : BaseLayout
     }
 
     [UsedImplicitly]
-    public async Task<IActionResult> OnGet()
-    {
-        this.Error = string.Empty;
-        return this.Page();
-    }
+    public IActionResult OnGet() => this.Page();
 }

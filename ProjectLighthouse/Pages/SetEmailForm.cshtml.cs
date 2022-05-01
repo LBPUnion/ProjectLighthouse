@@ -19,7 +19,7 @@ public class SetEmailForm : BaseLayout
     public SetEmailForm(Database database) : base(database)
     {}
 
-    public EmailSetToken EmailToken;
+    public EmailSetToken? EmailToken;
 
     public async Task<IActionResult> OnGet(string? token = null)
     {

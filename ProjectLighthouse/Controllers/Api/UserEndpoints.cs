@@ -50,7 +50,7 @@ public class UserEndpoints : ApiEndpointController
     [HttpGet("user/{id:int}/status")]
     [ProducesResponseType(typeof(UserStatus), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserStatus(int id)
+    public IActionResult GetUserStatus(int id)
     {
         UserStatus userStatus = new(this.database, id);
 

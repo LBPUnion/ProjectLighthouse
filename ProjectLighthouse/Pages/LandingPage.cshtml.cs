@@ -15,7 +15,7 @@ public class LandingPage : BaseLayout
 {
 
     public int AuthenticationAttemptsCount;
-    public List<User> PlayersOnline;
+    public List<User> PlayersOnline = new();
 
     public int PlayersOnlineCount;
     public LandingPage(Database database) : base(database)

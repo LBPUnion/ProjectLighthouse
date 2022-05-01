@@ -15,13 +15,13 @@ namespace LBPUnion.ProjectLighthouse.Pages;
 
 public class SlotPage : BaseLayout
 {
-    public List<Comment> Comments;
-    public List<Review> Reviews;
+    public List<Comment> Comments = new();
+    public List<Review> Reviews = new();
 
     public readonly bool CommentsEnabled = ServerSettings.Instance.LevelCommentsEnabled;
     public readonly bool ReviewsEnabled = ServerSettings.Instance.LevelReviewsEnabled;
 
-    public Slot Slot;
+    public Slot? Slot;
     public SlotPage(Database database) : base(database)
     {}
 

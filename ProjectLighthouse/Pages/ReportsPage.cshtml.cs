@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Reports;
@@ -23,12 +22,12 @@ public class ReportsPage : BaseLayout
 
     public int ReportCount;
 
-    public List<GriefReport> Reports;
+    public List<GriefReport> Reports = new();
 
-    public string SearchValue;
+    public string SearchValue = "";
 
-    public ReportsPage([NotNull] Database database) : base(database)
-    { }
+    public ReportsPage(Database database) : base(database)
+    {}
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
     {
@@ -43,7 +42,7 @@ public class ReportsPage : BaseLayout
         this.ReportCount = await this.Database.Reports.Include(r => r.ReportingPlayer).CountAsync(r => r.ReportingPlayer.Username.Contains(this.SearchValue));
 
         this.PageNumber = pageNumber;
-        this.PageAmount = Math.Max(1, (int) Math.Ceiling((double) this.ReportCount / ServerStatics.PageSize));
+        this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.ReportCount / ServerStatics.PageSize));
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount)
             return this.Redirect($"/admin/reports/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
@@ -57,11 +56,11 @@ public class ReportsPage : BaseLayout
 
         foreach (GriefReport r in this.Reports)
         {
-            r.XmlPlayers = (ReportPlayer[]) JsonSerializer.Deserialize(r.Players, typeof(ReportPlayer[]))!;
+            r.XmlPlayers = (ReportPlayer[])JsonSerializer.Deserialize(r.Players, typeof(ReportPlayer[]))!;
 
             r.XmlBounds = new Marqee()
             {
-                Rect = (Rectangle) JsonSerializer.Deserialize(r.Bounds, typeof(Rectangle))!,
+                Rect = (Rectangle)JsonSerializer.Deserialize(r.Bounds, typeof(Rectangle))!,
             };
         }
 

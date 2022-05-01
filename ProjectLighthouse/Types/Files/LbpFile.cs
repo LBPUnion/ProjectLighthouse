@@ -19,7 +19,7 @@ public class LbpFile
 
     public readonly string Hash;
 
-    public LbpFile(byte[] data, string? hash = null)
+    public LbpFile(byte[] data)
     {
         this.Data = data;
 
@@ -34,6 +34,6 @@ public class LbpFile
 
         byte[] data = File.ReadAllBytes(path);
 
-        return new LbpFile(data, hash);
+        return new LbpFile(data);
     }
 }

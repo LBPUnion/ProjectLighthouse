@@ -89,7 +89,8 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
                 $"{nameof(noHashesExist)}: {noHashesExist}, " +
                 $"{nameof(largeHashIsInvalidFile)}: {largeHashIsInvalidFile}, " +
                 $"{nameof(tooManyPhotoSubjects)}: {tooManyPhotoSubjects}" +
-                $"{nameof(duplicatePhotoSubjects)}: {duplicatePhotoSubjects}"
+                $"{nameof(duplicatePhotoSubjects)}: {duplicatePhotoSubjects}" +
+                $"{nameof(takenInTheFuture)}: {takenInTheFuture}"
             );
 
             this.database.Photos.Remove(photo);

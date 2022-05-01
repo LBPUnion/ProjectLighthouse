@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -20,11 +19,11 @@ public class UsersPage : BaseLayout
 
     public int UserCount;
 
-    public List<User> Users;
+    public List<User> Users = new();
 
-    public string SearchValue;
+    public string? SearchValue;
 
-    public UsersPage([NotNull] Database database) : base(database)
+    public UsersPage(Database database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
