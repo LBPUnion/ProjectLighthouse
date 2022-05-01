@@ -1,7 +1,6 @@
 #nullable enable
 using System.IO;
 using System.Threading.Tasks;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
@@ -99,7 +98,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string scannedText = CensorHelper.ScanMessage(response);
 
-        Logger.Log($"{user.Username}: {response} / {scannedText}", LoggerLevelFilter.Instance);
+        Logger.LogInfo($"{user.Username}: {response} / {scannedText}", "Filter");
 
         return this.Ok(scannedText);
     }

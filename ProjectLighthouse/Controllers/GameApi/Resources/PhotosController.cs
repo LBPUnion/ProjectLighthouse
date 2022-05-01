@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Discord;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -68,7 +67,7 @@ public class PhotosController : ControllerBase
             if (subject.User == null) continue;
 
             subject.UserId = subject.User.UserId;
-            Logger.Log($"Adding PhotoSubject (userid {subject.UserId}) to db", LoggerLevelPhotos.Instance);
+            Logger.LogDebug($"Adding PhotoSubject (userid {subject.UserId}) to db", "Photos");
 
             this.database.PhotoSubjects.Add(subject);
         }
@@ -88,7 +87,7 @@ public class PhotosController : ControllerBase
 
         //            photo.Slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId);
 
-        Logger.Log($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LoggerLevelPhotos.Instance);
+        Logger.LogDebug($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", "Photos");
 
         this.database.Photos.Add(photo);
 

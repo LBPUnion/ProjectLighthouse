@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -46,7 +45,7 @@ public class RoomHelper
     {
         if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
         {
-            Logger.Log($"Returning null for FindBestRoom, game ({roomVersion}) does not support dive in (should never happen?)", LoggerLevelMatch.Instance);
+            Logger.LogError($"Returning null for FindBestRoom, game ({roomVersion}) does not support dive in (should never happen?)", "Match");
             return null;
         }
 
@@ -140,7 +139,7 @@ public class RoomHelper
                 },
             };
 
-            Logger.Log($"Found a room (id: {room.RoomId}) for user {user?.Username ?? "null"} (id: {user?.UserId ?? -1})", LoggerLevelMatch.Instance);
+            Logger.LogSuccess($"Found a room (id: {room.RoomId}) for user {user?.Username ?? "null"} (id: {user?.UserId ?? -1})", "Match");
 
             return response;
         }
@@ -173,7 +172,7 @@ public class RoomHelper
 
         CleanupRooms(room.Host, room);
         lock(Rooms) Rooms.Add(room);
-        Logger.Log($"Created room (id: {room.RoomId}) for host {room.Host.Username} (id: {room.Host.UserId})", LoggerLevelMatch.Instance);
+        Logger.LogInfo($"Created room (id: {room.RoomId}) for host {room.Host.Username} (id: {room.Host.UserId})", "Match");
 
         return room;
     }
@@ -238,7 +237,7 @@ public class RoomHelper
 
             if (roomCountBeforeCleanup != roomCountAfterCleanup)
             {
-                Logger.Log($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.", LoggerLevelMatch.Instance);
+                Logger.LogDebug($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.", "Match");
             }
         }
     }

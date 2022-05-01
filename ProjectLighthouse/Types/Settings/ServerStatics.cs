@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Linq;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Types.Settings;
@@ -20,7 +19,7 @@ public static class ServerStatics
             }
             catch(Exception e)
             {
-                Logger.Log(e.ToString(), LoggerLevelDatabase.Instance);
+                Logger.LogError(e.ToString(), "Database");
                 return false;
             }
         }

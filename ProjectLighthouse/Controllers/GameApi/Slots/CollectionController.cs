@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -85,7 +84,7 @@ public class CollectionController : ControllerBase
         Category? category = CollectionHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();
 
-        Logger.Log("Found category " + category, LoggerLevelCategory.Instance);
+        Logger.LogDebug("Found category " + category, "Category");
 
         List<Slot> slots;
         int totalSlots;

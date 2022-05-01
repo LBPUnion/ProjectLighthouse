@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -48,7 +47,7 @@ public class MatchController : ControllerBase
 
         if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
 
-        Logger.Log("Received match data: " + bodyString, LoggerLevelMatch.Instance);
+        Logger.LogInfo("Received match data: " + bodyString, "Match");
 
         IMatchData? matchData;
         try
@@ -57,20 +56,19 @@ public class MatchController : ControllerBase
         }
         catch(Exception e)
         {
-            Logger.Log("Exception while parsing matchData: ", LoggerLevelMatch.Instance);
-            string[] lines = e.ToDetailedException().Split("\n");
-            foreach (string line in lines) Logger.Log(line, LoggerLevelMatch.Instance);
+            Logger.LogError("Exception while parsing matchData: ", "Match");
+            Logger.LogError(e.ToDetailedException(), "Match");
 
             return this.BadRequest();
         }
 
         if (matchData == null)
         {
-            Logger.Log("Could not parse match data: matchData is null", LoggerLevelMatch.Instance);
+            Logger.LogError($"Could not parse match data: {nameof(matchData)} is null", "Match");
             return this.BadRequest();
         }
 
-        Logger.Log($"Parsed match from {user.Username} (type: {matchData.GetType()})", LoggerLevelMatch.Instance);
+        Logger.LogError($"Parsed match from {user.Username} (type: {matchData.GetType()})", "Match");
 
         #endregion
 

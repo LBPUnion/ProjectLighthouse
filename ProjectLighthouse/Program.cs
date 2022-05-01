@@ -1,9 +1,10 @@
 #nullable enable
 using System;
 using System.Diagnostics;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Logging.Loggers;
+using LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,46 +24,47 @@ public static class Program
         stopwatch.Start();
 
         // Setup logging
-
-        Logger.StartLogging();
-        Logger.UpdateRate /= 2;
-        LoggerLine.LogFormat = "[{0}] {1}";
         Logger.AddLogger(new ConsoleLogger());
         Logger.AddLogger(new LighthouseFileLogger());
 
-        Logger.Log("Welcome to Project Lighthouse!", LoggerLevelStartup.Instance);
-        Logger.Log($"You are running version {VersionHelper.FullVersion}", LoggerLevelStartup.Instance);
+        Logger.LogInfo("Welcome to Project Lighthouse!", "Startup");
+        Logger.LogInfo($"You are running version {VersionHelper.FullVersion}", "Startup");
 
         // Referencing ServerSettings.Instance here loads the config, see ServerSettings.cs for more information
-        Logger.Log("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LoggerLevelStartup.Instance);
+        Logger.LogSuccess("Loaded config file version " + ServerSettings.Instance.ConfigVersion, "Startup");
 
-        Logger.Log("Determining if the database is available...", LoggerLevelStartup.Instance);
+        Logger.LogInfo("Determining if the database is available...", "Startup");
         bool dbConnected = ServerStatics.DbConnected;
-        Logger.Log(dbConnected ? "Connected to the database." : "Database unavailable! Exiting.", LoggerLevelStartup.Instance);
+        if (!dbConnected)
+        {
+            Logger.LogError("Database unavailable! Exiting.", "Startup");
+        }
+        else
+        {
+            Logger.LogSuccess("Connected to the database.", "Startup");
+        }
 
         if (!dbConnected) Environment.Exit(1);
         using Database database = new();
 
-        Logger.Log("Migrating database...", LoggerLevelDatabase.Instance);
+        Logger.LogInfo("Migrating database...", "Database");
         MigrateDatabase(database);
 
         if (ServerSettings.Instance.InfluxEnabled)
         {
-            Logger.Log("Influx logging is enabled. Starting influx logging...", LoggerLevelStartup.Instance);
+            Logger.LogInfo("Influx logging is enabled. Starting influx logging...", "Startup");
             InfluxHelper.StartLogging().Wait();
             if (ServerSettings.Instance.InfluxLoggingEnabled) Logger.AddLogger(new InfluxLogger());
         }
 
-        #if DEBUG
-        Logger.Log
+        Logger.LogDebug
         (
             "This is a debug build, so performance may suffer! " +
             "If you are running Lighthouse in a production environment, " +
             "it is highly recommended to run a release build. ",
-            LoggerLevelStartup.Instance
+            "Startup"
         );
-        Logger.Log("You can do so by running any dotnet command with the flag: \"-c Release\". ", LoggerLevelStartup.Instance);
-        #endif
+        Logger.LogDebug("You can do so by running any dotnet command with the flag: \"-c Release\". ", "Startup");
 
         if (args.Length != 0)
         {
@@ -72,11 +74,11 @@ public static class Program
 
         if (ServerSettings.Instance.ConvertAssetsOnStartup) FileHelper.ConvertAllTexturesToPng();
 
-        Logger.Log("Starting room cleanup thread...", LoggerLevelStartup.Instance);
+        Logger.LogInfo("Starting room cleanup thread...", "Startup");
         RoomHelper.StartCleanupThread();
 
         stopwatch.Stop();
-        Logger.Log($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LoggerLevelStartup.Instance);
+        Logger.LogSuccess($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", "Startup");
 
         CreateHostBuilder(args).Build().Run();
     }
@@ -89,7 +91,7 @@ public static class Program
         database.Database.MigrateAsync().Wait();
 
         stopwatch.Stop();
-        Logger.Log($"Migration took {stopwatch.ElapsedMilliseconds}ms.", LoggerLevelDatabase.Instance);
+        Logger.LogSuccess($"Migration took {stopwatch.ElapsedMilliseconds}ms.", "Database");
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args)
@@ -108,7 +110,7 @@ public static class Program
                 logging =>
                 {
                     logging.ClearProviders();
-                    logging.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, AspNetToKettuLoggerProvider>());
+                    logging.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, AspNetToLighthouseLoggerProvider>());
                 }
             );
 }

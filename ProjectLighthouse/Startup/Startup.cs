@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -99,11 +98,11 @@ public class Startup
 
         if (string.IsNullOrEmpty(ServerSettings.Instance.ServerDigestKey))
         {
-            Logger.Log
+            Logger.LogWarn
             (
                 "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will also prevent LBP 1, LBP 2, and LBP Vita from working. " +
                 "To increase security, it is recommended that you find and set this variable.",
-                LoggerLevelStartup.Instance
+                "Startup"
             );
             computeDigests = false;
         }
@@ -142,10 +141,10 @@ public class Startup
 
                 requestStopwatch.Stop();
 
-                Logger.Log
+                Logger.LogInfo
                 (
                     $"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}",
-                    LoggerLevelHttp.Instance
+                    "HTTP"
                 );
 
                 #if DEBUG
@@ -153,7 +152,7 @@ public class Startup
                 if (context.Request.Method == "POST")
                 {
                     context.Request.Body.Position = 0;
-                    Logger.Log(await new StreamReader(context.Request.Body).ReadToEndAsync(), LoggerLevelHttp.Instance);
+                    Logger.LogDebug(await new StreamReader(context.Request.Body).ReadToEndAsync(), "HTTP");
                 }
                 #endif
             }

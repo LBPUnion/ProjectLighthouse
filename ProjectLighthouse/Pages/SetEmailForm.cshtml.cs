@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
@@ -72,7 +71,7 @@ public class SetEmailForm : BaseLayout
             }
         );
 
-        Logger.Log($"User {user.Username} (id: {user.UserId}) successfully logged in on web after setting an email address", LoggerLevelLogin.Instance);
+        Logger.LogSuccess($"User {user.Username} (id: {user.UserId}) successfully logged in on web after setting an email address", "Login");
 
         this.Database.WebTokens.Add(webToken);
         await this.Database.SaveChangesAsync();

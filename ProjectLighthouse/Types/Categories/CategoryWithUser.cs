@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Diagnostics;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -14,7 +13,7 @@ public abstract class CategoryWithUser : Category
     public override Slot? GetPreviewSlot(Database database)
     {
         #if DEBUG
-        Logger.Log("tried to get preview slot without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        Logger.LogError("tried to get preview slot without user on CategoryWithUser", "Category");
         if (Debugger.IsAttached) Debugger.Break();
         #endif
         return null;
@@ -24,7 +23,7 @@ public abstract class CategoryWithUser : Category
     public override int GetTotalSlots(Database database)
     {
         #if DEBUG
-        Logger.Log("tried to get total slots without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        Logger.LogError("tried to get total slots without user on CategoryWithUser", "Category");
         if (Debugger.IsAttached) Debugger.Break();
         #endif
         return -1;
@@ -34,7 +33,7 @@ public abstract class CategoryWithUser : Category
     public override IEnumerable<Slot> GetSlots(Database database, int pageStart, int pageSize)
     {
         #if DEBUG
-        Logger.Log("tried to get slots without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        Logger.LogError("tried to get slots without user on CategoryWithUser", "Category");
         if (Debugger.IsAttached) Debugger.Break();
         #endif
         return new List<Slot>();
@@ -42,7 +41,7 @@ public abstract class CategoryWithUser : Category
 
     public new string Serialize(Database database)
     {
-        Logger.Log("tried to serialize without user on CategoryWithUser", LoggerLevelCategory.Instance);
+        Logger.LogError("tried to serialize without user on CategoryWithUser", "Category");
         return string.Empty;
     }
 

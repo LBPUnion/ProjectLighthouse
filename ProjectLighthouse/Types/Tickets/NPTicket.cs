@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -93,12 +92,8 @@ public class NPTicket
 
             reader.ReadUInt16BE(); // Ticket length, we don't care about this
 
-            #if DEBUG
             SectionHeader bodyHeader = reader.ReadSectionHeader();
-            Logger.Log($"bodyHeader.Type is {bodyHeader.Type}", LoggerLevelLogin.Instance);
-            #else
-            reader.ReadSectionHeader();
-            #endif
+            Logger.LogDebug($"bodyHeader.Type is {bodyHeader.Type}", "Login");
 
             switch (npTicket.ticketVersion)
             {
@@ -120,15 +115,13 @@ public class NPTicket
             npTicket.titleId = npTicket.titleId.Substring(0, npTicket.titleId.Length - 3); // Trim _00 at the end
             // Data now (hopefully): BCUS98245
 
-            #if DEBUG
-            Logger.Log($"titleId is {npTicket.titleId}", LoggerLevelLogin.Instance);
-            #endif
+            Logger.LogDebug($"titleId is {npTicket.titleId}", "Login");
 
             npTicket.GameVersion = GameVersionHelper.FromTitleId(npTicket.titleId); // Finally, convert it to GameVersion
 
             if (npTicket.GameVersion == GameVersion.Unknown)
             {
-                Logger.Log($"Could not determine game version from title id {npTicket.titleId}", LoggerLevelLogin.Instance);
+                Logger.LogWarn($"Could not determine game version from title id {npTicket.titleId}", "Login");
                 return null;
             }
 
@@ -145,45 +138,34 @@ public class NPTicket
 
             if (npTicket.Platform == Platform.Unknown)
             {
-                Logger.Log($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LoggerLevelLogin.Instance);
+                Logger.LogWarn($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", "Login");
                 return null;
             }
 
             #if DEBUG
-            Logger.Log("npTicket data:", LoggerLevelLogin.Instance);
-            foreach (string line in JsonSerializer.Serialize(npTicket).Split('\n'))
-            {
-                Logger.Log(line, LoggerLevelLogin.Instance);
-            }
+            Logger.LogDebug("npTicket data:", "Login");
+            Logger.LogDebug(JsonSerializer.Serialize(npTicket), "Login");
             #endif
 
             return npTicket;
         }
         catch(NotImplementedException)
         {
-            Logger.Log($"The ticket version {npTicket.ticketVersion} is not implemented yet.", LoggerLevelLogin.Instance);
-            Logger.Log
+            Logger.LogError($"The ticket version {npTicket.ticketVersion} is not implemented yet.", "Login");
+            Logger.LogError
             (
                 "Please let us know that this is a ticket version that is actually used on our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues !",
-                LoggerLevelLogin.Instance
+                "Login"
             );
 
             return null;
         }
         catch(Exception e)
         {
-            Logger.Log("Failed to read npTicket!", LoggerLevelLogin.Instance);
-            Logger.Log("Either this is spam data, or the more likely that this is a bug.", LoggerLevelLogin.Instance);
-            Logger.Log
-            (
-                "Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues!",
-                LoggerLevelLogin.Instance
-            );
-
-            foreach (string line in e.ToDetailedException().Split('\n'))
-            {
-                Logger.Log(line, LoggerLevelLogin.Instance);
-            }
+            Logger.LogError("Failed to read npTicket!", "Login");
+            Logger.LogError("Either this is spam data, or the more likely that this is a bug.", "Login");
+            Logger.LogError("Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues!", "Login");
+            Logger.LogError(e.ToDetailedException(), "Login");
             return null;
         }
     }

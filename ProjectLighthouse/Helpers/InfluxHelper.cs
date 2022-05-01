@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using InfluxDB.Client;
 using InfluxDB.Client.Writes;
-using Kettu;
+using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
@@ -49,9 +49,8 @@ public static class InfluxHelper
         }
         catch(Exception e)
         {
-            Logger.Log("Exception while logging: ", LoggerLevelInflux.Instance);
-
-            foreach (string line in e.ToString().Split("\n")) Logger.Log(line, LoggerLevelInflux.Instance);
+            Logger.LogError("Exception while logging: ", "InfluxDB");
+            Logger.LogError(e.ToDetailedException(), "InfluxDB");
         }
     }
 
@@ -59,7 +58,7 @@ public static class InfluxHelper
     public static async Task StartLogging()
     {
         await Client.ReadyAsync();
-        Logger.Log("InfluxDB is now ready.", LoggerLevelInflux.Instance);
+        Logger.LogSuccess("InfluxDB is now ready.", "InfluxDB");
         Thread t = new
         (
             delegate()
@@ -72,9 +71,8 @@ public static class InfluxHelper
                     }
                     catch(Exception e)
                     {
-                        Logger.Log("Exception while running log thread: ", LoggerLevelInflux.Instance);
-
-                        foreach (string line in e.ToString().Split("\n")) Logger.Log(line, LoggerLevelInflux.Instance);
+                        Logger.LogError("Exception while running log thread: ", "InfluxDB");
+                        Logger.LogError(e.ToDetailedException(), "InfluxDB");
                     }
 
                     Thread.Sleep(60000);

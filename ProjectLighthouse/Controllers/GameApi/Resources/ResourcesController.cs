@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -97,27 +96,23 @@ public class ResourcesController : ControllerBase
         // lbp treats code 409 as success and as an indicator that the file is already present
         if (FileHelper.ResourceExists(hash)) this.Conflict();
 
-        Logger.Log($"Processing resource upload (hash: {hash})", LoggerLevelResources.Instance);
+        Logger.LogInfo($"Processing resource upload (hash: {hash})", "Resources");
         LbpFile file = new(await BinaryHelper.ReadFromPipeReader(this.Request.BodyReader));
 
         if (!FileHelper.IsFileSafe(file))
         {
-            Logger.Log($"File is unsafe (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
+            Logger.LogWarn($"File is unsafe (hash: {hash}, type: {file.FileType})", "Resources");
             return this.Conflict();
         }
 
         string calculatedHash = file.Hash;
         if (calculatedHash != hash)
         {
-            Logger.Log
-            (
-                $"File hash does not match the uploaded file! (hash: {hash}, calculatedHash: {calculatedHash}, type: {file.FileType})",
-                LoggerLevelResources.Instance
-            );
+            Logger.LogWarn($"File hash does not match the uploaded file! (hash: {hash}, calculatedHash: {calculatedHash}, type: {file.FileType})", "Resources");
             return this.Conflict();
         }
 
-        Logger.Log($"File is OK! (hash: {hash}, type: {file.FileType})", LoggerLevelResources.Instance);
+        Logger.LogSuccess($"File is OK! (hash: {hash}, type: {file.FileType})", "Resources");
         await IOFile.WriteAllBytesAsync(path, file.Data);
         return this.Ok();
     }

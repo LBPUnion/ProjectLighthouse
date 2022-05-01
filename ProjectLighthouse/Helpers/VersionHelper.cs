@@ -1,5 +1,4 @@
 using System.Linq;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 
@@ -30,11 +29,11 @@ public static class VersionHelper
         }
         catch
         {
-            Logger.Log
+            Logger.LogError
             (
                 "Project Lighthouse was built incorrectly. Please make sure git is available when building. " +
                 "Because of this, you will not be notified of updates.",
-                LoggerLevelStartup.Instance
+                "Startup"
             );
             CommitHash = "invalid";
             Branch = "invalid";
@@ -43,11 +42,11 @@ public static class VersionHelper
 
         if (IsDirty)
         {
-            Logger.Log
+            Logger.LogWarn
             (
                 "This is a modified version of Project Lighthouse. " +
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
-                LoggerLevelStartup.Instance
+                "Startup"
             );
             CanCheckForUpdates = false;
         }
@@ -67,6 +66,6 @@ public static class VersionHelper
     #elif RELEASE
         "Release";
     #else
-            "Unknown";
+         "Unknown";
     #endif
 }

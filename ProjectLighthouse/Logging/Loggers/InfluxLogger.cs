@@ -1,21 +1,18 @@
 using InfluxDB.Client;
 using InfluxDB.Client.Writes;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 
-namespace LBPUnion.ProjectLighthouse.Logging;
+namespace LBPUnion.ProjectLighthouse.Logging.Loggers;
 
-public class InfluxLogger : LoggerBase
+public class InfluxLogger : ILogger
 {
-    public override bool AllowMultiple => false;
-
-    public override void Send(LoggerLine line)
+    public void Log(LogLine line)
     {
-        string channel = string.IsNullOrEmpty(line.LoggerLevel.Channel) ? "" : $"[{line.LoggerLevel.Channel}] ";
+        string channel = string.IsNullOrEmpty(line.Area) ? "" : $"[{line.Area}] ";
 
-        string level = $"{$"{line.LoggerLevel.Name} {channel}".TrimEnd()}";
-        string content = line.LineData;
+        string level = $"{$"{channel} {line}".TrimEnd()}";
+        string content = line.Message;
 
         using WriteApi writeApi = InfluxHelper.Client.GetWriteApi();
 

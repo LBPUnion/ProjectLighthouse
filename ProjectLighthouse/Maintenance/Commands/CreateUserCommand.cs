@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Kettu;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
@@ -25,17 +24,17 @@ public class CreateUserCommand : ICommand
         if (user == null)
         {
             user = await this._database.CreateUser(onlineId, CryptoHelper.BCryptHash(password));
-            Logger.Log($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LoggerLevelLogin.Instance);
+            Logger.LogSuccess($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", "Login");
 
             user.PasswordResetRequired = true;
-            Logger.Log("This user will need to reset their password when they log in.", LoggerLevelLogin.Instance);
+            Logger.LogInfo("This user will need to reset their password when they log in.", "Login");
 
             await this._database.SaveChangesAsync();
-            Logger.Log("Database changes saved.", LoggerLevelDatabase.Instance);
+            Logger.LogInfo("Database changes saved.", "Database");
         }
         else
         {
-            Logger.Log("A user with this username already exists.", LoggerLevelLogin.Instance);
+            Logger.LogError("A user with this username already exists.", "Login");
         }
     }
 
