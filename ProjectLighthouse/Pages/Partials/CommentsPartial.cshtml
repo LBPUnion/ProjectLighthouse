@@ -28,6 +28,10 @@
             </div>
             <input type="submit" class="ui blue button">
         </form>
+        @if (Model.Comments.Count > 0)
+        {
+            <div class="ui divider"></div>
+        }
     }
 
     @for(int i = 0; i < Model.Comments.Count; i++)

@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,27 @@ public class SlotsPage : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
+        string? targetAuthor = null;
+        GameVersion? targetGame = null;
+        StringBuilder finalSearch = new();
+        foreach (string part in name.Split(" "))
+        {
+            if (part.Contains("by:"))
+            {
+                targetAuthor = part.Replace("by:", "");
+            } else if (part.Contains("game:"))
+            {
+                if (part.Contains('1')) targetGame = GameVersion.LittleBigPlanet1;
+                else if (part.Contains('2')) targetGame = GameVersion.LittleBigPlanet2;
+                else if (part.Contains('3')) targetGame = GameVersion.LittleBigPlanet3;
+                else if (part.Contains('v')) targetGame = GameVersion.LittleBigPlanetVita;
+            }
+            else
+            {
+                finalSearch.Append(part);
+            }
+        }
+
         this.SearchValue = name.Trim();
 
         this.SlotCount = await this.Database.Slots.CountAsync(p => p.Name.Contains(this.SearchValue));
@@ -41,11 +64,15 @@ public class SlotsPage : BaseLayout
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount) return this.Redirect($"/slots/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
         this.Slots = await this.Database.Slots.Include(p => p.Creator)
-            .Where(p => p.Name.Contains(this.SearchValue))
+            .Where(p => p.Name.Contains(finalSearch.ToString()))
+            .Where(p => p.Creator != null && (targetAuthor == null || string.Equals(p.Creator.Username.ToLower(), targetAuthor.ToLower())))
+            .Where(p => targetGame == null || p.GameVersion == targetGame)
             .OrderByDescending(p => p.FirstUploaded)
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)
             .ToListAsync();
+
+        this.SlotCount = this.Slots.Count;
 
         return this.Page();
     }

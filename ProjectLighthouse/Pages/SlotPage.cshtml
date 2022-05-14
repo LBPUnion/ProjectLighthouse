@@ -79,8 +79,9 @@
             {
                 int count = Model.Reviews.Count;
                 <p>There @(count == 1 ? "is" : "are") @count review@(count == 1 ? "" : "s").</p>
+                <div class="ui divider"></div>
             }
-            <div class="ui divider"></div>
+
 
             @for (int i = 0; i < Model.Reviews.Count; i++)
             {
@@ -148,7 +149,7 @@
                             else
                             {
                                 {
-                                    <p>@review.Text</p>
+                                    <p>@HttpUtility.HtmlDecode(review.Text)</p>
                                 }
                             }
                         }
