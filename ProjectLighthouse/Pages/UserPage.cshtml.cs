@@ -15,7 +15,7 @@ public class UserPage : BaseLayout
 {
     public List<Comment>? Comments;
 
-    public bool CommentsEnabled = ServerSettings.Instance.ProfileCommentsEnabled;
+    public bool CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
 
     public bool IsProfileUserHearted;
 
@@ -45,14 +45,15 @@ public class UserPage : BaseLayout
         }
 
         if (this.User == null) return this.Page();
-        
+
         foreach (Comment c in this.Comments)
         {
-           Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.TargetId == c.CommentId);
-           if (reaction != null) c.YourThumb = reaction.Rating;
+            Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.TargetId == c.CommentId);
+            if (reaction != null) c.YourThumb = reaction.Rating;
         }
         this.IsProfileUserHearted = await this.Database.HeartedProfiles.FirstOrDefaultAsync
-            (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId) != null;        
+                                        (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId) !=
+                                    null;
 
         return this.Page();
     }

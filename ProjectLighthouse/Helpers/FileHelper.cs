@@ -20,7 +20,7 @@ public static class FileHelper
 
     public static bool IsFileSafe(LbpFile file)
     {
-        if (!ServerSettings.Instance.CheckForUnsafeFiles) return true;
+        if (!ServerConfiguration.Instance.CheckForUnsafeFiles) return true;
 
         if (file.FileType == LbpFileType.Unknown) return false;
 

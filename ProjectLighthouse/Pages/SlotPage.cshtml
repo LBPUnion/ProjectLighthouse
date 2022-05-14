@@ -83,7 +83,7 @@
             }
 
 
-            @for (int i = 0; i < Model.Reviews.Count; i++)
+            @for(int i = 0; i < Model.Reviews.Count; i++)
             {
                 Review review = Model.Reviews[i];
                 string faceHash = review.Thumb switch {
@@ -96,9 +96,8 @@
 
                 if (string.IsNullOrWhiteSpace(faceHash))
                 {
-                    faceHash = ServerSettings.Instance.MissingIconHash;
+                    faceHash = ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash;
                 }
-
 
                 string faceAlt = review.Thumb switch {
                     -1 => "Boo!",
@@ -112,7 +111,7 @@
 
                 <div class="card">
                     <div>
-                        <img class="cardIcon slotCardIcon" src="@ServerSettings.Instance.ExternalUrl/gameAssets/@faceHash" alt="@faceAlt" title="@faceAlt" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
+                        <img class="cardIcon slotCardIcon" src="@ServerConfiguration.Instance.ExternalUrl/gameAssets/@faceHash" alt="@faceAlt" title="@faceAlt" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
                     </div>
                     <div class="cardStats">
                         <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>

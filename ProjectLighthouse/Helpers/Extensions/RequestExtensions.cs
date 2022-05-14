@@ -26,7 +26,7 @@ public static class RequestExtensions
 
     public static async Task<bool> CheckCaptchaValidity(this HttpRequest request)
     {
-        if (ServerSettings.Instance.HCaptchaEnabled)
+        if (ServerConfiguration.Instance.Captcha.CaptchaEnabled)
         {
             bool gotCaptcha = request.Form.TryGetValue("h-captcha-response", out StringValues values);
             if (!gotCaptcha) return false;

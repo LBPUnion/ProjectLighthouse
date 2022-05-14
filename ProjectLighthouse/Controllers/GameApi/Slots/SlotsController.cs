@@ -42,7 +42,7 @@ public class SlotsController : ControllerBase
             this.database.Slots.ByGameVersion(gameVersion, token.UserId == user.UserId, true)
                 .Where(s => s.Creator!.Username == user.Username)
                 .Skip(pageStart - 1)
-                .Take(Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)),
+                .Take(Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)),
             string.Empty,
             (current, slot) => current + slot.Serialize(token.GameVersion)
         );
@@ -56,7 +56,7 @@ public class SlotsController : ControllerBase
                 new Dictionary<string, object>
                 {
                     {
-                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
                         "total", user.UsedSlots
@@ -135,7 +135,7 @@ public class SlotsController : ControllerBase
                 new Dictionary<string, object>
                 {
                     {
-                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
                         "total", await StatisticsHelper.SlotCount()
@@ -169,7 +169,7 @@ public class SlotsController : ControllerBase
                 new Dictionary<string, object>
                 {
                     {
-                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
                         "total", await StatisticsHelper.TeamPickCount()
@@ -200,7 +200,7 @@ public class SlotsController : ControllerBase
                 new Dictionary<string, object>
                 {
                     {
-                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
                         "total", await StatisticsHelper.SlotCount()
@@ -244,7 +244,7 @@ public class SlotsController : ControllerBase
                 new Dictionary<string, object>
                 {
                     {
-                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
                         "total", await StatisticsHelper.SlotCount()
@@ -302,7 +302,7 @@ public class SlotsController : ControllerBase
                 new Dictionary<string, object>
                 {
                     {
-                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
                         "total", await StatisticsHelper.SlotCount()
@@ -346,7 +346,7 @@ public class SlotsController : ControllerBase
                 new Dictionary<string, object>
                 {
                     {
-                        "hint_start", pageStart + Math.Min(pageSize, ServerSettings.Instance.EntitledSlots)
+                        "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
                         "total", await StatisticsHelper.SlotCount()

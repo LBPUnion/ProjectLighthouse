@@ -21,7 +21,7 @@ public class AuthenticationPage : BaseLayout
 
     public IActionResult OnGet()
     {
-        if (!ServerSettings.Instance.UseExternalAuth) return this.NotFound();
+        if (!ServerConfiguration.Instance.Authentication.UseExternalAuth) return this.NotFound();
         if (this.User == null) return this.StatusCode(403, "");
 
         this.IpAddress = this.HttpContext.Connection.RemoteIpAddress;

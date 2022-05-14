@@ -22,7 +22,7 @@ public class RegisterForm : BaseLayout
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
     public async Task<IActionResult> OnPost(string username, string password, string confirmPassword, string emailAddress)
     {
-        if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
+        if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled) return this.NotFound();
 
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -36,7 +36,7 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        if (string.IsNullOrWhiteSpace(emailAddress) && ServerSettings.Instance.SMTPEnabled)
+        if (string.IsNullOrWhiteSpace(emailAddress) && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             this.Error = "Email address field is required.";
             return this.Page();
@@ -54,7 +54,7 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        if (ServerSettings.Instance.SMTPEnabled &&
+        if (ServerConfiguration.Instance.Mail.MailEnabled &&
             await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress.ToLower() == emailAddress.ToLower()) != null)
         {
             this.Error = "The email address you've chosen is already taken.";
@@ -80,7 +80,7 @@ public class RegisterForm : BaseLayout
 
         this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
 
-        if (ServerSettings.Instance.SMTPEnabled) return this.Redirect("~/login/sendVerificationEmail");
+        if (ServerConfiguration.Instance.Mail.MailEnabled) return this.Redirect("~/login/sendVerificationEmail");
 
         return this.RedirectToPage(nameof(LandingPage));
     }
@@ -90,7 +90,7 @@ public class RegisterForm : BaseLayout
     public IActionResult OnGet()
     {
         this.Error = string.Empty;
-        if (!ServerSettings.Instance.RegistrationEnabled) return this.NotFound();
+        if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled) return this.NotFound();
 
         return this.Page();
     }

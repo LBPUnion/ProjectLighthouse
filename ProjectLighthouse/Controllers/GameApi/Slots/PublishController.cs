@@ -56,7 +56,7 @@ public class PublishController : ControllerBase
             if (oldSlot == null) return this.NotFound();
             if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
         }
-        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerSettings.Instance.EntitledSlots)
+        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
@@ -167,7 +167,7 @@ public class PublishController : ControllerBase
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
-        if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerSettings.Instance.EntitledSlots)
+        if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
@@ -198,7 +198,7 @@ public class PublishController : ControllerBase
         await WebhookHelper.SendWebhook
         (
             "New level published!",
-            $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerSettings.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}"
+            $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}"
         );
 
         return this.Ok(slot.Serialize(gameToken.GameVersion));
@@ -232,7 +232,7 @@ public class PublishController : ControllerBase
 
         XmlSerializer serializer = new(typeof(Slot));
         Slot? slot = (Slot?)serializer.Deserialize(new StringReader(bodyString));
-        
+
         SanitizationHelper.SanitizeStringsInClass(slot);
 
         return slot;

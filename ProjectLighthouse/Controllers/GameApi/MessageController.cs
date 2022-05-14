@@ -41,7 +41,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        return this.Ok($"{license}\n{ServerSettings.Instance.EulaText}");
+        return this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
     }
 
     [HttpGet("announce")]
@@ -60,7 +60,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         GameToken gameToken = userAndToken.Value.Item2;
         #endif
 
-        string announceText = ServerSettings.Instance.AnnounceText;
+        string announceText = ServerConfiguration.Instance.AnnounceText;
 
         announceText = announceText.Replace("%user", user.Username);
         announceText = announceText.Replace("%id", user.UserId.ToString());

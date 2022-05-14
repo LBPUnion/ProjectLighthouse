@@ -14,7 +14,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class InfluxHelper
 {
-    public static readonly InfluxDBClient Client = InfluxDBClientFactory.Create(ServerSettings.Instance.InfluxUrl, ServerSettings.Instance.InfluxToken);
+    public static readonly InfluxDBClient Client = InfluxDBClientFactory.Create
+        (url: ServerConfiguration.Instance.InfluxDB.Url, token: ServerConfiguration.Instance.InfluxDB.Token);
 
     private static readonly List<GameVersion> gameVersions = new()
     {
@@ -40,10 +41,10 @@ public static class InfluxHelper
                     .Tag("game", gameVersion.ToString())
                     .Field("playerCountGame", await StatisticsHelper.RecentMatchesForGame(gameVersion));
 
-                writeApi.WritePoint(gamePoint, ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg);
+                writeApi.WritePoint(gamePoint, ServerConfiguration.Instance.InfluxDB.Bucket, ServerConfiguration.Instance.InfluxDB.Organization);
             }
 
-            writeApi.WritePoint(point, ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg);
+            writeApi.WritePoint(point, ServerConfiguration.Instance.InfluxDB.Bucket, ServerConfiguration.Instance.InfluxDB.Organization);
 
             writeApi.Flush();
         }

@@ -12,7 +12,7 @@
 @if (Model.User != null)
 {
     <p>You are currently logged in as <b>@Model.User.Username</b>.</p>
-    if (ServerSettings.Instance.UseExternalAuth && Model.AuthenticationAttemptsCount > 0)
+    if (ServerConfiguration.Instance.Authentication.UseExternalAuth && Model.AuthenticationAttemptsCount > 0)
     {
         <p>
             <b>You have @Model.AuthenticationAttemptsCount authentication attempts pending. Click <a href="/authentication">here</a> to view them.</b>

@@ -81,9 +81,9 @@ public class LoginController : ControllerBase
             return this.StatusCode(403, "");
         }
 
-        if (ServerSettings.Instance.UseExternalAuth)
+        if (ServerConfiguration.Instance.Authentication.UseExternalAuth)
         {
-            if (ServerSettings.Instance.BlockDeniedUsers)
+            if (ServerConfiguration.Instance.Authentication.BlockDeniedUsers)
             {
                 string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
                 if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3)

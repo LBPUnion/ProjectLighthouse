@@ -1,6 +1,6 @@
 @using LBPUnion.ProjectLighthouse.Types.Settings
-@if (ServerSettings.Instance.HCaptchaEnabled)
+@if (ServerConfiguration.Instance.Captcha.CaptchaEnabled)
 {
-    <div class="h-captcha" data-sitekey="@ServerSettings.Instance.HCaptchaSiteKey"></div>
+    <div class="h-captcha" data-sitekey="@ServerConfiguration.Instance.Captcha.SiteKey"></div>
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 }

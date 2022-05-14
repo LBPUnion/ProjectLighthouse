@@ -11,7 +11,7 @@
     }
     else
     {
-        if (ServerSettings.Instance.UseExternalAuth)
+        if (ServerConfiguration.Instance.Authentication.UseExternalAuth)
         {
             Model.NavigationItems.Add(new PageNavigationItem("Authentication", "/authentication", "key"));
         }
@@ -62,16 +62,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     @* Google Analytics *@
-    @if (ServerSettings.Instance.GoogleAnalyticsEnabled)
+    @if (ServerConfiguration.Instance.GoogleAnalytics.AnalyticsEnabled)
     {
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=@ServerSettings.Instance.GoogleAnalyticsId"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=@ServerConfiguration.Instance.GoogleAnalytics.Id"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', '@ServerSettings.Instance.GoogleAnalyticsId');
+            gtag('config', '@ServerConfiguration.Instance.GoogleAnalytics.Id');
         </script>
     }
 </head>

@@ -37,7 +37,7 @@ public class DebugWarmupLifetime : IHostLifetime
     {
         using HttpClient client = new();
 
-        string url = ServerSettings.Instance.ServerListenUrl;
+        string url = ServerConfiguration.Instance.ListenUrl;
         url = url.Replace("0.0.0.0", "127.0.0.1");
 
         Logger.LogDebug("Warming up Hot Reload...", LogArea.Startup);

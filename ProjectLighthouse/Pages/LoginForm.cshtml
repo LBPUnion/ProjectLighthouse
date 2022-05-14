@@ -50,13 +50,13 @@
         </div>
     </div>
 
-    @if (ServerSettings.Instance.HCaptchaEnabled)
+    @if (ServerConfiguration.Instance.Captcha.CaptchaEnabled)
     {
         @await Html.PartialAsync("Partials/CaptchaPartial")
     }
 
     <input type="submit" value="Log in" id="submit" class="ui blue button">
-    @if (ServerSettings.Instance.RegistrationEnabled)
+    @if (ServerConfiguration.Instance.Authentication.RegistrationEnabled)
     {
         <a href="/register">
             <div class="ui button">
