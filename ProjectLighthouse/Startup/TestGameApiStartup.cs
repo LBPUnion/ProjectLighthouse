@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace LBPUnion.ProjectLighthouse.Startup;
 
-public class TestStartup : Startup
+public class TestGameApiStartup : GameApiStartup
 {
-    public TestStartup(IConfiguration configuration) : base(configuration)
+    public TestGameApiStartup(IConfiguration configuration) : base(configuration)
     {}
 
     public override void Configure(IApplicationBuilder app, IWebHostEnvironment env)

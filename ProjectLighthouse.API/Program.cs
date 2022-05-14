@@ -1,21 +1,15 @@
-#nullable enable
 using LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
-using LBPUnion.ProjectLighthouse.Startup;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace LBPUnion.ProjectLighthouse;
+namespace LBPUnion.ProjectLighthouse.API;
 
 public static class Program
 {
     public static void Main(string[] args)
     {
-        StartupTasks.Run(args, ServerType.GameApi);
+        StartupTasks.Run(args, ServerType.Api);
 
         CreateHostBuilder(args).Build().Run();
     }
@@ -26,8 +20,7 @@ public static class Program
             (
                 webBuilder =>
                 {
-                    webBuilder.UseStartup<GameApiStartup>();
-                    webBuilder.UseWebRoot("StaticFiles");
+                    webBuilder.UseStartup<ApiStartup>();
                     webBuilder.UseUrls(ServerConfiguration.Instance.ListenUrl);
                 }
             )

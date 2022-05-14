@@ -1,30 +1,27 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Startup.Middlewares;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
-using Microsoft.OpenApi.Models;
 #if RELEASE
 using Microsoft.Extensions.Hosting.Internal;
 #endif
 
 namespace LBPUnion.ProjectLighthouse.Startup;
 
-public class Startup
+public class GameApiStartup
 {
-    public Startup(IConfiguration configuration)
+    public GameApiStartup(IConfiguration configuration)
     {
         this.Configuration = configuration;
     }
@@ -60,30 +57,6 @@ public class Startup
             }
         );
 
-        services.AddSwaggerGen
-        (
-            c =>
-            {
-                // Give swagger the name and version of our project
-                c.SwaggerDoc
-                (
-                    "v1",
-                    new OpenApiInfo
-                    {
-                        Title = "Project Lighthouse API",
-                        Version = "v1",
-                    }
-                );
-
-                // Filter out endpoints not in /api/v1
-                c.DocumentFilter<SwaggerFilter>();
-
-                // Add XMLDoc to swagger
-                string xmlDocs = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlDocs));
-            }
-        );
-
         #if DEBUG
         services.AddSingleton<IHostLifetime, DebugWarmupLifetime>();
         #else
@@ -113,50 +86,7 @@ public class Startup
 
         app.UseForwardedHeaders();
 
-        app.UseSwagger();
-        app.UseSwaggerUI
-        (
-            c =>
-            {
-                c.SwaggerEndpoint("v1/swagger.json", "Project Lighthouse API");
-            }
-        );
-
-        // Logs every request and the response to it
-        // Example: "200, 13ms: GET /LITTLEBIGPLANETPS3_XML/news"
-        // Example: "404, 127ms: GET /asdasd?query=osucookiezi727ppbluezenithtopplayhdhr"
-        app.Use
-        (
-            async (context, next) =>
-            {
-                Stopwatch requestStopwatch = new();
-                requestStopwatch.Start();
-
-                context.Request.EnableBuffering(); // Allows us to reset the position of Request.Body for later logging
-
-                // Log all headers.
-//                    foreach (KeyValuePair<string, StringValues> header in context.Request.Headers) Logger.Log($"{header.Key}: {header.Value}");
-
-                await next(context); // Handle the request so we can get the status code from it
-
-                requestStopwatch.Stop();
-
-                Logger.LogInfo
-                (
-                    $"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}",
-                    LogArea.HTTP
-                );
-
-                #if DEBUG
-                // Log post body
-                if (context.Request.Method == "POST")
-                {
-                    context.Request.Body.Position = 0;
-                    Logger.LogDebug(await new StreamReader(context.Request.Body).ReadToEndAsync(), LogArea.HTTP);
-                }
-                #endif
-            }
-        );
+        app.UseMiddleware<RequestLogMiddleware>();
 
         // Digest check
         app.Use

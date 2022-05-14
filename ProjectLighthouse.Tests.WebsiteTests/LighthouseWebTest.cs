@@ -15,7 +15,7 @@ public class LighthouseWebTest : IDisposable
     public readonly string BaseAddress;
 
     public readonly IWebDriver Driver;
-    public readonly IWebHost WebHost = new WebHostBuilder().UseKestrel().UseStartup<TestStartup>().UseWebRoot("StaticFiles").Build();
+    public readonly IWebHost WebHost = new WebHostBuilder().UseKestrel().UseStartup<TestGameApiStartup>().UseWebRoot("StaticFiles").Build();
 
     public LighthouseWebTest()
     {

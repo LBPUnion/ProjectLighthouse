@@ -22,7 +22,7 @@ public class LighthouseServerTest
 
     public LighthouseServerTest()
     {
-        this.Server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
+        this.Server = new TestServer(new WebHostBuilder().UseStartup<TestGameApiStartup>());
         this.Client = this.Server.CreateClient();
     }
     public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
