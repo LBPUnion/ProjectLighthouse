@@ -1,17 +1,18 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="Lighthouse" type="DotNetProject" factoryName=".NET Project">
-        <option name="EXE_PATH" value="$PROJECT_DIR$/ProjectLighthouse/bin/Debug/net6.0/LBPUnion.ProjectLighthouse"/>
+    <configuration default="false" name="Lighthouse Website" type="DotNetProject" factoryName=".NET Project">
+        <option name="EXE_PATH"
+                value="$PROJECT_DIR$/ProjectLighthouse.Website/bin/Debug/net6.0/LBPUnion.ProjectLighthouse.Website"/>
         <option name="PROGRAM_PARAMETERS" value=""/>
         <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ProjectLighthouse"/>
         <option name="PASS_PARENT_ENVS" value="1"/>
         <option name="USE_EXTERNAL_CONSOLE" value="0"/>
         <option name="USE_MONO" value="0"/>
         <option name="RUNTIME_ARGUMENTS" value=""/>
-        <option name="PROJECT_PATH" value="$PROJECT_DIR$/ProjectLighthouse/ProjectLighthouse.csproj"/>
+        <option name="PROJECT_PATH" value="$PROJECT_DIR$/ProjectLighthouse.Website/ProjectLighthouse.Website.csproj"/>
         <option name="PROJECT_EXE_PATH_TRACKING" value="1"/>
         <option name="PROJECT_ARGUMENTS_TRACKING" value="1"/>
-        <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1"/>
-        <option name="PROJECT_KIND" value="Unloaded"/>
+        <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="0"/>
+        <option name="PROJECT_KIND" value="DotNetCore"/>
         <option name="PROJECT_TFM" value="net6.0"/>
         <method v="2">
             <option name="RunConfigurationTask" enabled="true" run_configuration_name="Development Database"
