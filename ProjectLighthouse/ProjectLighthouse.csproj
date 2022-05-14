@@ -51,14 +51,6 @@
         <EmbeddedResource Include="chatCensoredList.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="recent-activity.xml" />
-        <None Remove="r.tar.gz" />
-        <None Remove="lighthouse.yml"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Remove="Migrations\20220301204930_AddEmailVerificationTokens.Designer.cs" />
-        <Compile Remove="Helpers\EulaHelper.cs"/>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
