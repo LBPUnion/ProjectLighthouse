@@ -1,11 +1,9 @@
-using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Api;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Controllers.Api;
+namespace LBPUnion.ProjectLighthouse.API.Controllers;
 
 /// <summary>
 /// A collection of endpoints relating to statistics.

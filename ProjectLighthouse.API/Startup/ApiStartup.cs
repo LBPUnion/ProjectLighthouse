@@ -3,7 +3,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Startup.Middlewares;
 using Microsoft.OpenApi.Models;
 
-namespace LBPUnion.ProjectLighthouse.API;
+namespace LBPUnion.ProjectLighthouse.API.Startup;
 
 public class ApiStartup
 {

@@ -1,14 +1,12 @@
 #nullable enable
-using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 // ReSharper disable RouteTemplates.ActionRoutePrefixCanBeExtractedToControllerRoute
 
-namespace LBPUnion.ProjectLighthouse.Controllers.Api;
+namespace LBPUnion.ProjectLighthouse.API.Controllers;
 
 /// <summary>
 /// A collection of endpoints relating to users.

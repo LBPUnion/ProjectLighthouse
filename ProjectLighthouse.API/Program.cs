@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.API.Startup;
 using LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
