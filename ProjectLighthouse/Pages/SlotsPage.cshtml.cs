@@ -56,7 +56,11 @@ public class SlotsPage : BaseLayout
 
         this.SearchValue = name.Trim();
 
-        this.SlotCount = await this.Database.Slots.CountAsync(p => p.Name.Contains(this.SearchValue));
+        this.SlotCount = await this.Database.Slots.Include(p => p.Creator)
+            .Where(p => p.Name.Contains(finalSearch.ToString()))
+            .Where(p => p.Creator != null && (targetAuthor == null || string.Equals(p.Creator.Username.ToLower(), targetAuthor.ToLower())))
+            .Where(p => targetGame == null || p.GameVersion == targetGame)
+            .CountAsync();
 
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.SlotCount / ServerStatics.PageSize));
@@ -71,8 +75,6 @@ public class SlotsPage : BaseLayout
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)
             .ToListAsync();
-
-        this.SlotCount = this.Slots.Count;
 
         return this.Page();
     }
