@@ -32,11 +32,6 @@ public class GameApiStartup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
-        #if DEBUG
-        services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation();
-        #else
-        services.AddRazorPages().WithRazorPagesAtContentRoot();
-        #endif
 
         services.AddMvc
         (
@@ -193,8 +188,6 @@ public class GameApiStartup
         );
 
         app.UseRouting();
-
-        app.UseStaticFiles();
 
         app.UseEndpoints(endpoints => endpoints.MapControllers());
         app.UseEndpoints(endpoints => endpoints.MapRazorPages());

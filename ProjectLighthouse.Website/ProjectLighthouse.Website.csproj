@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AssemblyName>LBPUnion.ProjectLighthouse.Website</AssemblyName>
+        <RootNamespace>LBPUnion.ProjectLighthouse.Website</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="gitVersion.txt"/>
+        <EmbeddedResource Include="gitVersion.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="gitBranch.txt"/>
+        <EmbeddedResource Include="gitBranch.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="gitRemotes.txt"/>
+        <EmbeddedResource Include="gitRemotes.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="gitUnpushed.txt"/>
+        <EmbeddedResource Include="gitUnpushed.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="Pages\Admin\AdminBanUserPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Admin\AdminPanelPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Admin\AdminPanelUsersPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Admin\AdminSetGrantedSlotsPage.cshtml"/>
+        <AdditionalFiles Include="Pages\CompleteEmailVerificationPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Debug\FilterTestPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Debug\RoomVisualizerPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Debug\VersionInfoPage.cshtml"/>
+        <AdditionalFiles Include="Pages\ExternalAuth\AuthenticationPage.cshtml"/>
+        <AdditionalFiles Include="Pages\ExternalAuth\ManageUserApprovedIpAddressesPage.cshtml"/>
+        <AdditionalFiles Include="Pages\LandingPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Layouts\BaseLayout.cshtml"/>
+        <AdditionalFiles Include="Pages\LoginForm.cshtml"/>
+        <AdditionalFiles Include="Pages\LogoutPage.cshtml"/>
+        <AdditionalFiles Include="Pages\Partials\AdminPanelStatisticPartial.cshtml"/>
+        <AdditionalFiles Include="Pages\Partials\AdminSetGrantedSlotsFormPartial.cshtml"/>
+        <AdditionalFiles Include="Pages\Partials\CaptchaPartial.cshtml"/>
+        <AdditionalFiles Include="Pages\Partials\CommentsPartial.cshtml"/>
+        <AdditionalFiles Include="Pages\Partials\PhotoPartial.cshtml"/>
+        <AdditionalFiles Include="Pages\Partials\SlotCardPartial.cshtml"/>
+        <AdditionalFiles Include="Pages\Partials\UserCardPartial.cshtml"/>
+        <AdditionalFiles Include="Pages\PasswordResetPage.cshtml"/>
+        <AdditionalFiles Include="Pages\PasswordResetRequiredPage.cshtml"/>
+        <AdditionalFiles Include="Pages\PhotosPage.cshtml"/>
+        <AdditionalFiles Include="Pages\RegisterForm.cshtml"/>
+        <AdditionalFiles Include="Pages\ReportsPage.cshtml"/>
+        <AdditionalFiles Include="Pages\SendVerificationEmailPage.cshtml"/>
+        <AdditionalFiles Include="Pages\SetEmailForm.cshtml"/>
+        <AdditionalFiles Include="Pages\SlotPage.cshtml"/>
+        <AdditionalFiles Include="Pages\SlotsPage.cshtml"/>
+        <AdditionalFiles Include="Pages\UserPage.cshtml"/>
+        <AdditionalFiles Include="Pages\UsersPage.cshtml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.5"/>
+    </ItemGroup>
+
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;"/>
+        <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;"/>
+        <Exec Command="git remote -v &gt; &quot;$(ProjectDir)/gitRemotes.txt&quot;"/>
+        <Exec Command="git log --branches --not --remotes --oneline &gt; &quot;$(ProjectDir)/gitUnpushed.txt&quot;"/>
+    </Target>
+</Project>

@@ -4,6 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>LBPUnion.ProjectLighthouse</AssemblyName>
         <RootNamespace>LBPUnion.ProjectLighthouse</RootNamespace>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,7 +14,6 @@
         <PackageReference Include="InfluxDB.Client" Version="4.1.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2022.1.0"/>
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.5"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.5"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.5"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.5">
             <PrivateAssets>all</PrivateAssets>

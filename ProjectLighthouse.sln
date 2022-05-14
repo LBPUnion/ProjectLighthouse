@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse.Tests.Web
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse.API", "ProjectLighthouse.API\ProjectLighthouse.API.csproj", "{5593825E-F5C9-467F-9125-3E3249CFEEAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse.GameAPI", "ProjectLighthouse.GameAPI\ProjectLighthouse.GameAPI.csproj", "{0CD7F64B-7827-4AC9-B7D8-CE371D505544}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectLighthouse.Website", "ProjectLighthouse.Website\ProjectLighthouse.Website.csproj", "{FA9AEA06-D6B5-4E68-8370-DB9188108635}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,14 @@ Global
 		{5593825E-F5C9-467F-9125-3E3249CFEEAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5593825E-F5C9-467F-9125-3E3249CFEEAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5593825E-F5C9-467F-9125-3E3249CFEEAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CD7F64B-7827-4AC9-B7D8-CE371D505544}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CD7F64B-7827-4AC9-B7D8-CE371D505544}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CD7F64B-7827-4AC9-B7D8-CE371D505544}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CD7F64B-7827-4AC9-B7D8-CE371D505544}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA9AEA06-D6B5-4E68-8370-DB9188108635}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA9AEA06-D6B5-4E68-8370-DB9188108635}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA9AEA06-D6B5-4E68-8370-DB9188108635}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA9AEA06-D6B5-4E68-8370-DB9188108635}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AFC74569-B289-4ACC-B21C-313A3A62C017} = {D360C08E-EA47-43AC-A566-FDF413442980}
