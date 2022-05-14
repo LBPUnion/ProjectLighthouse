@@ -22,7 +22,7 @@ public static class Program
                 webBuilder =>
                 {
                     webBuilder.UseStartup<ApiStartup>();
-                    webBuilder.UseUrls(ServerConfiguration.Instance.ListenUrl);
+                    webBuilder.UseUrls(ServerConfiguration.Instance.ApiListenUrl);
                 }
             )
             .ConfigureLogging

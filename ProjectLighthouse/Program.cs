@@ -28,7 +28,7 @@ public static class Program
                 {
                     webBuilder.UseStartup<GameApiStartup>();
                     webBuilder.UseWebRoot("StaticFiles");
-                    webBuilder.UseUrls(ServerConfiguration.Instance.ListenUrl);
+                    webBuilder.UseUrls(ServerConfiguration.Instance.GameApiListenUrl);
                 }
             )
             .ConfigureLogging

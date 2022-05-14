@@ -5,7 +5,7 @@ using Microsoft.OpenApi.Models;
 
 namespace LBPUnion.ProjectLighthouse.API.Startup;
 
-public class ApiStartup
+public sealed class ApiStartup
 {
     public ApiStartup(IConfiguration configuration)
     {
@@ -52,7 +52,7 @@ public class ApiStartup
         );
     }
 
-    public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         #if DEBUG
         app.UseDeveloperExceptionPage();

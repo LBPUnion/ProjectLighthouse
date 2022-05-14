@@ -3,6 +3,7 @@ using System.Diagnostics;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
+using LBPUnion.ProjectLighthouse.Startup;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,10 @@ public static class StartupTasks
         // Log startup time
         Stopwatch stopwatch = new();
         stopwatch.Start();
+
+        #if DEBUG
+        DebugWarmupLifetime.ServerType = serverType;
+        #endif
 
         // Setup logging
         Logger.AddLogger(new ConsoleLogger());

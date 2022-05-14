@@ -22,7 +22,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 1;
+    public const int CurrentConfigVersion = 2;
 
     #region Meta
 
@@ -162,7 +162,13 @@ public class ServerConfiguration
 
     #endregion
 
+    [Obsolete("Obsolete. Use the Website/GameApi/Api listen URLS instead.")]
     public string ListenUrl { get; set; } = "http://localhost:10060";
+
+    public string WebsiteListenUrl { get; set; } = "http://localhost:10060";
+    public string GameApiListenUrl { get; set; } = "http://localhost:10061";
+    public string ApiListenUrl { get; set; } = "http://localhost:10062";
+
     public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
     public string ExternalUrl { get; set; } = "http://localhost:10060";
     public bool ConfigReloading { get; set; }

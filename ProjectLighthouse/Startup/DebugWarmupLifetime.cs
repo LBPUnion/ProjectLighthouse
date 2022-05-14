@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -19,6 +20,7 @@ public class DebugWarmupLifetime : IHostLifetime
     private CancellationTokenRegistration applicationStartedRegistration;
 
     private readonly ConsoleLifetime consoleLifetime;
+    public static ServerType ServerType;
 
     public DebugWarmupLifetime
     (
@@ -37,7 +39,13 @@ public class DebugWarmupLifetime : IHostLifetime
     {
         using HttpClient client = new();
 
-        string url = ServerConfiguration.Instance.ListenUrl;
+        string url = ServerType switch
+        {
+            ServerType.GameApi => ServerConfiguration.Instance.GameApiListenUrl,
+            ServerType.Website => ServerConfiguration.Instance.WebsiteListenUrl,
+            ServerType.Api => ServerConfiguration.Instance.ApiListenUrl,
+        };
+
         url = url.Replace("0.0.0.0", "127.0.0.1");
 
         Logger.LogDebug("Warming up Hot Reload...", LogArea.Startup);
