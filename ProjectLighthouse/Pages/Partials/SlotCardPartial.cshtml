@@ -26,7 +26,7 @@
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
 
     string iconHash = Model.IconHash;
-    if (string.IsNullOrWhiteSpace(iconHash) || iconHash.StartsWith('g')) iconHash = ServerSettings.Instance.MissingIconHash;
+    if (string.IsNullOrWhiteSpace(iconHash) || iconHash.StartsWith('g')) iconHash = ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash;
 }
 <div class="card">
     @{

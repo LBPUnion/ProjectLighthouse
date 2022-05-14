@@ -34,7 +34,7 @@ public class PhotosController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        if (user.PhotosByMe >= ServerSettings.Instance.PhotosQuota) return this.BadRequest();
+        if (user.PhotosByMe >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
 
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -99,7 +99,7 @@ public class PhotosController : ControllerBase
             {
                 Title = "New photo uploaded!",
                 Description = $"{user.Username} uploaded a new photo.",
-                ImageUrl = $"{ServerSettings.Instance.ExternalUrl}/gameAssets/{photo.LargeHash}",
+                ImageUrl = $"{ServerConfiguration.Instance.ExternalUrl}/gameAssets/{photo.LargeHash}",
                 Color = WebhookHelper.UnionColor,
             }
         );

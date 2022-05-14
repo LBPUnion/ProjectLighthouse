@@ -289,8 +289,8 @@ public class Slot
                           LbpSerializer.StringElement("yourlbpPlayCount", yourVisitedStats?.PlaysLBP1) +
                           LbpSerializer.StringElement("yourlbp3PlayCount", yourVisitedStats?.PlaysLBP3) +
                           yourReview?.Serialize("yourReview") +
-                          LbpSerializer.StringElement("reviewsEnabled", ServerSettings.Instance.LevelReviewsEnabled) +
-                          LbpSerializer.StringElement("commentsEnabled", ServerSettings.Instance.LevelCommentsEnabled) +
+                          LbpSerializer.StringElement("reviewsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled) +
+                          LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled) +
                           LbpSerializer.StringElement("playerCount", playerCount) +
                           LbpSerializer.StringElement("reviewCount", this.ReviewCount);
 

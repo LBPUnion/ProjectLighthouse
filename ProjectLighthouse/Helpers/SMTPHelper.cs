@@ -12,20 +12,20 @@ public static class SMTPHelper
 
     static SMTPHelper()
     {
-        if (!ServerSettings.Instance.SMTPEnabled) return;
+        if (!ServerConfiguration.Instance.Mail.MailEnabled) return;
 
-        client = new SmtpClient(ServerSettings.Instance.SMTPHost, ServerSettings.Instance.SMTPPort)
+        client = new SmtpClient(ServerConfiguration.Instance.Mail.Host, ServerConfiguration.Instance.Mail.Port)
         {
-            EnableSsl = ServerSettings.Instance.SMTPSsl,
-            Credentials = new NetworkCredential(ServerSettings.Instance.SMTPFromAddress, ServerSettings.Instance.SMTPPassword),
+            EnableSsl = ServerConfiguration.Instance.Mail.UseSSL,
+            Credentials = new NetworkCredential(ServerConfiguration.Instance.Mail.FromAddress, ServerConfiguration.Instance.Mail.Password),
         };
 
-        fromAddress = new MailAddress(ServerSettings.Instance.SMTPFromAddress, ServerSettings.Instance.SMTPFromName);
+        fromAddress = new MailAddress(ServerConfiguration.Instance.Mail.FromAddress, ServerConfiguration.Instance.Mail.FromName);
     }
 
     public static bool SendEmail(string recipientAddress, string subject, string body)
     {
-        if (!ServerSettings.Instance.SMTPEnabled) return false;
+        if (!ServerConfiguration.Instance.Mail.MailEnabled) return false;
 
         MailMessage message = new(fromAddress, new MailAddress(recipientAddress))
         {

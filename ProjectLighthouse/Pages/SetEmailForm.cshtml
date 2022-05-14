@@ -12,7 +12,7 @@
 <form class="ui form" onsubmit="return onSubmit(this)" method="post">
     @Html.AntiForgeryToken()
 
-    @if (ServerSettings.Instance.SMTPEnabled)
+    @if (ServerConfiguration.Instance.Mail.MailEnabled)
     {
         <div class="field">
             <label>Please type a valid email address and verify it:</label>

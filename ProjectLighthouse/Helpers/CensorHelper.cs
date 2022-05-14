@@ -21,7 +21,7 @@ public static class CensorHelper
 
     public static string ScanMessage(string message)
     {
-        if (ServerSettings.Instance.UserInputFilterMode == FilterMode.None) return message;
+        if (ServerConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
 
         int profaneIndex = -1;
 
@@ -44,7 +44,7 @@ public static class CensorHelper
 
         sb.Append(message.AsSpan(0, profanityIndex));
 
-        switch (ServerSettings.Instance.UserInputFilterMode)
+        switch (ServerConfiguration.Instance.UserInputFilterMode)
         {
             case FilterMode.Random:
                 for(int i = 0; i < profanityLength; i++)

@@ -18,8 +18,8 @@ public class SlotPage : BaseLayout
     public List<Comment> Comments = new();
     public List<Review> Reviews = new();
 
-    public readonly bool CommentsEnabled = ServerSettings.Instance.LevelCommentsEnabled;
-    public readonly bool ReviewsEnabled = ServerSettings.Instance.LevelReviewsEnabled;
+    public readonly bool CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
+    public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
 
     public Slot? Slot;
     public SlotPage(Database database) : base(database)

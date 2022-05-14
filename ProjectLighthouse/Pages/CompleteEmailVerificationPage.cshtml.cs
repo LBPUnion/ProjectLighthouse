@@ -18,7 +18,7 @@ public class CompleteEmailVerificationPage : BaseLayout
 
     public async Task<IActionResult> OnGet(string token)
     {
-        if (!ServerSettings.Instance.SMTPEnabled) return this.NotFound();
+        if (!ServerConfiguration.Instance.Mail.MailEnabled) return this.NotFound();
 
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");

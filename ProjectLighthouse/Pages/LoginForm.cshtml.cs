@@ -65,7 +65,7 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        if (user.EmailAddress == null && ServerSettings.Instance.SMTPEnabled)
+        if (user.EmailAddress == null && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             Logger.LogWarn($"User {user.Username} (id: {user.UserId}) failed to login; email not set", LogArea.Login);
 
@@ -104,7 +104,7 @@ public class LoginForm : BaseLayout
         Logger.LogSuccess($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LogArea.Login);
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
-        if (ServerSettings.Instance.SMTPEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
+        if (ServerConfiguration.Instance.Mail.MailEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
 
         return this.RedirectToPage(nameof(LandingPage));
     }

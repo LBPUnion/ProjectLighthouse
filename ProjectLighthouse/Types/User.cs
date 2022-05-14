@@ -64,7 +64,7 @@ public class User
             if (string.IsNullOrWhiteSpace(avatarHash) || this.IconHash.StartsWith('g')) avatarHash = this.YayHash;
             if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.MehHash;
             if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = this.BooHash;
-            if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = ServerSettings.Instance.MissingIconHash;
+            if (string.IsNullOrWhiteSpace(avatarHash)) avatarHash = ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash;
 
             return avatarHash;
         }
@@ -149,13 +149,17 @@ public class User
                       LbpSerializer.StringElement("game", (int)gameVersion) +
                       this.serializeSlots(gameVersion) +
                       LbpSerializer.StringElement("lists", this.Lists) +
-                      LbpSerializer.StringElement("lists_quota", ServerSettings.Instance.ListsQuota) + // technically not a part of the user but LBP expects it
+                      LbpSerializer.StringElement
+                      (
+                          "lists_quota",
+                          ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota
+                      ) + // technically not a part of the user but LBP expects it
                       LbpSerializer.StringElement("biography", this.Biography) +
                       LbpSerializer.StringElement("reviewCount", this.Reviews) +
                       LbpSerializer.StringElement("commentCount", this.Comments) +
                       LbpSerializer.StringElement("photosByMeCount", this.PhotosByMe) +
                       LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMe) +
-                      LbpSerializer.StringElement("commentsEnabled", ServerSettings.Instance.ProfileCommentsEnabled) +
+                      LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled) +
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
                       LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels) +
                       LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +
@@ -204,7 +208,7 @@ public class User
 
     [JsonIgnore]
     [XmlIgnore]
-    public int EntitledSlots => ServerSettings.Instance.EntitledSlots + this.AdminGrantedSlots;
+    public int EntitledSlots => ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + this.AdminGrantedSlots;
 
     /// <summary>
     ///     The number of slots remaining on the earth

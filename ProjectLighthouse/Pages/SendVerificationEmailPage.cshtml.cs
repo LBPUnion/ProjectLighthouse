@@ -17,7 +17,7 @@ public class SendVerificationEmailPage : BaseLayout
 
     public async Task<IActionResult> OnGet()
     {
-        if (!ServerSettings.Instance.SMTPEnabled) return this.NotFound();
+        if (!ServerConfiguration.Instance.Mail.MailEnabled) return this.NotFound();
 
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
@@ -47,7 +47,7 @@ public class SendVerificationEmailPage : BaseLayout
 
         string body = "Hello,\n\n" +
                       $"This email is a request to verify this email for your (likely new!) Project Lighthouse account ({user.Username}).\n\n" +
-                      $"To verify your account, click the following link: {ServerSettings.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}\n\n\n" +
+                      $"To verify your account, click the following link: {ServerConfiguration.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}\n\n\n" +
                       "If this wasn't you, feel free to ignore this email.";
 
         if (SMTPHelper.SendEmail(user.EmailAddress, "Project Lighthouse Email Verification", body))

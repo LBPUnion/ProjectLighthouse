@@ -31,7 +31,7 @@ public static class Program
         Logger.LogInfo($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
 
         // Referencing ServerSettings.Instance here loads the config, see ServerSettings.cs for more information
-        Logger.LogSuccess("Loaded config file version " + ServerSettings.Instance.ConfigVersion, LogArea.Startup);
+        Logger.LogSuccess("Loaded config file version " + ServerConfiguration.Instance.ConfigVersion, LogArea.Startup);
 
         Logger.LogInfo("Determining if the database is available...", LogArea.Startup);
         bool dbConnected = ServerStatics.DbConnected;
@@ -50,11 +50,11 @@ public static class Program
         Logger.LogInfo("Migrating database...", LogArea.Database);
         MigrateDatabase(database);
 
-        if (ServerSettings.Instance.InfluxEnabled)
+        if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
         {
             Logger.LogInfo("Influx logging is enabled. Starting influx logging...", LogArea.Startup);
             InfluxHelper.StartLogging().Wait();
-            if (ServerSettings.Instance.InfluxLoggingEnabled) Logger.AddLogger(new InfluxLogger());
+            if (ServerConfiguration.Instance.InfluxDB.LoggingEnabled) Logger.AddLogger(new InfluxLogger());
         }
 
         Logger.LogDebug
@@ -72,7 +72,7 @@ public static class Program
             return;
         }
 
-        if (ServerSettings.Instance.ConvertAssetsOnStartup) FileHelper.ConvertAllTexturesToPng();
+        if (ServerConfiguration.Instance.WebsiteConfiguration.ConvertAssetsOnStartup) FileHelper.ConvertAllTexturesToPng();
 
         Logger.LogInfo("Starting room cleanup thread...", LogArea.Startup);
         RoomHelper.StartCleanupThread();
@@ -102,7 +102,7 @@ public static class Program
                 {
                     webBuilder.UseStartup<Startup.Startup>();
                     webBuilder.UseWebRoot("StaticFiles");
-                    webBuilder.UseUrls(ServerSettings.Instance.ServerListenUrl);
+                    webBuilder.UseUrls(ServerConfiguration.Instance.ListenUrl);
                 }
             )
             .ConfigureLogging

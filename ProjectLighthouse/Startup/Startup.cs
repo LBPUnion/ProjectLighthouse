@@ -96,7 +96,7 @@ public class Startup
     {
         bool computeDigests = true;
 
-        if (string.IsNullOrEmpty(ServerSettings.Instance.ServerDigestKey))
+        if (string.IsNullOrEmpty(ServerConfiguration.Instance.DigestKey.PrimaryDigestKey))
         {
             Logger.LogWarn
             (
@@ -172,7 +172,8 @@ public class Startup
 
                 if (computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
                 {
-                    string clientRequestDigest = await CryptoHelper.ComputeDigest(digestPath, authCookie, body, ServerSettings.Instance.ServerDigestKey);
+                    string clientRequestDigest = await CryptoHelper.ComputeDigest
+                        (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey);
 
                     // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
                     if (context.Request.Headers.TryGetValue("X-Digest-A", out StringValues sentDigest))
@@ -185,13 +186,14 @@ public class Startup
                             // Reset the body stream
                             body.Position = 0;
 
-                            clientRequestDigest = await CryptoHelper.ComputeDigest(digestPath, authCookie, body, ServerSettings.Instance.AlternateDigestKey);
+                            clientRequestDigest = await CryptoHelper.ComputeDigest
+                                (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.AlternateDigestKey);
                             if (clientRequestDigest != sentDigest)
                             {
                                 #if DEBUG
                                 Console.WriteLine("Digest failed");
-                                Console.WriteLine("digestKey: " + ServerSettings.Instance.ServerDigestKey);
-                                Console.WriteLine("altDigestKey: " + ServerSettings.Instance.AlternateDigestKey);
+                                Console.WriteLine("digestKey: " + ServerConfiguration.Instance.DigestKey.PrimaryDigestKey);
+                                Console.WriteLine("altDigestKey: " + ServerConfiguration.Instance.DigestKey.AlternateDigestKey);
                                 Console.WriteLine("computed digest: " + clientRequestDigest);
                                 #endif
                                 // We still failed to validate. Abort the request.
@@ -218,7 +220,9 @@ public class Startup
                 {
                     responseBuffer.Position = 0;
 
-                    string digestKey = usedAlternateDigestKey ? ServerSettings.Instance.AlternateDigestKey : ServerSettings.Instance.ServerDigestKey;
+                    string digestKey = usedAlternateDigestKey
+                        ? ServerConfiguration.Instance.DigestKey.AlternateDigestKey
+                        : ServerConfiguration.Instance.DigestKey.PrimaryDigestKey;
 
                     // Compute the digest for the response.
                     string serverDigest = await CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer, digestKey);
