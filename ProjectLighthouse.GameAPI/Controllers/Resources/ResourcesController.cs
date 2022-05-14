@@ -59,25 +59,6 @@ public class ResourcesController : ControllerBase
         return this.NotFound();
     }
 
-    [ResponseCache(Duration = 86400)]
-    [HttpGet("/gameAssets/{hash}")]
-    public IActionResult GetGameImage(string hash)
-    {
-        string path = Path.Combine("png", $"{hash}.png");
-
-        if (IOFile.Exists(path))
-        {
-            return this.File(IOFile.OpenRead(path), "image/png");
-        }
-
-        LbpFile? file = LbpFile.FromHash(hash);
-        if (file != null && ImageHelper.LbpFileToPNG(file))
-        {
-            return this.File(IOFile.OpenRead(path), "image/png");
-        }
-        return this.NotFound();
-    }
-
     // TODO: check if this is a valid hash
     [HttpPost("upload/{hash}/unattributed")]
     [HttpPost("upload/{hash}")]
