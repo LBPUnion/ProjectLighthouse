@@ -49,15 +49,6 @@
         </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="Extensions\SerializationExtensions.cs" />
-        <Compile Remove="Helpers\FriendHelper.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Startup\Middlewares" />
-    </ItemGroup>
-
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;" />
         <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;" />

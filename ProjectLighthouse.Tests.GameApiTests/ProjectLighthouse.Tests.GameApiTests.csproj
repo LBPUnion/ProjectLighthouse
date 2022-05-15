@@ -30,12 +30,4 @@
         <ProjectReference Include="..\ProjectLighthouse.Tests\ProjectLighthouse.Tests.csproj"/>
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="..\ProjectLighthouse.Tests\ExampleFiles\**">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj"/>
-    </ItemGroup>
-
 </Project>
