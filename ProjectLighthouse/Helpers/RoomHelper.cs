@@ -193,7 +193,9 @@ public class RoomHelper
     [SuppressMessage("ReSharper", "InvertIf")]
     public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
-        int roomCountBeforeCleanup = Rooms.Count();
+        lock(Rooms)
+        {
+            int roomCountBeforeCleanup = Rooms.Count();
 
             // Remove offline players from rooms
             foreach (Room room in Rooms)
@@ -232,7 +234,9 @@ public class RoomHelper
 
             if (roomCountBeforeCleanup != roomCountAfterCleanup)
             {
-                Logger.LogDebug($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.", LogArea.Match);
+                Logger.LogDebug($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.",
+                    LogArea.Match);
             }
+        }
     }
 }
