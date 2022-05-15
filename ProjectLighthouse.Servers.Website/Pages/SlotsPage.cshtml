@@ -42,10 +42,10 @@
 
 @if (Model.PageNumber != 0)
 {
-    <a href="/slots/@(Model.PageNumber - 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Previous Page</a>
+    <a href="/slots/@(Model.PageNumber - 1)@(Model.SearchValue?.Length == 0 ? "" : "?name=" + Model.SearchValue)">Previous Page</a>
 }
 @(Model.PageNumber + 1) / @(Model.PageAmount)
 @if (Model.PageNumber < Model.PageAmount - 1)
 {
-    <a href="/slots/@(Model.PageNumber + 1)@(Model.SearchValue.Length == 0 ? "" : "?name=" + Model.SearchValue)">Next Page</a>
+    <a href="/slots/@(Model.PageNumber + 1)@(Model.SearchValue?.Length == 0 ? "" : "?name=" + Model.SearchValue)">Next Page</a>
 }

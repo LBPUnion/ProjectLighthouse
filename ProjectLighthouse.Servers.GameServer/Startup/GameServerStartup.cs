@@ -73,7 +73,7 @@ public class GameServerStartup
             async (context, next) =>
             {
                 // Client digest check.
-                if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string authCookie)) authCookie = string.Empty;
+                if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie) || authCookie == null) authCookie = string.Empty;
                 string digestPath = context.Request.Path;
                 Stream body = context.Request.Body;
 

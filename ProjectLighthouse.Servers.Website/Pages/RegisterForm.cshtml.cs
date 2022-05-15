@@ -15,7 +15,7 @@ public class RegisterForm : BaseLayout
     public RegisterForm(Database database) : base(database)
     {}
 
-    public string Error { get; private set; }
+    public string? Error { get; private set; }
 
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
@@ -54,7 +54,7 @@ public class RegisterForm : BaseLayout
         }
 
         if (ServerConfiguration.Instance.Mail.MailEnabled &&
-            await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress.ToLower() == emailAddress.ToLower()) != null)
+            await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == emailAddress.ToLower()) != null)
         {
             this.Error = "The email address you've chosen is already taken.";
             return this.Page();

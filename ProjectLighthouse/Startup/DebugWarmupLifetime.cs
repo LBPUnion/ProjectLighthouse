@@ -44,6 +44,7 @@ public class DebugWarmupLifetime : IHostLifetime
             ServerType.GameApi => ServerConfiguration.Instance.GameApiListenUrl,
             ServerType.Website => ServerConfiguration.Instance.WebsiteListenUrl,
             ServerType.Api => ServerConfiguration.Instance.ApiListenUrl,
+            _ => throw new ArgumentOutOfRangeException(),
         };
 
         url = url.Replace("0.0.0.0", "127.0.0.1");

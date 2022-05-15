@@ -41,7 +41,8 @@
         HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
 
         string decodedMessage = messageWriter.ToString();
-        string url = Url.RouteUrl(ViewContext.RouteData.Values);
+        string? url = Url.RouteUrl(ViewContext.RouteData.Values);
+        if (url == null) continue;
 
         int rating = comment.ThumbsUp - comment.ThumbsDown;
 
