@@ -1,4 +1,6 @@
 #nullable enable
+using System.Buffers;
+using System.IO.Pipelines;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -75,7 +77,7 @@ public class ResourcesController : ControllerBase
         if (FileHelper.ResourceExists(hash)) this.Conflict();
 
         Logger.LogInfo($"Processing resource upload (hash: {hash})", LogArea.Resources);
-        LbpFile file = new(await BinaryHelper.ReadFromPipeReader(this.Request.BodyReader));
+        LbpFile file = new(await readFromPipeReader(this.Request.BodyReader));
 
         if (!FileHelper.IsFileSafe(file))
         {
@@ -94,5 +96,26 @@ public class ResourcesController : ControllerBase
         Logger.LogSuccess($"File is OK! (hash: {hash}, type: {file.FileType})", LogArea.Resources);
         await IOFile.WriteAllBytesAsync(path, file.Data);
         return this.Ok();
+    }
+
+    // Written with reference from
+    // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/request-response?view=aspnetcore-5.0
+    // Surprisingly doesn't take seconds. (67ms for a 100kb file)
+    private static async Task<byte[]> readFromPipeReader(PipeReader reader)
+    {
+        List<byte> data = new();
+        while (true)
+        {
+            ReadResult readResult = await reader.ReadAsync();
+            ReadOnlySequence<byte> buffer = readResult.Buffer;
+
+            if (readResult.IsCompleted && buffer.Length > 0) data.AddRange(buffer.ToArray());
+
+            reader.AdvanceTo(buffer.Start, buffer.End);
+
+            if (readResult.IsCompleted) break;
+        }
+
+        return data.ToArray();
     }
 }

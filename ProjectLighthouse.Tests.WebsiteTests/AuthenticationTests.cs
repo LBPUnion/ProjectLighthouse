@@ -19,7 +19,7 @@ public class AuthenticationTests : LighthouseWebTest
         await using Database database = new();
         Random random = new();
 
-        string password = CryptoHelper.Sha256Hash(RandomHelper.GenerateRandomBytes(64).ToArray());
+        string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
         User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");

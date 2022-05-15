@@ -1,7 +1,7 @@
 using System;
 using LBPUnion.ProjectLighthouse.Logging;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
+namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class LogLevelExtensions
 {

@@ -1,5 +1,5 @@
 using System;
-using LBPUnion.ProjectLighthouse.Helpers.Extensions;
+using LBPUnion.ProjectLighthouse.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers;
 

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
+namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class StringExtensions
 {

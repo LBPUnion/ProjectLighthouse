@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Reviews;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
+namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class DatabaseExtensions
 {

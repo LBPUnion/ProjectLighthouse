@@ -17,7 +17,7 @@ public class UserStatus
 
     public UserStatus(Database database, int userId)
     {
-        LastContact? lastContact = database.LastContacts.Where(l => l.UserId == userId).FirstOrDefault(l => TimestampHelper.Timestamp - l.Timestamp < 300);
+        LastContact? lastContact = database.LastContacts.Where(l => l.UserId == userId).FirstOrDefault(l => TimeHelper.Timestamp - l.Timestamp < 300);
 
         if (lastContact == null)
         {

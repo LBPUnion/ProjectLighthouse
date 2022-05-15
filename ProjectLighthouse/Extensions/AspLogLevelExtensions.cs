@@ -1,7 +1,7 @@
 using LBPUnion.ProjectLighthouse.Logging;
 using AspLogLevel = Microsoft.Extensions.Logging.LogLevel;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
+namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class AspLogLevelExtensions
 {

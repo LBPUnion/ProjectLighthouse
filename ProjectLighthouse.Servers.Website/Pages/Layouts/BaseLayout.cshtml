@@ -1,5 +1,5 @@
+@using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Helpers
-@using LBPUnion.ProjectLighthouse.Helpers.Extensions
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Settings
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts.BaseLayout
@@ -25,7 +25,7 @@
     }
 
     Model.IsMobile = Model.Request.IsMobile();
-    long timeStarted = TimestampHelper.TimestampMillis;
+    long timeStarted = TimeHelper.TimestampMillis;
 }
 
 <!DOCTYPE html>
@@ -179,7 +179,7 @@
                         <p>Model.Title: @Model.Title</p>
                         <p>Model.Description: @Model.Description</p>
                         <p>Model.User.UserId: @(Model.User?.UserId.ToString() ?? "(not logged in)")</p>
-                        <p>Render time: ~@(TimestampHelper.TimestampMillis - timeStarted)ms</p>
+                        <p>Render time: ~@(TimeHelper.TimestampMillis - timeStarted)ms</p>
                     </div>
                 </div>
             </div>

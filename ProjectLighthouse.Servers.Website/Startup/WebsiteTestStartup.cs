@@ -1,4 +1,4 @@
-using LBPUnion.ProjectLighthouse.Helpers.Middlewares;
+using LBPUnion.ProjectLighthouse.Middlewares;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Startup;
 

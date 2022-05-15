@@ -26,7 +26,7 @@ public static class LastContactHelper
             database.LastContacts.Add(lastContact);
         }
 
-        lastContact.Timestamp = TimestampHelper.Timestamp;
+        lastContact.Timestamp = TimeHelper.Timestamp;
         lastContact.GameVersion = gameVersion;
         lastContact.Platform = platform;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
+namespace LBPUnion.ProjectLighthouse.Extensions;
 
 // https://stackoverflow.com/a/8039737
 public static class ExceptionExtensions

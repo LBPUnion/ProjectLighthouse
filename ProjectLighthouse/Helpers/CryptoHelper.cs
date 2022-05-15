@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
@@ -10,6 +11,11 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class CryptoHelper
 {
+    /// <summary>
+    /// An instance of Random. Must be locked when in use.
+    /// </summary>
+    public static readonly Random Random = new();
+
     // private static readonly SHA1 sha1 = SHA1.Create();
     private static readonly SHA256 sha256 = SHA256.Create();
 
@@ -19,7 +25,7 @@ public static class CryptoHelper
     /// <returns>The token as a string.</returns>
     public static string GenerateAuthToken()
     {
-        byte[] bytes = (byte[])RandomHelper.GenerateRandomBytes(256);
+        byte[] bytes = (byte[])GenerateRandomBytes(256);
 
         return BCryptHash(Sha256Hash(bytes));
     }
@@ -46,6 +52,23 @@ public static class CryptoHelper
         string digestString = Convert.ToHexString(digestBytes).ToLower();
 
         return digestString;
+    }
+
+    /// <summary>
+    ///     Generates a specified amount of random bytes in an array.
+    /// </summary>
+    /// <param name="count">The amount of bytes to generate.</param>
+    /// <returns>The bytes generated</returns>
+    public static IEnumerable<byte> GenerateRandomBytes(int count)
+    {
+        byte[] b = new byte[count];
+
+        lock(Random)
+        {
+            Random.NextBytes(b);
+        }
+
+        return b;
     }
 
     #region Hash Functions

@@ -152,7 +152,6 @@ internal class LegacyServerSettings
         configuration.Authentication = new AuthenticationConfiguration
         {
             RegistrationEnabled = this.RegistrationEnabled,
-            BlockDeniedUsers = this.BlockDeniedUsers,
             UseExternalAuth = this.UseExternalAuth,
         };
 

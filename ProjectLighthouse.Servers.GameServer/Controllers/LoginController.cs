@@ -89,7 +89,7 @@ public class LoginController : ControllerBase
                 {
                     GameToken = token,
                     GameTokenId = token.TokenId,
-                    Timestamp = TimestampHelper.Timestamp,
+                    Timestamp = TimeHelper.Timestamp,
                     IPAddress = ipAddress,
                     Platform = npTicket.Platform,
                 };

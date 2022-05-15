@@ -1,5 +1,5 @@
 using System;
-using LBPUnion.ProjectLighthouse.Helpers.Extensions;
+using LBPUnion.ProjectLighthouse.Extensions;
 using Microsoft.Extensions.Logging;
 using AspLogLevel = Microsoft.Extensions.Logging.LogLevel;
 

@@ -10,10 +10,10 @@ public static class VersionHelper
     {
         try
         {
-            CommitHash = ResourceHelper.readManifestFile("gitVersion.txt");
-            Branch = ResourceHelper.readManifestFile("gitBranch.txt");
+            CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
+            Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
 
-            string remotesFile = ResourceHelper.readManifestFile("gitRemotes.txt");
+            string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
 
             string[] lines = remotesFile.Split('\n');
 
@@ -23,7 +23,7 @@ public static class VersionHelper
             // linq is a serious and painful catastrophe but its useful so i'm gonna keep using it
             Remotes = lines.Select(line => line.Split("\t")[1]).ToArray();
 
-            CommitsOutOfDate = ResourceHelper.readManifestFile("gitUnpushed.txt").Split('\n').Length;
+            CommitsOutOfDate = ResourceHelper.ReadManifestFile("gitUnpushed.txt").Split('\n').Length;
 
             CanCheckForUpdates = true;
         }

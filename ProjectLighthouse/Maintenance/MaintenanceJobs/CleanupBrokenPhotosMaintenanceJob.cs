@@ -35,7 +35,7 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
                 goto removePhoto;
             }
 
-            if (photo.Timestamp > TimestampHelper.Timestamp)
+            if (photo.Timestamp > TimeHelper.Timestamp)
             {
                 takenInTheFuture = true;
                 goto removePhoto;

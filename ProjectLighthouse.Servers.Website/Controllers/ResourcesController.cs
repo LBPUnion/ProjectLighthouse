@@ -20,7 +20,7 @@ public class ResourcesController : ControllerBase
         }
 
         LbpFile? file = LbpFile.FromHash(hash);
-        if (file != null && ImageHelper.LbpFileToPNG(file))
+        if (file != null && FileHelper.LbpFileToPNG(file))
         {
             return this.File(IOFile.OpenRead(path), "image/png");
         }

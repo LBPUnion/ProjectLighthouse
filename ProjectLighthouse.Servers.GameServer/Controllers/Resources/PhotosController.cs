@@ -53,7 +53,7 @@ public class PhotosController : ControllerBase
 
         if (photo.Subjects.Count > 4) return this.BadRequest();
 
-        if (photo.Timestamp > TimestampHelper.Timestamp) photo.Timestamp = TimestampHelper.Timestamp;
+        if (photo.Timestamp > TimeHelper.Timestamp) photo.Timestamp = TimeHelper.Timestamp;
 
         foreach (PhotoSubject subject in photo.Subjects)
         {

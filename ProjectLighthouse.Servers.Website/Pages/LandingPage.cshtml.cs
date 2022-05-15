@@ -31,7 +31,7 @@ public class LandingPage : BaseLayout
                     (a => a.GameToken)
                 .CountAsync(a => a.GameToken.UserId == user.UserId);
 
-        List<int> userIds = await this.Database.LastContacts.Where(l => TimestampHelper.Timestamp - l.Timestamp < 300).Select(l => l.UserId).ToListAsync();
+        List<int> userIds = await this.Database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300).Select(l => l.UserId).ToListAsync();
 
         this.PlayersOnline = await this.Database.Users.Where(u => userIds.Contains(u.UserId)).ToListAsync();
         return this.Page();

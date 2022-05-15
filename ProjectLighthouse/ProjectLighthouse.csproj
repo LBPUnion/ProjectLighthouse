@@ -49,10 +49,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Extensions"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Compile Remove="Extensions\SerializationExtensions.cs"/>
     </ItemGroup>
 

@@ -6,9 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DDSReader;
+using ICSharpCode.SharpZipLib.Zip.Compression;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Files;
 using LBPUnion.ProjectLighthouse.Types.Settings;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -56,7 +61,7 @@ public static class FileHelper
         // Determine if file is a FARC (File Archive).
         // Needs to be done before anything else that determines the type by the header
         // because this determines the type by the footer.
-        string footer = Encoding.ASCII.GetString(BinaryHelper.ReadLastBytes(reader, 4));
+        string footer = Encoding.ASCII.GetString(readLastBytes(reader, 4));
         if (footer == "FARC") return LbpFileType.FileArchive;
 
         byte[] header = reader.ReadBytes(3);
@@ -73,6 +78,19 @@ public static class FileHelper
             "PLN" => LbpFileType.Plan,
             _ => readAlternateHeader(reader),
         };
+    }
+
+    private static byte[] readLastBytes(BinaryReader reader, int count, bool restoreOldPosition = true)
+    {
+        long oldPosition = reader.BaseStream.Position;
+
+        if (reader.BaseStream.Length < count) return Array.Empty<byte>();
+
+        reader.BaseStream.Position = reader.BaseStream.Length - count;
+        byte[] data = reader.ReadBytes(count);
+
+        if (restoreOldPosition) reader.BaseStream.Position = oldPosition;
+        return data;
     }
 
     private static LbpFileType readAlternateHeader(BinaryReader reader)
@@ -133,7 +151,7 @@ public static class FileHelper
 
                             if (file.FileType == LbpFileType.Jpeg || file.FileType == LbpFileType.Png || file.FileType == LbpFileType.Texture)
                             {
-                                ImageHelper.LbpFileToPNG(file);
+                                LbpFileToPNG(file);
                             }
                         }
                     }
@@ -146,5 +164,112 @@ public static class FileHelper
             }
         }
     }
+
+    #region Images
+
+    public static bool LbpFileToPNG(LbpFile file) => LbpFileToPNG(file.Data, file.Hash, file.FileType);
+
+    public static bool LbpFileToPNG(byte[] data, string hash, LbpFileType type)
+    {
+        if (type != LbpFileType.Jpeg && type != LbpFileType.Png && type != LbpFileType.Texture) return false;
+
+        if (File.Exists(Path.Combine("png", $"{hash}.png"))) return true;
+
+        using MemoryStream ms = new(data);
+        using BinaryReader reader = new(ms);
+
+        try
+        {
+            return type switch
+            {
+                LbpFileType.Texture => TextureToPNG(hash, reader),
+                LbpFileType.Png => PNGToPNG(hash, data),
+                LbpFileType.Jpeg => JPGToPNG(hash, data),
+                // ReSharper disable once UnreachableSwitchArmDueToIntegerAnalysis
+                _ => false,
+            };
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine($"Error while converting {hash}:");
+            Console.WriteLine(e);
+            return false;
+        }
+    }
+
+    private static bool TextureToPNG(string hash, BinaryReader reader)
+    {
+        // Skip the magic (3 bytes), we already know its a texture
+        for(int i = 0; i < 3; i++) reader.ReadByte();
+
+        // This below is shamelessly stolen from ennuo's Toolkit: https://github.com/ennuo/toolkit/blob/d996ee4134740db0ee94e2cbf1e4edbd1b5ec798/src/main/java/ennuo/craftworld/utilities/Compressor.java#L40
+
+        // This byte determines the method of reading. We can only read a texture (' ') so if it's not ' ' it must be invalid.
+        if ((char)reader.ReadByte() != ' ') return false;
+
+        reader.ReadInt16(); // ?
+        short chunks = reader.ReadInt16BE();
+
+        int[] compressed = new int[chunks];
+        int[] decompressed = new int[chunks];
+
+        for(int i = 0; i < chunks; ++i)
+        {
+            compressed[i] = reader.ReadUInt16BE();
+            decompressed[i] = reader.ReadUInt16BE();
+        }
+
+        using MemoryStream ms = new();
+        using BinaryWriter writer = new(ms);
+        for(int i = 0; i < chunks; ++i)
+        {
+            byte[] deflatedData = reader.ReadBytes(compressed[i]);
+            if (compressed[i] == decompressed[i])
+            {
+                writer.Write(deflatedData);
+            }
+
+            Inflater inflater = new();
+            inflater.SetInput(deflatedData);
+            byte[] inflatedData = new byte[decompressed[i]];
+            inflater.Inflate(inflatedData);
+
+            writer.Write(inflatedData);
+        }
+
+        return DDSToPNG(hash, ms.ToArray());
+    }
+
+    private static bool DDSToPNG(string hash, byte[] data)
+    {
+        using MemoryStream stream = new();
+        DDSImage image = new(data);
+
+        image.SaveAsPng(stream);
+
+        Directory.CreateDirectory("png");
+        File.WriteAllBytes($"png/{hash}.png", stream.ToArray());
+        return true;
+    }
+
+    private static bool JPGToPNG(string hash, byte[] data)
+    {
+        using Image<Rgba32> image = Image.Load(data);
+        using MemoryStream ms = new();
+        image.SaveAsPng(ms);
+
+        File.WriteAllBytes($"png/{hash}.png", ms.ToArray());
+        return true;
+    }
+
+    // it sounds dumb i know but hear me out:
+    // you're completely correct
+    private static bool PNGToPNG(string hash, byte[] data)
+    {
+        File.WriteAllBytes($"png/{hash}.png", data);
+        return true;
+    }
+
+    #endregion
 
 }

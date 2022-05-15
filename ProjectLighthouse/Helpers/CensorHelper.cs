@@ -17,7 +17,7 @@ public static class CensorHelper
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
 
-    private static readonly string[] censorList = ResourceHelper.readManifestFile("chatCensoredList.txt").Replace("\r", "").Split("\n");
+    private static readonly string[] censorList = ResourceHelper.ReadManifestFile("chatCensoredList.txt").Replace("\r", "").Split("\n");
 
     public static string ScanMessage(string message)
     {
@@ -48,7 +48,7 @@ public static class CensorHelper
         {
             case FilterMode.Random:
                 for(int i = 0; i < profanityLength; i++)
-                    lock(RandomHelper.Random)
+                    lock(CryptoHelper.Random)
                     {
                         if (message[i] == ' ')
                         {
@@ -56,8 +56,8 @@ public static class CensorHelper
                         }
                         else
                         {
-                            char randomChar = randomCharacters[RandomHelper.Random.Next(0, randomCharacters.Length - 1)];
-                            if (randomChar == prevRandomChar) randomChar = randomCharacters[RandomHelper.Random.Next(0, randomCharacters.Length - 1)];
+                            char randomChar = randomCharacters[CryptoHelper.Random.Next(0, randomCharacters.Length - 1)];
+                            if (randomChar == prevRandomChar) randomChar = randomCharacters[CryptoHelper.Random.Next(0, randomCharacters.Length - 1)];
 
                             prevRandomChar = randomChar;
 
@@ -81,9 +81,9 @@ public static class CensorHelper
 
                 break;
             case FilterMode.Furry:
-                lock(RandomHelper.Random)
+                lock(CryptoHelper.Random)
                 {
-                    string randomWord = randomFurry[RandomHelper.Random.Next(0, randomFurry.Length - 1)];
+                    string randomWord = randomFurry[CryptoHelper.Random.Next(0, randomFurry.Length - 1)];
                     sb.Append(randomWord);
                 }
 

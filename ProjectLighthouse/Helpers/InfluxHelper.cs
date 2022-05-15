@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using InfluxDB.Client;
 using InfluxDB.Client.Writes;
-using LBPUnion.ProjectLighthouse.Helpers.Extensions;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;

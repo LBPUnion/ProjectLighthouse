@@ -2,7 +2,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Middlewares;
+namespace LBPUnion.ProjectLighthouse.Middlewares;
 
 public class FakeRemoteIPAddressMiddleware
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
+namespace LBPUnion.ProjectLighthouse.Extensions;
 
 internal static class ConsoleColorExtensions
 {

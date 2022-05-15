@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace LBPUnion.ProjectLighthouse.Helpers.Extensions;
+namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class BinaryReaderExtensions
 {
