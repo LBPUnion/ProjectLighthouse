@@ -170,7 +170,7 @@ public class ServerConfiguration
     public string ApiListenUrl { get; set; } = "http://localhost:10062";
 
     public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
-    public string RedisConnectionString { get; set; } = "";
+    public string RedisConnectionString { get; set; } = "redis://localhost:6379";
     public string ExternalUrl { get; set; } = "http://localhost:10060";
     public bool ConfigReloading { get; set; }
     public string EulaText { get; set; } = "";

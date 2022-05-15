@@ -53,14 +53,13 @@ public class FriendsController : ControllerBase
             blockedUsers.Add(blockedUser.UserId);
         }
 
-        if (FriendHelper.FriendIdsByUserId.ContainsKey(user.UserId))
-        {
-            FriendHelper.FriendIdsByUserId.Remove(user.UserId);
-            FriendHelper.BlockedIdsByUserId.Remove(user.UserId);
-        }
+        UserFriendStore? friendStore = Redis.GetUserFriendStore(user.UserId);
+        if (friendStore == null) friendStore = Redis.CreateUserFriendStore(user.UserId);
 
-        FriendHelper.FriendIdsByUserId.Add(user.UserId, friends.Select(u => u.UserId).ToArray());
-        FriendHelper.BlockedIdsByUserId.Add(user.UserId, blockedUsers.ToArray());
+        friendStore.FriendIds = friends.Select(u => u.UserId).ToList();
+        friendStore.BlockedIds = blockedUsers;
+        
+        Redis.UpdateFriendStore(friendStore);
 
         string friendsSerialized = friends.Aggregate(string.Empty, (current, user1) => current + LbpSerializer.StringElement("npHandle", user1.Username));
 
@@ -78,11 +77,13 @@ public class FriendsController : ControllerBase
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 
-        if (!FriendHelper.FriendIdsByUserId.TryGetValue(user.UserId, out int[]? friendIds) || friendIds == null)
+        UserFriendStore? friendStore = Redis.GetUserFriendStore(user.UserId);
+
+        if (friendStore == null)
             return this.Ok(LbpSerializer.BlankElement("myFriends"));
 
         string friends = "";
-        foreach (int friendId in friendIds)
+        foreach (int friendId in friendStore.FriendIds)
         {
             User? friend = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == friendId);
             if (friend == null) continue;

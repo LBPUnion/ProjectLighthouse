@@ -32,7 +32,7 @@ public static class StartupTasks
         // Referencing ServerSettings.Instance here loads the config, see ServerSettings.cs for more information
         Logger.LogSuccess("Loaded config file version " + ServerConfiguration.Instance.ConfigVersion, LogArea.Startup);
 
-        Logger.LogInfo("Determining if the database is available...", LogArea.Startup);
+        Logger.LogInfo("Connecting to the database...", LogArea.Startup);
         bool dbConnected = ServerStatics.DbConnected;
         if (!dbConnected)
         {
@@ -40,7 +40,7 @@ public static class StartupTasks
         }
         else
         {
-            Logger.LogSuccess("Connected to the database.", LogArea.Startup);
+            Logger.LogSuccess("Connected!", LogArea.Startup);
         }
 
         if (!dbConnected) Environment.Exit(1);
@@ -48,7 +48,7 @@ public static class StartupTasks
 
         Logger.LogInfo("Migrating database...", LogArea.Database);
         migrateDatabase(database);
-
+        
         if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
         {
             Logger.LogInfo("Influx logging is enabled. Starting influx logging...", LogArea.Startup);
