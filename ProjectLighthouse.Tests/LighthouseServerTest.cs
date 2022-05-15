@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Startup;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -22,7 +22,7 @@ public class LighthouseServerTest
 
     public LighthouseServerTest()
     {
-        this.Server = new TestServer(new WebHostBuilder().UseStartup<TestGameApiStartup>());
+        this.Server = new TestServer(new WebHostBuilder().UseStartup<GameServerTestStartup>());
         this.Client = this.Server.CreateClient();
     }
     public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)

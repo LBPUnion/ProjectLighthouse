@@ -1,0 +1,197 @@
+@page "/slot/{id:int}"
+@using System.Web
+@using LBPUnion.ProjectLighthouse.Helpers.Extensions
+@using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Types.Reviews
+@using LBPUnion.ProjectLighthouse.Types.Settings
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.ShowTitleInPage = false;
+
+    Model.Title = Model.Slot.Name;
+    Model.Description = Model.Slot.Description;
+
+    bool isMobile = this.Request.IsMobile();
+}
+
+@await Html.PartialAsync("Partials/SlotCardPartial", Model.Slot, new ViewDataDictionary(ViewData)
+{
+    {
+        "User", Model.User
+    },
+    {
+        "CallbackUrl", $"~/slot/{Model.Slot.SlotId}"
+    },
+    {
+        "ShowLink", false
+    },
+    {
+        "IsMobile", Model.Request.IsMobile()
+    },
+})
+<br>
+
+<div class="ui grid">
+    <div class="eight wide column">
+        <div class="ui blue segment">
+            <h2>Description</h2>
+            <p>@HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model.Slot.Description) ? "This level has no description." : Model.Slot.Description)</p>
+        </div>
+    </div>
+    <div class="eight wide column">
+        <div class="ui red segment">
+            <h2>Tags</h2>
+            @{
+                string[] authorLabels = Model.Slot.AuthorLabels.Split(",");
+                if (authorLabels.Length == 1) // ..?? ok c#
+                {
+                    <p>This level has no tags.</p>
+                }
+                else
+                {
+                    foreach (string label in authorLabels.Where(label => !string.IsNullOrEmpty(label)))
+                    {
+                        <div class="ui blue label">@label.Replace("LABEL_", "")</div>
+                    }
+                }
+            }
+        </div>
+    </div>
+    <div class="eight wide column">
+        @await Html.PartialAsync("Partials/CommentsPartial")
+    </div>
+    <div class="eight wide column">
+        <div class="ui purple segment">
+            <h2>Reviews</h2>
+            @if (Model.Reviews.Count == 0 && Model.ReviewsEnabled)
+            {
+                <p>There are no reviews.</p>
+            }
+            else if (!Model.ReviewsEnabled)
+            {
+                <b>
+                    <i>Reviews are disabled on this level.</i>
+                </b>
+            }
+            else
+            {
+                int count = Model.Reviews.Count;
+                <p>There @(count == 1 ? "is" : "are") @count review@(count == 1 ? "" : "s").</p>
+                <div class="ui divider"></div>
+            }
+
+
+            @for(int i = 0; i < Model.Reviews.Count; i++)
+            {
+                Review review = Model.Reviews[i];
+                string faceHash = review.Thumb switch {
+                    -1 => review.Reviewer?.BooHash,
+                    0 => review.Reviewer?.MehHash,
+                    1 => review.Reviewer?.YayHash,
+                    
+                    _ => throw new ArgumentOutOfRangeException(),
+                    };
+
+                if (string.IsNullOrWhiteSpace(faceHash))
+                {
+                    faceHash = ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash;
+                }
+
+                string faceAlt = review.Thumb switch {
+                    -1 => "Boo!",
+                    0 => "Meh.",
+                    1 => "Yay!",
+                    
+                    _ => throw new ArgumentOutOfRangeException(),
+                    };
+
+                int size = isMobile ? 50 : 100;
+
+                <div class="card">
+                    <div>
+                        <img class="cardIcon slotCardIcon" src="@ServerConfiguration.Instance.ExternalUrl/gameAssets/@faceHash" alt="@faceAlt" title="@faceAlt" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
+                    </div>
+                    <div class="cardStats">
+                        <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                        @if (review.Deleted)
+                        {
+                            if (review.DeletedBy == DeletedBy.LevelAuthor)
+                            {
+                                <p>
+                                    <i>This review has been deleted by the level author.</i>
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    <i>This review has been deleted by a moderator.</i>
+                                </p>
+                            }
+                        }
+                        else
+                        {
+                            @if (review.Labels.Length > 1)
+                            {
+                                @foreach (string reviewLabel in review.Labels)
+                                {
+                                    <div class="ui blue label">@reviewLabel.Replace("LABEL_", "")</div>
+                                }
+                            }
+                            @if (string.IsNullOrWhiteSpace(review.Text))
+                            {
+                                <p>
+                                    <i>This review contains no text.</i>
+                                </p>
+                            }
+                            else
+                            {
+                                {
+                                    <p>@HttpUtility.HtmlDecode(review.Text)</p>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+                @if (i != Model.Reviews.Count - 1)
+                {
+                    <div class="ui divider"></div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.User != null && Model.User.IsAdmin)
+{
+    <div class="ui yellow segment">
+        <h2>Admin Options</h2>
+
+        @if (Model.Slot.TeamPick)
+        {
+            <a href="/admin/slot/@Model.Slot.SlotId/removeTeamPick">
+                <div class="ui pink button">
+                    <i class="ribbon icon"></i>
+                    <span>Remove Team Pick</span>
+                </div>
+            </a>
+        }
+        else
+        {
+            <a href="/admin/slot/@Model.Slot.SlotId/teamPick">
+                <div class="ui pink button">
+                    <i class="ribbon icon"></i>
+                    <span>Team Pick</span>
+                </div>
+            </a>
+        }
+
+        <a href="/admin/slot/@Model.Slot.SlotId/delete">
+            <div class="ui red button">
+                <i class="trash icon"></i>
+                <span>Delete</span>
+            </div>
+        </a>
+    </div>
+}

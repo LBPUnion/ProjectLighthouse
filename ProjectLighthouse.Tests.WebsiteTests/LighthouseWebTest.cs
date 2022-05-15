@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using LBPUnion.ProjectLighthouse.Startup;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using OpenQA.Selenium;
@@ -15,7 +15,7 @@ public class LighthouseWebTest : IDisposable
     public readonly string BaseAddress;
 
     public readonly IWebDriver Driver;
-    public readonly IWebHost WebHost = new WebHostBuilder().UseKestrel().UseStartup<TestGameApiStartup>().UseWebRoot("StaticFiles").Build();
+    public readonly IWebHost WebHost = new WebHostBuilder().UseKestrel().UseStartup<GameServerTestStartup>().UseWebRoot("StaticFiles").Build();
 
     public LighthouseWebTest()
     {
