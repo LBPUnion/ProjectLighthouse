@@ -11,7 +11,7 @@ public class TicketReader : BinaryReader
     public TicketReader([NotNull] Stream input) : base(input)
     {}
 
-    public Version ReadTicketVersion() => new(this.ReadByte() >> 4, this.ReadByte());
+    public Version ReadTicketVersion() => new((byte)(this.ReadByte() >> 4), this.ReadByte());
 
     public SectionHeader ReadSectionHeader()
     {

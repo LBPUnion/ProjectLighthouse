@@ -1,11 +1,11 @@
 namespace LBPUnion.ProjectLighthouse.Types;
 
-public class Version
+public struct Version
 {
-    public int Major { get; set; }
-    public int Minor { get; set; }
+    public byte Major { get; set; }
+    public byte Minor { get; set; }
 
-    public Version(int major, int minor)
+    public Version(byte major, byte minor)
     {
         this.Major = major;
         this.Minor = minor;
