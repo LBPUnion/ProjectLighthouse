@@ -1,5 +1,6 @@
+using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 

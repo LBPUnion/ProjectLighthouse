@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

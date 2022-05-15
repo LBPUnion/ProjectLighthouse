@@ -1,7 +1,8 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;

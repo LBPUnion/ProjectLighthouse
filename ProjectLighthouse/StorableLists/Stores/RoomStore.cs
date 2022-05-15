@@ -1,6 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
-using LBPUnion.ProjectLighthouse.Types.Match;
+using LBPUnion.ProjectLighthouse.Match.Rooms;
 
 namespace LBPUnion.ProjectLighthouse.StorableLists.Stores;
 

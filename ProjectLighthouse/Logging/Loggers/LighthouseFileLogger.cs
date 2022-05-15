@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers;

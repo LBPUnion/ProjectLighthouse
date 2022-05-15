@@ -1,7 +1,7 @@
 using System;
 using System.Text;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 

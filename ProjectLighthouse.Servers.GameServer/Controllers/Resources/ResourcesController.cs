@@ -2,11 +2,12 @@
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Files;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
 

@@ -1,4 +1,4 @@
-using LBPUnion.ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

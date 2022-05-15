@@ -1,12 +1,13 @@
 #nullable enable
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Files;
-using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Profiles;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

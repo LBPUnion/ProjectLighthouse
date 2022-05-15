@@ -1,10 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

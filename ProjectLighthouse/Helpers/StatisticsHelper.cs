@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.EntityFrameworkCore;
 

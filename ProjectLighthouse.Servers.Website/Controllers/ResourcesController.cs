@@ -1,5 +1,5 @@
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Types.Files;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
 

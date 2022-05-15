@@ -1,10 +1,11 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Profiles;
-using LBPUnion.ProjectLighthouse.Types.Reviews;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

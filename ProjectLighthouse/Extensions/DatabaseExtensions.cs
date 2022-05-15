@@ -1,7 +1,8 @@
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Reviews;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;

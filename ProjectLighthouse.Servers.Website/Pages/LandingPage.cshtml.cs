@@ -1,6 +1,7 @@
 #nullable enable
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Types;

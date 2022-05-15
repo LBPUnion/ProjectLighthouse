@@ -1,7 +1,7 @@
 using InfluxDB.Client;
 using InfluxDB.Client.Writes;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers;
 

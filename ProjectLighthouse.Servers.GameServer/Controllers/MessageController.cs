@@ -1,8 +1,10 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;

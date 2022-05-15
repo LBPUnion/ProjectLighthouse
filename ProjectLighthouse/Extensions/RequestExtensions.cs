@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;

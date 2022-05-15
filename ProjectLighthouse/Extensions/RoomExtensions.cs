@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Match.Rooms;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Match;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
 

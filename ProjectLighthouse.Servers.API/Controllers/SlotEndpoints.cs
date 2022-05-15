@@ -1,8 +1,8 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

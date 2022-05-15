@@ -1,4 +1,4 @@
-using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Levels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;

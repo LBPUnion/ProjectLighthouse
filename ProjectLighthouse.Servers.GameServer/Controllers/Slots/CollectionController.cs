@@ -1,10 +1,12 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.Levels.Categories;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Categories;
-using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
@@ -31,7 +33,7 @@ public class CollectionController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        string categoriesSerialized = CollectionHelper.Categories.Aggregate
+        string categoriesSerialized = CategoryHelper.Categories.Aggregate
         (
             string.Empty,
             (current, category) =>
@@ -60,7 +62,7 @@ public class CollectionController : ControllerBase
                         "hint_start", 1
                     },
                     {
-                        "total", CollectionHelper.Categories.Count
+                        "total", CategoryHelper.Categories.Count
                     },
                 }
             )
@@ -78,7 +80,7 @@ public class CollectionController : ControllerBase
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 
-        Category? category = CollectionHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
+        Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();
 
         Logger.LogDebug("Found category " + category, LogArea.Category);

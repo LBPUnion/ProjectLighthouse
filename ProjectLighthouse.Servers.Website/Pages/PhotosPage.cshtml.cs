@@ -1,7 +1,8 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

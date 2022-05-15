@@ -1,10 +1,13 @@
 #nullable enable
 using System.Net;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Match.Rooms;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
-using LBPUnion.ProjectLighthouse.Types.Tickets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

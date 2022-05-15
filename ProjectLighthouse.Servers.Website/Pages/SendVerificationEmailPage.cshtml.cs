@@ -1,9 +1,10 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Profiles.Email;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;

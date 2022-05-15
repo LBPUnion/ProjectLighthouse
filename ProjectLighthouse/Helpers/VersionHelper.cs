@@ -1,6 +1,6 @@
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 

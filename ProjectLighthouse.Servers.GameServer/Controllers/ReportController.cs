@@ -1,9 +1,10 @@
 ﻿#nullable enable
 using System.Text.Json;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Administration.Reports;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Reports;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;

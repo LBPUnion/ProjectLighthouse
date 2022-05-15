@@ -1,8 +1,10 @@
 @using LBPUnion.ProjectLighthouse
+@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.PlayerData
+@using LBPUnion.ProjectLighthouse.PlayerData.Profiles
 @using LBPUnion.ProjectLighthouse.Types
-@using LBPUnion.ProjectLighthouse.Types.Settings
 @using Microsoft.EntityFrameworkCore
-@model LBPUnion.ProjectLighthouse.Types.Levels.Slot
+@model LBPUnion.ProjectLighthouse.Levels.Slot
 
 @{
     User user = (User)ViewData["User"]!;

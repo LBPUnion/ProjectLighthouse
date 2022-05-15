@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Discord;
 using Discord.Webhook;
-using LBPUnion.ProjectLighthouse.Types.Settings;
+using LBPUnion.ProjectLighthouse.Configuration;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 

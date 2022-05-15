@@ -3,8 +3,12 @@ using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Match;
+using LBPUnion.ProjectLighthouse.Match.MatchCommands;
+using LBPUnion.ProjectLighthouse.Match.Rooms;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Match;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +48,7 @@ public class MatchController : ControllerBase
 
         Logger.LogInfo("Received match data: " + bodyString, LogArea.Match);
 
-        IMatchData? matchData;
+        IMatchCommand? matchData;
         try
         {
             matchData = MatchHelper.Deserialize(bodyString);
