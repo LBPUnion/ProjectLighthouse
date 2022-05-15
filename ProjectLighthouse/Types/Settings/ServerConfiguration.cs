@@ -22,7 +22,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 3;
+    public const int CurrentConfigVersion = 4;
 
     #region Meta
 
@@ -170,6 +170,7 @@ public class ServerConfiguration
     public string ApiListenUrl { get; set; } = "http://localhost:10062";
 
     public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
+    public string RedisConnectionString { get; set; } = "";
     public string ExternalUrl { get; set; } = "http://localhost:10060";
     public bool ConfigReloading { get; set; }
     public string EulaText { get; set; } = "";

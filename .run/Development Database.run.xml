@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="Development Database" type="docker-deploy" factoryName="docker-compose.yml"
+    <configuration default="false" name="Development Databases" type="docker-deploy" factoryName="docker-compose.yml"
                    server-name="Docker">
         <deployment type="docker-compose.yml">
             <settings>
@@ -7,6 +7,7 @@
                 <option name="sourceFilePath" value="docker-compose.yml"/>
             </settings>
         </deployment>
+        <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isPublishEnabled="true"/>
         <method v="2"/>
     </configuration>
 </component>

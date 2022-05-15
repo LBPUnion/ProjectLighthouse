@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Match;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
+using Redis.OM;
+using Redis.OM.Searching;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public class RoomHelper
 {
-    public static readonly List<Room> Rooms = new();
+    public static readonly IRedisCollection<Room> Rooms = Redis.GetRooms();
 
     public static readonly RoomSlot PodSlot = new()
     {
@@ -49,14 +52,9 @@ public class RoomHelper
             return null;
         }
 
-        bool anyRoomsLookingForPlayers;
-        List<Room> rooms;
+        IEnumerable<Room> rooms = Rooms;
 
-        lock(Rooms)
-        {
-            anyRoomsLookingForPlayers = Rooms.Any(r => r.IsLookingForPlayers);
-            rooms = anyRoomsLookingForPlayers ? Rooms.Where(r => anyRoomsLookingForPlayers && r.IsLookingForPlayers).ToList() : Rooms;
-        }
+        rooms = rooms.OrderBy(r => r.IsLookingForPlayers);
 
         rooms = rooms.Where(r => r.RoomVersion == roomVersion).ToList();
         if (platform != null) rooms = rooms.Where(r => r.RoomPlatform == platform).ToList();
@@ -72,24 +70,24 @@ public class RoomHelper
         // Don't attempt to dive into the current room the player is in.
         if (user != null)
         {
-            rooms = rooms.Where(r => !r.Players.Contains(user)).ToList();
+            rooms = rooms.Where(r => !r.PlayerIds.Contains(user.UserId)).ToList();
         }
 
         foreach (Room room in rooms)
             // Look for rooms looking for players before moving on to rooms that are idle.
         {
-            if (user != null && MatchHelper.DidUserRecentlyDiveInWith(user.UserId, room.Host.UserId)) continue;
+            if (user != null && MatchHelper.DidUserRecentlyDiveInWith(user.UserId, room.HostId)) continue;
 
             Dictionary<int, string> relevantUserLocations = new();
 
             // Determine if all players in a room have UserLocations stored, also store the relevant userlocations while we're at it
-            bool allPlayersHaveLocations = room.Players.All
+            bool allPlayersHaveLocations = room.PlayerIds.All
             (
                 p =>
                 {
-                    bool gotValue = MatchHelper.UserLocations.TryGetValue(p.UserId, out string? value);
+                    bool gotValue = MatchHelper.UserLocations.TryGetValue(p, out string? value);
 
-                    if (gotValue && value != null) relevantUserLocations.Add(p.UserId, value);
+                    if (gotValue && value != null) relevantUserLocations.Add(p, value);
                     return gotValue;
                 }
             );
@@ -104,7 +102,7 @@ public class RoomHelper
 
             response.Players = new List<Player>();
             response.Locations = new List<string>();
-            foreach (User player in room.Players)
+            foreach (User player in room.GetPlayers(new Database()))
             {
                 response.Players.Add
                 (
@@ -147,74 +145,82 @@ public class RoomHelper
         return null;
     }
 
-    public static Room CreateRoom(User user, GameVersion roomVersion, Platform roomPlatform, RoomSlot? slot = null)
+    public static Room CreateRoom(int userId, GameVersion roomVersion, Platform roomPlatform, RoomSlot? slot = null)
         => CreateRoom
         (
-            new List<User>
+            new List<int>
             {
-                user,
+                userId,
             },
             roomVersion,
             roomPlatform,
             slot
         );
-    public static Room CreateRoom(List<User> users, GameVersion roomVersion, Platform roomPlatform, RoomSlot? slot = null)
+    public static Room CreateRoom(List<int> users, GameVersion roomVersion, Platform roomPlatform, RoomSlot? slot = null)
     {
         Room room = new()
         {
             RoomId = RoomIdIncrement,
-            Players = users,
+            PlayerIds = users,
             State = RoomState.Idle,
             Slot = slot ?? PodSlot,
             RoomVersion = roomVersion,
             RoomPlatform = roomPlatform,
         };
 
-        CleanupRooms(room.Host, room);
-        lock(Rooms) Rooms.Add(room);
-        Logger.LogInfo($"Created room (id: {room.RoomId}) for host {room.Host.Username} (id: {room.Host.UserId})", LogArea.Match);
+        CleanupRooms(room.HostId, room);
+        lock(Rooms) Rooms.Insert(room);
+        Logger.LogInfo($"Created room (id: {room.RoomId}) for host {room.HostId}", LogArea.Match);
 
         return room;
     }
 
-    public static Room? FindRoomByUser(User user, GameVersion roomVersion, Platform roomPlatform, bool createIfDoesNotExist = false)
+    public static Room? FindRoomByUser(int userId, GameVersion roomVersion, Platform roomPlatform, bool createIfDoesNotExist = false)
     {
         lock(Rooms)
-            foreach (Room room in Rooms.Where(room => room.Players.Any(player => user == player)))
+            foreach (Room room in Rooms.Where(room => room.PlayerIds.Any(player => userId == player)))
                 return room;
 
-        return createIfDoesNotExist ? CreateRoom(user, roomVersion, roomPlatform) : null;
+        return createIfDoesNotExist ? CreateRoom(userId, roomVersion, roomPlatform) : null;
     }
 
     public static Room? FindRoomByUserId(int userId)
     {
         lock(Rooms)
-            foreach (Room room in Rooms.Where(room => room.Players.Any(player => player.UserId == userId)))
-                return room;
+            foreach (Room room in Rooms)
+            {
+                if (room.PlayerIds.Any(p => p == userId))
+                {
+                    return room;
+                }
+            }
 
         return null;
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    public static void CleanupRooms(User? host = null, Room? newRoom = null)
+    public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
+//        return;
         lock(Rooms)
         {
-            int roomCountBeforeCleanup = Rooms.Count;
+            int roomCountBeforeCleanup = Rooms.Count();
 
             // Remove offline players from rooms
             foreach (Room room in Rooms)
             {
-                // do not shorten, this prevents collection modified errors
-                List<User> playersToRemove = room.Players.Where(player => player.Status.StatusType == StatusType.Offline).ToList();
-                foreach (User user in playersToRemove) room.Players.Remove(user);
+                List<User> players = room.GetPlayers(database ?? new Database());
+
+                List<int> playersToRemove = players.Where(player => player.Status.StatusType == StatusType.Offline).Select(player => player.UserId).ToList();
+
+                foreach (int player in playersToRemove) room.PlayerIds.Remove(player);
             }
 
             // Delete old rooms based on host
-            if (host != null)
+            if (hostId != null)
                 try
                 {
-                    Rooms.RemoveAll(r => r.Host == host);
+                    Rooms.DeleteAll(r => r.HostId == hostId);
                 }
                 catch
                 {
@@ -227,13 +233,13 @@ public class RoomHelper
                 {
                     if (room == newRoom) continue;
 
-                    foreach (User newRoomPlayer in newRoom.Players) room.Players.RemoveAll(p => p == newRoomPlayer);
+                    foreach (int newRoomPlayer in newRoom.PlayerIds) room.PlayerIds.RemoveAll(p => p == newRoomPlayer);
                 }
 
-            Rooms.RemoveAll(r => r.Players.Count == 0); // Remove empty rooms
-            Rooms.RemoveAll(r => r.Players.Count > 4); // Remove obviously bogus rooms
+            Rooms.DeleteAll(r => r.PlayerIds.Count == 0); // Remove empty rooms
+            Rooms.DeleteAll(r => r.PlayerIds.Count > 4); // Remove obviously bogus rooms
 
-            int roomCountAfterCleanup = Rooms.Count;
+            int roomCountAfterCleanup = Rooms.Count();
 
             if (roomCountBeforeCleanup != roomCountAfterCleanup)
             {

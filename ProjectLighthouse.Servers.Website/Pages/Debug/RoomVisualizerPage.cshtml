@@ -1,4 +1,5 @@
 @page "/debug/roomVisualizer"
+@using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Types
 @using LBPUnion.ProjectLighthouse.Types.Match
@@ -35,7 +36,7 @@
     <meta http-equiv="refresh" content="@refreshSeconds">
 </noscript>
 
-<p>@RoomHelper.Rooms.Count rooms</p>
+<p>@RoomHelper.Rooms.Count() rooms</p>
 
 <a href="/debug/roomVisualizer/createFakeRoom">
     <div class="ui blue button">Create Fake Room</div>
@@ -63,7 +64,7 @@
 
 @foreach (Room room in RoomHelper.Rooms)
 {
-    bool userInRoom = room.Players.Select(p => p.Username).Contains(Model.User?.Username);
+    bool userInRoom = room.PlayerIds.Contains(Model.User?.UserId ?? -1);
     string color = userInRoom ? "green" : "blue";
     <div class="ui @color inverted segment">
         <h3>Room @room.RoomId</h3>
@@ -73,9 +74,9 @@
                 <b>You are currently in this room.</b>
             </p>
         }
-        <p>@room.Players.Count players, state is @room.State, version is @room.RoomVersion.ToPrettyString()on paltform @room.RoomPlatform</p>
+        <p>@room.PlayerIds.Count players, state is @room.State, version is @room.RoomVersion.ToPrettyString()on paltform @room.RoomPlatform</p>
         <p>Slot type: @room.Slot.SlotType, slot id: @room.Slot.SlotId</p>
-        @foreach (User player in room.Players)
+        @foreach (User player in room.GetPlayers(Model.Database))
         {
             <div class="ui segment">@player.Username</div>
         }

@@ -18,4 +18,5 @@ public enum LogArea
     Photos,
     Resources,
     Logger,
+    Redis,
 }

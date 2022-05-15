@@ -1,36 +1,47 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using LBPUnion.ProjectLighthouse.Types.Levels;
+using Redis.OM.Modeling;
 
 namespace LBPUnion.ProjectLighthouse.Types.Match;
 
+[Document(StorageType = StorageType.Json)]
 public class Room
 {
-    [JsonIgnore]
-    public List<User> Players { get; set; }
+    private int roomId;
 
-    public int RoomId { get; set; }
+    public int RoomId {
+        get => this.roomId;
+        set {
+            this.RedisId = value.ToString();
+            this.roomId = value;
+        }
+    }
 
-    [JsonIgnore]
+    [RedisIdField]
+    public string RedisId { get; set; }
+
+    [Indexed]
+    public List<int> PlayerIds { get; set; }
+
+    [Indexed]
     public GameVersion RoomVersion { get; set; }
 
-    [JsonIgnore]
+    [Indexed]
     public Platform RoomPlatform { get; set; }
 
+    [Indexed]
     public RoomSlot Slot { get; set; }
+
+    [Indexed]
     public RoomState State { get; set; }
 
     [JsonIgnore]
-    public bool IsInPod => this.Slot.SlotType == SlotType.Pod;
-
-    [JsonIgnore]
+    [Indexed]
     public bool IsLookingForPlayers => this.State == RoomState.PlayingLevel || this.State == RoomState.DivingInWaiting;
 
     [JsonIgnore]
-    public User Host => this.Players[0];
-
-    public int PlayerCount => this.Players.Count;
+    public int HostId => this.PlayerIds[0];
 
     #nullable enable
     public override bool Equals(object? obj)

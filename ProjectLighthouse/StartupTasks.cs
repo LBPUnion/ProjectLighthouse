@@ -76,6 +76,9 @@ public static class StartupTasks
         Logger.LogInfo("Starting room cleanup thread...", LogArea.Startup);
         RoomHelper.StartCleanupThread();
 
+        Logger.LogInfo("Initializing Redis...", LogArea.Startup);
+        Redis.Initialize().Wait();
+
         stopwatch.Stop();
         Logger.LogSuccess($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
     }

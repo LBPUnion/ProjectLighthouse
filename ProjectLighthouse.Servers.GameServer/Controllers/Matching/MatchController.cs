@@ -74,10 +74,10 @@ public class MatchController : ControllerBase
         if (matchData is UpdateMyPlayerData playerData)
         {
             MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
-            Room? room = RoomHelper.FindRoomByUser(user, gameToken.GameVersion, gameToken.Platform, true);
+            Room? room = RoomHelper.FindRoomByUser(user.UserId, gameToken.GameVersion, gameToken.Platform, true);
 
             if (playerData.RoomState != null)
-                if (room != null && Equals(room.Host, user))
+                if (room != null && Equals(room.HostId, user.UserId))
                     room.State = (RoomState)playerData.RoomState;
         }
 
@@ -101,12 +101,12 @@ public class MatchController : ControllerBase
 
         if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
         {
-            List<User> users = new();
+            List<int> users = new();
             foreach (string playerUsername in createRoom.Players)
             {
                 User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                if (player != null) users.Add(player);
+                if (player != null) users.Add(player.UserId);
                 else return this.BadRequest();
             }
 
@@ -116,7 +116,7 @@ public class MatchController : ControllerBase
 
         if (matchData is UpdatePlayersInRoom updatePlayersInRoom)
         {
-            Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.Host == user);
+            Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.HostId == user.UserId);
 
             if (room != null)
             {
@@ -129,7 +129,7 @@ public class MatchController : ControllerBase
                     else return this.BadRequest();
                 }
 
-                room.Players = users;
+                room.PlayerIds = users.Select(u => u.UserId).ToList();
                 RoomHelper.CleanupRooms(null, room);
             }
         }
