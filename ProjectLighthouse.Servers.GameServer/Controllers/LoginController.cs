@@ -79,22 +79,6 @@ public class LoginController : ControllerBase
 
         if (ServerConfiguration.Instance.Authentication.UseExternalAuth)
         {
-            if (ServerConfiguration.Instance.Authentication.BlockDeniedUsers)
-            {
-                string ipAddressAndName = $"{token.UserLocation}|{user.Username}";
-                if (DeniedAuthenticationHelper.RecentlyDenied(ipAddressAndName) || DeniedAuthenticationHelper.GetAttempts(ipAddressAndName) > 3)
-                {
-                    this.database.AuthenticationAttempts.RemoveRange
-                        (this.database.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
-
-                    DeniedAuthenticationHelper.AddAttempt(ipAddressAndName);
-
-                    await this.database.SaveChangesAsync();
-                    Logger.LogWarn($"Too many recent denied logins from user {user.Username}, rejecting login", LogArea.Login);
-                    return this.StatusCode(403, "");
-                }
-            }
-
             if (this.database.UserApprovedIpAddresses.Where(a => a.UserId == user.UserId).Select(a => a.IpAddress).Contains(ipAddress))
             {
                 token.Approved = true;

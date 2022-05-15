@@ -1,5 +1,4 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,8 +53,6 @@ public class AuthenticationController : ControllerBase
         this.database.GameTokens.Remove(authAttempt.GameToken);
         this.database.AuthenticationAttempts.Remove(authAttempt);
 
-        DeniedAuthenticationHelper.SetDeniedAt($"{authAttempt.IPAddress}|{user.Username}");
-
         await this.database.SaveChangesAsync();
 
         return this.Redirect("~/authentication");
@@ -76,8 +73,6 @@ public class AuthenticationController : ControllerBase
         {
             this.database.GameTokens.Remove(authAttempt.GameToken);
             this.database.AuthenticationAttempts.Remove(authAttempt);
-
-            DeniedAuthenticationHelper.SetDeniedAt($"{authAttempt.IPAddress}|{user.Username}");
         }
 
         await this.database.SaveChangesAsync();
