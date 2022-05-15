@@ -4,17 +4,14 @@ using Microsoft.AspNetCore.Http;
 
 namespace LBPUnion.ProjectLighthouse.Middlewares;
 
-public class FakeRemoteIPAddressMiddleware
+public class FakeRemoteIPAddressMiddleware : Middleware
 {
     private readonly IPAddress fakeIpAddress = IPAddress.Parse("127.0.0.1");
-    private readonly RequestDelegate next;
 
-    public FakeRemoteIPAddressMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
+    public FakeRemoteIPAddressMiddleware(RequestDelegate next) : base(next)
+    {}
 
-    public async Task Invoke(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         httpContext.Connection.RemoteIpAddress = this.fakeIpAddress;
 

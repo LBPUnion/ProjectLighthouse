@@ -6,19 +6,15 @@ using Microsoft.AspNetCore.Http;
 
 namespace LBPUnion.ProjectLighthouse.Middlewares;
 
-public class RequestLogMiddleware
+public class RequestLogMiddleware : Middleware
 {
-    private readonly RequestDelegate next;
-
-    public RequestLogMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
+    public RequestLogMiddleware(RequestDelegate next) : base(next)
+    {}
 
     // Logs every request and the response to it
     // Example: "200, 13ms: GET /LITTLEBIGPLANETPS3_XML/news"
     // Example: "404, 127ms: GET /asdasd?query=osucookiezi727ppbluezenithtopplayhdhr"
-    public async Task InvokeAsync(HttpContext context)
+    public override async Task InvokeAsync(HttpContext context)
     {
         Stopwatch requestStopwatch = new();
         requestStopwatch.Start();
