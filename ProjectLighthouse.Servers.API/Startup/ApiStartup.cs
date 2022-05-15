@@ -1,6 +1,5 @@
-using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Startup.Middlewares;
 using Microsoft.OpenApi.Models;
 
 namespace LBPUnion.ProjectLighthouse.Servers.API.Startup;

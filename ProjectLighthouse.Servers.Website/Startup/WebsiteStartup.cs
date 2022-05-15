@@ -1,5 +1,5 @@
+using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Startup;
-using LBPUnion.ProjectLighthouse.Startup.Middlewares;
 using Microsoft.AspNetCore.HttpOverrides;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Startup;

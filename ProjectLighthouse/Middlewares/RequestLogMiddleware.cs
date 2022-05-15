@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Logging;
 using Microsoft.AspNetCore.Http;
 
-namespace LBPUnion.ProjectLighthouse.Startup.Middlewares;
+namespace LBPUnion.ProjectLighthouse.Middlewares;
 
 public class RequestLogMiddleware
 {
@@ -28,7 +28,7 @@ public class RequestLogMiddleware
         // Log all headers.
 //                    foreach (KeyValuePair<string, StringValues> header in context.Request.Headers) Logger.Log($"{header.Key}: {header.Value}");
 
-        await next(context); // Handle the request so we can get the status code from it
+        await this.next(context); // Handle the request so we can get the status code from it
 
         requestStopwatch.Stop();
 
