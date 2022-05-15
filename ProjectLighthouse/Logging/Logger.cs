@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,20 +36,6 @@ public static class Logger
     {
         const int depth = 5;
         const int skipDepth = depth - 2;
-
-//        // Get the stacktrace for logging...
-//        string trace = Environment.StackTrace
-//            .Split('\n', depth + extraTraceLines, StringSplitOptions.RemoveEmptyEntries)
-//            .Skip(skipDepth + extraTraceLines)
-//            .First();
-//
-//        trace = trace.TrimEnd('\r');
-//        trace = trace.Substring(trace.LastIndexOf(Path.DirectorySeparatorChar) + 1); // Try splitting by the filename.
-//        if (trace.StartsWith("   at ")) // If we still havent split properly...
-//        {
-//            trace = trace.Substring(trace.LastIndexOf('.') + 1); // Try splitting by the last dot.
-//        }
-//        trace = trace.Replace(".cs:line ", ":");
 
         StackTrace stackTrace = new(true);
         StackFrame? frame = stackTrace.GetFrame(skipDepth + extraTraceLines);
@@ -118,6 +105,33 @@ public static class Logger
                 }
             }
         );
+
+        // Flush the log queue when we're exiting.
+        AppDomain.CurrentDomain.UnhandledException += Flush;
+        AppDomain.CurrentDomain.ProcessExit += Flush;
+    }
+
+    /// <summary>
+    /// Logs everything in the queue to all loggers immediately.
+    /// This is a helper function to allow for this function to be easily added to events.
+    /// </summary>
+    public static void Flush(object? _, EventArgs __)
+    {
+        Flush();
+    }
+
+    /// <summary>
+    /// Logs everything in the queue to all loggers immediately.
+    /// </summary>
+    public static void Flush()
+    {
+        while (logQueue.TryDequeue(out LogLine line))
+        {
+            foreach (ILogger logger in loggers)
+            {
+                logger.Log(line);
+            }
+        }
     }
 
     /// <summary>
