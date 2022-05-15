@@ -5,7 +5,7 @@ using Redis.OM.Searching;
 namespace LBPUnion.ProjectLighthouse.Extensions;
 
 [SuppressMessage("ReSharper", "LoopCanBePartlyConvertedToQuery")]
-public static class IRedisCollectionExtensions
+public static class RedisCollectionExtensions
 {
     public static void DeleteAll<T>(this IRedisCollection<T> collection, Func<T, bool> predicate)
     {

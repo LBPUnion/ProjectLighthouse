@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types;
@@ -38,8 +39,8 @@ public static class Redis
             return;
         }
 
-        await connection.CreateIndexAsync(typeof(Room));
-        await connection.CreateIndexAsync(typeof(UserFriendStore));
+        await connection.RecreateIndexAsync(typeof(Room));
+        await connection.RecreateIndexAsync(typeof(UserFriendStore));
 
         initialized = true;
         Logger.LogSuccess("Initialized Redis.", LogArea.Redis);
