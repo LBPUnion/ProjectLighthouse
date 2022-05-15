@@ -18,14 +18,6 @@ public class RoomHelper
 {
     public static readonly StorableList<Room> Rooms = RoomStore.GetRooms();
 
-    public static readonly RoomSlot PodSlot = new()
-    {
-        SlotType = SlotType.Pod,
-        SlotId = 0,
-    };
-
-    private static int roomIdIncrement;
-
     public static void StartCleanupThread()
     {
         // ReSharper disable once FunctionNeverReturns
@@ -41,7 +33,8 @@ public class RoomHelper
             }
         );
     }
-
+    
+    private static int roomIdIncrement;
     internal static int RoomIdIncrement => roomIdIncrement++;
 
     public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform, string? location)
@@ -163,7 +156,7 @@ public class RoomHelper
             RoomId = RoomIdIncrement,
             PlayerIds = users,
             State = RoomState.Idle,
-            Slot = slot ?? PodSlot,
+            Slot = slot ?? RoomSlot.PodSlot,
             RoomVersion = roomVersion,
             RoomPlatform = roomPlatform,
         };
@@ -177,23 +170,22 @@ public class RoomHelper
 
     public static Room? FindRoomByUser(int userId, GameVersion roomVersion, Platform roomPlatform, bool createIfDoesNotExist = false)
     {
-        lock(Rooms)
-            foreach (Room room in Rooms.Where(room => room.PlayerIds.Any(player => userId == player)))
-                return room;
+        foreach (Room room in Rooms.Where(room => room.PlayerIds.Any(player => userId == player)))
+            return room;
 
         return createIfDoesNotExist ? CreateRoom(userId, roomVersion, roomPlatform) : null;
     }
 
     public static Room? FindRoomByUserId(int userId)
     {
-        lock(Rooms)
-            foreach (Room room in Rooms)
+        // ReSharper disable once LoopCanBeConvertedToQuery
+        foreach (Room room in Rooms)
+        {
+            if (room.PlayerIds.Any(p => p == userId))
             {
-                if (room.PlayerIds.Any(p => p == userId))
-                {
-                    return room;
-                }
+                return room;
             }
+        }
 
         return null;
     }
@@ -201,9 +193,7 @@ public class RoomHelper
     [SuppressMessage("ReSharper", "InvertIf")]
     public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
-        lock(Rooms)
-        {
-            int roomCountBeforeCleanup = Rooms.Count();
+        int roomCountBeforeCleanup = Rooms.Count();
 
             // Remove offline players from rooms
             foreach (Room room in Rooms)
@@ -244,6 +234,5 @@ public class RoomHelper
             {
                 Logger.LogDebug($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.", LogArea.Match);
             }
-        }
     }
 }
