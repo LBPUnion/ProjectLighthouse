@@ -10,12 +10,6 @@ using System.Threading.Tasks;
 
 namespace LBPUnion.ProjectLighthouse.Logging;
 
-// TODO: make into singleton, but with ability to also have instances
-// Logger.LogSuccess() should still work and all, but ideally i'm also able to have another instance and do:
-// Logger logger = new();
-// logger.LogSuccess();
-// I should also be able to access the log queue.
-// This functionality is going to be used in the admin panel to get the output of commands.
 public class Logger
 {
     internal static readonly Logger Instance = new();
@@ -30,7 +24,7 @@ public class Logger
     public void AddLogger(ILogger logger)
     {
         loggers.Add(logger);
-        LogSuccess("Initialized " + logger.GetType().Name, LogArea.Logger);
+        LogDebug("Initialized " + logger.GetType().Name, LogArea.Logger);
     }
 
     private LogTrace getTrace(int extraTraceLines = 0)

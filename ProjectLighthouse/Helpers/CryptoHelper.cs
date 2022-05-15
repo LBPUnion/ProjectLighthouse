@@ -71,6 +71,18 @@ public static class CryptoHelper
         return b;
     }
 
+    public static string ToBase64(string str)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(str);
+        return Convert.ToBase64String(bytes);
+    }
+
+    public static string FromBase64(string base64)
+    {
+        byte[] bytes = Convert.FromBase64String(base64);
+        return Encoding.UTF8.GetString(bytes);
+    }
+
     #region Hash Functions
 
     public static string Sha256Hash(string str) => Sha256Hash(Encoding.UTF8.GetBytes(str));
@@ -86,5 +98,4 @@ public static class CryptoHelper
     public static string BCryptHash(byte[] bytes) => BCrypt.Net.BCrypt.HashPassword(Encoding.UTF8.GetString(bytes));
 
     #endregion
-
 }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Logging.Loggers;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance;
 
@@ -28,7 +30,7 @@ public static class MaintenanceHelper
             .ToList()!;
     }
 
-    public static async Task RunCommand(string[] args)
+    public static async Task<List<LogLine>> RunCommand(string[] args)
     {
         if (args.Length < 1)
             throw new Exception
@@ -36,18 +38,27 @@ public static class MaintenanceHelper
 
         string baseCmd = args[0];
         args = args.Skip(1).ToArray();
+        
+        // Setup memory logger for output
+        Logger logger = new();
+        InMemoryLogger memoryLogger = new();
+        logger.AddLogger(memoryLogger);
 
         IEnumerable<ICommand> suitableCommands = Commands.Where
                 (command => command.Aliases().Any(a => a.ToLower() == baseCmd.ToLower()))
             .Where(command => args.Length >= command.RequiredArgs());
         foreach (ICommand command in suitableCommands)
         {
-            Console.WriteLine("Running command " + command.Name());
-            await command.Run(args);
-            return;
+            logger.LogInfo("Running command " + command.Name(), LogArea.Command);
+            
+            await command.Run(args, logger);
+            logger.Flush();
+            return memoryLogger.Lines;
         }
 
-        Console.WriteLine("Command not found.");
+        logger.LogError("Command not found.", LogArea.Command);
+        logger.Flush();
+        return memoryLogger.Lines;
     }
 
     public static async Task RunMaintenanceJob(string jobName)

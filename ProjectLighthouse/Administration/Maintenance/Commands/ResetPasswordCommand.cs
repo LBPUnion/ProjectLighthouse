@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public class ResetPasswordCommand : ICommand
     public string Arguments() => "<username/userId> <sha256/plaintext>";
     public int RequiredArgs() => 2;
 
-    public async Task Run(string[] args)
+    public async Task Run(string[] args, Logger logger)
     {
         User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
         if (user == null)
@@ -30,9 +31,10 @@ public class ResetPasswordCommand : ICommand
             }
             catch
             {
-                Console.WriteLine($"Could not find user by parameter '{args[0]}'");
+                logger.LogError($"Could not find user by parameter '{args[0]}'", LogArea.Command);
                 return;
             }
+        
         string password = args[1];
         if (password.Length != 64) password = CryptoHelper.Sha256Hash(password);
 
@@ -41,6 +43,6 @@ public class ResetPasswordCommand : ICommand
 
         await this.database.SaveChangesAsync();
 
-        Console.WriteLine($"The password for user {user.Username} (id: {user.UserId}) has been reset.");
+        logger.LogSuccess($"The password for user {user.Username} (id: {user.UserId}) has been reset.", LogArea.Command);
     }
 }

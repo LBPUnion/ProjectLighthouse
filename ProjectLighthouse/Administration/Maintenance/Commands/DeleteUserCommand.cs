@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,7 @@ public class DeleteUserCommand : ICommand
         };
     public string Arguments() => "<username/userId>";
     public int RequiredArgs() => 1;
-    public async Task Run(string[] args)
+    public async Task Run(string[] args, Logger logger)
     {
         User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
         if (user == null)
@@ -28,7 +29,7 @@ public class DeleteUserCommand : ICommand
             }
             catch
             {
-                Console.WriteLine($"Could not find user by parameter '{args[0]}'");
+                logger.LogError($"Could not find user by parameter '{args[0]}'", LogArea.Command);
                 return;
             }
 

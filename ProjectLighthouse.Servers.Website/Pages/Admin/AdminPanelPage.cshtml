@@ -11,6 +11,17 @@
     Model.Title = "Admin Panel";
 }
 
+@if (Model.Log != null)
+{
+    <div class="ui bottom attached message">
+        <h2>Command Output</h2>
+        @foreach (string line in Model.Log.Split("\n"))
+        {
+            <code>@line.TrimEnd()</code><br>
+        }
+    </div>
+}
+
 @if (!this.Request.IsMobile())
 {
     <div class="ui center aligned grid">

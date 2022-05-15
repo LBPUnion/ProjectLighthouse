@@ -1,11 +1,12 @@
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class TestWebhookCommand : ICommand
 {
-    public async Task Run(string[] args)
+    public async Task Run(string[] args, Logger logger)
     {
         await WebhookHelper.SendWebhook("Testing 123", "Someone is testing the Discord webhook from the admin panel.");
     }

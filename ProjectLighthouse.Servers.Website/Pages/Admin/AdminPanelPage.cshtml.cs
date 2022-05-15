@@ -1,7 +1,9 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
@@ -17,7 +19,9 @@ public class AdminPanelPage : BaseLayout
 
     public List<AdminPanelStatistic> Statistics = new();
 
-    public async Task<IActionResult> OnGet([FromQuery] string? args, [FromQuery] string? command, [FromQuery] string? maintenanceJob)
+    public string? Log;
+
+    public async Task<IActionResult> OnGet([FromQuery] string? args, [FromQuery] string? command, [FromQuery] string? maintenanceJob, [FromQuery] string? log)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
@@ -33,14 +37,20 @@ public class AdminPanelPage : BaseLayout
             args ??= "";
             args = command + " " + args;
             string[] split = args.Split(" ");
-            await MaintenanceHelper.RunCommand(split);
-            return this.Redirect("~/admin");
+
+            List<LogLine> runCommand = await MaintenanceHelper.RunCommand(split);
+            return this.Redirect($"~/admin?log={CryptoHelper.ToBase64(runCommand.ToLogString())}");
         }
 
         if (!string.IsNullOrEmpty(maintenanceJob))
         {
             await MaintenanceHelper.RunMaintenanceJob(maintenanceJob);
             return this.Redirect("~/admin");
+        }
+
+        if (!string.IsNullOrEmpty(log))
+        {
+            this.Log = CryptoHelper.FromBase64(log);
         }
 
         return this.Page();

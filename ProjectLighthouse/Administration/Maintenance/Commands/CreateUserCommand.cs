@@ -11,7 +11,7 @@ public class CreateUserCommand : ICommand
 {
     private readonly Database _database = new();
 
-    public async Task Run(string[] args)
+    public async Task Run(string[] args, Logger logger)
     {
         string onlineId = args[0];
         string password = args[1];
@@ -22,17 +22,17 @@ public class CreateUserCommand : ICommand
         if (user == null)
         {
             user = await this._database.CreateUser(onlineId, CryptoHelper.BCryptHash(password));
-            Logger.Success($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LogArea.Login);
+            logger.LogSuccess($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LogArea.Command);
 
             user.PasswordResetRequired = true;
-            Logger.Info("This user will need to reset their password when they log in.", LogArea.Login);
+            logger.LogInfo("This user will need to reset their password when they log in.", LogArea.Command);
 
             await this._database.SaveChangesAsync();
-            Logger.Info("Database changes saved.", LogArea.Database);
+            logger.LogInfo("Database changes saved.", LogArea.Command);
         }
         else
         {
-            Logger.Error("A user with this username already exists.", LogArea.Login);
+            logger.LogError("A user with this username already exists.", LogArea.Command);
         }
     }
 

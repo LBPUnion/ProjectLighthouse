@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -71,7 +73,8 @@ public static class StartupTasks
 
         if (args.Length != 0)
         {
-            MaintenanceHelper.RunCommand(args).Wait();
+            List<LogLine> logLines = MaintenanceHelper.RunCommand(args).Result;
+            Console.WriteLine(logLines.ToLogString());
             return;
         }
 
