@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -29,6 +31,13 @@ public static class Redis
 
         IRedisConnection connection = getConnection();
 
+        string pong = (await connection.ExecuteAsync("PING")).ToString(CultureInfo.InvariantCulture);
+        if (pong != "PONG")
+        {
+            Logger.LogError("Could not ping, ping returned " + pong, LogArea.Redis);
+            return;
+        }
+
         await connection.CreateIndexAsync(typeof(Room));
         await connection.CreateIndexAsync(typeof(UserFriendStore));
 
@@ -38,7 +47,7 @@ public static class Redis
 
     private static IRedisConnection getConnection()
     {
-        Logger.LogDebug("Getting a redis connection", LogArea.Redis);
+        Logger.LogDebug("Getting a Redis connection", LogArea.Redis);
         return provider.Connection;
     }
 
