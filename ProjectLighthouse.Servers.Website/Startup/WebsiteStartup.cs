@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Startup;
 
-public sealed class WebsiteStartup
+public class WebsiteStartup
 {
     public WebsiteStartup(IConfiguration configuration)
     {
@@ -41,7 +41,7 @@ public sealed class WebsiteStartup
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         #if DEBUG
         app.UseDeveloperExceptionPage();
