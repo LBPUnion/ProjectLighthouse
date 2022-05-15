@@ -1,13 +1,11 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Maintenance.Commands;
 
-[UsedImplicitly]
 public class MakeUserAdminCommand : ICommand
 {
     private readonly Database database = new();

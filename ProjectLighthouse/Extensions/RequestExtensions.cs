@@ -15,9 +15,10 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class RequestExtensions
 {
-    // yoinked and adapted from https://stackoverflow.com/a/68641796
 
     #region Mobile Checking
+
+    // yoinked and adapted from https://stackoverflow.com/a/68641796
 
     private static readonly Regex mobileCheck = new
     (

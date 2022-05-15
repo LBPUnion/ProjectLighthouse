@@ -1,14 +1,12 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Maintenance.Commands;
 
-[UsedImplicitly]
 public class ResetPasswordCommand : ICommand
 {
     private readonly Database database = new();

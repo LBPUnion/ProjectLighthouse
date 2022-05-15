@@ -1,10 +1,8 @@
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Maintenance.Commands;
 
-[UsedImplicitly]
 public class TestWebhookCommand : ICommand
 {
     public async Task Run(string[] args)

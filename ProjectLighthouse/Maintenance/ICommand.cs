@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace LBPUnion.ProjectLighthouse.Maintenance;
 
+[UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public interface ICommand
 {
 
