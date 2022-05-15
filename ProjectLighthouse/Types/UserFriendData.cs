@@ -6,7 +6,7 @@ namespace LBPUnion.ProjectLighthouse.Types;
 
 [SuppressMessage("ReSharper", "CollectionNeverQueried.Global")]
 [Document(StorageType = StorageType.Json)]
-public class UserFriendStore
+public class UserFriendData
 {
     private int userId;
     public int UserId {

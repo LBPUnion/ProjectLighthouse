@@ -5,18 +5,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.StorableLists;
+using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Match;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
-using Redis.OM;
-using Redis.OM.Searching;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public class RoomHelper
 {
-    public static readonly IRedisCollection<Room> Rooms = Redis.GetRooms();
+    public static readonly StorableList<Room> Rooms = RoomStore.GetRooms();
 
     public static readonly RoomSlot PodSlot = new()
     {
@@ -169,7 +169,7 @@ public class RoomHelper
         };
 
         CleanupRooms(room.HostId, room);
-        lock(Rooms) Rooms.Insert(room);
+        lock(Rooms) Rooms.Add(room);
         Logger.LogInfo($"Created room (id: {room.RoomId}) for host {room.HostId}", LogArea.Match);
 
         return room;
@@ -201,7 +201,6 @@ public class RoomHelper
     [SuppressMessage("ReSharper", "InvertIf")]
     public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
-//        return;
         lock(Rooms)
         {
             int roomCountBeforeCleanup = Rooms.Count();
@@ -220,7 +219,7 @@ public class RoomHelper
             if (hostId != null)
                 try
                 {
-                    Rooms.DeleteAll(r => r.HostId == hostId);
+                    Rooms.RemoveAll(r => r.HostId == hostId);
                 }
                 catch
                 {
@@ -236,8 +235,8 @@ public class RoomHelper
                     foreach (int newRoomPlayer in newRoom.PlayerIds) room.PlayerIds.RemoveAll(p => p == newRoomPlayer);
                 }
 
-            Rooms.DeleteAll(r => r.PlayerIds.Count == 0); // Remove empty rooms
-            Rooms.DeleteAll(r => r.PlayerIds.Count > 4); // Remove obviously bogus rooms
+            Rooms.RemoveAll(r => r.PlayerIds.Count == 0); // Remove empty rooms
+            Rooms.RemoveAll(r => r.PlayerIds.Count > 4); // Remove obviously bogus rooms
 
             int roomCountAfterCleanup = Rooms.Count();
 

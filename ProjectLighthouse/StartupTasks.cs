@@ -4,6 +4,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
 using LBPUnion.ProjectLighthouse.Startup;
+using LBPUnion.ProjectLighthouse.StorableLists;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +78,7 @@ public static class StartupTasks
         RoomHelper.StartCleanupThread();
 
         Logger.LogInfo("Initializing Redis...", LogArea.Startup);
-        Redis.Initialize().Wait();
+        RedisDatabase.Initialize().Wait();
 
         stopwatch.Stop();
         Logger.LogSuccess($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);

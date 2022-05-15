@@ -2,6 +2,8 @@
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.StorableLists;
+using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types;
 using LBPUnion.ProjectLighthouse.Types.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -53,13 +55,13 @@ public class FriendsController : ControllerBase
             blockedUsers.Add(blockedUser.UserId);
         }
 
-        UserFriendStore? friendStore = Redis.GetUserFriendStore(user.UserId);
-        if (friendStore == null) friendStore = Redis.CreateUserFriendStore(user.UserId);
+        UserFriendData? friendStore = UserFriendStore.GetUserFriendData(user.UserId);
+        if (friendStore == null) friendStore = UserFriendStore.CreateUserFriendData(user.UserId);
 
         friendStore.FriendIds = friends.Select(u => u.UserId).ToList();
         friendStore.BlockedIds = blockedUsers;
-        
-        Redis.UpdateFriendStore(friendStore);
+
+        UserFriendStore.UpdateFriendData(friendStore);
 
         string friendsSerialized = friends.Aggregate(string.Empty, (current, user1) => current + LbpSerializer.StringElement("npHandle", user1.Username));
 
@@ -77,7 +79,7 @@ public class FriendsController : ControllerBase
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 
-        UserFriendStore? friendStore = Redis.GetUserFriendStore(user.UserId);
+        UserFriendData? friendStore = UserFriendStore.GetUserFriendData(user.UserId);
 
         if (friendStore == null)
             return this.Ok(LbpSerializer.BlankElement("myFriends"));

@@ -40,7 +40,7 @@ public class RoomVisualizerController : ControllerBase
         #if !DEBUG
         return this.NotFound();
         #else
-        RoomHelper.Rooms.DeleteAll();
+        RoomHelper.Rooms.RemoveAll();
         return this.Redirect("/debug/roomVisualizer");
         #endif
     }
