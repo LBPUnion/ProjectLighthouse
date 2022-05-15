@@ -1,4 +1,7 @@
-namespace LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+
+namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 
 public struct MinimalSlot
 {

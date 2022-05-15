@@ -1,4 +1,4 @@
-namespace LBPUnion.ProjectLighthouse.Types.Api;
+namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 
 public class StatisticsResponse
 {
