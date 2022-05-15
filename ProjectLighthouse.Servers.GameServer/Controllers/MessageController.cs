@@ -98,7 +98,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string scannedText = CensorHelper.ScanMessage(response);
 
-        Logger.LogInfo($"{user.Username}: {response} / {scannedText}", LogArea.Filter);
+        Logger.Info($"{user.Username}: {response} / {scannedText}", LogArea.Filter);
 
         return this.Ok(scannedText);
     }

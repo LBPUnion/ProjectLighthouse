@@ -64,7 +64,7 @@ public class PhotosController : ControllerBase
             if (subject.User == null) continue;
 
             subject.UserId = subject.User.UserId;
-            Logger.LogDebug($"Adding PhotoSubject (userid {subject.UserId}) to db", LogArea.Photos);
+            Logger.Debug($"Adding PhotoSubject (userid {subject.UserId}) to db", LogArea.Photos);
 
             this.database.PhotoSubjects.Add(subject);
         }
@@ -84,7 +84,7 @@ public class PhotosController : ControllerBase
 
         //            photo.Slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId);
 
-        Logger.LogDebug($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LogArea.Photos);
+        Logger.Debug($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LogArea.Photos);
 
         this.database.Photos.Add(photo);
 

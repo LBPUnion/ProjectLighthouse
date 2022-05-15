@@ -49,18 +49,18 @@ public class DebugWarmupLifetime : IHostLifetime
 
         url = url.Replace("0.0.0.0", "127.0.0.1");
 
-        Logger.LogDebug("Warming up Hot Reload...", LogArea.Startup);
+        Logger.Debug("Warming up Hot Reload...", LogArea.Startup);
         try
         {
             client.GetAsync(url).Wait();
         }
         catch(Exception e)
         {
-            Logger.LogDebug("An error occurred while attempting to warm up hot reload. Initial page load will be delayed.", LogArea.Startup);
-            Logger.LogDebug(e.ToDetailedException(), LogArea.Startup);
+            Logger.Debug("An error occurred while attempting to warm up hot reload. Initial page load will be delayed.", LogArea.Startup);
+            Logger.Debug(e.ToDetailedException(), LogArea.Startup);
             return;
         }
-        Logger.LogSuccess("Hot Reload is ready to go!", LogArea.Startup);
+        Logger.Success("Hot Reload is ready to go!", LogArea.Startup);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => this.consoleLifetime.StopAsync(cancellationToken);

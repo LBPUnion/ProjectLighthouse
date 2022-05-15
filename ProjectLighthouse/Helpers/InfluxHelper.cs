@@ -51,8 +51,8 @@ public static class InfluxHelper
         }
         catch(Exception e)
         {
-            Logger.LogError("Exception while logging: ", LogArea.InfluxDB);
-            Logger.LogError(e.ToDetailedException(), LogArea.InfluxDB);
+            Logger.Error("Exception while logging: ", LogArea.InfluxDB);
+            Logger.Error(e.ToDetailedException(), LogArea.InfluxDB);
         }
     }
 
@@ -60,7 +60,7 @@ public static class InfluxHelper
     public static async Task StartLogging()
     {
         await Client.ReadyAsync();
-        Logger.LogSuccess("InfluxDB is now ready.", LogArea.InfluxDB);
+        Logger.Success("InfluxDB is now ready.", LogArea.InfluxDB);
         Thread t = new
         (
             delegate()
@@ -73,8 +73,8 @@ public static class InfluxHelper
                     }
                     catch(Exception e)
                     {
-                        Logger.LogError("Exception while running log thread: ", LogArea.InfluxDB);
-                        Logger.LogError(e.ToDetailedException(), LogArea.InfluxDB);
+                        Logger.Error("Exception while running log thread: ", LogArea.InfluxDB);
+                        Logger.Error(e.ToDetailedException(), LogArea.InfluxDB);
                     }
 
                     Thread.Sleep(60000);

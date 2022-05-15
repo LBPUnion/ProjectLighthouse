@@ -11,13 +11,13 @@ public static class RedisConnectionExtensions
 {
     public static async Task RecreateIndexAsync(this IRedisConnection connection, Type type)
     {
-        Logger.LogDebug("Recreating index for " + type.Name, LogArea.Redis);
+        Logger.Debug("Recreating index for " + type.Name, LogArea.Redis);
         
         // TODO: use `await connection.DropIndexAndAssociatedRecordsAsync(type);` here instead when that becomes a thing
         bool dropped = await connection.DropIndexAsync(type);
-        Logger.LogDebug("Dropped index: " + dropped, LogArea.Redis);
+        Logger.Debug("Dropped index: " + dropped, LogArea.Redis);
         
         bool created = await connection.CreateIndexAsync(type);
-        Logger.LogDebug("Created index: " + created, LogArea.Redis);
+        Logger.Debug("Created index: " + created, LogArea.Redis);
     }
 }

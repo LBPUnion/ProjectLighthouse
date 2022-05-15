@@ -47,7 +47,7 @@ public class ServerConfiguration
     {
         if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
-        Logger.LogInfo("Loading config...", LogArea.Config);
+        Logger.Info("Loading config...", LogArea.Config);
 
         ServerConfiguration? tempConfig;
 
@@ -59,7 +59,7 @@ public class ServerConfiguration
 
             if (Instance.ConfigVersion < CurrentConfigVersion)
             {
-                Logger.LogInfo($"Upgrading config file from version {Instance.ConfigVersion} to version {CurrentConfigVersion}", LogArea.Config);
+                Logger.Info($"Upgrading config file from version {Instance.ConfigVersion} to version {CurrentConfigVersion}", LogArea.Config);
                 Instance.ConfigVersion = CurrentConfigVersion;
 
                 Instance.writeConfig(ConfigFileName);
@@ -68,10 +68,10 @@ public class ServerConfiguration
         // If we have a valid legacy configuration we can migrate, let's do it now.
         else if (File.Exists(LegacyConfigFileName))
         {
-            Logger.LogWarn("This version of Project Lighthouse now uses YML instead of JSON to store configuration.", LogArea.Config);
-            Logger.LogWarn
+            Logger.Warn("This version of Project Lighthouse now uses YML instead of JSON to store configuration.", LogArea.Config);
+            Logger.Warn
                 ("As such, the config will now be migrated to use YML. Do not modify the original JSON file; changes will not be kept.", LogArea.Config);
-            Logger.LogInfo($"The new configuration is stored at {ConfigFileName}.", LogArea.Config);
+            Logger.Info($"The new configuration is stored at {ConfigFileName}.", LogArea.Config);
 
             LegacyServerSettings? legacyConfig = LegacyServerSettings.FromFile(LegacyConfigFileName);
             Debug.Assert(legacyConfig != null);
@@ -79,7 +79,7 @@ public class ServerConfiguration
 
             Instance.writeConfig(ConfigFileName);
 
-            Logger.LogSuccess("The configuration migration completed successfully.", LogArea.Config);
+            Logger.Success("The configuration migration completed successfully.", LogArea.Config);
         }
         // If there is no valid YML configuration available,
         // generate a blank one and ask the server operator to configure it, then exit.
@@ -87,7 +87,7 @@ public class ServerConfiguration
         {
             new ServerConfiguration().writeConfig(ConfigFileName + ".configme");
 
-            Logger.LogWarn
+            Logger.Warn
             (
                 "The configuration file was not found. " +
                 "A blank configuration file has been created for you at " +
@@ -101,7 +101,7 @@ public class ServerConfiguration
         // Set up reloading
         if (Instance.ConfigReloading)
         {
-            Logger.LogInfo("Setting up config reloading...", LogArea.Config);
+            Logger.Info("Setting up config reloading...", LogArea.Config);
             fileWatcher = new FileSystemWatcher
             {
                 Path = Environment.CurrentDirectory,
@@ -119,19 +119,19 @@ public class ServerConfiguration
     private static void onConfigChanged(object sender, FileSystemEventArgs e)
     {
         Debug.Assert(e.Name == ConfigFileName);
-        Logger.LogInfo("Configuration file modified, reloading config...", LogArea.Config);
-        Logger.LogWarn("Some changes may not apply; they will require a restart of Lighthouse.", LogArea.Config);
+        Logger.Info("Configuration file modified, reloading config...", LogArea.Config);
+        Logger.Warn("Some changes may not apply; they will require a restart of Lighthouse.", LogArea.Config);
 
         ServerConfiguration? configuration = fromFile(ConfigFileName);
         if (configuration == null)
         {
-            Logger.LogWarn("The new configuration was unable to be loaded for some reason. The old config has been kept.", LogArea.Config);
+            Logger.Warn("The new configuration was unable to be loaded for some reason. The old config has been kept.", LogArea.Config);
             return;
         }
 
         Instance = configuration;
 
-        Logger.LogSuccess("Successfully reloaded the configuration!", LogArea.Config);
+        Logger.Success("Successfully reloaded the configuration!", LogArea.Config);
     }
 
     private static INamingConvention namingConvention = CamelCaseNamingConvention.Instance;

@@ -22,17 +22,17 @@ public class CreateUserCommand : ICommand
         if (user == null)
         {
             user = await this._database.CreateUser(onlineId, CryptoHelper.BCryptHash(password));
-            Logger.LogSuccess($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LogArea.Login);
+            Logger.Success($"Created user {user.UserId} with online ID (username) {user.Username} and the specified password.", LogArea.Login);
 
             user.PasswordResetRequired = true;
-            Logger.LogInfo("This user will need to reset their password when they log in.", LogArea.Login);
+            Logger.Info("This user will need to reset their password when they log in.", LogArea.Login);
 
             await this._database.SaveChangesAsync();
-            Logger.LogInfo("Database changes saved.", LogArea.Database);
+            Logger.Info("Database changes saved.", LogArea.Database);
         }
         else
         {
-            Logger.LogError("A user with this username already exists.", LogArea.Login);
+            Logger.Error("A user with this username already exists.", LogArea.Login);
         }
     }
 

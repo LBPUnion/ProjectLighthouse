@@ -29,7 +29,7 @@ public static class VersionHelper
         }
         catch
         {
-            Logger.LogError
+            Logger.Error
             (
                 "Project Lighthouse was built incorrectly. Please make sure git is available when building. " +
                 "Because of this, you will not be notified of updates.",
@@ -42,7 +42,7 @@ public static class VersionHelper
 
         if (IsDirty)
         {
-            Logger.LogWarn
+            Logger.Warn
             (
                 "This is a modified version of Project Lighthouse. " +
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",

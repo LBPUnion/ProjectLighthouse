@@ -51,7 +51,7 @@ public class GameServerStartup
 
         if (string.IsNullOrEmpty(ServerConfiguration.Instance.DigestKey.PrimaryDigestKey))
         {
-            Logger.LogWarn
+            Logger.Warn
             (
                 "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will also prevent LBP 1, LBP 2, and LBP Vita from working. " +
                 "To increase security, it is recommended that you find and set this variable.",

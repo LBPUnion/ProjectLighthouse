@@ -16,30 +16,31 @@ namespace LBPUnion.ProjectLighthouse.Logging;
 // logger.LogSuccess();
 // I should also be able to access the log queue.
 // This functionality is going to be used in the admin panel to get the output of commands.
-public static class Logger
+public class Logger
 {
-
+    internal static readonly Logger Instance = new();
+    
     #region Internals
 
     /// <summary>
     /// A list of custom loggers to use.
     /// </summary>
-    private static readonly List<ILogger> loggers = new();
+    private readonly List<ILogger> loggers = new();
 
-    public static void AddLogger(ILogger logger)
+    public void AddLogger(ILogger logger)
     {
         loggers.Add(logger);
         LogSuccess("Initialized " + logger.GetType().Name, LogArea.Logger);
     }
 
-    private static LogTrace getTrace(int extraTraceLines = 0)
+    private LogTrace getTrace(int extraTraceLines = 0)
     {
         const int depth = 5;
         const int skipDepth = depth - 2;
 
         StackTrace stackTrace = new(true);
         StackFrame? frame = stackTrace.GetFrame(skipDepth + extraTraceLines);
-        Debug.Assert(frame != null);
+        System.Diagnostics.Debug.Assert(frame != null);
 
         string? name;
         string? section;
@@ -76,19 +77,19 @@ public static class Logger
     /// We use a queue because if two threads try to log something at the time they'll mess each other's printing up.
     /// </para>
     /// </summary>
-    private static readonly ConcurrentQueue<LogLine> logQueue = new();
+    private readonly ConcurrentQueue<LogLine> logQueue = new();
 
     /// <summary>
     /// Adds a <see cref="LogLine"/> to the queue. Only used internally.
     /// </summary>
     /// <param name="logLine">The logLine to send to the queue.</param>
-    private static void queueLog(LogLine logLine)
+    private void queueLog(LogLine logLine)
     {
         logQueue.Enqueue(logLine);
     }
 
     [SuppressMessage("ReSharper", "FunctionNeverReturns")]
-    static Logger() // Start queue thread on first Logger access
+    public Logger() // Start queue thread on first Logger access
     {
         Task.Factory.StartNew
         (
@@ -115,7 +116,7 @@ public static class Logger
     /// Logs everything in the queue to all loggers immediately.
     /// This is a helper function to allow for this function to be easily added to events.
     /// </summary>
-    public static void Flush(object? _, EventArgs __)
+    public void Flush(object? _, EventArgs __)
     {
         Flush();
     }
@@ -123,7 +124,7 @@ public static class Logger
     /// <summary>
     /// Logs everything in the queue to all loggers immediately.
     /// </summary>
-    public static void Flush()
+    public void Flush()
     {
         while (logQueue.TryDequeue(out LogLine line))
         {
@@ -138,7 +139,7 @@ public static class Logger
     /// A function used by the queue thread 
     /// </summary>
     /// <returns></returns>
-    private static bool queueLoop()
+    private bool queueLoop()
     {
         bool logged = false;
         if (logQueue.TryDequeue(out LogLine line))
@@ -157,48 +158,73 @@ public static class Logger
     #endregion
 
     #region Logging functions
-
-    public static void LogDebug(string text, LogArea logArea)
+    #region Static
+    public static void Debug(string text, LogArea logArea)
     {
         #if DEBUG
-        Log(text, logArea.ToString(), LogLevel.Debug);
+        Instance.Log(text, logArea.ToString(), LogLevel.Debug);
         #endif
     }
 
-    public static void LogSuccess(string text, LogArea logArea)
+    public static void Success(string text, LogArea logArea)
     {
-        Log(text, logArea.ToString(), LogLevel.Success);
+        Instance.Log(text, logArea.ToString(), LogLevel.Success);
     }
 
-    public static void LogInfo(string text, LogArea logArea)
+    public static void Info(string text, LogArea logArea)
     {
-        Log(text, logArea.ToString(), LogLevel.Info);
+        Instance.Log(text, logArea.ToString(), LogLevel.Info);
     }
 
-    public static void LogWarn(string text, LogArea logArea)
+    public static void Warn(string text, LogArea logArea)
     {
-        Log(text, logArea.ToString(), LogLevel.Warning);
+        Instance.Log(text, logArea.ToString(), LogLevel.Warning);
     }
 
-    public static void LogError(string text, LogArea logArea)
+    public static void Error(string text, LogArea logArea)
     {
-        Log(text, logArea.ToString(), LogLevel.Error);
+        Instance.Log(text, logArea.ToString(), LogLevel.Error);
+    }
+    
+    #endregion
+    #region Instance-based
+    public void LogDebug(string text, LogArea logArea)
+    {
+        #if DEBUG
+        this.Log(text, logArea.ToString(), LogLevel.Debug);
+        #endif
     }
 
-    public static void Log(string text, string area, LogLevel level, int extraTraceLines = 0)
+    public void LogSuccess(string text, LogArea logArea)
     {
-        queueLog
-        (
-            new LogLine
-            {
-                Level = level,
-                Message = text,
-                Area = area,
-                Trace = getTrace(extraTraceLines),
-            }
-        );
+        this.Log(text, logArea.ToString(), LogLevel.Success);
     }
 
+    public void LogInfo(string text, LogArea logArea)
+    {
+        this.Log(text, logArea.ToString(), LogLevel.Info);
+    }
+
+    public void LogWarn(string text, LogArea logArea)
+    {
+        this.Log(text, logArea.ToString(), LogLevel.Warning);
+    }
+
+    public void LogError(string text, LogArea logArea)
+    {
+        this.Log(text, logArea.ToString(), LogLevel.Error);
+    }
     #endregion
 
+    public void Log(string text, string area, LogLevel level, int extraTraceLines = 0)
+    {
+        queueLog(new LogLine
+        {
+            Level = level,
+            Message = text,
+            Area = area,
+            Trace = getTrace(extraTraceLines),
+        });
+    }
+    #endregion
 }

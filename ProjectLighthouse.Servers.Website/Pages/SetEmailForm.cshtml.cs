@@ -70,7 +70,7 @@ public class SetEmailForm : BaseLayout
             }
         );
 
-        Logger.LogSuccess($"User {user.Username} (id: {user.UserId}) successfully logged in on web after setting an email address", LogArea.Login);
+        Logger.Success($"User {user.Username} (id: {user.UserId}) successfully logged in on web after setting an email address", LogArea.Login);
 
         this.Database.WebTokens.Add(webToken);
         await this.Database.SaveChangesAsync();

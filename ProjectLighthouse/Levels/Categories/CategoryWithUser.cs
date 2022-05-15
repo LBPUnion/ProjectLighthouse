@@ -13,7 +13,7 @@ public abstract class CategoryWithUser : Category
     public override Slot? GetPreviewSlot(Database database)
     {
         #if DEBUG
-        Logger.LogError("tried to get preview slot without user on CategoryWithUser", LogArea.Category);
+        Logger.Error("tried to get preview slot without user on CategoryWithUser", LogArea.Category);
         if (Debugger.IsAttached) Debugger.Break();
         #endif
         return null;
@@ -23,7 +23,7 @@ public abstract class CategoryWithUser : Category
     public override int GetTotalSlots(Database database)
     {
         #if DEBUG
-        Logger.LogError("tried to get total slots without user on CategoryWithUser", LogArea.Category);
+        Logger.Error("tried to get total slots without user on CategoryWithUser", LogArea.Category);
         if (Debugger.IsAttached) Debugger.Break();
         #endif
         return -1;
@@ -33,7 +33,7 @@ public abstract class CategoryWithUser : Category
     public override IEnumerable<Slot> GetSlots(Database database, int pageStart, int pageSize)
     {
         #if DEBUG
-        Logger.LogError("tried to get slots without user on CategoryWithUser", LogArea.Category);
+        Logger.Error("tried to get slots without user on CategoryWithUser", LogArea.Category);
         if (Debugger.IsAttached) Debugger.Break();
         #endif
         return new List<Slot>();
@@ -41,7 +41,7 @@ public abstract class CategoryWithUser : Category
 
     public new string Serialize(Database database)
     {
-        Logger.LogError("tried to serialize without user on CategoryWithUser", LogArea.Category);
+        Logger.Error("tried to serialize without user on CategoryWithUser", LogArea.Category);
         return string.Empty;
     }
 

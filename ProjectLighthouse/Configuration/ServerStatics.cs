@@ -19,7 +19,7 @@ public static class ServerStatics
             }
             catch(Exception e)
             {
-                Logger.LogError(e.ToString(), LogArea.Database);
+                Logger.Error(e.ToString(), LogArea.Database);
                 return false;
             }
         }

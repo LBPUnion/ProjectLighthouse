@@ -27,47 +27,47 @@ public static class StartupTasks
         #endif
 
         // Setup logging
-        Logger.AddLogger(new ConsoleLogger());
-        Logger.AddLogger(new LighthouseFileLogger());
+        Logger.Instance.AddLogger(new ConsoleLogger());
+        Logger.Instance.AddLogger(new LighthouseFileLogger());
 
-        Logger.LogInfo($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
-        Logger.LogInfo($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
+        Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
+        Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
 
         // Referencing ServerSettings.Instance here loads the config, see ServerSettings.cs for more information
-        Logger.LogSuccess("Loaded config file version " + ServerConfiguration.Instance.ConfigVersion, LogArea.Startup);
+        Logger.Success("Loaded config file version " + ServerConfiguration.Instance.ConfigVersion, LogArea.Startup);
 
-        Logger.LogInfo("Connecting to the database...", LogArea.Startup);
+        Logger.Info("Connecting to the database...", LogArea.Startup);
         bool dbConnected = ServerStatics.DbConnected;
         if (!dbConnected)
         {
-            Logger.LogError("Database unavailable! Exiting.", LogArea.Startup);
+            Logger.Error("Database unavailable! Exiting.", LogArea.Startup);
         }
         else
         {
-            Logger.LogSuccess("Connected!", LogArea.Startup);
+            Logger.Success("Connected!", LogArea.Startup);
         }
 
         if (!dbConnected) Environment.Exit(1);
         using Database database = new();
 
-        Logger.LogInfo("Migrating database...", LogArea.Database);
+        Logger.Info("Migrating database...", LogArea.Database);
         migrateDatabase(database);
         
         if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
         {
-            Logger.LogInfo("Influx logging is enabled. Starting influx logging...", LogArea.Startup);
+            Logger.Info("Influx logging is enabled. Starting influx logging...", LogArea.Startup);
             InfluxHelper.StartLogging().Wait();
-            if (ServerConfiguration.Instance.InfluxDB.LoggingEnabled) Logger.AddLogger(new InfluxLogger());
+            if (ServerConfiguration.Instance.InfluxDB.LoggingEnabled) Logger.Instance.AddLogger(new InfluxLogger());
         }
 
-        Logger.LogDebug
+        Logger.Debug
         (
             "This is a debug build, so performance may suffer! " +
             "If you are running Lighthouse in a production environment, " +
             "it is highly recommended to run a release build. ",
             LogArea.Startup
         );
-        Logger.LogDebug("You can do so by running any dotnet command with the flag: \"-c Release\". ", LogArea.Startup);
+        Logger.Debug("You can do so by running any dotnet command with the flag: \"-c Release\". ", LogArea.Startup);
 
         if (args.Length != 0)
         {
@@ -77,14 +77,14 @@ public static class StartupTasks
 
         if (ServerConfiguration.Instance.WebsiteConfiguration.ConvertAssetsOnStartup) FileHelper.ConvertAllTexturesToPng();
 
-        Logger.LogInfo("Starting room cleanup thread...", LogArea.Startup);
+        Logger.Info("Starting room cleanup thread...", LogArea.Startup);
         RoomHelper.StartCleanupThread();
 
-        Logger.LogInfo("Initializing Redis...", LogArea.Startup);
+        Logger.Info("Initializing Redis...", LogArea.Startup);
         RedisDatabase.Initialize().Wait();
 
         stopwatch.Stop();
-        Logger.LogSuccess($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
+        Logger.Success($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
     }
 
     private static void migrateDatabase(Database database)
@@ -95,6 +95,6 @@ public static class StartupTasks
         database.Database.MigrateAsync().Wait();
 
         stopwatch.Stop();
-        Logger.LogSuccess($"Migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+        Logger.Success($"Migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
     }
 }

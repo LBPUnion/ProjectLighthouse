@@ -28,7 +28,7 @@ public class RequestLogMiddleware : Middleware
 
         requestStopwatch.Stop();
 
-        Logger.LogInfo
+        Logger.Info
         (
             $"{context.Response.StatusCode}, {requestStopwatch.ElapsedMilliseconds}ms: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}",
             LogArea.HTTP
@@ -39,7 +39,7 @@ public class RequestLogMiddleware : Middleware
         if (context.Request.Method == "POST")
         {
             context.Request.Body.Position = 0;
-            Logger.LogDebug(await new StreamReader(context.Request.Body).ReadToEndAsync(), LogArea.HTTP);
+            Logger.Debug(await new StreamReader(context.Request.Body).ReadToEndAsync(), LogArea.HTTP);
         }
         #endif
     }

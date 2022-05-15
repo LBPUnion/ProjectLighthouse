@@ -44,14 +44,14 @@ public class LoginController : ControllerBase
 
         if (npTicket == null)
         {
-            Logger.LogWarn("npTicket was null, rejecting login", LogArea.Login);
+            Logger.Warn("npTicket was null, rejecting login", LogArea.Login);
             return this.BadRequest();
         }
 
         IPAddress? remoteIpAddress = this.HttpContext.Connection.RemoteIpAddress;
         if (remoteIpAddress == null)
         {
-            Logger.LogWarn("unable to determine ip, rejecting login", LogArea.Login);
+            Logger.Warn("unable to determine ip, rejecting login", LogArea.Login);
             return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
         }
 
@@ -67,7 +67,7 @@ public class LoginController : ControllerBase
             token = await this.database.AuthenticateUser(npTicket, ipAddress);
             if (token == null)
             {
-                Logger.LogWarn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
+                Logger.Warn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
                 return this.StatusCode(403, ""); // If not, then 403.
             }
         }
@@ -76,7 +76,7 @@ public class LoginController : ControllerBase
 
         if (user == null || user.Banned)
         {
-            Logger.LogError($"Unable to find user {npTicket.Username} from token", LogArea.Login);
+            Logger.Error($"Unable to find user {npTicket.Username} from token", LogArea.Login);
             return this.StatusCode(403, "");
         }
 
@@ -109,11 +109,11 @@ public class LoginController : ControllerBase
 
         if (!token.Approved)
         {
-            Logger.LogWarn($"Token unapproved for user {user.Username}, rejecting login", LogArea.Login);
+            Logger.Warn($"Token unapproved for user {user.Username}, rejecting login", LogArea.Login);
             return this.StatusCode(403, "");
         }
 
-        Logger.LogSuccess($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);
+        Logger.Success($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);
         // After this point we are now considering this session as logged in.
 
         // We just logged in with the token. Mark it as used so someone else doesnt try to use it,

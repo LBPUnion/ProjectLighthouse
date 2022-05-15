@@ -36,7 +36,7 @@ public static class RedisDatabase
             string pong = (await connection.ExecuteAsync("PING")).ToString(CultureInfo.InvariantCulture);
             if (pong != "PONG")
             {
-                Logger.LogError("Could not ping, ping returned " + pong,
+                Logger.Error("Could not ping, ping returned " + pong,
                     LogArea.Redis);
                 return;
             }
@@ -46,17 +46,17 @@ public static class RedisDatabase
         }
         catch(Exception e)
         {
-            Logger.LogError("Could not initialize Redis:\n" + e, LogArea.Redis);
+            Logger.Error("Could not initialize Redis:\n" + e, LogArea.Redis);
             return;
         }
 
         Initialized = true;
-        Logger.LogSuccess("Initialized Redis.", LogArea.Redis);
+        Logger.Success("Initialized Redis.", LogArea.Redis);
     }
 
     private static IRedisConnection getConnection()
     {
-        Logger.LogDebug("Getting a Redis connection", LogArea.Redis);
+        Logger.Debug("Getting a Redis connection", LogArea.Redis);
         return provider.Connection;
     }
 

@@ -46,7 +46,7 @@ public class MatchController : ControllerBase
 
         if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
 
-        Logger.LogInfo("Received match data: " + bodyString, LogArea.Match);
+        Logger.Info("Received match data: " + bodyString, LogArea.Match);
 
         IMatchCommand? matchData;
         try
@@ -55,19 +55,19 @@ public class MatchController : ControllerBase
         }
         catch(Exception e)
         {
-            Logger.LogError("Exception while parsing matchData: ", LogArea.Match);
-            Logger.LogError(e.ToDetailedException(), LogArea.Match);
+            Logger.Error("Exception while parsing matchData: ", LogArea.Match);
+            Logger.Error(e.ToDetailedException(), LogArea.Match);
 
             return this.BadRequest();
         }
 
         if (matchData == null)
         {
-            Logger.LogError($"Could not parse match data: {nameof(matchData)} is null", LogArea.Match);
+            Logger.Error($"Could not parse match data: {nameof(matchData)} is null", LogArea.Match);
             return this.BadRequest();
         }
 
-        Logger.LogInfo($"Parsed match from {user.Username} (type: {matchData.GetType()})", LogArea.Match);
+        Logger.Info($"Parsed match from {user.Username} (type: {matchData.GetType()})", LogArea.Match);
 
         #endregion
 

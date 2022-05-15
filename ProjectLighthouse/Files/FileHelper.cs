@@ -131,7 +131,7 @@ public static class FileHelper
         EnsureDirectoryCreated(Path.Combine(Environment.CurrentDirectory, "png"));
         if (Directory.Exists("r"))
         {
-            Logger.LogInfo("Converting all textures to PNG. This may take a while if this is the first time running this operation...", LogArea.Startup);
+            Logger.Info("Converting all textures to PNG. This may take a while if this is the first time running this operation...", LogArea.Startup);
 
             ConcurrentQueue<string> fileQueue = new();
 
