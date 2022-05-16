@@ -7,6 +7,7 @@ Type=simple
 ExecStart=bash -c "/srv/lighthouse/start.sh GameServer"
 TimeoutStopSec=15
 User=lighthouse
+Restart=on-failure
 
 [Install]
 Alias=lighthouse-website
