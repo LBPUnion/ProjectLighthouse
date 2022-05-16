@@ -1,6 +1,11 @@
 using LBPUnion.ProjectLighthouse.Middlewares;
-using LBPUnion.ProjectLighthouse.Startup;
 using Microsoft.AspNetCore.HttpOverrides;
+
+#if !DEBUG
+using Microsoft.Extensions.Hosting.Internal;
+#else
+using LBPUnion.ProjectLighthouse.Startup;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Startup;
 
