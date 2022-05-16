@@ -10,7 +10,7 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        StartupTasks.Run(args, ServerType.GameApi);
+        StartupTasks.Run(args, ServerType.GameServer);
 
         CreateHostBuilder(args).Build().Run();
     }

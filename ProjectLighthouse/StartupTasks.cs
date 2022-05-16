@@ -78,7 +78,11 @@ public static class StartupTasks
             return;
         }
 
-        if (ServerConfiguration.Instance.WebsiteConfiguration.ConvertAssetsOnStartup) FileHelper.ConvertAllTexturesToPng();
+        if (ServerConfiguration.Instance.WebsiteConfiguration.ConvertAssetsOnStartup
+            && serverType == ServerType.Website)
+        {
+            FileHelper.ConvertAllTexturesToPng();
+        }
 
         Logger.Info("Starting room cleanup thread...", LogArea.Startup);
         RoomHelper.StartCleanupThread();

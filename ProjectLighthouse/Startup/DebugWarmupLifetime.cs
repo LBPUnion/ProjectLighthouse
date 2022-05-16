@@ -41,7 +41,7 @@ public class DebugWarmupLifetime : IHostLifetime
 
         string url = ServerType switch
         {
-            ServerType.GameApi => ServerConfiguration.Instance.GameApiListenUrl,
+            ServerType.GameServer => ServerConfiguration.Instance.GameApiListenUrl,
             ServerType.Website => ServerConfiguration.Instance.WebsiteListenUrl,
             ServerType.Api => ServerConfiguration.Instance.ApiListenUrl,
             _ => throw new ArgumentOutOfRangeException(),
