@@ -14,6 +14,7 @@
       <Path>create-migration.sh</Path>
       <Path>docker-compose.yml</Path>
       <Path>global.json</Path>
+      <Path>scripts-and-tools</Path>
     </explicitIncludes>
     <explicitExcludes>
       <Path>.idea/.idea.ProjectLighthouse/.idea/workspace.xml</Path>
