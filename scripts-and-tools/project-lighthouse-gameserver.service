@@ -4,7 +4,7 @@ Documentation=https://github.com/LBPUnion/ProjectLighthouse
 
 [Service]
 Type=simple
-ExecStart=/srv/lighthouse/start.sh GameServer
+ExecStart=bash -c "/srv/lighthouse/start.sh GameServer"
 TimeoutStopSec=15
 User=lighthouse
 

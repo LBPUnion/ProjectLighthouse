@@ -4,7 +4,7 @@ Documentation=https://github.com/LBPUnion/ProjectLighthouse
 
 [Service]
 Type=simple
-ExecStart=/srv/lighthouse/start.sh API
+ExecStart=bash -c "/srv/lighthouse/start.sh API"
 TimeoutStopSec=15
 User=lighthouse
 
