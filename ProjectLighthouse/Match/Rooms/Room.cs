@@ -11,6 +11,7 @@ public class Room
 {
     private int roomId;
 
+    [Indexed]
     public int RoomId {
         get => this.roomId;
         set {

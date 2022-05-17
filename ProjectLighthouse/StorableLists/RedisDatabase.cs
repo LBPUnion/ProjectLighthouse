@@ -1,14 +1,12 @@
 #nullable enable
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 using Redis.OM;
 using Redis.OM.Contracts;
 using Redis.OM.Searching;

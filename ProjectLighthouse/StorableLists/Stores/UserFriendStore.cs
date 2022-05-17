@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 
 namespace LBPUnion.ProjectLighthouse.StorableLists.Stores;
 

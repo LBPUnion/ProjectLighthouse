@@ -9,6 +9,8 @@ namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 public class UserFriendData
 {
     private int userId;
+    
+    [Indexed]
     public int UserId {
         get => this.userId;
         set {
