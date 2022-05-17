@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <AssemblyName>LBPUnion.ProjectLighthouse.Servers.Website</AssemblyName>
         <RootNamespace>LBPUnion.ProjectLighthouse.Servers.Website</RootNamespace>
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
 
     <ItemGroup>
