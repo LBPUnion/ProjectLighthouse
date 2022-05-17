@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <AssemblyName>LBPUnion.ProjectLighthouse.Servers.API</AssemblyName>
         <RootNamespace>LBPUnion.ProjectLighthouse.Servers.API</RootNamespace>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
 
     <PropertyGroup>

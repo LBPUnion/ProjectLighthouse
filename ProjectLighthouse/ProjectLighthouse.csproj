@@ -5,6 +5,7 @@
         <AssemblyName>LBPUnion.ProjectLighthouse</AssemblyName>
         <RootNamespace>LBPUnion.ProjectLighthouse</RootNamespace>
         <OutputType>Library</OutputType>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
 
     <ItemGroup>
