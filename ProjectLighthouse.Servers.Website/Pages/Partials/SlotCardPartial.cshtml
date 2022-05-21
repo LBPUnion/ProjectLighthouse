@@ -7,15 +7,21 @@
 @model LBPUnion.ProjectLighthouse.Levels.Slot
 
 @{
-    User user = (User)ViewData["User"]!;
+    User? user = (User?)ViewData["User"];
 
     await using Database database = new();
 
     string slotName = string.IsNullOrEmpty(Model.Name) ? "Unnamed Level" : Model.Name;
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
+    
+    bool isQueued = false;
+    bool isHearted = false;
 
-    bool isQueued = await database.QueuedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
-    bool isHearted = await database.HeartedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
+    if (user != null)
+    {
+        isQueued = await database.QueuedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
+        isHearted = await database.HeartedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
+    }
 
     string callbackUrl = (string)ViewData["CallbackUrl"]!;
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
