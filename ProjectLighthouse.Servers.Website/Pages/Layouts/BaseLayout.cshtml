@@ -25,7 +25,6 @@
     }
 
     Model.IsMobile = Model.Request.IsMobile();
-    long timeStarted = TimeHelper.TimestampMillis;
 }
 
 <!DOCTYPE html>
@@ -179,7 +178,6 @@
                         <p>Model.Title: @Model.Title</p>
                         <p>Model.Description: @Model.Description</p>
                         <p>Model.User.UserId: @(Model.User?.UserId.ToString() ?? "(not logged in)")</p>
-                        <p>Render time: ~@(TimeHelper.TimestampMillis - timeStarted)ms</p>
                     </div>
                 </div>
             </div>
