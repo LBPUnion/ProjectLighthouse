@@ -20,4 +20,5 @@ public enum LogArea
     Logger,
     Redis,
     Command,
+    Admin,
 }

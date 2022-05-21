@@ -130,6 +130,15 @@
             </div>
             <div class="ui fitted hidden divider"></div>
         }
+        
+        <div>
+            <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/wipePlanets">
+                <i class="trash alternate icon"></i>
+                <span>Wipe user's earth decorations</span>
+            </a>
+        </div>
+        <div class="ui fitted hidden divider"></div>
+        
         @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
     </div>
 }
