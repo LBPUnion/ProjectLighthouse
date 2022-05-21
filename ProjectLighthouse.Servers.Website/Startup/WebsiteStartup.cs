@@ -56,10 +56,12 @@ public class WebsiteStartup
 
         app.UseMiddleware<RequestLogMiddleware>();
 
+        #if !DEBUG
+        app.UseHttpsRedirection();
+        #endif
+
         app.UseRouting();
-
         app.UseStaticFiles();
-
         app.UseEndpoints(endpoints => endpoints.MapControllers());
         app.UseEndpoints(endpoints => endpoints.MapRazorPages());
     }
