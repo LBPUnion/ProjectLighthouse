@@ -68,10 +68,6 @@ public class ApiStartup
 
         app.UseMiddleware<RequestLogMiddleware>();
 
-        #if !DEBUG
-        app.UseHttpsRedirection();
-        #endif
-
         app.UseRouting();
         app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
