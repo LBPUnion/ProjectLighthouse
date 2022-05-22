@@ -83,12 +83,15 @@ public static class StartupTasks
         {
             FileHelper.ConvertAllTexturesToPng();
         }
-
-        Logger.Info("Starting room cleanup thread...", LogArea.Startup);
-        RoomHelper.StartCleanupThread();
-
+        
         Logger.Info("Initializing Redis...", LogArea.Startup);
         RedisDatabase.Initialize().Wait();
+
+        if (serverType == ServerType.GameServer)
+        {
+            Logger.Info("Starting room cleanup thread...", LogArea.Startup);
+            RoomHelper.StartCleanupThread();
+        }
 
         stopwatch.Stop();
         Logger.Success($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
