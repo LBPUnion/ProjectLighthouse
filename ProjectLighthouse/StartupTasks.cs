@@ -24,13 +24,11 @@ public static class StartupTasks
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        #if DEBUG
-        DebugWarmupLifetime.ServerType = serverType;
-        #endif
+        ServerStatics.ServerType = serverType;
 
         // Setup logging
         Logger.Instance.AddLogger(new ConsoleLogger());
-        Logger.Instance.AddLogger(new LighthouseFileLogger());
+        Logger.Instance.AddLogger(new FileLogger());
 
         Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);

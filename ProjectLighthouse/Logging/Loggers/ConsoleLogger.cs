@@ -11,7 +11,8 @@ public class ConsoleLogger : ILogger
 
         foreach (string line in logLine.Message.Split('\n'))
         {
-            // The following is scuffed. Beware~
+            // The following is scuffed.
+            // Beware~
 
             // Write the level! [Success]
             Console.ForegroundColor = ConsoleColor.White;
