@@ -1,4 +1,5 @@
 @page "/admin/users"
+@using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminPanelUsersPage
@@ -14,17 +15,37 @@
 <div class="ui grid">
     @foreach (User user in Model.Users)
     {
-        string color = "blue";
-        string subtitle = "User";
-        if (user.IsAdmin)
+        string color;
+        string subtitle;
+
+        switch (user.PermissionLevel)
         {
-            color = "yellow";
-            subtitle = "Admin";
-        }
-        if (user.Banned)
-        {
-            color = "red";
-            subtitle = $"Banned user! Reason: {user.BannedReason}";
+            // jank but works
+            case PermissionLevel.Banned:
+            {
+                color = "red";
+                subtitle = $"Banned user! Reason: {user.BannedReason}";
+                break;
+            }
+            case PermissionLevel.Moderator:
+            {
+                color = "green";
+                subtitle = "Moderator";
+                break;
+            }
+            case PermissionLevel.Administrator:
+            {
+                color = "yellow";
+                subtitle = "Admin";       
+                break;
+            }
+            case PermissionLevel.Default:
+            default:
+            {
+                color = "blue";
+                subtitle = "User";
+                break;
+            }
         }
 
         subtitle += $" (id: {user.UserId})";

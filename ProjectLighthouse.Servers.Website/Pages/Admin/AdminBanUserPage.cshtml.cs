@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
@@ -33,7 +34,7 @@ public class AdminBanUserPage : BaseLayout
         this.TargetedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (this.TargetedUser == null) return this.NotFound();
 
-        this.TargetedUser.Banned = true;
+        this.TargetedUser.PermissionLevel = PermissionLevel.Default;
         this.TargetedUser.BannedReason = reason;
 
         // invalidate all currently active gametokens

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
@@ -15,7 +16,6 @@ public class User
     [NotMapped]
     [JsonIgnore]
     private Database? _database;
-    #nullable disable
 
     [NotMapped]
     [JsonIgnore]
@@ -124,9 +124,6 @@ public class User
     public int Hearts => this.database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
 
     [JsonIgnore]
-    public bool IsAdmin { get; set; } = false;
-
-    [JsonIgnore]
     public bool PasswordResetRequired { get; set; }
 
     public string YayHash { get; set; } = "";
@@ -138,10 +135,19 @@ public class User
     public UserStatus Status => new(this.database, this.UserId);
 
     [JsonIgnore]
-    public bool Banned { get; set; }
+    public bool IsBanned => this.PermissionLevel == PermissionLevel.Banned;
 
     [JsonIgnore]
-    public string BannedReason { get; set; }
+    public bool IsModerator => this.PermissionLevel == PermissionLevel.Moderator;
+
+    [JsonIgnore]
+    public bool IsAdmin => this.PermissionLevel == PermissionLevel.Administrator;
+
+    [JsonIgnore]
+    public PermissionLevel PermissionLevel { get; set; } = PermissionLevel.Default;
+
+    [JsonIgnore]
+    public string? BannedReason { get; set; }
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {

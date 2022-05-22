@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ public static class StatisticsHelper
 
     public static async Task<int> SlotCount() => await database.Slots.CountAsync();
 
-    public static async Task<int> UserCount() => await database.Users.CountAsync(u => !u.Banned);
+    public static async Task<int> UserCount() => await database.Users.CountAsync(u => u.PermissionLevel != PermissionLevel.Banned);
 
     public static async Task<int> TeamPickCount() => await database.Slots.CountAsync(s => s.TeamPick);
 

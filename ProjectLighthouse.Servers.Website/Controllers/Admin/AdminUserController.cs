@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -28,7 +29,7 @@ public class AdminUserController : ControllerBase
         User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
 
-        targetedUser.Banned = false;
+        targetedUser.PermissionLevel = PermissionLevel.Default;
         targetedUser.BannedReason = null;
 
         await this.database.SaveChangesAsync();

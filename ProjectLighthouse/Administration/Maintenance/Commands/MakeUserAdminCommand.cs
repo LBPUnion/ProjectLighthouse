@@ -35,7 +35,7 @@ public class MakeUserAdminCommand : ICommand
                 return;
             }
 
-        user.IsAdmin = true;
+        user.PermissionLevel = PermissionLevel.Administrator;
         await this.database.SaveChangesAsync();
 
         logger.LogSuccess($"The user {user.Username} (id: {user.UserId}) is now an admin.", LogArea.Command);

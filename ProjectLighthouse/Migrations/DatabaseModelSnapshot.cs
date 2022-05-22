@@ -15,35 +15,56 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.4")
+                .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.AuthenticationAttempt", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.Reports.GriefReport", b =>
                 {
-                    b.Property<int>("AuthenticationAttemptId")
+                    b.Property<int>("ReportId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("GameTokenId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("IPAddress")
+                    b.Property<string>("Bounds")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Platform")
+                    b.Property<string>("GriefStateHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("InitialStateHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("JpegHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("LevelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LevelOwner")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LevelType")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Players")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReportingPlayerId")
                         .HasColumnType("int");
 
                     b.Property<long>("Timestamp")
                         .HasColumnType("bigint");
 
-                    b.HasKey("AuthenticationAttemptId");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
-                    b.HasIndex("GameTokenId");
+                    b.HasKey("ReportId");
 
-                    b.ToTable("AuthenticationAttempts");
+                    b.HasIndex("ReportingPlayerId");
+
+                    b.ToTable("Reports");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Categories.DatabaseCategory", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.Categories.DatabaseCategory", b =>
                 {
                     b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
@@ -69,62 +90,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("CustomCategories");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
-                {
-                    b.Property<int>("TokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Approved")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("GameVersion")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Platform")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Used")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserLocation")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserToken")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("TokenId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("GameTokens");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
-                {
-                    b.Property<int>("HeartedProfileId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("HeartedUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("HeartedProfileId");
-
-                    b.HasIndex("HeartedUserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("HeartedProfiles");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.HeartedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.HeartedLevel", b =>
                 {
                     b.Property<int>("HeartedLevelId")
                         .ValueGeneratedOnAdd()
@@ -145,7 +111,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("HeartedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.QueuedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.QueuedLevel", b =>
                 {
                     b.Property<int>("QueuedLevelId")
                         .ValueGeneratedOnAdd()
@@ -166,7 +132,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("QueuedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.RatedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.RatedLevel", b =>
                 {
                     b.Property<int>("RatedLevelId")
                         .ValueGeneratedOnAdd()
@@ -193,7 +159,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("RatedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.Slot", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.Slot", b =>
                 {
                     b.Property<int>("SlotId")
                         .ValueGeneratedOnAdd()
@@ -318,7 +284,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Slots");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.VisitedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.VisitedLevel", b =>
                 {
                     b.Property<int>("VisitedLevelId")
                         .ValueGeneratedOnAdd()
@@ -351,7 +317,66 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("VisitedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Photo", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.AuthenticationAttempt", b =>
+                {
+                    b.Property<int>("AuthenticationAttemptId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameTokenId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Platform")
+                        .HasColumnType("int");
+
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AuthenticationAttemptId");
+
+                    b.HasIndex("GameTokenId");
+
+                    b.ToTable("AuthenticationAttempts");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.GameToken", b =>
+                {
+                    b.Property<int>("TokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Approved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("GameVersion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Platform")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserLocation")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserToken")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TokenId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GameTokens");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Photo", b =>
                 {
                     b.Property<int>("PhotoId")
                         .ValueGeneratedOnAdd()
@@ -390,7 +415,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Photos");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.PhotoSubject", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.PhotoSubject", b =>
                 {
                     b.Property<int>("PhotoSubjectId")
                         .ValueGeneratedOnAdd()
@@ -409,7 +434,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("PhotoSubjects");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Comment", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Comment", b =>
                 {
                     b.Property<int>("CommentId")
                         .ValueGeneratedOnAdd()
@@ -452,7 +477,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailSetToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email.EmailSetToken", b =>
                 {
                     b.Property<int>("EmailSetTokenId")
                         .ValueGeneratedOnAdd()
@@ -471,7 +496,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("EmailSetTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailVerificationToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email.EmailVerificationToken", b =>
                 {
                     b.Property<int>("EmailVerificationTokenId")
                         .ValueGeneratedOnAdd()
@@ -490,7 +515,28 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("EmailVerificationTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.LastContact", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.HeartedProfile", b =>
+                {
+                    b.Property<int>("HeartedProfileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("HeartedUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("HeartedProfileId");
+
+                    b.HasIndex("HeartedUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HeartedProfiles");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.LastContact", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -509,7 +555,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("LastContacts");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Location", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Location", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -526,7 +572,107 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Locations");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reaction", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AdminGrantedSlots")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BannedReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Biography")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BooHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("EmailAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("EmailAddressVerified")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("Game")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IconHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MehHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("PasswordResetRequired")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("PermissionLevel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Pins")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PlanetHashLBP2")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PlanetHashLBP3")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PlanetHashLBPVita")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("YayHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.UserApprovedIpAddress", b =>
+                {
+                    b.Property<int>("UserApprovedIpAddressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserApprovedIpAddressId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserApprovedIpAddresses");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reaction", b =>
                 {
                     b.Property<int>("RatingId")
                         .ValueGeneratedOnAdd()
@@ -546,53 +692,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Reactions");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reports.GriefReport", b =>
-                {
-                    b.Property<int>("ReportId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Bounds")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("GriefStateHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("InitialStateHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("JpegHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("LevelId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LevelOwner")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LevelType")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Players")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ReportingPlayerId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("Timestamp")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("ReportId");
-
-                    b.HasIndex("ReportingPlayerId");
-
-                    b.ToTable("Reports");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.RatedReview", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reviews.RatedReview", b =>
                 {
                     b.Property<int>("RatedReviewId")
                         .ValueGeneratedOnAdd()
@@ -616,7 +716,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("RatedReviews");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.Review", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reviews.Review", b =>
                 {
                     b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
@@ -663,7 +763,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Score", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Score", b =>
                 {
                     b.Property<int>("ScoreId")
                         .ValueGeneratedOnAdd()
@@ -688,99 +788,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Scores");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("AdminGrantedSlots")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Banned")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("BannedReason")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Biography")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("BooHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("EmailAddress")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("EmailAddressVerified")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("Game")
-                        .HasColumnType("int");
-
-                    b.Property<string>("IconHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MehHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("PasswordResetRequired")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Pins")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PlanetHashLBP2")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PlanetHashLBP3")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PlanetHashLBPVita")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Username")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("YayHash")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.UserApprovedIpAddress", b =>
-                {
-                    b.Property<int>("UserApprovedIpAddressId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserApprovedIpAddressId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserApprovedIpAddresses");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.WebToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.WebToken", b =>
                 {
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
@@ -797,9 +805,115 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("WebTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.AuthenticationAttempt", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.Reports.GriefReport", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.GameToken", "GameToken")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "ReportingPlayer")
+                        .WithMany()
+                        .HasForeignKey("ReportingPlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportingPlayer");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.HeartedLevel", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.QueuedLevel", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.RatedLevel", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.Slot", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.VisitedLevel", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.AuthenticationAttempt", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.GameToken", "GameToken")
                         .WithMany()
                         .HasForeignKey("GameTokenId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -808,9 +922,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("GameToken");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.GameToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.GameToken", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -819,15 +933,70 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.HeartedProfile", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Photo", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "HeartedUser")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.PhotoSubject", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Comment", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Poster")
+                        .WithMany()
+                        .HasForeignKey("PosterUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Poster");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email.EmailSetToken", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email.EmailVerificationToken", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.HeartedProfile", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "HeartedUser")
                         .WithMany()
                         .HasForeignKey("HeartedUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -838,115 +1007,31 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.HeartedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.LastContact", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
-                        .WithMany()
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Slot");
-
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.QueuedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
-                        .WithMany()
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Slot");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.RatedLevel", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
-                        .WithMany()
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Slot");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.Slot", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Profiles.Location", "Location")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Creator");
-
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Levels.VisitedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.UserApprovedIpAddress", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
-                        .WithMany()
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Slot");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Photo", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.PhotoSubject", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -955,70 +1040,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Comment", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reviews.RatedReview", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Poster")
-                        .WithMany()
-                        .HasForeignKey("PosterUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Poster");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailSetToken", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.Email.EmailVerificationToken", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Profiles.LastContact", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reports.GriefReport", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "ReportingPlayer")
-                        .WithMany()
-                        .HasForeignKey("ReportingPlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReportingPlayer");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.RatedReview", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Reviews.Review", "Review")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Reviews.Review", "Review")
                         .WithMany()
                         .HasForeignKey("ReviewId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1029,15 +1059,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Reviews.Review", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reviews.Review", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "Reviewer")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Reviewer")
                         .WithMany()
                         .HasForeignKey("ReviewerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Slot", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1048,37 +1078,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Slot");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Score", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Score", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Levels.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Slot", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Slot");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.User", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Profiles.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.UserApprovedIpAddress", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
