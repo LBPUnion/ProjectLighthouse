@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Tests;
 using Xunit;
@@ -25,7 +26,7 @@ public class AuthenticationTests : LighthouseServerTest
         Assert.True(response.IsSuccessStatusCode);
         string responseContent = await response.Content.ReadAsStringAsync();
         Assert.Contains("MM_AUTH=", responseContent);
-        Assert.Contains(ServerStatics.ServerName, responseContent);
+        Assert.Contains(VersionHelper.FullVersion, responseContent);
     }
 
     [DatabaseFact]
@@ -35,10 +36,10 @@ public class AuthenticationTests : LighthouseServerTest
 
         Assert.NotNull(loginResult);
         Assert.NotNull(loginResult.AuthTicket);
-        Assert.NotNull(loginResult.LbpEnvVer);
+        Assert.NotNull(loginResult.ServerBrand);
 
         Assert.Contains("MM_AUTH=", loginResult.AuthTicket);
-        Assert.Equal(ServerStatics.ServerName, loginResult.LbpEnvVer);
+        Assert.Equal(VersionHelper.FullVersion, loginResult.ServerBrand);
     }
 
     [DatabaseFact]

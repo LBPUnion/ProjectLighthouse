@@ -163,6 +163,9 @@ public class ServerConfiguration
 
     #endregion
 
+    // TODO: Find a way to properly remove config options
+    // YamlDotNet hates that and it's fucking annoying.
+    // This seriously sucks. /rant
     [Obsolete("Obsolete. Use the Website/GameApi/Api listen URLS instead.")]
     public string ListenUrl { get; set; } = "http://localhost:10060";
 
@@ -193,5 +196,5 @@ public class ServerConfiguration
     public MailConfiguration Mail { get; set; } = new();
     public UserGeneratedContentLimitConfiguration UserGeneratedContentLimits { get; set; } = new();
     public WebsiteConfiguration WebsiteConfiguration { get; set; } = new();
-
+    public CustomizationConfiguration Customization { get; set; } = new();
 }

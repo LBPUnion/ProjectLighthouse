@@ -8,8 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Configuration;
 
 public static class ServerStatics
 {
-    public const string ServerName = "ProjectLighthouse";
-
     public const int PageSize = 20;
 
     public static bool DbConnected {
