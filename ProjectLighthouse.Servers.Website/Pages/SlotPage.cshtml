@@ -98,7 +98,7 @@
 
                 if (string.IsNullOrWhiteSpace(faceHash))
                 {
-                    faceHash = ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash;
+                    faceHash = ServerConfiguration.Instance.Website.MissingIconHash;
                 }
 
                 string faceAlt = review.Thumb switch {

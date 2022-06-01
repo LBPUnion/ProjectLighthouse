@@ -77,7 +77,7 @@ public static class StartupTasks
             return;
         }
 
-        if (ServerConfiguration.Instance.WebsiteConfiguration.ConvertAssetsOnStartup
+        if (ServerConfiguration.Instance.Website.ConvertAssetsOnStartup
             && serverType == ServerType.Website)
         {
             FileHelper.ConvertAllTexturesToPng();
