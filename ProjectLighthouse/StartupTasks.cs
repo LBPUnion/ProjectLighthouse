@@ -33,7 +33,7 @@ public static class StartupTasks
         Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
 
-        // Referencing ServerSettings.Instance here loads the config, see ServerSettings.cs for more information
+        // Referencing ServerConfiguration.Instance here loads the config, see ServerConfiguration.cs for more information
         Logger.Success("Loaded config file version " + ServerConfiguration.Instance.ConfigVersion, LogArea.Startup);
 
         Logger.Info("Connecting to the database...", LogArea.Startup);
@@ -44,7 +44,7 @@ public static class StartupTasks
         }
         else
         {
-            Logger.Success("Connected!", LogArea.Startup);
+            Logger.Success("Connected to the database!", LogArea.Startup);
         }
 
         if (!dbConnected) Environment.Exit(1);
@@ -95,7 +95,7 @@ public static class StartupTasks
         Logger.Success($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
     }
 
-    private static void migrateDatabase(Database database)
+    private static void migrateDatabase(DbContext database)
     {
         Stopwatch stopwatch = new();
         stopwatch.Start();

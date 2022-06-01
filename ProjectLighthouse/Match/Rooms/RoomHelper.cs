@@ -16,7 +16,7 @@ namespace LBPUnion.ProjectLighthouse.Match.Rooms;
 
 public class RoomHelper
 {
-    public static readonly StorableList<Room> Rooms = RoomStore.GetRooms();
+    public static StorableList<Room> Rooms => RoomStore.GetRooms();
 
     public static void StartCleanupThread()
     {
