@@ -9,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Startup;
 using LBPUnion.ProjectLighthouse.StorableLists;
 using LBPUnion.ProjectLighthouse.Types;
@@ -89,6 +90,22 @@ public static class StartupTasks
         {
             Logger.Info("Starting room cleanup thread...", LogArea.Startup);
             RoomHelper.StartCleanupThread();
+        }
+
+        // Create admin user if no users exist
+        if (serverType == ServerType.Website && database.Users.CountAsync().Result == 0)
+        {
+            const string passwordClear = "lighthouse";
+            string password = CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(passwordClear));
+            
+            User admin = database.CreateUser("admin", password).Result;
+            admin.IsAdmin = true;
+            admin.PasswordResetRequired = true;
+
+            database.SaveChanges();
+
+            Logger.Success("No users were found, so an admin user was created. " + 
+                           $"The username is 'admin' and the password is '{passwordClear}'.", LogArea.Startup);
         }
 
         stopwatch.Stop();
