@@ -195,6 +195,6 @@ public class ServerConfiguration
     public InfluxDBConfiguration InfluxDB { get; set; } = new();
     public MailConfiguration Mail { get; set; } = new();
     public UserGeneratedContentLimitConfiguration UserGeneratedContentLimits { get; set; } = new();
-    public WebsiteConfiguration Website { get; set; } = new();
+    public WebsiteConfiguration WebsiteConfiguration { get; set; } = new();
     public CustomizationConfiguration Customization { get; set; } = new();
 }

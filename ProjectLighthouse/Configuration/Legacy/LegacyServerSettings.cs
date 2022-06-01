@@ -203,7 +203,7 @@ internal class LegacyServerSettings
             ProfileCommentsEnabled = this.ProfileCommentsEnabled,
         };
 
-        configuration.Website = new WebsiteConfiguration
+        configuration.WebsiteConfiguration = new WebsiteConfiguration
         {
             MissingIconHash = this.MissingIconHash,
             ConvertAssetsOnStartup = this.ConvertAssetsOnStartup,
