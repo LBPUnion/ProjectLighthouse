@@ -1,5 +1,6 @@
 #nullable enable
 using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -38,7 +39,8 @@ public class PasswordResetPage : BaseLayout
 
         await this.Database.SaveChangesAsync();
 
-        if (!user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
+        if (!user.EmailAddressVerified && ServerConfiguration.Instance.Mail.MailEnabled) 
+            return this.Redirect("~/login/sendVerificationEmail");
 
         return this.Redirect("~/");
     }
