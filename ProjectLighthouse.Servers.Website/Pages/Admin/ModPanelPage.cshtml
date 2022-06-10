@@ -1,0 +1,28 @@
+@page "/modPanel"
+@using LBPUnion.ProjectLighthouse.Administration
+@using LBPUnion.ProjectLighthouse.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.ModPanelPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Moderator Panel";
+}
+
+@if (!this.Request.IsMobile())
+{
+    <div class="ui grid">
+        @foreach (AdminPanelStatistic statistic in Model.Statistics)
+        {
+            @await Html.PartialAsync("Partials/AdminPanelStatisticPartial", statistic)
+        }
+    </div>
+    <br>
+}
+else
+{
+    @foreach (AdminPanelStatistic statistic in Model.Statistics)
+    {
+        @await Html.PartialAsync("Partials/AdminPanelStatisticPartial", statistic)
+        <br>
+    }
+}

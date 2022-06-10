@@ -21,6 +21,10 @@
         {
             Model.NavigationItemsRight.Add(new PageNavigationItem("Admin Panel", "/admin", "cogs"));
         }
+        else if(Model.User.IsModerator)
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem("Mod Panel", "/modPanel", "user shield"));
+        }
         Model.NavigationItemsRight.Add(new PageNavigationItem("Log out", "/logout", "user alternate slash")); // should always be last
     }
 
