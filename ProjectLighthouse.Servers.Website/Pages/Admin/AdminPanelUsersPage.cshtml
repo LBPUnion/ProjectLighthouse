@@ -10,7 +10,7 @@
 }
 
 <p>There are currently @Model.UserCount users registered to your instance.</p>
-<p><b>Note:</b> Users are ordered by most-recent-first.</p>
+<p><b>Note:</b> Users are ordered by their permissions, then by most-recent-first.</p>
 
 <div class="ui grid">
     @foreach (User user in Model.Users)
@@ -56,6 +56,19 @@
                     <a href="/user/@user.UserId">@user.Username</a>
                 </h2>
                 <h3>@subtitle</h3>
+                <form method="post" action="/admin/user/@user.UserId/setPermissionLevel">
+                    <div class="ui right action input">
+                        <select name="role" class="ui selection dropdown">
+                            @foreach (PermissionLevel level in Enum.GetValues<PermissionLevel>())
+                            {
+                                string selected = level == user.PermissionLevel ? " selected" : "";
+                        
+                                <option value="@((int)level)"@selected>@level.ToString()</option>
+                            }
+                        </select>
+                        <input type="submit" class="ui green button" value="Apply"/>
+                    </div>
+                </form>
             </div>
         </div>
     }

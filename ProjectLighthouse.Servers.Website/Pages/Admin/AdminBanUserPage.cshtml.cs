@@ -34,7 +34,7 @@ public class AdminBanUserPage : BaseLayout
         this.TargetedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (this.TargetedUser == null) return this.NotFound();
 
-        this.TargetedUser.PermissionLevel = PermissionLevel.Default;
+        this.TargetedUser.PermissionLevel = PermissionLevel.Banned;
         this.TargetedUser.BannedReason = reason;
 
         // invalidate all currently active gametokens

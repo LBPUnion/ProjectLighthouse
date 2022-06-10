@@ -101,4 +101,26 @@ public class AdminUserController : ControllerBase
 
         return this.Redirect($"/user/{targetedUser.UserId}");
     }
+
+    [HttpPost("setPermissionLevel")]
+    public async Task<IActionResult> SetUserPermissionLevel([FromRoute] int id, [FromForm] PermissionLevel role)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsAdmin) return this.NotFound();
+
+        User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        if (role != PermissionLevel.Banned)
+        {
+            targetedUser.PermissionLevel = role;
+            await this.database.SaveChangesAsync();
+        }
+        else
+        {
+            return this.Redirect($"/admin/user/{id}/ban");
+        }
+
+        return this.Redirect("/admin/users");
+    }
 }
