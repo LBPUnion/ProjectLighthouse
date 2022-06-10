@@ -1,0 +1,14 @@
+[Unit]
+Description=Project Lighthouse API - a clean-room, open-source custom server for LBP
+Documentation=https://github.com/LBPUnion/ProjectLighthouse
+
+[Service]
+Type=simple
+ExecStart=bash -c "/srv/lighthouse/start.sh API"
+TimeoutStopSec=15
+User=lighthouse
+Restart=on-failure
+
+[Install]
+Alias=lighthouse-api
+WantedBy=multi-user.target

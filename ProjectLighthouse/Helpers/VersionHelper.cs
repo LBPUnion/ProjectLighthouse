@@ -1,9 +1,6 @@
-using System;
-using System.IO;
 using System.Linq;
-using Kettu;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -13,10 +10,10 @@ public static class VersionHelper
     {
         try
         {
-            CommitHash = ResourceHelper.readManifestFile("gitVersion.txt");
-            Branch = ResourceHelper.readManifestFile("gitBranch.txt");
+            CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
+            Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
 
-            string remotesFile = ResourceHelper.readManifestFile("gitRemotes.txt");
+            string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
 
             string[] lines = remotesFile.Split('\n');
 
@@ -26,17 +23,17 @@ public static class VersionHelper
             // linq is a serious and painful catastrophe but its useful so i'm gonna keep using it
             Remotes = lines.Select(line => line.Split("\t")[1]).ToArray();
 
-            CommitsOutOfDate = ResourceHelper.readManifestFile("gitUnpushed.txt").Split('\n').Length;
+            CommitsOutOfDate = ResourceHelper.ReadManifestFile("gitUnpushed.txt").Split('\n').Length;
 
             CanCheckForUpdates = true;
         }
         catch
         {
-            Logger.Log
+            Logger.Error
             (
-                "Project Lighthouse was built incorrectly. Please make sure git is available when building. " +
-                "Because of this, you will not be notified of updates.",
-                LoggerLevelStartup.Instance
+                "Project Lighthouse was built incorrectly. Please make sure git is available when building.",
+//                "Because of this, you will not be notified of updates.",
+                LogArea.Startup
             );
             CommitHash = "invalid";
             Branch = "invalid";
@@ -45,11 +42,11 @@ public static class VersionHelper
 
         if (IsDirty)
         {
-            Logger.Log
+            Logger.Warn
             (
                 "This is a modified version of Project Lighthouse. " +
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
-                LoggerLevelStartup.Instance
+                LogArea.Startup
             );
             CanCheckForUpdates = false;
         }
@@ -57,18 +54,18 @@ public static class VersionHelper
 
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
-    public static string FullVersion => $"{ServerStatics.ServerName} {Branch}@{CommitHash} {Build}";
+    public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({ServerConfiguration.Instance.Customization.ServerName})";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
     public static bool CanCheckForUpdates { get; set; }
     public static string[] Remotes { get; set; }
 
     public const string Build =
-        #if DEBUG
-            "Debug";
-        #elif RELEASE
+    #if DEBUG
+        "Debug";
+    #elif RELEASE
         "Release";
     #else
-            "Unknown";
+         "Unknown";
     #endif
 }

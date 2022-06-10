@@ -23,6 +23,7 @@ png/
 /ProjectLighthouse/r/*
 /ProjectLighthouse/logs/*
 lighthouse.config.json
+lighthouse.yml
 gitBranch.txt
 gitVersion.txt
 gitRemotes.txt

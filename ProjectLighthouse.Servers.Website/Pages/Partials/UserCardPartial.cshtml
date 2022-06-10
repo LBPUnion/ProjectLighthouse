@@ -1,0 +1,37 @@
+@model LBPUnion.ProjectLighthouse.PlayerData.Profiles.User
+
+@{
+    bool showLink = (bool?)ViewData["ShowLink"] ?? false;
+    bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
+}
+
+<div class="card">
+    @{
+        int size = isMobile ? 50 : 100;
+    }
+    <div class="cardIcon userCardIcon" style="background-image: url('/gameAssets/@Model.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px">
+    </div>
+    <div class="cardStats">
+        @if (showLink)
+        {
+            <h2 style="margin-bottom: 2px;">
+                <a href="~/user/@Model.UserId">@Model.Username</a>
+            </h2>
+        }
+        else
+        {
+            <h1 style="margin-bottom: 2px;">
+                @Model.Username
+            </h1>
+        }
+        <p>
+            <i>@Model.Status</i>
+        </p>
+        <div class="cardStatsUnderTitle">
+            <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@Model.Comments</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.UsedSlots</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.PhotosByMe</span>
+        </div>
+    </div>
+</div>

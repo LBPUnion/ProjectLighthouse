@@ -5,8 +5,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Startup;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -22,7 +23,7 @@ public class LighthouseServerTest
 
     public LighthouseServerTest()
     {
-        this.Server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
+        this.Server = new TestServer(new WebHostBuilder().UseStartup<GameServerTestStartup>());
         this.Client = this.Server.CreateClient();
     }
     public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
@@ -34,7 +35,7 @@ public class LighthouseServerTest
         {
             await using Database database = new();
             if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
-                await database.CreateUser($"{username}{number}", HashHelper.BCryptHash($"unitTestPassword{number}"));
+                await database.CreateUser($"{username}{number}", CryptoHelper.BCryptHash($"unitTestPassword{number}"));
         }
 
         //TODO: generate actual tickets
@@ -68,9 +69,19 @@ public class LighthouseServerTest
     public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
     {
         byte[] bytes = await File.ReadAllBytesAsync(filePath);
-        string hash = HashHelper.Sha1Hash(bytes).ToLower();
+        string hash = CryptoHelper.Sha1Hash(bytes).ToLower();
 
         return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
+    }
+
+    public async Task<HttpResponseMessage> AuthenticatedUploadFileEndpointRequest(string filePath, string mmAuth)
+    {
+        byte[] bytes = await File.ReadAllBytesAsync(filePath);
+        string hash = CryptoHelper.Sha1Hash(bytes).ToLower();
+        using HttpRequestMessage requestMessage = new(HttpMethod.Post, $"/LITTLEBIGPLANETPS3_XML/upload/{hash}");
+        requestMessage.Headers.Add("Cookie", mmAuth);
+        requestMessage.Content = new ByteArrayContent(bytes);
+        return await this.Client.SendAsync(requestMessage);
     }
 
     public async Task<HttpResponseMessage> UploadFileRequest(string endpoint, string filePath)
