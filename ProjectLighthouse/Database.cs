@@ -47,6 +47,7 @@ public class Database : DbContext
     public DbSet<GriefReport> Reports { get; set; }
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
     public DbSet<EmailSetToken> EmailSetTokens { get; set; }
+    public DbSet<ModerationCase> Cases { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
