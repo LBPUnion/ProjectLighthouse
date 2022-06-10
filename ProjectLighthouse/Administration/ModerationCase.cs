@@ -17,6 +17,8 @@ public class ModerationCase
     
     public DateTime CaseCreated { get; set; }
     
+    public DateTime? CaseExpires { get; set; }
+    
     public int CaseCreatorId { get; set; }
     
     [ForeignKey(nameof(CaseCreatorId))]

@@ -48,6 +48,9 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime?>("CaseExpires")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("CaseType")
                         .HasColumnType("int");
 
