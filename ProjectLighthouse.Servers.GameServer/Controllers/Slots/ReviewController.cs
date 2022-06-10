@@ -96,7 +96,7 @@ public class ReviewController : ControllerBase
         Review? newReview = await this.getReviewFromBody();
         if (newReview == null) return this.BadRequest();
 
-        if (newReview.Text.Length > 100) return this.BadRequest();
+        if (newReview.Text.Length > 512) return this.BadRequest();
 
         Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == user.UserId);
 
