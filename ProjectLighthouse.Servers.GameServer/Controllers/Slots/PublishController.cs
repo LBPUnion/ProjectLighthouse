@@ -86,9 +86,9 @@ public class PublishController : ControllerBase
 
         if (slot.Location == null) return this.BadRequest();
 
-        if (slot.Description.Length > 200) return this.BadRequest();
+        if (slot.Description.Length > 500) return this.BadRequest();
 
-        if (slot.Name.Length > 100) return this.BadRequest();
+        if (slot.Name.Length > 64) return this.BadRequest();
 
         if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
         {

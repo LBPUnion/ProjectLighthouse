@@ -1,9 +1,11 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
 
@@ -11,24 +13,16 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance;
 
 public static class MaintenanceHelper
 {
-
     static MaintenanceHelper()
     {
         Commands = getListOfInterfaceObjects<ICommand>();
         MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
+        MigrationTasks = getListOfInterfaceObjects<IMigrationTask>();
     }
+    
     public static List<ICommand> Commands { get; }
-
     public static List<IMaintenanceJob> MaintenanceJobs { get; }
-
-    private static List<T> getListOfInterfaceObjects<T>() where T : class
-    {
-        return Assembly.GetExecutingAssembly()
-            .GetTypes()
-            .Where(t => t.GetInterfaces().Contains(typeof(T)) && t.GetConstructor(Type.EmptyTypes) != null)
-            .Select(t => Activator.CreateInstance(t) as T)
-            .ToList()!;
-    }
+    public static List<IMigrationTask> MigrationTasks { get; }
 
     public static async Task<List<LogLine>> RunCommand(string[] args)
     {
@@ -66,11 +60,57 @@ public static class MaintenanceHelper
         IMaintenanceJob? job = MaintenanceJobs.FirstOrDefault(j => j.GetType().Name == jobName);
         if (job == null) throw new ArgumentNullException();
 
-        await RunMaintenanceJob(job);
+        await job.Run();
     }
 
-    public static async Task RunMaintenanceJob(IMaintenanceJob job)
+    public static async Task RunMigration(IMigrationTask migrationTask, Database? database = null)
     {
-        await job.Run();
+        database ??= new Database();
+
+        // Migrations should never be run twice.
+        Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name));
+        
+        Logger.Info($"Running migration task {migrationTask.Name()}", LogArea.Database);
+        
+        bool success;
+        Exception? exception = null;
+        
+        try
+        {
+            success = await migrationTask.Run(database);
+        }
+        catch(Exception e)
+        {
+            success = false;
+            exception = e;
+        }
+        
+        if(!success)
+        {
+            Logger.Error($"Could not run migration {migrationTask.Name()}", LogArea.Database);
+            if (exception != null) Logger.Error(exception.ToDetailedException(), LogArea.Database);
+            
+            return;
+        }
+        
+        Logger.Success($"Successfully completed migration {migrationTask.Name()}", LogArea.Database);
+
+        CompletedMigration completedMigration = new()
+        {
+            MigrationName = migrationTask.GetType().Name,
+            RanAt = DateTime.Now,
+        };
+
+        database.CompletedMigrations.Add(completedMigration);
+        await database.SaveChangesAsync();
+    }
+
+    private static List<T> getListOfInterfaceObjects<T>() where T : class
+    {
+        return Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.GetInterfaces().Contains(typeof(T)) && t.GetConstructor(Type.EmptyTypes) != null)
+            .Select(t => Activator.CreateInstance(t) as T)
+            .ToList()!;
     }
 }

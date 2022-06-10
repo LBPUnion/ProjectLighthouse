@@ -2,13 +2,12 @@
 using System;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
 
 public static class ServerStatics
 {
-    public const string ServerName = "ProjectLighthouse";
-
     public const int PageSize = 20;
 
     public static bool DbConnected {
@@ -25,11 +24,18 @@ public static class ServerStatics
         }
     }
 
+    // FIXME: This needs to go at some point.
     public static bool IsUnitTesting => AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.FullName!.StartsWith("xunit"));
 
     #if DEBUG
-    public static readonly bool IsDebug = true;
+    public const bool IsDebug = true;
     #else
-    public static readonly bool IsDebug = false;
+    public const bool IsDebug = false;
     #endif
+
+    /// <summary>
+    /// The servertype, determined on startup. Shouldn't be null unless very very early in startup.
+    /// </summary>
+    // The way of doing this is kinda weird, but it works.
+    public static ServerType ServerType;
 }

@@ -25,7 +25,7 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
             bool largeHashIsInvalidFile = false;
             bool tooManyPhotoSubjects = false;
             bool duplicatePhotoSubjects = false;
-            bool takenInTheFuture = true;
+            bool takenInTheFuture = false;
 
             // Checks should generally be ordered in least computationally expensive to most.
 

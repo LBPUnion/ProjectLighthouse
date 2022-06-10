@@ -1,23 +1,27 @@
 #nullable enable
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
 public class LandingPage : BaseLayout
 {
+    public LandingPage(Database database) : base(database)
+    {}
 
     public int AuthenticationAttemptsCount;
     public List<User> PlayersOnline = new();
 
     public int PlayersOnlineCount;
-    public LandingPage(Database database) : base(database)
-    {}
+
+    public List<Slot>? LatestTeamPicks;
+    public List<Slot>? NewestLevels;
 
     [UsedImplicitly]
     public async Task<IActionResult> OnGet()
@@ -35,6 +39,38 @@ public class LandingPage : BaseLayout
         List<int> userIds = await this.Database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300).Select(l => l.UserId).ToListAsync();
 
         this.PlayersOnline = await this.Database.Users.Where(u => userIds.Contains(u.UserId)).ToListAsync();
+
+        const int maxShownLevels = 5;
+
+        this.LatestTeamPicks = await this.Database.Slots.Where
+                (s => s.TeamPick)
+            .OrderByDescending(s => s.FirstUploaded)
+            .Take(maxShownLevels)
+            .Include(s => s.Creator)
+            .ToListAsync();
+
+        this.NewestLevels = await this.Database.Slots.OrderByDescending(s => s.FirstUploaded).Take(maxShownLevels).Include(s => s.Creator).ToListAsync();
+
         return this.Page();
     }
+
+    public ViewDataDictionary GetSlotViewData(int slotId, bool isMobile = false)
+        => new(ViewData)
+        {
+            {
+                "User", this.User
+            },
+            {
+                "CallbackUrl", $"~/slot/{slotId}"
+            },
+            {
+                "ShowLink", true
+            },
+            {
+                "IsMini", true
+            },
+            {
+                "IsMobile", isMobile
+            },
+        };
 }

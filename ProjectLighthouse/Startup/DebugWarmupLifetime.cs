@@ -20,7 +20,6 @@ public class DebugWarmupLifetime : IHostLifetime
     private CancellationTokenRegistration applicationStartedRegistration;
 
     private readonly ConsoleLifetime consoleLifetime;
-    public static ServerType ServerType;
 
     public DebugWarmupLifetime
     (
@@ -39,7 +38,7 @@ public class DebugWarmupLifetime : IHostLifetime
     {
         using HttpClient client = new();
 
-        string url = ServerType switch
+        string url = ServerStatics.ServerType switch
         {
             ServerType.GameServer => ServerConfiguration.Instance.GameApiListenUrl,
             ServerType.Website => ServerConfiguration.Instance.WebsiteListenUrl,

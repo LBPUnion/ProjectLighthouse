@@ -1,11 +1,11 @@
 using System;
 using System.IO;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Files;
-using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers;
 
-public class LighthouseFileLogger : ILogger
+public class FileLogger : ILogger
 {
     private static readonly string logsDirectory = Path.Combine(Environment.CurrentDirectory, "logs");
 
@@ -13,8 +13,8 @@ public class LighthouseFileLogger : ILogger
     {
         FileHelper.EnsureDirectoryCreated(logsDirectory);
 
-        string contentFile = $"[{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
-        string contentAll = $"[{line.Area}:{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
+        string contentFile = $"[{ServerStatics.ServerType}] [{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
+        string contentAll = $"[{ServerStatics.ServerType}] [{line.Area}:{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
 
         try
         {

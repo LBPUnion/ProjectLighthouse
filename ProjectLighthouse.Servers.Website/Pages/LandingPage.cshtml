@@ -1,14 +1,16 @@
 @page "/"
 @using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
-@using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Levels
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.LandingPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.ShowTitleInPage = false;
+    bool isMobile = this.Request.IsMobile();
 }
-<h1>Welcome to <b>Project Lighthouse</b>!</h1>
+<h1>Welcome to <b>@ServerConfiguration.Instance.Customization.ServerName</b>!</h1>
 
 @if (Model.User != null)
 {
@@ -42,3 +44,38 @@ else
         <a href="/user/@user.UserId" title="@user.Status.ToString()">@user.Username</a>
     }
 }
+
+<br>
+
+<div class="@(isMobile ? "" : "ui center aligned grid")">
+    <div class="eight wide column">
+        <div class="ui pink segment">
+            <h1><i class="ribbon icon"></i>Latest Team Picks</h1>
+            <div class="ui divider"></div>
+            <div class="ui left aligned segment">
+                @foreach (Slot slot in Model.LatestTeamPicks!) @* Can't reach a point where this is null *@
+                {
+                    @await Html.PartialAsync("Partials/SlotCardPartial", slot, Model.GetSlotViewData(slot.SlotId, isMobile))
+                    <br>
+                }
+            </div>
+        </div>
+    </div>
+    @if (isMobile)
+    {
+        <br>
+    }
+    <div class="eight wide column">
+        <div class="ui blue segment">
+            <h1><i class="certificate icon"></i>Newest Levels</h1>
+            <div class="ui divider"></div>
+            <div class="ui left aligned segment">
+                @foreach (Slot slot in Model.NewestLevels!) @* Can't reach a point where this is null *@
+                {
+                    @await Html.PartialAsync("Partials/SlotCardPartial", slot, Model.GetSlotViewData(slot.SlotId, isMobile))
+                    <br>
+                }
+            </div>
+        </div>
+    </div>
+</div>
