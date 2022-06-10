@@ -16,6 +16,7 @@ namespace LBPUnion.ProjectLighthouse.Match.Rooms;
 
 public class RoomHelper
 {
+    public static readonly object RoomLock = new();
     public static StorableList<Room> Rooms => RoomStore.GetRooms();
 
     public static void StartCleanupThread()
@@ -162,7 +163,7 @@ public class RoomHelper
         };
 
         CleanupRooms(room.HostId, room);
-        lock(Rooms) Rooms.Add(room);
+        lock(RoomLock) Rooms.Add(room);
         Logger.Info($"Created room (id: {room.RoomId}) for host {room.HostId}", LogArea.Match);
 
         return room;
@@ -193,7 +194,7 @@ public class RoomHelper
     [SuppressMessage("ReSharper", "InvertIf")]
     public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
-        lock(Rooms)
+        lock(RoomLock)
         {
             int roomCountBeforeCleanup = Rooms.Count();
 

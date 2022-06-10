@@ -42,7 +42,7 @@ public class RoomVisualizerController : ControllerBase
         #if !DEBUG
         return this.NotFound();
         #else
-        RoomHelper.Rooms.RemoveAll();
+        lock(RoomHelper.RoomLock) RoomHelper.Rooms.RemoveAll();
         return this.Redirect("/debug/roomVisualizer");
         #endif
     }
