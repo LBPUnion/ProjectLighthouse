@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -112,14 +114,35 @@ public static class StartupTasks
         Logger.Success($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
     }
 
-    private static void migrateDatabase(DbContext database)
+    private static void migrateDatabase(Database database)
     {
+        Stopwatch totalStopwatch = new();
         Stopwatch stopwatch = new();
+        totalStopwatch.Start();
         stopwatch.Start();
 
         database.Database.MigrateAsync().Wait();
+        stopwatch.Stop();
+        Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+        
+        stopwatch.Reset();
+        stopwatch.Start();
+
+        List<CompletedMigration> completedMigrations = database.CompletedMigrations.ToList();
+        List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
+            .Where(migrationTask => !completedMigrations
+                .Select(m => m.MigrationName)
+                .Contains(migrationTask.GetType().Name)
+            ).ToList();
+        
+        foreach (IMigrationTask migrationTask in migrationsToRun)
+        {
+            MaintenanceHelper.RunMigration(migrationTask, database).Wait();
+        }
 
         stopwatch.Stop();
-        Logger.Success($"Migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+        totalStopwatch.Stop();
+        Logger.Success($"Extra migration tasks took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+        Logger.Success($"Total migration took {totalStopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
     }
 }

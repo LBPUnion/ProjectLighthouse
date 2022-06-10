@@ -1,4 +1,7 @@
+using System;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
@@ -52,4 +55,7 @@ public static class DatabaseExtensions
 
         return query;
     }
+
+    public static async Task<bool> Has<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> predicate) => 
+        await queryable.FirstOrDefaultAsync(predicate) != null;
 }

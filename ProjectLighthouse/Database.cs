@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Reports;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -21,6 +22,7 @@ namespace LBPUnion.ProjectLighthouse;
 
 public class Database : DbContext
 {
+    public DbSet<CompletedMigration> CompletedMigrations { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<Slot> Slots { get; set; }
