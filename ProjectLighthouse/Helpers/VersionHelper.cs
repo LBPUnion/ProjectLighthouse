@@ -54,7 +54,7 @@ public static class VersionHelper
 
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
-    public static string FullVersion => $"{ServerConfiguration.Instance.Customization.ServerName} {Branch}@{CommitHash} {Build}";
+    public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({ServerConfiguration.Instance.Customization.ServerName})";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
     public static bool CanCheckForUpdates { get; set; }
