@@ -138,7 +138,8 @@ public class User
     public bool IsBanned => this.PermissionLevel == PermissionLevel.Banned;
 
     [JsonIgnore]
-    public bool IsModerator => this.PermissionLevel == PermissionLevel.Moderator;
+    public bool IsModerator => this.PermissionLevel == PermissionLevel.Moderator ||
+                               this.PermissionLevel == PermissionLevel.Administrator;
 
     [JsonIgnore]
     public bool IsAdmin => this.PermissionLevel == PermissionLevel.Administrator;
