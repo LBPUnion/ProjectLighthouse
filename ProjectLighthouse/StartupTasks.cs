@@ -103,7 +103,7 @@ public static class StartupTasks
             string password = CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(passwordClear));
             
             User admin = database.CreateUser("admin", password).Result;
-            admin.IsAdmin = true;
+            admin.PermissionLevel = PermissionLevel.Administrator;
             admin.PasswordResetRequired = true;
 
             database.SaveChanges();
