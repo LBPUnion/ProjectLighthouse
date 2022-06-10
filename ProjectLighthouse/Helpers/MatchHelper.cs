@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using LBPUnion.ProjectLighthouse.Types.Match;
+using LBPUnion.ProjectLighthouse.Match.MatchCommands;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -37,7 +37,7 @@ public static class MatchHelper
     }
 
     // This is the function used to show people how laughably awful LBP's protocol is. Beware.
-    public static IMatchData? Deserialize(string data)
+    public static IMatchCommand? Deserialize(string data)
     {
         string matchType = "";
 
@@ -61,7 +61,7 @@ public static class MatchHelper
         return Deserialize(matchType, matchData);
     }
 
-    public static IMatchData? Deserialize(string matchType, string matchData)
+    public static IMatchCommand? Deserialize(string matchType, string matchData)
     {
         return matchType switch
         {

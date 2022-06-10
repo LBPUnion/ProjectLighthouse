@@ -3,11 +3,13 @@
   <component name="UserContentModel">
     <attachedFolders />
     <explicitIncludes>
+      <Path>.config/dotnet-tools.json</Path>
       <Path>.github</Path>
       <Path>.gitignore</Path>
       <Path>.idea</Path>
       <Path>CONTRIBUTING.md</Path>
       <Path>DatabaseMigrations</Path>
+      <Path>LICENSE</Path>
       <Path>ProjectLighthouse.sln.DotSettings</Path>
       <Path>ProjectLighthouse.sln.DotSettings.user</Path>
       <Path>README.md</Path>
@@ -15,6 +17,7 @@
       <Path>crowdin.yml</Path>
       <Path>docker-compose.yml</Path>
       <Path>global.json</Path>
+      <Path>scripts-and-tools</Path>
     </explicitIncludes>
     <explicitExcludes>
       <Path>.idea/.idea.ProjectLighthouse/.idea/workspace.xml</Path>

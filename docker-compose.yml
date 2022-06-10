@@ -14,6 +14,15 @@ services:
       - '3306' # Expose port to localhost:3306
     volumes:
       - lighthouse-db:/var/lib/mysql
+  lighthouse-redis:
+    image: redis/redis-stack
+    ports:
+      - '6379:6379'
+      - '8001:8001'
+    expose:
+      - '6379'
+      - '8001'
+
 
 volumes:
   lighthouse-db:

@@ -1,0 +1,14 @@
+[Unit]
+Description=Project Lighthouse Website - a clean-room, open-source custom server for LBP
+Documentation=https://github.com/LBPUnion/ProjectLighthouse
+
+[Service]
+Type=simple
+ExecStart=bash -c "/srv/lighthouse/start.sh Website"
+TimeoutStopSec=15
+User=lighthouse
+Restart=on-failure
+
+[Install]
+Alias=lighthouse-website
+WantedBy=multi-user.target

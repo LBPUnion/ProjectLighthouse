@@ -1,19 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using InfluxDB.Client;
 using InfluxDB.Client.Writes;
-using Kettu;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Types;
-using LBPUnion.ProjectLighthouse.Types.Settings;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class InfluxHelper
 {
-    public static readonly InfluxDBClient Client = InfluxDBClientFactory.Create(ServerSettings.Instance.InfluxUrl, ServerSettings.Instance.InfluxToken);
+    public static readonly InfluxDBClient Client = InfluxDBClientFactory.Create
+        (url: ServerConfiguration.Instance.InfluxDB.Url, token: ServerConfiguration.Instance.InfluxDB.Token);
 
     private static readonly List<GameVersion> gameVersions = new()
     {
@@ -39,25 +42,25 @@ public static class InfluxHelper
                     .Tag("game", gameVersion.ToString())
                     .Field("playerCountGame", await StatisticsHelper.RecentMatchesForGame(gameVersion));
 
-                writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, gamePoint);
+                writeApi.WritePoint(gamePoint, ServerConfiguration.Instance.InfluxDB.Bucket, ServerConfiguration.Instance.InfluxDB.Organization);
             }
 
-            writeApi.WritePoint(ServerSettings.Instance.InfluxBucket, ServerSettings.Instance.InfluxOrg, point);
+            writeApi.WritePoint(point, ServerConfiguration.Instance.InfluxDB.Bucket, ServerConfiguration.Instance.InfluxDB.Organization);
 
             writeApi.Flush();
         }
         catch(Exception e)
         {
-            Logger.Log("Exception while logging: ", LoggerLevelInflux.Instance);
-
-            foreach (string line in e.ToString().Split("\n")) Logger.Log(line, LoggerLevelInflux.Instance);
+            Logger.Error("Exception while logging: ", LogArea.InfluxDB);
+            Logger.Error(e.ToDetailedException(), LogArea.InfluxDB);
         }
     }
 
+    [SuppressMessage("ReSharper", "FunctionNeverReturns")]
     public static async Task StartLogging()
     {
         await Client.ReadyAsync();
-        Logger.Log("InfluxDB is now ready.", LoggerLevelInflux.Instance);
+        Logger.Success("InfluxDB is now ready.", LogArea.InfluxDB);
         Thread t = new
         (
             delegate()
@@ -70,9 +73,8 @@ public static class InfluxHelper
                     }
                     catch(Exception e)
                     {
-                        Logger.Log("Exception while running log thread: ", LoggerLevelInflux.Instance);
-
-                        foreach (string line in e.ToString().Split("\n")) Logger.Log(line, LoggerLevelInflux.Instance);
+                        Logger.Error("Exception while running log thread: ", LogArea.InfluxDB);
+                        Logger.Error(e.ToDetailedException(), LogArea.InfluxDB);
                     }
 
                     Thread.Sleep(60000);
