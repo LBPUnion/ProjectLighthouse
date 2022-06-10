@@ -52,8 +52,10 @@ public static class StartupTasks
 
         if (!dbConnected) Environment.Exit(1);
         using Database database = new();
-
-        Logger.Info("Migrating database...", LogArea.Database);
+        
+        #if !DEBUG
+        if(serverType == ServerType.GameServer)
+        #endif
         migrateDatabase(database);
         
         if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
@@ -116,6 +118,7 @@ public static class StartupTasks
 
     private static void migrateDatabase(Database database)
     {
+        Logger.Info("Migrating database...", LogArea.Database);
         Stopwatch totalStopwatch = new();
         Stopwatch stopwatch = new();
         totalStopwatch.Start();
