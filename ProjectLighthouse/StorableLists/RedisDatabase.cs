@@ -39,8 +39,7 @@ public static class RedisDatabase
                 return;
             }
 
-            await connection.RecreateIndexAsync(typeof(Room));
-            await connection.RecreateIndexAsync(typeof(UserFriendData));
+            await createIndexes(connection);
         }
         catch(Exception e)
         {
@@ -50,6 +49,20 @@ public static class RedisDatabase
 
         Initialized = true;
         Logger.Success("Initialized Redis.", LogArea.Redis);
+    }
+
+    public static async Task FlushAll()
+    {
+        IRedisConnection connection = getConnection();
+        await connection.ExecuteAsync("FLUSHALL");
+
+        await createIndexes(connection);
+    }
+
+    private static async Task createIndexes(IRedisConnection connection)
+    {
+        await connection.RecreateIndexAsync(typeof(Room));
+        await connection.RecreateIndexAsync(typeof(UserFriendData));
     }
 
     private static IRedisConnection getConnection()
