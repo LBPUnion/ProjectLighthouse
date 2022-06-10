@@ -60,6 +60,8 @@ public class WebsiteStartup
 
         app.UseStaticFiles();
 
+        app.UseRequestLocalization();
+
         app.UseEndpoints(endpoints => endpoints.MapControllers());
         app.UseEndpoints(endpoints => endpoints.MapRazorPages());
     }
