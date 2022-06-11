@@ -7,18 +7,33 @@
 
 @{
     Database database = new();
+    string color = Model.Expired ? "red" : "yellow";
 }
 
-<div class="ui yellow segment">
+<div class="ui @color segment">
     <h2>Case #@Model.CaseId: @Model.CaseType</h2>
-    <p><i>Created by <strong>@Model.CaseCreator?.Username</strong></i></p>
-    <p><strong>Description:</strong> @Model.CaseDescription</p>
+    @if (Model.Expired)
+    {
+        <h3 class="ui red header">
+            This case expired on @Model.CaseExpires!.Value.ToString("MM/dd/yyyy @ h:mm tt").
+        </h3>
+    }
+    
+    <span>
+        Case created by <a href="/user/@Model.CaseCreator!.UserId">@Model.CaseCreator.Username</a>
+        on @Model.CaseCreated.ToString("MM/dd/yyyy @ h:mm tt")
+    </span><br>
+    
+    <span>
+        <strong>Description:</strong> @Model.CaseDescription
+    </span><br>
+    
     @if (Model.CaseType.AffectsLevel())
     {
         Slot slot = await Model.GetSlotAsync(database);
         <p><strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name</a></p>
     }
-    @if (Model.CaseType.AffectsUser())
+    else if (Model.CaseType.AffectsUser())
     {
         User user = await Model.GetUserAsync(database);
         <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>

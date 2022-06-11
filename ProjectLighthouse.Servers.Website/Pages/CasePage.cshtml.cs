@@ -23,11 +23,23 @@ public class CasePage : BaseLayout
         {
             CaseId = 1,
             CaseCreated = DateTime.Now,
-            CaseExpires = new DateTime(2023, 11, 17),
+            CaseExpires = new DateTime(2011, 11, 17),
             CaseCreatorId = user.UserId,
             CaseCreator = user,
             CaseDescription = "Being a dumbass",
             CaseType = CaseType.UserBan,
+            AffectedId = user.UserId,
+        });
+        
+        this.Cases.Add(new ModerationCase
+        {
+            CaseId = 2,
+            CaseCreated = DateTime.Now,
+            CaseExpires = new DateTime(2023, 11, 17),
+            CaseCreatorId = user.UserId,
+            CaseCreator = user,
+            CaseDescription = "Being too cool",
+            CaseType = CaseType.UserSilence,
             AffectedId = user.UserId,
         });
 
