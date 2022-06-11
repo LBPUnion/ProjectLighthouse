@@ -38,13 +38,4 @@
         User user = await Model.GetUserAsync(database);
         <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
     }
-
-    @if (ServerStatics.IsDebug)
-    {
-        <p style="background-color: red; color: white">
-            <strong>DEBUG SHIT</strong><br>
-            <b>Affects level:</b> @Model.CaseType.AffectsLevel()<br>
-            <b>Affects user:</b> @Model.CaseType.AffectsUser()
-        </p>
-    }
 </div>
