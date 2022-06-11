@@ -1,0 +1,35 @@
+@using LBPUnion.ProjectLighthouse
+@using LBPUnion.ProjectLighthouse.Administration
+@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Levels
+@using LBPUnion.ProjectLighthouse.PlayerData.Profiles
+@model LBPUnion.ProjectLighthouse.Administration.ModerationCase
+
+@{
+    Database database = new();
+}
+
+<div class="ui yellow segment">
+    <h2>Case #@Model.CaseId: @Model.CaseType</h2>
+    <p><i>Created by <strong>@Model.CaseCreator?.Username</strong></i></p>
+    <p><strong>Description:</strong> @Model.CaseDescription</p>
+    @if (Model.CaseType.AffectsLevel())
+    {
+        Slot slot = await Model.GetSlotAsync(database);
+        <p><strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name</a></p>
+    }
+    @if (Model.CaseType.AffectsUser())
+    {
+        User user = await Model.GetUserAsync(database);
+        <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
+    }
+
+    @if (ServerStatics.IsDebug)
+    {
+        <p style="background-color: red; color: white">
+            <strong>DEBUG SHIT</strong><br>
+            <b>Affects level:</b> @Model.CaseType.AffectsLevel()<br>
+            <b>Affects user:</b> @Model.CaseType.AffectsUser()
+        </p>
+    }
+</div>

@@ -20,6 +20,7 @@ public class ModPanelPage : BaseLayout
         if (!user.IsModerator) return this.NotFound();
         
         this.Statistics.Add(new AdminPanelStatistic("Reports", await StatisticsHelper.ReportCount(), "/modPanel/reports/0"));
+        this.Statistics.Add(new AdminPanelStatistic("Cases", await StatisticsHelper.CaseCount(), "/modPanel/cases/0"));
 
         return this.Page();
     }

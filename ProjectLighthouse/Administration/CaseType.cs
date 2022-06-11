@@ -29,3 +29,35 @@ public enum CaseType
     
     IpAddressBan = 15,
 }
+
+public static class CaseTypeExtensions
+{
+    public static bool AffectsUser(this CaseType type)
+    {
+        return type switch
+        {
+            CaseType.UserSilence => true,
+            CaseType.UserRestriction => true,
+            CaseType.UserBan => true,
+            CaseType.UserDeletion => true,
+            CaseType.UserCommentsDisabled => true,
+            CaseType.UserDetailsEdited => true,
+            CaseType.UserEarthDeletion => true,
+            _ => false,
+        };
+    }
+    
+    public static bool AffectsLevel(this CaseType type)
+    {
+        return type switch
+        {
+            CaseType.LevelDeletion => true,
+            CaseType.LevelLock => true,
+            CaseType.LevelCommentsDisabled => true,
+            CaseType.LevelDetailsEdited => true,
+            CaseType.LevelTeamPickAdded => true,
+            CaseType.LevelTeamPickRemoved => true,
+            _ => false,
+        };
+    }
+}

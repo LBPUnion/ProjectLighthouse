@@ -1,0 +1,13 @@
+@page "/modPanel/cases/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Administration
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.CasePage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Cases";
+}
+
+@foreach (ModerationCase @case in Model.Cases)
+{
+    @(await Html.PartialAsync("Partials/ModerationCasePartial", @case))
+}

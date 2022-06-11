@@ -4,15 +4,13 @@ using LBPUnion.ProjectLighthouse.Administration.Reports;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
 
 public class ReportsPage : BaseLayout
 {
-
     public int PageAmount;
 
     public int PageNumber;
@@ -42,7 +40,7 @@ public class ReportsPage : BaseLayout
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.ReportCount / ServerStatics.PageSize));
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount)
-            return this.Redirect($"/admin/reports/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
+            return this.Redirect($"/modPanel/reports/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
         this.Reports = await this.Database.Reports.Include(r => r.ReportingPlayer)
             .Where(r => r.ReportingPlayer.Username.Contains(this.SearchValue))

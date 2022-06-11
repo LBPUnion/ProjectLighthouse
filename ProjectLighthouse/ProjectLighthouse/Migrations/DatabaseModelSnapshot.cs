@@ -38,6 +38,9 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("AffectedId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CaseCreated")
                         .HasColumnType("datetime(6)");
 

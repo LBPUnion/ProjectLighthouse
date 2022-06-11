@@ -1,7 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Administration;
 #nullable enable
@@ -23,4 +27,20 @@ public class ModerationCase
     
     [ForeignKey(nameof(CaseCreatorId))]
     public User? CaseCreator { get; set; }
+    
+    public int AffectedId { get; set; }
+
+    #region Get affected id result
+    public Task<User> GetUserAsync(Database database)
+    {
+        Debug.Assert(CaseType.AffectsUser());
+        return database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId)!;
+    }
+    
+    public Task<Slot> GetSlotAsync(Database database)
+    {
+        Debug.Assert(CaseType.AffectsLevel());
+        return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId)!;
+    }
+    #endregion
 }

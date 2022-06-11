@@ -13,8 +13,7 @@ public static class StatisticsHelper
 
     public static async Task<int> RecentMatches() => await database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300).CountAsync();
 
-    public static async Task<int> RecentMatchesForGame
-        (GameVersion gameVersion)
+    public static async Task<int> RecentMatchesForGame(GameVersion gameVersion)
         => await database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300 && l.GameVersion == gameVersion).CountAsync();
 
     public static async Task<int> SlotCount() => await database.Slots.CountAsync();
@@ -24,6 +23,9 @@ public static class StatisticsHelper
     public static async Task<int> TeamPickCount() => await database.Slots.CountAsync(s => s.TeamPick);
 
     public static async Task<int> PhotoCount() => await database.Photos.CountAsync();
-
+    
+    #region Moderator/Admin specific
     public static async Task<int> ReportCount() => await database.Reports.CountAsync();
+    public static async Task<int> CaseCount() => await database.Cases.CountAsync();
+    #endregion
 }

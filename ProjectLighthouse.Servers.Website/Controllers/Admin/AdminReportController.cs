@@ -48,7 +48,7 @@ public class AdminReportController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Redirect("~/admin/reports/0");
+        return this.Redirect("~/modPanel/reports/0");
     }
 
     [HttpGet("dismiss")]
