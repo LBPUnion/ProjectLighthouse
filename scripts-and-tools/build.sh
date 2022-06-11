@@ -1,3 +1,4 @@
+#!/bin/sh
 # Build script for production
 #
 # No arguments
