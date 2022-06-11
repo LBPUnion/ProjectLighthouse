@@ -82,7 +82,7 @@ public class LoginController : ControllerBase
 
         if (ServerConfiguration.Instance.Authentication.UseExternalAuth)
         {
-            if (this.database.UserApprovedIpAddresses.Where(a => a.UserId == user.UserId).Select(a => a.IpAddress).Contains(ipAddress))
+            if (user.ApprovedIPAddress == ipAddress)
             {
                 token.Approved = true;
             }

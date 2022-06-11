@@ -58,7 +58,10 @@ public class WebsiteStartup
 
         app.UseRouting();
 
-        app.UseStaticFiles();
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            ServeUnknownFileTypes = true,
+        });
 
         app.UseEndpoints(endpoints => endpoints.MapControllers());
         app.UseEndpoints(endpoints => endpoints.MapRazorPages());

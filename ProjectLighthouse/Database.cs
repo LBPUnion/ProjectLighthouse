@@ -41,7 +41,6 @@ public class Database : DbContext
     public DbSet<AuthenticationAttempt> AuthenticationAttempts { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<RatedReview> RatedReviews { get; set; }
-    public DbSet<UserApprovedIpAddress> UserApprovedIpAddresses { get; set; }
     public DbSet<DatabaseCategory> CustomCategories { get; set; }
     public DbSet<Reaction> Reactions { get; set; }
     public DbSet<GriefReport> Reports { get; set; }

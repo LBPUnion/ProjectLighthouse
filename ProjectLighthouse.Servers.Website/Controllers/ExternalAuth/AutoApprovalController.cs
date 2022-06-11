@@ -32,15 +32,8 @@ public class AutoApprovalController : ControllerBase
         if (authAttempt.GameToken.UserId != user.UserId) return this.Redirect("/login");
 
         authAttempt.GameToken.Approved = true;
-
-        UserApprovedIpAddress approvedIpAddress = new()
-        {
-            UserId = user.UserId,
-            User = user,
-            IpAddress = authAttempt.IPAddress,
-        };
-
-        this.database.UserApprovedIpAddresses.Add(approvedIpAddress);
+        user.ApprovedIPAddress = authAttempt.IPAddress;
+        
         this.database.AuthenticationAttempts.Remove(authAttempt);
 
         await this.database.SaveChangesAsync();
@@ -48,20 +41,16 @@ public class AutoApprovalController : ControllerBase
         return this.Redirect("/authentication");
     }
 
-    [HttpGet("revokeAutoApproval/{id:int}")]
-    public async Task<IActionResult> RevokeAutoApproval([FromRoute] int id)
+    [HttpGet("revokeAutoApproval")]
+    public async Task<IActionResult> RevokeAutoApproval()
     {
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
-        UserApprovedIpAddress? approvedIpAddress = await this.database.UserApprovedIpAddresses.FirstOrDefaultAsync(a => a.UserApprovedIpAddressId == id);
-        if (approvedIpAddress == null) return this.BadRequest();
-        if (approvedIpAddress.UserId != user.UserId) return this.Redirect("/login");
-
-        this.database.UserApprovedIpAddresses.Remove(approvedIpAddress);
+        user.ApprovedIPAddress = null;
 
         await this.database.SaveChangesAsync();
 
-        return this.Redirect("/authentication/autoApprovals");
+        return this.Redirect("/authentication");
     }
 }

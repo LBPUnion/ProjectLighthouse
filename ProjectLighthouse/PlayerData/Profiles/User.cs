@@ -142,6 +142,9 @@ public class User
 
     [JsonIgnore]
     public string BannedReason { get; set; }
+    
+    [JsonIgnore]
+    public string? ApprovedIPAddress { get; set; }
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
