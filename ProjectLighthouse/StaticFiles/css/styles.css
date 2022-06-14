@@ -27,6 +27,7 @@ canvas.hide-subjects {
 
 .card {
     display: flex;
+    overflow-wrap: anywhere;
     width: 100%;
 }
 

@@ -1,3 +1,4 @@
+@using System.Web
 @using LBPUnion.ProjectLighthouse
 @using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.PlayerData
@@ -10,8 +11,8 @@
 
     await using Database database = new();
 
-    string slotName = string.IsNullOrEmpty(Model.Name) ? "Unnamed Level" : Model.Name;
-    
+    string slotName = HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model!.Name) ? "Unnamed Level" : Model.Name);
+
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
     bool mini = (bool?)ViewData["IsMini"] ?? false;
 
