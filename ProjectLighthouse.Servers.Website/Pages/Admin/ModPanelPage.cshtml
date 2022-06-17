@@ -1,4 +1,5 @@
-@page "/modPanel"
+@page "/moderation"
+@using System.Diagnostics
 @using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.ModPanelPage
@@ -6,7 +7,18 @@
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = "Moderation Panel";
+
+    if (Model.User == null) throw new ArgumentNullException($"{nameof(Model)}.{nameof(User)}");
+
+    // Technically, this should never happen but I'm going to handle it anyways.
+    if (!Model.User.IsModerator)
+    {
+        if(Debugger.IsAttached) Debugger.Break();
+        throw new Exception("Tried to render mod panel with user whose not mod somehow???");
+    }
 }
+
+<p>Hello, <b>@Model.User.Username.</b></p>
 
 @if (!this.Request.IsMobile())
 {

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 
 [ApiController]
-[Route("/modPanel/report/{id:int}")]
+[Route("/moderation/report/{id:int}")]
 public class AdminReportController : ControllerBase
 {
     private readonly Database database;
@@ -48,7 +48,7 @@ public class AdminReportController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Redirect("~/modPanel/reports/0");
+        return this.Redirect("~/moderation/reports/0");
     }
 
     [HttpGet("dismiss")]
@@ -73,6 +73,6 @@ public class AdminReportController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Redirect("~/modPanel/reports/0");
+        return this.Redirect("~/moderation/reports/0");
     }
 }
