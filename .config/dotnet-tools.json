@@ -7,6 +7,12 @@
       "commands": [
         "dotnet-ef"
       ]
+    },
+    "dotnet-trace": {
+      "version": "6.0.328102",
+      "commands": [
+        "dotnet-trace"
+      ]
     }
   }
 }

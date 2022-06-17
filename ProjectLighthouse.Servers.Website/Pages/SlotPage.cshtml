@@ -4,15 +4,14 @@
 @using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.PlayerData.Reviews
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.ShowTitleInPage = false;
 
-    Model.Title = Model.Slot?.Name ?? "";
-    Model.Description = Model.Slot?.Description ?? "";
+    Model.Title = HttpUtility.HtmlDecode(Model.Slot?.Name ?? "");
+    Model.Description = HttpUtility.HtmlDecode(Model.Slot?.Description ?? "");
 
     bool isMobile = this.Request.IsMobile();
 }
@@ -38,15 +37,14 @@
     <div class="eight wide column">
         <div class="ui blue segment">
             <h2>Description</h2>
-            <p>@HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model.Slot?.Description) ? "This level has no description." : Model.Slot.Description)</p>
+            <p style="overflow-wrap: anywhere">@HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model.Slot?.Description) ? "This level has no description." : Model.Slot.Description)</p>
         </div>
     </div>
     <div class="eight wide column">
         <div class="ui red segment">
             <h2>Tags</h2>
             @{
-                string[] authorLabels = Model.Slot?.AuthorLabels.Split(",") ?? new string[]
-                {};
+                string[] authorLabels = Model.Slot?.AuthorLabels.Split(",") ?? new string[]{};
                 if (authorLabels.Length == 1) // ..?? ok c#
                 {
                     <p>This level has no tags.</p>

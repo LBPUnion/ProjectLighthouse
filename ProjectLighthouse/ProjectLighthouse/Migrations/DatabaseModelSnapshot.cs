@@ -627,6 +627,12 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("AdminGrantedSlots")
                         .HasColumnType("int");
 
+                    b.Property<string>("ApprovedIPAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Banned")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("BannedReason")
                         .HasColumnType("longtext");
 
@@ -687,25 +693,6 @@ namespace ProjectLighthouse.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.UserApprovedIpAddress", b =>
-                {
-                    b.Property<int>("UserApprovedIpAddressId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserApprovedIpAddressId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserApprovedIpAddresses");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reaction", b =>
@@ -1074,17 +1061,6 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("Location");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.UserApprovedIpAddress", b =>
-                {
-                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reviews.RatedReview", b =>

@@ -150,6 +150,11 @@ public class User
     [JsonIgnore]
     public string? BannedReason { get; set; }
 
+    #nullable enable
+    [JsonIgnore]
+    public string? ApprovedIPAddress { get; set; }
+    #nullable disable
+
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +

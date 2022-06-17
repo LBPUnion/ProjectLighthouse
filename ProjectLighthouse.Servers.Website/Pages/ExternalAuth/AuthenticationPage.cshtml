@@ -21,18 +21,24 @@ else
     }
 }
 
-<a href="/authentication/autoApprovals">
-    <button class="ui small blue button">
-        <i class="cog icon"></i>
-        <span>Manage automatically approved IP addresses</span>
-    </button>
-</a>
-<a href="/authentication/denyAll">
-    <button class="ui small red button">
-        <i class="x icon"></i>
-        <span>Deny all</span>
-    </button>
-</a>
+@if (Model.User!.ApprovedIPAddress != null)
+{
+    <a href="/authentication/revokeAutoApproval">
+        <button class="ui red button">
+            <i class="trash icon"></i>
+            <span>Revoke automatically approved IP Address (@Model.User!.ApprovedIPAddress)</span>
+        </button>
+    </a>
+}
+@if (Model.AuthenticationAttempts.Count > 1)
+{
+    <a href="/authentication/denyAll">
+        <button class="ui red button">
+            <i class="x icon"></i>
+            <span>Deny all</span>
+        </button>
+    </a>    
+}
 
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
 {
@@ -41,19 +47,19 @@ else
         <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>
             <a href="/authentication/autoApprove/@authAttempt.AuthenticationAttemptId">
-                <button class="ui tiny green button">
+                <button class="ui small green button">
                     <i class="check icon"></i>
                     <span>Automatically approve every time</span>
                 </button>
             </a>
             <a href="/authentication/approve/@authAttempt.AuthenticationAttemptId">
-                <button class="ui tiny yellow button">
+                <button class="ui small yellow button">
                     <i class="check icon"></i>
                     <span>Approve this time</span>
                 </button>
             </a>
             <a href="/authentication/deny/@authAttempt.AuthenticationAttemptId">
-                <button class="ui tiny red button">
+                <button class="ui small red button">
                     <i class="x icon"></i>
                     <span>Deny</span>
                 </button>

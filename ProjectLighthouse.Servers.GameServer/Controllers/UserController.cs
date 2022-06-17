@@ -99,7 +99,7 @@ public class UserController : ControllerBase
 
         if (update.Biography != null)
         {
-            if (update.Biography.Length > 100) return this.BadRequest();
+            if (update.Biography.Length > 512) return this.BadRequest();
 
             user.Biography = update.Biography;
         }
