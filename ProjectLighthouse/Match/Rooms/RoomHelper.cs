@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -194,8 +195,15 @@ public class RoomHelper
     [SuppressMessage("ReSharper", "InvertIf")]
     public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
+        #if DEBUG
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+        #endif
         lock(RoomLock)
         {
+            #if DEBUG
+            Logger.Debug($"Cleaning up rooms... (took {stopwatch.ElapsedMilliseconds}ms to get lock on {nameof(RoomLock)})", LogArea.Match);
+            #endif
             int roomCountBeforeCleanup = Rooms.Count();
 
             // Remove offline players from rooms
@@ -233,10 +241,21 @@ public class RoomHelper
 
             int roomCountAfterCleanup = Rooms.Count();
 
-            if (roomCountBeforeCleanup != roomCountAfterCleanup)
+            // Log the amount of rooms cleaned up.
+            // If we didnt clean any rooms, it's not useful to log in a 
+            // production environment but it's still quite useful for debugging.
+            //
+            // So, we handle that case here:
+            int roomsCleanedUp = roomCountBeforeCleanup - roomCountAfterCleanup;
+            string logText = $"Cleaned up {roomsCleanedUp} rooms.";
+            
+            if (roomsCleanedUp == 0)
             {
-                Logger.Debug($"Cleaned up {roomCountBeforeCleanup - roomCountAfterCleanup} rooms.",
-                    LogArea.Match);
+                Logger.Debug(logText, LogArea.Match);
+            }
+            else
+            {
+                Logger.Info(logText, LogArea.Match);
             }
         }
     }
