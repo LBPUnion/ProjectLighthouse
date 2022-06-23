@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
-public class CleanupSlotVersionMismatchMigration : IMaintenanceJob
+public class CleanupSlotVersionMismatchMaintenanceJob : IMaintenanceJob
 {
     private readonly Database _database = new();
     public string Name() => "Cleanup slot versions";
