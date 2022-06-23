@@ -11,6 +11,7 @@ using ICSharpCode.SharpZipLib.Zip.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -48,6 +49,50 @@ public static class FileHelper
             _ => false,
             #endif
         };
+    }
+
+    public static GameVersion ParseLevelVersion(LbpFile file)
+    {
+        if (file.FileType != LbpFileType.Level)
+        {
+            return GameVersion.Unknown;
+        }
+
+        // Revision numbers borrowed from https://github.com/ennuo/toolkit/blob/main/src/main/java/ennuo/craftworld/resources/structs/Revision.java
+        // LBP3 latest revision is 0x21803F9
+        // LBP2 latest revision is 0x3F8
+        // LBP1 latest revision is 0x272
+        // LBP Vita latest is 0x3E2
+        // There are like 1600 revisions so this doesn't cover everything
+        uint revision = 0;
+
+        // construct a 32 bit number from 4 individual bytes
+        for (int i = 4; i <= 7; i++)
+        {
+            revision <<= 8;
+            revision |= file.Data[i];
+        }
+        // construct a 16 bit number from 2 individual bytes
+        ushort branchId = (ushort) (file.Data[0xC] << 8 | file.Data[0xD]);
+
+        GameVersion version = GameVersion.Unknown;
+        if (revision <= 0x272 || revision == 0x2C3)
+        {
+            version = GameVersion.LittleBigPlanet1;
+        }
+        else if (revision == 0x3E2 && branchId == 0x4431 || revision == 0x38B)
+        {
+            version = GameVersion.LittleBigPlanetVita;
+        } else if (revision >> 0x10 != 0)
+        {
+            version = GameVersion.LittleBigPlanet3;
+        }
+        else if(revision <= 0x3F8)
+        {
+            version = GameVersion.LittleBigPlanet2;
+        }
+
+        return version;
     }
 
     public static LbpFileType DetermineFileType(byte[] data)
