@@ -39,7 +39,7 @@ public class PasswordResetRequestForm : BaseLayout
 
         if (user == null)
         {
-            this.Error = "User does not exist";
+            this.Error = "User does not exist.";
             return this.Page();
         }
 
