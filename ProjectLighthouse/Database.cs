@@ -46,7 +46,6 @@ public class Database : DbContext
     public DbSet<GriefReport> Reports { get; set; }
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
     public DbSet<EmailSetToken> EmailSetTokens { get; set; }
-
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
