@@ -25,7 +25,7 @@ public class PasswordResetRequestForm : BaseLayout
 
         if (!ServerConfiguration.Instance.Mail.MailEnabled)
         {
-            this.Error = "Email disabled in lighthouse configuration, unable to continue.";
+            this.Error = "Email is not configured on this server, so password resets cannot be issued. Please contact your instance administrator for more details.";
             return this.Page();
         }
 
