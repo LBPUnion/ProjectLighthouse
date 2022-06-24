@@ -46,11 +46,9 @@ public class PublishController : ControllerBase
         if (string.IsNullOrEmpty(slot.ResourceCollection)) slot.ResourceCollection = slot.RootLevel;
 
         LbpFile? rootLevel = LbpFile.FromHash(slot.RootLevel);
-
         if (rootLevel == null) return this.BadRequest();
 
         GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
-
         if (slotVersion == GameVersion.Unknown) slotVersion = gameToken.GameVersion;
 
         // Republish logic
@@ -111,7 +109,6 @@ public class PublishController : ControllerBase
         GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
 
         slot.GameVersion = slotVersion;
-
         if (slotVersion == GameVersion.Unknown) slot.GameVersion = gameToken.GameVersion;
 
         // Republish logic
