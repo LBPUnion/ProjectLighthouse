@@ -55,7 +55,12 @@
         @await Html.PartialAsync("Partials/CaptchaPartial")
     }
 
-    <input type="submit" value="Log in" id="submit" class="ui blue button">
+    <input type="submit" value="Log in" id="submit" class="ui blue button">  
+    <a href="/passwordresetrequest">     
+        <div class="ui button">
+            Reset Password         
+        </div>
+    </a>
     @if (ServerConfiguration.Instance.Authentication.RegistrationEnabled)
     {
         <a href="/register">

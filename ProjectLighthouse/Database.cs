@@ -47,6 +47,8 @@ public class Database : DbContext
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
     public DbSet<EmailSetToken> EmailSetTokens { get; set; }
 
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
@@ -354,6 +356,27 @@ public class Database : DbContext
         if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken) || lighthouseToken == null) return null;
 
         return this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
+    }
+
+    #endregion
+
+    #region Password Reset Token
+
+    public User? UserFromPasswordResetToken(string pwToken)
+    {
+
+        PasswordResetToken? token = this.PasswordResetTokens.FirstOrDefault(token => token.ResetToken == pwToken);
+        if (token == null)
+        {
+            return null;
+        }
+
+        if (token.Created < DateTime.Now.AddHours(-1)) // if token is expired
+        {
+            this.PasswordResetTokens.Remove(token);
+            return null;
+        }
+        return this.Users.FirstOrDefault(user => user.UserId == token.UserId);
     }
 
     #endregion

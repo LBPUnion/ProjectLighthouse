@@ -2,10 +2,12 @@
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
@@ -19,8 +21,21 @@ public class PasswordResetPage : BaseLayout
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string password, string confirmPassword)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null) return this.Redirect("~/login");
+        User? user;
+        if (Request.Query.ContainsKey("token"))
+        {
+            user = this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
+            if (user == null)
+            {
+                this.Error = "Invalid Password Reset Token";
+                return this.Page();
+            }
+        }
+        else
+        {
+            user = this.Database.UserFromWebRequest(this.Request);
+            if (user == null) return this.Redirect("~/login");
+        }
 
         if (string.IsNullOrWhiteSpace(password))
         {
@@ -46,10 +61,22 @@ public class PasswordResetPage : BaseLayout
     }
 
     [UsedImplicitly]
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet()
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null) return this.Redirect("~/login");
+        if (Request.Query.ContainsKey("token"))
+        {
+            User? user = this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
+            if (user == null)
+            {
+                this.Error = "WTF?";
+                return this.Page();
+            }
+        }
+        else
+        {
+            User? user = this.Database.UserFromWebRequest(this.Request);
+            if (user == null) return this.Redirect("~/login");
+        }
 
         return this.Page();
     }
