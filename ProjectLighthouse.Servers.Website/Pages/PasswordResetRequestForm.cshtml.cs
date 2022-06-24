@@ -54,8 +54,7 @@ public class PasswordResetRequestForm : BaseLayout
         $"Your {ServerConfiguration.Instance.Customization.ServerName} password can be reset at the following link\n" +
         $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={token.ResetToken}";
 
-        SMTPHelper.SendEmail(user.EmailAddress,
-            "Password reset request", messageBody);
+        SMTPHelper.SendEmail(user.EmailAddress, $"Project Lighthouse Password Reset Request for {user.Username}", messageBody);
 
         this.Database.PasswordResetTokens.Add(token);
         await this.Database.SaveChangesAsync();
