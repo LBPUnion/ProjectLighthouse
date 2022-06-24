@@ -27,7 +27,7 @@ public class PasswordResetPage : BaseLayout
             user = this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
             if (user == null)
             {
-                this.Error = "Invalid password reset token.";
+                this.Error = "This password reset link either is invalid or has expired. Please try again.";
                 return this.Page();
             }
         }
