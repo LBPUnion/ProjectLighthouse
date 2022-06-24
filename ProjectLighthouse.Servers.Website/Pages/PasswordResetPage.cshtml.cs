@@ -27,7 +27,7 @@ public class PasswordResetPage : BaseLayout
             user = this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
             if (user == null)
             {
-                this.Error = "Invalid Password Reset Token";
+                this.Error = "Invalid password reset token.";
                 return this.Page();
             }
         }
@@ -61,22 +61,12 @@ public class PasswordResetPage : BaseLayout
     }
 
     [UsedImplicitly]
-    public async Task<IActionResult> OnGet()
+    public IActionResult OnGet()
     {
-        if (Request.Query.ContainsKey("token"))
-        {
-            User? user = this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
-            if (user == null)
-            {
-                this.Error = "WTF?";
-                return this.Page();
-            }
-        }
-        else
-        {
-            User? user = this.Database.UserFromWebRequest(this.Request);
-            if (user == null) return this.Redirect("~/login");
-        }
+        if (this.Request.Query.ContainsKey("token")) return this.Page();
+        
+        User? user = this.Database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect("~/login");
 
         return this.Page();
     }
