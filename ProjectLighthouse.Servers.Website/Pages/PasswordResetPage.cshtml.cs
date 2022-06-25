@@ -4,7 +4,6 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
@@ -19,8 +18,21 @@ public class PasswordResetPage : BaseLayout
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string password, string confirmPassword)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null) return this.Redirect("~/login");
+        User? user;
+        if (Request.Query.ContainsKey("token"))
+        {
+            user = await this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
+            if (user == null)
+            {
+                this.Error = "This password reset link either is invalid or has expired. Please try again.";
+                return this.Page();
+            }
+        }
+        else
+        {
+            user = this.Database.UserFromWebRequest(this.Request);
+            if (user == null) return this.Redirect("~/login");
+        }
 
         if (string.IsNullOrWhiteSpace(password))
         {
@@ -48,6 +60,8 @@ public class PasswordResetPage : BaseLayout
     [UsedImplicitly]
     public IActionResult OnGet()
     {
+        if (this.Request.Query.ContainsKey("token")) return this.Page();
+        
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
