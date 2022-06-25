@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.5")
+                .HasAnnotation("ProductVersion", "6.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.CompletedMigration", b =>
@@ -388,6 +388,26 @@ namespace ProjectLighthouse.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("GameTokens");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.PasswordResetToken", b =>
+                {
+                    b.Property<int>("TokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ResetToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TokenId");
+
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Photo", b =>
