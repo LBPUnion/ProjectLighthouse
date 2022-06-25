@@ -59,7 +59,9 @@ public class PasswordResetRequestForm : BaseLayout
         this.Database.PasswordResetTokens.Add(token);
         await this.Database.SaveChangesAsync();
 
-        this.Status = $"Password reset email sent to {user.EmailAddress}.";
+
+
+        this.Status = $"Password reset email sent to {CensorHelper.MaskEmail(user.EmailAddress)}.";
         return this.Page();
     }
     public void OnGet() => this.Page();
