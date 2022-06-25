@@ -2,12 +2,9 @@
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
@@ -24,7 +21,7 @@ public class PasswordResetPage : BaseLayout
         User? user;
         if (Request.Query.ContainsKey("token"))
         {
-            user = this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
+            user = await this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
             if (user == null)
             {
                 this.Error = "This password reset link either is invalid or has expired. Please try again.";
