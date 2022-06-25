@@ -69,17 +69,19 @@ public static class FileHelper
             revision <<= 8;
             revision |= file.Data[i];
         }
-        // construct a 16 bit number from 2 individual bytes
-        ushort branchId = (ushort) (file.Data[12] << 8 | file.Data[13]);
+
+        if (revision >= 0x271)
+        {
+            // construct a 16 bit number from 2 individual bytes
+            ushort branchId = (ushort) (file.Data[12] << 8 | file.Data[13]);
+            if (revision == lbpVitaLatest && branchId == 0x4431 || revision == 0x38B) return GameVersion.LittleBigPlanetVita;
+        }
+
 
         GameVersion version = GameVersion.Unknown;
-        if (revision <= lbp1Latest || revision == 0x2C3)
+        if (revision <= lbp1Latest)
         {
             version = GameVersion.LittleBigPlanet1;
-        }
-        else if (revision == lbpVitaLatest && branchId == 0x4431 || revision == 0x38B)
-        {
-            version = GameVersion.LittleBigPlanetVita;
         }
         else if (revision >> 0x10 != 0)
         {
