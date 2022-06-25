@@ -56,16 +56,16 @@
     }
     
     <div class="row">
-    <input type="submit" value="Log in" id="submit" class="ui blue button">
-    @if (ServerConfiguration.Instance.Authentication.RegistrationEnabled)
-    {
-        <a href="/register">
-            <div class="ui button">
-                <i class="user alternate add icon"></i>
-                Register
-            </div>
-        </a>
-    }       
+        <input type="submit" value="Log in" id="submit" class="ui blue button">
+        @if (ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        {
+            <a href="/register">
+                <div class="ui button">
+                    <i class="user alternate add icon"></i>
+                    Register
+                </div>
+            </a>
+        }       
     </div>
     <br/>
         <a href="/passwordResetRequest">
