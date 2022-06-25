@@ -361,10 +361,10 @@ public class Database : DbContext
 
     #region Password Reset Token
 
-    public User? UserFromPasswordResetToken(string pwToken)
+    public async Task<User?> UserFromPasswordResetToken(string resetToken)
     {
 
-        PasswordResetToken? token = this.PasswordResetTokens.FirstOrDefault(token => token.ResetToken == pwToken);
+        PasswordResetToken? token = await this.PasswordResetTokens.FirstOrDefaultAsync(token => token.ResetToken == resetToken);
         if (token == null)
         {
             return null;
@@ -375,7 +375,7 @@ public class Database : DbContext
             this.PasswordResetTokens.Remove(token);
             return null;
         }
-        return this.Users.FirstOrDefault(user => user.UserId == token.UserId);
+        return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
     }
 
     #endregion
