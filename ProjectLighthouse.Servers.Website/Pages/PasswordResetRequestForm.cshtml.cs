@@ -50,17 +50,16 @@ public class PasswordResetRequestForm : BaseLayout
             ResetToken = CryptoHelper.GenerateAuthToken(),
         };
 
-        string messageBody = $"Hello {user.Username}\n\n"+
-        $"Your {ServerConfiguration.Instance.Customization.ServerName} password can be reset at the following link\n" +
-        $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={token.ResetToken}";
+        string messageBody = $"Hello, {user.Username}.\n\n" +
+            "A request to reset your account's password was issued. If this wasn't you, this can probably be ignored.\n\n" +
+            $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be reset at the following link:\n" +
+            $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={token.ResetToken}";
 
         SMTPHelper.SendEmail(user.EmailAddress, $"Project Lighthouse Password Reset Request for {user.Username}", messageBody);
 
         this.Database.PasswordResetTokens.Add(token);
         await this.Database.SaveChangesAsync();
-
-
-
+        
         this.Status = $"Password reset email sent to {CensorHelper.MaskEmail(user.EmailAddress)}.";
         return this.Page();
     }
