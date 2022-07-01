@@ -104,12 +104,9 @@ public class UserController : ControllerBase
             user.Biography = update.Biography;
         }
 
-        foreach (string? resource in new[]
-                 {
-                     update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,
-                 })
+        foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
         {
-            if (resource != null && !FileHelper.ResourceExists(resource)) return this.BadRequest();
+            if (resource != null && !resource.StartsWith('g') && !FileHelper.ResourceExists(resource)) return this.BadRequest();
         }
 
         if (update.IconHash != null) user.IconHash = update.IconHash;
