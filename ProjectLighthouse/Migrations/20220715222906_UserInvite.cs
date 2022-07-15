@@ -1,11 +1,15 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using LBPUnion.ProjectLighthouse;
 
 #nullable disable
 
 namespace ProjectLighthouse.Migrations
 {
+    [DbContext(typeof(Database))]
+    [Migration("20220715222906_UserInvite")]
     public partial class UserInvite : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
