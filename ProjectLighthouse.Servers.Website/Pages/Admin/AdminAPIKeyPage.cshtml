@@ -1,0 +1,34 @@
+﻿@page "/admin/keys"
+
+@using LBPUnion.ProjectLighthouse.PlayerData
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminAPIKeyPageModel
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "API Keys";
+}
+
+<p>There are <b>@Model.KeyCount</b> API Keys in Lighthouse</p>
+
+<div class="ui grid">
+    @foreach (APIKey key in Model.APIKeys)
+    {
+        string color = "blue";
+        string subtitle = "Enabled";
+        if (!key.Enabled)
+        {
+            color = "red";
+            subtitle = "Disabled";
+        }
+
+        <div class="eight wide column">
+            <div class="ui @color segment">
+                <h2>
+                    <a href="#">@key.Description</a>
+                </h2>
+                <div class="two wide column">
+                    <h3 class="ui">@subtitle</h3> <h4 class="ui">Created at: @key.Created.ToString()</h4>
+                </div>
+            </div>
+        </div>
+    }
+</div>

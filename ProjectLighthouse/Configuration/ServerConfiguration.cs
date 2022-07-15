@@ -23,7 +23,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 5;
+    public const int CurrentConfigVersion = 6;
 
     #region Meta
 
@@ -42,7 +42,7 @@ public class ServerConfiguration
     private static FileSystemWatcher fileWatcher;
 
     // ReSharper disable once NotNullMemberIsNotInitialized
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     static ServerConfiguration()
     {
         if (ServerStatics.IsUnitTesting) return; // Unit testing, we don't want to read configurations here since the tests will provide their own
@@ -54,7 +54,7 @@ public class ServerConfiguration
         // If a valid YML configuration is available!
         if (File.Exists(ConfigFileName) && (tempConfig = fromFile(ConfigFileName)) != null)
         {
-//            Instance = JsonSerializer.Deserialize<ServerConfiguration>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
+            //            Instance = JsonSerializer.Deserialize<ServerConfiguration>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
             Instance = tempConfig;
 
             if (Instance.ConfigVersion < CurrentConfigVersion)
@@ -114,7 +114,7 @@ public class ServerConfiguration
             fileWatcher.EnableRaisingEvents = true; // begin watching
         }
     }
-    #pragma warning restore CS8618
+#pragma warning restore CS8618
 
     private static void onConfigChanged(object sender, FileSystemEventArgs e)
     {
@@ -178,11 +178,11 @@ public class ServerConfiguration
     public string ExternalUrl { get; set; } = "http://localhost:10060";
     public bool ConfigReloading { get; set; }
     public string EulaText { get; set; } = "";
-    #if !DEBUG
+#if !DEBUG
     public string AnnounceText { get; set; } = "You are now logged in as %user.";
-    #else
+#else
     public string AnnounceText { get; set; } = "You are now logged in as %user (id: %id).";
-    #endif
+#endif
     public bool CheckForUnsafeFiles { get; set; } = true;
 
     public FilterMode UserInputFilterMode { get; set; } = FilterMode.None;

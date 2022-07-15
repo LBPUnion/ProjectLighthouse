@@ -15,7 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 public class RegisterForm : BaseLayout
 {
     public RegisterForm(Database database) : base(database)
-    {}
+    { }
 
     public string? Error { get; private set; }
 
@@ -23,7 +23,22 @@ public class RegisterForm : BaseLayout
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
     public async Task<IActionResult> OnPost(string username, string password, string confirmPassword, string emailAddress)
     {
-        if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled) return this.NotFound();
+        if (ServerConfiguration.Instance.Authentication.PrivateRegistration)
+        {
+            if (this.Request.Query.ContainsKey("token"))
+            {
+                if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
+                    return this.Forbid("Invalid Token");
+            }
+            else
+            {
+                return this.NotFound();
+            }
+        }
+        else if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        {
+            return this.NotFound();
+        }
 
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -68,6 +83,11 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
+        if (this.Request.Query.ContainsKey("token"))
+        {
+            await Database.RemoveRegistrationToken(this.Request.Query["token"]);
+        }
+
         User user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
 
         WebToken webToken = new()
@@ -91,7 +111,22 @@ public class RegisterForm : BaseLayout
     public IActionResult OnGet()
     {
         this.Error = string.Empty;
-        if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled) return this.NotFound();
+        if (ServerConfiguration.Instance.Authentication.PrivateRegistration)
+        {
+            if (this.Request.Query.ContainsKey("token"))
+            {
+                if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
+                    return this.Forbid("Invalid Token");
+            }
+            else
+            {
+                return this.NotFound();
+            }
+        }
+        else if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        {
+            return this.NotFound();
+        }
 
         return this.Page();
     }

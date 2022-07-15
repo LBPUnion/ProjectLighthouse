@@ -25,4 +25,6 @@ public static class StatisticsHelper
     public static async Task<int> PhotoCount() => await database.Photos.CountAsync();
 
     public static async Task<int> ReportCount() => await database.Reports.CountAsync();
+
+    public static async Task<int> APIKeyCount() => await database.APIKeys.CountAsync();
 }
