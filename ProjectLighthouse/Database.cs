@@ -378,7 +378,7 @@ public class Database : DbContext
 
     public bool IsRegistrationTokenValid(string tokenString)
     {
-        var token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
+        RegistrationToken? token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
 
         if (token == null) return false;
 
@@ -393,7 +393,7 @@ public class Database : DbContext
 
     public async Task RemoveRegistrationToken(string tokenString)
     {
-        var token = await this.RegistrationTokens.FirstOrDefaultAsync(t => t.Token == tokenString);
+        RegistrationToken? token = await this.RegistrationTokens.FirstOrDefaultAsync(t => t.Token == tokenString);
 
         if (token == null) return;
 
