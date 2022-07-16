@@ -343,9 +343,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Key")
                         .HasColumnType("longtext");
 

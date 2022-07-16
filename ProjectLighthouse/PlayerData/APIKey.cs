@@ -14,8 +14,6 @@ namespace LBPUnion.ProjectLighthouse.PlayerData
         public string Key { get; set; }
 
         public DateTime Created { get; set; }
-
-        public bool Enabled { get; set; }
     }
 }
 

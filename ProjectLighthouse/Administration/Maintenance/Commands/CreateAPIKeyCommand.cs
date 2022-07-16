@@ -27,7 +27,6 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands
             }
             key.Key = CryptoHelper.GenerateAuthToken();
             key.Created = DateTime.Now;
-            key.Enabled = true;
             Database database = new();
             await database.APIKeys.AddAsync(key);
             await database.SaveChangesAsync();
