@@ -26,5 +26,18 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin
             return this.Page();
         }
 
+        public async Task<IActionResult> OnPost(string keyID)
+        {
+            User? user = this.Database.UserFromWebRequest(this.Request);
+            if (user == null || !user.IsAdmin) return this.NotFound();
+
+            APIKey? apiKey = await this.Database.APIKeys.FirstOrDefaultAsync(k => k.Id == int.Parse(keyID));
+            if (apiKey == null) return this.NotFound();
+            this.Database.APIKeys.Remove(apiKey);
+            await this.Database.SaveChangesAsync();
+
+            return this.Page();
+        }
+
     }
 }
