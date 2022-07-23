@@ -70,8 +70,6 @@ public class UserEndpoints : ApiEndpointController
                 APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == AuthHeader);
                 if (apiKey == null) return this.Forbid();
 
-                if (!apiKey.Enabled) return this.Forbid();
-
                 RegistrationToken token = new();
                 token.Created = DateTime.Now;
                 token.Token = CryptoHelper.GenerateAuthToken();
