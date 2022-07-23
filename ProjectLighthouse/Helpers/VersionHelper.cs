@@ -11,7 +11,7 @@ public static class VersionHelper
         try
         {
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
-            Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
+            Branch = $"{ResourceHelper.ReadManifestFile("gitBranch.txt")}{((IsDirty) ? "-dirty" : "")}";
             string rawRevision = ResourceHelper.ReadManifestFile("gitRevCount.txt");
             Revision = (Branch == "main") ? $"r{rawRevision}" : $"{Branch}_r{rawRevision}";
 
@@ -57,7 +57,8 @@ public static class VersionHelper
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
     public static string Revision { get; set; }
-    public static string FullVersion => $"{ServerConfiguration.Instance.Customization.ServerName} {Revision}";//$"Project Lighthouse {Branch}@{CommitHash} {Build} ({ServerConfiguration.Instance.Customization.ServerName})";
+    public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({ServerConfiguration.Instance.Customization.ServerName} {Revision})";
+    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.ServerName} {Revision}";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
     public static bool CanCheckForUpdates { get; set; }
