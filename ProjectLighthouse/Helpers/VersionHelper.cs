@@ -11,9 +11,7 @@ public static class VersionHelper
         try
         {
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
-            string DirtyVerString = (IsDirty) ? "-dirty" : "";
-            string _Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
-            Branch = $"{_Branch}{DirtyVerString}";
+            Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
             string rawRevision = ResourceHelper.ReadManifestFile("gitRevCount.txt");
             Revision = (Branch == "main") ? $"r{rawRevision}" : $"{Branch}_r{rawRevision}";
 
@@ -52,6 +50,8 @@ public static class VersionHelper
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
                 LogArea.Startup
             );
+            string rawRevision = ResourceHelper.ReadManifestFile("gitRevCount.txt");
+            Revision = $"{Branch}-dirty_r{rawRevision}";
             CanCheckForUpdates = false;
         }
     }
