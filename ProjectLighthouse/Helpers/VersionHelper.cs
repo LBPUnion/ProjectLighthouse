@@ -11,7 +11,9 @@ public static class VersionHelper
         try
         {
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
-            Branch = $"{ResourceHelper.ReadManifestFile("gitBranch.txt")}{((IsDirty) ? "-dirty" : "")}";
+            string DirtyVerString = (IsDirty) ? "-dirty" : "";
+            string _Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
+            Branch = $"{_Branch}{DirtyVerString}";
             string rawRevision = ResourceHelper.ReadManifestFile("gitRevCount.txt");
             Revision = (Branch == "main") ? $"r{rawRevision}" : $"{Branch}_r{rawRevision}";
 
