@@ -201,45 +201,58 @@ public class RoomHelper
         #endif
         lock(RoomLock)
         {
+            StorableList<Room> rooms = Rooms; // cache rooms so we dont gen a new one every time
+            List<Room> roomsToUpdate = new();
+            
             #if DEBUG
             Logger.Debug($"Cleaning up rooms... (took {stopwatch.ElapsedMilliseconds}ms to get lock on {nameof(RoomLock)})", LogArea.Match);
             #endif
-            int roomCountBeforeCleanup = Rooms.Count();
+            int roomCountBeforeCleanup = rooms.Count();
 
             // Remove offline players from rooms
-            foreach (Room room in Rooms)
+            foreach (Room room in rooms)
             {
                 List<User> players = room.GetPlayers(database ?? new Database());
-
                 List<int> playersToRemove = players.Where(player => player.Status.StatusType == StatusType.Offline).Select(player => player.UserId).ToList();
 
                 foreach (int player in playersToRemove) room.PlayerIds.Remove(player);
+                
+                roomsToUpdate.Add(room);
             }
 
             // Delete old rooms based on host
             if (hostId != null)
+            {
                 try
                 {
-                    Rooms.RemoveAll(r => r.HostId == hostId);
+                    rooms.RemoveAll(r => r.HostId == hostId);
                 }
                 catch
                 {
                     // TODO: detect the room that failed and remove it
                 }
+            }
 
             // Remove players in this new room from other rooms
             if (newRoom != null)
-                foreach (Room room in Rooms)
+                foreach (Room room in rooms)
                 {
                     if (room == newRoom) continue;
 
                     foreach (int newRoomPlayer in newRoom.PlayerIds) room.PlayerIds.RemoveAll(p => p == newRoomPlayer);
+                    roomsToUpdate.Add(room);
                 }
 
-            Rooms.RemoveAll(r => r.PlayerIds.Count == 0); // Remove empty rooms
-            Rooms.RemoveAll(r => r.PlayerIds.Count > 4); // Remove obviously bogus rooms
+            foreach (Room room in roomsToUpdate)
+            {
+                rooms.Update(room);
+            }
 
-            int roomCountAfterCleanup = Rooms.Count();
+            rooms.RemoveAll(r => r.PlayerIds.Count == 0); // Remove empty rooms
+            rooms.RemoveAll(r => r.HostId == -1); // Remove rooms with broken hosts
+            rooms.RemoveAll(r => r.PlayerIds.Count > 4); // Remove obviously bogus rooms
+
+            int roomCountAfterCleanup = rooms.Count();
 
             // Log the amount of rooms cleaned up.
             // If we didnt clean any rooms, it's not useful to log in a 
@@ -248,8 +261,18 @@ public class RoomHelper
             // So, we handle that case here:
             int roomsCleanedUp = roomCountBeforeCleanup - roomCountAfterCleanup;
             string logText = $"Cleaned up {roomsCleanedUp} rooms.";
-            
+
             if (roomsCleanedUp == 0)
+            {
+                Logger.Debug(logText, LogArea.Match);
+            }
+            else
+            {
+                Logger.Info(logText, LogArea.Match);
+            }
+
+            logText = $"Updated {roomsToUpdate.Count} rooms.";
+            if (roomsToUpdate.Count == 0)
             {
                 Logger.Debug(logText, LogArea.Match);
             }
