@@ -17,15 +17,15 @@ public class RedisStorableList<T> : StorableList<T>
         this.redisNormalCollection.Insert(item);
     }
     
-    public override Task RemoveAsync(T item) => this.redisNormalCollection.Delete(item);
+    public override Task RemoveAsync(T item) => this.redisNormalCollection.DeleteAsync(item);
     public override void Remove(T item)
     {
-        this.redisNormalCollection.DeleteSync(item);
+        this.redisNormalCollection.Delete(item);
     }
     
-    public override Task UpdateAsync(T item) => this.redisNormalCollection.Update(item);
+    public override Task UpdateAsync(T item) => this.redisNormalCollection.UpdateAsync(item);
     public override void Update(T item)
     {
-        this.redisNormalCollection.UpdateSync(item);
+        this.redisNormalCollection.Update(item);
     }
 }
