@@ -32,7 +32,11 @@
 
     }</script>
 
-<p>There are <b>@Model.KeyCount</b> API Keys in Lighthouse</p>
+<p>There are <b>@Model.KeyCount</b> API keys registered.</p>
+@if (Model.KeyCount == 0)
+{
+    <p>To create one, you can use the "Create API key" command in the admin panel.</p>
+}
 
 <div class="ui four column grid">
     @foreach (APIKey key in Model.APIKeys)
