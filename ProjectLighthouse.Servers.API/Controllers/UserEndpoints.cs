@@ -63,11 +63,12 @@ public class UserEndpoints : ApiEndpointController
             Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
         {
 
-            if (!string.IsNullOrWhiteSpace(this.Request.Headers["Authorization"]))
+            string authHeader = this.Request.Headers["Authorization"];
+            if (!string.IsNullOrWhiteSpace(authHeader))
             {
-                string authHeader = this.Request.Headers["Authorization"].ToString().Substring(6);
+                string authToken = authHeader.Substring(authHeader.IndexOf(' ') + 1);
 
-                APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authHeader);
+                APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
                 if (apiKey == null) return this.StatusCode(403, null);
 
                 RegistrationToken token = new();
