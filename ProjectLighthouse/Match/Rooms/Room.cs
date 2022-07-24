@@ -43,7 +43,18 @@ public class Room
     public bool IsLookingForPlayers => this.State == RoomState.PlayingLevel || this.State == RoomState.DivingInWaiting;
 
     [JsonIgnore]
-    public int HostId => this.PlayerIds[0];
+    public int HostId {
+        get {
+            try
+            {
+                return this.PlayerIds[0];
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+    }
 
     #nullable enable
     public override bool Equals(object? obj)

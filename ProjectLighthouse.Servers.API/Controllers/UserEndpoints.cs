@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -53,5 +54,34 @@ public class UserEndpoints : ApiEndpointController
         UserStatus userStatus = new(this.database, id);
 
         return this.Ok(userStatus);
+    }
+
+    [HttpPost("user/inviteToken")]
+    public async Task<IActionResult> CreateUserInviteToken()
+    {
+        if (Configuration.ServerConfiguration.Instance.Authentication.PrivateRegistration ||
+            Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        {
+
+            string authHeader = this.Request.Headers["Authorization"];
+            if (!string.IsNullOrWhiteSpace(authHeader))
+            {
+                string authToken = authHeader.Substring(authHeader.IndexOf(' ') + 1);
+
+                APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
+                if (apiKey == null) return this.StatusCode(403, null);
+
+                RegistrationToken token = new();
+                token.Created = DateTime.Now;
+                token.Token = CryptoHelper.GenerateAuthToken();
+
+                this.database.RegistrationTokens.Add(token);
+                await this.database.SaveChangesAsync();
+
+                return Ok(token.Token);
+            }
+
+        }
+        return this.NotFound();
     }
 }
