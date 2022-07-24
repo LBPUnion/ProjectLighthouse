@@ -81,6 +81,6 @@ public class UserEndpoints : ApiEndpointController
             }
 
         }
-        return Forbid();
+        return this.NotFound();
     }
 }
