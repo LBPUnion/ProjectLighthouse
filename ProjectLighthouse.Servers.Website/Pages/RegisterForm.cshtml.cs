@@ -28,7 +28,7 @@ public class RegisterForm : BaseLayout
             if (this.Request.Query.ContainsKey("token"))
             {
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
-                    return this.Forbid("Invalid Token");
+                    return this.StatusCode(403, "Invalid Token");
             }
             else
             {
@@ -116,7 +116,7 @@ public class RegisterForm : BaseLayout
             if (this.Request.Query.ContainsKey("token"))
             {
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
-                    return this.Forbid("Invalid Token");
+                    return this.StatusCode(403, "Invalid Token");
             }
             else
             {
