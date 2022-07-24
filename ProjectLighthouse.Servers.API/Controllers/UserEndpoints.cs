@@ -65,10 +65,10 @@ public class UserEndpoints : ApiEndpointController
 
             if (!string.IsNullOrWhiteSpace(this.Request.Headers["Authorization"]))
             {
-                var AuthHeader = this.Request.Headers["Authorization"].ToString().Substring(6);
+                string authHeader = this.Request.Headers["Authorization"].ToString().Substring(6);
 
-                APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == AuthHeader);
-                if (apiKey == null) return this.Forbid();
+                APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authHeader);
+                if (apiKey == null) return this.StatusCode(403, null);
 
                 RegistrationToken token = new();
                 token.Created = DateTime.Now;
