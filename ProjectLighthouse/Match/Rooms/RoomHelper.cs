@@ -225,7 +225,7 @@ public class RoomHelper
             {
                 try
                 {
-                    rooms.RemoveAll(r => r.HostId == hostId);
+                    rooms.RemoveAll(r => r.PlayerIds.Contains((int)hostId));
                 }
                 catch
                 {
@@ -233,15 +233,18 @@ public class RoomHelper
                 }
             }
 
-            // Remove players in this new room from other rooms
+            // Remove rooms containing players in this new room
             if (newRoom != null)
-                foreach (Room room in rooms)
+            {
+                foreach (Room room in rooms.Where(room => room != newRoom))
                 {
-                    if (room == newRoom) continue;
-
-                    foreach (int newRoomPlayer in newRoom.PlayerIds) room.PlayerIds.RemoveAll(p => p == newRoomPlayer);
-                    roomsToUpdate.Add(room);
+                    foreach (int newRoomPlayer in newRoom.PlayerIds)
+                    {
+                        if (room.PlayerIds.Contains(newRoomPlayer)) 
+                            rooms.Remove(room);
+                    }
                 }
+            }
 
             foreach (Room room in roomsToUpdate)
             {
