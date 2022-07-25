@@ -113,5 +113,11 @@ public class LoginForm : BaseLayout
     }
 
     [UsedImplicitly]
-    public IActionResult OnGet() => this.Page();
+    public IActionResult OnGet()
+    {
+        if (this.Database.UserFromWebRequest(this.Request) != null) 
+            return this.RedirectToPage(nameof(LandingPage));
+
+        return this.Page();
+    }
 }

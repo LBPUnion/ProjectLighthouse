@@ -13,7 +13,7 @@
     function onSubmit(form) {
         if (document.referrer !== null && document.referrer !== "") {
             const url = new URL(document.referrer);
-            if (url.pathname !== "/logout")
+            if (url.pathname !== "/logout" && url.pathname !== "/login")
                 document.getElementById("redirect").value = url.pathname;
         }
         
