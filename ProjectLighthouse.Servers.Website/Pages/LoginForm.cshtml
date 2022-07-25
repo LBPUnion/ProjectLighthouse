@@ -11,11 +11,16 @@
 
 <script>
     function onSubmit(form) {
+        if (document.referrer !== null && document.referrer !== "") {
+            const url = new URL(document.referrer);
+            if (url.pathname !== "/logout")
+                document.getElementById("redirect").value = url.pathname;
+        }
+        
         const passwordInput = document.getElementById("password");
         const passwordSubmit = document.getElementById("password-submit");
         
         passwordSubmit.value = sha256(passwordInput.value);
-        
         return true;
     }
 </script>
@@ -32,6 +37,7 @@
 
 <form class="ui form" onsubmit="return onSubmit(this)" method="post">
     @Html.AntiForgeryToken()
+    <input type="hidden" id="redirect" name="redirect">
 
     <div class="field">
         <label>Username</label>
