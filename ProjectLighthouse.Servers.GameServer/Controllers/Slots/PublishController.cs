@@ -95,15 +95,15 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.Description.Length > 500)
+        if (slot.Description.Length > 512)
         {
-            Logger.Warn("Rejecting level upload, description too long", LogArea.Publish);
+            Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)", LogArea.Publish);
             return this.BadRequest();
         }
 
         if (slot.Name.Length > 64)
         {
-            Logger.Warn("Rejecting level upload, title too long", LogArea.Publish);
+            Logger.Warn($"Rejecting level upload, title too long ({slot.Name.Length} characters)", LogArea.Publish);
             return this.BadRequest();
         }
 
