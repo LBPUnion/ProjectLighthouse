@@ -8,5 +8,6 @@ public class AuthenticationConfiguration
     public bool BlockDeniedUsers { get; set; }
 
     public bool RegistrationEnabled { get; set; } = true;
+    public bool PrivateRegistration { get; set; } = false;
     public bool UseExternalAuth { get; set; }
 }

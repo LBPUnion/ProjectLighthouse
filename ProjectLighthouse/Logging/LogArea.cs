@@ -21,4 +21,5 @@ public enum LogArea
     Redis,
     Command,
     Admin,
+    Publish,
 }
