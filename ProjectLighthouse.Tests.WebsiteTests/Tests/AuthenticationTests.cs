@@ -78,7 +78,7 @@ public class AuthenticationTests : LighthouseWebTest
     [DatabaseFact]
     public async Task ShouldLoginWithInjectedCookie()
     {
-        const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/p[1]/b";
+        const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/p[1]";
 
         await using Database database = new();
         Random random = new();
@@ -96,10 +96,10 @@ public class AuthenticationTests : LighthouseWebTest
         INavigation navigation = this.Driver.Navigate();
 
         navigation.GoToUrl(this.BaseAddress + "/");
+        Assert.DoesNotContain(user.Username, this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)).Text);
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
-        Assert.Throws<NoSuchElementException>(() => this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)));
         navigation.Refresh();
-        Assert.True(this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)).Text == user.Username);
+        Assert.Contains(user.Username, this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)).Text);
 
         await database.RemoveUser(user);
     }

@@ -1,5 +1,8 @@
+using System.Globalization;
+using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 
 #if !DEBUG
 using Microsoft.Extensions.Hosting.Internal;
@@ -38,6 +41,16 @@ public class WebsiteStartup
             }
         );
 
+        services.Configure<RequestLocalizationOptions>(config =>
+        {
+            List<CultureInfo> languages = LocalizationManager.GetAvailableLanguages().Select(l => new CultureInfo(LocalizationManager.MapLanguage(l))).ToList();
+
+            config.DefaultRequestCulture = new RequestCulture(new CultureInfo("en-US"));
+
+            config.SupportedCultures = languages;
+            config.SupportedUICultures = languages;
+        });
+
         #if DEBUG
         services.AddSingleton<IHostLifetime, DebugWarmupLifetime>();
         #else
@@ -62,6 +75,8 @@ public class WebsiteStartup
         {
             ServeUnknownFileTypes = true,
         });
+
+        app.UseRequestLocalization();
 
         app.UseEndpoints(endpoints => endpoints.MapControllers());
         app.UseEndpoints(endpoints => endpoints.MapRazorPages());

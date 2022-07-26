@@ -15,7 +15,7 @@ public class AdminPanelPage : BaseLayout
 {
     public List<ICommand> Commands = MaintenanceHelper.Commands;
     public AdminPanelPage(Database database) : base(database)
-    {}
+    { }
 
     public List<AdminPanelStatistic> Statistics = new();
 
@@ -30,6 +30,8 @@ public class AdminPanelPage : BaseLayout
         this.Statistics.Add(new AdminPanelStatistic("Users", await StatisticsHelper.UserCount(), "/admin/users"));
         this.Statistics.Add(new AdminPanelStatistic("Slots", await StatisticsHelper.SlotCount()));
         this.Statistics.Add(new AdminPanelStatistic("Photos", await StatisticsHelper.PhotoCount()));
+        this.Statistics.Add(new AdminPanelStatistic("Reports", await StatisticsHelper.ReportCount(), "/admin/reports/0"));
+        this.Statistics.Add(new AdminPanelStatistic("API Keys", await StatisticsHelper.APIKeyCount(), "/admin/keys"));
 
         if (!string.IsNullOrEmpty(command))
         {

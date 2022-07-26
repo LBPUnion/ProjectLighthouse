@@ -22,7 +22,7 @@ public class LoginForm : BaseLayout
     public string? Error { get; private set; }
 
     [UsedImplicitly]
-    public async Task<IActionResult> OnPost(string username, string password)
+    public async Task<IActionResult> OnPost(string username, string password, string redirect)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -105,9 +105,19 @@ public class LoginForm : BaseLayout
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
         if (ServerConfiguration.Instance.Mail.MailEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
 
-        return this.RedirectToPage(nameof(LandingPage));
+        if (string.IsNullOrWhiteSpace(redirect))
+        {
+            return this.RedirectToPage(nameof(LandingPage));
+        }
+        return this.Redirect(redirect);
     }
 
     [UsedImplicitly]
-    public IActionResult OnGet() => this.Page();
+    public IActionResult OnGet()
+    {
+        if (this.Database.UserFromWebRequest(this.Request) != null) 
+            return this.RedirectToPage(nameof(LandingPage));
+
+        return this.Page();
+    }
 }

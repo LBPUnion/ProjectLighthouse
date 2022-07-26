@@ -4,6 +4,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -82,34 +83,67 @@ public class PublishController : ControllerBase
         GameToken gameToken = userAndToken.Value.Item2;
         Slot? slot = await this.getSlotFromBody();
 
-        if (slot == null) return this.BadRequest();
+        if (slot == null)
+        {
+            Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
+            return this.BadRequest();
+        }
 
-        if (slot.Location == null) return this.BadRequest();
+        if (slot.Location == null)
+        {
+            Logger.Warn("Rejecting level upload, slot location is null", LogArea.Publish);
+            return this.BadRequest();
+        }
 
-        if (slot.Description.Length > 500) return this.BadRequest();
+        if (slot.Description.Length > 512)
+        {
+            Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)", LogArea.Publish);
+            return this.BadRequest();
+        }
 
-        if (slot.Name.Length > 64) return this.BadRequest();
+        if (slot.Name.Length > 64)
+        {
+            Logger.Warn($"Rejecting level upload, title too long ({slot.Name.Length} characters)", LogArea.Publish);
+            return this.BadRequest();
+        }
 
         if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
         {
+            Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
             return this.BadRequest();
         }
 
         LbpFile? rootLevel = LbpFile.FromHash(slot.RootLevel);
 
-        if (rootLevel == null) return this.BadRequest();
+        if (rootLevel == null)
+        {
+            Logger.Warn("Rejecting level upload, unable to find rootLevel", LogArea.Publish);
+            return this.BadRequest();
+        }
 
-        if (rootLevel.FileType != LbpFileType.Level) return this.BadRequest();
+        if (rootLevel.FileType != LbpFileType.Level)
+        {
+            Logger.Warn("Rejecting level upload, rootLevel is not a level", LogArea.Publish);
+            return this.BadRequest();
+        }
 
         // Republish logic
         if (slot.SlotId != 0)
         {
             Slot? oldSlot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
-            if (oldSlot == null) return this.NotFound();
+            if (oldSlot == null)
+            {
+                Logger.Warn("Rejecting level republish, wasn't able to find old slot", LogArea.Publish);
+                return this.NotFound();
+            }
 
             if (oldSlot.Location == null) throw new ArgumentNullException();
 
-            if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
+            if (oldSlot.CreatorId != user.UserId)
+            {
+                Logger.Warn("Rejecting level republish, old level not owned by current user", LogArea.Publish);
+                return this.BadRequest();
+            }
 
             oldSlot.Location.X = slot.Location.X;
             oldSlot.Location.Y = slot.Location.Y;
@@ -166,7 +200,8 @@ public class PublishController : ControllerBase
 
         if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
-            return this.StatusCode(403, "");
+            Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
+            return this.BadRequest();
         }
 
         //TODO: parse location in body
@@ -197,6 +232,8 @@ public class PublishController : ControllerBase
             "New level published!",
             $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}"
         );
+        
+        Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
         return this.Ok(slot.Serialize(gameToken.GameVersion));
     }

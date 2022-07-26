@@ -47,6 +47,9 @@ public class Database : DbContext
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
     public DbSet<EmailSetToken> EmailSetTokens { get; set; }
     public DbSet<ModerationCase> Cases { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+    public DbSet<RegistrationToken> RegistrationTokens { get; set; }
+    public DbSet<APIKey> APIKeys { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
@@ -355,6 +358,49 @@ public class Database : DbContext
         if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken) || lighthouseToken == null) return null;
 
         return this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
+    }
+
+    public async Task<User?> UserFromPasswordResetToken(string resetToken)
+    {
+
+        PasswordResetToken? token = await this.PasswordResetTokens.FirstOrDefaultAsync(token => token.ResetToken == resetToken);
+        if (token == null)
+        {
+            return null;
+        }
+
+        if (token.Created < DateTime.Now.AddHours(-1)) // if token is expired
+        {
+            this.PasswordResetTokens.Remove(token);
+            return null;
+        }
+        return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
+    }
+
+    public bool IsRegistrationTokenValid(string tokenString)
+    {
+        RegistrationToken? token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
+
+        if (token == null) return false;
+
+        if (token.Created < DateTime.Now.AddDays(-7)) // if token is expired
+        {
+            this.RegistrationTokens.Remove(token);
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task RemoveRegistrationToken(string tokenString)
+    {
+        RegistrationToken? token = await this.RegistrationTokens.FirstOrDefaultAsync(t => t.Token == tokenString);
+
+        if (token == null) return;
+
+        this.RegistrationTokens.Remove(token);
+
+        await this.SaveChangesAsync();
     }
 
     #endregion
