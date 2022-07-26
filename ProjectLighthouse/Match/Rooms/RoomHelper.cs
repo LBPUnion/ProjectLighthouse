@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -47,10 +48,10 @@ public class RoomHelper
             return null;
         }
 
-        IEnumerable<Room> rooms = Rooms;
+        Random random = new();
+        IEnumerable<Room> rooms = Rooms.OrderBy(_ => random.Next());
 
         rooms = rooms.OrderBy(r => r.IsLookingForPlayers);
-
         rooms = rooms.Where(r => r.RoomVersion == roomVersion).ToList();
         if (platform != null) rooms = rooms.Where(r => r.RoomPlatform == platform).ToList();
 
@@ -135,6 +136,12 @@ public class RoomHelper
             Logger.Success($"Found a room (id: {room.RoomId}) for user {user?.Username ?? "null"} (id: {user?.UserId ?? -1})", LogArea.Match);
 
             return response;
+        }
+
+        if (user != null)
+        {
+            MatchHelper.ClearUserRecentDiveIns(user.UserId);
+            Logger.Info($"Cleared {user.Username} (id: {user.UserId})'s recent dive-ins", LogArea.Match);
         }
 
         return null;
