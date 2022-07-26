@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -47,6 +48,8 @@ public class BaseLayout : PageModel
 
     private string getLanguage()
     {
+        if (ServerStatics.IsUnitTesting) return "en-US";
+        
         IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
         
         if (requestCulture == null) return LocalizationManager.DefaultLang;
