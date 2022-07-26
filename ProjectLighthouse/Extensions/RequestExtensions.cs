@@ -15,7 +15,21 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class RequestExtensions
 {
-
+    static RequestExtensions()
+    {
+        Uri captchaUri = ServerConfiguration.Instance.Captcha.Type switch
+        {
+            CaptchaType.HCaptcha => new Uri("https://hcaptcha.com"),
+            CaptchaType.ReCaptcha => new Uri("https://www.google.com/recaptcha/api/"),
+            _ => throw new ArgumentOutOfRangeException(),
+        };
+        
+        client = new HttpClient
+        {
+            BaseAddress = captchaUri,
+        };
+    }
+    
     #region Mobile Checking
 
     // yoinked and adapted from https://stackoverflow.com/a/68641796
@@ -32,10 +46,7 @@ public static class RequestExtensions
 
     #region Captcha
 
-    private static readonly HttpClient client = new()
-    {
-        BaseAddress = new Uri("https://hcaptcha.com"),
-    };
+    private static readonly HttpClient client;
 
     [SuppressMessage("ReSharper", "ArrangeObjectCreationWhenTypeNotEvident")]
     private static async Task<bool> verifyCaptcha(string token)
@@ -48,7 +59,7 @@ public static class RequestExtensions
             new("response", token),
         };
 
-        HttpResponseMessage response = await client.PostAsync("/siteverify", new FormUrlEncodedContent(payload));
+        HttpResponseMessage response = await client.PostAsync("siteverify", new FormUrlEncodedContent(payload));
 
         response.EnsureSuccessStatusCode();
 
@@ -63,7 +74,14 @@ public static class RequestExtensions
     {
         if (ServerConfiguration.Instance.Captcha.CaptchaEnabled)
         {
-            bool gotCaptcha = request.Form.TryGetValue("h-captcha-response", out StringValues values);
+            string keyName = ServerConfiguration.Instance.Captcha.Type switch
+            {
+                CaptchaType.HCaptcha => "h-captcha-response",
+                CaptchaType.ReCaptcha => "g-recaptcha-response",
+                _ => throw new ArgumentOutOfRangeException(),
+            };
+            
+            bool gotCaptcha = request.Form.TryGetValue(keyName, out StringValues values);
             if (!gotCaptcha) return false;
 
             if (!await verifyCaptcha(values[0])) return false;

@@ -48,7 +48,14 @@
         int rating = comment.ThumbsUp - comment.ThumbsDown;
 
         <div style="display: flex" id="@comment.CommentId">
-            <div class="voting">
+            @{
+                string style = "";
+                if (Model.User?.UserId == comment.PosterUserId)
+                {
+                    style = "visibility: hidden";
+                }
+            }
+            <div class="voting" style="@(style)">
                 <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == 1 ? 0 : 1)">
                     <i class="fitted @(comment.YourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
                 </a>

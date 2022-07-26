@@ -36,6 +36,8 @@ public static class MatchHelper
         return recentlyDivedIn.Contains(otherUserId);
     }
 
+    public static bool ClearUserRecentDiveIns(int userId) => UserRecentlyDivedIn.Remove(userId);
+
     // This is the function used to show people how laughably awful LBP's protocol is. Beware.
     public static IMatchCommand? Deserialize(string data)
     {

@@ -46,4 +46,17 @@ public class RoomVisualizerController : ControllerBase
         return this.Redirect("/debug/roomVisualizer");
         #endif
     }
+
+    [HttpGet("createRoomsWithDuplicatePlayers")]
+    public async Task<IActionResult> CreateRoomsWithDuplicatePlayers()
+    {
+        #if !DEBUG
+        return this.NotFound();
+        #else
+        List<int> users = await this.database.Users.OrderByDescending(_ => EF.Functions.Random()).Take(1).Select(u => u.UserId).ToListAsync();
+        RoomHelper.CreateRoom(users, GameVersion.LittleBigPlanet2, Platform.PS3);
+        RoomHelper.CreateRoom(users, GameVersion.LittleBigPlanet2, Platform.PS3);
+        return this.Redirect("/debug/roomVisualizer");
+        #endif
+    }
 }
