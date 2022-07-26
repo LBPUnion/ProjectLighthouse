@@ -51,4 +51,12 @@
         <value>Masz {0} oczekujących prób autoryzacji. Kliknij tutaj, by je zobaczyć.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
+    
+    <data name="newest_levels" xml:space="preserve">
+        <value>Newest Levels</value>
+    </data>
+    
+    <data name="latest_team_picks" xml:space="preserve">
+        <value>Latest Team Picks</value>
+    </data>
 </root>
