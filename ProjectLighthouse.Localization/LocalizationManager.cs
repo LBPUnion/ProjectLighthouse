@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Localization;
 public static class LocalizationManager
 {
     private static readonly string namespaceStr = typeof(LocalizationManager).Namespace ?? "";
-    public const string DefaultLang = "ja-JP";
+    public const string DefaultLang = "en-US";
 
     public static string GetLocalizedString(TranslationAreas translationArea, string language, string key)
     {
