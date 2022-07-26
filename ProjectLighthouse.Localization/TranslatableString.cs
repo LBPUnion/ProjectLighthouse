@@ -13,6 +13,8 @@ public class TranslatableString
 
     public string Translate(string language) => LocalizationManager.GetLocalizedString(this.Area, language, this.Key);
 
+    public string Translate(string language, params object?[] format) => string.Format(LocalizationManager.GetLocalizedString(this.Area, language, this.Key), format);
+
     // CS0809 is a warning about obsolete methods overriding non-obsoleted methods.
     // That works against what we're trying to do here, so we disable the warning here.
     #pragma warning disable CS0809

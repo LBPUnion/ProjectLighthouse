@@ -9,6 +9,9 @@ public static class LandingPageStrings
     public static readonly TranslatableString UsersSingle = create("users_single");
     public static readonly TranslatableString UsersMultiple = create("users_multiple");
 
+    public static readonly TranslatableString LatestTeamPicks = create("latest_team_picks");
+    public static readonly TranslatableString NewestLevels = create("newest_levels");
+
     public static readonly TranslatableString AuthAttemptsPending = create("authAttemptsPending");
 
     private static TranslatableString create(string key) => new(TranslationAreas.LandingPage, key);

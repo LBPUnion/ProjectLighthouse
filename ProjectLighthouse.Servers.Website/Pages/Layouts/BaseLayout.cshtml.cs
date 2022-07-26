@@ -45,19 +45,15 @@ public class BaseLayout : PageModel
         set => this.user = value;
     }
 
-    public string Translate(TranslatableString translatableString)
+    private string getLanguage()
     {
-        string lang;
+        return "da-DK";
         IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
-
-        if (requestCulture == null) lang = LocalizationManager.DefaultLang;
-        else
-        {
-            lang = requestCulture.RequestCulture.UICulture.Name;
-        }
-
-        Console.WriteLine(lang);
-
-        return translatableString.Translate(lang);
+        
+        if (requestCulture == null) return LocalizationManager.DefaultLang;
+        return requestCulture.RequestCulture.UICulture.Name;
     }
+
+    public string Translate(TranslatableString translatableString) => translatableString.Translate(this.getLanguage());
+    public string Translate(TranslatableString translatableString, params object?[] format) => translatableString.Translate(this.getLanguage(), format);
 }
