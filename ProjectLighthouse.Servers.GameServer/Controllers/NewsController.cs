@@ -27,8 +27,9 @@ public class NewsController : ControllerBase
                 Title = "Test Title",
                 Text = "Test Text",
                 Date = 1348755214000,
+                Picks = "<picks></picks>",
             }.Serialize()
-        );
+        ); ;
 
         return this.Ok(LbpSerializer.StringElement("news", newsEntry));
     }

@@ -14,9 +14,19 @@ public static class News {
 		public string Text { get; set; }
 		public NewsImage Image { get; set; }
 		public long Date { get; set; }
+		public string Type { get; set; }
+		public string Name { get; set; }
+		public string Author { get; set; }
+		public string Icon { get; set; }
+		public string Level { get; set; }
+		public string Picks { get; set; }
 
 		public string Serialize()
-			=> LbpSerializer.StringElement("id", this.Id) +
+			=> LbpSerializer.StringElement("type", this.Type) + 
+			LbpSerializer.StringElement("id", this.Id) +
+			LbpSerializer.StringElement("picks", this.Picks) +
+			LbpSerializer.StringElement("type", this.Type) +
+			LbpSerializer.StringElement("date", this.Date) +
 			LbpSerializer.StringElement("title", this.Title) +
 			LbpSerializer.StringElement("summary", this.Summary) +
 			LbpSerializer.StringElement("text", this.Text) +
