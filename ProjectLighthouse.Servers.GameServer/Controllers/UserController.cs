@@ -99,17 +99,14 @@ public class UserController : ControllerBase
 
         if (update.Biography != null)
         {
-            if (update.Biography.Length > 100) return this.BadRequest();
+            if (update.Biography.Length > 512) return this.BadRequest();
 
             user.Biography = update.Biography;
         }
 
-        foreach (string? resource in new[]
-                 {
-                     update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,
-                 })
+        foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
         {
-            if (resource != null && !FileHelper.ResourceExists(resource)) return this.BadRequest();
+            if (resource != null && !resource.StartsWith('g') && !FileHelper.ResourceExists(resource)) return this.BadRequest();
         }
 
         if (update.IconHash != null) user.IconHash = update.IconHash;

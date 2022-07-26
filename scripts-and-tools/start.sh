@@ -1,3 +1,4 @@
+#!/bin/sh
 # Startup script for production
 #
 # $1: Server to start; case sensitive!!!!!

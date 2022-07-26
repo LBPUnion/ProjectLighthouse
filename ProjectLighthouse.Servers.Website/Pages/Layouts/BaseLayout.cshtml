@@ -26,20 +26,23 @@
     }
 
     Model.IsMobile = Model.Request.IsMobile();
+
+    string title;
+    if (Model.Title == string.Empty)
+    {
+        title = ServerConfiguration.Instance.Customization.ServerName;
+    }
+    else
+    {
+        title = $"{Model.Title} - {ServerConfiguration.Instance.Customization.ServerName}";
+    }
 }
 
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
-    @if (Model.Title == string.Empty)
-    {
-        <title>@ServerConfiguration.Instance.Customization.ServerName</title>
-    }
-    else
-    {
-        <title>@ServerConfiguration.Instance.Customization.ServerName - @Model.Title</title>
-    }
+    <title>@title</title>
     <link rel="stylesheet" type="text/css" href="~/css/styles.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
 
@@ -53,7 +56,7 @@
 
     @* Embed Stuff *@
     <meta name="theme-color" data-react-helmet="true" content="#008cff">
-    <meta content="@ServerConfiguration.Instance.Customization.ServerName - @Model.Title" property="og:title">
+    <meta content="@title" property="og:title">
     @if (!string.IsNullOrEmpty(Model.Description))
     {
         <meta content="@Model.Description" property="og:description">

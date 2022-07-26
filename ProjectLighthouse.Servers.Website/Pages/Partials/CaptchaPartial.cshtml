@@ -1,6 +1,17 @@
 @using LBPUnion.ProjectLighthouse.Configuration
 @if (ServerConfiguration.Instance.Captcha.CaptchaEnabled)
 {
-    <div class="h-captcha" data-sitekey="@ServerConfiguration.Instance.Captcha.SiteKey"></div>
-    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    @switch (ServerConfiguration.Instance.Captcha.Type)
+    {
+        case CaptchaType.HCaptcha:
+            <div class="h-captcha" data-sitekey="@ServerConfiguration.Instance.Captcha.SiteKey"></div>
+            <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+            break;
+        case CaptchaType.ReCaptcha:
+            <div class="g-recaptcha" data-sitekey="@ServerConfiguration.Instance.Captcha.SiteKey"></div>
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+            break;
+        default:
+            throw new ArgumentOutOfRangeException();
+    }
 }

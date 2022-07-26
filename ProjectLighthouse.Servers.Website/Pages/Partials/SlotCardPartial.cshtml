@@ -1,3 +1,4 @@
+@using System.Web
 @using LBPUnion.ProjectLighthouse
 @using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.PlayerData
@@ -10,8 +11,8 @@
 
     await using Database database = new();
 
-    string slotName = string.IsNullOrEmpty(Model.Name) ? "Unnamed Level" : Model.Name;
-    
+    string slotName = HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model!.Name) ? "Unnamed Level" : Model.Name);
+
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
     bool mini = (bool?)ViewData["IsMini"] ?? false;
 
@@ -36,7 +37,9 @@
     }
     <div>
         <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute">
-        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
+        <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: -1;">
+        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px;" 
+             onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
     </div>
     <div class="cardStats">
         @if (!mini)
@@ -79,7 +82,7 @@
             @if (Model.GameVersion == GameVersion.LittleBigPlanet1)
             {
                 <i class="yellow star icon" title="LBP1 Stars"></i>
-                <span>@Model.RatingLBP1</span>
+                <span>@(Math.Round(Model.RatingLBP1 * 10) / 10)</span>
             }
         </div>
         <p>
