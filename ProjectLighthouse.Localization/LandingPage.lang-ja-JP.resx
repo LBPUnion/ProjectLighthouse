@@ -23,7 +23,7 @@
     </resheader>
 
     <data name="welcome" xml:space="preserve">
-        <value>Welcome to {0}!</value>
+        <value>{0}へようこそ</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
@@ -33,17 +33,17 @@
     </data>
 
     <data name="users_none" xml:space="preserve">
-        <value>オンラインユーザーなし</value>
+        <value>オンラインユーザーはなし</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
     <data name="users_single" xml:space="preserve">
-        <value>1つのユーザーがオンライン</value>
+        <value>1人のユーザーがオンライン</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
     <data name="users_multiple" xml:space="preserve">
-        <value>{0}つのユーザーがオンライン</value>
+        <value>{0}人のユーザーがオンライン</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
@@ -53,10 +53,10 @@
     </data>
     
     <data name="newest_levels" xml:space="preserve">
-        <value>Newest Levels</value>
+        <value>最新のレベル</value>
     </data>
     
     <data name="latest_team_picks" xml:space="preserve">
-        <value>Latest Team Picks</value>
+        <value>最新のチームピック</value>
     </data>
 </root>

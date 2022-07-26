@@ -18,21 +18,21 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="username" xml:space="preserve">
-        <value>Username</value>
+        <value>Brugernavn</value>
     </data>
     <data name="password" xml:space="preserve">
-        <value>Password</value>
+        <value>Adgangskode</value>
     </data>
     <data name="register" xml:space="preserve">
-        <value>Register</value>
+        <value>Registrer</value>
     </data>
     <data name="forgot_password" xml:space="preserve">
-        <value>Forgot Password?</value>
+        <value>Glemt adgangskode?</value>
     </data>
     <data name="error" xml:space="preserve">
-        <value>Uh oh!</value>
+        <value>Åh nej!</value>
     </data>
     <data name="log_in" xml:space="preserve">
-        <value>Log In</value>
+        <value>Log ind</value>
     </data>
 </root>

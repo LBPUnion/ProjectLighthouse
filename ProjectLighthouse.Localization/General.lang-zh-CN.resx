@@ -18,7 +18,7 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="username" xml:space="preserve">
-        <value>Username</value>
+        <value>用户名</value>
     </data>
     <data name="password" xml:space="preserve">
         <value>Password</value>
@@ -27,12 +27,12 @@
         <value>Register</value>
     </data>
     <data name="forgot_password" xml:space="preserve">
-        <value>Forgot Password?</value>
+        <value>忘记密码?</value>
     </data>
     <data name="error" xml:space="preserve">
-        <value>Uh oh!</value>
+        <value>哎呀！</value>
     </data>
     <data name="log_in" xml:space="preserve">
-        <value>Log In</value>
+        <value>登入</value>
     </data>
 </root>

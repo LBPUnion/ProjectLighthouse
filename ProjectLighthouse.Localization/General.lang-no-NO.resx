@@ -17,13 +17,22 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="logged_out" xml:space="preserve">
-        <value>ログアウトしました</value>
+    <data name="username" xml:space="preserve">
+        <value>Brukernavn</value>
     </data>
-    <data name="logged_out_info" xml:space="preserve">
-        <value>正常にログアウトされました。5秒後にリダイレクトされるか、以下をクリックして手動でログアウトできます。</value>
+    <data name="password" xml:space="preserve">
+        <value>Passord</value>
     </data>
-    <data name="redirect" xml:space="preserve">
-        <value>リダイレクト</value>
+    <data name="register" xml:space="preserve">
+        <value>Registrer</value>
+    </data>
+    <data name="forgot_password" xml:space="preserve">
+        <value>Glemt Passord?</value>
+    </data>
+    <data name="error" xml:space="preserve">
+        <value>Ånei!</value>
+    </data>
+    <data name="log_in" xml:space="preserve">
+        <value>Logg in</value>
     </data>
 </root>

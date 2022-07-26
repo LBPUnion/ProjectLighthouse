@@ -18,12 +18,12 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="logged_out" xml:space="preserve">
-        <value>ログアウトしました</value>
+        <value>Logget ut</value>
     </data>
     <data name="logged_out_info" xml:space="preserve">
-        <value>正常にログアウトされました。5秒後にリダイレクトされるか、以下をクリックして手動でログアウトできます。</value>
+        <value>Du har blitt logget ut. Du vil bli omdirigert om 5 sekunder, eller du kan klikke nedenfor for å gjøre det manuelt.</value>
     </data>
     <data name="redirect" xml:space="preserve">
-        <value>リダイレクト</value>
+        <value>Videresend</value>
     </data>
 </root>
