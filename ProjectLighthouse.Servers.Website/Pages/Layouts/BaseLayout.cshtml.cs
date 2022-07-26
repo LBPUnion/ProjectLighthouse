@@ -47,7 +47,6 @@ public class BaseLayout : PageModel
 
     private string getLanguage()
     {
-        return "da-DK";
         IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
         
         if (requestCulture == null) return LocalizationManager.DefaultLang;
