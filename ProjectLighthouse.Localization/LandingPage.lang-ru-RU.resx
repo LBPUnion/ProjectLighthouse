@@ -23,7 +23,7 @@
     </resheader>
 
     <data name="welcome" xml:space="preserve">
-        <value>Добро пожаловать в Project Lighthouse!</value>
+        <value>Welcome to {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
