@@ -13,6 +13,14 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>LandingPage.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="General.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>General.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="LoggedOut.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>LoggedOut.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>

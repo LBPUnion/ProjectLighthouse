@@ -26,9 +26,19 @@ public static class LocalizationManager
         // e.g. BaseLayout.resx as opposed to BaseLayout.lang-da-DK.resx.
         if (language != DefaultLang) resourceBasename += $".lang-{language}";
 
-        ResourceManager resourceManager = new(resourceBasename, Assembly.GetExecutingAssembly());
+        string? localizedString = null;
+        try
+        {
+            ResourceManager resourceManager = new(resourceBasename,
+                Assembly.GetExecutingAssembly());
 
-        string? localizedString = resourceManager.GetString(key);
+            localizedString = resourceManager.GetString(key);
+        }
+        catch
+        {
+            // ignored
+        }
+        
         if (localizedString == null)
         {
             #if DEBUG
