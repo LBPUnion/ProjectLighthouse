@@ -227,6 +227,13 @@ public class RoomHelper
                 roomsToUpdate.Add(room);
             }
 
+            // DO NOT REMOVE ROOMS BEFORE THIS POINT!
+            // this will cause the room to be added back to the database
+            foreach (Room room in roomsToUpdate)
+            {
+                rooms.Update(room);
+            }
+
             // Delete old rooms based on host
             if (hostId != null)
             {
@@ -247,15 +254,9 @@ public class RoomHelper
                 {
                     foreach (int newRoomPlayer in newRoom.PlayerIds)
                     {
-                        if (room.PlayerIds.Contains(newRoomPlayer)) 
-                            rooms.Remove(room);
+                        if (room.PlayerIds.Contains(newRoomPlayer)) rooms.Remove(room);
                     }
                 }
-            }
-
-            foreach (Room room in roomsToUpdate)
-            {
-                rooms.Update(room);
             }
 
             rooms.RemoveAll(r => r.PlayerIds.Count == 0); // Remove empty rooms
