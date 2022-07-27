@@ -30,7 +30,9 @@ public class CasePage : BaseLayout
 
         this.SearchValue = name.Replace(" ", string.Empty);
 
-        this.Cases = await this.Database.Cases.ToListAsync();
+        this.Cases = await this.Database.Cases
+            .OrderByDescending(c => c.CaseId)
+            .ToListAsync();
         this.CaseCount = await this.Database.Cases.CountAsync(c => c.CaseDescription.Contains(this.SearchValue));
 
         this.PageNumber = pageNumber;

@@ -163,14 +163,14 @@
     </div>
 </div>
 
-@if (Model.User != null && Model.User.IsAdmin)
+@if (Model.User != null && Model.User.IsModerator)
 {
-    <div class="ui yellow segment">
-        <h2>Admin Options</h2>
+    <div class="ui green segment">
+        <h2>Moderator Options</h2>
 
         @if (Model.Slot?.TeamPick ?? false)
         {
-            <a href="/admin/slot/@Model.Slot.SlotId/removeTeamPick">
+            <a href="/moderation/slot/@Model.Slot.SlotId/removeTeamPick">
                 <div class="ui pink button">
                     <i class="ribbon icon"></i>
                     <span>Remove Team Pick</span>
@@ -179,7 +179,7 @@
         }
         else
         {
-            <a href="/admin/slot/@Model.Slot?.SlotId/teamPick">
+            <a href="/moderation/slot/@Model.Slot?.SlotId/teamPick">
                 <div class="ui pink button">
                     <i class="ribbon icon"></i>
                     <span>Team Pick</span>
@@ -187,7 +187,7 @@
             </a>
         }
 
-        <a href="/admin/slot/@Model.Slot?.SlotId/delete">
+        <a href="/moderation/slot/@Model.Slot?.SlotId/delete">
             <div class="ui red button">
                 <i class="trash icon"></i>
                 <span>Delete</span>

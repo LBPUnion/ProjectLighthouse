@@ -44,4 +44,13 @@ public class ModerationCase
         return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId)!;
     }
     #endregion
+
+    public static ModerationCase NewTeamPickCase(int caseCreator, int slotId, bool added) => new()
+    {
+        CaseType = added ? CaseType.LevelTeamPickAdded : CaseType.LevelTeamPickRemoved,
+        CaseDescription = "",
+        CaseCreatorId = caseCreator,
+        CaseCreated = DateTime.Now,
+        AffectedId = slotId,
+    };
 }
