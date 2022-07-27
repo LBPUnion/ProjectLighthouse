@@ -59,6 +59,7 @@ public class ModerationSlotController : ControllerBase
         if (slot == null) return this.Ok();
 
         await this.database.RemoveSlot(slot);
+        this.database.Cases.Add(ModerationCase.NewLevelDeletionCase(user.UserId, slot.SlotId));
 
         return this.Ok();
     }

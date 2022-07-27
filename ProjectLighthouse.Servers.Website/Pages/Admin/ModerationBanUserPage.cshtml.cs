@@ -26,7 +26,7 @@ public class ModeratorBanUserPage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost([FromRoute] int id, string reason, DateTime caseExpires)
+    public async Task<IActionResult> OnPost([FromRoute] int id, string reason, string modNotes, DateTime caseExpires)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.NotFound();
@@ -44,7 +44,7 @@ public class ModeratorBanUserPage : BaseLayout
         this.Database.WebTokens.RemoveRange(this.Database.WebTokens.Where(t => t.UserId == this.TargetedUser.UserId));
         
         // generate & add moderation case
-        this.Database.Add(ModerationCase.NewBanCase(user.UserId, this.TargetedUser.UserId, reason, caseExpires));
+        this.Database.Add(ModerationCase.NewBanCase(user.UserId, this.TargetedUser.UserId, reason, modNotes, caseExpires));
 
         await this.Database.SaveChangesAsync();
         return this.Redirect($"/user/{this.TargetedUser.UserId}");

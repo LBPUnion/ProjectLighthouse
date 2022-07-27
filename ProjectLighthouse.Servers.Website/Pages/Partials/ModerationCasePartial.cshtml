@@ -18,14 +18,10 @@
             This case expired on @Model.CaseExpires!.Value.ToString("MM/dd/yyyy @ h:mm tt").
         </h3>
     }
-    
+
     <span>
         Case created by <a href="/user/@Model.CaseCreator!.UserId">@Model.CaseCreator.Username</a>
         on @Model.CaseCreated.ToString("MM/dd/yyyy @ h:mm tt")
-    </span><br>
-    
-    <span>
-        <strong>Description:</strong> @Model.CaseDescription
     </span><br>
     
     @if (Model.CaseType.AffectsLevel())
@@ -37,5 +33,15 @@
     {
         User user = await Model.GetUserAsync(database);
         <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
+    }
+    
+    @if (!string.IsNullOrWhiteSpace(Model.CaseDescription))
+    {
+        <h3>Description</h3>
+        <pre>@Model.CaseDescription</pre>
+    }
+    else
+    {
+        <b>No description was provided.</b>
     }
 </div>

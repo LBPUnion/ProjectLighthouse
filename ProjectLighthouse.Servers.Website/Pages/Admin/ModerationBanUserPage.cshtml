@@ -14,12 +14,17 @@
     <div class="ui left labeled input">
         <label for="text" class="ui blue label">Reason: </label>
         <input type="text" name="reason" id="text">
-    </div><br>
+    </div><br><br>
+    
+    <div class="ui left labeled input">
+        <label for="modNotes" class="ui blue label">Moderation case notes: </label>
+        <input type="text" name="modNotes" id="modNotes">
+    </div><br><br>
     
     <div class="ui left labeled input">
             <label for="caseExpires" class="ui blue label">Expires on: </label>
             <input type="datetime-local" name="caseExpires" id="caseExpires">
-    </div><br>
+    </div><br><br>
 
     <br><input type="submit" value="Yes, ban @Model.TargetedUser.Username!" id="submit" class="ui red button"><br>
 </form>

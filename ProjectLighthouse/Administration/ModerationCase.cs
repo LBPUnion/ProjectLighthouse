@@ -68,11 +68,11 @@ public class ModerationCase
     #endregion
 
     #region User
-    public static ModerationCase NewBanCase(int caseCreator, int userId, string reason, DateTime caseExpires)
+    public static ModerationCase NewBanCase(int caseCreator, int userId, string reason, string modNotes, DateTime caseExpires)
         => new()
         {
             CaseType = CaseType.UserBan,
-            CaseDescription = $"Banned for reason '{reason}'",
+            CaseDescription = $"Banned for reason '{reason}'\nModeration notes: {modNotes}",
             CaseCreatorId = caseCreator,
             CaseCreated = DateTime.Now,
             CaseExpires = caseExpires,
