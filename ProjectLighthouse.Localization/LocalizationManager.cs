@@ -75,6 +75,9 @@ public static class LocalizationManager
         {
             "fr-FR", "fr"
         },
+        {
+            "de-DE", "de"
+        }
     };
 
     /// <summary>
