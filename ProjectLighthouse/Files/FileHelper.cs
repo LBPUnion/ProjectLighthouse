@@ -108,18 +108,18 @@ public static class FileHelper
         string footer = Encoding.ASCII.GetString(readLastBytes(reader, 4));
         if (footer == "FARC") return LbpFileType.FileArchive;
 
-        byte[] header = reader.ReadBytes(3);
+        byte[] header = reader.ReadBytes(4);
 
         return Encoding.ASCII.GetString(header) switch
         {
-            "REC" => LbpFileType.MotionRecording,
-            "PRF" => LbpFileType.CrossLevel,
-            "PTG" => LbpFileType.Painting,
-            "TEX" => LbpFileType.Texture,
-            "FSH" => LbpFileType.Script,
-            "VOP" => LbpFileType.Voice,
-            "LVL" => LbpFileType.Level,
-            "PLN" => LbpFileType.Plan,
+            "RECb" => LbpFileType.MotionRecording,
+            "PRFb" => LbpFileType.CrossLevel,
+            "PTGb" => LbpFileType.Painting,
+            "TEX " => LbpFileType.Texture,
+            "FSHb" => LbpFileType.Script,
+            "VOPb" => LbpFileType.Voice,
+            "LVLb" => LbpFileType.Level,
+            "PLNb" => LbpFileType.Plan,
             _ => readAlternateHeader(reader),
         };
     }
