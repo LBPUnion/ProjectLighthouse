@@ -23,7 +23,7 @@
     </resheader>
 
     <data name="welcome" xml:space="preserve">
-        <value>Welcome to {0}!</value>
+        <value>Добро пожаловать в {0}</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
 
@@ -53,7 +53,7 @@
     </data>
     
     <data name="newest_levels" xml:space="preserve">
-        <value>Newest Levels</value>
+        <value>Новые уровни</value>
     </data>
     
     <data name="latest_team_picks" xml:space="preserve">
