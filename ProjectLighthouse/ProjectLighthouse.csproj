@@ -48,14 +48,6 @@
         <EmbeddedResource Include="chatCensoredList.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-		<None Remove="gitRevCount.txt" />
-        <EmbeddedResource Include="gitRevCount.txt">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </EmbeddedResource>
-		<None Remove="gitIsShallowRepo.txt" />
-		<EmbeddedResource Include="gitIsShallowRepo.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -67,8 +59,6 @@
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<Exec Command="git rev-parse --is-shallow-repository &gt; &quot;$(ProjectDir)/gitIsShallowRepo.txt&quot;" />
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;" />
 		<Exec Command="git rev-list HEAD --count &gt; &quot;$(ProjectDir)/gitRevCount.txt&quot;" />
         <Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;" />
         <Exec Command="git remote -v &gt; &quot;$(ProjectDir)/gitRemotes.txt&quot;" />
