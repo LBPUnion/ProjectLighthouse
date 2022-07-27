@@ -1,6 +1,8 @@
 #nullable enable
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -34,15 +36,17 @@ public class UserStatus
         this.CurrentRoom = RoomHelper.FindRoomByUserId(userId);
     }
 
-    public override string ToString()
+    public string ToTranslatedString(string language)
     {
         this.CurrentVersion ??= GameVersion.Unknown;
         this.CurrentPlatform ??= Platform.Unknown;
+
         return this.StatusType switch
         {
-            StatusType.Online => $"Currently online on {((GameVersion)this.CurrentVersion).ToPrettyString()} on {((Platform)this.CurrentPlatform)}",
-            StatusType.Offline => "Offline",
-            _ => "Unknown",
+            StatusType.Online => StatusStrings.CurrentlyOnline.Translate(language, 
+                ((GameVersion)this.CurrentVersion).ToPrettyString(), ((Platform)this.CurrentPlatform)),
+            StatusType.Offline => StatusStrings.Offline.Translate(language),
+            _ => GeneralStrings.Unknown.Translate(language),
         };
     }
 }

@@ -18,25 +18,13 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="username" xml:space="preserve">
-        <value>Username</value>
+    <data name="currently_online" xml:space="preserve">
+        <value>Currently online on {0} on {1}</value>
     </data>
-    <data name="password" xml:space="preserve">
-        <value>Password</value>
+    <data name="offline" xml:space="preserve">
+        <value>Offline</value>
     </data>
-    <data name="register" xml:space="preserve">
-        <value>Register</value>
-    </data>
-    <data name="forgot_password" xml:space="preserve">
-        <value>Forgot Password?</value>
-    </data>
-    <data name="error" xml:space="preserve">
-        <value>Uh oh!</value>
-    </data>
-    <data name="log_in" xml:space="preserve">
-        <value>Log In</value>
-    </data>
-    <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+    <data name="last_online" xml:space="preserve">
+        <value>Offline since {0}</value>
     </data>
 </root>

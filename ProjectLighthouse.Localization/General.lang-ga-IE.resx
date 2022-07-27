@@ -35,4 +35,7 @@
   <data name="log_in" xml:space="preserve">
         <value>Logáil isteach</value>
     </data>
+  <data name="unknown" xml:space="preserve">
+        <value>Unknown</value>
+    </data>
 </root>

@@ -1,8 +1,11 @@
+@using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Localization
 @model LBPUnion.ProjectLighthouse.PlayerData.Profiles.User
 
 @{
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
 }
 
 <div class="card">
@@ -25,7 +28,7 @@
             </h1>
         }
         <p>
-            <i>@Model.Status</i>
+            <i>@Model.Status.ToTranslatedString(language)</i>
         </p>
         <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
