@@ -22,33 +22,33 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>مرحبا بك في {0}</value>
+        <value>歡迎來到 {0}！</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>أنت حاليا مسجل الدخول كـ {0}.</value>
+        <value>您當前以 {0} 身份登錄。</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>لا يوجد مستخدمون على الإنترنت. لماذا لا يتم الاستدعاء للعمل؟</value>
+        <value>沒有用戶在線。為什麼不跳進去？</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>يوجد مستخدم واحد على الإنترنت:</value>
+        <value>目前有 1 位用戶在線：</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>يوجد حاليا {0} مستخدمين على الإنترنت:</value>
+        <value>目前有 {0} 位用戶在線：</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
-        <value>لديك {0} محاولات المصادقة المعلقة. انقر هنا لعرضها.</value>
+        <value>您有 {0} 次身份驗證嘗試待處理。點擊此處查看。</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>أحدث المستويات</value>
+        <value>最新關卡</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>أحدث رموز الفريق</value>
+        <value>最新球隊精選</value>
     </data>
 </root>

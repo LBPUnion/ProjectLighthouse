@@ -1,62 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-        <xsd:element name="root" msdata:IsDataSet="true">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
 
         </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
             PublicKeyToken=b77a5c561934e089
         </value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
             PublicKeyToken=b77a5c561934e089
         </value>
-    </resheader>
-
-    <data name="welcome" xml:space="preserve">
+  </resheader>
+  <data name="welcome" xml:space="preserve">
         <value>Добро пожаловать в {0}</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
-
-    <data name="loggedInAs" xml:space="preserve">
+  <data name="loggedInAs" xml:space="preserve">
         <value>Вы вошли как {0}</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
-
-    <data name="users_none" xml:space="preserve">
+  <data name="users_none" xml:space="preserve">
         <value>Нет пользователей в сети. Почему бы и не поиграть?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
-
-    <data name="users_single" xml:space="preserve">
+  <data name="users_single" xml:space="preserve">
         <value>Сейчас в сети 1 пользователь:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
-
-    <data name="users_multiple" xml:space="preserve">
+  <data name="users_multiple" xml:space="preserve">
         <value>В настоящее время сейчас {0} онлайн:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
-
-    <data name="authAttemptsPending" xml:space="preserve">
+  <data name="authAttemptsPending" xml:space="preserve">
         <value>У вас есть {0} попыток аутентификации в ожидании. Нажмите здесь, чтобы просмотреть их.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
-    
-    <data name="newest_levels" xml:space="preserve">
+  <data name="newest_levels" xml:space="preserve">
         <value>Новые уровни</value>
     </data>
-    
-    <data name="latest_team_picks" xml:space="preserve">
+  <data name="latest_team_picks" xml:space="preserve">
         <value>Последние избранное</value>
     </data>
 </root>
