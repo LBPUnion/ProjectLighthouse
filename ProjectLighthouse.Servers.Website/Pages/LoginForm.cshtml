@@ -1,10 +1,11 @@
 @page "/login"
 @using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.LoginForm
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Log in";
+    Model.Title = Model.Translate(GeneralStrings.LogIn);
 }
 
 <script src="https://geraintluff.github.io/sha256/sha256.min.js"></script>
@@ -29,7 +30,7 @@
 {
     <div class="ui negative message">
         <div class="header">
-            Uh oh!
+            @Model.Translate(GeneralStrings.Error)
         </div>
         <p style="white-space: pre-line">@Model.Error</p>
     </div>
@@ -40,17 +41,17 @@
     <input type="hidden" id="redirect" name="redirect">
 
     <div class="field">
-        <label>Username</label>
+        <label>@Model.Translate(GeneralStrings.Username)</label>
         <div class="ui left icon input">
-            <input type="text" name="username" id="text" placeholder="Username">
+            <input type="text" name="username" id="text" placeholder="@Model.Translate(GeneralStrings.Username)">
             <i class="user icon"></i>
         </div>
     </div>
 
     <div class="field">
-        <label>Password</label>
+        <label>@Model.Translate(GeneralStrings.Password)</label>
         <div class="ui left icon input">
-            <input type="password" id="password" placeholder="Password">
+            <input type="password" id="password" placeholder="@Model.Translate(GeneralStrings.Password)">
             <input type="hidden" id="password-submit" name="password">
             <i class="lock icon"></i>
         </div>
@@ -62,13 +63,13 @@
     }
     
     <div class="row">
-        <input type="submit" value="Log in" id="submit" class="ui blue button">
+        <input type="submit" value="@Model.Translate(GeneralStrings.LogIn)" id="submit" class="ui blue button">
         @if (ServerConfiguration.Instance.Authentication.RegistrationEnabled)
         {
             <a href="/register">
                 <div class="ui button">
                     <i class="user alternate add icon"></i>
-                    Register
+                    @Model.Translate(GeneralStrings.Register)
                 </div>
             </a>
         }       
@@ -76,7 +77,7 @@
     <br/>
         <a href="/passwordResetRequest">
             <div class="ui button">
-                Forgot Password?         
+                @Model.Translate(GeneralStrings.ForgotPassword)
             </div>
         </a>
 </form>

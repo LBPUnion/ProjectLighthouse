@@ -1,22 +1,21 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 
 public class BaseLayout : PageModel
 {
-
     public readonly Database Database;
 
-    public readonly List<PageNavigationItem> NavigationItems = new()
-    {
-        new PageNavigationItem("Home", "/", "home"),
-        new PageNavigationItem("Users", "/users/0", "user friends"),
-        new PageNavigationItem("Photos", "/photos/0", "camera"),
-        new PageNavigationItem("Levels", "/slots/0", "certificate"),
-    };
+    public readonly List<PageNavigationItem> NavigationItems = new();
 
     public readonly List<PageNavigationItem> NavigationItemsRight = new();
     public string Description = string.Empty;
@@ -31,6 +30,11 @@ public class BaseLayout : PageModel
     public BaseLayout(Database database)
     {
         this.Database = database;
+
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderHome, "/", "home"));
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderUsers, "/users/0", "user friends"));
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderPhotos, "/photos/0", "camera"));
+        this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderSlots, "/slots/0", "certificate"));
     }
 
     public new User? User {
@@ -41,4 +45,17 @@ public class BaseLayout : PageModel
         }
         set => this.user = value;
     }
+
+    private string getLanguage()
+    {
+        if (ServerStatics.IsUnitTesting) return "en-US";
+        
+        IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
+        
+        if (requestCulture == null) return LocalizationManager.DefaultLang;
+        return requestCulture.RequestCulture.UICulture.Name;
+    }
+
+    public string Translate(TranslatableString translatableString) => translatableString.Translate(this.getLanguage());
+    public string Translate(TranslatableString translatableString, params object?[] format) => translatableString.Translate(this.getLanguage(), format);
 }

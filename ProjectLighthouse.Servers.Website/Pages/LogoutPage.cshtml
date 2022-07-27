@@ -1,10 +1,16 @@
 @page "/logout"
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.LogoutPage
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Logged out";
+    Model.Title = Model.Translate(LoggedOutStrings.LoggedOut);
 }
 
-<p>You have been successfully logged out. You will be redirected in 5 seconds, or you may click <a href="/">here</a> to do so manually.</p>
+<p>@Model.Translate(LoggedOutStrings.LoggedOutInfo)</p>
+
+<a href="/" class="ui blue button">
+    @Model.Translate(LoggedOutStrings.Redirect)
+</a>
+
 <meta http-equiv="refresh" content="5; url=/"/>

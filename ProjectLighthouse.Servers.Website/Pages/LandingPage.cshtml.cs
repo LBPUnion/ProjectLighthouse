@@ -15,7 +15,7 @@ public class LandingPage : BaseLayout
     public LandingPage(Database database) : base(database)
     {}
 
-    public int AuthenticationAttemptsCount;
+    public int PendingAuthAttempts;
     public List<User> PlayersOnline = new();
 
     public int PlayersOnlineCount;
@@ -32,7 +32,7 @@ public class LandingPage : BaseLayout
         this.PlayersOnlineCount = await StatisticsHelper.RecentMatches();
 
         if (user != null)
-            this.AuthenticationAttemptsCount = await this.Database.AuthenticationAttempts.Include
+            this.PendingAuthAttempts = await this.Database.AuthenticationAttempts.Include
                     (a => a.GameToken)
                 .CountAsync(a => a.GameToken.UserId == user.UserId);
 
