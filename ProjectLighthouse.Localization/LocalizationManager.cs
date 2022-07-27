@@ -77,7 +77,10 @@ public static class LocalizationManager
         },
         {
             "de-DE", "de"
-        }
+        },
+        {
+            "da-DK", "da"
+        },
     };
 
     /// <summary>
