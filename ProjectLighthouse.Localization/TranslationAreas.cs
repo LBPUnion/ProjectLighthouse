@@ -6,4 +6,5 @@ public enum TranslationAreas
     LandingPage,
     General,
     LoggedOut,
+    Status,
 }
