@@ -10,7 +10,7 @@ using IOFile = System.IO.File;
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 
 [ApiController]
-[Route("admin/user/{id:int}")]
+[Route("moderation/user/{id:int}")]
 public class AdminUserController : ControllerBase
 {
     private readonly Database database;
@@ -97,6 +97,7 @@ public class AdminUserController : ControllerBase
             }
         }
 
+        this.database.Cases.Add(ModerationCase.NewPlanetDeletionCase(user.UserId, targetedUser.UserId));
         await this.database.SaveChangesAsync();
 
         return this.Redirect($"/user/{targetedUser.UserId}");

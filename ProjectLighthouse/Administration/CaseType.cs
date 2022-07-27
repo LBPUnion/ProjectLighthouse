@@ -12,7 +12,7 @@ public enum CaseType
     UserDeletion = 3,
     UserCommentsDisabled = 4,
     UserDetailsEdited = 5,
-    UserEarthDeletion = 6,
+    UserPlanetsDeletion = 6,
     
     LevelDeletion = 7,
     LevelLock = 8,
@@ -42,7 +42,7 @@ public static class CaseTypeExtensions
             CaseType.UserBan => true,
             CaseType.UserCommentsDisabled => true,
             CaseType.UserDetailsEdited => true,
-            CaseType.UserEarthDeletion => true,
+            CaseType.UserPlanetsDeletion => true,
             _ => false,
         };
     }

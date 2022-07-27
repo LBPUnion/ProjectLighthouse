@@ -88,7 +88,16 @@ public class ModerationCase
             CaseCreated = DateTime.Now,
         };
 
-    #endregion
-    #endregion
+    public static ModerationCase NewPlanetDeletionCase(int caseCreator, int userId)
+        => new()
+        {
+            CaseType = CaseType.UserPlanetsDeletion,
+            CaseDescription = "",
+            CaseCreatorId = caseCreator,
+            CaseCreated = DateTime.Now,
+            AffectedId = userId,
+        };
 
+    #endregion
+    #endregion
 }
