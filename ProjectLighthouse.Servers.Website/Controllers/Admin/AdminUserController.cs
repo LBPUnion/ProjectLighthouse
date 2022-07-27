@@ -103,7 +103,7 @@ public class AdminUserController : ControllerBase
         return this.Redirect($"/user/{targetedUser.UserId}");
     }
 
-    [HttpPost("setPermissionLevel")]
+    [HttpPost("/admin/user/{id:int}/setPermissionLevel")]
     public async Task<IActionResult> SetUserPermissionLevel([FromRoute] int id, [FromForm] PermissionLevel role)
     {
         User? user = this.database.UserFromWebRequest(this.Request);
