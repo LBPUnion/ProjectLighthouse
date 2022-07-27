@@ -7,4 +7,5 @@ public enum TranslationAreas
     General,
     LoggedOut,
     Status,
+    ModPanel,
 }

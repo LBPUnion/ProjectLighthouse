@@ -2,11 +2,12 @@
 @using System.Diagnostics
 @using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.ModPanelPage
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Moderation Panel";
+    Model.Title = Model.Translate(ModPanelStrings.ModPanelTitle);
 
     if (Model.User == null) throw new ArgumentNullException($"{nameof(Model)}.{nameof(User)}");
 
@@ -18,7 +19,7 @@
     }
 }
 
-<p>Hello, <b>@Model.User.Username.</b></p>
+<p>@Model.Translate(ModPanelStrings.Greeting)</p>
 
 @if (!this.Request.IsMobile())
 {
