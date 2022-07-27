@@ -8,13 +8,25 @@ public static class VersionHelper
 {
     static VersionHelper()
     {
-        string rawRevision = "<unknown>";
+        string commitNumber = "invalid";
         try
         {
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
             Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
-            rawRevision = ServerConfiguration.Instance.Customization.UseNumericRevisionNumber ? ResourceHelper.ReadManifestFile("gitRevCount.txt") : $"{CommitHash}_{Build}";
-            Revision = (Branch == "main") ? $"r{rawRevision}" : $"{Branch}_r{rawRevision}";
+            bool isShallowRepo = ResourceHelper.ReadManifestFile("gitIsShallowRepo.txt") == "true";
+            if (isShallowRepo)
+            {
+                Logger.Warn
+                (
+                    "The UseLessReliavleNumericRevisionNumberingSystem option is not supported for builds made from a shallow clone." +
+                    "Please perform a full clone if you want to use numeric revision numbers." +
+                    "UseLessReliavleNumericRevisionNumberingSystem is now disabled.",
+                    LogArea.Startup
+                );
+                ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem = false;
+            }
+            commitNumber = ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem ? ResourceHelper.ReadManifestFile("gitRevCount.txt") : $"{CommitHash}_{Build}";
+            OrdinalCommitNumber = (Branch == "main") ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
 
             string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
 
@@ -51,16 +63,16 @@ public static class VersionHelper
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
                 LogArea.Startup
             );
-            Revision = $"{Branch}-dirty_r{rawRevision}";
+            OrdinalCommitNumber = $"{Branch}-dirty_r{commitNumber}";
             CanCheckForUpdates = false;
         }
     }
 
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
-    public static string Revision { get; set; }
-    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {Revision}";
-    public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({EnvVer})";
+    public static string OrdinalCommitNumber { get; set; }
+    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {OrdinalCommitNumber}";
+    public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({(ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem ? EnvVer : ServerConfiguration.Instance.Customization.EnvironmentName)})";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
     public static bool CanCheckForUpdates { get; set; }
