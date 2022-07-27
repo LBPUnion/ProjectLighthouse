@@ -53,7 +53,7 @@ public static class FileHelper
 
     public static GameVersion ParseLevelVersion(LbpFile file)
     {
-        if (file.FileType != LbpFileType.Level || file.Data.Length < 16) return GameVersion.Unknown;
+        if (file.FileType != LbpFileType.Level || file.Data.Length < 16 || file.Data[3] != 'b') return GameVersion.Unknown;
 
         // Revision numbers borrowed from https://github.com/ennuo/toolkit/blob/main/src/main/java/ennuo/craftworld/resources/structs/Revision.java
 
@@ -73,8 +73,8 @@ public static class FileHelper
         if (revision >= 0x271)
         {
             // construct a 16 bit number from 2 individual bytes
-            ushort branchId = (ushort) (file.Data[12] << 8 | file.Data[13]);
-            if (revision == lbpVitaLatest && branchId == 0x4431 || revision == 0x38B) return GameVersion.LittleBigPlanetVita;
+            ushort branchDescriptor = (ushort) (file.Data[12] << 8 | file.Data[13]);
+            if (revision == lbpVitaLatest && branchDescriptor == 0x4431 || revision == 0x38B) return GameVersion.LittleBigPlanetVita;
         }
 
 
