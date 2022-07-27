@@ -71,9 +71,16 @@ public static class VersionHelper
 
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
+    /// <summary>
+    /// The amount of commits that currently exist in the local copy of the Git repository.
+    /// Not reliable as versioning if shallow cloning is used, with using the hash of the current commit being more reliable in that case.
+    /// </summary>
     public static string OrdinalCommitNumber { get; set; }
-    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {OrdinalCommitNumber}"; // what's sent as lbpEnvVer to game
-    public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({(ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem ? EnvVer : ServerConfiguration.Instance.Customization.EnvironmentName)})";
+    /// <summary>
+    /// The server's branding (environment version) to show to LBP clients. Shows the environment name next to the revision.
+    /// </summary>
+    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {OrdinalCommitNumber}";
+    public static string FullVersion => $"Project Lighthouse {ServerConfiguration.Instance.Customization.EnvironmentName} {Branch}@{CommitHash} {Build}";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
     public static bool CanCheckForUpdates { get; set; }
