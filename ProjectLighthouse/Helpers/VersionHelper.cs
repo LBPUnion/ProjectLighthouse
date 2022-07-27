@@ -63,7 +63,8 @@ public static class VersionHelper
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
                 LogArea.Startup
             );
-            OrdinalCommitNumber = $"{Branch}-dirty_r{commitNumber}";
+            if (ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem) // remove redundancy
+                OrdinalCommitNumber = $"{Branch}-dirty_r{commitNumber}";
             CanCheckForUpdates = false;
         }
     }
