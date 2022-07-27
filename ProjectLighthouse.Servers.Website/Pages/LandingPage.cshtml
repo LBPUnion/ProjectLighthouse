@@ -3,6 +3,7 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
 @using LBPUnion.ProjectLighthouse.Levels
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.LandingPage
 
 @{
@@ -10,22 +11,22 @@
     Model.ShowTitleInPage = false;
     bool isMobile = this.Request.IsMobile();
 }
-<h1>Welcome to <b>@ServerConfiguration.Instance.Customization.ServerName</b>!</h1>
+<h1>@Model.Translate(LandingPageStrings.Welcome, ServerConfiguration.Instance.Customization.ServerName)</h1>
 
 @if (Model.User != null)
 {
-    <p>You are currently logged in as <b>@Model.User.Username</b>.</p>
-    if (ServerConfiguration.Instance.Authentication.UseExternalAuth && Model.AuthenticationAttemptsCount > 0)
+    <p>@Model.Translate(LandingPageStrings.LoggedInAs, Model.User.Username)</p>
+    if (ServerConfiguration.Instance.Authentication.UseExternalAuth && Model.PendingAuthAttempts > 0)
     {
         <p>
-            <b>You have @Model.AuthenticationAttemptsCount authentication attempts pending. Click <a href="/authentication">here</a> to view them.</b>
+            <b><a href="/authentication">@Model.Translate(LandingPageStrings.AuthAttemptsPending, Model.PendingAuthAttempts)</a></b>
         </p>
     }
 }
 
 @if (Model.PlayersOnlineCount == 1)
 {
-    <p>There is 1 user currently online:</p>
+    <p>@Model.Translate(LandingPageStrings.UsersSingle)</p>
     @foreach (User user in Model.PlayersOnline)
     {
         <a href="/user/@user.UserId" title="@user.Status.ToString()">@user.Username</a>
@@ -34,11 +35,11 @@
 
 else if (Model.PlayersOnlineCount == 0)
 {
-    <p>There are no users online. Why not hop on?</p>
+    <p>@Model.Translate(LandingPageStrings.UsersNone)</p>
 }
 else
 {
-    <p>There are currently @Model.PlayersOnlineCount users online:</p>
+    <p>@Model.Translate(LandingPageStrings.UsersMultiple, Model.PlayersOnlineCount)</p>
     @foreach (User user in Model.PlayersOnline)
     {
         <a href="/user/@user.UserId" title="@user.Status.ToString()">@user.Username</a>
@@ -50,7 +51,7 @@ else
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
         <div class="ui pink segment">
-            <h1><i class="ribbon icon"></i>Latest Team Picks</h1>
+            <h1><i class="ribbon icon"></i>@Model.Translate(LandingPageStrings.LatestTeamPicks)</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
                 @foreach (Slot slot in Model.LatestTeamPicks!) @* Can't reach a point where this is null *@
@@ -67,7 +68,7 @@ else
     }
     <div class="eight wide column">
         <div class="ui blue segment">
-            <h1><i class="certificate icon"></i>Newest Levels</h1>
+            <h1><i class="certificate icon"></i>@Model.Translate(LandingPageStrings.NewestLevels)</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
                 @foreach (Slot slot in Model.NewestLevels!) @* Can't reach a point where this is null *@

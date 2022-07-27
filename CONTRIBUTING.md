@@ -17,9 +17,6 @@ Once you've gotten MySQL running you can run Lighthouse. It will take care of th
 PS3 is difficult to set up, so I will be going over how to set up RPCS3 instead. A guide will be coming for PS3 closer
 to release. You can also follow this guide if you want to learn how to modify your EBOOT.
 
-*Note: This requires a patched copy of RPCS3. You can find a working
-version [on our GitHub](https://github.com/LBPUnion/rpcs3).*
-
 Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do
 extra steps for your game to not crash upon entering pod computer). 
 
@@ -44,8 +41,8 @@ Now, copy the `EBOOTlocalhost.elf` file to where you got your `EBOOT.elf` file f
 
 To launch the game with the patched EBOOT, open up RPCS3, go to File, Boot SELF/ELF, and open up `EBOOTlocalhost.elf`.
 
-Assuming you are running the patched version of RPCS3, you patched the file correctly, the database is migrated, and
-Project Lighthouse is running, the game should now connect and you may begin contributing!
+Assuming you patched the file correctly, the database is migrated, and
+Project Lighthouse is running, the game should now connect, and you may begin contributing!
 
 ### LittleBigPlanet 1
 

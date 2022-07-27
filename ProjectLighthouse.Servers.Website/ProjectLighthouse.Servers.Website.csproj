@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\ProjectLighthouse.Localization\ProjectLighthouse.Localization.csproj" />
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
     </ItemGroup>
 

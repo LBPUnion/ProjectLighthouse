@@ -20,7 +20,7 @@ environment until release**.
 This is because we have not entirely nailed security down yet, and **your instance WILL get attacked** as a result. It's
 happened before, and it'll happen again.
 
-Simply put, **Project Lighthouse is not ready for the general public yet**.
+Simply put, **Project Lighthouse is not ready for the public yet**.
 
 In addition, we're not responsible if someone hacks your machine and wipes your database, so make frequent backups, and
 be sure to report any vulnerabilities. Thank you in advance.
@@ -61,12 +61,12 @@ information.
 
 ## Compatibility across games and platforms
 
-| Game     | Console (PS3/Vita/PSP)              | Emulator (RPCS3/Vita3k/PPSSPP)                               | Next-Gen (PS4/PS5/Vita) |
-|----------|-------------------------------------|--------------------------------------------------------------|-------------------------|
-| LBP1     | Compatible                          | Compatible with patched RPCS3 build                          | No next-gen equivalent  |
-| LBP2     | Compatible                          | Compatible with patched RPCS3 build                          | No next-gen equivalent  |
-| LBP3     | Mostly compatible, frequent crashes | Mostly compatible with patched RPCS3 build, frequent crashes | Incompatible            |
-| LBP Vita | Compatible                          | Incompatible, marked as "Intro" on Vita3k                    | No next-gen equivalent  |
-| LBP PSP  | Potentially compatible              | Incompatible, PSN not supported on PPSSPP                    | Potentially Compatible  |
+| Game     | Console (PS3/Vita/PSP) | Emulator (RPCS3/Vita3k/PPSSPP)            | Next-Gen (PS4/PS5/Adrenaline) |
+|----------|------------------------|-------------------------------------------|-------------------------------|
+| LBP1     | Compatible             | Compatible                                | No next-gen equivalent        |
+| LBP2     | Compatible             | Compatible                                | No next-gen equivalent        |
+| LBP3     | Mostly compatible      | Mostly compatible                         | Incompatible                  |
+| LBP Vita | Compatible             | Incompatible, PSN not supported on Vita3k | No next-gen equivalent        |
+| LBP PSP  | Potentially compatible | Incompatible, PSN not supported on PPSSPP | Potentially Compatible        |
 
 Project Lighthouse is mostly a work in progress, so this chart is subject to change at any point.

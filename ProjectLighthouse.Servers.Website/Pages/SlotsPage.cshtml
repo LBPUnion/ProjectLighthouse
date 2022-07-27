@@ -1,11 +1,12 @@
 @page "/slots/{pageNumber:int}"
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Levels
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotsPage
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Levels";
+    Model.Title = Model.Translate(BaseLayoutStrings.HeaderSlots);
 }
 
 <p>There are @Model.SlotCount total levels!</p>

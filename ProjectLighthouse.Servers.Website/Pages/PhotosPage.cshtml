@@ -1,11 +1,12 @@
 @page "/photos/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.PhotosPage
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Photos";
+    Model.Title = Model.Translate(BaseLayoutStrings.HeaderPhotos);
 }
 
 <p>There are @Model.PhotoCount total photos!</p>

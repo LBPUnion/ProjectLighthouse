@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+
+    <data name="welcome" xml:space="preserve">
+        <value>Velkommen til {0}!</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+
+    <data name="loggedInAs" xml:space="preserve">
+        <value>Du er i øjeblikket logget ind som {0}.</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+
+    <data name="users_none" xml:space="preserve">
+        <value>Der er ingen brugere online. Hvorfor ikke hoppe på?</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+
+    <data name="users_single" xml:space="preserve">
+        <value>Der er 1 bruger online:</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+
+    <data name="users_multiple" xml:space="preserve">
+        <value>Der er {0} brugere online:</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+
+    <data name="authAttemptsPending" xml:space="preserve">
+        <value>Du har {0} godkendelsesforsøg afventende. Klik her for at se dem.</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+    
+    <data name="newest_levels" xml:space="preserve">
+        <value>Seneste Baner</value>
+    </data>
+    
+    <data name="latest_team_picks" xml:space="preserve">
+        <value>Seneste Team Picks</value>
+    </data>
+</root>
