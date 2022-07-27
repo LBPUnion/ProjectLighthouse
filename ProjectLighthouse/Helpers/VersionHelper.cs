@@ -71,7 +71,7 @@ public static class VersionHelper
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
     public static string OrdinalCommitNumber { get; set; }
-    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {OrdinalCommitNumber}";
+    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {OrdinalCommitNumber}"; // what's sent as lbpEnvVer to game
     public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({(ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem ? EnvVer : ServerConfiguration.Instance.Customization.EnvironmentName)})";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
