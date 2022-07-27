@@ -8,17 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
 
-public class AdminBanUserPage : BaseLayout
+public class ModeratorBanUserPage : BaseLayout
 {
 
     public User? TargetedUser;
-    public AdminBanUserPage(Database database) : base(database)
+    public ModeratorBanUserPage(Database database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet([FromRoute] int id)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsAdmin) return this.NotFound();
+        if (user == null || !user.IsModerator) return this.NotFound();
 
         this.TargetedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (this.TargetedUser == null) return this.NotFound();
@@ -26,10 +26,10 @@ public class AdminBanUserPage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost([FromRoute] int id, string reason)
+    public async Task<IActionResult> OnPost([FromRoute] int id, string reason, DateTime caseExpires)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsAdmin) return this.NotFound();
+        if (user == null || !user.IsModerator) return this.NotFound();
 
         this.TargetedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (this.TargetedUser == null) return this.NotFound();
@@ -42,6 +42,9 @@ public class AdminBanUserPage : BaseLayout
 
         // invalidate all currently active webtokens
         this.Database.WebTokens.RemoveRange(this.Database.WebTokens.Where(t => t.UserId == this.TargetedUser.UserId));
+        
+        // generate & add moderation case
+        this.Database.Add(ModerationCase.NewBanCase(user.UserId, this.TargetedUser.UserId, reason, caseExpires));
 
         await this.Database.SaveChangesAsync();
         return this.Redirect($"/user/{this.TargetedUser.UserId}");

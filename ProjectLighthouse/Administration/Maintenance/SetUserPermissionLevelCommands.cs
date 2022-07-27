@@ -67,14 +67,6 @@ public class SetUserModeratorCommand : SetUserPermissionLevelCommand
     public override string[] Aliases() => new[] { "make-moderator", };
 }
 
-public class BanUserCommand : SetUserPermissionLevelCommand
-{
-    public BanUserCommand() : base(PermissionLevel.Banned)
-    {}
-    public override string Name() => "Ban User";
-    public override string[] Aliases() => new[] { "ban", };
-}
-
 public class DemoteUserCommand : SetUserPermissionLevelCommand
 {
     public DemoteUserCommand() : base(PermissionLevel.Default)

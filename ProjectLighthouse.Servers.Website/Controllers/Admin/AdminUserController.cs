@@ -24,7 +24,7 @@ public class AdminUserController : ControllerBase
     public async Task<IActionResult> UnbanUser([FromRoute] int id)
     {
         User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsAdmin) return this.NotFound();
+        if (user == null || !user.IsModerator) return this.NotFound();
 
         User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
@@ -42,7 +42,7 @@ public class AdminUserController : ControllerBase
     [HttpGet("wipePlanets")]
     public async Task<IActionResult> WipePlanets([FromRoute] int id) {
         User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsAdmin) return this.NotFound();
+        if (user == null || !user.IsModerator) return this.NotFound();
 
         User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
@@ -118,7 +118,7 @@ public class AdminUserController : ControllerBase
         }
         else
         {
-            return this.Redirect($"/admin/user/{id}/ban");
+            return this.Redirect($"/moderation/user/{id}/ban");
         }
 
         return this.Redirect("/admin/users");

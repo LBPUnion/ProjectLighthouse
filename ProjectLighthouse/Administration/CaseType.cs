@@ -36,10 +36,10 @@ public static class CaseTypeExtensions
     {
         return type switch
         {
+            CaseType.UserDeletion => false, // you cant get a user from a deleted id
             CaseType.UserSilence => true,
             CaseType.UserRestriction => true,
             CaseType.UserBan => true,
-            CaseType.UserDeletion => true,
             CaseType.UserCommentsDisabled => true,
             CaseType.UserDetailsEdited => true,
             CaseType.UserEarthDeletion => true,
@@ -51,7 +51,7 @@ public static class CaseTypeExtensions
     {
         return type switch
         {
-            CaseType.LevelDeletion => true,
+            CaseType.LevelDeletion => false, // you cant get a slot from a deleted id
             CaseType.LevelLock => true,
             CaseType.LevelCommentsDisabled => true,
             CaseType.LevelDetailsEdited => true,
