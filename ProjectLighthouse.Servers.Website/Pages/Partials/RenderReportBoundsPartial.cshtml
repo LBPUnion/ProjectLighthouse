@@ -1,0 +1,147 @@
+<script>
+    function getReportId(name){
+        let split = name.split("-");
+        return split[split.length-1];
+    }
+    const colours = ["#96dd3c", "#ceb424", "#cc0a1d", "#c800cc"];
+    let displayType;
+    window.addEventListener("load", function () {
+        document.querySelectorAll(".hover-players").forEach(item => {
+            item.addEventListener('mouseenter', function () {
+                let reportId = getReportId(item.id);
+                const canvas = canvases[reportId];
+                displayType = 1;
+                
+                canvas.className = "photo-subjects";
+                
+                redraw(reportId);
+            });
+        });
+        document.querySelectorAll(".hover-region").forEach(item => {
+            item.addEventListener('mouseenter', function () {
+                let reportId = getReportId(item.id);
+                const canvas = canvases[reportId];
+                const image = document.getElementById("game-image-" + reportId.toString());
+                displayType = 0;
+                
+                canvas.className = "photo-subjects";
+                
+                canvas.width = image.offsetWidth;
+                canvas.height = image.clientHeight; // space for names to hang off
+                
+                redraw(reportId);
+            });
+        });                
+        document.querySelectorAll(".hover-region, .hover-players").forEach(item => {
+            item.addEventListener('mouseleave', function () {
+                canvases[getReportId(item.id)].className = "photo-subjects hide-subjects";
+            });
+        });
+    }, false);
+    
+    function redraw(reportId){
+        let context = ctx[reportId];
+        let canvas = canvases[reportId];
+        let image = images[reportId];
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        let w = canvas.width;
+        let h = canvas.height;
+                                    
+        // halfwidth, halfheight
+        const hw = w / 2;
+        const hh = h / 2;
+        switch (displayType){
+            case 0: {
+                let imageBounds = bounds[reportId];
+                const x1 = imageBounds.Left;
+                const x2 = imageBounds.Right;
+                const y1 = imageBounds.Top;
+                const y2 = imageBounds.Bottom;
+                const scaleX = image.naturalWidth / canvas.width;
+                const scaleY = image.naturalHeight / canvas.height;
+                const bx = canvas.width-(x2/scaleX);
+                const by = canvas.height-(y2/scaleY);
+                const bw = (x2 - x1) / scaleX;
+                const bh = (y2 - y1) / scaleY;
+                context.beginPath();
+                context.globalAlpha = 0.6;
+                context.fillStyle = "black";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.clearRect(bx, by, bw, bh);
+                context.beginPath();
+                context.lineWidth = 2;
+                context.strokeStyle = "#957a24";
+                context.rect(bx, by, bw, bh);
+                context.stroke();
+                context.globalAlpha = 1.0;
+                break;
+            }
+            case 1: {
+                let subject = subjects[reportId]; 
+                subject.forEach((s, si) => {
+                    const colour = colours[si % 4];
+                
+                    // Bounding box
+                    const x1 = s.Location.Left;
+                    const x2 = s.Location.Right;
+                    const y1 = s.Location.Top;
+                    const y2 = s.Location.Bottom;
+                            
+                    const scaleX = image.naturalWidth / canvas.width;
+                    const scaleY = image.naturalHeight / canvas.height;
+                
+                
+                    const bx = canvas.width-(x2/scaleX);
+                    const by = canvas.height-(y2/scaleY);
+                    const bw = (x2 - x1) / scaleX;
+                    const bh = (y2 - y1) / scaleY;
+                
+                    context.beginPath();
+                    context.lineWidth = 3;
+                    context.strokeStyle = colour;
+                    context.rect(bx, by, bw, bh);
+                    context.stroke();
+                
+                    // Move into relative coordinates from bounding box
+                    context.translate(bx, by);
+                
+                    // Username label
+                    context.font = "16px Lato";
+                    context.fillStyle = colour;
+                
+                    // Text width/height for the label background
+                    const tw = context.measureText(s.Name).width;
+                    const th = 24;
+                
+                    // Check if the label will flow off the bottom of the frame
+                    const overflowBottom = (y2+tw - 24) > (canvas.width);
+                    // Check if the label will flow off the left of the frame
+                    const overflowLeft = (x2) < (24);
+                
+                    // Set alignment
+                    context.textAlign = overflowLeft ? "start" : "end";
+                
+                    // Text x / y
+                    const lx = overflowLeft ? -bw + 6 : -6;
+                    const ly = overflowBottom ? -bh - 6 : 16;
+                
+                    // Label background x / y
+                    const lbx = overflowLeft ? bw - tw - 12 : 0;
+                    const lby = overflowBottom ? bh : -24;
+                
+                    // Draw background
+                    context.fillRect(lbx, lby, tw+8, th);
+                
+                    // Draw text, rotated back upright (canvas draws rotated 180deg)
+                    context.fillStyle = "white";
+                    context.rotate(Math.PI);
+                    context.fillText(s.Name, lx, ly);
+                
+                    // reset transform
+                    context.setTransform(1, 0, 0, 1, 0, 0);            
+                });                                
+                break;
+            }
+        }
+    }
+</script>
