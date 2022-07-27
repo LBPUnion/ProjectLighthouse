@@ -13,19 +13,7 @@ public static class VersionHelper
         {
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
             Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
-            bool isShallowRepo = ResourceHelper.ReadManifestFile("gitIsShallowRepo.txt") == "true";
-            if (isShallowRepo)
-            {
-                Logger.Warn
-                (
-                    "The UseLessReliavleNumericRevisionNumberingSystem option is not supported for builds made from a shallow clone." +
-                    "Please perform a full clone if you want to use numeric revision numbers." +
-                    "UseLessReliavleNumericRevisionNumberingSystem is now disabled.",
-                    LogArea.Startup
-                );
-                ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem = false;
-            }
-            commitNumber = ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem ? ResourceHelper.ReadManifestFile("gitRevCount.txt") : $"{CommitHash}_{Build}";
+            commitNumber = $"{CommitHash}_{Build}";
             OrdinalCommitNumber = (Branch == "main") ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
 
             string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
@@ -63,8 +51,6 @@ public static class VersionHelper
                 "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
                 LogArea.Startup
             );
-            if (ServerConfiguration.Instance.Customization.UseLessReliableNumericRevisionNumberingSystem) // remove redundancy
-                OrdinalCommitNumber = $"{Branch}-dirty_r{commitNumber}";
             CanCheckForUpdates = false;
         }
     }
