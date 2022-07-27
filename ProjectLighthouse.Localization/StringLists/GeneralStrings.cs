@@ -8,6 +8,7 @@ public static class GeneralStrings
     public static readonly TranslatableString ForgotPassword = create("forgot_password");
     public static readonly TranslatableString Error = create("error");
     public static readonly TranslatableString LogIn = create("log_in");
+    public static readonly TranslatableString Unknown = create("unknown");
     
     private static TranslatableString create(string key) => new(TranslationAreas.General, key);
 }

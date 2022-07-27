@@ -8,10 +8,13 @@ public static class VersionHelper
 {
     static VersionHelper()
     {
+        string commitNumber = "invalid";
         try
         {
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
             Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
+            commitNumber = $"{CommitHash}_{Build}";
+            FullRevision = (Branch == "main") ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
 
             string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
 
@@ -54,7 +57,15 @@ public static class VersionHelper
 
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
-    public static string FullVersion => $"Project Lighthouse {Branch}@{CommitHash} {Build} ({ServerConfiguration.Instance.Customization.ServerName})";
+    /// <summary>
+    /// The full revision string. States current revision hash and, if not main, the branch.
+    /// </summary>
+    public static string FullRevision { get; set; }
+    /// <summary>
+    /// The server's branding (environment version) to show to LBP clients. Shows the environment name next to the revision.
+    /// </summary>
+    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {FullRevision}";
+    public static string FullVersion => $"Project Lighthouse {ServerConfiguration.Instance.Customization.EnvironmentName} {Branch}@{CommitHash} {Build}";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
     public static bool CanCheckForUpdates { get; set; }

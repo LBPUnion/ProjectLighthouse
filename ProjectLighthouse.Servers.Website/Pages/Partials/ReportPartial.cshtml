@@ -1,0 +1,63 @@
+@using LBPUnion.ProjectLighthouse.Administration.Reports
+@model LBPUnion.ProjectLighthouse.Administration.Reports.GriefReport
+
+    <div class="ui segment">
+        <div>
+            <canvas class="hide-subjects" id="canvas-subjects-@Model.ReportId" width="1920" height="1080"
+                    style="position: absolute; transform: rotate(180deg)">
+            </canvas>
+            <img class="hover-region" id="game-image-@Model.ReportId" src="/gameAssets/@Model.JpegHash" alt="Grief report picture" style="width: 100%; height: auto; border-radius: .28571429rem;">
+        </div>
+        <p>
+            <i>
+                Report submitted by
+                <b>
+                    <a href="/user/@Model.ReportingPlayerId">@Model.ReportingPlayer.Username</a>
+                </b>
+            </i>
+        </p>
+        <b class="hover-players" id="hover-subjects-2-@Model.ReportId">Report contains @Model.XmlPlayers.Length @(Model.XmlPlayers.Length == 1 ? "player" : "players")</b>
+        @foreach (ReportPlayer player in Model.XmlPlayers)
+        {
+            <div id="hover-subjects-@Model.ReportId" class="hover-players">
+                <a href="/">@player.Name</a>
+            </div>
+        }
+
+        <br>
+        <div>
+            <b>Report time: </b>@(DateTimeOffset.FromUnixTimeMilliseconds(Model.Timestamp).ToString("R"))
+        </div>
+        <div>
+            <b>Report reason: </b>@Model.Type
+        </div>
+        <div>
+            <b>Level ID:</b> @Model.LevelId
+        </div>
+        <div>
+            <b>Level type:</b> @Model.LevelType
+        </div>
+        <div>
+            <b>Level owner:</b> @Model.LevelOwner
+        </div>
+        <br>
+
+        <a class="ui green small button" href="/admin/report/@Model.ReportId/dismiss">
+            <i class="checkmark icon"></i>
+            <span>Dismiss</span>
+        </a>
+        <a class="ui red small button" href="/admin/report/@Model.ReportId/remove">
+            <i class="trash icon"></i>
+            <span>Remove all related assets</span>
+        </a>
+    </div>
+    <script>
+        subjects[@Model.ReportId] = @Html.Raw(Model.Players)
+        bounds[@Model.ReportId] = @Html.Raw(Model.Bounds)
+        images[@Model.ReportId] = document.getElementById("game-image-@Model.ReportId")
+        canvases[@Model.ReportId] = document.getElementById("canvas-subjects-@Model.ReportId")
+        canvases[@Model.ReportId].width = images[@Model.ReportId].offsetWidth;
+        canvases[@Model.ReportId].height = images[@Model.ReportId].clientHeight;
+        ctx[@Model.ReportId] = canvases[@Model.ReportId].getContext('2d');
+    </script>
+

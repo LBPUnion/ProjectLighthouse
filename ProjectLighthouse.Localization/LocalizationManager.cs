@@ -60,6 +60,27 @@ public static class LocalizationManager
         {
             "eo-UY", "eo"
         },
+        {
+            "ru-RU", "ru"
+        },
+        {
+            "pt-PT", "pt"
+        },
+        {
+            "no-NO", "no"
+        },
+        {
+            "pl-PL", "pl"
+        },
+        {
+            "fr-FR", "fr"
+        },
+        {
+            "de-DE", "de"
+        },
+        {
+            "da-DK", "da"
+        },
     };
 
     /// <summary>

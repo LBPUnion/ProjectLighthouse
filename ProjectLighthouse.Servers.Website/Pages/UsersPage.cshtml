@@ -1,12 +1,13 @@
 @page "/users/{pageNumber:int}"
 @using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UsersPage
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Users";
+    Model.Title = Model.Translate(BaseLayoutStrings.HeaderUsers);
 }
 
 <p>There are @Model.UserCount total users.</p>
@@ -30,6 +31,9 @@
             },
             {
                 "IsMobile", isMobile
+            },
+            {
+                "Language", Model.GetLanguage()
             },
         })
     </div>

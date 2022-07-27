@@ -130,7 +130,7 @@ public class LoginController : ControllerBase
             new LoginResult
             {
                 AuthTicket = "MM_AUTH=" + token.UserToken,
-                ServerBrand = VersionHelper.FullVersion,
+                ServerBrand = VersionHelper.EnvVer,
             }.Serialize()
         );
     }

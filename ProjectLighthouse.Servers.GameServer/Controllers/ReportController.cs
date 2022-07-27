@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Administration.Reports;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
@@ -44,6 +45,13 @@ public class ReportController : ControllerBase
 
         this.database.Reports.Add(report);
         await this.database.SaveChangesAsync();
+
+        await WebhookHelper.SendWebhook(
+            title: "New grief report",
+            description: $"Submitted by {user.Username}\n" +
+                         $"To view it, click [here]({ServerConfiguration.Instance.ExternalUrl}/admin/report/{report.ReportId}).",
+            dest: WebhookHelper.WebhookDestination.Moderation
+        );
 
         return this.Ok();
     }

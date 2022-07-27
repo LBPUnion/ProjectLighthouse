@@ -26,7 +26,7 @@ public class AuthenticationTests : LighthouseServerTest
         Assert.True(response.IsSuccessStatusCode);
         string responseContent = await response.Content.ReadAsStringAsync();
         Assert.Contains("MM_AUTH=", responseContent);
-        Assert.Contains(VersionHelper.FullVersion, responseContent);
+        Assert.Contains(VersionHelper.EnvVer, responseContent);
     }
 
     [DatabaseFact]
@@ -39,7 +39,7 @@ public class AuthenticationTests : LighthouseServerTest
         Assert.NotNull(loginResult.ServerBrand);
 
         Assert.Contains("MM_AUTH=", loginResult.AuthTicket);
-        Assert.Equal(VersionHelper.FullVersion, loginResult.ServerBrand);
+        Assert.Equal(VersionHelper.EnvVer, loginResult.ServerBrand);
     }
 
     [DatabaseFact]

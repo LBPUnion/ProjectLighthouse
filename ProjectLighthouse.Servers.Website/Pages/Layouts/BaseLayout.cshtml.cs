@@ -46,16 +46,19 @@ public class BaseLayout : PageModel
         set => this.user = value;
     }
 
-    private string getLanguage()
+    private string? language;
+
+    public string GetLanguage()
     {
-        if (ServerStatics.IsUnitTesting) return "en-US";
+        if (ServerStatics.IsUnitTesting) return LocalizationManager.DefaultLang;
+        if (this.language != null) return this.language;
         
         IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
+        if (requestCulture == null) return this.language = LocalizationManager.DefaultLang;
         
-        if (requestCulture == null) return LocalizationManager.DefaultLang;
-        return requestCulture.RequestCulture.UICulture.Name;
+        return this.language = requestCulture.RequestCulture.UICulture.Name;
     }
 
-    public string Translate(TranslatableString translatableString) => translatableString.Translate(this.getLanguage());
-    public string Translate(TranslatableString translatableString, params object?[] format) => translatableString.Translate(this.getLanguage(), format);
+    public string Translate(TranslatableString translatableString) => translatableString.Translate(this.GetLanguage());
+    public string Translate(TranslatableString translatableString, params object?[] format) => translatableString.Translate(this.GetLanguage(), format);
 }
