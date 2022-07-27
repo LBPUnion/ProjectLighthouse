@@ -7,6 +7,18 @@
     Model.Title = "Cases";
 }
 
+<p>There are @Model.CaseCount total cases.</p>
+
+<form action="/moderation/cases/0">
+    <div class="ui icon input">
+        <input type="text" autocomplete="off" name="name" placeholder="Search cases..." value="@Model.SearchValue">
+        <i class="search icon"></i>
+    </div>
+    <a class="ui red button" href="/debug/newCase">DEBUG: Create Case</a>
+</form>
+
+<div class="ui divider"></div>
+
 @foreach (ModerationCase @case in Model.Cases)
 {
     @(await Html.PartialAsync("Partials/ModerationCasePartial", @case))
