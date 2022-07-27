@@ -19,7 +19,7 @@
     }
 }
 
-<p>@Model.Translate(ModPanelStrings.Greeting)</p>
+<p>@Model.Translate(ModPanelStrings.Greeting, Model.User.Username)</p>
 
 @if (!this.Request.IsMobile())
 {
