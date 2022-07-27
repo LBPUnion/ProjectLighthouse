@@ -14,7 +14,7 @@ public static class VersionHelper
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
             Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
             commitNumber = $"{CommitHash}_{Build}";
-            OrdinalCommitNumber = (Branch == "main") ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
+            FullRevision = (Branch == "main") ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
 
             string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
 
@@ -58,14 +58,13 @@ public static class VersionHelper
     public static string CommitHash { get; set; }
     public static string Branch { get; set; }
     /// <summary>
-    /// The amount of commits that currently exist in the local copy of the Git repository.
-    /// Not reliable as versioning if shallow cloning is used, with using the hash of the current commit being more reliable in that case.
+    /// The full revision string. States current revision hash and, if not main, the branch.
     /// </summary>
-    public static string OrdinalCommitNumber { get; set; }
+    public static string FullRevision { get; set; }
     /// <summary>
     /// The server's branding (environment version) to show to LBP clients. Shows the environment name next to the revision.
     /// </summary>
-    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {OrdinalCommitNumber}";
+    public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {FullRevision}";
     public static string FullVersion => $"Project Lighthouse {ServerConfiguration.Instance.Customization.EnvironmentName} {Branch}@{CommitHash} {Build}";
     public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
     public static int CommitsOutOfDate { get; set; }
