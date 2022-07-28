@@ -18,7 +18,7 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         if (Directory.Exists(assetsDirectory)) Directory.Delete(assetsDirectory, true);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldNotAcceptScript()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -28,7 +28,7 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         Assert.False(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldNotAcceptFarc()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -38,7 +38,7 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         Assert.False(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldNotAcceptGarbage()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -48,7 +48,7 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         Assert.False(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldAcceptTexture()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -58,7 +58,7 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         Assert.True(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldAcceptLevel()
     {
         LoginResult loginResult = await this.Authenticate();
