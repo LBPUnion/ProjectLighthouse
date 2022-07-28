@@ -60,6 +60,7 @@ public static class FileHelper
         const ushort lbp2Latest = 0x3F8;
         const ushort lbp1Latest = 0x272;
         const ushort lbpVitaLatest = 0x3E2;
+        const ushort lbpVitaDescriptor = 0x4431;
         // There are like 1600 revisions so this doesn't cover everything
         uint revision = 0;
 
@@ -74,7 +75,7 @@ public static class FileHelper
         {
             // construct a 16 bit number from 2 individual bytes
             ushort branchDescriptor = (ushort) (file.Data[12] << 8 | file.Data[13]);
-            if (revision == lbpVitaLatest && branchDescriptor == 0x4431 || revision == 0x38B) return GameVersion.LittleBigPlanetVita;
+            if (revision == lbpVitaLatest && branchDescriptor == lbpVitaDescriptor) return GameVersion.LittleBigPlanetVita;
         }
 
 
