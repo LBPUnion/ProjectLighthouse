@@ -6,12 +6,13 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;
 
-public class SlotTests : LighthouseServerTest
+public class SlotTests : LighthouseServerTest<GameServerTestStartup>
 {
     [DatabaseFact]
     public async Task ShouldOnlyShowUsersLevels()
