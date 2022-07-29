@@ -49,15 +49,11 @@ public class ListController : ControllerBase
         );
     }
 
-    [HttpPost("lolcatftw/add/{slotType}/{id:int}")]
-    public async Task<IActionResult> AddQueuedLevel(string slotType, int id)
+    [HttpPost("lolcatftw/add/user/{id:int}")]
+    public async Task<IActionResult> AddQueuedLevel(int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
-
-        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
-
-        if (slotType == "developer") id = await SlotHelper.GetDevSlotId(this.database, id);
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -67,15 +63,11 @@ public class ListController : ControllerBase
         return this.Ok();
     }
 
-    [HttpPost("lolcatftw/remove/{slotType}/{id:int}")]
-    public async Task<IActionResult> RemoveQueuedLevel(string slotType, int id)
+    [HttpPost("lolcatftw/remove/user/{id:int}")]
+    public async Task<IActionResult> RemoveQueuedLevel(int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
-
-        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
-
-        if (slotType == "developer") id = await SlotHelper.GetDevSlotId(this.database, id);
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -126,15 +118,11 @@ public class ListController : ControllerBase
         );
     }
 
-    [HttpPost("favourite/slot/{slotType}/{id:int}")]
-    public async Task<IActionResult> AddFavouriteSlot(string slotType, int id)
+    [HttpPost("favourite/slot/user/{id:int}")]
+    public async Task<IActionResult> AddFavouriteSlot(int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
-
-        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
-
-        if (slotType == "developer") id = await SlotHelper.GetDevSlotId(this.database, id);
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -144,15 +132,11 @@ public class ListController : ControllerBase
         return this.Ok();
     }
 
-    [HttpPost("unfavourite/slot/{slotType}/{id:int}")]
-    public async Task<IActionResult> RemoveFavouriteSlot(string slotType, int id)
+    [HttpPost("unfavourite/slot/user/{id:int}")]
+    public async Task<IActionResult> RemoveFavouriteSlot(int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
-
-        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
-
-        if (slotType == "developer") id = await SlotHelper.GetDevSlotId(this.database, id);
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();

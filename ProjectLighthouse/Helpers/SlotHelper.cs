@@ -1,7 +1,6 @@
 ﻿#nullable enable
-using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -23,54 +22,66 @@ public static class SlotHelper
         };
     }
 
+    private static readonly SemaphoreSlim semaphore = new(1, 1); 
+
     public static async Task<int> GetDevSlotId(Database database, int guid)
     {
         int slotId = await database.Slots.Where(s => s.Type == "developer" && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
         if (slotId != 0) return slotId;
 
-        Location? devLocation = await database.Locations.FirstOrDefaultAsync(l => l.Id == 1);
-        if (devLocation == null)
+        await semaphore.WaitAsync();
+        try
         {
-            devLocation = new Location
-            {
-                Id = 1,
-            };
-            database.Locations.Add(devLocation);
-        }
+            // if two requests come in at the same time for the same story level which hasn't been generated
+            // one will wait for the lock to be released and the second will be caught by this second check
+            slotId = await database.Slots.Where(s => s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
 
-        User? devCreator = await database.Users.FirstOrDefaultAsync(u => u.Username.Length == 0);
-        if (devCreator == null)
-        {
-            devCreator = new User
+            if (slotId != 0) return slotId;
+
+            Location? devLocation = await database.Locations.FirstOrDefaultAsync(l => l.Id == 1);
+            if (devLocation == null)
             {
-                Username = "",
-                Banned = true,
-                Biography = "Placeholder author of story levels",
-                BannedReason = "Banned to not show in users list",
+                devLocation = new Location
+                {
+                    Id = 1,
+                };
+                database.Locations.Add(devLocation);
+            }
+
+            int devCreatorId = await database.Users.Where(u => u.Username.Length == 0).Select(u => u.UserId).FirstOrDefaultAsync();
+            if (devCreatorId == 0)
+            {
+                User devCreator = new()
+                {
+                    Username = "",
+                    Banned = true,
+                    Biography = "Placeholder author of story levels",
+                    BannedReason = "Banned to not show in users list",
+                    LocationId = devLocation.Id,
+                };
+                database.Users.Add(devCreator);
+                await database.SaveChangesAsync();
+                devCreatorId = devCreator.UserId;
+            }
+
+            Slot slot = new()
+            {
+                Name = $"Dev slot {guid}",
+                Description = "Placeholder for story mode level",
+                CreatorId = devCreatorId,
+                InternalSlotId = guid,
                 LocationId = devLocation.Id,
+                Type = "developer",
             };
-            database.Users.Add(devCreator);
+
+            database.Slots.Add(slot);
             await database.SaveChangesAsync();
+            return slot.SlotId;
         }
-
-        Console.WriteLine(@"unable to find developer slot with id " + guid);
-        Console.WriteLine(@"dev creator id=" + devCreator.UserId);
-        Slot slot = new()
+        finally
         {
-            Name = $"Dev slot {guid}",
-            Description = "Placeholder for story mode level",
-            CreatorId = devCreator.UserId,
-            InternalSlotId = guid,
-            LocationId = devLocation.Id,
-            Type = "developer",
-        };
-        int doubleCheck = await database.Slots.Where(s => s.Type == "developer" && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
-        if (doubleCheck != 0) return doubleCheck;
-
-        database.Slots.Add(slot);
-        await database.SaveChangesAsync();
-        return slot.SlotId;
-
+            semaphore.Release();
+        }
     }
-    
+
 }
