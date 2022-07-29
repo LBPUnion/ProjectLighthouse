@@ -64,7 +64,7 @@ public class PhotosController : ControllerBase
             else
             {
                 slot = await this.database.Slots.FirstOrDefaultAsync(s => s.InternalSlotId == photo.XmlLevelInfo.SlotId);
-                if (slot != null)
+                if (slot != null && slot.Type == "developer")
                 {
                     photo.XmlLevelInfo.SlotId = slot.SlotId;
                     validLevel = true;
