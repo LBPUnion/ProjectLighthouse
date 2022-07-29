@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Reports;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Levels.Categories;
@@ -111,6 +112,8 @@ public class Database : DbContext
             UserLocation = userLocation,
             GameVersion = npTicket.GameVersion,
             Platform = npTicket.Platform,
+            // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
+            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
         };
 
         this.GameTokens.Add(gameToken);
@@ -289,6 +292,13 @@ public class Database : DbContext
         if (token == null) return null;
         if (!allowUnapproved && !token.Approved) return null;
 
+        if (DateTime.Now > token.ExpiresAt)
+        {
+            this.Remove(token);
+            await this.SaveChangesAsync();
+            return null;
+        }
+
         return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
     }
 
@@ -314,6 +324,13 @@ public class Database : DbContext
         if (token == null) return null;
         if (!allowUnapproved && !token.Approved) return null;
 
+        if (DateTime.Now > token.ExpiresAt)
+        {
+            this.Remove(token);
+            await this.SaveChangesAsync();
+            return null;
+        }
+
         return token;
     }
 
@@ -325,6 +342,13 @@ public class Database : DbContext
         GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
         if (token == null) return null;
         if (!allowUnapproved && !token.Approved) return null;
+
+        if (DateTime.Now > token.ExpiresAt)
+        {
+            this.Remove(token);
+            await this.SaveChangesAsync();
+            return null;
+        }
 
         User? user = await this.UserFromGameToken(token);
 
@@ -342,6 +366,13 @@ public class Database : DbContext
         WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
 
+        if (DateTime.Now > token.ExpiresAt)
+        {
+            this.Remove(token);
+            this.SaveChanges();
+            return null;
+        }
+
         return this.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == token.UserId);
     }
 
@@ -356,12 +387,21 @@ public class Database : DbContext
     {
         if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken) || lighthouseToken == null) return null;
 
-        return this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
+        WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
+        if (token == null) return null;
+
+        if (DateTime.Now > token.ExpiresAt)
+        {
+            this.Remove(token);
+            this.SaveChanges();
+            return null;
+        }
+
+        return token;
     }
 
     public async Task<User?> UserFromPasswordResetToken(string resetToken)
     {
-
         PasswordResetToken? token = await this.PasswordResetTokens.FirstOrDefaultAsync(token => token.ResetToken == resetToken);
         if (token == null)
         {
@@ -371,8 +411,10 @@ public class Database : DbContext
         if (token.Created < DateTime.Now.AddHours(-1)) // if token is expired
         {
             this.PasswordResetTokens.Remove(token);
+            await this.SaveChangesAsync();
             return null;
         }
+        
         return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
     }
 
@@ -385,10 +427,21 @@ public class Database : DbContext
         if (token.Created < DateTime.Now.AddDays(-7)) // if token is expired
         {
             this.RegistrationTokens.Remove(token);
+            this.SaveChanges();
             return false;
         }
 
         return true;
+    }
+
+    public async Task RemoveExpiredTokens()
+    {
+        this.GameTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+        this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+        this.EmailVerificationTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+        this.EmailSetTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+
+        await this.SaveChangesAsync();
     }
 
     public async Task RemoveRegistrationToken(string tokenString)
@@ -398,7 +451,6 @@ public class Database : DbContext
         if (token == null) return;
 
         this.RegistrationTokens.Remove(token);
-
         await this.SaveChangesAsync();
     }
 
@@ -426,10 +478,10 @@ public class Database : DbContext
         this.RatedLevels.RemoveRange(this.RatedLevels.Where(r => r.UserId == user.UserId));
         this.GameTokens.RemoveRange(this.GameTokens.Where(t => t.UserId == user.UserId));
         this.WebTokens.RemoveRange(this.WebTokens.Where(t => t.UserId == user.UserId));
+        this.Reactions.RemoveRange(this.Reactions.Where(p => p.UserId == user.UserId));
         this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
         this.Reviews.RemoveRange(this.Reviews.Where(r => r.ReviewerId == user.UserId));
         this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
-        this.Reactions.RemoveRange(this.Reactions.Where(p => p.UserId == user.UserId));
 
         this.Users.Remove(user);
 
