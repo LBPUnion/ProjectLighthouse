@@ -57,9 +57,10 @@ public class LoginController : ControllerBase
 
         string ipAddress = remoteIpAddress.ToString();
 
+        await this.database.RemoveExpiredTokens();
+
         // Get an existing token from the IP & username
-        GameToken? token = await this.database.GameTokens.Include
-                (t => t.User)
+        GameToken? token = await this.database.GameTokens.Include(t => t.User)
             .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == npTicket.Username && !t.Used);
 
         if (token == null) // If we cant find an existing token, try to generate a new one
@@ -67,7 +68,8 @@ public class LoginController : ControllerBase
             token = await this.database.AuthenticateUser(npTicket, ipAddress);
             if (token == null)
             {
-                Logger.Warn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
+                Logger.Warn($"Unable to " +
+                            $"find/generate a token for username {npTicket.Username}", LogArea.Login);
                 return this.StatusCode(403, ""); // If not, then 403.
             }
         }

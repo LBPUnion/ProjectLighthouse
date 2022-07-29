@@ -49,15 +49,18 @@ public class SetEmailForm : BaseLayout
             UserId = user.UserId,
             User = user,
             EmailToken = CryptoHelper.GenerateAuthToken(),
+            ExpiresAt = DateTime.Now + TimeSpan.FromHours(6),
         };
 
         this.Database.EmailVerificationTokens.Add(emailVerifyToken);
 
         // The user just set their email address. Now, let's grant them a token to proceed with verifying the email.
+        // TODO: insecure
         WebToken webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
+            ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
         };
 
         this.Response.Cookies.Append

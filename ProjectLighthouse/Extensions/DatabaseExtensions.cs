@@ -57,6 +57,9 @@ public static class DatabaseExtensions
         return query;
     }
 
-    public static async Task<bool> Has<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> predicate) => 
-        await queryable.FirstOrDefaultAsync(predicate) != null;
+    public static async Task<bool> Has<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> predicate) 
+        => await queryable.FirstOrDefaultAsync(predicate) != null;
+
+    public static void RemoveWhere<T>(this DbSet<T> queryable, Expression<Func<T, bool>> predicate) where T : class 
+        => queryable.RemoveRange(queryable.Where(predicate));
 }
