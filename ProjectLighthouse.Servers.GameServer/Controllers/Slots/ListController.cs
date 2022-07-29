@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -25,24 +26,21 @@ public class ListController : ControllerBase
     #region Level Queue (lolcatftw)
 
     [HttpGet("slots/lolcatftw/{username}")]
-    public async Task<IActionResult> GetLevelQueue(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
+    public async Task<IActionResult> GetQueuedLevels(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<QueuedLevel> queuedLevels = this.database.QueuedLevels.Include(q => q.User)
-            .Include(q => q.Slot)
-            .Include(q => q.Slot.Location)
-            .Include(q => q.Slot.Creator)
-            .Where(q => q.Slot.GameVersion <= gameVersion)
-            .Where(q => q.User.Username == username)
+        IEnumerable<Slot> queuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
+            .Select(q => q.Slot)
+            .ByGameVersion(gameVersion, false, true)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
-        string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize(gameVersion));
+        string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Serialize(gameVersion));
 
         return this.Ok
         (
@@ -104,17 +102,14 @@ public class ListController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<HeartedLevel> heartedLevels = this.database.HeartedLevels.Include(q => q.User)
-            .Include(q => q.Slot)
-            .Include(q => q.Slot.Location)
-            .Include(q => q.Slot.Creator)
-            .Where(q => q.Slot.GameVersion <= gameVersion)
-            .Where(q => q.User.Username == username)
+        IEnumerable<Slot> heartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
+            .Select(q => q.Slot)
+            .ByGameVersion(gameVersion, false, true)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
-        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize(gameVersion));
+        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Serialize(gameVersion));
 
         return this.Ok
         (

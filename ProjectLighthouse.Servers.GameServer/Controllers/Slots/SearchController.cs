@@ -31,8 +31,7 @@ public class SearchController : ControllerBase
 
         string[] keywords = query.Split(" ");
 
-        IQueryable<Slot> dbQuery = this.database.Slots.Include
-                (s => s.Creator)
+        IQueryable<Slot> dbQuery = this.database.Slots.Include(s => s.Creator)
             .Include(s => s.Location)
             .OrderBy(s => !s.TeamPick)
             .ThenByDescending(s => s.FirstUploaded)
