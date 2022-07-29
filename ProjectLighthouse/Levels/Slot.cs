@@ -40,13 +40,14 @@ public class Slot
     }
 
     [XmlAttribute("type")]
-    [NotMapped]
     [JsonIgnore]
     public string Type { get; set; } = "user";
 
     [Key]
     [XmlElement("id")]
     public int SlotId { get; set; }
+
+    public int InternalSlotId { get; set; }
 
     [XmlElement("name")]
     public string Name { get; set; } = "";
@@ -240,6 +241,20 @@ public class Slot
                LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
     }
 
+    public string SerializeDevSlot()
+    {
+        int comments = this.database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
+
+        int photos = this.database.Photos.Count(c => c.SlotId == this.SlotId);
+
+        string slotData = LbpSerializer.StringElement("id", this.InternalSlotId) +
+                          LbpSerializer.StringElement("playerCount", 0) +
+                          LbpSerializer.StringElement("commentCount", comments) +
+                          LbpSerializer.StringElement("photoCount", photos);
+
+        return LbpSerializer.TaggedStringElement("slot", slotData, "type", "developer");
+    }
+
     public string Serialize
     (
         GameVersion gameVersion = GameVersion.LittleBigPlanet1,
@@ -248,6 +263,8 @@ public class Slot
         Review? yourReview = null
     )
     {
+        if (this.Type == "developer") return this.SerializeDevSlot();
+
         int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
 
         string slotData = LbpSerializer.StringElement("name", this.Name) +

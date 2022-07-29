@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,10 @@ public class Photo
 
     [NotMapped]
     private List<PhotoSubject>? _subjects;
+
+    [NotMapped]
+    [XmlElement("slot")]
+    public PhotoSlot? XmlLevelInfo;
 
     [NotMapped]
     [XmlArray("subjects")]
@@ -81,9 +86,31 @@ public class Photo
     [ForeignKey(nameof(CreatorId))]
     public User? Creator { get; set; }
 
-    public string Serialize(int slotId)
+    public int? SlotId { get; set; }
+
+    [ForeignKey(nameof(SlotId))]
+    public Slot? Slot { get; set; }
+
+    public string Serialize()
     {
-        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", "user");
+        using Database database = new();
+        var partialSlot = database.Slots.Where(s => s.SlotId == this.SlotId.GetValueOrDefault())
+            .Select(s => new
+            {
+                s.InternalSlotId,
+                s.Type,
+            })
+            .FirstOrDefault();
+        if (partialSlot == null) return this.Serialize(0, "user");
+
+        return this.Serialize(partialSlot.InternalSlotId, partialSlot.Type);
+    }
+
+    public string Serialize(int slotId, string slotType)
+    {
+        
+        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", slotType);
+        if (slotId == 0) slot = "";
 
         string subjectsAggregate = this.Subjects.Aggregate(string.Empty, (s, subject) => s + subject.Serialize());
 

@@ -3,11 +3,11 @@ using System.Xml.Serialization;
 using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,6 +52,27 @@ public class PhotosController : ControllerBase
 
         photo.CreatorId = user.UserId;
         photo.Creator = user;
+
+        if (photo.XmlLevelInfo != null)
+        {
+            bool validLevel = false;
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.XmlLevelInfo.SlotId);
+            if (slot != null && photo.XmlLevelInfo.SlotType == "user")
+            {
+                if (slot.RootLevel == photo.XmlLevelInfo.RootLevel) validLevel = true;
+            }
+            else
+            {
+                slot = await this.database.Slots.FirstOrDefaultAsync(s => s.InternalSlotId == photo.XmlLevelInfo.SlotId);
+                if (slot != null)
+                {
+                    photo.XmlLevelInfo.SlotId = slot.SlotId;
+                    validLevel = true;
+                }
+            }
+
+            if (validLevel) photo.SlotId = photo.XmlLevelInfo.SlotId;
+        }
 
         if (photo.Subjects.Count > 4) return this.BadRequest();
 
@@ -104,11 +125,18 @@ public class PhotosController : ControllerBase
         return this.Ok();
     }
 
-    [HttpGet("photos/user/{id:int}")]
-    public async Task<IActionResult> SlotPhotos(int id)
+    [HttpGet("photos/{slotType}/{id:int}")]
+    public async Task<IActionResult> SlotPhotos(string slotType, int id)
     {
-        List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Take(10).ToListAsync();
-        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id));
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
+
+        if (slotType == "developer") id = await SlotHelper.GetDevSlotId(this.database, id);
+
+        List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Where(p => p.SlotId == id).Take(10).ToListAsync();
+        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id, slotType));
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }
 
@@ -126,7 +154,7 @@ public class PhotosController : ControllerBase
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .ToListAsync();
-        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
+        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize());
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }
 
@@ -145,7 +173,7 @@ public class PhotosController : ControllerBase
                 (s => s.Timestamp)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
-            .Aggregate(string.Empty, (s, photo) => s + photo.Serialize(0));
+            .Aggregate(string.Empty, (s, photo) => s + photo.Serialize());
 
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }

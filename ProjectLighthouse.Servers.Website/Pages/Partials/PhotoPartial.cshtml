@@ -1,5 +1,4 @@
 @using LBPUnion.ProjectLighthouse.PlayerData
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.PlayerData.Photo
 
 
@@ -18,6 +17,20 @@
         <b>
             <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a>
         </b>
+        @if (Model.Slot != null)
+        {
+            switch (Model.Slot.Type)
+            {
+                case "user":
+                    <span>
+                        in level <b><a href="/slot/@Model.SlotId">@Model.Slot.Name</a></b>
+                    </span>
+                    break;
+                case "developer":
+                    <span>in a story mode level</span>
+                    break;
+            }
+        }
     </i>
 </p>
 

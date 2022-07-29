@@ -16,7 +16,7 @@ public static class StatisticsHelper
         (GameVersion gameVersion)
         => await database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300 && l.GameVersion == gameVersion).CountAsync();
 
-    public static async Task<int> SlotCount() => await database.Slots.CountAsync();
+    public static async Task<int> SlotCount() => await database.Slots.Where(s => s.Type == "user").CountAsync();
 
     public static async Task<int> UserCount() => await database.Users.CountAsync(u => !u.Banned);
 

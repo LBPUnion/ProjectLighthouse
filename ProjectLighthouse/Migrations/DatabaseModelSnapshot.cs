@@ -210,6 +210,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<bool>("InitiallyLocked")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("InternalSlotId")
+                        .HasColumnType("int");
+
                     b.Property<long>("LastUpdated")
                         .HasColumnType("bigint");
 
@@ -288,6 +291,10 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<bool>("TeamPick")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("SlotId");
 
@@ -455,6 +462,9 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("SlotId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SmallHash")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -465,6 +475,8 @@ namespace ProjectLighthouse.Migrations
                     b.HasKey("PhotoId");
 
                     b.HasIndex("CreatorId");
+
+                    b.HasIndex("SlotId");
 
                     b.ToTable("Photos");
                 });
@@ -988,7 +1000,13 @@ namespace ProjectLighthouse.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId");
+
                     b.Navigation("Creator");
+
+                    b.Navigation("Slot");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.PhotoSubject", b =>

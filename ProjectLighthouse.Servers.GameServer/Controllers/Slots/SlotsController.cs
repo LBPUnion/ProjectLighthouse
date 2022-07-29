@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,6 +62,48 @@ public class SlotsController : ControllerBase
             )
         );
     }
+
+    [HttpGet("slotList")]
+    public async Task<IActionResult> GetSlotListAlt([FromQuery] int[] s)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        List<string?> serializedSlots = new();
+        foreach (int slotId in s)
+        {
+            Slot? slot = await this.database.Slots.Include(t => t.Creator).Include(t => t.Location).Where(t => t.SlotId == slotId && t.Type == "user").FirstOrDefaultAsync();
+            if (slot == null)
+            {
+                slot = await this.database.Slots.Where(t => t.InternalSlotId == slotId && t.Type == "developer").FirstOrDefaultAsync();
+                if (slot == null)
+                {
+                    serializedSlots.Add($"<slot type=\"developer\"><id>{slotId}</id></slot>");
+                    continue;
+                }
+            }
+            serializedSlots.Add(slot.Serialize());
+        }
+
+        string serialized = serializedSlots.Aggregate(string.Empty, (current, slot) => slot == null ? current : current + slot);
+
+        return this.Ok(LbpSerializer.TaggedStringElement("slots", serialized, "total", serializedSlots.Count));
+    }
+
+    [HttpGet("s/developer/{id:int}")]
+    public async Task<IActionResult> SDev(int id)
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        int slotId = await SlotHelper.GetDevSlotId(this.database, id);
+        Slot slot = await this.database.Slots.FirstAsync(s => s.SlotId == slotId);
+
+        return this.Ok(slot.SerializeDevSlot());
+    } 
 
     [HttpGet("s/user/{id:int}")]
     public async Task<IActionResult> SUser(int id)
