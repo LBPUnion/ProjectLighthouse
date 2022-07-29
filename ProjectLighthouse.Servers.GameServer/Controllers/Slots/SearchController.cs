@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
 [ApiController]
-[Route("LITTLEBIGPLANETPS3_XML/")]
+[Route("LITTLEBIGPLANETPS3_XML/slots")]
 [Produces("text/xml")]
 public class SearchController : ControllerBase
 {
@@ -19,8 +19,17 @@ public class SearchController : ControllerBase
         this.database = database;
     }
 
-    [HttpGet("slots/search")]
-    public async Task<IActionResult> SearchSlots([FromQuery] string query, [FromQuery] int pageSize, [FromQuery] int pageStart)
+    [HttpGet("searchLBP3")]
+    public Task<IActionResult> SearchSlotsLBP3([FromQuery] int pageSize, [FromQuery] int pageStart, [FromQuery] string textFilter) 
+        => SearchSlots(textFilter, pageSize, pageStart, "results");
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchSlots(
+        [FromQuery] string query,
+        [FromQuery] int pageSize,
+        [FromQuery] int pageStart,
+        string keyName = "slots"
+    )
     {
         GameToken? gameToken = await this.database.GameTokenFromRequest(this.Request);
         if (gameToken == null) return this.StatusCode(403, "");
@@ -51,6 +60,9 @@ public class SearchController : ControllerBase
 
         string response = slots.Aggregate("", (current, slot) => current + slot.Serialize(gameToken.GameVersion));
 
-        return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", dbQuery.Count()));
+        return this.Ok(LbpSerializer.TaggedStringElement(keyName, response, "total", dbQuery.Count()));
     }
+    
+    // /LITTLEBIGPLANETPS3_XML?pageStart=1&pageSize=10&resultTypes[]=slot&resultTypes[]=playlist&resultTypes[]=user&adventure=dontCare&textFilter=qwer
+
 }
