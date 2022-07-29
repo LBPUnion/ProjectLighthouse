@@ -35,9 +35,6 @@
         <Content Include="ExampleFiles\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <ProjectReference Include="..\ProjectLighthouse.Servers.API\ProjectLighthouse.Servers.API.csproj" />
-        <ProjectReference Include="..\ProjectLighthouse.Servers.GameServer\ProjectLighthouse.Servers.GameServer.csproj" />
-        <ProjectReference Include="..\ProjectLighthouse.Servers.Website\ProjectLighthouse.Servers.Website.csproj" />
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
     </ItemGroup>
 </Project>

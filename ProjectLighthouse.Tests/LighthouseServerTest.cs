@@ -7,8 +7,6 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -16,14 +14,14 @@ using Microsoft.EntityFrameworkCore;
 namespace LBPUnion.ProjectLighthouse.Tests;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-public class LighthouseServerTest
+public class LighthouseServerTest<TStartup> where TStartup : class
 {
     public readonly HttpClient Client;
     public readonly TestServer Server;
 
     public LighthouseServerTest()
     {
-        this.Server = new TestServer(new WebHostBuilder().UseStartup<GameServerTestStartup>());
+        this.Server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
         this.Client = this.Server.CreateClient();
     }
     public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)

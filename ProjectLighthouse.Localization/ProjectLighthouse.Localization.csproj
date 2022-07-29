@@ -5,7 +5,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>LBPUnion.ProjectLighthouse.Localization</RootNamespace>
-        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
