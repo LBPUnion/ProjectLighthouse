@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData;
@@ -11,4 +12,6 @@ public class WebToken
     public int UserId { get; set; }
 
     public string UserToken { get; set; }
+
+    public DateTime ExpiresAt { get; set; }
 }

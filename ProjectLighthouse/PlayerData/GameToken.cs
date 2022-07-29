@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -28,4 +29,6 @@ public class GameToken
 
     // Set to true on login
     public bool Used { get; set; }
+
+    public DateTime ExpiresAt { get; set; }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,4 +15,6 @@ public class EmailSetToken
     public User User { get; set; }
 
     public string EmailToken { get; set; }
+
+    public DateTime ExpiresAt { get; set; }
 }

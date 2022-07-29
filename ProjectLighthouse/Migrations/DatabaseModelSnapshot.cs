@@ -385,6 +385,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<bool>("Approved")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("GameVersion")
                         .HasColumnType("int");
 
@@ -417,6 +420,9 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ResetToken")
@@ -540,6 +546,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("EmailToken")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -558,6 +567,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("EmailToken")
                         .HasColumnType("longtext");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -731,6 +743,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Token")
                         .HasColumnType("longtext");
 
@@ -840,6 +855,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
