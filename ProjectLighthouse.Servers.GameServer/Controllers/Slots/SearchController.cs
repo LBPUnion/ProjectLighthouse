@@ -28,7 +28,7 @@ public class SearchController : ControllerBase
         [FromQuery] string query,
         [FromQuery] int pageSize,
         [FromQuery] int pageStart,
-        string keyName = "slots"
+        string? keyName = "slots"
     )
     {
         GameToken? gameToken = await this.database.GameTokenFromRequest(this.Request);
