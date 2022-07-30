@@ -31,6 +31,8 @@ gitUnpushed.txt
 gitRevCount.txt
 logs/*
 npTicket*
+r.tar.gz
+lighthouse.yml.configme
 
 # MSBuild stuff
 bin/

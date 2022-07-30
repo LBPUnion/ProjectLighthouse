@@ -40,26 +40,35 @@ public class PublishController : ControllerBase
         GameToken gameToken = userAndToken.Value.Item2;
 
         Slot? slot = await this.getSlotFromBody();
-        if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
+        if (slot == null) {
+            Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
+            return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
+        }
 
-        if (string.IsNullOrEmpty(slot.RootLevel)) return this.BadRequest();
+        if (string.IsNullOrEmpty(slot.RootLevel))
+        {
+            Logger.Warn("Rejecting level upload, slot does not include rootLevel", LogArea.Publish);
+            return this.BadRequest();
+        }
 
         if (string.IsNullOrEmpty(slot.ResourceCollection)) slot.ResourceCollection = slot.RootLevel;
-
-        LbpFile? rootLevel = LbpFile.FromHash(slot.RootLevel);
-        if (rootLevel == null) return this.BadRequest();
-
-        GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
-        if (slotVersion == GameVersion.Unknown) slotVersion = gameToken.GameVersion;
 
         // Republish logic
         if (slot.SlotId != 0)
         {
             Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
-            if (oldSlot == null) return this.NotFound();
-            if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
+            if (oldSlot == null)
+            {
+                Logger.Warn("Rejecting level reupload, could not find old slot", LogArea.Publish);
+                return this.NotFound();
+            }
+            if (oldSlot.CreatorId != user.UserId)
+            {
+                Logger.Warn("Rejecting level reupload, old slot's creator is not publishing user", LogArea.Publish);
+                return this.BadRequest();
+            }
         }
-        else if (user.GetUsedSlotsForGame(slotVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
