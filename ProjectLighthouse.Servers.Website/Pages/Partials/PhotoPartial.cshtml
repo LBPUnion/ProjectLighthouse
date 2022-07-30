@@ -1,3 +1,4 @@
+@using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.PlayerData
 @model LBPUnion.ProjectLighthouse.PlayerData.Photo
 
@@ -21,13 +22,19 @@
         {
             switch (Model.Slot.Type)
             {
-                case "user":
+                case SlotType.User:
                     <span>
                         in level <b><a href="/slot/@Model.SlotId">@Model.Slot.Name</a></b>
                     </span>
                     break;
-                case "developer":
+                case SlotType.Developer:
                     <span>in a story mode level</span>
+                    break;
+                case SlotType.Pod:
+                    <span>in a pod</span>
+                    break;
+                case SlotType.Local:
+                    <span>in create mode</span>
                     break;
             }
         }

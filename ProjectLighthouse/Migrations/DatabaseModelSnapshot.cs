@@ -294,7 +294,7 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("int");
 
                     b.HasKey("SlotId");
 

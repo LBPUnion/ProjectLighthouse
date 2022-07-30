@@ -41,7 +41,7 @@ public class Slot
 
     [XmlAttribute("type")]
     [JsonIgnore]
-    public string Type { get; set; } = "user";
+    public SlotType Type { get; set; } = SlotType.User;
 
     [Key]
     [XmlElement("id")]
@@ -263,7 +263,7 @@ public class Slot
         Review? yourReview = null
     )
     {
-        if (this.Type == "developer") return this.SerializeDevSlot();
+        if (this.Type == SlotType.Developer) return this.SerializeDevSlot();
 
         int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
 

@@ -22,7 +22,8 @@ namespace ProjectLighthouse.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "Type",
                 table: "Slots",
-                type: "longtext",
+                type: "int",
+                defaultValue: 0,
                 nullable: false)
                 .Annotation("MySql:CharSet", "utf8mb4");
 

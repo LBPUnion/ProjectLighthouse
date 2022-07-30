@@ -101,15 +101,15 @@ public class Photo
                 s.Type,
             })
             .FirstOrDefault();
-        if (partialSlot == null) return this.Serialize(0, "user");
+        if (partialSlot == null) return this.Serialize(0, SlotType.User);
 
         return this.Serialize(partialSlot.InternalSlotId, partialSlot.Type);
     }
 
-    public string Serialize(int slotId, string slotType)
+    public string Serialize(int slotId, SlotType slotType)
     {
         
-        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", slotType);
+        string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", slotType.ToString().ToLower());
         if (slotId == 0) slot = "";
 
         string subjectsAggregate = this.Subjects.Aggregate(string.Empty, (s, subject) => s + subject.Serialize());

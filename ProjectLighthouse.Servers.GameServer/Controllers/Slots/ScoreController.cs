@@ -31,7 +31,7 @@ public class ScoreController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
+        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
@@ -46,7 +46,7 @@ public class ScoreController : ControllerBase
 
         SanitizationHelper.SanitizeStringsInClass(score);
 
-        if (slotType == "developer") id = await SlotHelper.GetDevSlotId(this.database, id);
+        if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
         score.SlotId = id;
 
@@ -106,9 +106,9 @@ public class ScoreController : ControllerBase
 
         if (user == null) return this.StatusCode(403, "");
 
-        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
+        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
-        if (slotType == "developer") slotId = await SlotHelper.GetDevSlotId(this.database, slotId);
+        if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
         return this.Ok(this.getScores(slotId, type, user, pageStart, pageSize));
     }

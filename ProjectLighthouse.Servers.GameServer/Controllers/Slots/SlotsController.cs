@@ -73,10 +73,10 @@ public class SlotsController : ControllerBase
         List<string?> serializedSlots = new();
         foreach (int slotId in s)
         {
-            Slot? slot = await this.database.Slots.Include(t => t.Creator).Include(t => t.Location).Where(t => t.SlotId == slotId && t.Type == "user").FirstOrDefaultAsync();
+            Slot? slot = await this.database.Slots.Include(t => t.Creator).Include(t => t.Location).Where(t => t.SlotId == slotId && t.Type == SlotType.User).FirstOrDefaultAsync();
             if (slot == null)
             {
-                slot = await this.database.Slots.Where(t => t.InternalSlotId == slotId && t.Type == "developer").FirstOrDefaultAsync();
+                slot = await this.database.Slots.Where(t => t.InternalSlotId == slotId && t.Type == SlotType.Developer).FirstOrDefaultAsync();
                 if (slot == null)
                 {
                     serializedSlots.Add($"<slot type=\"developer\"><id>{slotId}</id></slot>");
@@ -100,7 +100,7 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        int slotId = await SlotHelper.GetDevSlotId(this.database, id);
+        int slotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
         Slot slot = await this.database.Slots.FirstAsync(s => s.SlotId == slotId);
 
         return this.Ok(slot.SerializeDevSlot());
@@ -499,10 +499,10 @@ public class SlotsController : ControllerBase
         if (gameFilterType == "both")
             // Get game versions less than the current version
             // Needs support for LBP3 ("both" = LBP1+2)
-            whereSlots = this.database.Slots.Where(s => s.Type == "user" && s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
         else
             // Get game versions exactly equal to gamefiltertype
-            whereSlots = this.database.Slots.Where(s => s.Type == "user" && s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
 
         return whereSlots.Include(s => s.Creator).Include(s => s.Location);
     }

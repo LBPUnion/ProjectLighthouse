@@ -11,7 +11,22 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 public static class SlotHelper
 {
 
-    public static bool isTypeInvalid(string? slotType)
+    public static SlotType ParseSlotType(string? slotType)
+    {
+        if (slotType == null) return SlotType.Unknown;
+        return slotType switch
+        {
+            "developer" => SlotType.Developer,
+            "user" => SlotType.User,
+            "moon" => SlotType.Moon,
+            "pod" => SlotType.Pod,
+            "local" => SlotType.Local,
+            _ => SlotType.Unknown,
+        };
+
+    }
+
+    public static bool IsTypeInvalid(string? slotType)
     {
         if (slotType == null) return true;
         return slotType switch
@@ -24,9 +39,9 @@ public static class SlotHelper
 
     private static readonly SemaphoreSlim semaphore = new(1, 1); 
 
-    public static async Task<int> GetDevSlotId(Database database, int guid)
+    public static async Task<int> GetPlaceholderSlotId(Database database, int guid, SlotType slotType)
     {
-        int slotId = await database.Slots.Where(s => s.Type == "developer" && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
+        int slotId = await database.Slots.Where(s => s.Type == slotType && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
         if (slotId != 0) return slotId;
 
         await semaphore.WaitAsync();
@@ -34,7 +49,7 @@ public static class SlotHelper
         {
             // if two requests come in at the same time for the same story level which hasn't been generated
             // one will wait for the lock to be released and the second will be caught by this second check
-            slotId = await database.Slots.Where(s => s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
+            slotId = await database.Slots.Where(s => s.Type == slotType && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
 
             if (slotId != 0) return slotId;
 
@@ -66,12 +81,12 @@ public static class SlotHelper
 
             Slot slot = new()
             {
-                Name = $"Dev slot {guid}",
-                Description = "Placeholder for story mode level",
+                Name = $"{slotType} slot {guid}",
+                Description = "Placeholder for {slotType} type level",
                 CreatorId = devCreatorId,
                 InternalSlotId = guid,
                 LocationId = devLocation.Id,
-                Type = "developer",
+                Type = slotType,
             };
 
             database.Slots.Add(slot);

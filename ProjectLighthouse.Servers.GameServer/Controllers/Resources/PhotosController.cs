@@ -56,19 +56,30 @@ public class PhotosController : ControllerBase
         if (photo.XmlLevelInfo != null)
         {
             bool validLevel = false;
-            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.XmlLevelInfo.SlotId);
-            if (slot != null && photo.XmlLevelInfo.SlotType == "user")
+            PhotoSlot photoSlot = photo.XmlLevelInfo;
+            if (photoSlot.SlotType is SlotType.Pod or SlotType.Local) photoSlot.SlotId = 0;
+            switch (photoSlot.SlotType)
             {
-                if (slot.RootLevel == photo.XmlLevelInfo.RootLevel) validLevel = true;
-            }
-            else
-            {
-                slot = await this.database.Slots.FirstOrDefaultAsync(s => s.InternalSlotId == photo.XmlLevelInfo.SlotId);
-                if (slot != null && slot.Type == "developer")
+                case SlotType.User:
                 {
-                    photo.XmlLevelInfo.SlotId = slot.SlotId;
-                    validLevel = true;
+                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.SlotId == photoSlot.SlotId);
+                    if (slot != null) validLevel = slot.RootLevel == photoSlot.RootLevel;
+                    break;
                 }
+                case SlotType.Pod:
+                case SlotType.Local:
+                case SlotType.Developer:
+                {
+                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == photoSlot.SlotType && s.InternalSlotId == photoSlot.SlotId);
+                    if (slot != null) 
+                        photoSlot.SlotId = slot.SlotId;
+                    else
+                        photoSlot.SlotId = await SlotHelper.GetPlaceholderSlotId(this.database, photoSlot.SlotId, photoSlot.SlotType);
+                    validLevel = true;
+                    break;
+                }
+                default: Logger.Error($"Invalid photo level type: {photoSlot.SlotType}", LogArea.Photos);
+                    break;
             }
 
             if (validLevel) photo.SlotId = photo.XmlLevelInfo.SlotId;
@@ -131,12 +142,12 @@ public class PhotosController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        if (SlotHelper.isTypeInvalid(slotType)) return this.BadRequest();
+        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
-        if (slotType == "developer") id = await SlotHelper.GetDevSlotId(this.database, id);
+        if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
         List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Where(p => p.SlotId == id).Take(10).ToListAsync();
-        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id, slotType));
+        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id, SlotHelper.ParseSlotType(slotType)));
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }
 

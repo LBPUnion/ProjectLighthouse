@@ -1,4 +1,5 @@
 ﻿using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Levels;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData;
 
@@ -6,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.PlayerData;
 public class PhotoSlot
 {
     [XmlAttribute("type")]
-    public string SlotType { get; set; }
+    public SlotType SlotType { get; set; }
 
     [XmlElement("id")]
     public int SlotId { get; set; }

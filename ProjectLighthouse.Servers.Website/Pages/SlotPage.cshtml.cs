@@ -27,7 +27,7 @@ public class SlotPage : BaseLayout
     {
         Slot? slot = await this.Database.Slots.Include
                 (s => s.Creator)
-            .Where(s => s.Type == "user")
+            .Where(s => s.Type == SlotType.User)
             .FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 

@@ -18,7 +18,7 @@ public static class DatabaseExtensions
     public static IQueryable<Slot> ByGameVersion
         (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
     {
-        query = query.Where(s => s.Type == "user");
+        query = query.Where(s => s.Type == SlotType.User);
 
         if (includeCreatorAndLocation)
         {
