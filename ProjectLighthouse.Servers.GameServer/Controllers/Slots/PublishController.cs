@@ -8,7 +8,6 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,6 +46,12 @@ public class PublishController : ControllerBase
 
         if (string.IsNullOrEmpty(slot.ResourceCollection)) slot.ResourceCollection = slot.RootLevel;
 
+        LbpFile? rootLevel = LbpFile.FromHash(slot.RootLevel);
+        if (rootLevel == null) return this.BadRequest();
+
+        GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
+        if (slotVersion == GameVersion.Unknown) slotVersion = gameToken.GameVersion;
+
         // Republish logic
         if (slot.SlotId != 0)
         {
@@ -54,7 +59,7 @@ public class PublishController : ControllerBase
             if (oldSlot == null) return this.NotFound();
             if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
         }
-        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+        else if (user.GetUsedSlotsForGame(slotVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
@@ -127,6 +132,11 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
+        GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
+
+        slot.GameVersion = slotVersion;
+        if (slotVersion == GameVersion.Unknown) slot.GameVersion = gameToken.GameVersion;
+
         // Republish logic
         if (slot.SlotId != 0)
         {
@@ -177,16 +187,6 @@ public class PublishController : ControllerBase
 
             slot.TeamPick = oldSlot.TeamPick;
 
-            // Only update a slot's gameVersion if the level was actually change
-            if (oldSlot.RootLevel != slot.RootLevel)
-            {
-                slot.GameVersion = gameToken.GameVersion;
-            }
-            else
-            {
-                slot.GameVersion = oldSlot.GameVersion;
-            }
-
             if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
             {
                 slot.MinimumPlayers = 1;
@@ -198,7 +198,7 @@ public class PublishController : ControllerBase
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
-        if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+        if (user.GetUsedSlotsForGame(slotVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
             return this.BadRequest();
@@ -216,7 +216,6 @@ public class PublishController : ControllerBase
         slot.CreatorId = user.UserId;
         slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
         slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
-        slot.GameVersion = gameToken.GameVersion;
 
         if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
         {
