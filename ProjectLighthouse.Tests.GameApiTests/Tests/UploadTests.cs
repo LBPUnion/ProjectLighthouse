@@ -4,12 +4,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;
 
-public class UploadTests : LighthouseServerTest
+public class UploadTests : LighthouseServerTest<GameServerTestStartup>
 {
     public UploadTests()
     {
@@ -17,7 +18,7 @@ public class UploadTests : LighthouseServerTest
         if (Directory.Exists(assetsDirectory)) Directory.Delete(assetsDirectory, true);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldNotAcceptScript()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -27,7 +28,7 @@ public class UploadTests : LighthouseServerTest
         Assert.False(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldNotAcceptFarc()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -37,7 +38,7 @@ public class UploadTests : LighthouseServerTest
         Assert.False(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldNotAcceptGarbage()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -47,7 +48,7 @@ public class UploadTests : LighthouseServerTest
         Assert.False(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldAcceptTexture()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -57,7 +58,7 @@ public class UploadTests : LighthouseServerTest
         Assert.True(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [DatabaseFact]
     public async Task ShouldAcceptLevel()
     {
         LoginResult loginResult = await this.Authenticate();

@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\ProjectLighthouse.Servers.GameServer\ProjectLighthouse.Servers.GameServer.csproj" />
         <ProjectReference Include="..\ProjectLighthouse.Tests\ProjectLighthouse.Tests.csproj" />
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
     </ItemGroup>

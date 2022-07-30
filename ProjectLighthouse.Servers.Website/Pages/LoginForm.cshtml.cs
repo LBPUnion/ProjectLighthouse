@@ -73,6 +73,7 @@ public class LoginForm : BaseLayout
                 UserId = user.UserId,
                 User = user,
                 EmailToken = CryptoHelper.GenerateAuthToken(),
+                ExpiresAt = DateTime.Now + TimeSpan.FromHours(6),
             };
 
             this.Database.EmailSetTokens.Add(emailSetToken);
@@ -85,6 +86,7 @@ public class LoginForm : BaseLayout
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
+            ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
         };
 
         this.Database.WebTokens.Add(webToken);

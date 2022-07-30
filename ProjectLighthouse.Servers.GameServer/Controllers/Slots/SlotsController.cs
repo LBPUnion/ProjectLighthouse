@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.Match.Rooms;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
@@ -353,6 +354,69 @@ public class SlotsController : ControllerBase
             )
         );
     }
+    
+    // /slots/busiest?pageStart=1&pageSize=30&gameFilterType=both&players=1&move=true
+    [HttpGet("slots/busiest")]
+    public async Task<IActionResult> BusiestLevels
+    (
+        [FromQuery] int pageStart,
+        [FromQuery] int pageSize,
+        [FromQuery] string? gameFilterType = null,
+        [FromQuery] int? players = null,
+        [FromQuery] bool? move = null
+    )
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        Dictionary<int, int> playersBySlotId = new();
+
+        foreach (Room room in RoomHelper.Rooms)
+        {
+            // TODO: support developer slotTypes?
+            if(room.Slot.SlotType != SlotType.User) continue;
+
+            if (!playersBySlotId.TryGetValue(room.Slot.SlotId, out int playerCount)) 
+                playersBySlotId.Add(room.Slot.SlotId, 0);
+
+            playerCount += room.PlayerIds.Count;
+
+            playersBySlotId.Remove(room.Slot.SlotId);
+            playersBySlotId.Add(room.Slot.SlotId, playerCount);
+        }
+
+        IEnumerable<int> orderedPlayersBySlotId = playersBySlotId
+            .Skip(pageStart - 1)
+            .Take(Math.Min(pageSize, 30))
+            .OrderByDescending(kvp => kvp.Value)
+            .Select(kvp => kvp.Key);
+        
+        List<Slot> slots = new();
+
+        foreach (int slotId in orderedPlayersBySlotId)
+        {
+            Slot? slot = await this.database.Slots.ByGameVersion(token.GameVersion, false, true)
+                .FirstOrDefaultAsync(s => s.SlotId == slotId);
+            if(slot == null) continue; // shouldn't happen ever unless the room is borked
+            
+            slots.Add(slot);
+        }
+
+        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
+
+        return this.Ok(LbpSerializer.TaggedStringElement("slots",
+            response,
+            new Dictionary<string, object>
+            {
+                {
+                    "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+                },
+                {
+                    "total", playersBySlotId.Count
+                },
+            }));
+    }
+
 
     private GameVersion getGameFilter(string? gameFilterType, GameVersion version)
     {

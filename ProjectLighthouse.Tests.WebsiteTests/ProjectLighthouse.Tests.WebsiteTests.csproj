@@ -29,6 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\ProjectLighthouse.Servers.Website\ProjectLighthouse.Servers.Website.csproj" />
         <ProjectReference Include="..\ProjectLighthouse.Tests\ProjectLighthouse.Tests.csproj" />
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
     </ItemGroup>

@@ -47,6 +47,8 @@ public class CollectionController : ControllerBase
             }
         );
 
+        categoriesSerialized += LbpSerializer.StringElement("text_search", LbpSerializer.StringElement("url", "/slots/searchLBP3"));
+
         return this.Ok
         (
             LbpSerializer.TaggedStringElement

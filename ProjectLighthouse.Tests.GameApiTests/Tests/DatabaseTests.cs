@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;
 
-public class DatabaseTests : LighthouseServerTest
+public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
 {
     [DatabaseFact]
     public async Task CanCreateUserTwice()

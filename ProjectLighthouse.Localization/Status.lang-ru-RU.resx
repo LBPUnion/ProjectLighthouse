@@ -21,7 +21,7 @@
         <value>Currently online on {0} on {1}</value>
     </data>
   <data name="offline" xml:space="preserve">
-        <value>Offline</value>
+        <value>Не в сети</value>
     </data>
   <data name="last_online" xml:space="preserve">
         <value>Offline since {0}</value>
