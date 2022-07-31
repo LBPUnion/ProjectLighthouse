@@ -23,7 +23,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 10;
+    public const int CurrentConfigVersion = 11;
 
     #region Meta
 
@@ -177,7 +177,7 @@ public class ServerConfiguration
     public string RedisConnectionString { get; set; } = "redis://localhost:6379";
     public string ExternalUrl { get; set; } = "http://localhost:10060";
     public bool ConfigReloading { get; set; }
-    public string EulaText { get; set; } = "";
+    public string EulaText { get; set; } = "%license";
 #if !DEBUG
     public string AnnounceText { get; set; } = "You are now logged in as %user.";
 #else
