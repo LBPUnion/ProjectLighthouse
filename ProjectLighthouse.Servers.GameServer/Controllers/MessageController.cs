@@ -42,11 +42,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        string eulaText = ServerConfiguration.Instance.EulaText;
-
-        eulaText = eulaText.Replace("%licence", $"{license}\n");
-        eulaText = eulaText.Replace("\\n", "\n"); // just in case, may be redundant
-
         return this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
     }
 
