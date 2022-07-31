@@ -11,6 +11,7 @@ using ICSharpCode.SharpZipLib.Zip.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -50,6 +51,51 @@ public static class FileHelper
         };
     }
 
+    public static GameVersion ParseLevelVersion(LbpFile file)
+    {
+        if (file.FileType != LbpFileType.Level || file.Data.Length < 16 || file.Data[3] != 'b') return GameVersion.Unknown;
+
+        // Revision numbers borrowed from https://github.com/ennuo/toolkit/blob/main/src/main/java/ennuo/craftworld/resources/structs/Revision.java
+
+        const ushort lbp2Latest = 0x3F8;
+        const ushort lbp1Latest = 0x272;
+        const ushort lbpVitaLatest = 0x3E2;
+        const ushort lbpVitaDescriptor = 0x4431;
+        // There are like 1600 revisions so this doesn't cover everything
+        uint revision = 0;
+
+        // construct a 32 bit number from 4 individual bytes
+        for (int i = 4; i <= 7; i++)
+        {
+            revision <<= 8;
+            revision |= file.Data[i];
+        }
+
+        if (revision >= 0x271)
+        {
+            // construct a 16 bit number from 2 individual bytes
+            ushort branchDescriptor = (ushort) (file.Data[12] << 8 | file.Data[13]);
+            if (revision == lbpVitaLatest && branchDescriptor == lbpVitaDescriptor) return GameVersion.LittleBigPlanetVita;
+        }
+
+
+        GameVersion version = GameVersion.Unknown;
+        if (revision <= lbp1Latest)
+        {
+            version = GameVersion.LittleBigPlanet1;
+        }
+        else if (revision >> 0x10 != 0)
+        {
+            version = GameVersion.LittleBigPlanet3;
+        }
+        else if(revision <= lbp2Latest)
+        {
+            version = GameVersion.LittleBigPlanet2;
+        }
+
+        return version;
+    }
+
     public static LbpFileType DetermineFileType(byte[] data)
     {
         if (data.Length == 0) return LbpFileType.Unknown; // Can't be anything if theres no data.
@@ -63,18 +109,18 @@ public static class FileHelper
         string footer = Encoding.ASCII.GetString(readLastBytes(reader, 4));
         if (footer == "FARC") return LbpFileType.FileArchive;
 
-        byte[] header = reader.ReadBytes(3);
+        byte[] header = reader.ReadBytes(4);
 
         return Encoding.ASCII.GetString(header) switch
         {
-            "REC" => LbpFileType.MotionRecording,
-            "PRF" => LbpFileType.CrossLevel,
-            "PTG" => LbpFileType.Painting,
-            "TEX" => LbpFileType.Texture,
-            "FSH" => LbpFileType.Script,
-            "VOP" => LbpFileType.Voice,
-            "LVL" => LbpFileType.Level,
-            "PLN" => LbpFileType.Plan,
+            "RECb" => LbpFileType.MotionRecording,
+            "PRFb" => LbpFileType.CrossLevel,
+            "PTGb" => LbpFileType.Painting,
+            "TEX " => LbpFileType.Texture,
+            "FSHb" => LbpFileType.Script,
+            "VOPb" => LbpFileType.Voice,
+            "LVLb" => LbpFileType.Level,
+            "PLNb" => LbpFileType.Plan,
             _ => readAlternateHeader(reader),
         };
     }
