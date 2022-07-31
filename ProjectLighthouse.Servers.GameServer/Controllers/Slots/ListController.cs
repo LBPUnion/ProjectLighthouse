@@ -34,8 +34,10 @@ public class ListController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         IEnumerable<Slot> queuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
+            .Include(q => q.Slot.Creator)
+            .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
-            .ByGameVersion(gameVersion, false, true)
+            .ByGameVersion(gameVersion)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
@@ -103,8 +105,10 @@ public class ListController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         IEnumerable<Slot> heartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
+            .Include(q => q.Slot.Creator)
+            .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
-            .ByGameVersion(gameVersion, false, true)
+            .ByGameVersion(gameVersion)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
