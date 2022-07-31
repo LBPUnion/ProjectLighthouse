@@ -1,3 +1,4 @@
+@using System.Globalization
 @using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.PlayerData
 @model LBPUnion.ProjectLighthouse.PlayerData.Photo
@@ -38,6 +39,7 @@
                     break;
             }
         }
+        at @DateTime.UnixEpoch.AddSeconds(Model.Timestamp).ToString(CultureInfo.CurrentCulture)
     </i>
 </p>
 

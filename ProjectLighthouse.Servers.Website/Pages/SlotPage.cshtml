@@ -3,6 +3,7 @@
 @using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.PlayerData.Reviews
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotPage
 
@@ -162,7 +163,21 @@
         </div>
     </div>
 </div>
-
+        @if (Model.Photos.Count != 0)
+            {
+                <div class="ui purple segment">
+                    <h2>Most recent photos</h2>
+        
+                    <div class="ui center aligned grid">
+                        @foreach (Photo photo in Model.Photos)
+                        {
+                            <div class="eight wide column">
+                                @await Html.PartialAsync("Partials/PhotoPartial", photo)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
 @if (Model.User != null && Model.User.IsAdmin)
 {
     <div class="ui yellow segment">
