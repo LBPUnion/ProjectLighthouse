@@ -84,7 +84,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             $"token.ExpiresAt: {gameToken.ExpiresAt.ToString(CultureInfo.CurrentCulture)}\n" +
             "---DEBUG INFO---" +
             #endif
-            "\n"
+            (announceText != "" ? "\n" : "")
         );
     }
 
