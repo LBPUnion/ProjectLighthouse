@@ -38,4 +38,7 @@
   <data name="unknown" xml:space="preserve">
         <value>Okänd</value>
     </data>
+  <data name="success" xml:space="preserve">
+        <value>Success!</value>
+    </data>
 </root>

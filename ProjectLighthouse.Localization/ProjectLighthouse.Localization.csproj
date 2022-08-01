@@ -28,6 +28,10 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Register.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Error.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Error.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>

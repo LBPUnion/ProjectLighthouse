@@ -8,4 +8,5 @@ public enum TranslationAreas
     LoggedOut,
     Status,
     Register,
+    Error,
 }
