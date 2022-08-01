@@ -78,7 +78,7 @@ public class PhotosController : ControllerBase
                     validLevel = true;
                     break;
                 }
-                default: Logger.Error($"Invalid photo level type: {photoSlot.SlotType}", LogArea.Photos);
+                default: Logger.Warn($"Invalid photo level type: {photoSlot.SlotType}", LogArea.Photos);
                     break;
             }
 

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,12 +45,15 @@ public static class SlotHelper
         int slotId = await database.Slots.Where(s => s.Type == slotType && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
         if (slotId != 0) return slotId;
 
-        await semaphore.WaitAsync();
+        await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
         try
         {
             // if two requests come in at the same time for the same story level which hasn't been generated
             // one will wait for the lock to be released and the second will be caught by this second check
-            slotId = await database.Slots.Where(s => s.Type == slotType && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
+            slotId = await database.Slots
+                           .Where(s => s.Type == slotType && s.InternalSlotId == guid)
+                           .Select(s => s.SlotId)
+                           .FirstOrDefaultAsync();
 
             if (slotId != 0) return slotId;
 
