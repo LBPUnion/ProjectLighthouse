@@ -18,24 +18,24 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username" xml:space="preserve">
-        <value>Username</value>
+        <value>Käyttäjänimi</value>
     </data>
   <data name="password" xml:space="preserve">
-        <value>Password</value>
+        <value>Salasana</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Register</value>
+        <value>Rekisteröidy</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
-        <value>Forgot Password?</value>
+        <value>Unohditko salasanasi?</value>
     </data>
   <data name="error" xml:space="preserve">
-        <value>Uh oh!</value>
+        <value>Voi ei!</value>
     </data>
   <data name="log_in" xml:space="preserve">
-        <value>Log In</value>
+        <value>Kirjaudu sisään</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+        <value>Tuntematon</value>
     </data>
 </root>

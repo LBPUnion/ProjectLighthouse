@@ -17,13 +17,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="logged_out" xml:space="preserve">
-        <value>Kirjauduttu Ulos</value>
-    </data>
-  <data name="logged_out_info" xml:space="preserve">
-        <value>Sinut on onnistuneesti kirjattu ulos. Sinut ohjataan uudelleen 5 sekunnin kuluttua, tai voit klikata alla olevaa linkkiä tehdäksesi sen manuaalisesti.</value>
-    </data>
-  <data name="redirect" xml:space="preserve">
-        <value>Uudelleenohjaus</value>
+  <data name="username_notice" xml:space="preserve">
+        <value>Caution: Your username MUST match your PSN/RPCN username in order to be able to sign in from in-game.</value>
     </data>
 </root>
