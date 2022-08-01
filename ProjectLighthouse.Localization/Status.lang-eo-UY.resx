@@ -24,6 +24,6 @@
         <value>Eksterretas</value>
     </data>
   <data name="last_online" xml:space="preserve">
-        <value>Offline since {0}</value>
+        <value>Eksterrete ekde {0}</value>
     </data>
 </root>

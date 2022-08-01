@@ -30,7 +30,7 @@
         <value>¿Olvidaste tu contraseña?</value>
     </data>
   <data name="error" xml:space="preserve">
-        <value>Uh oh!</value>
+        <value>¡Uh oh!</value>
     </data>
   <data name="log_in" xml:space="preserve">
         <value>Iniciar Sesión</value>
