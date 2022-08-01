@@ -137,7 +137,7 @@ public class PhotosController : ControllerBase
     }
 
     [HttpGet("photos/{slotType}/{id:int}")]
-    public async Task<IActionResult> SlotPhotos(string slotType, int id)
+    public async Task<IActionResult> SlotPhotos([FromQuery] int pageStart, [FromQuery] int pageSize, string slotType, int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
@@ -146,8 +146,13 @@ public class PhotosController : ControllerBase
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
-        List<Photo> photos = await this.database.Photos.Include(p => p.Creator).Where(p => p.SlotId == id).Take(10).ToListAsync();
-        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id, SlotHelper.ParseSlotType(slotType)));
+        List<Photo> photos = await this.database.Photos.Include(p => p.Creator)
+            .Where(p => p.SlotId == id)
+            .OrderByDescending(s => s.Timestamp)
+            .Skip(pageStart - 1)
+            .Take(Math.Min(pageSize, 30))
+            .ToListAsync();
+        string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id, SlotHelper.ParseType(slotType)));
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }
 

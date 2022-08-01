@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 public static class SlotHelper
 {
 
-    public static SlotType ParseSlotType(string? slotType)
+    public static SlotType ParseType(string? slotType)
     {
         if (slotType == null) return SlotType.Unknown;
         return slotType switch
@@ -82,7 +82,7 @@ public static class SlotHelper
             Slot slot = new()
             {
                 Name = $"{slotType} slot {guid}",
-                Description = "Placeholder for {slotType} type level",
+                Description = $"Placeholder for {slotType} type level",
                 CreatorId = devCreatorId,
                 InternalSlotId = guid,
                 LocationId = devLocation.Id,

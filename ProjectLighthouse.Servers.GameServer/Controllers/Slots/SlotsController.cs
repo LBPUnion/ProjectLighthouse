@@ -85,7 +85,6 @@ public class SlotsController : ControllerBase
             }
             serializedSlots.Add(slot.Serialize());
         }
-
         string serialized = serializedSlots.Aggregate(string.Empty, (current, slot) => slot == null ? current : current + slot);
 
         return this.Ok(LbpSerializer.TaggedStringElement("slots", serialized, "total", serializedSlots.Count));

@@ -103,7 +103,10 @@ public class Photo
             .FirstOrDefault();
         if (partialSlot == null) return this.Serialize(0, SlotType.User);
 
-        return this.Serialize(partialSlot.InternalSlotId, partialSlot.Type);
+        int serializedSlotId = partialSlot.InternalSlotId;
+        if (serializedSlotId == 0) serializedSlotId = this.SlotId.GetValueOrDefault();
+
+        return this.Serialize(serializedSlotId, partialSlot.Type);
     }
 
     public string Serialize(int slotId, SlotType slotType)
