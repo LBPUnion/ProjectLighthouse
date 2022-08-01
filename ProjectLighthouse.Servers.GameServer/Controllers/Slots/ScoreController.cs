@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
@@ -23,12 +24,14 @@ public class ScoreController : ControllerBase
         this.database = database;
     }
 
-    [HttpPost("scoreboard/user/{id:int}")]
-    public async Task<IActionResult> SubmitScore(int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
+    [HttpPost("scoreboard/{slotType}/{id:int}")]
+    public async Task<IActionResult> SubmitScore(string slotType, int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
     {
         (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
         if (userAndToken == null) return this.StatusCode(403, "");
+
+        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
@@ -42,6 +45,8 @@ public class ScoreController : ControllerBase
         if (score == null) return this.BadRequest();
 
         SanitizationHelper.SanitizeStringsInClass(score);
+
+        if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
         score.SlotId = id;
 
@@ -92,14 +97,18 @@ public class ScoreController : ControllerBase
         //=> await TopScores(slotId, type);
         => this.Ok(LbpSerializer.BlankElement("scores"));
 
-    [HttpGet("topscores/user/{slotId:int}/{type:int}")]
+    [HttpGet("topscores/{slotType}/{slotId:int}/{type:int}")]
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    public async Task<IActionResult> TopScores(int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+    public async Task<IActionResult> TopScores(string slotType, int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
         // Get username
         User? user = await this.database.UserFromGameRequest(this.Request);
 
         if (user == null) return this.StatusCode(403, "");
+
+        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
+
+        if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
         return this.Ok(this.getScores(slotId, type, user, pageStart, pageSize));
     }

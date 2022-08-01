@@ -43,13 +43,14 @@ public class LandingPage : BaseLayout
         const int maxShownLevels = 5;
 
         this.LatestTeamPicks = await this.Database.Slots.Where
-                (s => s.TeamPick)
+                (s => s.Type == SlotType.User)
+            .Where(s => s.TeamPick)
             .OrderByDescending(s => s.FirstUploaded)
             .Take(maxShownLevels)
             .Include(s => s.Creator)
             .ToListAsync();
 
-        this.NewestLevels = await this.Database.Slots.OrderByDescending(s => s.FirstUploaded).Take(maxShownLevels).Include(s => s.Creator).ToListAsync();
+        this.NewestLevels = await this.Database.Slots.Where(s => s.Type == SlotType.User).OrderByDescending(s => s.FirstUploaded).Take(maxShownLevels).Include(s => s.Creator).ToListAsync();
 
         return this.Page();
     }
