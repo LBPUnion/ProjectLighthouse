@@ -422,9 +422,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("ResetToken")
                         .HasColumnType("longtext");
 
@@ -677,6 +674,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("LevelVisibility")
+                        .HasColumnType("int");
+
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
@@ -700,6 +700,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("PlanetHashLBPVita")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("ProfileVisibility")
+                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .HasColumnType("longtext");
@@ -741,9 +744,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Token")

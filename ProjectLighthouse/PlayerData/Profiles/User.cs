@@ -148,6 +148,10 @@ public class User
     public string? ApprovedIPAddress { get; set; }
     #nullable disable
 
+    public PrivacyType LevelVisibility { get; set; } = PrivacyType.All;
+
+    public PrivacyType ProfileVisibility { get; set; } = PrivacyType.All;
+
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
