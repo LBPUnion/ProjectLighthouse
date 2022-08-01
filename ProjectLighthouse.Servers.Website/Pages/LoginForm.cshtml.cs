@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -26,19 +27,19 @@ public class LoginForm : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(username))
         {
-            this.Error = "The username field is required.";
+            this.Error = this.Translate(ErrorStrings.UsernameInvalid);
             return this.Page();
         }
 
         if (string.IsNullOrWhiteSpace(password))
         {
-            this.Error = "The password field is required.";
+            this.Error = this.Translate(ErrorStrings.PasswordInvalid);
             return this.Page();
         }
 
         if (!await this.Request.CheckCaptchaValidity())
         {
-            this.Error = "You must complete the captcha correctly.";
+            this.Error = this.Translate(ErrorStrings.CaptchaFailed);
             return this.Page();
         }
 
@@ -60,7 +61,7 @@ public class LoginForm : BaseLayout
         if (user.Banned)
         {
             Logger.Warn($"User {user.Username} (id: {user.UserId}) failed to login on web due to being banned", LogArea.Login);
-            this.Error = "You have been banned. Please contact an administrator for more information.\nReason: " + user.BannedReason;
+            this.Error = this.Translate(ErrorStrings.UserIsBanned, user.BannedReason);
             return this.Page();
         }
 

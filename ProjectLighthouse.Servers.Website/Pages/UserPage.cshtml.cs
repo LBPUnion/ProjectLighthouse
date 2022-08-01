@@ -36,11 +36,13 @@ public class UserPage : BaseLayout
                 case PrivacyType.PSN:
                 {
                     if (this.User != null) return this.NotFound();
+
                     break;
                 }
                 case PrivacyType.Game:
                 {
                     if (this.ProfileUser != this.User) return this.NotFound();
+
                     break;
                 }
                 case PrivacyType.All: break;
@@ -48,7 +50,7 @@ public class UserPage : BaseLayout
             }
         }
 
-        this.Photos = await this.Database.Photos.OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
+        this.Photos = await this.Database.Photos.Include(p => p.Slot).OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
         if (this.CommentsEnabled)
         {
             this.Comments = await this.Database.Comments.Include(p => p.Poster)

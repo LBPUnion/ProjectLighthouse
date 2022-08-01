@@ -1,5 +1,6 @@
 @page "/register"
 @using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.RegisterForm
 
 @{
@@ -26,11 +27,13 @@
 {
     <div class="ui negative message">
         <div class="header">
-            Uh oh!
+            @Model.Translate(GeneralStrings.Error)
         </div>
         <p>@Model.Error</p>
     </div>
 }
+
+<p><b>@Model.Translate(RegisterStrings.UsernameNotice)</b></p>
 
 <form class="ui form" onsubmit="return onSubmit(this)" method="post">
     @Html.AntiForgeryToken()
