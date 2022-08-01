@@ -23,7 +23,7 @@ namespace ProjectLighthouse.Migrations
                 name: "Type",
                 table: "Slots",
                 type: "int",
-                defaultValue: 0,
+                defaultValue: 1,
                 nullable: false);
 
             migrationBuilder.AddColumn<int>(
