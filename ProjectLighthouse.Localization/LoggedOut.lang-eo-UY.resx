@@ -18,12 +18,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="logged_out" xml:space="preserve">
-        <value>Logged Out</value>
+        <value>Elsalutita</value>
     </data>
   <data name="logged_out_info" xml:space="preserve">
-        <value>You have been successfully logged out. You will be redirected in 5 seconds, or you may click below to do so manually.</value>
+        <value>Vi estis sukcese elsalutinta. Vi estos redirektita en 5 sekundoj, aŭ vi povas alklaki sube por fari tion permane.</value>
     </data>
   <data name="redirect" xml:space="preserve">
-        <value>Redirect</value>
+        <value>Plusendo</value>
     </data>
 </root>

@@ -22,7 +22,7 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>Welcome to {0}!</value>
+        <value>Bonvenon al {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
@@ -46,9 +46,9 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>Newest Levels</value>
+        <value>Plej Novaj Niveloj</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>Latest Team Picks</value>
+        <value>Plej Novaj Teamaj Elektoj</value>
     </data>
 </root>
