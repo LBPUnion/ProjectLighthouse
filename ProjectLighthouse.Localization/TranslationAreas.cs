@@ -9,4 +9,5 @@ public enum TranslationAreas
     Status,
     Register,
     Error,
+    Profile,
 }

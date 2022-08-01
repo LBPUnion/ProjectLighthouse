@@ -32,6 +32,10 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Error.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Profile.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Profile.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>

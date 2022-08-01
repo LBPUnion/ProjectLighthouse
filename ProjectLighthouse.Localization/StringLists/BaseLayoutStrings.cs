@@ -13,5 +13,8 @@ public static class BaseLayoutStrings
     public static readonly TranslatableString HeaderAdminPanel = create("header_adminPanel");
     public static readonly TranslatableString HeaderLogout = create("header_logout");
 
+    public static readonly TranslatableString GeneratedBy = create("generated_by");
+    public static readonly TranslatableString GeneratedModified = create("generated_modified");
+
     private static TranslatableString create(string key) => new(TranslationAreas.BaseLayout, key);
 }
