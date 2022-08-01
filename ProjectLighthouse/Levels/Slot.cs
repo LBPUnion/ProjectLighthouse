@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -247,8 +248,12 @@ public class Slot
 
         int photos = this.database.Photos.Count(c => c.SlotId == this.SlotId);
 
+        int players = RoomHelper.Rooms
+            .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)
+            .Sum(r => r.PlayerIds.Count);
+
         string slotData = LbpSerializer.StringElement("id", this.InternalSlotId) +
-                          LbpSerializer.StringElement("playerCount", 0) +
+                          LbpSerializer.StringElement("playerCount", players) +
                           LbpSerializer.StringElement("commentCount", comments) +
                           LbpSerializer.StringElement("photoCount", photos);
 
