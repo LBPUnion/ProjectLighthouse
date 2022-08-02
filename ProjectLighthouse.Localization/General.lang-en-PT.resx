@@ -30,7 +30,7 @@
         <value>Forgot Password?</value>
     </data>
   <data name="error" xml:space="preserve">
-        <value>Uh oh!</value>
+        <value>Shiver me timbers!</value>
     </data>
   <data name="log_in" xml:space="preserve">
         <value>Log In</value>
@@ -48,7 +48,7 @@
         <value>Recent Activity</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Coming soon!</value>
+        <value>Comin' soon!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
         <value>Most recent photos</value>
