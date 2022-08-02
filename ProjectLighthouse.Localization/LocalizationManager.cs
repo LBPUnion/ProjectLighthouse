@@ -49,7 +49,7 @@ public static class LocalizationManager
             return $"{translationArea.ToString()}.{language}.{key}";
         }
 
-        return localizedString;
+        return localizedString.Replace("\\n", "\n");
     }
 
     // If a language isn't working, it might be because a language is using a different name than what ASP.NET expects.
