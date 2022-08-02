@@ -64,21 +64,21 @@
         <value>Denne side blev genereret brugt af en ændret version af Project Lighthouse. Sørg for, at du afslører kildekoden korrekt til alle brugere, der muligvis bruger denne instans.</value>
     </data>
   <data name="js_warn" xml:space="preserve">
-        <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
+        <value>Mens vi har til hensigt at have så lidt JavaScript som muligt, kan vi ikke garantere alt vil fungere uden det. Vi anbefaler, at du hvidliste JavaScript til Project Lighthouse.</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript is not enabled</value>
+        <value>JavaScript er ikke aktiveret</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
-        <value>Potential License Violation</value>
+        <value>Potentiel Licens Overtrædelse</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the {0}.</value>
+        <value>Denne instans er en offentlig instans, der er blevet ændret uden de offentliggjorte ændringer. Du kan være i strid med {0}.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
-        <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
+        <value>Hvis du mener, at dette er en fejl, opret et problem med output fra {0} løb fra roden af serverens kildekode i beskrivelsen på vores {1}issue tracker{2}.</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
-        <value>If not, please publish the source code somewhere accessible to your users.</value>
+        <value>Hvis ikke, bedes du publicere kildekoden et eller andet sted, der er tilgængeligt for dine brugere.</value>
     </data>
 </root>

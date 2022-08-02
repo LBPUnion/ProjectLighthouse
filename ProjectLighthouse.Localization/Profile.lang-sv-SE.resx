@@ -21,9 +21,9 @@
         <value>Biografi</value>
     </data>
   <data name="no_biography" xml:space="preserve">
-        <value>{0} hasn't introduced themselves yet.</value>
+        <value>{0} har inte presenterat sig än.</value>
     </data>
   <data name="title" xml:space="preserve">
-        <value>{0}'s user page</value>
+        <value>{0}</value>
     </data>
 </root>

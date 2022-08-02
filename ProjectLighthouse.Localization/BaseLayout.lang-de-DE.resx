@@ -64,21 +64,21 @@
         <value>Diese Seite wurde von einer modifizierten Version von Project Lighthouse generiert. Stelle bitte sicher, dass du den veränderten Quellcode für alle Nutzer, die diese Instanz benutzen dürfen, sichtbar machst.</value>
     </data>
   <data name="js_warn" xml:space="preserve">
-        <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
+        <value>Obwohl wir versuchen, so wenig JavaScript wie möglich zu benutzen, können wir nicht garantieren, dass alles ohne JavaScript funktionieren wird. Wir empfehlen dir, JavaScript für Project Lighthouse zu erlauben.</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript is not enabled</value>
+        <value>JavaScript ist nicht aktiviert</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
-        <value>Potential License Violation</value>
+        <value>Potenzieller Lizenzverstoß</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the {0}.</value>
+        <value>Dies ist eine öffentlich zugängliche Instanz, dessen Quellcode verändert aber nicht veröffentlicht wurde. Es könnte sein, dass du gegen die {0} verstoßt.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
         <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
-        <value>If not, please publish the source code somewhere accessible to your users.</value>
+        <value>Falls nicht, veröffentliche den Quellcode irgendwo, wo die Nutzer deiner Instanz darauf zugreifen können.</value>
     </data>
 </root>

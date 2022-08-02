@@ -64,21 +64,21 @@
         <value>Denne siden ble generert med en modifisert versjon av Project Lighthouse. Sørg for at du avslører kildekoden på riktig måte til brukere som kan bruke denne forekomsten.</value>
     </data>
   <data name="js_warn" xml:space="preserve">
-        <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
+        <value>Selv om vi har til hensikt å ha så lite JavaScript som mulig, kan vi ikke garantere at alt vil fungere uten det. Vi anbefaler at du godkjenner JavaScript for Projekt Lighthouse.</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript is not enabled</value>
+        <value>JacaScript er ikke aktivert</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
-        <value>Potential License Violation</value>
+        <value>Potensielt brudd på lisensen</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the {0}.</value>
+        <value>Denne forekomsten er en offentlig forekomst som har blitt endret uten at endringene er publisert. Du kan være i strid med {0}.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
-        <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
+        <value>Hvis du mener dette er en feil, kan du opprette et problem med utdataene til {0} kjørte fra roten til serverkildekoden i beskrivelsen på vår {1}problemsporing{2}.</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
-        <value>If not, please publish the source code somewhere accessible to your users.</value>
+        <value>Hvis ikke, vennligst publiser kildekoden et sted som er tilgjengelig for brukerne dine</value>
     </data>
 </root>
