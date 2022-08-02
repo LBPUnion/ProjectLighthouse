@@ -73,6 +73,7 @@ public class ClientConfigurationController : ControllerBase
 
         XmlSerializer serializer = new(typeof(PrivacySettings));
         PrivacySettings? settings = (PrivacySettings?)serializer.Deserialize(new StringReader(bodyString));
+        if (settings == null) return this.BadRequest();
         
         if (settings.LevelVisibility != null)
         {

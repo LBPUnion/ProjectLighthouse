@@ -18,14 +18,14 @@ namespace ProjectLighthouse.Migrations
                 table: "Users",
                 type: "int",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 2);
 
             migrationBuilder.AddColumn<int>(
                 name: "ProfileVisibility",
                 table: "Users",
                 type: "int",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 2);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
