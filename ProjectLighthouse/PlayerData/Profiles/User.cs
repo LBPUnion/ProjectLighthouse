@@ -147,6 +147,11 @@ public class User
     [JsonIgnore]
     public string? ApprovedIPAddress { get; set; }
     #nullable disable
+    
+    /// <summary>
+    /// ARRR! Forces the user to see Pirate English translations on the website.
+    /// </summary>
+    public bool IsAPirate { get; set; }
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {

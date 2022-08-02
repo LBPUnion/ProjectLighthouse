@@ -52,6 +52,8 @@ public class BaseLayout : PageModel
     {
         if (ServerStatics.IsUnitTesting) return LocalizationManager.DefaultLang;
         if (this.language != null) return this.language;
+
+        if (this.User?.IsAPirate ?? false) return "en-PT"; 
         
         IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
         if (requestCulture == null) return this.language = LocalizationManager.DefaultLang;

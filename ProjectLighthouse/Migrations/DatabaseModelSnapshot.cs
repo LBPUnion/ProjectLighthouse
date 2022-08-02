@@ -292,8 +292,7 @@ namespace ProjectLighthouse.Migrations
                     b.Property<bool>("TeamPick")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("SlotId");
@@ -427,9 +426,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ResetToken")
@@ -686,6 +682,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("IconHash")
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsAPirate")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
@@ -753,9 +752,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Token")
