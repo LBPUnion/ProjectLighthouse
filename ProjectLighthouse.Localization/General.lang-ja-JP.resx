@@ -36,21 +36,21 @@
         <value>ログイン</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+        <value>不明</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>成功!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Reset Password</value>
+        <value>パスワードのリセット</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Recent Activity</value>
+        <value>最近のアクティビティ</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Coming soon!</value>
+        <value>近日公開！</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Most recent photos</value>
+        <value>最近の写真</value>
     </data>
 </root>

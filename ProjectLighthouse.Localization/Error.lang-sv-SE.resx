@@ -39,9 +39,9 @@
         <value>The email address you've chosen is already taken.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Email address field is required.</value>
+        <value>E-postadress krävs.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
-        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
+        <value>Du har blivit bannad. Kontakta en administratör för mer information.\nAnledning: {0}</value>
     </data>
 </root>

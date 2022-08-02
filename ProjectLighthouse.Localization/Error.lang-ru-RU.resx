@@ -21,19 +21,19 @@
         <value>The username field is blank.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>The username you've chosen is already taken.</value>
+        <value>Выбранное имя пользователя уже занято.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
         <value>Password field is required.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Passwords do not match!</value>
+        <value>Пароли не совпадают!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
-        <value>Invalid Token</value>
+        <value>Неверный Токен</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>You must complete the captcha correctly.</value>
+        <value>Вы должны правильно завершить капчу.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
         <value>The email address you've chosen is already taken.</value>
@@ -42,6 +42,6 @@
         <value>Email address field is required.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
-        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
+        <value>Вы были заблокированы. Пожалуйста, свяжитесь с администратором для получения дополнительной информации.\nПричина: {0}</value>
     </data>
 </root>
