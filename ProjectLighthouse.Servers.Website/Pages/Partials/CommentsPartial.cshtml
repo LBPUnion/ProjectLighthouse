@@ -52,7 +52,7 @@
                 string style = "";
                 if (Model.User?.UserId == comment.PosterUserId)
                 {
-                    style = "visibility: hidden";
+                    style = "pointer-events: none";
                 }
             }
             <div class="voting" style="@(style)">
