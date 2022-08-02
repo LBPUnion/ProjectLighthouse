@@ -64,21 +64,21 @@
         <value>Esta página foi gerada usando uma versão modificada do Projeto Lighthouse. Certifique-se de que você está divulgando corretamente o código fonte para qualquer usuário que possa estar usando esta instância.</value>
     </data>
   <data name="js_warn" xml:space="preserve">
-        <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
+        <value>Embora a nossa intenção seja ter o mínimo possível de JavaScript, não é possível garantir que tudo funcionará sem a sua presença. Recomendamos que dê whitelist ao JavaScript para o Projeto Lighthouse</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript is not enabled</value>
+        <value>O JavaScript não está ativado</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
-        <value>Potential License Violation</value>
+        <value>Potencial Violação de Licença</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the {0}.</value>
+        <value>Esta é uma instância pública que foi modificada sem ter tido as suas alterações publicadas. Poderá estar em violação de {0}.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
-        <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
+        <value>Se acredita que isto possa ser um erro, por favor cria uma "solicitação" com saída {0} executada na raiz do código-fonte do servidor na descrição no nosso {1}rastreador de problemas{2}</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
-        <value>If not, please publish the source code somewhere accessible to your users.</value>
+        <value>Se não for o caso, publique o código-fonte em um local acessível aos seus utilizadores.</value>
     </data>
 </root>

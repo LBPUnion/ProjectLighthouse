@@ -27,7 +27,7 @@
         <value>Password field be required.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Passwords do not match!</value>
+        <value>Secret keys do not match!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
         <value>Invalid Token</value>
