@@ -21,7 +21,7 @@
         <value>Utloggad</value>
     </data>
   <data name="logged_out_info" xml:space="preserve">
-        <value>Du har loggat ut. Om 5 sekunder kommer du bli omderigerad, eller kan du klicka på knappen under, manuellt.</value>
+        <value>Du har loggat ut. Om 5 sekunder kommer du bli omdirigerad, eller kan du klicka på knappen under, manuellt.</value>
     </data>
   <data name="redirect" xml:space="preserve">
         <value>Omdirigera</value>

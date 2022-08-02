@@ -39,16 +39,16 @@
         <value>Неизвестно</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>Успешно!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Reset Password</value>
+        <value>Сбросить пароль</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
         <value>Recent Activity</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Coming soon!</value>
+        <value>Скоро будет!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
         <value>Most recent photos</value>

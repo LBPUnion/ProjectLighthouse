@@ -123,29 +123,36 @@
                 <div class="ui container">
                     <div style="display: flex; align-items: center; font-size: 1.2rem;">
                         <i class="warning icon"></i>
-                        <span style="font-size: 1.2rem;">JavaScript not enabled</span>
+                        <span style="font-size: 1.2rem;">@Model.Translate(BaseLayoutStrings.JavaScriptWarnTitle)</span>
                     </div>
-                    <p>
-                        While we intend to have as little JavaScript as possible, we can not
-                        guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.
-                        It's not <i>too</i> bloated, we promise.
-                    </p>
+                    <p>@Model.Translate(BaseLayoutStrings.JavaScriptWarn)</p>
                 </div>
             </div>
         </noscript>
-        @* ReSharper disable once CSharpWarnings::CS0162 *@
+        @* ReSharper disable HeuristicUnreachableCode *@
+        @* ReSharper disable CSharpWarnings::CS0162 *@
         @if (!ServerStatics.IsDebug && VersionHelper.IsDirty)
         {
             <div class="ui bottom attached red message large">
                 <div class="ui container">
                     <i class="warning icon"></i>
-                    <span style="font-size: 1.2rem;">Potential License Violation</span>
-                    <p>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the <a href="https://github.com/LBPUnion/project-lighthouse/blob/main/LICENSE">GNU Affero General Public License v3.0</a>.</p>
-                    <p>If you believe this is an error, please create an issue with the output of <code>git status</code> ran from the root of the server source code in the description on our <a href="https://github.com/LBPUnion/project-lighthouse/issues">issue tracker</a>.</p>
-                    <p>If not, please publish the source code somewhere accessible to your users.</p>
+                    <span style="font-size: 1.2rem;">@Model.Translate(BaseLayoutStrings.LicenseWarnTitle)</span>
+                    <p>
+                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn1, 
+                            "<a href=\"https://github.com/LBPUnion/project-lighthouse/blob/main/LICENSE\">GNU Affero General Public License v3.0</a>"))
+                    </p>
+                    <p>
+                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn2, 
+                            "<code>git status</code>", "<a href=\"https://github.com/LBPUnion/project-lighthouse/issues\">", "</a>"))
+                    </p>
+                    <p>
+                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn3))
+                    </p>
                 </div>
             </div>
         }
+        @* ReSharper restore CSharpWarnings::CS0162 *@
+        @* ReSharper restore HeuristicUnreachableCode *@
     </header>
     <div class="main">
         <div class="ui container">
@@ -162,7 +169,7 @@
         <div class="ui black attached inverted segment">
             <div class="ui container">
 
-                <p>@Model.Translate(BaseLayoutStrings.GeneratedModified, VersionHelper.FullVersion)</p>
+                <p>@Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)</p>
                 @if (VersionHelper.IsDirty)
                 {
                     <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>

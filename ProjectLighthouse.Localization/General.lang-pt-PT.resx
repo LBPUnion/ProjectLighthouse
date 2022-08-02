@@ -39,18 +39,18 @@
         <value>Desconhecido</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>Sucesso!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Reset Password</value>
+        <value>Repor Palavra-passe</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Recent Activity</value>
+        <value>Atividades Recentes</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Coming soon!</value>
+        <value>Em breve!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Most recent photos</value>
+        <value>Fotos mais recentes</value>
     </data>
 </root>
