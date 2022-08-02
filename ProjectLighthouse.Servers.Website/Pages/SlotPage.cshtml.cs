@@ -31,6 +31,29 @@ public class SlotPage : BaseLayout
             .Where(s => s.Type == SlotType.User)
             .FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+        System.Diagnostics.Debug.Assert(slot.Creator != null);
+
+        // Determine if user can view slot according to creator's privacy settings
+        if (this.User == null || !this.User.IsAdmin)
+        {
+            switch (slot.Creator.ProfileVisibility)
+            {
+                case PrivacyType.PSN:
+                {
+                    if (this.User != null) return this.NotFound();
+
+                    break;
+                }
+                case PrivacyType.Game:
+                {
+                    if (slot.Creator != this.User) return this.NotFound();
+
+                    break;
+                }
+                case PrivacyType.All: break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
 
         this.Slot = slot;
 

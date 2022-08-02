@@ -1,7 +1,9 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,12 +47,56 @@ public class ClientConfigurationController : ControllerBase
 
     [HttpGet("privacySettings")]
     [Produces("text/xml")]
-    public IActionResult PrivacySettings()
+    public async Task<IActionResult> GetPrivacySettings()
     {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+        
         PrivacySettings ps = new()
         {
-            LevelVisibility = "all",
-            ProfileVisibility = "all",
+            LevelVisibility = user.LevelVisibility.ToSerializedString(),
+            ProfileVisibility = user.ProfileVisibility.ToSerializedString(),
+        };
+
+        return this.Ok(ps.Serialize());
+    }
+
+    [HttpPost("privacySettings")]
+    [Produces("text/xml")]
+    public async Task<IActionResult> SetPrivacySetting()
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        this.Request.Body.Position = 0;
+        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+
+        XmlSerializer serializer = new(typeof(PrivacySettings));
+        PrivacySettings? settings = (PrivacySettings?)serializer.Deserialize(new StringReader(bodyString));
+        if (settings == null) return this.BadRequest();
+        
+        if (settings.LevelVisibility != null)
+        {
+            PrivacyType? type = PrivacyTypeExtensions.FromSerializedString(settings.LevelVisibility);
+            if (type == null) return this.BadRequest();
+            
+            user.LevelVisibility = (PrivacyType)type;
+        }
+
+        if (settings.ProfileVisibility != null)
+        {
+            PrivacyType? type = PrivacyTypeExtensions.FromSerializedString(settings.ProfileVisibility);
+            if (type == null) return this.BadRequest();
+
+            user.ProfileVisibility = (PrivacyType)type;
+        }
+
+        await this.database.SaveChangesAsync();
+
+        PrivacySettings ps = new()
+        {
+            LevelVisibility = user.LevelVisibility.ToSerializedString(),
+            ProfileVisibility = user.ProfileVisibility.ToSerializedString(),
         };
 
         return this.Ok(ps.Serialize());

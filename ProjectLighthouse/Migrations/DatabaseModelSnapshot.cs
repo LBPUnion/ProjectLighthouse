@@ -688,6 +688,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("LevelVisibility")
+                        .HasColumnType("int");
+
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
@@ -711,6 +714,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("PlanetHashLBPVita")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("ProfileVisibility")
+                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .HasColumnType("longtext");

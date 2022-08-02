@@ -234,13 +234,13 @@ public class PublishController : ControllerBase
 
         this.database.Slots.Add(slot);
         await this.database.SaveChangesAsync();
-
-        await WebhookHelper.SendWebhook
-        (
-            "New level published!",
-            $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}"
-        );
         
+        if (user.LevelVisibility == PrivacyType.All)
+        {
+            await WebhookHelper.SendWebhook("New level published!",
+                $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}");
+        }
+
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
         return this.Ok(slot.Serialize(gameToken.GameVersion));
