@@ -162,7 +162,7 @@
         <div class="ui black attached inverted segment">
             <div class="ui container">
 
-                <p>@Model.Translate(BaseLayoutStrings.GeneratedModified, VersionHelper.FullVersion)</p>
+                <p>@Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)</p>
                 @if (VersionHelper.IsDirty)
                 {
                     <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>
