@@ -74,7 +74,7 @@ public class Review
             _ => "none",
         };
 
-        string reviewData = LbpSerializer.TaggedStringElement("slot_id", this.SlotId, "type", this.Slot?.Type) +
+        string reviewData = LbpSerializer.TaggedStringElement("slot_id", this.SlotId, "type", this.Slot?.Type.ToString().ToLower()) +
                             LbpSerializer.StringElement("reviewer", this.Reviewer?.Username) +
                             LbpSerializer.StringElement("thumb", this.Thumb) +
                             LbpSerializer.StringElement("timestamp", this.Timestamp) +
