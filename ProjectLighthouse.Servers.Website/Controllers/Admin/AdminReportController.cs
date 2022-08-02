@@ -31,8 +31,9 @@ public class AdminReportController : ControllerBase
         {
             report.JpegHash,
             report.GriefStateHash,
-            report.InitialStateHash,
         };
+        if(report.LevelType != "user")
+            hashes.Add(report.InitialStateHash);
         foreach (string hash in hashes)
         {
             if (System.IO.File.Exists(Path.Combine("png", $"{hash}.png")))
