@@ -313,8 +313,8 @@ public class Slot
                           LbpSerializer.StringElement("mmpick", this.TeamPick) +
                           LbpSerializer.StringElement("heartCount", this.Hearts) +
                           LbpSerializer.StringElement("playCount", this.Plays) +
-                          LbpSerializer.StringElement("photoCount", this.PhotoCount) +
-                          LbpSerializer.StringElement("authorPhotoCount", this.AuthorPhotoCount) +
+                          LbpSerializer.StringElement("photoCount", this.Photos) +
+                          LbpSerializer.StringElement("authorPhotoCount", this.PhotosWithAuthor) +
                           LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
                           LbpSerializer.StringElement("completionCount", this.PlaysComplete) +
