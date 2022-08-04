@@ -145,6 +145,16 @@ public class Slot
 
     [XmlIgnore]
     [NotMapped]
+    [JsonIgnore]
+    public int Photos => this.database.Photos.Count(p => p.SlotId == this.SlotId);
+
+    [XmlIgnore]
+    [NotMapped]
+    [JsonIgnore]
+    public int PhotosWithAuthor => this.database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId);
+
+    [XmlIgnore]
+    [NotMapped]
     public int Plays => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3 + this.PlaysLBPVita;
 
     [XmlIgnore]
@@ -303,6 +313,8 @@ public class Slot
                           LbpSerializer.StringElement("mmpick", this.TeamPick) +
                           LbpSerializer.StringElement("heartCount", this.Hearts) +
                           LbpSerializer.StringElement("playCount", this.Plays) +
+                          LbpSerializer.StringElement("photoCount", this.PhotoCount) +
+                          LbpSerializer.StringElement("authorPhotoCount", this.AuthorPhotoCount) +
                           LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
                           LbpSerializer.StringElement("completionCount", this.PlaysComplete) +
