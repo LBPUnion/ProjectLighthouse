@@ -242,20 +242,27 @@ public class Slot
                LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
     }
 
-    public string SerializeDevSlot()
+    public string SerializeDevSlot(bool includeExtras = true)
     {
-        int comments = this.database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
 
-        int photos = this.database.Photos.Count(c => c.SlotId == this.SlotId);
+        int comments = 0, photos = 0;
+        if (includeExtras)
+        {
+            comments = this.database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
 
+            photos = this.database.Photos.Count(c => c.SlotId == this.SlotId);
+        }
+        
         int players = RoomHelper.Rooms
             .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)
             .Sum(r => r.PlayerIds.Count);
 
         string slotData = LbpSerializer.StringElement("id", this.InternalSlotId) +
-                          LbpSerializer.StringElement("playerCount", players) +
-                          LbpSerializer.StringElement("commentCount", comments) +
-                          LbpSerializer.StringElement("photoCount", photos);
+                          LbpSerializer.StringElement("playerCount", players);
+
+        if(includeExtras)
+            slotData += LbpSerializer.StringElement("commentCount", comments) +
+                        LbpSerializer.StringElement("photoCount", photos);
 
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "developer");
     }
