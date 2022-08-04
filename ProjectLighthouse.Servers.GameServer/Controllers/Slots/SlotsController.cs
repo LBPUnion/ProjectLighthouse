@@ -90,6 +90,31 @@ public class SlotsController : ControllerBase
         return this.Ok(LbpSerializer.TaggedStringElement("slots", serialized, "total", serializedSlots.Count));
     }
 
+    [HttpGet("slots/developer")]
+    public async Task<IActionResult> StoryPlayers()
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        List<int> activeSlotIds = RoomHelper.Rooms.Where(r => r.Slot.SlotType == SlotType.Developer).Select(r => r.Slot.SlotId).ToList();
+
+        List<string> serializedSlots = new();
+
+        foreach (int id in activeSlotIds)
+        {
+            int placeholderSlotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
+            Slot slot = await this.database.Slots.FirstAsync(s => s.SlotId == placeholderSlotId);
+            serializedSlots.Add(slot.SerializeDevSlot(false));
+        }
+
+        string serialized = serializedSlots.Aggregate(string.Empty, (current, slot) => current + slot);
+
+        return this.Ok(LbpSerializer.StringElement("slots", serialized));
+    }
+
     [HttpGet("s/developer/{id:int}")]
     public async Task<IActionResult> SDev(int id)
     {
