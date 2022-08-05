@@ -1,6 +1,6 @@
 namespace LBPUnion.ProjectLighthouse.Administration;
 
-// Next available ID for use: 18
+// Next available ID for use: 7
 // PLEASE UPDATE THIS WHEN YOU ADD SOMETHING HERE!
 // IF YOU DO NOT ADD THIS IN ORDER PROPERLY THEN THERE WILL BE DATA CORRUPTION!
 // THE VALUE MUST ALWAYS BE EXPLICITLY SET.
@@ -9,25 +9,11 @@ public enum CaseType
     UserSilence = 0,
     UserRestriction = 1,
     UserBan = 2,
-    UserDeletion = 3,
-    UserCommentsDisabled = 4,
-    UserDetailsEdited = 5,
-    UserPlanetsDeletion = 6,
+    UserCommentsDisabled = 3,
     
-    LevelDeletion = 7,
-    LevelLock = 8,
-    LevelCommentsDisabled = 9,
-    LevelDetailsEdited = 10,
-    LevelTeamPickAdded = 16,
-    LevelTeamPickRemoved = 17,
-    
-    CommentDeletion = 11,
-    ReviewDeletion = 12,
-    PhotoDeletion = 13,
-    
-    HashModeration = 14,
-    
-    IpAddressBan = 15,
+    LevelLock = 4,
+    LevelCommentsDisabled = 5,
+    LevelDetailsEdited = 6,
 }
 
 public static class CaseTypeExtensions
@@ -36,13 +22,10 @@ public static class CaseTypeExtensions
     {
         return type switch
         {
-            CaseType.UserDeletion => false, // you cant get a user from a deleted id
             CaseType.UserSilence => true,
             CaseType.UserRestriction => true,
             CaseType.UserBan => true,
             CaseType.UserCommentsDisabled => true,
-            CaseType.UserDetailsEdited => true,
-            CaseType.UserPlanetsDeletion => true,
             _ => false,
         };
     }
@@ -51,12 +34,9 @@ public static class CaseTypeExtensions
     {
         return type switch
         {
-            CaseType.LevelDeletion => false, // you cant get a slot from a deleted id
             CaseType.LevelLock => true,
             CaseType.LevelCommentsDisabled => true,
             CaseType.LevelDetailsEdited => true,
-            CaseType.LevelTeamPickAdded => true,
-            CaseType.LevelTeamPickRemoved => true,
             _ => false,
         };
     }

@@ -47,24 +47,7 @@ public class ModerationCase
 
     #region Case creators
     #region Level
-    public static ModerationCase NewTeamPickCase(int caseCreator, int slotId, bool added) 
-        => new()
-        {
-            CaseType = added ? CaseType.LevelTeamPickAdded : CaseType.LevelTeamPickRemoved,
-            CaseDescription = "",
-            CaseCreatorId = caseCreator,
-            CaseCreated = DateTime.Now,
-            AffectedId = slotId,
-        };
 
-    public static ModerationCase NewLevelDeletionCase(int caseCreator, int slotId)
-        => new()
-        {
-            CaseType = CaseType.LevelDeletion,
-            CaseDescription = "Deleted slot ID " + slotId,
-            CaseCreatorId = caseCreator,
-            CaseCreated = DateTime.Now,
-        };
     #endregion
 
     #region User
@@ -76,25 +59,6 @@ public class ModerationCase
             CaseCreatorId = caseCreator,
             CaseCreated = DateTime.Now,
             CaseExpires = caseExpires,
-            AffectedId = userId,
-        };
-
-    public static ModerationCase NewAccountDeletionCase(int caseCreator, int userId)
-        => new()
-        {
-            CaseType = CaseType.UserDeletion,
-            CaseDescription = "Deleted user ID " + userId,
-            CaseCreatorId = caseCreator,
-            CaseCreated = DateTime.Now,
-        };
-
-    public static ModerationCase NewPlanetDeletionCase(int caseCreator, int userId)
-        => new()
-        {
-            CaseType = CaseType.UserPlanetsDeletion,
-            CaseDescription = "",
-            CaseCreatorId = caseCreator,
-            CaseCreated = DateTime.Now,
             AffectedId = userId,
         };
 

@@ -28,7 +28,6 @@ public class ModerationSlotController : ControllerBase
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
         slot.TeamPick = true;
-        this.database.Cases.Add(ModerationCase.NewTeamPickCase(user.UserId, slot.SlotId, true));
 
         await this.database.SaveChangesAsync();
         return this.Ok();
@@ -43,7 +42,6 @@ public class ModerationSlotController : ControllerBase
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
         slot.TeamPick = false;
-        this.database.Cases.Add(ModerationCase.NewTeamPickCase(user.UserId, slot.SlotId, false));
 
         await this.database.SaveChangesAsync();
         return this.Ok();
@@ -59,7 +57,6 @@ public class ModerationSlotController : ControllerBase
         if (slot == null) return this.Ok();
 
         await this.database.RemoveSlot(slot);
-        this.database.Cases.Add(ModerationCase.NewLevelDeletionCase(user.UserId, slot.SlotId));
 
         return this.Ok();
     }

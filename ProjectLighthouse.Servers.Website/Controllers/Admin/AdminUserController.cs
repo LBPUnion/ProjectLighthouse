@@ -96,8 +96,7 @@ public class AdminUserController : ControllerBase
                 Logger.Error($"Failed to delete planet resource {hash}\n{e}", LogArea.Admin);
             }
         }
-
-        this.database.Cases.Add(ModerationCase.NewPlanetDeletionCase(user.UserId, targetedUser.UserId));
+        
         await this.database.SaveChangesAsync();
 
         return this.Redirect($"/user/{targetedUser.UserId}");
