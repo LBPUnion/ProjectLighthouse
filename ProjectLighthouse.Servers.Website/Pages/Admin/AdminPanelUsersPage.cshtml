@@ -61,6 +61,7 @@
                         <select name="role" class="ui selection dropdown">
                             @foreach (PermissionLevel level in Enum.GetValues<PermissionLevel>())
                             {
+                                if(level < 0) continue;
                                 string selected = level == user.PermissionLevel ? " selected" : "";
                         
                                 <option value="@((int)level)"@selected>@level.ToString()</option>

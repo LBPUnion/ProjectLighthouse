@@ -22,13 +22,13 @@
         Debug.Assert(Model.Dismisser != null);
         Debug.Assert(Model.DismissedAt != null);
         
-        <h3 class="ui red header">
+        <h3 class="ui @color header">
             This case was dismissed by <a href="/user/@Model.Dismisser.UserId">@Model.Dismisser.Username</a> on @Model.DismissedAt.Value.ToString("MM/dd/yyyy @ h:mm tt").
         </h3>
     }
     else if (Model.Expired)
     {
-        <h3 class="ui red header">
+        <h3 class="ui @color header">
             This case expired on @Model.ExpiresAt!.Value.ToString("MM/dd/yyyy @ h:mm tt").
         </h3>
     }
@@ -59,8 +59,18 @@
         <b>No description was provided.</b>
     }
     
-    <a class="ui green small button" href="/moderation/case/@Model.CaseId/dismiss">
-        <i class="checkmark icon"></i>
-        <span>Dismiss</span>
-    </a>
+    @if (!Model.Dismissed)
+    {
+        <a class="ui green small button" href="/moderation/case/@Model.CaseId/dismiss">
+            <i class="checkmark icon"></i>
+            <span>Dismiss</span>
+        </a>
+    }
+    else
+    {
+        <a class="ui yellow small button" href="/moderation/case/@Model.CaseId/undoDismiss">
+            <i class="undo icon"></i>
+            <span>Undo dismission</span> @* TODO: fix english here lol wtf is this *@
+        </a>
+    }
 </div>

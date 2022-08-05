@@ -31,6 +31,8 @@ public class CasePage : BaseLayout
         this.SearchValue = name.Replace(" ", string.Empty);
 
         this.Cases = await this.Database.Cases
+            .Include(c => c.Creator)
+            .Include(c => c.Dismisser)
             .OrderByDescending(c => c.CaseId)
             .ToListAsync();
         this.CaseCount = await this.Database.Cases.CountAsync(c => c.Description.Contains(this.SearchValue));
