@@ -96,6 +96,7 @@ public class ListController : ControllerBase
 
     #region Hearted Levels
 
+    // TODO: Implement proper listing of developer slots
     [HttpGet("favouriteSlots/{username}")]
     public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
     {
