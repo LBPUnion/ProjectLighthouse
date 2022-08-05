@@ -22,11 +22,11 @@ public class NewCasePage : BaseLayout
     {
         ModerationCase @case = new()
         {
-            CaseType = (CaseType)type,
-            CaseDescription = description,
-            CaseExpires = expires,
-            CaseCreated = DateTime.Now,
-            CaseCreatorId = 1,
+            Type = (CaseType)type,
+            Description = description,
+            ExpiresAt = expires,
+            CreatedAt = DateTime.Now,
+            CreatorId = 1,
             AffectedId = affectedId,
         };
 

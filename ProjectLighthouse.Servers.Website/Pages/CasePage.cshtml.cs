@@ -33,7 +33,7 @@ public class CasePage : BaseLayout
         this.Cases = await this.Database.Cases
             .OrderByDescending(c => c.CaseId)
             .ToListAsync();
-        this.CaseCount = await this.Database.Cases.CountAsync(c => c.CaseDescription.Contains(this.SearchValue));
+        this.CaseCount = await this.Database.Cases.CountAsync(c => c.Description.Contains(this.SearchValue));
 
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.CaseCount / ServerStatics.PageSize));

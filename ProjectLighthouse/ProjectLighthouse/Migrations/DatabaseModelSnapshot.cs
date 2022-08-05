@@ -41,25 +41,33 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("AffectedId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CaseCreated")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("CaseCreatorId")
+                    b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CaseDescription")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("CaseExpires")
+                    b.Property<DateTime?>("DismissedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("CaseType")
+                    b.Property<int?>("DismisserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("CaseId");
 
-                    b.HasIndex("CaseCreatorId");
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("DismisserId");
 
                     b.ToTable("Cases");
                 });
@@ -690,9 +698,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("ApprovedIPAddress")
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("Banned")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("BannedReason")
                         .HasColumnType("longtext");
 
@@ -919,13 +924,19 @@ namespace ProjectLighthouse.Migrations
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.ModerationCase", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "CaseCreator")
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Creator")
                         .WithMany()
-                        .HasForeignKey("CaseCreatorId")
+                        .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CaseCreator");
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Dismisser")
+                        .WithMany()
+                        .HasForeignKey("DismisserId");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Dismisser");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.Reports.GriefReport", b =>

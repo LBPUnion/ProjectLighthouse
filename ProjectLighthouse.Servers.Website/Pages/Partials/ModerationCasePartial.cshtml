@@ -1,3 +1,4 @@
+@using System.Diagnostics
 @using LBPUnion.ProjectLighthouse
 @using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Configuration
@@ -7,43 +8,59 @@
 
 @{
     Database database = new();
-    string color = Model.Expired ? "red" : "green";
+    string color = "blue";
+
+    if (Model.Expired) color = "yellow";
+    if (Model.Dismissed) color = "green";
 }
 
 <div class="ui @color segment">
-    <h2>Case #@Model.CaseId: @Model.CaseType</h2>
-    @if (Model.Expired)
+    <h2>Case #@Model.CaseId: @Model.Type</h2>
+    
+    @if (Model.Dismissed)
     {
+        Debug.Assert(Model.Dismisser != null);
+        Debug.Assert(Model.DismissedAt != null);
+        
         <h3 class="ui red header">
-            This case expired on @Model.CaseExpires!.Value.ToString("MM/dd/yyyy @ h:mm tt").
+            This case was dismissed by <a href="/user/@Model.Dismisser.UserId">@Model.Dismisser.Username</a> on @Model.DismissedAt.Value.ToString("MM/dd/yyyy @ h:mm tt").
         </h3>
     }
-
+    else if (Model.Expired)
+    {
+        <h3 class="ui red header">
+            This case expired on @Model.ExpiresAt!.Value.ToString("MM/dd/yyyy @ h:mm tt").
+        </h3>
+    }
+    
     <span>
-        Case created by <a href="/user/@Model.CaseCreator!.UserId">@Model.CaseCreator.Username</a>
-        on @Model.CaseCreated.ToString("MM/dd/yyyy @ h:mm tt")
+        Case created by <a href="/user/@Model.Creator!.UserId">@Model.Creator.Username</a>
+        on @Model.CreatedAt.ToString("MM/dd/yyyy @ h:mm tt")
     </span><br>
     
-    @if (Model.CaseType.AffectsLevel())
+    @if (Model.Type.AffectsLevel())
     {
         Slot slot = await Model.GetSlotAsync(database);
         <p><strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name</a></p>
     }
-    else if (Model.CaseType.AffectsUser())
+    else if (Model.Type.AffectsUser())
     {
         User user = await Model.GetUserAsync(database);
         <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
     }
     
-    @if (!string.IsNullOrWhiteSpace(Model.CaseDescription))
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
     {
         <h3>Description</h3>
-        <pre>@Model.CaseDescription</pre>
+        <pre>@Model.Description</pre>
     }
     else
     {
         <b>No description was provided.</b>
     }
     
-    <a href="/moderation/case/@Model.CaseId/expire"></a>
+    <a class="ui green small button" href="/moderation/case/@Model.CaseId/dismiss">
+        <i class="checkmark icon"></i>
+        <span>Dismiss</span>
+    </a>
 </div>

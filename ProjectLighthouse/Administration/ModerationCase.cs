@@ -15,32 +15,38 @@ public class ModerationCase
     [Key]
     public int CaseId { get; set; }
     
-    public CaseType CaseType { get; set; }
+    public CaseType Type { get; set; }
     
-    public string CaseDescription { get; set; }
+    public string Description { get; set; }
     
-    public DateTime CaseCreated { get; set; }
+    public DateTime CreatedAt { get; set; }
     
-    public DateTime? CaseExpires { get; set; }
-    public bool Expired => this.CaseExpires != null && this.CaseExpires < DateTime.Now;
+    public DateTime? ExpiresAt { get; set; }
+    public bool Expired => this.ExpiresAt != null && this.ExpiresAt < DateTime.Now;
+
+    public DateTime? DismissedAt { get; set; }
+    public bool Dismissed => this.DismissedAt != null;
+    public int? DismisserId { get; set; }
+    [ForeignKey(nameof(DismisserId))]
+    public User? Dismisser { get; set; }
     
-    public int CaseCreatorId { get; set; }
+    public int CreatorId { get; set; }
     
-    [ForeignKey(nameof(CaseCreatorId))]
-    public User? CaseCreator { get; set; }
+    [ForeignKey(nameof(CreatorId))]
+    public User? Creator { get; set; }
     
     public int AffectedId { get; set; }
 
     #region Get affected id result
     public Task<User> GetUserAsync(Database database)
     {
-        Debug.Assert(CaseType.AffectsUser());
+        Debug.Assert(this.Type.AffectsUser());
         return database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId)!;
     }
     
     public Task<Slot> GetSlotAsync(Database database)
     {
-        Debug.Assert(CaseType.AffectsLevel());
+        Debug.Assert(this.Type.AffectsLevel());
         return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId)!;
     }
     #endregion
@@ -54,11 +60,11 @@ public class ModerationCase
     public static ModerationCase NewBanCase(int caseCreator, int userId, string reason, string modNotes, DateTime caseExpires)
         => new()
         {
-            CaseType = CaseType.UserBan,
-            CaseDescription = $"Banned for reason '{reason}'\nModeration notes: {modNotes}",
-            CaseCreatorId = caseCreator,
-            CaseCreated = DateTime.Now,
-            CaseExpires = caseExpires,
+            Type = CaseType.UserBan,
+            Description = $"Banned for reason '{reason}'\nModeration notes: {modNotes}",
+            CreatorId = caseCreator,
+            CreatedAt = DateTime.Now,
+            ExpiresAt = caseExpires,
             AffectedId = userId,
         };
 
