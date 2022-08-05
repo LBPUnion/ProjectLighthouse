@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -18,11 +20,13 @@ public static class MaintenanceHelper
         Commands = getListOfInterfaceObjects<ICommand>();
         MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
         MigrationTasks = getListOfInterfaceObjects<IMigrationTask>();
+        RepeatingTasks = getListOfInterfaceObjects<IRepeatingTask>();
     }
     
     public static List<ICommand> Commands { get; }
     public static List<IMaintenanceJob> MaintenanceJobs { get; }
     public static List<IMigrationTask> MigrationTasks { get; }
+    public static List<IRepeatingTask> RepeatingTasks { get; }
 
     public static async Task<List<LogLine>> RunCommand(string[] args)
     {
