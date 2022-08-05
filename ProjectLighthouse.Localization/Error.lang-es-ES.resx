@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="username_invalid" xml:space="preserve">
+        <value>Debes colocar un nombre de usuario</value>
+    </data>
+  <data name="username_taken" xml:space="preserve">
+        <value>El nombre que elegiste ya está en uso</value>
+    </data>
+  <data name="password_invalid" xml:space="preserve">
+        <value>Debes de crear una contraseña</value>
+    </data>
+  <data name="password_doesnt_match" xml:space="preserve">
+        <value>¡Las contraseñas no coinciden!</value>
+    </data>
+  <data name="token_invalid" xml:space="preserve">
+        <value>Toquen inválido</value>
+    </data>
+  <data name="captcha_failed" xml:space="preserve">
+        <value>Debes completar el captcha correctamente</value>
+    </data>
+  <data name="email_taken" xml:space="preserve">
+        <value>La dirección de correo electrónico que elegiste ya está en uso</value>
+    </data>
+  <data name="email_invalid" xml:space="preserve">
+        <value>Debes de colocar un correo electrónico</value>
+    </data>
+  <data name="user_banned" xml:space="preserve">
+        <value>Has sido vetado. Por favor contacta a un administrador para más información.\n Razón: {0}</value>
+    </data>
+</root>

@@ -1,9 +1,10 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,24 +26,23 @@ public class ListController : ControllerBase
     #region Level Queue (lolcatftw)
 
     [HttpGet("slots/lolcatftw/{username}")]
-    public async Task<IActionResult> GetLevelQueue(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
+    public async Task<IActionResult> GetQueuedLevels(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<QueuedLevel> queuedLevels = this.database.QueuedLevels.Include(q => q.User)
-            .Include(q => q.Slot)
-            .Include(q => q.Slot.Location)
+        IEnumerable<Slot> queuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
             .Include(q => q.Slot.Creator)
-            .Where(q => q.Slot.GameVersion <= gameVersion)
-            .Where(q => q.User.Username == username)
+            .Include(q => q.Slot.Location)
+            .Select(q => q.Slot)
+            .ByGameVersion(gameVersion)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
-        string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize(gameVersion));
+        string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Serialize(gameVersion));
 
         return this.Ok
         (
@@ -104,22 +104,24 @@ public class ListController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<HeartedLevel> heartedLevels = this.database.HeartedLevels.Include(q => q.User)
-            .Include(q => q.Slot)
-            .Include(q => q.Slot.Location)
+        IEnumerable<Slot> heartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
             .Include(q => q.Slot.Creator)
-            .Where(q => q.Slot.GameVersion <= gameVersion)
-            .Where(q => q.User.Username == username)
+            .Include(q => q.Slot.Location)
+            .Select(q => q.Slot)
+            .ByGameVersion(gameVersion)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
-        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Slot.Serialize(gameVersion));
+        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Serialize(gameVersion));
 
         return this.Ok
         (
-            LbpSerializer.TaggedStringElement
-                ("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+            LbpSerializer.TaggedStringElement("favouriteSlots", response, new Dictionary<string, object>
+            {
+                { "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username) },
+                { "hint_start", pageStart + Math.Min(pageSize, 30) },
+            })
         );
     }
 
@@ -176,8 +178,11 @@ public class ListController : ControllerBase
 
         return this.Ok
         (
-            LbpSerializer.TaggedStringElement
-                ("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Count(q => q.User.Username == username))
+            LbpSerializer.TaggedStringElement("favouriteUsers", response, new Dictionary<string, object>
+            {
+                { "total", this.database.HeartedProfiles.Include(q => q.User).Count(q => q.User.Username == username) },
+                { "hint_start", pageStart + Math.Min(pageSize, 30) },
+            })
         );
     }
 

@@ -8,7 +8,6 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,9 +40,16 @@ public class PublishController : ControllerBase
         GameToken gameToken = userAndToken.Value.Item2;
 
         Slot? slot = await this.getSlotFromBody();
-        if (slot == null) return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
+        if (slot == null) {
+            Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
+            return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
+        }
 
-        if (string.IsNullOrEmpty(slot.RootLevel)) return this.BadRequest();
+        if (string.IsNullOrEmpty(slot.RootLevel))
+        {
+            Logger.Warn("Rejecting level upload, slot does not include rootLevel", LogArea.Publish);
+            return this.BadRequest();
+        }
 
         if (string.IsNullOrEmpty(slot.ResourceCollection)) slot.ResourceCollection = slot.RootLevel;
 
@@ -51,8 +57,16 @@ public class PublishController : ControllerBase
         if (slot.SlotId != 0)
         {
             Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
-            if (oldSlot == null) return this.NotFound();
-            if (oldSlot.CreatorId != user.UserId) return this.BadRequest();
+            if (oldSlot == null)
+            {
+                Logger.Warn("Rejecting level reupload, could not find old slot", LogArea.Publish);
+                return this.NotFound();
+            }
+            if (oldSlot.CreatorId != user.UserId)
+            {
+                Logger.Warn("Rejecting level reupload, old slot's creator is not publishing user", LogArea.Publish);
+                return this.BadRequest();
+            }
         }
         else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
@@ -127,6 +141,11 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
+        GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
+
+        slot.GameVersion = slotVersion;
+        if (slotVersion == GameVersion.Unknown) slot.GameVersion = gameToken.GameVersion;
+
         // Republish logic
         if (slot.SlotId != 0)
         {
@@ -177,16 +196,6 @@ public class PublishController : ControllerBase
 
             slot.TeamPick = oldSlot.TeamPick;
 
-            // Only update a slot's gameVersion if the level was actually change
-            if (oldSlot.RootLevel != slot.RootLevel)
-            {
-                slot.GameVersion = gameToken.GameVersion;
-            }
-            else
-            {
-                slot.GameVersion = oldSlot.GameVersion;
-            }
-
             if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
             {
                 slot.MinimumPlayers = 1;
@@ -198,7 +207,7 @@ public class PublishController : ControllerBase
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
-        if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+        if (user.GetUsedSlotsForGame(slotVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
             return this.BadRequest();
@@ -216,7 +225,6 @@ public class PublishController : ControllerBase
         slot.CreatorId = user.UserId;
         slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
         slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
-        slot.GameVersion = gameToken.GameVersion;
 
         if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
         {
@@ -226,13 +234,13 @@ public class PublishController : ControllerBase
 
         this.database.Slots.Add(slot);
         await this.database.SaveChangesAsync();
-
-        await WebhookHelper.SendWebhook
-        (
-            "New level published!",
-            $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}"
-        );
         
+        if (user.LevelVisibility == PrivacyType.All)
+        {
+            await WebhookHelper.SendWebhook("New level published!",
+                $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}");
+        }
+
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
         return this.Ok(slot.Serialize(gameToken.GameVersion));

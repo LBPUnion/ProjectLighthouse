@@ -4,12 +4,13 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;
 
-public class AuthenticationTests : LighthouseServerTest
+public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
 {
     [Fact]
     public async Task ShouldReturnErrorOnNoPostData()

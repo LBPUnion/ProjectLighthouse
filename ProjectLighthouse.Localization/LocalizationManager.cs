@@ -7,10 +7,12 @@ namespace LBPUnion.ProjectLighthouse.Localization;
 public static class LocalizationManager
 {
     private static readonly string namespaceStr = typeof(LocalizationManager).Namespace ?? "";
-    public const string DefaultLang = "en-US";
+    public const string DefaultLang = "en";
 
     public static string GetLocalizedString(TranslationAreas translationArea, string language, string key)
     {
+//        return $"{translationArea.ToString()}.{language}.{key}";
+
         // ASP.NET requires specific names for certain languages (like ja for japanese as opposed to the standard ja-JP)
         // We map that value back here.
         language = mapLanguageBack(language);
@@ -21,7 +23,7 @@ public static class LocalizationManager
 
         string resourceBasename = $"{namespaceStr}.{translationArea.ToString()}";
 
-        // We don't have an en-US .resx, so if we aren't using en-US then we need to add the appropriate language.
+        // We don't have an en .resx, so if we aren't using en then we need to add the appropriate language.
         // Otherwise, keep it to the normal .resx file
         // e.g. BaseLayout.resx as opposed to BaseLayout.lang-da-DK.resx.
         if (language != DefaultLang) resourceBasename += $".lang-{language}";
@@ -47,7 +49,7 @@ public static class LocalizationManager
             return $"{translationArea.ToString()}.{language}.{key}";
         }
 
-        return localizedString;
+        return localizedString.Replace("\\n", "\n");
     }
 
     // If a language isn't working, it might be because a language is using a different name than what ASP.NET expects.

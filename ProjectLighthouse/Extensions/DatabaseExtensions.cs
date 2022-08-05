@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
@@ -19,6 +18,8 @@ public static class DatabaseExtensions
     public static IQueryable<Slot> ByGameVersion
         (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
     {
+        query = query.Where(s => s.Type == SlotType.User);
+
         if (includeCreatorAndLocation)
         {
             query = query.Include(s => s.Creator).Include(s => s.Location);
@@ -56,6 +57,9 @@ public static class DatabaseExtensions
         return query;
     }
 
-    public static async Task<bool> Has<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> predicate) => 
-        await queryable.FirstOrDefaultAsync(predicate) != null;
+    public static async Task<bool> Has<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> predicate) 
+        => await queryable.FirstOrDefaultAsync(predicate) != null;
+
+    public static void RemoveWhere<T>(this DbSet<T> queryable, Expression<Func<T, bool>> predicate) where T : class 
+        => queryable.RemoveRange(queryable.Where(predicate));
 }

@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -28,7 +29,7 @@ public class RegisterForm : BaseLayout
             if (this.Request.Query.ContainsKey("token"))
             {
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
-                    return this.StatusCode(403, "Invalid Token");
+                    return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
             }
             else
             {
@@ -42,44 +43,44 @@ public class RegisterForm : BaseLayout
 
         if (string.IsNullOrWhiteSpace(username))
         {
-            this.Error = "The username field is blank.";
+            this.Error = this.Translate(ErrorStrings.UsernameInvalid);
             return this.Page();
         }
 
         if (string.IsNullOrWhiteSpace(password))
         {
-            this.Error = "Password field is required.";
+            this.Error = this.Translate(ErrorStrings.PasswordInvalid);
             return this.Page();
         }
 
         if (string.IsNullOrWhiteSpace(emailAddress) && ServerConfiguration.Instance.Mail.MailEnabled)
         {
-            this.Error = "Email address field is required.";
+            this.Error = this.Translate(ErrorStrings.EmailInvalid);
             return this.Page();
         }
 
         if (password != confirmPassword)
         {
-            this.Error = "Passwords do not match!";
+            this.Error = this.Translate(ErrorStrings.PasswordDoesntMatch);
             return this.Page();
         }
 
         if (await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null)
         {
-            this.Error = "The username you've chosen is already taken.";
+            this.Error = this.Translate(ErrorStrings.UsernameTaken);
             return this.Page();
         }
 
         if (ServerConfiguration.Instance.Mail.MailEnabled &&
             await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == emailAddress.ToLower()) != null)
         {
-            this.Error = "The email address you've chosen is already taken.";
+            this.Error = this.Translate(ErrorStrings.EmailTaken);
             return this.Page();
         }
 
         if (!await this.Request.CheckCaptchaValidity())
         {
-            this.Error = "You must complete the captcha correctly.";
+            this.Error = this.Translate(ErrorStrings.CaptchaFailed);
             return this.Page();
         }
 
@@ -94,6 +95,7 @@ public class RegisterForm : BaseLayout
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
+            ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
         };
 
         this.Database.WebTokens.Add(webToken);
@@ -116,7 +118,7 @@ public class RegisterForm : BaseLayout
             if (this.Request.Query.ContainsKey("token"))
             {
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
-                    return this.StatusCode(403, "Invalid Token");
+                    return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
             }
             else
             {

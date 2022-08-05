@@ -18,12 +18,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="currently_online" xml:space="preserve">
-        <value>Currently online on {0} on {1}</value>
+        <value>متصل حاليا على {0} في {1}</value>
     </data>
   <data name="offline" xml:space="preserve">
-        <value>Offline</value>
+        <value>غير مُتصل</value>
     </data>
   <data name="last_online" xml:space="preserve">
-        <value>Offline since {0}</value>
+        <value>غير متصل منذ {0}</value>
     </data>
 </root>

@@ -15,6 +15,7 @@ public class SlotPage : BaseLayout
 {
     public List<Comment> Comments = new();
     public List<Review> Reviews = new();
+    public List<Photo> Photos = new();
 
     public readonly bool CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
@@ -25,8 +26,34 @@ public class SlotPage : BaseLayout
 
     public async Task<IActionResult> OnGet([FromRoute] int id)
     {
-        Slot? slot = await this.Database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
+        Slot? slot = await this.Database.Slots.Include
+                (s => s.Creator)
+            .Where(s => s.Type == SlotType.User)
+            .FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+        System.Diagnostics.Debug.Assert(slot.Creator != null);
+
+        // Determine if user can view slot according to creator's privacy settings
+        if (this.User == null || !this.User.IsAdmin)
+        {
+            switch (slot.Creator.ProfileVisibility)
+            {
+                case PrivacyType.PSN:
+                {
+                    if (this.User != null) return this.NotFound();
+
+                    break;
+                }
+                case PrivacyType.Game:
+                {
+                    if (slot.Creator != this.User) return this.NotFound();
+
+                    break;
+                }
+                case PrivacyType.All: break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
 
         this.Slot = slot;
 
@@ -56,6 +83,12 @@ public class SlotPage : BaseLayout
         {
             this.Reviews = new List<Review>();
         }
+
+        this.Photos = await this.Database.Photos.Include(p => p.Creator)
+            .OrderByDescending(p => p.Timestamp)
+            .Where(r => r.SlotId == id)
+            .Take(10)
+            .ToListAsync();
 
         if (this.User == null) return this.Page();
 

@@ -36,6 +36,21 @@
         <value>Iniciar Sessão</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+        <value>Desconhecido</value>
+    </data>
+  <data name="success" xml:space="preserve">
+        <value>Sucesso!</value>
+    </data>
+  <data name="reset_password" xml:space="preserve">
+        <value>Repor Palavra-passe</value>
+    </data>
+  <data name="recent_activity" xml:space="preserve">
+        <value>Atividades Recentes</value>
+    </data>
+  <data name="soon" xml:space="preserve">
+        <value>Em breve!</value>
+    </data>
+  <data name="recent_photos" xml:space="preserve">
+        <value>Fotos mais recentes</value>
     </data>
 </root>

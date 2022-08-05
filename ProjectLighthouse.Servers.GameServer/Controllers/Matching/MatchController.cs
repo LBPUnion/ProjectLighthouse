@@ -8,7 +8,6 @@ using LBPUnion.ProjectLighthouse.Match.MatchCommands;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -71,7 +70,7 @@ public class MatchController : ControllerBase
 
         #endregion
 
-        await LastContactHelper.SetLastContact(user, gameToken.GameVersion, gameToken.Platform);
+        await LastContactHelper.SetLastContact(this.database, user, gameToken.GameVersion, gameToken.Platform);
 
         #region Process match data
 

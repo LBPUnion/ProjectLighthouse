@@ -13,7 +13,7 @@ public class ReportPage : BaseLayout
     public ReportPage(Database database) : base(database)
     {}
 
-    public GriefReport Report;
+    public GriefReport Report = null!; // Report is not used if it's null in OnGet
     
     public async Task<IActionResult> OnGet([FromRoute] int reportId)
     {

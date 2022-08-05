@@ -1,5 +1,6 @@
+@using System.Globalization
+@using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.PlayerData
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.PlayerData.Photo
 
 
@@ -18,6 +19,27 @@
         <b>
             <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a>
         </b>
+        @if (Model.Slot != null)
+        {
+            switch (Model.Slot.Type)
+            {
+                case SlotType.User:
+                    <span>
+                        in level <b><a href="/slot/@Model.SlotId">@Model.Slot.Name</a></b>
+                    </span>
+                    break;
+                case SlotType.Developer:
+                    <span>in a story mode level</span>
+                    break;
+                case SlotType.Pod:
+                    <span>in the pod</span>
+                    break;
+                case SlotType.Local:
+                    <span>in a level on the moon</span>
+                    break;
+            }
+        }
+        at @DateTime.UnixEpoch.AddSeconds(Model.Timestamp).ToString(CultureInfo.CurrentCulture)
     </i>
 </p>
 

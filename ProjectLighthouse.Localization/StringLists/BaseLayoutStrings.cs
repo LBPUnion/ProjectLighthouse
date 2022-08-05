@@ -14,5 +14,15 @@ public static class BaseLayoutStrings
     public static readonly TranslatableString HeaderModPanel = create("header_modPanel");
     public static readonly TranslatableString HeaderLogout = create("header_logout");
 
+    public static readonly TranslatableString GeneratedBy = create("generated_by");
+    public static readonly TranslatableString GeneratedModified = create("generated_modified");
+
+    public static readonly TranslatableString JavaScriptWarnTitle = create("js_warn_title");
+    public static readonly TranslatableString JavaScriptWarn = create("js_warn");
+    public static readonly TranslatableString LicenseWarnTitle = create("license_warn_title");
+    public static readonly TranslatableString LicenseWarn1 = create("license_warn_1");
+    public static readonly TranslatableString LicenseWarn2 = create("license_warn_2");
+    public static readonly TranslatableString LicenseWarn3 = create("license_warn_3");
+
     private static TranslatableString create(string key) => new(TranslationAreas.BaseLayout, key);
 }

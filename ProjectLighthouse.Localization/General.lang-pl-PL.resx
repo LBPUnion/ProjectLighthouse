@@ -36,6 +36,21 @@
         <value>Zaloguj się</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+        <value>Nieznane</value>
+    </data>
+  <data name="success" xml:space="preserve">
+        <value>Sukces!</value>
+    </data>
+  <data name="reset_password" xml:space="preserve">
+        <value>Zresetuj Hasło</value>
+    </data>
+  <data name="recent_activity" xml:space="preserve">
+        <value>Ostatnia Aktywność</value>
+    </data>
+  <data name="soon" xml:space="preserve">
+        <value>Dostępne wkrótce!</value>
+    </data>
+  <data name="recent_photos" xml:space="preserve">
+        <value>Ostatnie zdjęcia</value>
     </data>
 </root>

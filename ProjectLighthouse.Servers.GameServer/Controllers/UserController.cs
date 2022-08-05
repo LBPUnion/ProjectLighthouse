@@ -104,9 +104,15 @@ public class UserController : ControllerBase
             user.Biography = update.Biography;
         }
 
+        // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
         {
-            if (resource != null && !resource.StartsWith('g') && !FileHelper.ResourceExists(resource)) return this.BadRequest();
+            if (resource == "0") continue;
+
+            if (resource != null && !resource.StartsWith('g') && !FileHelper.ResourceExists(resource))
+            {
+                return this.BadRequest();
+            }
         }
 
         if (update.IconHash != null) user.IconHash = update.IconHash;

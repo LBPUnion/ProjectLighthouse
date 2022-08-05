@@ -1,4 +1,5 @@
 #nullable enable
+using System.Globalization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -75,9 +76,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             $"token.Used: {gameToken.Used}\n" +
             $"token.UserLocation: {gameToken.UserLocation}\n" +
             $"token.GameVersion: {gameToken.GameVersion}\n" +
+            $"token.ExpiresAt: {gameToken.ExpiresAt.ToString(CultureInfo.CurrentCulture)}\n" +
             "---DEBUG INFO---" +
             #endif
-            "\n"
+            (announceText != "" ? "\n" : "")
         );
     }
 

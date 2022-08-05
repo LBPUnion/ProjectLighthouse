@@ -1,6 +1,7 @@
 @page "/user/{userId:int}"
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
@@ -9,7 +10,7 @@
     Layout = "Layouts/BaseLayout";
     Model.ShowTitleInPage = false;
 
-    Model.Title = Model.ProfileUser!.Username + "'s user page";
+    Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
     Model.Description = Model.ProfileUser!.Biography;
 }
 
@@ -74,16 +75,16 @@
         {
             <a class="ui blue button" href="/passwordReset">
                 <i class="key icon"></i>
-                <span>Reset Password</span>
+                <span>@Model.Translate(GeneralStrings.ResetPassword)</span>
             </a>
         }
     </div>
     <div class="eight wide column">
         <div class="ui blue segment">
-            <h2>Biography</h2>
+            <h2>@Model.Translate(ProfileStrings.Biography)</h2>
             @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
             {
-                <p>@Model.ProfileUser.Username hasn't introduced themselves yet</p>
+                <p>@Model.Translate(ProfileStrings.NoBiography, Model.ProfileUser.Username)</p>
             }
             else
             {
@@ -93,8 +94,8 @@
     </div>
     <div class="eight wide column">
         <div class="ui red segment">
-            <h2>Recent Activity</h2>
-            <p>Coming soon?</p>
+            <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
+            <p>@Model.Translate(GeneralStrings.Soon)</p>
         </div>
     </div>
 </div>
@@ -103,7 +104,7 @@
 @if (Model.Photos != null && Model.Photos.Count != 0)
 {
     <div class="ui purple segment">
-        <h2>Most recent photos</h2>
+        <h2>@Model.Translate(GeneralStrings.RecentPhotos)</h2>
 
         <div class="ui center aligned grid">
             @foreach (Photo photo in Model.Photos)

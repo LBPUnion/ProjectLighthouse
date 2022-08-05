@@ -45,7 +45,7 @@ public class WebsiteStartup
         {
             List<CultureInfo> languages = LocalizationManager.GetAvailableLanguages().Select(l => new CultureInfo(LocalizationManager.MapLanguage(l))).ToList();
 
-            config.DefaultRequestCulture = new RequestCulture(new CultureInfo("en-US"));
+            config.DefaultRequestCulture = new RequestCulture(new CultureInfo("en"));
 
             config.SupportedCultures = languages;
             config.SupportedUICultures = languages;

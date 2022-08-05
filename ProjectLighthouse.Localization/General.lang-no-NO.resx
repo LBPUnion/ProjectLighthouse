@@ -36,6 +36,21 @@
         <value>Logg in</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+        <value>Ukjent</value>
+    </data>
+  <data name="success" xml:space="preserve">
+        <value>Suksess!</value>
+    </data>
+  <data name="reset_password" xml:space="preserve">
+        <value>Tilbakestill passord</value>
+    </data>
+  <data name="recent_activity" xml:space="preserve">
+        <value>Nyglig aktivitet</value>
+    </data>
+  <data name="soon" xml:space="preserve">
+        <value>Kommer snart!</value>
+    </data>
+  <data name="recent_photos" xml:space="preserve">
+        <value>Siste bilder</value>
     </data>
 </root>

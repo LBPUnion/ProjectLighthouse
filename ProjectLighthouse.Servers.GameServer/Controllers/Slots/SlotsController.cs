@@ -3,11 +3,11 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.Match.Rooms;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,6 +63,72 @@ public class SlotsController : ControllerBase
             )
         );
     }
+
+    [HttpGet("slotList")]
+    public async Task<IActionResult> GetSlotListAlt([FromQuery] int[] s)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        List<string?> serializedSlots = new();
+        foreach (int slotId in s)
+        {
+            Slot? slot = await this.database.Slots.Include(t => t.Creator).Include(t => t.Location).Where(t => t.SlotId == slotId && t.Type == SlotType.User).FirstOrDefaultAsync();
+            if (slot == null)
+            {
+                slot = await this.database.Slots.Where(t => t.InternalSlotId == slotId && t.Type == SlotType.Developer).FirstOrDefaultAsync();
+                if (slot == null)
+                {
+                    serializedSlots.Add($"<slot type=\"developer\"><id>{slotId}</id></slot>");
+                    continue;
+                }
+            }
+            serializedSlots.Add(slot.Serialize());
+        }
+        string serialized = serializedSlots.Aggregate(string.Empty, (current, slot) => slot == null ? current : current + slot);
+
+        return this.Ok(LbpSerializer.TaggedStringElement("slots", serialized, "total", serializedSlots.Count));
+    }
+
+    [HttpGet("slots/developer")]
+    public async Task<IActionResult> StoryPlayers()
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        List<int> activeSlotIds = RoomHelper.Rooms.Where(r => r.Slot.SlotType == SlotType.Developer).Select(r => r.Slot.SlotId).ToList();
+
+        List<string> serializedSlots = new();
+
+        foreach (int id in activeSlotIds)
+        {
+            int placeholderSlotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
+            Slot slot = await this.database.Slots.FirstAsync(s => s.SlotId == placeholderSlotId);
+            serializedSlots.Add(slot.SerializeDevSlot(false));
+        }
+
+        string serialized = serializedSlots.Aggregate(string.Empty, (current, slot) => current + slot);
+
+        return this.Ok(LbpSerializer.StringElement("slots", serialized));
+    }
+
+    [HttpGet("s/developer/{id:int}")]
+    public async Task<IActionResult> SDev(int id)
+    {
+        User? user = await this.database.UserFromGameRequest(this.Request);
+        if (user == null) return this.StatusCode(403, "");
+
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        int slotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
+        Slot slot = await this.database.Slots.FirstAsync(s => s.SlotId == slotId);
+
+        return this.Ok(slot.SerializeDevSlot());
+    } 
 
     [HttpGet("s/user/{id:int}")]
     public async Task<IActionResult> SUser(int id)
@@ -353,6 +419,69 @@ public class SlotsController : ControllerBase
             )
         );
     }
+    
+    // /slots/busiest?pageStart=1&pageSize=30&gameFilterType=both&players=1&move=true
+    [HttpGet("slots/busiest")]
+    public async Task<IActionResult> BusiestLevels
+    (
+        [FromQuery] int pageStart,
+        [FromQuery] int pageSize,
+        [FromQuery] string? gameFilterType = null,
+        [FromQuery] int? players = null,
+        [FromQuery] bool? move = null
+    )
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        Dictionary<int, int> playersBySlotId = new();
+
+        foreach (Room room in RoomHelper.Rooms)
+        {
+            // TODO: support developer slotTypes?
+            if(room.Slot.SlotType != SlotType.User) continue;
+
+            if (!playersBySlotId.TryGetValue(room.Slot.SlotId, out int playerCount)) 
+                playersBySlotId.Add(room.Slot.SlotId, 0);
+
+            playerCount += room.PlayerIds.Count;
+
+            playersBySlotId.Remove(room.Slot.SlotId);
+            playersBySlotId.Add(room.Slot.SlotId, playerCount);
+        }
+
+        IEnumerable<int> orderedPlayersBySlotId = playersBySlotId
+            .Skip(pageStart - 1)
+            .Take(Math.Min(pageSize, 30))
+            .OrderByDescending(kvp => kvp.Value)
+            .Select(kvp => kvp.Key);
+        
+        List<Slot> slots = new();
+
+        foreach (int slotId in orderedPlayersBySlotId)
+        {
+            Slot? slot = await this.database.Slots.ByGameVersion(token.GameVersion, false, true)
+                .FirstOrDefaultAsync(s => s.SlotId == slotId);
+            if(slot == null) continue; // shouldn't happen ever unless the room is borked
+            
+            slots.Add(slot);
+        }
+
+        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
+
+        return this.Ok(LbpSerializer.TaggedStringElement("slots",
+            response,
+            new Dictionary<string, object>
+            {
+                {
+                    "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+                },
+                {
+                    "total", playersBySlotId.Count
+                },
+            }));
+    }
+
 
     private GameVersion getGameFilter(string? gameFilterType, GameVersion version)
     {
@@ -394,10 +523,10 @@ public class SlotsController : ControllerBase
         if (gameFilterType == "both")
             // Get game versions less than the current version
             // Needs support for LBP3 ("both" = LBP1+2)
-            whereSlots = this.database.Slots.Where(s => s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
         else
             // Get game versions exactly equal to gamefiltertype
-            whereSlots = this.database.Slots.Where(s => s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
 
         return whereSlots.Include(s => s.Creator).Include(s => s.Location);
     }

@@ -5,7 +5,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>LBPUnion.ProjectLighthouse.Localization</RootNamespace>
-        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,6 +23,18 @@
         <EmbeddedResource Update="Status.resx">
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Status.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Register.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Register.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Error.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Error.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Profile.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Profile.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="ModPanel.resx">
           <Generator>ResXFileCodeGenerator</Generator>

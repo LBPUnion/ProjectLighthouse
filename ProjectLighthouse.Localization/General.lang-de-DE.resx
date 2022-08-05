@@ -36,6 +36,21 @@
         <value>Anmelden</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+        <value>Unbekannt</value>
+    </data>
+  <data name="success" xml:space="preserve">
+        <value>Erfolg!</value>
+    </data>
+  <data name="reset_password" xml:space="preserve">
+        <value>Passwort zurücksetzen</value>
+    </data>
+  <data name="recent_activity" xml:space="preserve">
+        <value>Letzte Aktivitäten</value>
+    </data>
+  <data name="soon" xml:space="preserve">
+        <value>Kommt bald!</value>
+    </data>
+  <data name="recent_photos" xml:space="preserve">
+        <value>Neueste Fotos</value>
     </data>
 </root>

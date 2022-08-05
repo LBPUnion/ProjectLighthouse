@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -40,13 +41,14 @@ public class Slot
     }
 
     [XmlAttribute("type")]
-    [NotMapped]
     [JsonIgnore]
-    public string Type { get; set; } = "user";
+    public SlotType Type { get; set; } = SlotType.User;
 
     [Key]
     [XmlElement("id")]
     public int SlotId { get; set; }
+
+    public int InternalSlotId { get; set; }
 
     [XmlElement("name")]
     public string Name { get; set; } = "";
@@ -140,6 +142,16 @@ public class Slot
     [NotMapped]
     [JsonIgnore]
     public int Comments => this.database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
+
+    [XmlIgnore]
+    [NotMapped]
+    [JsonIgnore]
+    public int Photos => this.database.Photos.Count(p => p.SlotId == this.SlotId);
+
+    [XmlIgnore]
+    [NotMapped]
+    [JsonIgnore]
+    public int PhotosWithAuthor => this.database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId);
 
     [XmlIgnore]
     [NotMapped]
@@ -240,6 +252,31 @@ public class Slot
                LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
     }
 
+    public string SerializeDevSlot(bool includeExtras = true)
+    {
+
+        int comments = 0, photos = 0;
+        if (includeExtras)
+        {
+            comments = this.database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
+
+            photos = this.database.Photos.Count(c => c.SlotId == this.SlotId);
+        }
+        
+        int players = RoomHelper.Rooms
+            .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)
+            .Sum(r => r.PlayerIds.Count);
+
+        string slotData = LbpSerializer.StringElement("id", this.InternalSlotId) +
+                          LbpSerializer.StringElement("playerCount", players);
+
+        if(includeExtras)
+            slotData += LbpSerializer.StringElement("commentCount", comments) +
+                        LbpSerializer.StringElement("photoCount", photos);
+
+        return LbpSerializer.TaggedStringElement("slot", slotData, "type", "developer");
+    }
+
     public string Serialize
     (
         GameVersion gameVersion = GameVersion.LittleBigPlanet1,
@@ -248,6 +285,8 @@ public class Slot
         Review? yourReview = null
     )
     {
+        if (this.Type == SlotType.Developer) return this.SerializeDevSlot();
+
         int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
 
         string slotData = LbpSerializer.StringElement("name", this.Name) +
@@ -274,6 +313,8 @@ public class Slot
                           LbpSerializer.StringElement("mmpick", this.TeamPick) +
                           LbpSerializer.StringElement("heartCount", this.Hearts) +
                           LbpSerializer.StringElement("playCount", this.Plays) +
+                          LbpSerializer.StringElement("photoCount", this.Photos) +
+                          LbpSerializer.StringElement("authorPhotoCount", this.PhotosWithAuthor) +
                           LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
                           LbpSerializer.StringElement("completionCount", this.PlaysComplete) +

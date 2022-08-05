@@ -75,7 +75,7 @@ public class ResourcesController : ControllerBase
 
         FileHelper.EnsureDirectoryCreated(assetsDirectory);
         // lbp treats code 409 as success and as an indicator that the file is already present
-        if (FileHelper.ResourceExists(hash)) this.Conflict();
+        if (FileHelper.ResourceExists(hash)) return this.Conflict();
 
         Logger.Info($"Processing resource upload (hash: {hash})", LogArea.Resources);
         LbpFile file = new(await readFromPipeReader(this.Request.BodyReader));

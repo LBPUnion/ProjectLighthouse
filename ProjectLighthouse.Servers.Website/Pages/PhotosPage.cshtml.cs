@@ -40,6 +40,7 @@ public class PhotosPage : BaseLayout
 
         this.Photos = await this.Database.Photos.Include
                 (p => p.Creator)
+            .Include(p => p.Slot)
             .Where(p => p.Creator!.Username.Contains(this.SearchValue) || p.PhotoSubjectCollection.Contains(this.SearchValue))
             .OrderByDescending(p => p.Timestamp)
             .Skip(pageNumber * ServerStatics.PageSize)

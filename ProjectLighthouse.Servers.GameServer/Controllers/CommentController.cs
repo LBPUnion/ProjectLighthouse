@@ -23,11 +23,13 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost("rateUserComment/{username}")]
-    [HttpPost("rateComment/user/{slotId:int}")]
-    public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, int? slotId)
+    [HttpPost("rateComment/{slotType}/{slotId:int}")]
+    public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
+
+        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         bool success = await this.database.RateComment(user, commentId, rating);
         if (!success) return this.BadRequest();
@@ -35,20 +37,26 @@ public class CommentController : ControllerBase
         return this.Ok();
     }
 
-    [HttpGet("comments/user/{slotId:int}")]
+    [HttpGet("comments/{slotType}/{slotId:int}")]
     [HttpGet("userComments/{username}")]
-    public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, int? slotId)
+    public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, string? slotType, int slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        int targetId = slotId.GetValueOrDefault();
+        int targetId = slotId;
         CommentType type = CommentType.Level;
         if (!string.IsNullOrWhiteSpace(username))
         {
             targetId = this.database.Users.First(u => u.Username.Equals(username)).UserId;
             type = CommentType.Profile;
         }
+        else
+        {
+            if (SlotHelper.IsTypeInvalid(slotType) || slotId == 0) return this.BadRequest();
+        }
+
+        if (type == CommentType.Level && slotType == "developer") targetId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
         List<Comment> comments = await this.database.Comments.Include
                 (c => c.Poster)
@@ -72,8 +80,8 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost("postUserComment/{username}")]
-    [HttpPost("postComment/user/{slotId:int}")]
-    public async Task<IActionResult> PostComment(string? username, int? slotId)
+    [HttpPost("postComment/{slotType}/{slotId:int}")]
+    public async Task<IActionResult> PostComment(string? username, string? slotType, int slotId)
     {
         User? poster = await this.database.UserFromGameRequest(this.Request);
         if (poster == null) return this.StatusCode(403, "");
@@ -86,13 +94,17 @@ public class CommentController : ControllerBase
 
         SanitizationHelper.SanitizeStringsInClass(comment);
 
-        CommentType type = (slotId.GetValueOrDefault() == 0 ? CommentType.Profile : CommentType.Level);
+        CommentType type = (slotId == 0 ? CommentType.Profile : CommentType.Level);
+
+        if (type == CommentType.Level && (SlotHelper.IsTypeInvalid(slotType) || slotId == 0)) return this.BadRequest();
 
         if (comment == null) return this.BadRequest();
 
-        int targetId = slotId.GetValueOrDefault();
+        int targetId = slotId;
 
         if (type == CommentType.Profile) targetId = this.database.Users.First(u => u.Username == username).UserId;
+
+        if (slotType == "developer") targetId = await SlotHelper.GetPlaceholderSlotId(this.database, targetId, SlotType.Developer);
 
         bool success = await this.database.PostComment(poster, targetId, type, comment.Message);
         if (success) return this.Ok();
@@ -101,14 +113,18 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost("deleteUserComment/{username}")]
-    [HttpPost("deleteComment/user/{slotId:int}")]
-    public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, int? slotId)
+    [HttpPost("deleteComment/{slotType}/{slotId:int}")]
+    public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
         Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.NotFound();
+
+        if (comment.Type == CommentType.Level && (SlotHelper.IsTypeInvalid(slotType) || slotId == 0)) return this.BadRequest();
+
+        if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
         // if you are not the poster
         if (comment.PosterUserId != user.UserId)
@@ -125,7 +141,7 @@ public class CommentController : ControllerBase
             {
                 Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == comment.TargetId);
                 // if you aren't the creator of the level
-                if (slot == null || slot.CreatorId != user.UserId || slotId.GetValueOrDefault() != slot.SlotId)
+                if (slot == null || slot.CreatorId != user.UserId || slotId != slot.SlotId)
                 {
                     return this.StatusCode(403, "");
                 }

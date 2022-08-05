@@ -1,66 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-        <xsd:element name="root" msdata:IsDataSet="true">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
 
         </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
             PublicKeyToken=b77a5c561934e089
         </value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
             PublicKeyToken=b77a5c561934e089
         </value>
-    </resheader>
-
-    <data name="header_home" xml:space="preserve">
+  </resheader>
+  <data name="header_home" xml:space="preserve">
         <value>Hjem</value>
         <comment>A button on the header that takes you to the landing page.</comment>
     </data>
-
-    <data name="header_users" xml:space="preserve">
+  <data name="header_users" xml:space="preserve">
         <value>Brukere</value>
         <comment>A button on the header that takes you to the user listing.</comment>
     </data>
-
-    <data name="header_photos" xml:space="preserve">
+  <data name="header_photos" xml:space="preserve">
         <value>Bilder</value>
         <comment>A button on the header that takes you to a list of user-uploaded photos.</comment>
     </data>
-
-    <data name="header_slots" xml:space="preserve">
+  <data name="header_slots" xml:space="preserve">
         <value>Nivåer</value>
         <comment>A button on the header that takes you to a list of user-uploaded levels. Levels are internally referred to as "slots".</comment>
     </data>
-
-    <data name="header_authentication" xml:space="preserve">
+  <data name="header_authentication" xml:space="preserve">
         <value>Godkjenning</value>
         <comment>A button on the header that takes you to a list of authentication attempts.</comment>
     </data>
-
-    <data name="header_loginRegister" xml:space="preserve">
+  <data name="header_loginRegister" xml:space="preserve">
         <value>Logg inn/Registrer</value>
         <comment>A button on the header that lets you log in or register.</comment>
     </data>
-    <data name="header_profile" xml:space="preserve">
+  <data name="header_profile" xml:space="preserve">
         <value>Profil</value>
         <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
-    <data name="header_adminPanel" xml:space="preserve">
+  <data name="header_adminPanel" xml:space="preserve">
         <value>Administrasjon</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
-    <data name="header_logout" xml:space="preserve">
+  <data name="header_logout" xml:space="preserve">
         <value>Logg ut</value>
         <comment>A shortcut to log you out of your account.</comment>
+    </data>
+  <data name="generated_by" xml:space="preserve">
+        <value>Side generert av {0}.</value>
+    </data>
+  <data name="generated_modified" xml:space="preserve">
+        <value>Denne siden ble generert med en modifisert versjon av Project Lighthouse. Sørg for at du avslører kildekoden på riktig måte til brukere som kan bruke denne forekomsten.</value>
+    </data>
+  <data name="js_warn" xml:space="preserve">
+        <value>Selv om vi har til hensikt å ha så lite JavaScript som mulig, kan vi ikke garantere at alt vil fungere uten det. Vi anbefaler at du godkjenner JavaScript for Projekt Lighthouse.</value>
+    </data>
+  <data name="js_warn_title" xml:space="preserve">
+        <value>JacaScript er ikke aktivert</value>
+    </data>
+  <data name="license_warn_title" xml:space="preserve">
+        <value>Potensielt brudd på lisensen</value>
+    </data>
+  <data name="license_warn_1" xml:space="preserve">
+        <value>Denne forekomsten er en offentlig forekomst som har blitt endret uten at endringene er publisert. Du kan være i strid med {0}.</value>
+    </data>
+  <data name="license_warn_2" xml:space="preserve">
+        <value>Hvis du mener dette er en feil, kan du opprette et problem med utdataene til {0} kjørte fra roten til serverkildekoden i beskrivelsen på vår {1}problemsporing{2}.</value>
+    </data>
+  <data name="license_warn_3" xml:space="preserve">
+        <value>Hvis ikke, vennligst publiser kildekoden et sted som er tilgjengelig for brukerne dine</value>
     </data>
 </root>
