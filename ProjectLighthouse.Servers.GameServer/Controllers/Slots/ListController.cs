@@ -117,8 +117,11 @@ public class ListController : ControllerBase
 
         return this.Ok
         (
-            LbpSerializer.TaggedStringElement
-                ("favouriteSlots", response, "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+            LbpSerializer.TaggedStringElement("favouriteSlots", response, new Dictionary<string, object>
+            {
+                { "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username) },
+                { "hint_start", pageStart + Math.Min(pageSize, 30) },
+            })
         );
     }
 
@@ -175,8 +178,11 @@ public class ListController : ControllerBase
 
         return this.Ok
         (
-            LbpSerializer.TaggedStringElement
-                ("favouriteUsers", response, "total", this.database.HeartedProfiles.Include(q => q.User).Count(q => q.User.Username == username))
+            LbpSerializer.TaggedStringElement("favouriteUsers", response, new Dictionary<string, object>
+            {
+                { "total", this.database.HeartedProfiles.Include(q => q.User).Count(q => q.User.Username == username) },
+                { "hint_start", pageStart + Math.Min(pageSize, 30) },
+            })
         );
     }
 
