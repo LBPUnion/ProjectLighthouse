@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.EntityFrameworkCore;
@@ -73,7 +74,7 @@ public static class SlotHelper
                 User devCreator = new()
                 {
                     Username = "",
-                    Banned = true,
+                    PermissionLevel = PermissionLevel.Banned,
                     Biography = "Placeholder author of story levels",
                     BannedReason = "Banned to not show in users list",
                     LocationId = devLocation.Id,
