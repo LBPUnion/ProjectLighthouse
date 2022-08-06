@@ -63,6 +63,10 @@ public class PerformCaseActionsTask : IRepeatingTask
                     case CaseType.UserBan:
                     {
                         user!.PermissionLevel = PermissionLevel.Banned;
+                        user.BannedReason = @case.Reason;
+                        
+                        database.GameTokens.RemoveRange(database.GameTokens.Where(t => t.UserId == user.UserId));
+                        database.WebTokens.RemoveRange(database.WebTokens.Where(t => t.UserId == user.UserId));
                         break;
                     }
                     case CaseType.UserCommentsDisabled: break;

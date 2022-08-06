@@ -43,10 +43,10 @@ public static class CaseTypeExtensions
         };
     }
 
-    public static Task<bool> IsIdValid(this CaseType type, int affectedId, Database database)
+    public static async Task<bool> IsIdValid(this CaseType type, int affectedId, Database database)
     {
-        if (type.AffectsUser()) return database.Users.Has(u => u.UserId == affectedId);
-        if (type.AffectsLevel()) return database.Slots.Has(u => u.SlotId == affectedId);
+        if (type.AffectsUser()) return await database.Users.Has(u => u.UserId == affectedId);
+        if (type.AffectsLevel()) return await database.Slots.Has(u => u.SlotId == affectedId);
 
         throw new ArgumentOutOfRangeException();
     }

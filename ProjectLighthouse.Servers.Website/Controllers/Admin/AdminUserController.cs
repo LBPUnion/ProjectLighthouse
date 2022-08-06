@@ -118,7 +118,7 @@ public class AdminUserController : ControllerBase
         }
         else
         {
-            return this.Redirect($"/moderation/user/{id}/ban");
+            return this.Redirect($"/moderation/newCase?type={(int)CaseType.UserBan}&affectedId={id}");
         }
 
         return this.Redirect("/admin/users");

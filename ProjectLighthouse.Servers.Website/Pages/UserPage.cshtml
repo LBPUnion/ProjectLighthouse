@@ -1,5 +1,6 @@
 @page "/user/{userId:int}"
 @using System.Web
+@using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
@@ -127,7 +128,7 @@
         @if (!Model.ProfileUser.IsBanned)
         {
             <div>
-                <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/ban">
+                <a class="ui red button" href="/moderation/newCase?type=@((int)CaseType.UserBan)&affectedId=@Model.ProfileUser.UserId">
                     <i class="ban icon"></i>
                     <span>Ban User</span>
                 </a>

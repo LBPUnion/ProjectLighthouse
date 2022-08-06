@@ -14,28 +14,31 @@ public class NewCasePage : BaseLayout
     public CaseType Type { get; set; }
     public int AffectedId { get; set; }
 
-    public IActionResult OnGet([FromQuery] CaseType? type)
+    public IActionResult OnGet([FromQuery] CaseType? type, [FromQuery] int? affectedId)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.Redirect("/login");
 
         if (type == null) return this.BadRequest();
+        if (affectedId == null) return this.BadRequest();
 
         this.Type = (CaseType)type;
+        this.AffectedId = (int)affectedId;
         
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost(CaseType? type, string reason, string modNotes, DateTime expires, int affectedId)
+    public async Task<IActionResult> OnPost(CaseType? type, string reason, string modNotes, DateTime expires, int? affectedId)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.Redirect("/login");
 
         if (type == null) return this.BadRequest();
+        if (affectedId == null) return this.BadRequest();
         
-        // this is fucking ugly and so is the person who wrote it
+        // this is fucking ugly
         // if id is invalid then return bad request
-        if (!(await ((CaseType)type).IsIdValid(affectedId, this.Database))) return this.BadRequest();
+        if (!(await ((CaseType)type).IsIdValid((int)affectedId, this.Database))) return this.BadRequest();
         
         ModerationCase @case = new()
         {
@@ -45,7 +48,7 @@ public class NewCasePage : BaseLayout
             ExpiresAt = expires,
             CreatedAt = DateTime.Now,
             CreatorId = user.UserId,
-            AffectedId = affectedId,
+            AffectedId = (int)affectedId,
         };
 
         this.Database.Cases.Add(@case);
