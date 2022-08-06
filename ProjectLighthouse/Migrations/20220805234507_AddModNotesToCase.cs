@@ -12,6 +12,9 @@ namespace ProjectLighthouse.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("UPDATE Users SET PermissionLevel = PermissionLevel - 1;");
+            migrationBuilder.Sql("UPDATE Users SET PermissionLevel = -3 WHERE PermissionLevel = -1;");
+            
             migrationBuilder.RenameColumn(
                 name: "Description",
                 table: "Cases",
