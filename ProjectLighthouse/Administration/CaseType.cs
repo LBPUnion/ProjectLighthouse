@@ -1,3 +1,7 @@
+using System;
+using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Extensions;
+
 namespace LBPUnion.ProjectLighthouse.Administration;
 
 // Next available ID for use: 7
@@ -37,5 +41,13 @@ public static class CaseTypeExtensions
             CaseType.LevelCommentsDisabled => true,
             _ => false,
         };
+    }
+
+    public static Task<bool> IsIdValid(this CaseType type, int affectedId, Database database)
+    {
+        if (type.AffectsUser()) return database.Users.Has(u => u.UserId == affectedId);
+        if (type.AffectsLevel()) return database.Slots.Has(u => u.SlotId == affectedId);
+
+        throw new ArgumentOutOfRangeException();
     }
 }
