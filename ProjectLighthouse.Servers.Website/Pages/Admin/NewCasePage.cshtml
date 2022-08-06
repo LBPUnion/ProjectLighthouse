@@ -13,14 +13,20 @@
     <input type="hidden" name="type" value="@((int)Model.Type)"/>
     <input type="hidden" name="affectedId" value="@Model.AffectedId"/>
 
-    <label for="reason">Reason: </label>
-    <input type="text" name="reason" id="reason"/><br/>
+    <div class="ui left labeled input">
+        <label for="reason" class="ui blue label">Reason: </label>
+        <input type="text" name="reason" id="reason"/>
+    </div><br/><br/>
     
-    <label for="mod-notes">Mod Notes: </label>
-    <input type="text" name="modNotes" id="mod-notes"/><br/>
+    <div class="ui left labeled input">
+        <label for="mod-notes" class="ui blue label">Mod Notes: </label>
+        <input type="text" name="modNotes" id="mod-notes"/>
+    </div><br/><br/>
 
-    <label for="expires">Expires: </label>
-    <input type="datetime-local" name="expires" id="expires"/><br/>
+    <div class="ui left labeled input">
+        <label for="expires" class="ui blue label">Expires: </label>
+        <input type="datetime-local" name="expires" id="expires"/>
+    </div><br/><br/>
 
-    <br/><input type="submit"/>
+    <br/><input type="submit" value="Create case" class="ui red button"/>
 </form>
