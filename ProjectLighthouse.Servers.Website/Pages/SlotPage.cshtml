@@ -17,6 +17,18 @@
     bool isMobile = this.Request.IsMobile();
 }
 
+@if (Model.Slot.Hidden)
+{
+    <div class="ui inverted red segment">
+        <h2>This level is currently hidden.</h2>
+        <p><b>Only you and moderators may view this level.</b></p>
+        
+        <b>Reason:</b> <span>"@Model.Slot.HiddenReason"</span>
+        
+        <p><b>For more information please contact a moderator.</b></p>
+    </div>
+}
+
 @await Html.PartialAsync("Partials/SlotCardPartial", Model.Slot, new ViewDataDictionary(ViewData)
 {
     {
@@ -210,5 +222,15 @@
                 <span>Delete</span>
             </div>
         </a>
+        
+        @if (!(bool)Model.Slot?.Hidden)
+        {
+            <a href="/moderation/newCase?type=@((int)CaseType.LevelHide)&affectedId=@Model.Slot?.SlotId">
+                <div class="ui yellow button">
+                    <i class="lock icon"></i>
+                    <span>Hide</span>
+                </div>
+            </a>
+        }
     </div>
 }

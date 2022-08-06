@@ -20,22 +20,6 @@ public class AdminUserController : ControllerBase
         this.database = database;
     }
 
-    [HttpGet("unban")]
-    public async Task<IActionResult> UnbanUser([FromRoute] int id)
-    {
-        User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsModerator) return this.NotFound();
-
-        User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
-        if (targetedUser == null) return this.NotFound();
-
-        targetedUser.PermissionLevel = PermissionLevel.Default;
-        targetedUser.BannedReason = null;
-
-        await this.database.SaveChangesAsync();
-        return this.Redirect($"/user/{targetedUser.UserId}");
-    }
-    
     /// <summary>
     /// Resets the user's earth decorations to a blank state. Useful for users who abuse audio for example.
     /// </summary>

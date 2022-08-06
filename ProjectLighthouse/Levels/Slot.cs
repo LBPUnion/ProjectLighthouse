@@ -245,6 +245,12 @@ public class Slot
 
     [XmlElement("vitaCrossControlRequired")]
     public bool CrossControllerRequired { get; set; }
+    
+    [JsonIgnore]
+    public bool Hidden { get; set; }
+    
+    [JsonIgnore]
+    public string HiddenReason { get; set; }
 
     public string SerializeResources()
     {

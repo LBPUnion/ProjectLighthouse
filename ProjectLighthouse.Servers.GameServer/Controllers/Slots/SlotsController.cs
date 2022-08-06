@@ -523,10 +523,10 @@ public class SlotsController : ControllerBase
         if (gameFilterType == "both")
             // Get game versions less than the current version
             // Needs support for LBP3 ("both" = LBP1+2)
-            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
+            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && !s.Hidden && s.GameVersion <= gameVersion && s.FirstUploaded >= oldestTime);
         else
             // Get game versions exactly equal to gamefiltertype
-            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
+            whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && !s.Hidden && s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
 
         return whereSlots.Include(s => s.Creator).Include(s => s.Location);
     }

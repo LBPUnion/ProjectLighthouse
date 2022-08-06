@@ -15,7 +15,7 @@ public enum CaseType
     UserBan = 2,
     UserCommentsDisabled = 3,
     
-    LevelLock = 4,
+    LevelHide = 4,
     LevelCommentsDisabled = 5,
 }
 
@@ -37,7 +37,7 @@ public static class CaseTypeExtensions
     {
         return type switch
         {
-            CaseType.LevelLock => true,
+            CaseType.LevelHide => true,
             CaseType.LevelCommentsDisabled => true,
             _ => false,
         };

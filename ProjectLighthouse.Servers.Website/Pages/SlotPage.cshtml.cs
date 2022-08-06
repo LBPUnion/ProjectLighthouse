@@ -26,8 +26,7 @@ public class SlotPage : BaseLayout
 
     public async Task<IActionResult> OnGet([FromRoute] int id)
     {
-        Slot? slot = await this.Database.Slots.Include
-                (s => s.Creator)
+        Slot? slot = await this.Database.Slots.Include(s => s.Creator)
             .Where(s => s.Type == SlotType.User)
             .FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -54,6 +53,8 @@ public class SlotPage : BaseLayout
                 default: throw new ArgumentOutOfRangeException();
             }
         }
+
+        if (slot.Hidden && (this.User != slot.Creator && !(bool)this.User?.IsModerator)) return this.NotFound();
 
         this.Slot = slot;
 

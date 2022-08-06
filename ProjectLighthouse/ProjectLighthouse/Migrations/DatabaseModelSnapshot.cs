@@ -250,6 +250,13 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("GameVersion")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Hidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("HiddenReason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("IconHash")
                         .IsRequired()
                         .HasColumnType("longtext");

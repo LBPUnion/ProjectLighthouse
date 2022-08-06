@@ -41,7 +41,14 @@ public class PerformCaseActionsTask : IRepeatingTask
                         break;
                     };
                     case CaseType.UserCommentsDisabled: break;
-                    case CaseType.LevelLock: break;
+                    
+                    case CaseType.LevelHide:
+                    {
+                        slot!.Hidden = false;
+                        slot.HiddenReason = "";
+                        
+                        break;
+                    }
                     case CaseType.LevelCommentsDisabled: break;
                     default: throw new ArgumentOutOfRangeException();
                 }
@@ -70,7 +77,14 @@ public class PerformCaseActionsTask : IRepeatingTask
                         break;
                     }
                     case CaseType.UserCommentsDisabled: break;
-                    case CaseType.LevelLock: break;
+
+                    case CaseType.LevelHide:
+                    {
+                        slot!.Hidden = true;
+                        slot.HiddenReason = @case.Reason;
+                        
+                        break;
+                    }
                     case CaseType.LevelCommentsDisabled: break;
                     default: throw new ArgumentOutOfRangeException();
                 }
