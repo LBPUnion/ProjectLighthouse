@@ -49,14 +49,24 @@
         <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
     }
     
-    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    <h3>Reason</h3>
+    @if (!string.IsNullOrWhiteSpace(Model.Reason))
     {
-        <h3>Description</h3>
-        <pre>@Model.Description</pre>
+        <pre>@Model.Reason</pre>
     }
     else
     {
-        <b>No description was provided.</b>
+        <pre><b>No reason was provided.</b></pre>
+    }
+    
+    <h3>Moderator Notes</h3>
+    @if (!string.IsNullOrWhiteSpace(Model.ModeratorNotes))
+    {
+        <pre>@Model.ModeratorNotes</pre>
+    }
+    else
+    {
+        <pre><b>No notes were provided.</b></pre>
     }
     
     @if (!Model.Dismissed)
@@ -64,13 +74,6 @@
         <a class="ui green small button" href="/moderation/case/@Model.CaseId/dismiss">
             <i class="checkmark icon"></i>
             <span>Dismiss</span>
-        </a>
-    }
-    else
-    {
-        <a class="ui yellow small button" href="/moderation/case/@Model.CaseId/undoDismiss">
-            <i class="undo icon"></i>
-            <span>Undo dismission</span> @* TODO: fix english here lol wtf is this *@
         </a>
     }
 </div>

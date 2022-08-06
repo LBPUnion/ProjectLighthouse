@@ -23,7 +23,7 @@ public class NewCasePage : BaseLayout
         ModerationCase @case = new()
         {
             Type = (CaseType)type,
-            Description = description,
+            Reason = description,
             ExpiresAt = expires,
             CreatedAt = DateTime.Now,
             CreatorId = 1,

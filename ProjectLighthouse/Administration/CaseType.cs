@@ -13,7 +13,6 @@ public enum CaseType
     
     LevelLock = 4,
     LevelCommentsDisabled = 5,
-    LevelDetailsEdited = 6,
 }
 
 public static class CaseTypeExtensions
@@ -36,7 +35,6 @@ public static class CaseTypeExtensions
         {
             CaseType.LevelLock => true,
             CaseType.LevelCommentsDisabled => true,
-            CaseType.LevelDetailsEdited => true,
             _ => false,
         };
     }

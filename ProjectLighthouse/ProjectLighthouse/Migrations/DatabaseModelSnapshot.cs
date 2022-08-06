@@ -47,10 +47,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime?>("DismissedAt")
                         .HasColumnType("datetime(6)");
 
@@ -59,6 +55,17 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ModeratorNotes")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Processed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");

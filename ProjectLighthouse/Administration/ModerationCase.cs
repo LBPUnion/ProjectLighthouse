@@ -16,8 +16,12 @@ public class ModerationCase
     public int CaseId { get; set; }
     
     public CaseType Type { get; set; }
-    
-    public string Description { get; set; }
+
+    public string Reason { get; set; } = "";
+
+    public string ModeratorNotes { get; set; } = "";
+
+    public bool Processed { get; set; } = false;
     
     public DateTime CreatedAt { get; set; }
     
@@ -61,7 +65,7 @@ public class ModerationCase
         => new()
         {
             Type = CaseType.UserBan,
-            Description = $"Banned for reason '{reason}'\nModeration notes: {modNotes}",
+            Reason = $"Banned for reason '{reason}'\nModeration notes: {modNotes}",
             CreatorId = caseCreator,
             CreatedAt = DateTime.Now,
             ExpiresAt = caseExpires,

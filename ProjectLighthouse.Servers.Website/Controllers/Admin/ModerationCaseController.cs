@@ -27,26 +27,11 @@ public class ModerationCaseController : ControllerBase
         
         @case.DismissedAt = DateTime.Now;
         @case.DismisserId = user.UserId;
+        
+        @case.Processed = false;
 
         await this.database.SaveChangesAsync();
         
-        return this.Ok();
-    }
-
-    [HttpGet("undoDismiss")]
-    public async Task<IActionResult> UndoDismissCase([FromRoute] int id)
-    {
-        User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsModerator) return this.StatusCode(403, "");
-
-        ModerationCase? @case = await this.database.Cases.FirstOrDefaultAsync(c => c.CaseId == id);
-        if (@case == null) return this.NotFound();
-
-        @case.DismissedAt = null;
-        @case.DismisserId = null;
-
-        await this.database.SaveChangesAsync();
-
         return this.Ok();
     }
 }

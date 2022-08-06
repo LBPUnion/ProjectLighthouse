@@ -35,7 +35,7 @@ public class CasePage : BaseLayout
             .Include(c => c.Dismisser)
             .OrderByDescending(c => c.CaseId)
             .ToListAsync();
-        this.CaseCount = await this.Database.Cases.CountAsync(c => c.Description.Contains(this.SearchValue));
+        this.CaseCount = await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue));
 
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.CaseCount / ServerStatics.PageSize));
