@@ -51,10 +51,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Administration\Maintenance\MaintenanceJobs\CleanupXMLInjection.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\ProjectLighthouse.Localization\ProjectLighthouse.Localization.csproj" />
     </ItemGroup>
 

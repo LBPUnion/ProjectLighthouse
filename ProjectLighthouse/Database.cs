@@ -47,6 +47,7 @@ public class Database : DbContext
     public DbSet<GriefReport> Reports { get; set; }
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
     public DbSet<EmailSetToken> EmailSetTokens { get; set; }
+    public DbSet<ModerationCase> Cases { get; set; }
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
     public DbSet<RegistrationToken> RegistrationTokens { get; set; }
     public DbSet<APIKey> APIKeys { get; set; }
@@ -54,7 +55,7 @@ public class Database : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
-#nullable enable
+    #nullable enable
     public async Task<User> CreateUser(string username, string password, string? emailAddress = null)
     {
         if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
@@ -495,5 +496,5 @@ public class Database : DbContext
 
         if (saveChanges) await this.SaveChangesAsync();
     }
-#nullable disable
+    #nullable disable
 }

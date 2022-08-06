@@ -76,7 +76,7 @@ public class LoginController : ControllerBase
 
         User? user = await this.database.UserFromGameToken(token, true);
 
-        if (user == null || user.Banned)
+        if (user == null || user.IsBanned)
         {
             Logger.Error($"Unable to find user {npTicket.Username} from token", LogArea.Login);
             return this.StatusCode(403, "");

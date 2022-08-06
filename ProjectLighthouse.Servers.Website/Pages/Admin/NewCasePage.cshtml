@@ -1,0 +1,32 @@
+@page "/moderation/newCase"
+@using LBPUnion.ProjectLighthouse.Administration
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.NewCasePage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = $"New {Model.Type.ToString()} Case";
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    
+    <input type="hidden" name="type" value="@((int)Model.Type)"/>
+    <input type="hidden" name="affectedId" value="@Model.AffectedId"/>
+
+    <div class="ui left labeled input">
+        <label for="reason" class="ui blue label">Reason: </label>
+        <input type="text" name="reason" id="reason"/>
+    </div><br/><br/>
+    
+    <div class="ui left labeled input">
+        <label for="mod-notes" class="ui blue label">Mod Notes: </label>
+        <input type="text" name="modNotes" id="mod-notes"/>
+    </div><br/><br/>
+
+    <div class="ui left labeled input">
+        <label for="expires" class="ui blue label">Expires: </label>
+        <input type="datetime-local" name="expires" id="expires"/>
+    </div><br/><br/>
+
+    <br/><input type="submit" value="Create case" class="ui red button"/>
+</form>

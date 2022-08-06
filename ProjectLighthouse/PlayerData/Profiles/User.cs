@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
@@ -15,7 +16,6 @@ public class User
     [NotMapped]
     [JsonIgnore]
     private Database? _database;
-    #nullable disable
 
     [NotMapped]
     [JsonIgnore]
@@ -124,9 +124,6 @@ public class User
     public int Hearts => this.database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
 
     [JsonIgnore]
-    public bool IsAdmin { get; set; } = false;
-
-    [JsonIgnore]
     public bool PasswordResetRequired { get; set; }
 
     public string YayHash { get; set; } = "";
@@ -138,10 +135,29 @@ public class User
     public UserStatus Status => new(this.database, this.UserId);
 
     [JsonIgnore]
-    public bool Banned { get; set; }
+    public bool IsBanned => this.PermissionLevel == PermissionLevel.Banned;
 
     [JsonIgnore]
-    public string BannedReason { get; set; }
+    public bool IsRestricted => this.PermissionLevel == PermissionLevel.Restricted ||
+                                this.PermissionLevel == PermissionLevel.Banned;
+
+    [JsonIgnore]
+    public bool IsSilenced => this.PermissionLevel == PermissionLevel.Silenced || 
+                              this.PermissionLevel == PermissionLevel.Restricted ||
+                              this.PermissionLevel == PermissionLevel.Banned;
+
+    [JsonIgnore]
+    public bool IsModerator => this.PermissionLevel == PermissionLevel.Moderator ||
+                               this.PermissionLevel == PermissionLevel.Administrator;
+
+    [JsonIgnore]
+    public bool IsAdmin => this.PermissionLevel == PermissionLevel.Administrator;
+
+    [JsonIgnore]
+    public PermissionLevel PermissionLevel { get; set; } = PermissionLevel.Default;
+
+    [JsonIgnore]
+    public string? BannedReason { get; set; }
 
     #nullable enable
     [JsonIgnore]
@@ -156,6 +172,9 @@ public class User
     public PrivacyType LevelVisibility { get; set; } = PrivacyType.All;
 
     public PrivacyType ProfileVisibility { get; set; } = PrivacyType.All;
+
+    // should not be adjustable by user
+    public bool CommentsEnabled { get; set; } = true;
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
@@ -173,7 +192,7 @@ public class User
                       LbpSerializer.StringElement("commentCount", this.Comments) +
                       LbpSerializer.StringElement("photosByMeCount", this.PhotosByMe) +
                       LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMe) +
-                      LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled) +
+                      LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled && CommentsEnabled) +
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
                       LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels) +
                       LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +

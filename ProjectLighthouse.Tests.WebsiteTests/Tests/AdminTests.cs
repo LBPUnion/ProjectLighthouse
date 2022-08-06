@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -29,7 +30,7 @@ public class AdminTests : LighthouseWebTest
         };
 
         database.WebTokens.Add(webToken);
-        user.IsAdmin = true;
+        user.PermissionLevel = PermissionLevel.Administrator;
         await database.SaveChangesAsync();
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
@@ -54,7 +55,7 @@ public class AdminTests : LighthouseWebTest
         };
 
         database.WebTokens.Add(webToken);
-        user.IsAdmin = false;
+        user.PermissionLevel = PermissionLevel.Default;
         await database.SaveChangesAsync();
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
