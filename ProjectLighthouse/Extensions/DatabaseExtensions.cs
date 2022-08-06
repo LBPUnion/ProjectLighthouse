@@ -16,9 +16,9 @@ public static class DatabaseExtensions
         => set.AsQueryable().ByGameVersion(gameVersion, includeSublevels, includeCreatorAndLocation);
 
     public static IQueryable<Slot> ByGameVersion
-        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
+        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false, bool includeDeveloperLevels = false)
     {
-        query = query.Where(s => s.Type == SlotType.User);
+        query = query.Where(s => (s.Type == SlotType.User) || (s.Type == SlotType.Developer && includeDeveloperLevels));
 
         if (includeCreatorAndLocation)
         {
@@ -31,7 +31,32 @@ public static class DatabaseExtensions
         }
         else
         {
-            query = query.Where(s => s.GameVersion <= gameVersion);
+            query = query.Where(s => (includeDeveloperLevels && s.Type == SlotType.Developer) ? (s.GameVersion == gameVersion) : (s.GameVersion <= gameVersion));
+        }
+
+        if (!includeSublevels) query = query.Where(s => !s.SubLevel);
+
+        return query;
+    }
+
+    public static IQueryable<Slot> HeartedByGameVersion
+        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
+    {
+        query = query.Where(s => (s.Type == SlotType.User) || (s.Type == SlotType.Developer));
+
+        if (includeCreatorAndLocation)
+        {
+            query = query.Include(s => s.Creator).Include(s => s.Location);
+        }
+
+        if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
+        {
+            query = query.Where(s => s.GameVersion == gameVersion);
+        }
+        else
+        {
+            // prevent developer slots from showing up in a newer game
+            query = query.Where(s => (s.Type == SlotType.User && s.GameVersion <= gameVersion) || (s.Type == SlotType.Developer && s.GameVersion == gameVersion));
         }
 
         if (!includeSublevels) query = query.Where(s => !s.SubLevel);

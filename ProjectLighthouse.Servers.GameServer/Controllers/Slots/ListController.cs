@@ -96,7 +96,6 @@ public class ListController : ControllerBase
 
     #region Hearted Levels
 
-    // TODO: Implement proper listing of developer slots
     [HttpGet("favouriteSlots/{username}")]
     public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
     {
@@ -109,7 +108,7 @@ public class ListController : ControllerBase
             .Include(q => q.Slot.Creator)
             .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
-            .ByGameVersion(gameVersion)
+            .ByGameVersion(gameVersion, false, false, true)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
