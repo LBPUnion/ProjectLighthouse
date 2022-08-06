@@ -11,6 +11,7 @@ public static class BaseLayoutStrings
     public static readonly TranslatableString HeaderLoginRegister = create("header_loginRegister");
     public static readonly TranslatableString HeaderProfile = create("header_profile");
     public static readonly TranslatableString HeaderAdminPanel = create("header_adminPanel");
+    public static readonly TranslatableString HeaderModPanel = create("header_modPanel");
     public static readonly TranslatableString HeaderLogout = create("header_logout");
 
     public static readonly TranslatableString GeneratedBy = create("generated_by");

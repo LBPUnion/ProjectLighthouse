@@ -10,6 +10,7 @@
       <Path>CONTRIBUTING.md</Path>
       <Path>DatabaseMigrations</Path>
       <Path>LICENSE</Path>
+      <Path>ProjectLighthouse.Localization</Path>
       <Path>ProjectLighthouse.sln.DotSettings</Path>
       <Path>ProjectLighthouse.sln.DotSettings.user</Path>
       <Path>README.md</Path>

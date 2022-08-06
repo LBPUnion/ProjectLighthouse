@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -9,7 +10,7 @@ using IOFile = System.IO.File;
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 
 [ApiController]
-[Route("admin/user/{id:int}")]
+[Route("moderation/user/{id:int}")]
 public class AdminUserController : ControllerBase
 {
     private readonly Database database;
@@ -19,29 +20,13 @@ public class AdminUserController : ControllerBase
         this.database = database;
     }
 
-    [HttpGet("unban")]
-    public async Task<IActionResult> UnbanUser([FromRoute] int id)
-    {
-        User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsAdmin) return this.NotFound();
-
-        User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
-        if (targetedUser == null) return this.NotFound();
-
-        targetedUser.Banned = false;
-        targetedUser.BannedReason = null;
-
-        await this.database.SaveChangesAsync();
-        return this.Redirect($"/user/{targetedUser.UserId}");
-    }
-    
     /// <summary>
     /// Resets the user's earth decorations to a blank state. Useful for users who abuse audio for example.
     /// </summary>
     [HttpGet("wipePlanets")]
     public async Task<IActionResult> WipePlanets([FromRoute] int id) {
         User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsAdmin) return this.NotFound();
+        if (user == null || !user.IsModerator) return this.NotFound();
 
         User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
@@ -95,9 +80,31 @@ public class AdminUserController : ControllerBase
                 Logger.Error($"Failed to delete planet resource {hash}\n{e}", LogArea.Admin);
             }
         }
-
+        
         await this.database.SaveChangesAsync();
 
         return this.Redirect($"/user/{targetedUser.UserId}");
+    }
+
+    [HttpPost("/admin/user/{id:int}/setPermissionLevel")]
+    public async Task<IActionResult> SetUserPermissionLevel([FromRoute] int id, [FromForm] PermissionLevel role)
+    {
+        User? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsAdmin) return this.NotFound();
+
+        User? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        if (role != PermissionLevel.Banned)
+        {
+            targetedUser.PermissionLevel = role;
+            await this.database.SaveChangesAsync();
+        }
+        else
+        {
+            return this.Redirect($"/moderation/newCase?type={(int)CaseType.UserBan}&affectedId={id}");
+        }
+
+        return this.Redirect("/admin/users");
     }
 }

@@ -53,9 +53,9 @@ public static class RepeatingTaskHandler
                 taskQueue.Enqueue(task);
                 Thread.Sleep(500); // Doesn't need to be that precise.
             }
-            catch
+            catch(Exception e)
             {
-                // ignored
+                Logger.Warn($"Error occured while processing repeating tasks: \n{e}", LogArea.Maintenace);
             }
         }
     }

@@ -21,7 +21,11 @@ public class AdminPanelUsersPage : BaseLayout
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
 
-        this.Users = await this.Database.Users.OrderByDescending(u => u.UserId).ToListAsync();
+        this.Users = await this.Database.Users
+            .OrderByDescending(u => u.PermissionLevel)
+            .ThenByDescending(u => u.UserId)
+            .ToListAsync();
+        
         this.UserCount = this.Users.Count;
 
         return this.Page();

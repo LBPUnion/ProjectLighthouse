@@ -24,11 +24,11 @@ png/
 /ProjectLighthouse/logs/*
 lighthouse.config.json
 lighthouse.yml
+lighthouse.yml.configme
 gitBranch.txt
 gitVersion.txt
 gitRemotes.txt
 gitUnpushed.txt
-gitRevCount.txt
 logs/*
 npTicket*
 r.tar.gz

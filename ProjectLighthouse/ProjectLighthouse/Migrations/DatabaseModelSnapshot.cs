@@ -32,6 +32,53 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("CompletedMigrations");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.ModerationCase", b =>
+                {
+                    b.Property<int>("CaseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AffectedId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("CreatorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DismissedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DismisserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ModeratorNotes")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Processed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("CaseId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("DismisserId");
+
+                    b.ToTable("Cases");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.Reports.GriefReport", b =>
                 {
                     b.Property<int>("ReportId")
@@ -187,6 +234,9 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("CommentsEnabled")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
@@ -202,6 +252,13 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<int>("GameVersion")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Hidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("HiddenReason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("IconHash")
                         .IsRequired()
@@ -658,9 +715,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("ApprovedIPAddress")
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("Banned")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("BannedReason")
                         .HasColumnType("longtext");
 
@@ -669,6 +723,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("BooHash")
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("CommentsEnabled")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("EmailAddress")
                         .HasColumnType("longtext");
@@ -683,9 +740,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsAPirate")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<int>("LevelVisibility")
@@ -703,6 +757,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<bool>("PasswordResetRequired")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("PermissionLevel")
+                        .HasColumnType("int");
+
                     b.Property<string>("Pins")
                         .HasColumnType("longtext");
 
@@ -719,6 +776,7 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("YayHash")
@@ -882,6 +940,23 @@ namespace ProjectLighthouse.Migrations
                     b.HasKey("TokenId");
 
                     b.ToTable("WebTokens");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.ModerationCase", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Dismisser")
+                        .WithMany()
+                        .HasForeignKey("DismisserId");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Dismisser");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.Reports.GriefReport", b =>

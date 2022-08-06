@@ -1,4 +1,5 @@
 @page "/admin/users"
+@using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminPanelUsersPage
@@ -9,22 +10,42 @@
 }
 
 <p>There are currently @Model.UserCount users registered to your instance.</p>
-<p><b>Note:</b> Users are ordered by most-recent-first.</p>
+<p><b>Note:</b> Users are ordered by their permissions, then by most-recent-first.</p>
 
 <div class="ui grid">
     @foreach (User user in Model.Users)
     {
-        string color = "blue";
-        string subtitle = "User";
-        if (user.IsAdmin)
+        string color;
+        string subtitle;
+
+        switch (user.PermissionLevel)
         {
-            color = "yellow";
-            subtitle = "Admin";
-        }
-        if (user.Banned)
-        {
-            color = "red";
-            subtitle = $"Banned user! Reason: {user.BannedReason}";
+            // jank but works
+            case PermissionLevel.Banned:
+            {
+                color = "red";
+                subtitle = $"Banned user! Reason: {user.BannedReason}";
+                break;
+            }
+            case PermissionLevel.Moderator:
+            {
+                color = "green";
+                subtitle = "Moderator";
+                break;
+            }
+            case PermissionLevel.Administrator:
+            {
+                color = "yellow";
+                subtitle = "Admin";       
+                break;
+            }
+            case PermissionLevel.Default:
+            default:
+            {
+                color = "blue";
+                subtitle = "User";
+                break;
+            }
         }
 
         subtitle += $" (id: {user.UserId})";
@@ -35,6 +56,20 @@
                     <a href="/user/@user.UserId">@user.Username</a>
                 </h2>
                 <h3>@subtitle</h3>
+                <form method="post" action="/admin/user/@user.UserId/setPermissionLevel">
+                    <div class="ui right action input">
+                        <select name="role" class="ui selection dropdown">
+                            @foreach (PermissionLevel level in Enum.GetValues<PermissionLevel>())
+                            {
+                                if(level < 0) continue;
+                                string selected = level == user.PermissionLevel ? " selected" : "";
+                        
+                                <option value="@((int)level)"@selected>@level.ToString()</option>
+                            }
+                        </select>
+                        <input type="submit" class="ui green button" value="Apply"/>
+                    </div>
+                </form>
             </div>
         </div>
     }

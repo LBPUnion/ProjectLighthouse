@@ -1,0 +1,41 @@
+@page "/moderation"
+@using System.Diagnostics
+@using LBPUnion.ProjectLighthouse.Administration
+@using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.ModPanelPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ModPanelStrings.ModPanelTitle);
+
+    if (Model.User == null) throw new ArgumentNullException($"{nameof(Model)}.{nameof(User)}");
+
+    // Technically, this should never happen but I'm going to handle it anyways.
+    if (!Model.User.IsModerator)
+    {
+        if(Debugger.IsAttached) Debugger.Break();
+        throw new Exception("Tried to render mod panel with user whose not mod somehow???");
+    }
+}
+
+<p>@Model.Translate(ModPanelStrings.Greeting, Model.User.Username)</p>
+
+@if (!this.Request.IsMobile())
+{
+    <div class="ui grid">
+        @foreach (AdminPanelStatistic statistic in Model.Statistics)
+        {
+            @await Html.PartialAsync("Partials/AdminPanelStatisticPartial", statistic)
+        }
+    </div>
+    <br>
+}
+else
+{
+    @foreach (AdminPanelStatistic statistic in Model.Statistics)
+    {
+        @await Html.PartialAsync("Partials/AdminPanelStatisticPartial", statistic)
+        <br>
+    }
+}

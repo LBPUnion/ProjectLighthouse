@@ -49,7 +49,7 @@ public class ReportController : ControllerBase
         await WebhookHelper.SendWebhook(
             title: "New grief report",
             description: $"Submitted by {user.Username}\n" +
-                         $"To view it, click [here]({ServerConfiguration.Instance.ExternalUrl}/admin/report/{report.ReportId}).",
+                         $"To view it, click [here]({ServerConfiguration.Instance.ExternalUrl}/moderation/report/{report.ReportId}).",
             dest: WebhookHelper.WebhookDestination.Moderation
         );
 

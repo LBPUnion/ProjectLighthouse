@@ -58,7 +58,7 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        if (user.Banned)
+        if (user.IsBanned)
         {
             Logger.Warn($"User {user.Username} (id: {user.UserId}) failed to login on web due to being banned", LogArea.Login);
             this.Error = this.Translate(ErrorStrings.UserIsBanned, user.BannedReason);
