@@ -248,9 +248,9 @@ public class Slot
     
     [JsonIgnore]
     public bool Hidden { get; set; }
-    
+
     [JsonIgnore]
-    public string HiddenReason { get; set; }
+    public string HiddenReason { get; set; } = "";
 
     public string SerializeResources()
     {
