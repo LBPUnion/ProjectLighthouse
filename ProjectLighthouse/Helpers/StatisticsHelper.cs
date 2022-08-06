@@ -28,6 +28,7 @@ public static class StatisticsHelper
     #region Moderator/Admin specific
     public static async Task<int> ReportCount() => await database.Reports.CountAsync();
     public static async Task<int> CaseCount() => await database.Cases.CountAsync();
+    public static async Task<int> DismissedCaseCount() => await database.Cases.CountAsync(c => c.DismissedAt != null);
     #endregion
 
     public static async Task<int> APIKeyCount() => await database.APIKeys.CountAsync();

@@ -19,8 +19,18 @@ public class ModPanelPage : BaseLayout
         if (user == null) return this.Redirect("~/login");
         if (!user.IsModerator) return this.NotFound();
         
-        this.Statistics.Add(new AdminPanelStatistic("Reports", await StatisticsHelper.ReportCount(), "/moderation/reports/0"));
-        this.Statistics.Add(new AdminPanelStatistic("Cases", await StatisticsHelper.CaseCount(), "/moderation/cases/0"));
+        this.Statistics.Add(new AdminPanelStatistic(
+            statisticNamePlural: "Reports",
+            count: await StatisticsHelper.ReportCount(), 
+            viewAllEndpoint: "/moderation/reports/0")
+        );
+        
+        this.Statistics.Add(new AdminPanelStatistic(
+            statisticNamePlural: "Cases",
+            count: await StatisticsHelper.DismissedCaseCount(), 
+            viewAllEndpoint: "/moderation/cases/0",
+            secondStatistic: await StatisticsHelper.CaseCount())
+        );
 
         return this.Page();
     }

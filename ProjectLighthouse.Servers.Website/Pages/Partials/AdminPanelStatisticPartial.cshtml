@@ -12,6 +12,13 @@
         {
             <h2>@Model.StatisticNamePlural</h2>
         }
-        <h3>@Model.Count</h3>
+        @if (Model.SecondStatistic == null)
+        {
+            <h3>@Model.Count</h3>
+        }
+        else
+        {
+            <h3>@Model.Count / @Model.SecondStatistic</h3>
+        }
     </div>
 </div>
