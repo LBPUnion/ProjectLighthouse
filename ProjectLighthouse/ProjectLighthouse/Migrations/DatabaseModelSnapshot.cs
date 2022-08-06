@@ -234,6 +234,9 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("CommentsEnabled")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
@@ -720,6 +723,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("BooHash")
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("CommentsEnabled")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("EmailAddress")
                         .HasColumnType("longtext");

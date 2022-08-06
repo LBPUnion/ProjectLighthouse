@@ -58,6 +58,19 @@ public class CommentController : ControllerBase
 
         if (type == CommentType.Level && slotType == "developer") targetId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
+        if (type == CommentType.Profile)
+        {
+            User? profile = await this.database.Users.FirstOrDefaultAsync(s => s.UserId == targetId);
+            if (profile == null) return this.BadRequest();
+            if (!profile.CommentsEnabled) return this.NotFound();
+        }
+        else
+        {
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == targetId);
+            if (slot == null) return this.BadRequest();
+            if (!slot.CommentsEnabled) return this.NotFound();
+        }
+
         List<Comment> comments = await this.database.Comments.Include
                 (c => c.Poster)
             .Where(c => c.TargetId == targetId && c.Type == type)

@@ -223,13 +223,21 @@
             </div>
         </a>
         
-        @if (!(bool)Model.Slot?.Hidden)
+        @if (!Model.Slot!.Hidden)
         {
             <a href="/moderation/newCase?type=@((int)CaseType.LevelHide)&affectedId=@Model.Slot?.SlotId">
                 <div class="ui yellow button">
                     <i class="lock icon"></i>
                     <span>Hide</span>
                 </div>
+            </a>
+        }
+        
+        @if (Model.Slot!.CommentsEnabled)
+        {
+            <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.LevelDisableComments)&affectedId=@Model.Slot?.SlotId">
+                <i class="lock icon"></i>
+                <span>Disable Comments</span>
             </a>
         }
     </div>

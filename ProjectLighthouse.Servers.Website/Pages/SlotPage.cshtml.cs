@@ -17,7 +17,7 @@ public class SlotPage : BaseLayout
     public List<Review> Reviews = new();
     public List<Photo> Photos = new();
 
-    public readonly bool CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
+    public bool CommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
 
     public Slot? Slot;
@@ -58,6 +58,7 @@ public class SlotPage : BaseLayout
 
         this.Slot = slot;
 
+        this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.Slot.CommentsEnabled;
         if (this.CommentsEnabled)
         {
             this.Comments = await this.Database.Comments.Include(p => p.Poster)

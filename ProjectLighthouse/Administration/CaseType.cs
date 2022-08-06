@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Administration;
 
-// Next available ID for use: 7
+// Next available ID for use: 6
 // PLEASE UPDATE THIS WHEN YOU ADD SOMETHING HERE!
 // IF YOU DO NOT ADD THIS IN ORDER PROPERLY THEN THERE WILL BE DATA CORRUPTION!
 // THE VALUE MUST ALWAYS BE EXPLICITLY SET.
@@ -13,10 +13,10 @@ public enum CaseType
     UserSilence = 0,
     UserRestriction = 1,
     UserBan = 2,
-    UserCommentsDisabled = 3,
+    UserDisableComments = 3,
     
     LevelHide = 4,
-    LevelCommentsDisabled = 5,
+    LevelDisableComments = 5,
 }
 
 public static class CaseTypeExtensions
@@ -28,7 +28,7 @@ public static class CaseTypeExtensions
             CaseType.UserSilence => true,
             CaseType.UserRestriction => true,
             CaseType.UserBan => true,
-            CaseType.UserCommentsDisabled => true,
+            CaseType.UserDisableComments => true,
             _ => false,
         };
     }
@@ -38,7 +38,7 @@ public static class CaseTypeExtensions
         return type switch
         {
             CaseType.LevelHide => true,
-            CaseType.LevelCommentsDisabled => true,
+            CaseType.LevelDisableComments => true,
             _ => false,
         };
     }

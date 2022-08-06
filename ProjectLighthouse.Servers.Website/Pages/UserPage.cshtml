@@ -132,6 +132,17 @@
             <div class="ui fitted hidden divider"></div>
         }
         
+        @if (Model.ProfileUser.CommentsEnabled)
+        {
+            <div>
+                <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
+                    <i class="lock icon"></i>
+                    <span>Disable Comments</span>
+                </a>
+            </div>
+            <div class="ui fitted hidden divider"></div>
+        }
+        
         <div>
             <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
                 <i class="trash alternate icon"></i>

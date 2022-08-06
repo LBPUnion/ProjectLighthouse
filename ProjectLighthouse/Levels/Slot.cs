@@ -283,6 +283,9 @@ public class Slot
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "developer");
     }
 
+    // should not be adjustable by user
+    public bool CommentsEnabled { get; set; } = true;
+
     public string Serialize
     (
         GameVersion gameVersion = GameVersion.LittleBigPlanet1,
@@ -340,7 +343,7 @@ public class Slot
                           LbpSerializer.StringElement("yourlbp3PlayCount", yourVisitedStats?.PlaysLBP3) +
                           yourReview?.Serialize("yourReview") +
                           LbpSerializer.StringElement("reviewsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled) +
-                          LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled) +
+                          LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && CommentsEnabled) +
                           LbpSerializer.StringElement("playerCount", playerCount) +
                           LbpSerializer.StringElement("reviewCount", this.ReviewCount);
 

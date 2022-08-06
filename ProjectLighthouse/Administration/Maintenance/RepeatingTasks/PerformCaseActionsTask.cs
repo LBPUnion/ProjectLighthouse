@@ -40,7 +40,11 @@ public class PerformCaseActionsTask : IRepeatingTask
                         user!.PermissionLevel = PermissionLevel.Default;
                         break;
                     };
-                    case CaseType.UserCommentsDisabled: break;
+                    case CaseType.UserDisableComments:
+                    {
+                        user!.CommentsEnabled = true;
+                        break;
+                    }
                     
                     case CaseType.LevelHide:
                     {
@@ -49,7 +53,11 @@ public class PerformCaseActionsTask : IRepeatingTask
                         
                         break;
                     }
-                    case CaseType.LevelCommentsDisabled: break;
+                    case CaseType.LevelDisableComments:
+                    {
+                        slot!.CommentsEnabled = true;
+                        break;
+                    }
                     default: throw new ArgumentOutOfRangeException();
                 }
             }
@@ -76,7 +84,11 @@ public class PerformCaseActionsTask : IRepeatingTask
                         database.WebTokens.RemoveRange(database.WebTokens.Where(t => t.UserId == user.UserId));
                         break;
                     }
-                    case CaseType.UserCommentsDisabled: break;
+                    case CaseType.UserDisableComments:
+                    {
+                        user!.CommentsEnabled = false;
+                        break;
+                    }
 
                     case CaseType.LevelHide:
                     {
@@ -85,7 +97,11 @@ public class PerformCaseActionsTask : IRepeatingTask
                         
                         break;
                     }
-                    case CaseType.LevelCommentsDisabled: break;
+                    case CaseType.LevelDisableComments:
+                    {
+                        slot!.CommentsEnabled = false;
+                        break;
+                    }
                     default: throw new ArgumentOutOfRangeException();
                 }
             }

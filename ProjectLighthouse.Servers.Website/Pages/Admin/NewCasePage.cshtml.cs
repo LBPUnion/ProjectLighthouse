@@ -28,13 +28,16 @@ public class NewCasePage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost(CaseType? type, string reason, string modNotes, DateTime expires, int? affectedId)
+    public async Task<IActionResult> OnPost(CaseType? type, string? reason, string? modNotes, DateTime expires, int? affectedId)
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.Redirect("/login");
 
         if (type == null) return this.BadRequest();
         if (affectedId == null) return this.BadRequest();
+
+        reason ??= string.Empty;
+        modNotes ??= string.Empty;
         
         // this is fucking ugly
         // if id is invalid then return bad request

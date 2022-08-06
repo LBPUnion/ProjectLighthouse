@@ -173,6 +173,9 @@ public class User
 
     public PrivacyType ProfileVisibility { get; set; } = PrivacyType.All;
 
+    // should not be adjustable by user
+    public bool CommentsEnabled { get; set; } = true;
+
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
@@ -189,7 +192,7 @@ public class User
                       LbpSerializer.StringElement("commentCount", this.Comments) +
                       LbpSerializer.StringElement("photosByMeCount", this.PhotosByMe) +
                       LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMe) +
-                      LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled) +
+                      LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled && CommentsEnabled) +
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
                       LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels) +
                       LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +
