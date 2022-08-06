@@ -57,6 +57,9 @@
         <value>Cerrar sesión</value>
         <comment>A shortcut to log you out of your account.</comment>
     </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Mod Panel</value>
+    </data>
   <data name="generated_by" xml:space="preserve">
         <value>Página generada por {0}.</value>
     </data>
@@ -64,21 +67,21 @@
         <value>Esta página fue generada usando una versión modificada de Project Lighthouse. Por favor asegúrese de que está revelando correctamente el código principal a los usuarios que están usando está instancia</value>
     </data>
   <data name="js_warn" xml:space="preserve">
-        <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
+        <value>Aunque intentemos tener el mínimo de JavaScript posible, no podemos garantizar que todo funcione sin él. Le recomendamos que actives JavaScript para Project Lighthouse.</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript is not enabled</value>
+        <value>JavaScript no está habilitado</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
-        <value>Potential License Violation</value>
+        <value>Posible infracción de licencia</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the {0}.</value>
+        <value>Esta instancia es una instancia pública que ha sido modificada sin que se hayan publicado los cambios. Puede estar infringiendo la {0}.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
-        <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
+        <value>Si crees que se trata de un error, por favor, crea un error (issue) con el resultado de {0} ejecutado desde la raíz del código fuente del servidor en la descripción en nuestro {1}buscador de errores{2}.</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
-        <value>If not, please publish the source code somewhere accessible to your users.</value>
+        <value>Si no es así, por favor publique el código fuente en algún lugar accesible para sus usuarios.</value>
     </data>
 </root>
