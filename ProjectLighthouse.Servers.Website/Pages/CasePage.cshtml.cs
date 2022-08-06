@@ -15,6 +15,7 @@ public class CasePage : BaseLayout
 
     public List<ModerationCase> Cases;
     public int CaseCount;
+    public int DismissedCaseCount;
 
     public int PageAmount;
     public int PageNumber;
@@ -35,7 +36,9 @@ public class CasePage : BaseLayout
             .Include(c => c.Dismisser)
             .OrderByDescending(c => c.CaseId)
             .ToListAsync();
+        
         this.CaseCount = await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue));
+        this.DismissedCaseCount = await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue) && c.DismissedAt != null);
 
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.CaseCount / ServerStatics.PageSize));
