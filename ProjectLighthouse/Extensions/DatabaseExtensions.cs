@@ -31,7 +31,7 @@ public static class DatabaseExtensions
         }
         else
         {
-            query = query.Where(s => (includeDeveloperLevels && s.Type == SlotType.Developer) ? (s.GameVersion == gameVersion) : (s.GameVersion <= gameVersion));
+            query = query.Where(s => s.GameVersion <= gameVersion);
         }
 
         if (!includeSublevels) query = query.Where(s => !s.SubLevel);

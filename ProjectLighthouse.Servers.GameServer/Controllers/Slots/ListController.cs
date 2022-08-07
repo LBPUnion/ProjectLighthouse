@@ -141,8 +141,6 @@ public class ListController : ControllerBase
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        if (slotType == "developer") slot.GameVersion = token.GameVersion;
-
         await this.database.HeartLevel(user, slot);
 
         return this.Ok();
@@ -163,8 +161,6 @@ public class ListController : ControllerBase
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
-
-        if (slotType == "developer") slot.GameVersion = token.GameVersion;
 
         await this.database.UnheartLevel(user, slot);
 
