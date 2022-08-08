@@ -183,6 +183,7 @@ public class ListController : ControllerBase
 
         IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include
                 (q => q.User)
+            .OrderByDescending(q => q.HeartedUserId)
             .Include(q => q.HeartedUser)
             .Include(q => q.HeartedUser.Location)
             .Where(q => q.User.Username == username)
