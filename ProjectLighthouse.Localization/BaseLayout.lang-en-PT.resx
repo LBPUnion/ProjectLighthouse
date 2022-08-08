@@ -57,6 +57,9 @@
         <value>Sleep</value>
         <comment>A shortcut to log you out of your account.</comment>
     </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Mod Panel</value>
+    </data>
   <data name="generated_by" xml:space="preserve">
         <value>This here ship be made by {0}.</value>
     </data>

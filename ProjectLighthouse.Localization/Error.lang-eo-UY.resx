@@ -18,30 +18,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>The username field is blank.</value>
+        <value>La uzantnoma kampo estas malplena.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>The username you've chosen is already taken.</value>
+        <value>La uzantnomo kiun vi elektis, estas jam prenita.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>Password field is required.</value>
+        <value>Pasvorta kampo necesas.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Passwords do not match!</value>
+        <value>Pasvortoj ne kongruas!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
-        <value>Invalid Token</value>
+        <value>Nevalida Ĵetono</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>You must complete the captcha correctly.</value>
+        <value>Vi devas kompletigi la CAPTCHA.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
-        <value>The email address you've chosen is already taken.</value>
+        <value>La retpoŝta adreso kiun vi elektis, estas jam prenita.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Email address field is required.</value>
+        <value>Retpoŝta adresa kampo estas bezonata.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
-        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
+        <value>Vi estis malpermesita. Bonvolu kontakti administranton por pliaj informoj.\nKialo: {0}</value>
     </data>
 </root>
