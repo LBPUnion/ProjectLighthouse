@@ -161,7 +161,6 @@ public class PhotosController : ControllerBase
     public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
         User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         if (userFromQuery == null) return this.NotFound();
 
         List<Photo> photos = await this.database.Photos.Include
@@ -179,18 +178,25 @@ public class PhotosController : ControllerBase
     public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
         User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         if (userFromQuery == null) return this.NotFound();
 
-        List<Photo> photos = new();
-        foreach (Photo photo in this.database.Photos.Include
-                     (p => p.Creator)) photos.AddRange(photo.Subjects.Where(subject => subject.User.UserId == userFromQuery.UserId).Select(_ => photo));
+        List<int> photoSubjectIds = new();
+        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == userFromQuery.UserId).Select(p => p.PhotoSubjectId));
 
-        string response = photos.OrderByDescending
-                (s => s.Timestamp)
-            .Skip(pageStart - 1)
-            .Take(Math.Min(pageSize, 30))
-            .Aggregate(string.Empty, (s, photo) => s + photo.Serialize());
+        var list = this.database.Photos.Select(p => new
+        {
+            p.PhotoId,
+            p.PhotoSubjectCollection,
+        }).ToList();
+        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Contains(ps.ToString())) select v.PhotoId).ToList();
+
+        string response = Enumerable.Aggregate(
+            this.database.Photos.Where(p => photoIds.Any(id => p.PhotoId == id) && p.CreatorId != userFromQuery.UserId)
+                .OrderByDescending(s => s.Timestamp)
+                .Skip(pageStart - 1)
+                .Take(Math.Min(pageSize, 30)),
+            string.Empty,
+            (current, photo) => current + photo.Serialize());
 
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }
