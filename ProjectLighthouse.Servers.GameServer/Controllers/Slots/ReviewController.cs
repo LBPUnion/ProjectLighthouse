@@ -209,7 +209,7 @@ public class ReviewController : ControllerBase
         IEnumerable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)
             .Include(r => r.Reviewer)
             .Include(r => r.Slot)
-            .Where(r => r.Reviewer!.Username == username)
+            .Where(r => r.ReviewerId == user.UserId)
             .OrderByDescending(r => r.Timestamp)
             .Skip(pageStart - 1)
             .Take(pageSize);

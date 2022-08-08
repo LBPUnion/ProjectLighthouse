@@ -1,10 +1,10 @@
+using System.IO.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Primitives;
 
@@ -124,6 +124,30 @@ public class GameServerStartup
                 context.Response.Body = responseBuffer;
 
                 await next(context); // Handle the request so we can get the server digest hash
+                responseBuffer.Position = 0;
+                // Set the X-Original-Content-Length header to the length of the response buffer.
+                if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate"))
+                {
+                    context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
+                    context.Response.Headers.Add("Vary", "Accept-Encoding");
+                    MemoryStream resultStream = new();
+                    await using ZLibStream stream = new(resultStream, CompressionMode.Compress, true);
+                    await stream.WriteAsync(responseBuffer.ToArray());
+                    stream.Close();
+
+                    resultStream.Position = 0;
+                    context.Response.Headers.Add("Content-Length", resultStream.Length.ToString());
+                    context.Response.Headers.Add("Content-Encoding", "deflate");
+                    responseBuffer.SetLength(0);
+                    await resultStream.CopyToAsync(responseBuffer);
+                }
+                else
+                {
+                    if(!context.Response.Headers.ContentLength.HasValue)
+                        context.Response.Headers.Add("Content-Length", responseBuffer.Length.ToString());
+                    else
+                        context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
+                }
 
                 // Compute the server digest hash.
                 if (computeDigests)
@@ -139,10 +163,7 @@ public class GameServerStartup
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
 
-                // Set the X-Original-Content-Length header to the length of the response buffer.
-                context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
-
-                // Copy the buffered response to the actual respose stream.
+                // Copy the buffered response to the actual response stream.
                 responseBuffer.Position = 0;
                 await responseBuffer.CopyToAsync(oldResponseStream);
                 context.Response.Body = oldResponseStream;

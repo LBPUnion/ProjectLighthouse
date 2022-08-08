@@ -2,7 +2,6 @@
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,13 +40,11 @@ public class EnterLevelController : ControllerBase
             switch (gameVersion)
             {
                 case GameVersion.LittleBigPlanet2:
+                case GameVersion.LittleBigPlanetVita:
                     slot.PlaysLBP2Unique++;
                     break;
                 case GameVersion.LittleBigPlanet3:
                     slot.PlaysLBP3Unique++;
-                    break;
-                case GameVersion.LittleBigPlanetVita:
-                    slot.PlaysLBPVitaUnique++;
                     break;
                 default: return this.BadRequest();
             }
@@ -67,6 +64,7 @@ public class EnterLevelController : ControllerBase
         switch (gameVersion)
         {
             case GameVersion.LittleBigPlanet2:
+            case GameVersion.LittleBigPlanetVita:
                 slot.PlaysLBP2++;
                 v.PlaysLBP2++;
                 break;
@@ -74,12 +72,9 @@ public class EnterLevelController : ControllerBase
                 slot.PlaysLBP3++;
                 v.PlaysLBP3++;
                 break;
-            case GameVersion.LittleBigPlanetVita:
-                slot.PlaysLBPVita++;
-                v.PlaysLBPVita++;
-                break;
             case GameVersion.LittleBigPlanetPSP: throw new NotImplementedException();
             case GameVersion.Unknown:
+            case GameVersion.LittleBigPlanet1:
             default:
                 return this.BadRequest();
         }
@@ -105,9 +100,11 @@ public class EnterLevelController : ControllerBase
         {
             slot.PlaysLBP1Unique++;
 
-            v = new VisitedLevel();
-            v.SlotId = id;
-            v.UserId = user.UserId;
+            v = new VisitedLevel
+            {
+                SlotId = id,
+                UserId = user.UserId,
+            };
             this.database.VisitedLevels.Add(v);
         }
         else

@@ -300,7 +300,7 @@ public class Database : DbContext
             return null;
         }
 
-        return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
     }
 
     public async Task<User?> UserFromGameToken
@@ -351,7 +351,7 @@ public class Database : DbContext
             return null;
         }
 
-        User? user = await this.UserFromGameToken(token);
+        User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
 
         if (user == null) return null;
 

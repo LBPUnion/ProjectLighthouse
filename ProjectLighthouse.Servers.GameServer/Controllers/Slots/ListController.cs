@@ -104,7 +104,10 @@ public class ListController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<Slot> heartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
+        User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (targetUser == null) return this.StatusCode(403, "");
+
+        IEnumerable<Slot> heartedLevels = this.database.HeartedLevels.Where(q => q.UserId == targetUser.UserId)
             .Include(q => q.Slot.Creator)
             .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
@@ -119,7 +122,7 @@ public class ListController : ControllerBase
         (
             LbpSerializer.TaggedStringElement("favouriteSlots", response, new Dictionary<string, object>
             {
-                { "total", this.database.HeartedLevels.Include(q => q.User).Count(q => q.User.Username == username) },
+                { "total", this.database.HeartedLevels.Count(q => q.UserId == targetUser.UserId) },
                 { "hint_start", pageStart + Math.Min(pageSize, 30) },
             })
         );
@@ -165,22 +168,25 @@ public class ListController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include
-                (q => q.User)
-            .Include(q => q.HeartedUser)
+        User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (targetUser == null) return this.StatusCode(403, "");
+
+        IEnumerable<User> heartedProfiles = this.database.HeartedProfiles.Include
+                (q => q.HeartedUser)
             .Include(q => q.HeartedUser.Location)
-            .Where(q => q.User.Username == username)
+            .Select(q => q.HeartedUser)
+            .Where(q => q.UserId == targetUser.UserId)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
-        string response = heartedProfiles.Aggregate(string.Empty, (current, q) => current + q.HeartedUser.Serialize(token.GameVersion));
+        string response = heartedProfiles.Aggregate(string.Empty, (current, u) => current + u.Serialize(token.GameVersion));
 
         return this.Ok
         (
             LbpSerializer.TaggedStringElement("favouriteUsers", response, new Dictionary<string, object>
             {
-                { "total", this.database.HeartedProfiles.Include(q => q.User).Count(q => q.User.Username == username) },
+                { "total", this.database.HeartedProfiles.Count(q => q.UserId == targetUser.UserId) },
                 { "hint_start", pageStart + Math.Min(pageSize, 30) },
             })
         );

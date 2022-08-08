@@ -38,7 +38,7 @@ public class SlotsController : ControllerBase
         string response = Enumerable.Aggregate
         (
             this.database.Slots.ByGameVersion(gameVersion, token.UserId == user.UserId, true)
-                .Where(s => s.Creator!.Username == user.Username)
+                .Where(s => s.CreatorId == user.UserId)
                 .Skip(pageStart - 1)
                 .Take(Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)),
             string.Empty,
@@ -148,7 +148,7 @@ public class SlotsController : ControllerBase
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
         VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
         Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == id && r.ReviewerId == user.UserId);
-        return this.Ok(slot.Serialize(gameVersion, ratedLevel, visitedLevel, review));
+        return this.Ok(slot.Serialize(gameVersion, ratedLevel, visitedLevel, review, true));
     }
 
     [HttpGet("slots/cool")]
@@ -346,7 +346,7 @@ public class SlotsController : ControllerBase
                         GameVersion.LittleBigPlanet1 => s.PlaysLBP1Unique,
                         GameVersion.LittleBigPlanet2 => s.PlaysLBP2Unique,
                         GameVersion.LittleBigPlanet3 => s.PlaysLBP3Unique,
-                        GameVersion.LittleBigPlanetVita => s.PlaysLBPVitaUnique,
+                        GameVersion.LittleBigPlanetVita => s.PlaysLBP2Unique,
                         _ => s.PlaysUnique,
                     };
                 }

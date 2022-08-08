@@ -185,10 +185,6 @@ public class PublishController : ControllerBase
             slot.PlaysLBP3Complete = oldSlot.PlaysLBP3Complete;
             slot.PlaysLBP3Unique = oldSlot.PlaysLBP3Unique;
 
-            slot.PlaysLBPVita = oldSlot.PlaysLBPVita;
-            slot.PlaysLBPVitaComplete = oldSlot.PlaysLBPVitaComplete;
-            slot.PlaysLBPVitaUnique = oldSlot.PlaysLBPVitaUnique;
-
             #endregion
 
             slot.FirstUploaded = oldSlot.FirstUploaded;
