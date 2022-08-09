@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -19,6 +20,8 @@ public static class LbpSerializer
     public static string StringElement(string key, bool value) => $"<{key}>{value.ToString().ToLower()}</{key}>";
 
     public static string StringElement(string key, object value) => $"<{key}>{value}</{key}>";
+
+    public static string StringElement(string key, object value, bool omitIfDefault) => !omitIfDefault || value != null && value.GetType().IsValueType && !Activator.CreateInstance(value.GetType())!.Equals(value) ? $"<{key}>{value}</{key}>" : "";
 
     public static string TaggedStringElement
         (KeyValuePair<string, object> pair, KeyValuePair<string, object> tagPair)
