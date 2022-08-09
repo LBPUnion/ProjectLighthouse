@@ -18,7 +18,7 @@ public class NewestLevelsCategory : Category
         (Database database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3, false, true)
             .OrderByDescending(s => s.FirstUploaded)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 20));
     public override int GetTotalSlots(Database database) => database.Slots.Count(s => s.Type == SlotType.User);
 }

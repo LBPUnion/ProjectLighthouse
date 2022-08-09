@@ -239,32 +239,18 @@ public class Slot
     [JsonIgnore]
     public string HiddenReason { get; set; } = "";
 
-    public string SerializeResources()
+    public string SerializeDevSlot()
     {
-        return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource)) +
-               LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
-    }
-
-    public string SerializeDevSlot(bool includeExtras = true)
-    {
-
-        int comments = 0, photos = 0;
-        if (includeExtras)
-        {
-            comments = this.Comments;
-            photos = this.Photos;
-        }
-        
+        int comments = this.Comments;
+        int photos = this.Photos;
         int players = RoomHelper.Rooms
             .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)
             .Sum(r => r.PlayerIds.Count);
 
         string slotData = LbpSerializer.StringElement("id", this.InternalSlotId) +
-                          LbpSerializer.StringElement("playerCount", players);
-
-        if(includeExtras)
-            slotData += LbpSerializer.StringElement("commentCount", comments) +
-                        LbpSerializer.StringElement("photoCount", photos);
+                          LbpSerializer.StringElement("playerCount", players) +
+                          LbpSerializer.StringElement("commentCount", comments) +
+                          LbpSerializer.StringElement("photoCount", photos);
 
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "developer");
     }

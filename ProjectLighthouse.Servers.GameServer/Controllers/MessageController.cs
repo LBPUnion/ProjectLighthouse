@@ -1,11 +1,8 @@
 #nullable enable
-using System.Globalization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
@@ -39,8 +36,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     [HttpGet("eula")]
     public async Task<IActionResult> Eula()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        // ReSharper disable once ConvertIfStatementToReturnStatement
+        if (token == null) return this.StatusCode(403, "");
 
         return this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
     }
@@ -48,38 +46,30 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     [HttpGet("announce")]
     public async Task<IActionResult> Announce()
     {
-        #if !DEBUG
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
-        #else
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
-        if (userAndToken == null) return this.StatusCode(403, "");
-
-        // ReSharper disable once PossibleInvalidOperationException
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
-        #endif
+        string username = await this.database.UsernameFromGameToken(token);
 
         string announceText = ServerConfiguration.Instance.AnnounceText;
 
-        announceText = announceText.Replace("%user", user.Username);
-        announceText = announceText.Replace("%id", user.UserId.ToString());
+        announceText = announceText.Replace("%user", username);
+        announceText = announceText.Replace("%id", token.UserId.ToString());
 
         return this.Ok
         (
             announceText +
             #if DEBUG
             "\n\n---DEBUG INFO---\n" +
-            $"user.UserId: {user.UserId}\n" +
-            $"token.Approved: {gameToken.Approved}\n" +
-            $"token.Used: {gameToken.Used}\n" +
-            $"token.UserLocation: {gameToken.UserLocation}\n" +
-            $"token.GameVersion: {gameToken.GameVersion}\n" +
-            $"token.ExpiresAt: {gameToken.ExpiresAt.ToString(CultureInfo.CurrentCulture)}\n" +
+            $"user.UserId: {token.UserId}\n" +
+            $"token.Approved: {token.Approved}\n" +
+            $"token.Used: {token.Used}\n" +
+            $"token.UserLocation: {token.UserLocation}\n" +
+            $"token.GameVersion: {token.GameVersion}\n" +
+            $"token.ExpiresAt: {token.ExpiresAt.ToString(CultureInfo.CurrentCulture)}\n" +
             "---DEBUG INFO---" +
             #endif
-            (announceText != "" ? "\n" : "")
+            (string.IsNullOrWhiteSpace(announceText) ? "" : "\n")
         );
     }
 
@@ -92,15 +82,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     [HttpPost("filter")]
     public async Task<IActionResult> Filter()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
 
-        if (user == null) return this.StatusCode(403, "");
+        if (token == null) return this.StatusCode(403, "");
 
         string response = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
         string scannedText = CensorHelper.ScanMessage(response);
 
-        Logger.Info($"{user.Username}: {response} / {scannedText}", LogArea.Filter);
+        string username = await this.database.UsernameFromGameToken(token);
+
+        Logger.Info($"{username}: {response} / {scannedText}", LogArea.Filter);
 
         return this.Ok(scannedText);
     }

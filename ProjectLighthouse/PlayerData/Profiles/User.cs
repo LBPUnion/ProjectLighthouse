@@ -83,9 +83,19 @@ public class User
     [JsonIgnore]
     public int PhotosByMe => this.database.Photos.Count(p => p.CreatorId == this.UserId);
 
-    [NotMapped]
-    [JsonIgnore]
-    public int PhotosWithMe => this.database.PhotoSubjects.Count(s => s.UserId == this.UserId);
+    private int PhotosWithMe()
+    {
+        List<int> photoSubjectIds = new();
+        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == this.UserId).Select(p => p.PhotoSubjectId));
+
+        var list = this.database.Photos.Select(p => new
+            {
+                p.PhotoId,
+                p.PhotoSubjectCollection,
+            }).ToList();
+        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Contains(ps.ToString())) select v.PhotoId).ToList();
+        return this.database.Photos.Count(p => photoIds.Any(pId => p.PhotoId == pId) && p.CreatorId != this.UserId);
+    }
 
     [JsonIgnore]
     public int LocationId { get; set; }
@@ -184,36 +194,36 @@ public class User
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                       LbpSerializer.StringElement("game", (int)gameVersion) +
                       this.serializeSlots(gameVersion) +
-                      LbpSerializer.StringElement("lists", this.Lists, true) +
-                      LbpSerializer.StringElement
+                      LbpSerializer.StringElement<string>("lists", this.Lists, true) +
+                      LbpSerializer.StringElement<string>
                       (
                           "lists_quota",
                           ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota,
                           true
                       ) + // technically not a part of the user but LBP expects it
-                      LbpSerializer.StringElement("heartCount", this.Hearts, true) +
+                      LbpSerializer.StringElement<string>("heartCount", this.Hearts, true) +
                       this.serializeEarth(gameVersion) +
-                      LbpSerializer.StringElement("yay2", this.YayHash, true) +
-                      LbpSerializer.StringElement("boo2", this.BooHash, true) +
-                      LbpSerializer.StringElement("meh2", this.MehHash, true) +
-                      LbpSerializer.StringElement("biography", this.Biography, true) +
-                      LbpSerializer.StringElement("reviewCount", this.Reviews, true) +
-                      LbpSerializer.StringElement("commentCount", this.Comments, true) +
-                      LbpSerializer.StringElement("photosByMeCount", this.PhotosByMe, true) +
-                      LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMe, true) +
+                      LbpSerializer.StringElement<string>("yay2", this.YayHash, true) +
+                      LbpSerializer.StringElement<string>("boo2", this.BooHash, true) +
+                      LbpSerializer.StringElement<string>("meh2", this.MehHash, true) +
+                      LbpSerializer.StringElement<string>("biography", this.Biography, true) +
+                      LbpSerializer.StringElement<int>("reviewCount", this.Reviews, true) +
+                      LbpSerializer.StringElement<int>("commentCount", this.Comments, true) +
+                      LbpSerializer.StringElement<int>("photosByMeCount", this.PhotosByMe, true) +
+                      LbpSerializer.StringElement<int>("photosWithMeCount", this.PhotosWithMe(), true) +
                       LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled && this.CommentsEnabled) +
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
-                      LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels, true) +
-                      LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers, true) +
-                      LbpSerializer.StringElement("lolcatftwCount", this.QueuedLevels, true) +
-                      LbpSerializer.StringElement("pins", this.Pins, true);
+                      LbpSerializer.StringElement<int>("favouriteSlotCount", this.HeartedLevels, true) +
+                      LbpSerializer.StringElement<int>("favouriteUserCount", this.HeartedUsers, true) +
+                      LbpSerializer.StringElement<int>("lolcatftwCount", this.QueuedLevels, true) +
+                      LbpSerializer.StringElement<string>("pins", this.Pins, true);
 
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }
 
     private string serializeEarth(GameVersion gameVersion)
     {
-        return LbpSerializer.StringElement
+        return LbpSerializer.StringElement<string>
         (
             "planets",
             gameVersion switch

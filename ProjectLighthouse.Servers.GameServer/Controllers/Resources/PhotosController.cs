@@ -140,8 +140,10 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/{slotType}/{id:int}")]
     public async Task<IActionResult> SlotPhotos([FromQuery] int pageStart, [FromQuery] int pageSize, string slotType, int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        if (pageSize <= 0) return this.BadRequest();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
@@ -150,7 +152,7 @@ public class PhotosController : ControllerBase
         List<Photo> photos = await this.database.Photos.Include(p => p.Creator)
             .Where(p => p.SlotId == id)
             .OrderByDescending(s => s.Timestamp)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync();
         string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize(id, SlotHelper.ParseType(slotType)));
@@ -160,14 +162,19 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/by")]
     public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
-        if (userFromQuery == null) return this.NotFound();
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        if (pageSize <= 0) return this.BadRequest();
+
+        int targetUserId = await this.database.Users.Where(u => u.Username == user).Select(u => u.UserId).FirstOrDefaultAsync();
+        if (targetUserId == 0) return this.NotFound();
 
         List<Photo> photos = await this.database.Photos.Include
                 (p => p.Creator)
-            .Where(p => p.CreatorId == userFromQuery.UserId)
+            .Where(p => p.CreatorId == targetUserId)
             .OrderByDescending(s => s.Timestamp)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync();
         string response = photos.Aggregate(string.Empty, (s, photo) => s + photo.Serialize());
@@ -177,11 +184,16 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/with")]
     public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        User? userFromQuery = await this.database.Users.FirstOrDefaultAsync(u => u.Username == user);
-        if (userFromQuery == null) return this.NotFound();
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        if (pageSize <= 0) return this.BadRequest();
+
+        int targetUserId = await this.database.Users.Where(u => u.Username == user).Select(u => u.UserId).FirstOrDefaultAsync();
+        if (targetUserId == 0) return this.NotFound();
 
         List<int> photoSubjectIds = new();
-        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == userFromQuery.UserId).Select(p => p.PhotoSubjectId));
+        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == targetUserId).Select(p => p.PhotoSubjectId));
 
         var list = this.database.Photos.Select(p => new
         {
@@ -191,9 +203,9 @@ public class PhotosController : ControllerBase
         List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Contains(ps.ToString())) select v.PhotoId).ToList();
 
         string response = Enumerable.Aggregate(
-            this.database.Photos.Where(p => photoIds.Any(id => p.PhotoId == id) && p.CreatorId != userFromQuery.UserId)
+            this.database.Photos.Where(p => photoIds.Any(id => p.PhotoId == id) && p.CreatorId != targetUserId)
                 .OrderByDescending(s => s.Timestamp)
-                .Skip(pageStart - 1)
+                .Skip(Math.Max(0, pageStart - 1))
                 .Take(Math.Min(pageSize, 30)),
             string.Empty,
             (current, photo) => current + photo.Serialize());
@@ -204,12 +216,12 @@ public class PhotosController : ControllerBase
     [HttpPost("deletePhoto/{id:int}")]
     public async Task<IActionResult> DeletePhoto(int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
         if (photo == null) return this.NotFound();
-        if (photo.CreatorId != user.UserId) return this.StatusCode(401, "");
+        if (photo.CreatorId != token.UserId) return this.StatusCode(401, "");
         foreach (string idStr in photo.PhotoSubjectIds)
         {
             if (!int.TryParse(idStr, out int subjectId)) throw new InvalidCastException(idStr + " is not a valid number.");

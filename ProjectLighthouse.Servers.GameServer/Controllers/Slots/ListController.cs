@@ -1,5 +1,4 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
@@ -31,6 +30,8 @@ public class ListController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         GameVersion gameVersion = token.GameVersion;
 
         IEnumerable<Slot> queuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
@@ -38,7 +39,7 @@ public class ListController : ControllerBase
             .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
             .ByGameVersion(gameVersion)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
@@ -54,13 +55,13 @@ public class ListController : ControllerBase
     [HttpPost("lolcatftw/add/user/{id:int}")]
     public async Task<IActionResult> AddQueuedLevel(int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        await this.database.QueueLevel(user, slot);
+        await this.database.QueueLevel(token.UserId, slot);
 
         return this.Ok();
     }
@@ -68,13 +69,13 @@ public class ListController : ControllerBase
     [HttpPost("lolcatftw/remove/user/{id:int}")]
     public async Task<IActionResult> RemoveQueuedLevel(int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        await this.database.UnqueueLevel(user, slot);
+        await this.database.UnqueueLevel(token.UserId, slot);
 
         return this.Ok();
     }
@@ -82,10 +83,10 @@ public class ListController : ControllerBase
     [HttpPost("lolcatftw/clear")]
     public async Task<IActionResult> ClearQueuedLevels()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
-        this.database.QueuedLevels.RemoveRange(this.database.QueuedLevels.Where(q => q.UserId == user.UserId));
+        this.database.QueuedLevels.RemoveRange(this.database.QueuedLevels.Where(q => q.UserId == token.UserId));
 
         await this.database.SaveChangesAsync();
 
@@ -102,6 +103,8 @@ public class ListController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         GameVersion gameVersion = token.GameVersion;
 
         User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -112,7 +115,7 @@ public class ListController : ControllerBase
             .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
             .ByGameVersion(gameVersion)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
@@ -131,13 +134,13 @@ public class ListController : ControllerBase
     [HttpPost("favourite/slot/user/{id:int}")]
     public async Task<IActionResult> AddFavouriteSlot(int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        await this.database.HeartLevel(user, slot);
+        await this.database.HeartLevel(token.UserId, slot);
 
         return this.Ok();
     }
@@ -145,13 +148,13 @@ public class ListController : ControllerBase
     [HttpPost("unfavourite/slot/user/{id:int}")]
     public async Task<IActionResult> RemoveFavouriteSlot(int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        await this.database.UnheartLevel(user, slot);
+        await this.database.UnheartLevel(token.UserId, slot);
 
         return this.Ok();
     }
@@ -171,12 +174,14 @@ public class ListController : ControllerBase
         User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (targetUser == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         IEnumerable<User> heartedProfiles = this.database.HeartedProfiles.Include
                 (q => q.HeartedUser)
             .Include(q => q.HeartedUser.Location)
             .Select(q => q.HeartedUser)
             .Where(q => q.UserId == targetUser.UserId)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
 
@@ -195,13 +200,13 @@ public class ListController : ControllerBase
     [HttpPost("favourite/user/{username}")]
     public async Task<IActionResult> AddFavouriteUser(string username)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (heartedUser == null) return this.NotFound();
 
-        await this.database.HeartUser(user, heartedUser);
+        await this.database.HeartUser(token.UserId, heartedUser);
 
         return this.Ok();
     }
@@ -209,13 +214,13 @@ public class ListController : ControllerBase
     [HttpPost("unfavourite/user/{username}")]
     public async Task<IActionResult> RemoveFavouriteUser(string username)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (heartedUser == null) return this.NotFound();
 
-        await this.database.UnheartUser(user, heartedUser);
+        await this.database.UnheartUser(token.UserId, heartedUser);
 
         return this.Ok();
     }

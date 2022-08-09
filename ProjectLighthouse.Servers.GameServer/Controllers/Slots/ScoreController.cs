@@ -25,15 +25,12 @@ public class ScoreController : ControllerBase
     [HttpPost("scoreboard/{slotType}/{id:int}")]
     public async Task<IActionResult> SubmitScore(string slotType, int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
-        if (userAndToken == null) return this.StatusCode(403, "");
+        string username = await this.database.UsernameFromGameToken(token);
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
-
-        // ReSharper disable once PossibleInvalidOperationException
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
 
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -51,7 +48,7 @@ public class ScoreController : ControllerBase
         Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
         if (slot == null) return this.BadRequest();
 
-        switch (gameToken.GameVersion)
+        switch (token.GameVersion)
         {
             case GameVersion.LittleBigPlanet1:
                 slot.PlaysLBP1Complete++;
@@ -83,7 +80,7 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        string myRanking = this.getScores(score.SlotId, score.Type, user, -1, 5, "scoreboardSegment");
+        string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment");
 
         return this.Ok(myRanking);
     }
@@ -98,15 +95,18 @@ public class ScoreController : ControllerBase
     public async Task<IActionResult> TopScores(string slotType, int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
         // Get username
-        User? user = await this.database.UserFromGameRequest(this.Request);
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
-        if (user == null) return this.StatusCode(403, "");
+        if (pageSize <= 0) return this.BadRequest();
+
+        string username = await this.database.UsernameFromGameToken(token);
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        return this.Ok(this.getScores(slotId, type, user, pageStart, pageSize));
+        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize));
     }
 
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -114,12 +114,13 @@ public class ScoreController : ControllerBase
     (
         int slotId,
         int type,
-        User user,
+        string username,
         int pageStart = -1,
         int pageSize = 5,
         string rootName = "scores"
     )
     {
+
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
         var rankedScores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type)
@@ -135,7 +136,7 @@ public class ScoreController : ControllerBase
             );
 
         // Find your score, since even if you aren't in the top list your score is pinned
-        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Contains(user.Username)).OrderByDescending(rs => rs.Score.Points).FirstOrDefault();
+        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Contains(username)).MaxBy(rs => rs.Score.Points);
 
         // Paginated viewing: if not requesting pageStart, get results around user
         var pagedScores = rankedScores.Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3).Take(Math.Min(pageSize, 30));

@@ -30,16 +30,18 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         GameVersion gameVersion = token.GameVersion;
 
-        User? user = await this.database.Users.FirstOrDefaultAsync(dbUser => dbUser.Username == u);
-        if (user == null) return this.NotFound();
+        int targetUserId = await this.database.Users.Where(dbUser => dbUser.Username == u).Select(dbUser => dbUser.UserId).FirstOrDefaultAsync();
+        if (targetUserId == 0) return this.NotFound();
 
         string response = Enumerable.Aggregate
         (
-            this.database.Slots.ByGameVersion(gameVersion, token.UserId == user.UserId, true)
-                .Where(s => s.CreatorId == user.UserId)
-                .Skip(pageStart - 1)
+            this.database.Slots.ByGameVersion(gameVersion, token.UserId == targetUserId, true)
+                .Where(s => s.CreatorId == targetUserId)
+                .Skip(Math.Max(0, pageStart - 1))
                 .Take(Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)),
             string.Empty,
             (current, slot) => current + slot.Serialize(token.GameVersion)
@@ -57,7 +59,7 @@ public class SlotsController : ControllerBase
                         "hint_start", pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
                     },
                     {
-                        "total", user.UsedSlots
+                        "total", await this.database.Slots.CountAsync(s => s.CreatorId == targetUserId)
                     },
                 }
             )
@@ -93,9 +95,6 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/developer")]
     public async Task<IActionResult> StoryPlayers()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
-
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
@@ -107,7 +106,7 @@ public class SlotsController : ControllerBase
         {
             int placeholderSlotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
             Slot slot = await this.database.Slots.FirstAsync(s => s.SlotId == placeholderSlotId);
-            serializedSlots.Add(slot.SerializeDevSlot(false));
+            serializedSlots.Add(slot.SerializeDevSlot());
         }
 
         string serialized = serializedSlots.Aggregate(string.Empty, (current, slot) => current + slot);
@@ -118,9 +117,6 @@ public class SlotsController : ControllerBase
     [HttpGet("s/developer/{id:int}")]
     public async Task<IActionResult> SDev(int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
-
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
@@ -133,9 +129,6 @@ public class SlotsController : ControllerBase
     [HttpGet("s/user/{id:int}")]
     public async Task<IActionResult> SUser(int id)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
-
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
@@ -145,9 +138,9 @@ public class SlotsController : ControllerBase
 
         if (slot == null) return this.NotFound();
 
-        RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-        VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == user.UserId);
-        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == id && r.ReviewerId == user.UserId);
+        RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == token.UserId);
+        VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == token.UserId);
+        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == id && r.ReviewerId == token.UserId);
         return this.Ok(slot.Serialize(gameVersion, ratedLevel, visitedLevel, review, true));
     }
 
@@ -181,11 +174,13 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         GameVersion gameVersion = token.GameVersion;
 
         IQueryable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion, false, true)
             .OrderByDescending(s => s.FirstUploaded)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
 
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
@@ -215,12 +210,14 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         GameVersion gameVersion = token.GameVersion;
 
         IQueryable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion, false, true)
             .Where(s => s.TeamPick)
             .OrderByDescending(s => s.LastUpdated)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
 
@@ -248,6 +245,8 @@ public class SlotsController : ControllerBase
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
+
+        if (pageSize <= 0) return this.BadRequest();
 
         GameVersion gameVersion = token.GameVersion;
 
@@ -288,13 +287,15 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         Random rand = new();
 
         IEnumerable<Slot> slots = this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending(s => s.Thumbsup)
             .ThenBy(_ => rand.Next())
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
@@ -332,6 +333,8 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         Random rand = new();
 
         IEnumerable<Slot> slots = this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
@@ -352,7 +355,7 @@ public class SlotsController : ControllerBase
                 }
             )
             .ThenBy(_ => rand.Next())
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
@@ -390,13 +393,15 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         Random rand = new();
 
         IEnumerable<Slot> slots = this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
             .AsEnumerable()
             .OrderByDescending(s => s.Hearts)
             .ThenBy(_ => rand.Next())
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
@@ -434,6 +439,8 @@ public class SlotsController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         Dictionary<int, int> playersBySlotId = new();
 
         foreach (Room room in RoomHelper.Rooms)
@@ -451,7 +458,7 @@ public class SlotsController : ControllerBase
         }
 
         IEnumerable<int> orderedPlayersBySlotId = playersBySlotId
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .OrderByDescending(kvp => kvp.Value)
             .Select(kvp => kvp.Key);
