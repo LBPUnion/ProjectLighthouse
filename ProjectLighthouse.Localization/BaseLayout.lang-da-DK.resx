@@ -57,6 +57,9 @@
         <value>Log ud</value>
         <comment>A shortcut to log you out of your account.</comment>
     </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Mod Panel</value>
+    </data>
   <data name="generated_by" xml:space="preserve">
         <value>Siden genereret af {0}.</value>
     </data>
