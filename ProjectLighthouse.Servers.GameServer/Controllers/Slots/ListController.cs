@@ -26,19 +26,23 @@ public class ListController : ControllerBase
     #region Level Queue (lolcatftw)
 
     [HttpGet("slots/lolcatftw/{username}")]
-    public async Task<IActionResult> GetQueuedLevels(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
+    public async Task<IActionResult> GetQueuedLevels
+    (
+        string username,
+        [FromQuery] int pageStart,
+        [FromQuery] int pageSize,
+        [FromQuery] string? gameFilterType = null,
+        [FromQuery] int? players = null,
+        [FromQuery] bool? move = null,
+        [FromQuery] string? dateFilterType = null
+    )
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<Slot> queuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
-            .OrderByDescending(q => q.QueuedLevelId)
-            .Include(q => q.Slot.Creator)
-            .Include(q => q.Slot.Location)
-            .Select(q => q.Slot)
-            .ByGameVersion(gameVersion)
+        IEnumerable<Slot> queuedLevels = this.filterLolcatftwByRequest(gameFilterType, dateFilterType, token.GameVersion, username)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
@@ -98,19 +102,23 @@ public class ListController : ControllerBase
     #region Hearted Levels
 
     [HttpGet("favouriteSlots/{username}")]
-    public async Task<IActionResult> GetFavouriteSlots(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
+    public async Task<IActionResult> GetFavouriteSlots
+    (
+        string username,
+        [FromQuery] int pageStart,
+        [FromQuery] int pageSize,
+        [FromQuery] string? gameFilterType = null,
+        [FromQuery] int? players = null,
+        [FromQuery] bool? move = null,
+        [FromQuery] string? dateFilterType = null
+    )
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<Slot> heartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
-            .OrderByDescending(q => q.HeartedLevelId)
-            .Include(q => q.Slot.Creator)
-            .Include(q => q.Slot.Location)
-            .Select(q => q.Slot)
-            .ByGameVersion(gameVersion, false, false, true)
+        IEnumerable<Slot> heartedLevels = this.filterFavouriteByRequest(gameFilterType, dateFilterType, token.GameVersion, username)
             .Skip(pageStart - 1)
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
@@ -131,7 +139,7 @@ public class ListController : ControllerBase
     public async Task<IActionResult> AddFavouriteSlot(string slotType, int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "403 Forbidden");
+        if (user == null) return this.StatusCode(403, "");
 
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -142,6 +150,10 @@ public class ListController : ControllerBase
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+
+        // assume g124806 is first LBP2 slot as it's the first guid in lbp2story_slots.slt, with guids being shared in the cutdown lbp2beta_slots.slt
+        PlayerData.GameVersion slotGameVersion = (slot.InternalSlotId < 124806) ? PlayerData.GameVersion.LittleBigPlanet1 : token.GameVersion;
+        if (slotType == "developer") slot.GameVersion = slotGameVersion;
 
         await this.database.HeartLevel(user, slot);
 
@@ -152,7 +164,7 @@ public class ListController : ControllerBase
     public async Task<IActionResult> RemoveFavouriteSlot(string slotType, int id)
     {
         User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "403 Forbidden");
+        if (user == null) return this.StatusCode(403, "");
 
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -163,6 +175,10 @@ public class ListController : ControllerBase
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+
+        // assume g124806 is first LBP2 slot as it's the first guid in lbp2story_slots.slt, with guids being shared in the cutdown lbp2beta_slots.slt
+        PlayerData.GameVersion slotGameVersion = (slot.InternalSlotId < 124806) ? PlayerData.GameVersion.LittleBigPlanet1 : token.GameVersion;
+        if (slotType == "developer") slot.GameVersion = slotGameVersion;
 
         await this.database.UnheartLevel(user, slot);
 
@@ -233,4 +249,87 @@ public class ListController : ControllerBase
 
     #endregion
 
+    private GameVersion getGameFilter(string? gameFilterType, GameVersion version)
+    {
+        if (version == GameVersion.LittleBigPlanetVita) return GameVersion.LittleBigPlanetVita;
+        if (version == GameVersion.LittleBigPlanetPSP) return GameVersion.LittleBigPlanetPSP;
+
+        return gameFilterType switch
+        {
+            "lbp1" => GameVersion.LittleBigPlanet1,
+            "lbp2" => GameVersion.LittleBigPlanet2,
+            "lbp3" => GameVersion.LittleBigPlanet3,
+            "both" => GameVersion.LittleBigPlanet2, // LBP2 default option
+            null => GameVersion.LittleBigPlanet1,
+            _ => GameVersion.Unknown,
+        };
+    }
+
+    private IQueryable<Slot> filterLolcatftwByRequest(string? gameFilterType, string? dateFilterType, GameVersion version, string username)
+    {
+        if (version == GameVersion.LittleBigPlanetVita || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown)
+        {
+            return this.database.Slots.ByGameVersion(version, false, true);
+        }
+
+        string _dateFilterType = dateFilterType ?? "";
+
+        long oldestTime = _dateFilterType switch
+        {
+            "thisWeek" => DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds(),
+            "thisMonth" => DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds(),
+            _ => 0,
+        };
+
+        GameVersion gameVersion = this.getGameFilter(gameFilterType, version);
+
+        IQueryable<QueuedLevel> whereQueuedLevels;
+
+        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+        if (gameFilterType == "both")
+            // Get game versions less than the current version
+            // Needs support for LBP3 ("both" = LBP1+2)
+            whereQueuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
+            .Where(q => q.Slot.Type == SlotType.User && !q.Slot.Hidden && q.Slot.GameVersion <= gameVersion && q.Slot.FirstUploaded >= oldestTime);
+        else
+            // Get game versions exactly equal to gamefiltertype
+            whereQueuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
+            .Where(q => q.Slot.Type == SlotType.User && !q.Slot.Hidden && q.Slot.GameVersion == gameVersion && q.Slot.FirstUploaded >= oldestTime);
+
+        return whereQueuedLevels.OrderByDescending(q => q.QueuedLevelId).Include(q => q.Slot.Creator).Include(q => q.Slot.Location).Select(q => q.Slot).ByGameVersion(gameVersion, false, false, true);
+    }
+
+    private IQueryable<Slot> filterFavouriteByRequest(string? gameFilterType, string? dateFilterType, GameVersion version, string username)
+    {
+        if (version == GameVersion.LittleBigPlanetVita || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown)
+        {
+            return this.database.Slots.ByGameVersion(version, false, true);
+        }
+
+        string _dateFilterType = dateFilterType ?? "";
+
+        long oldestTime = _dateFilterType switch
+        {
+            "thisWeek" => DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds(),
+            "thisMonth" => DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds(),
+            _ => 0,
+        };
+
+        GameVersion gameVersion = this.getGameFilter(gameFilterType, version);
+
+        IQueryable<HeartedLevel> whereHeartedLevels;
+
+        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+        if (gameFilterType == "both")
+            // Get game versions less than the current version
+            // Needs support for LBP3 ("both" = LBP1+2)
+            whereHeartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
+            .Where(q => q.Slot.Type == SlotType.User || q.Slot.Type == SlotType.Developer && !q.Slot.Hidden && q.Slot.GameVersion <= gameVersion && q.Slot.FirstUploaded >= oldestTime);
+        else
+            // Get game versions exactly equal to gamefiltertype
+            whereHeartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
+            .Where(q => q.Slot.Type == SlotType.User || q.Slot.Type == SlotType.Developer && !q.Slot.Hidden && q.Slot.GameVersion == gameVersion && q.Slot.FirstUploaded >= oldestTime);
+
+        return whereHeartedLevels.OrderByDescending(q => q.HeartedLevelId).Include(q => q.Slot.Creator).Include(q => q.Slot.Location).Select(q => q.Slot).ByGameVersion(gameVersion, false, false, true);
+    }
 }
