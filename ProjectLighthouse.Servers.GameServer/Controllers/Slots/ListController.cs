@@ -324,11 +324,11 @@ public class ListController : ControllerBase
             // Get game versions less than the current version
             // Needs support for LBP3 ("both" = LBP1+2)
             whereHeartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
-            .Where(q => q.Slot.Type == SlotType.User || q.Slot.Type == SlotType.Developer && !q.Slot.Hidden && q.Slot.GameVersion <= gameVersion && q.Slot.FirstUploaded >= oldestTime);
+            .Where(q => (q.Slot.Type == SlotType.User || q.Slot.Type == SlotType.Developer) && !q.Slot.Hidden && q.Slot.GameVersion <= gameVersion && q.Slot.FirstUploaded >= oldestTime);
         else
             // Get game versions exactly equal to gamefiltertype
             whereHeartedLevels = this.database.HeartedLevels.Where(q => q.User.Username == username)
-            .Where(q => q.Slot.Type == SlotType.User || q.Slot.Type == SlotType.Developer && !q.Slot.Hidden && q.Slot.GameVersion == gameVersion && q.Slot.FirstUploaded >= oldestTime);
+            .Where(q => (q.Slot.Type == SlotType.User || q.Slot.Type == SlotType.Developer) && !q.Slot.Hidden && q.Slot.GameVersion == gameVersion && q.Slot.FirstUploaded >= oldestTime);
 
         return whereHeartedLevels.OrderByDescending(q => q.HeartedLevelId).Include(q => q.Slot.Creator).Include(q => q.Slot.Location).Select(q => q.Slot).ByGameVersion(gameVersion, false, false, true);
     }
