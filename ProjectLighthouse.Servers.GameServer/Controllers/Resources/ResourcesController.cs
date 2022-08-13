@@ -3,9 +3,8 @@ using System.Buffers;
 using System.IO.Pipelines;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Files;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
@@ -32,8 +31,8 @@ public class ResourcesController : ControllerBase
     [HttpPost("showNotUploaded")]
     public async Task<IActionResult> FilterResources()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
@@ -52,8 +51,8 @@ public class ResourcesController : ControllerBase
     [HttpGet("r/{hash}")]
     public async Task<IActionResult> GetResource(string hash)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         string path = FileHelper.GetResourcePath(hash);
 
@@ -67,8 +66,8 @@ public class ResourcesController : ControllerBase
     [HttpPost("upload/{hash}")]
     public async Task<IActionResult> UploadResource(string hash)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         string assetsDirectory = FileHelper.ResourcePath;
         string path = FileHelper.GetResourcePath(hash);

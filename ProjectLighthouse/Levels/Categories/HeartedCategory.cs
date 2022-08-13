@@ -33,7 +33,7 @@ public class HeartedCategory : CategoryWithUser
             .Include(h => h.Slot.Location)
             .Select(h => h.Slot)
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart))
             .Take(Math.Min(pageSize, 20));
 
     public override int GetTotalSlots(Database database, User user) => database.HeartedLevels.Count(h => h.UserId == user.UserId);

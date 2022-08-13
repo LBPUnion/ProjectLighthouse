@@ -58,7 +58,7 @@
         <comment>A shortcut to log you out of your account.</comment>
     </data>
   <data name="header_modPanel" xml:space="preserve">
-        <value>Mod Panel</value>
+        <value>Panel De Mod.</value>
     </data>
   <data name="generated_by" xml:space="preserve">
         <value>Página generada por {0}.</value>

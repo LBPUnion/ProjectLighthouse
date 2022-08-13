@@ -17,7 +17,7 @@
     bool isMobile = this.Request.IsMobile();
 }
 
-@if (Model.Slot.Hidden)
+@if (Model.Slot!.Hidden)
 {
     <div class="ui inverted red segment">
         <h2>This level is currently hidden.</h2>

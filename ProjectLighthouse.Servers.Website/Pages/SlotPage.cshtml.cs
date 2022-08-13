@@ -45,7 +45,7 @@ public class SlotPage : BaseLayout
                 }
                 case PrivacyType.Game:
                 {
-                    if (slot.Creator != this.User) return this.NotFound();
+                    if (this.User == null || slot.Creator != this.User) return this.NotFound();
 
                     break;
                 }
@@ -54,7 +54,8 @@ public class SlotPage : BaseLayout
             }
         }
 
-        if (slot.Hidden && (this.User != slot.Creator && !(bool)this.User?.IsModerator)) return this.NotFound();
+        if (slot.Hidden || slot.SubLevel && (this.User == null && this.User != slot.Creator || !(this.User?.IsModerator ?? false)))
+            return this.NotFound();
 
         this.Slot = slot;
 

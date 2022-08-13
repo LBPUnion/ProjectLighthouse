@@ -184,7 +184,7 @@ public class RoomHelper
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
+    public static Task CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
         #if DEBUG
         Stopwatch stopwatch = new();
@@ -276,5 +276,7 @@ public class RoomHelper
                 Logger.Info(logText, LogArea.Match);
             }
         }
+
+        return Task.FromResult(0);
     }
 }

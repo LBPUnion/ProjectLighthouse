@@ -9,5 +9,5 @@ public class CleanupRoomsTask : IRepeatingTask
     public string Name => "Cleanup Rooms";
     public TimeSpan RepeatInterval => TimeSpan.FromSeconds(10);
     public DateTime LastRan { get; set; }
-    public async Task Run(Database database) => RoomHelper.CleanupRooms();
+    public Task Run(Database database) => RoomHelper.CleanupRooms();
 }

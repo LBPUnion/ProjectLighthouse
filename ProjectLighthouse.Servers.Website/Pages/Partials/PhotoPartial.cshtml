@@ -1,4 +1,5 @@
 @using System.Globalization
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.PlayerData
 @model LBPUnion.ProjectLighthouse.PlayerData.Photo
@@ -25,7 +26,7 @@
             {
                 case SlotType.User:
                     <span>
-                        in level <b><a href="/slot/@Model.SlotId">@Model.Slot.Name</a></b>
+                        in level <b><a href="/slot/@Model.SlotId">@HttpUtility.HtmlDecode(Model.Slot.Name)</a></b>
                     </span>
                     break;
                 case SlotType.Developer:

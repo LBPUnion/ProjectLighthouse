@@ -11,7 +11,7 @@ public class PirateSignupPage : BaseLayout
     public PirateSignupPage(Database database) : base(database)
     {}
     
-    public async Task<IActionResult> OnGet()
+    public IActionResult OnGet()
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.RedirectToPage("/login");

@@ -33,7 +33,7 @@ public class QueueCategory : CategoryWithUser
             .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 20));
 
     public override int GetTotalSlots(Database database, User user) => database.QueuedLevels.Count(q => q.UserId == user.UserId);
