@@ -39,18 +39,18 @@
         <value>Nekonata</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Sukceso!</value>
+        <value>Success!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Rekomencigi Pasvorton</value>
+        <value>Reset Password</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Nuntempa Agado</value>
+        <value>Recent Activity</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Baldaŭ!</value>
+        <value>Coming soon!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Plej lastatempaj bildoj</value>
+        <value>Most recent photos</value>
     </data>
 </root>
