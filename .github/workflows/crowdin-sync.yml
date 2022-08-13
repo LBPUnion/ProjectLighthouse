@@ -1,6 +1,7 @@
-on:
-  schedule:
-    - cron: "*/60 * * * *"
+on: [push]
+  #schedule:
+    #- cron: "*/60 * * * *"
+
 
 name: Crowdin Sync
 
