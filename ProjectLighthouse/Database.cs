@@ -369,6 +369,13 @@ public class Database : DbContext
 
     #region Web Token Shenanigans
 
+    public async Task<string> UsernameFromWebToken(WebToken? token)
+    {
+        if (token == null) return "";
+
+        return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
+    }
+
     public User? UserFromLighthouseToken(string lighthouseToken)
     {
         WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
