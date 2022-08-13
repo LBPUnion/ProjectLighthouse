@@ -45,7 +45,7 @@ public class SlotPage : BaseLayout
                 }
                 case PrivacyType.Game:
                 {
-                    if (slot.Creator != this.User) return this.NotFound();
+                    if (this.User == null || slot.Creator != this.User) return this.NotFound();
 
                     break;
                 }
