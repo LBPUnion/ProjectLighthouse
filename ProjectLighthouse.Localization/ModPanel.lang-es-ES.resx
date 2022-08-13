@@ -18,9 +18,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="mod_panel_title" xml:space="preserve">
-        <value>Moderation Panel</value>
+        <value>Panel de moderación</value>
     </data>
   <data name="greeting" xml:space="preserve">
-        <value>Welcome to the moderation panel, {0}!</value>
+        <value>¡Bienvenido al panel de moderación, {0}!</value>
     </data>
 </root>
