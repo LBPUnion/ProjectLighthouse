@@ -18,39 +18,39 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username" xml:space="preserve">
-        <value>Användarnamn</value>
+        <value>Username</value>
     </data>
   <data name="password" xml:space="preserve">
-        <value>Lösenord</value>
+        <value>Password</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Registrera</value>
+        <value>Register</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
-        <value>Glömt lösenordet?</value>
+        <value>Forgot Password?</value>
     </data>
   <data name="error" xml:space="preserve">
-        <value>Ajdå!</value>
+        <value>Uh oh!</value>
     </data>
   <data name="log_in" xml:space="preserve">
-        <value>Logga in</value>
+        <value>Log In</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Okänd</value>
+        <value>Unknown</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Succé!</value>
+        <value>Success!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Återställ lösenord</value>
+        <value>Reset Password</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Senaste aktivitet</value>
+        <value>Recent Activity</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Kommer snart!</value>
+        <value>Coming soon!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Senaste foton</value>
+        <value>Most recent photos</value>
     </data>
 </root>

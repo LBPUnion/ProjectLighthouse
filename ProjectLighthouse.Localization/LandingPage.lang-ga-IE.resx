@@ -22,33 +22,33 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>Fáilte go dtí {0}!</value>
+        <value>Welcome to {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Tá tú logáilte isteach mar {0} faoi láthair.</value>
+        <value>You are currently logged in as {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>Níl aon úsáideoirí ar líne. Cén fáth nár léim ar aghaidh?</value>
+        <value>There are no users online. Why not hop on?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>Tá úsáideoir amháin ar líne faoi láthair:</value>
+        <value>There is 1 user currently online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>Tá {0} úsáideoir ar líne faoi láthair:</value>
+        <value>There are currently {0} users online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
-        <value>Tá {0} iarracht fíordheimhnithe ar fheitheamh agat. Cliceáil anseo chun iad a fheiceáil.</value>
+        <value>You have {0} authentication attempts pending. Click here to view them.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>Leibhéil is Déanaí</value>
+        <value>Newest Levels</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>Roghanna Foirne is déanaí</value>
+        <value>Latest Team Picks</value>
     </data>
 </root>

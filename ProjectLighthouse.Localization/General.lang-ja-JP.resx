@@ -18,39 +18,39 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username" xml:space="preserve">
-        <value>ユーザーネーム</value>
+        <value>Username</value>
     </data>
   <data name="password" xml:space="preserve">
-        <value>パスワード</value>
+        <value>Password</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>登録する</value>
+        <value>Register</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
-        <value>パスワードを忘れましたか？</value>
+        <value>Forgot Password?</value>
     </data>
   <data name="error" xml:space="preserve">
-        <value>おおっと！</value>
+        <value>Uh oh!</value>
     </data>
   <data name="log_in" xml:space="preserve">
-        <value>ログイン</value>
+        <value>Log In</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>不明</value>
+        <value>Unknown</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>成功!</value>
+        <value>Success!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>パスワードのリセット</value>
+        <value>Reset Password</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>最近のアクティビティ</value>
+        <value>Recent Activity</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>近日公開！</value>
+        <value>Coming soon!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>最近の写真</value>
+        <value>Most recent photos</value>
     </data>
 </root>

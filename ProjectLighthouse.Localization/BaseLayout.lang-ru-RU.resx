@@ -22,39 +22,39 @@
         </value>
   </resheader>
   <data name="header_home" xml:space="preserve">
-        <value>Главная</value>
+        <value>Home</value>
         <comment>A button on the header that takes you to the landing page.</comment>
     </data>
   <data name="header_users" xml:space="preserve">
-        <value>Пользователи</value>
+        <value>Users</value>
         <comment>A button on the header that takes you to the user listing.</comment>
     </data>
   <data name="header_photos" xml:space="preserve">
-        <value>Фотографии</value>
+        <value>Photos</value>
         <comment>A button on the header that takes you to a list of user-uploaded photos.</comment>
     </data>
   <data name="header_slots" xml:space="preserve">
-        <value>Уровни</value>
+        <value>Levels</value>
         <comment>A button on the header that takes you to a list of user-uploaded levels. Levels are internally referred to as "slots".</comment>
     </data>
   <data name="header_authentication" xml:space="preserve">
-        <value>Аутентификация</value>
+        <value>Authentication</value>
         <comment>A button on the header that takes you to a list of authentication attempts.</comment>
     </data>
   <data name="header_loginRegister" xml:space="preserve">
-        <value>Вход / Регистрация</value>
+        <value>Login / Register</value>
         <comment>A button on the header that lets you log in or register.</comment>
     </data>
   <data name="header_profile" xml:space="preserve">
-        <value>Профиль</value>
+        <value>Profile</value>
         <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
   <data name="header_adminPanel" xml:space="preserve">
-        <value>Админпанель</value>
+        <value>Admin Panel</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
   <data name="header_logout" xml:space="preserve">
-        <value>Выйти</value>
+        <value>Log out</value>
         <comment>A shortcut to log you out of your account.</comment>
     </data>
   <data name="header_modPanel" xml:space="preserve">
@@ -70,7 +70,7 @@
         <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript не включен</value>
+        <value>JavaScript is not enabled</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
         <value>Potential License Violation</value>

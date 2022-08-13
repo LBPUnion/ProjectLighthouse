@@ -22,33 +22,33 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>¡Bienvenido a {0}!</value>
+        <value>Welcome to {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Estás conectado actualmente como {0}</value>
+        <value>You are currently logged in as {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>No hay usuarios en línea. ¿Por qué no subirse?</value>
+        <value>There are no users online. Why not hop on?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>Hay 1 usuario actualmente en línea:</value>
+        <value>There is 1 user currently online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>Actualmente hay {0} usuarios en línea:</value>
+        <value>There are currently {0} users online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
-        <value>Tiene {0} intentos de autenticación pendientes. Haga clic aquí para verlos.</value>
+        <value>You have {0} authentication attempts pending. Click here to view them.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>Niveles más nuevos</value>
+        <value>Newest Levels</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>Últimos niveles selecciónados</value>
+        <value>Latest Team Picks</value>
     </data>
 </root>

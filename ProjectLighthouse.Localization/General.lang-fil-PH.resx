@@ -24,19 +24,19 @@
         <value>Password</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Magrehistro</value>
+        <value>Register</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
-        <value>Nakalimutan ang password?</value>
+        <value>Forgot Password?</value>
     </data>
   <data name="error" xml:space="preserve">
         <value>Uh oh!</value>
     </data>
   <data name="log_in" xml:space="preserve">
-        <value>Mag log in</value>
+        <value>Log In</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Hindi kilala</value>
+        <value>Unknown</value>
     </data>
   <data name="success" xml:space="preserve">
         <value>Success!</value>
