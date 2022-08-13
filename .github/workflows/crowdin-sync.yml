@@ -1,7 +1,6 @@
 on: [push]
-  #schedule:
+    # schedule:
     #- cron: "*/60 * * * *"
-
 
 name: Crowdin Sync
 
@@ -9,10 +8,10 @@ jobs:
   crowdin-sync:
     runs-on: ubuntu-latest
 
-    - name: Checkout
-      uses: actions/checkout@v2
-
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: crowdin-action
         uses: crowdin/github-action@1.4.11
         with:
