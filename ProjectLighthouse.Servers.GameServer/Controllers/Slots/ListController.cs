@@ -206,9 +206,9 @@ public class ListController : ControllerBase
         IEnumerable<User> heartedProfiles = this.database.HeartedProfiles.Include
                 (q => q.HeartedUser)
             .OrderBy(q => q.HeartedProfileId)
+            .Where(q => q.UserId == targetUser.UserId)
             .Include(q => q.HeartedUser.Location)
             .Select(q => q.HeartedUser)
-            .Where(q => q.UserId == targetUser.UserId)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
