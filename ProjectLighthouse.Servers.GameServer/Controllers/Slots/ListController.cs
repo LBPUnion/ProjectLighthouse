@@ -205,7 +205,7 @@ public class ListController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        IEnumerable<HeartedProfile> heartedProfiles = this.database.HeartedProfiles.Include
+        IEnumerable<User> heartedProfiles = this.database.HeartedProfiles.Include
                 (q => q.User)
             .OrderBy(q => q.HeartedProfileId) // it's in reverse for some reason here but ok
             .Include(q => q.HeartedUser)
