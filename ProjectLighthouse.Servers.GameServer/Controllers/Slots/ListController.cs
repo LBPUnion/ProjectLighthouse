@@ -204,9 +204,8 @@ public class ListController : ControllerBase
         if (pageSize <= 0) return this.BadRequest();
 
         IEnumerable<User> heartedProfiles = this.database.HeartedProfiles.Include
-                (q => q.User)
-            .OrderBy(q => q.HeartedProfileId) // it's in reverse for some reason here but ok
-            .Include(q => q.HeartedUser)
+                (q => q.HeartedUser)
+            .OrderBy(q => q.HeartedProfileId)
             .Include(q => q.HeartedUser.Location)
             .Select(q => q.HeartedUser)
             .Where(q => q.UserId == targetUser.UserId)
