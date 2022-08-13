@@ -125,20 +125,20 @@ public class Database : DbContext
 
     #region Hearts & Queues
 
-    public async Task<bool> RateComment(User user, int commentId, int rating)
+    public async Task<bool> RateComment(int userId, int commentId, int rating)
     {
         Comment? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
 
         if (comment == null) return false;
 
-        if (comment.PosterUserId == user.UserId) return false;
+        if (comment.PosterUserId == userId) return false;
 
-        Reaction? reaction = await this.Reactions.FirstOrDefaultAsync(r => r.UserId == user.UserId && r.TargetId == commentId);
+        Reaction? reaction = await this.Reactions.FirstOrDefaultAsync(r => r.UserId == userId && r.TargetId == commentId);
         if (reaction == null)
         {
             Reaction newReaction = new()
             {
-                UserId = user.UserId,
+                UserId = userId,
                 TargetId = commentId,
                 Rating = 0,
             };
@@ -176,7 +176,7 @@ public class Database : DbContext
         return true;
     }
 
-    public async Task<bool> PostComment(User user, int targetId, CommentType type, string message)
+    public async Task<bool> PostComment(int userId, int targetId, CommentType type, string message)
     {
         if (message.Length > 100) return false;
 
@@ -195,7 +195,7 @@ public class Database : DbContext
         (
             new Comment
             {
-                PosterUserId = user.UserId,
+                PosterUserId = userId,
                 TargetId = targetId,
                 Type = type,
                 Message = message,
@@ -206,9 +206,9 @@ public class Database : DbContext
         return true;
     }
 
-    public async Task HeartUser(User user, User heartedUser)
+    public async Task HeartUser(int userId, User heartedUser)
     {
-        HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+        HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) return;
 
         this.HeartedProfiles.Add
@@ -216,24 +216,24 @@ public class Database : DbContext
             new HeartedProfile
             {
                 HeartedUserId = heartedUser.UserId,
-                UserId = user.UserId,
+                UserId = userId,
             }
         );
 
         await this.SaveChangesAsync();
     }
 
-    public async Task UnheartUser(User user, User heartedUser)
+    public async Task UnheartUser(int userId, User heartedUser)
     {
-        HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.HeartedUserId == heartedUser.UserId);
+        HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
 
         await this.SaveChangesAsync();
     }
 
-    public async Task HeartLevel(User user, Slot heartedSlot)
+    public async Task HeartLevel(int userId, Slot heartedSlot)
     {
-        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == heartedSlot.SlotId);
+        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) return;
 
         this.HeartedLevels.Add
@@ -241,24 +241,24 @@ public class Database : DbContext
             new HeartedLevel
             {
                 SlotId = heartedSlot.SlotId,
-                UserId = user.UserId,
+                UserId = userId,
             }
         );
 
         await this.SaveChangesAsync();
     }
 
-    public async Task UnheartLevel(User user, Slot heartedSlot)
+    public async Task UnheartLevel(int userId, Slot heartedSlot)
     {
-        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == heartedSlot.SlotId);
+        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
 
         await this.SaveChangesAsync();
     }
 
-    public async Task QueueLevel(User user, Slot queuedSlot)
+    public async Task QueueLevel(int userId, Slot queuedSlot)
     {
-        QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == queuedSlot.SlotId);
+        QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
         if (queuedLevel != null) return;
 
         this.QueuedLevels.Add
@@ -266,16 +266,16 @@ public class Database : DbContext
             new QueuedLevel
             {
                 SlotId = queuedSlot.SlotId,
-                UserId = user.UserId,
+                UserId = userId,
             }
         );
 
         await this.SaveChangesAsync();
     }
 
-    public async Task UnqueueLevel(User user, Slot queuedSlot)
+    public async Task UnqueueLevel(int userId, Slot queuedSlot)
     {
-        QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == user.UserId && q.SlotId == queuedSlot.SlotId);
+        QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
         if (queuedLevel != null) this.QueuedLevels.Remove(queuedLevel);
 
         await this.SaveChangesAsync();
@@ -284,6 +284,13 @@ public class Database : DbContext
     #endregion
 
     #region Game Token Shenanigans
+
+    public async Task<string> UsernameFromGameToken(GameToken? token)
+    {
+        if (token == null) return "";
+
+        return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
+    }
 
     public async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)
     {
@@ -300,7 +307,7 @@ public class Database : DbContext
             return null;
         }
 
-        return await this.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
     }
 
     public async Task<User?> UserFromGameToken
@@ -351,7 +358,7 @@ public class Database : DbContext
             return null;
         }
 
-        User? user = await this.UserFromGameToken(token);
+        User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
 
         if (user == null) return null;
 
@@ -361,6 +368,13 @@ public class Database : DbContext
     #endregion
 
     #region Web Token Shenanigans
+
+    public async Task<string> UsernameFromWebToken(WebToken? token)
+    {
+        if (token == null) return "";
+
+        return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
+    }
 
     public User? UserFromLighthouseToken(string lighthouseToken)
     {

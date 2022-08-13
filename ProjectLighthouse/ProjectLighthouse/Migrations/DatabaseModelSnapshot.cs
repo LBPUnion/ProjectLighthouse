@@ -323,15 +323,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PlaysLBP3Unique")
                         .HasColumnType("int");
 
-                    b.Property<int>("PlaysLBPVita")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBPVitaComplete")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBPVitaUnique")
-                        .HasColumnType("int");
-
                     b.Property<string>("ResourceCollection")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -374,9 +365,6 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("PlaysLBP3")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaysLBPVita")
                         .HasColumnType("int");
 
                     b.Property<int>("SlotId")

@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -155,15 +154,15 @@ public class Slot
 
     [XmlIgnore]
     [NotMapped]
-    public int Plays => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3 + this.PlaysLBPVita;
+    public int Plays => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3;
 
     [XmlIgnore]
     [NotMapped]
-    public int PlaysUnique => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique + this.PlaysLBPVitaUnique;
+    public int PlaysUnique => this.PlaysLBP1Unique + this.PlaysLBP2Unique + this.PlaysLBP3Unique;
 
     [XmlIgnore]
     [NotMapped]
-    public int PlaysComplete => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete + this.PlaysLBPVitaComplete;
+    public int PlaysComplete => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete;
 
     [XmlIgnore]
     [JsonIgnore]
@@ -200,18 +199,6 @@ public class Slot
     [XmlIgnore]
     [JsonIgnore]
     public int PlaysLBP3Unique { get; set; }
-
-    [XmlIgnore]
-    [JsonIgnore]
-    public int PlaysLBPVita { get; set; }
-
-    [XmlIgnore]
-    [JsonIgnore]
-    public int PlaysLBPVitaComplete { get; set; }
-
-    [XmlIgnore]
-    [JsonIgnore]
-    public int PlaysLBPVitaUnique { get; set; }
 
     [NotMapped]
     [JsonIgnore]
@@ -252,33 +239,18 @@ public class Slot
     [JsonIgnore]
     public string HiddenReason { get; set; } = "";
 
-    public string SerializeResources()
+    public string SerializeDevSlot()
     {
-        return this.Resources.Aggregate("", (current, resource) => current + LbpSerializer.StringElement("resource", resource)) +
-               LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize));
-    }
-
-    public string SerializeDevSlot(bool includeExtras = true)
-    {
-
-        int comments = 0, photos = 0;
-        if (includeExtras)
-        {
-            comments = this.database.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
-
-            photos = this.database.Photos.Count(c => c.SlotId == this.SlotId);
-        }
-        
+        int comments = this.Comments;
+        int photos = this.Photos;
         int players = RoomHelper.Rooms
             .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)
             .Sum(r => r.PlayerIds.Count);
 
         string slotData = LbpSerializer.StringElement("id", this.InternalSlotId) +
-                          LbpSerializer.StringElement("playerCount", players);
-
-        if(includeExtras)
-            slotData += LbpSerializer.StringElement("commentCount", comments) +
-                        LbpSerializer.StringElement("photoCount", photos);
+                          LbpSerializer.StringElement("playerCount", players) +
+                          LbpSerializer.StringElement("commentCount", comments) +
+                          LbpSerializer.StringElement("photoCount", photos);
 
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "developer");
     }
@@ -291,89 +263,76 @@ public class Slot
         GameVersion gameVersion = GameVersion.LittleBigPlanet1,
         RatedLevel? yourRatingStats = null,
         VisitedLevel? yourVisitedStats = null,
-        Review? yourReview = null
+        Review? yourReview = null,
+        bool fullSerialization = false
     )
     {
         if (this.Type == SlotType.Developer) return this.SerializeDevSlot();
 
         int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
 
-        string slotData = LbpSerializer.StringElement("name", this.Name) +
-                          LbpSerializer.StringElement("id", this.SlotId) +
-                          LbpSerializer.StringElement("game", (int)this.GameVersion) +
+        string slotData = LbpSerializer.StringElement("id", this.SlotId) +
                           LbpSerializer.StringElement("npHandle", this.Creator?.Username) +
-                          LbpSerializer.StringElement("description", this.Description) +
-                          LbpSerializer.StringElement("icon", this.IconHash) +
-                          LbpSerializer.StringElement("rootLevel", this.RootLevel) +
-                          LbpSerializer.StringElement("authorLabels", this.AuthorLabels) +
-                          LbpSerializer.StringElement("labels", this.AuthorLabels) +
-                          this.SerializeResources() +
                           LbpSerializer.StringElement("location", this.Location?.Serialize()) +
+                          LbpSerializer.StringElement("game", (int)this.GameVersion) +
+                          LbpSerializer.StringElement("name", this.Name) +
+                          LbpSerializer.StringElement("description", this.Description) +
+                          LbpSerializer.StringElement("rootLevel", this.RootLevel) +
+                          LbpSerializer.StringElement("icon", this.IconHash) +
                           LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
                           LbpSerializer.StringElement("isSubLevel", this.SubLevel) +
                           LbpSerializer.StringElement("isLBP1Only", this.Lbp1Only) +
-                          LbpSerializer.StringElement("shareable", this.Shareable) +
                           LbpSerializer.StringElement("background", this.BackgroundHash) +
+                          LbpSerializer.StringElement("shareable", this.Shareable) +
+                          LbpSerializer.StringElement("authorLabels", this.AuthorLabels) +
+                          LbpSerializer.StringElement("leveltype", this.LevelType) +
                           LbpSerializer.StringElement("minPlayers", this.MinimumPlayers) +
                           LbpSerializer.StringElement("maxPlayers", this.MaximumPlayers) +
-                          LbpSerializer.StringElement("moveRequired", this.MoveRequired) +
-                          LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
-                          LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
-                          LbpSerializer.StringElement("mmpick", this.TeamPick) +
                           LbpSerializer.StringElement("heartCount", this.Hearts) +
-                          LbpSerializer.StringElement("playCount", this.Plays) +
+                          LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
+                          LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
+                          LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
+                          LbpSerializer.StringElement("playerCount", playerCount) +
+                          LbpSerializer.StringElement("mmpick", this.TeamPick) +
+                          (fullSerialization ? LbpSerializer.StringElement("moveRequired", this.MoveRequired) : "") +
+                          (fullSerialization ? LbpSerializer.StringElement("crossControlRequired", this.CrossControllerRequired) : "") +
+                          (yourRatingStats != null ?
+                              LbpSerializer.StringElement("yourRating", yourRatingStats.RatingLBP1) +
+                              LbpSerializer.StringElement("yourDPadRating", yourRatingStats.Rating)
+                              : "") +
+                          (yourVisitedStats != null ?
+                              LbpSerializer.StringElement("yourlbp1PlayCount", yourVisitedStats.PlaysLBP1) +
+                              LbpSerializer.StringElement("yourlbp2PlayCount", yourVisitedStats.PlaysLBP2) +
+                              LbpSerializer.StringElement("yourlbp3PlayCount", yourVisitedStats.PlaysLBP3)
+                              : "") +
+                          LbpSerializer.StringElement("reviewCount", this.ReviewCount) +
+                          LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("photoCount", this.Photos) +
                           LbpSerializer.StringElement("authorPhotoCount", this.PhotosWithAuthor) +
-                          LbpSerializer.StringElement("commentCount", this.Comments) +
-                          LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
+                          (fullSerialization ? LbpSerializer.StringElement("labels", this.AuthorLabels) : "") +
+                          LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
+                          LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
+                          (fullSerialization ?
+                              yourReview?.Serialize() +
+                              LbpSerializer.StringElement("reviewsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled) +
+                              LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.CommentsEnabled)
+                              : "") +
+                          LbpSerializer.StringElement("playCount", this.Plays) +
                           LbpSerializer.StringElement("completionCount", this.PlaysComplete) +
                           LbpSerializer.StringElement("lbp1PlayCount", this.PlaysLBP1) +
                           LbpSerializer.StringElement("lbp1CompletionCount", this.PlaysLBP1Complete) +
                           LbpSerializer.StringElement("lbp1UniquePlayCount", this.PlaysLBP1Unique) +
+                          LbpSerializer.StringElement("lbp2PlayCount", this.PlaysLBP2) +
+                          LbpSerializer.StringElement("lbp2CompletionCount", this.PlaysLBP2Complete) +
+                          LbpSerializer.StringElement("uniquePlayCount", this.PlaysLBP2Unique) + // ??? good naming scheme lol
+
                           LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                           LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
                           LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
-                          LbpSerializer.StringElement("thumbsup", this.Thumbsup) +
-                          LbpSerializer.StringElement("thumbsdown", this.Thumbsdown) +
-                          LbpSerializer.StringElement("averageRating", this.RatingLBP1) +
-                          LbpSerializer.StringElement("leveltype", this.LevelType) +
-                          LbpSerializer.StringElement("yourRating", yourRatingStats?.RatingLBP1) +
-                          LbpSerializer.StringElement("yourDPadRating", yourRatingStats?.Rating) +
-                          LbpSerializer.StringElement("yourlbpPlayCount", yourVisitedStats?.PlaysLBP1) +
-                          LbpSerializer.StringElement("yourlbp3PlayCount", yourVisitedStats?.PlaysLBP3) +
-                          yourReview?.Serialize("yourReview") +
-                          LbpSerializer.StringElement("reviewsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled) +
-                          LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && CommentsEnabled) +
-                          LbpSerializer.StringElement("playerCount", playerCount) +
-                          LbpSerializer.StringElement("reviewCount", this.ReviewCount);
+                          (gameVersion == GameVersion.LittleBigPlanetVita ?
+                              LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize))
+                              : "");
 
-        int yourPlays;
-        int plays;
-        int playsComplete;
-        int playsUnique;
-
-        if (gameVersion == GameVersion.LittleBigPlanetVita)
-        {
-            yourPlays = yourVisitedStats?.PlaysLBPVita ?? 0;
-            plays = this.PlaysLBPVita;
-            playsComplete = this.PlaysLBPVitaComplete;
-            playsUnique = this.PlaysLBPVitaUnique;
-        }
-        else
-        {
-            yourPlays = yourVisitedStats?.PlaysLBP2 ?? 0;
-            plays = this.PlaysLBP2;
-            playsComplete = this.PlaysLBP2Complete;
-            playsUnique = this.PlaysLBP2Unique;
-        }
-
-        slotData += LbpSerializer.StringElement("yourlbp2PlayCount", yourPlays) +
-                    LbpSerializer.StringElement("lbp2PlayCount", plays) +
-                    LbpSerializer.StringElement("playCount", plays) +
-                    LbpSerializer.StringElement("lbp2CompletionCount", playsComplete) +
-                    LbpSerializer.StringElement("completionCount", playsComplete) +
-                    LbpSerializer.StringElement("lbp2UniquePlayCount", playsUnique) + // not actually used ingame, as per above comment
-                    LbpSerializer.StringElement("uniquePlayCount", playsUnique);
 
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
     }

@@ -5,7 +5,6 @@ using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,7 +48,7 @@ public class SlotsPage : BaseLayout
             }
             else
             {
-                finalSearch.Append(part);
+                finalSearch.Append(part).Append(' ');
             }
         }
 
@@ -59,6 +58,7 @@ public class SlotsPage : BaseLayout
             .Where(p => p.Type == SlotType.User && !p.Hidden)
             .Where(p => p.Name.Contains(finalSearch.ToString()))
             .Where(p => p.Creator != null && (targetAuthor == null || string.Equals(p.Creator.Username.ToLower(), targetAuthor.ToLower())))
+            .Where(p => p.Creator != null && (!p.SubLevel || p.Creator == this.User))
             .Where(p => targetGame == null || p.GameVersion == targetGame)
             .CountAsync();
 
@@ -71,6 +71,7 @@ public class SlotsPage : BaseLayout
             .Where(p => p.Type == SlotType.User && !p.Hidden)
             .Where(p => p.Name.Contains(finalSearch.ToString()))
             .Where(p => p.Creator != null && (targetAuthor == null || string.Equals(p.Creator.Username.ToLower(), targetAuthor.ToLower())))
+            .Where(p => p.Creator != null && (!p.SubLevel || p.Creator == this.User))
             .Where(p => p.Creator!.LevelVisibility == PrivacyType.All) // TODO: change check for when user is logged in
             .Where(p => targetGame == null || p.GameVersion == targetGame)
             .OrderByDescending(p => p.FirstUploaded)

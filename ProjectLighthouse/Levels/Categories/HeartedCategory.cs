@@ -22,6 +22,6 @@ public class HeartedCategory : CategoryWithUser
             .Include(h => h.Slot)
             .Select(h => h.Slot)
             .ByGameVersion(GameVersion.LittleBigPlanet3)
-            .Skip(pageStart)
+            .Skip(Math.Max(0, pageStart))
             .Take(Math.Min(pageSize, 20));
 }

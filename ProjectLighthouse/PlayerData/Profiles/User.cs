@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -29,14 +30,14 @@ public class User
     }
 
     public int UserId { get; set; }
-    public string Username { get; set; }
+    public string Username { get; set; } = "";
 
     #nullable enable
     [JsonIgnore]
-    public string? EmailAddress { get; set; } = null;
+    public string? EmailAddress { get; set; }
     #nullable disable
 
-    public bool EmailAddressVerified { get; set; } = false;
+    public bool EmailAddressVerified { get; set; }
 
     [JsonIgnore]
     public string Password { get; set; }
@@ -82,9 +83,19 @@ public class User
     [JsonIgnore]
     public int PhotosByMe => this.database.Photos.Count(p => p.CreatorId == this.UserId);
 
-    [NotMapped]
-    [JsonIgnore]
-    public int PhotosWithMe => Enumerable.Sum(this.database.Photos, photo => photo.Subjects.Count(subject => subject.User.UserId == this.UserId));
+    private int PhotosWithMe()
+    {
+        List<int> photoSubjectIds = new();
+        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == this.UserId).Select(p => p.PhotoSubjectId));
+
+        var list = this.database.Photos.Select(p => new
+            {
+                p.PhotoId,
+                p.PhotoSubjectCollection,
+            }).ToList();
+        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Contains(ps.ToString())) select v.PhotoId).ToList();
+        return this.database.Photos.Count(p => photoIds.Any(pId => p.PhotoId == pId) && p.CreatorId != this.UserId);
+    }
 
     [JsonIgnore]
     public int LocationId { get; set; }
@@ -156,8 +167,10 @@ public class User
     [JsonIgnore]
     public PermissionLevel PermissionLevel { get; set; } = PermissionLevel.Default;
 
+    #nullable enable
     [JsonIgnore]
     public string? BannedReason { get; set; }
+    #nullable disable
 
     #nullable enable
     [JsonIgnore]
@@ -181,36 +194,36 @@ public class User
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                       LbpSerializer.StringElement("game", (int)gameVersion) +
                       this.serializeSlots(gameVersion) +
-                      LbpSerializer.StringElement("lists", this.Lists) +
-                      LbpSerializer.StringElement
+                      LbpSerializer.StringElement<string>("lists", this.Lists, true) +
+                      LbpSerializer.StringElement<string>
                       (
                           "lists_quota",
-                          ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota
+                          ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota,
+                          true
                       ) + // technically not a part of the user but LBP expects it
-                      LbpSerializer.StringElement("biography", this.Biography) +
-                      LbpSerializer.StringElement("reviewCount", this.Reviews) +
-                      LbpSerializer.StringElement("commentCount", this.Comments) +
-                      LbpSerializer.StringElement("photosByMeCount", this.PhotosByMe) +
-                      LbpSerializer.StringElement("photosWithMeCount", this.PhotosWithMe) +
-                      LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled && CommentsEnabled) +
-                      LbpSerializer.StringElement("location", this.Location.Serialize()) +
-                      LbpSerializer.StringElement("favouriteSlotCount", this.HeartedLevels) +
-                      LbpSerializer.StringElement("favouriteUserCount", this.HeartedUsers) +
-                      LbpSerializer.StringElement("lolcatftwCount", this.QueuedLevels) +
-                      LbpSerializer.StringElement("pins", this.Pins) +
+                      LbpSerializer.StringElement<string>("heartCount", this.Hearts, true) +
                       this.serializeEarth(gameVersion) +
-                      LbpSerializer.BlankElement("photos") +
-                      LbpSerializer.StringElement("heartCount", this.Hearts) +
-                      LbpSerializer.StringElement("yay2", this.YayHash) +
-                      LbpSerializer.StringElement("boo2", this.BooHash) +
-                      LbpSerializer.StringElement("meh2", this.MehHash);
+                      LbpSerializer.StringElement<string>("yay2", this.YayHash, true) +
+                      LbpSerializer.StringElement<string>("boo2", this.BooHash, true) +
+                      LbpSerializer.StringElement<string>("meh2", this.MehHash, true) +
+                      LbpSerializer.StringElement<string>("biography", this.Biography, true) +
+                      LbpSerializer.StringElement<int>("reviewCount", this.Reviews, true) +
+                      LbpSerializer.StringElement<int>("commentCount", this.Comments, true) +
+                      LbpSerializer.StringElement<int>("photosByMeCount", this.PhotosByMe, true) +
+                      LbpSerializer.StringElement<int>("photosWithMeCount", this.PhotosWithMe(), true) +
+                      LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled && this.CommentsEnabled) +
+                      LbpSerializer.StringElement("location", this.Location.Serialize()) +
+                      LbpSerializer.StringElement<int>("favouriteSlotCount", this.HeartedLevels, true) +
+                      LbpSerializer.StringElement<int>("favouriteUserCount", this.HeartedUsers, true) +
+                      LbpSerializer.StringElement<int>("lolcatftwCount", this.QueuedLevels, true) +
+                      LbpSerializer.StringElement<string>("pins", this.Pins, true);
 
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }
 
     private string serializeEarth(GameVersion gameVersion)
     {
-        return LbpSerializer.StringElement
+        return LbpSerializer.StringElement<string>
         (
             "planets",
             gameVersion switch
@@ -219,7 +232,8 @@ public class User
                 GameVersion.LittleBigPlanet3 => this.PlanetHashLBP3,
                 GameVersion.LittleBigPlanetVita => this.PlanetHashLBPVita,
                 _ => "", // other versions do not have custom planets
-            }
+            },
+            true
         );
     }
 
@@ -243,52 +257,45 @@ public class User
     [XmlIgnore]
     public int EntitledSlots => ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + this.AdminGrantedSlots;
 
-    /// <summary>
-    ///     The number of slots remaining on the earth
-    /// </summary>
     [JsonIgnore]
-    public int FreeSlots => this.EntitledSlots - this.UsedSlots;
+    [XmlIgnore]
+    private int CrossControlSlots => this.database.Slots.Count(s => s.CreatorId == this.UserId && s.CrossControllerRequired);
 
     [JsonIgnore]
     [XmlIgnore]
     public int AdminGrantedSlots { get; set; }
 
-    private static readonly string[] slotTypes =
-    {
-        "lbp2", "lbp3", "crossControl",
-    };
-
     private string serializeSlots(GameVersion gameVersion)
     {
         string slots = string.Empty;
-
-        string[] slotTypesLocal;
+        int entitledSlots = this.EntitledSlots;
+        Dictionary<string, int> usedSlots = new();
 
         if (gameVersion == GameVersion.LittleBigPlanetVita)
         {
-            slots += LbpSerializer.StringElement("lbp2UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanetVita));
-            slotTypesLocal = new[]
-            {
-                "lbp2",
-            };
+            usedSlots.Add("lbp2", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanetVita));
         }
         else
         {
-            slots += LbpSerializer.StringElement("lbp1UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet1));
-            slots += LbpSerializer.StringElement("lbp2UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet2));
-            slots += LbpSerializer.StringElement("lbp3UsedSlots", this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet3));
-            slotTypesLocal = slotTypes;
+            int lbp1Used = this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet1);
+            int lbp2Used = this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet2);
+            int lbp3Used = this.GetUsedSlotsForGame(GameVersion.LittleBigPlanet3);
+            int crossControlUsed = this.CrossControlSlots;
+            usedSlots.Add("crossControl", crossControlUsed);
+            usedSlots.Add("lbp2", lbp2Used);
+            usedSlots.Add("lbp3", lbp3Used);
+            // these 3 actually correspond to lbp1 only despite the name
+            slots += LbpSerializer.StringElement("lbp1UsedSlots", lbp1Used);
+            slots += LbpSerializer.StringElement("entitledSlots", entitledSlots);
+            slots += LbpSerializer.StringElement("freeSlots", entitledSlots - lbp1Used);
         }
 
-        slots += LbpSerializer.StringElement("entitledSlots", this.EntitledSlots);
-        slots += LbpSerializer.StringElement("freeSlots", this.FreeSlots);
-
-        foreach (string slotType in slotTypesLocal)
+        foreach (KeyValuePair<string, int> entry in usedSlots)
         {
-            slots += LbpSerializer.StringElement(slotType + "EntitledSlots", this.EntitledSlots);
-            // ReSharper disable once StringLiteralTypo
-            slots += LbpSerializer.StringElement(slotType + slotType == "crossControl" ? "PurchsedSlots" : "PurchasedSlots", 0);
-            slots += LbpSerializer.StringElement(slotType + "FreeSlots", this.FreeSlots);
+            slots += LbpSerializer.StringElement(entry.Key + "UsedSlots", entry.Value);
+            slots += LbpSerializer.StringElement(entry.Key + "EntitledSlots", entitledSlots);
+            slots += LbpSerializer.StringElement(entry.Key + (entry.Key == "crossControl" ? "PurchsedSlots" : "PurchasedSlots"), 0);
+            slots += LbpSerializer.StringElement(entry.Key + "FreeSlots", entitledSlots - entry.Value);
         }
         return slots;
 
