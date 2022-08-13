@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -121,6 +122,9 @@ public class ListController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
+        User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (targetUser == null) return this.StatusCode(403, "");
+
         IEnumerable<Slot> heartedLevels = this.filterFavouriteByRequest(gameFilterType, dateFilterType, token.GameVersion, username)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
@@ -144,9 +148,6 @@ public class ListController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
@@ -166,9 +167,6 @@ public class ListController : ControllerBase
     [HttpPost("unfavourite/slot/{slotType}/{id:int}")]
     public async Task<IActionResult> RemoveFavouriteSlot(string slotType, int id)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
