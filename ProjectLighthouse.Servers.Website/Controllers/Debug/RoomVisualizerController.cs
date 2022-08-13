@@ -23,6 +23,7 @@ public class RoomVisualizerController : ControllerBase
     public async Task<IActionResult> CreateFakeRoom()
     {
         #if !DEBUG
+        await Task.FromResult(0);
         return this.NotFound();
         #else
         List<int> users = await this.database.Users.OrderByDescending(_ => EF.Functions.Random()).Take(2).Select(u => u.UserId).ToListAsync();
@@ -51,6 +52,7 @@ public class RoomVisualizerController : ControllerBase
     public async Task<IActionResult> CreateRoomsWithDuplicatePlayers()
     {
         #if !DEBUG
+        await Task.FromResult(0);
         return this.NotFound();
         #else
         List<int> users = await this.database.Users.OrderByDescending(_ => EF.Functions.Random()).Take(1).Select(u => u.UserId).ToListAsync();

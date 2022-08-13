@@ -1,5 +1,11 @@
 # Project Lighthouse
 
+[![Continuous Integration](https://github.com/LBPUnion/ProjectLighthouse/actions/workflows/ci.yml/badge.svg)](https://github.com/LBPUnion/ProjectLighthouse/actions/workflows/ci.yml)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/LBPUnion/ProjectLighthouse)
+![GitHub contributors](https://img.shields.io/github/contributors/LBPUnion/ProjectLighthouse)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/LBPUnion/ProjectLighthouse)
+![Source Lines of Code](https://tokei.ekzhang.com/b1/github/LBPUnion/ProjectLighthouse)
+
 Project Lighthouse is a clean-room, open-source custom server for LittleBigPlanet. This is a project conducted by
 the [LBP Union Ministry of Technology Research and Development team](https://www.lbpunion.com/technology).
 

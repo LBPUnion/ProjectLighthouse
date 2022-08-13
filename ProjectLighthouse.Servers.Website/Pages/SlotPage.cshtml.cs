@@ -54,7 +54,8 @@ public class SlotPage : BaseLayout
             }
         }
 
-        if (slot.Hidden && (this.User != slot.Creator && !(bool)this.User?.IsModerator)) return this.NotFound();
+        if (slot.Hidden || slot.SubLevel && this.User == null && this.User != slot.Creator || !this.User!.IsModerator)
+            return this.NotFound();
 
         this.Slot = slot;
 

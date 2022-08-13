@@ -2,7 +2,6 @@
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +33,8 @@ public class SearchController : ControllerBase
         GameToken? gameToken = await this.database.GameTokenFromRequest(this.Request);
         if (gameToken == null) return this.StatusCode(403, "");
 
+        if (pageSize <= 0) return this.BadRequest();
+
         if (string.IsNullOrWhiteSpace(query)) return this.BadRequest();
 
         query = query.ToLower();
@@ -56,7 +57,7 @@ public class SearchController : ControllerBase
                      s.SlotId.ToString().Equals(keyword)
             );
 
-        List<Slot> slots = await dbQuery.Skip(pageStart - 1).Take(Math.Min(pageSize, 30)).ToListAsync();
+        List<Slot> slots = await dbQuery.Skip(Math.Max(0, pageStart - 1)).Take(Math.Min(pageSize, 30)).ToListAsync();
 
         string response = slots.Aggregate("", (current, slot) => current + slot.Serialize(gameToken.GameVersion));
 

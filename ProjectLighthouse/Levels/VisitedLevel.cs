@@ -23,5 +23,4 @@ public class VisitedLevel
     public int PlaysLBP1 { get; set; }
     public int PlaysLBP2 { get; set; }
     public int PlaysLBP3 { get; set; }
-    public int PlaysLBPVita { get; set; }
 }

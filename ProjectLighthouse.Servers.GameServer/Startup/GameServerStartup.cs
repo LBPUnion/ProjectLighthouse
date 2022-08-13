@@ -1,10 +1,10 @@
+using System.IO.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Primitives;
 
@@ -124,6 +124,7 @@ public class GameServerStartup
                 context.Response.Body = responseBuffer;
 
                 await next(context); // Handle the request so we can get the server digest hash
+                responseBuffer.Position = 0;
 
                 // Compute the server digest hash.
                 if (computeDigests)
@@ -139,10 +140,7 @@ public class GameServerStartup
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
 
-                // Set the X-Original-Content-Length header to the length of the response buffer.
-                context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
-
-                // Copy the buffered response to the actual respose stream.
+                // Copy the buffered response to the actual response stream.
                 responseBuffer.Position = 0;
                 await responseBuffer.CopyToAsync(oldResponseStream);
                 context.Response.Body = oldResponseStream;
