@@ -125,8 +125,8 @@ public class ScoreController : ControllerBase
         // var needed for Anonymous type returned from SELECT
         var rankedScores = this.database.Scores
             .Where(s => s.SlotId == slotId && s.Type == type)
-            .OrderBy(s => s.ScoreId)
-            .ThenByDescending(s => s.Points)
+            .OrderByDescending(s => s.Points)
+            .ThenBy(s => s.ScoreId)
             .ToList()
             .Select
             (
