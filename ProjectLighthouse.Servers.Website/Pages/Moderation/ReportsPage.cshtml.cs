@@ -7,7 +7,7 @@ using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class ReportsPage : BaseLayout
 {

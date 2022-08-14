@@ -3,10 +3,9 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class CasePage : BaseLayout
 {

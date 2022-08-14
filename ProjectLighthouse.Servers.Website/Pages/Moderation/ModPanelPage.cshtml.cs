@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class ModPanelPage : BaseLayout
 {
