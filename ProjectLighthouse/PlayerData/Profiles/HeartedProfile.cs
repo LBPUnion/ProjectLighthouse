@@ -6,8 +6,6 @@ namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 
 public class HeartedProfile
 {
-    // ReSharper disable once UnusedMember.Global
-    [Obsolete($"Use {nameof(HeartedUserId)} instead, this is a key which you should never need to use.")]
     [Key]
     public int HeartedProfileId { get; set; }
 
