@@ -6,7 +6,7 @@ namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 
 public class HeartedProfile
 {
-    [Key] // this is actually useful for sorting
+    [Key]
     public int HeartedProfileId { get; set; }
 
     public int UserId { get; set; }
