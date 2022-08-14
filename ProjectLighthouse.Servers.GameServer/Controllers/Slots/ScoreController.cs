@@ -123,8 +123,10 @@ public class ScoreController : ControllerBase
 
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
-        var rankedScores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type)
-            .OrderByDescending(s => s.Points)
+        var rankedScores = this.database.Scores
+            .Where(s => s.SlotId == slotId && s.Type == type)
+            .OrderBy(s => s.ScoreId)
+            .ThenByDescending(s => s.Points)
             .ToList()
             .Select
             (
