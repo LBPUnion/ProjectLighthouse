@@ -151,6 +151,9 @@
         </div>
         <div class="ui fitted hidden divider"></div>
         
-        @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
+        @if (Model.User.IsAdmin)
+        {
+            @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
+        }
     </div>
 }
