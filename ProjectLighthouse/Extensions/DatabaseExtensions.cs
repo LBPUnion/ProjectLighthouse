@@ -39,31 +39,6 @@ public static class DatabaseExtensions
         return query;
     }
 
-    public static IQueryable<Slot> HeartedByGameVersion
-        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
-    {
-        query = query.Where(s => (s.Type == SlotType.User) || (s.Type == SlotType.Developer));
-
-        if (includeCreatorAndLocation)
-        {
-            query = query.Include(s => s.Creator).Include(s => s.Location);
-        }
-
-        if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
-        {
-            query = query.Where(s => s.GameVersion == gameVersion);
-        }
-        else
-        {
-            // prevent developer slots from showing up in a newer game
-            query = query.Where(s => (s.Type == SlotType.User && s.GameVersion <= gameVersion) || (s.Type == SlotType.Developer && s.GameVersion == gameVersion));
-        }
-
-        if (!includeSublevels) query = query.Where(s => !s.SubLevel);
-
-        return query;
-    }
-
     public static IQueryable<Review> ByGameVersion(this IQueryable<Review> queryable, GameVersion gameVersion, bool includeSublevels = false)
     {
         IQueryable<Review> query = queryable.Include(r => r.Slot).Include(r => r.Slot.Creator).Include(r => r.Slot.Location);
