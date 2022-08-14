@@ -6,6 +6,7 @@ name: Upload Translations to Crowdin
 
 jobs:
   crowdin-sync:
+    if: github.repository_owner == 'LBPUnion'
     runs-on: ubuntu-latest
 
     steps:
