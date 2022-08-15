@@ -62,20 +62,36 @@ public class ScoreController : ControllerBase
                 break;
         }
 
-        IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == score.SlotId)
-            .Where(s => s.PlayerIdCollection == score.PlayerIdCollection)
-            .Where(s => s.Type == score.Type);
+        // Submit scores from all players in lobby
+        foreach (string player in score.PlayerIds)
+        {
+            List<string> players = new();
+            players.Add(player); // make sure this player is first
+            players.AddRange(score.PlayerIds.Where(p => p != player));
 
-        if (existingScore.Any())
-        {
-            Score first = existingScore.First(s => s.SlotId == score.SlotId);
-            score.ScoreId = first.ScoreId;
-            score.Points = Math.Max(first.Points, score.Points);
-            this.database.Entry(first).CurrentValues.SetValues(score);
-        }
-        else
-        {
-            this.database.Scores.Add(score);
+            Score playerScore = new()
+            {
+                PlayerIdCollection = string.Join(',', players),
+                Type = score.Type,
+                Points = score.Points,
+                SlotId = score.SlotId,
+            };
+
+            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
+                .Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
+                .Where(s => s.Type == playerScore.Type);
+
+            if (existingScore.Any())
+            {
+                Score first = existingScore.First(s => s.SlotId == playerScore.SlotId);
+                playerScore.ScoreId = first.ScoreId;
+                playerScore.Points = Math.Max(first.Points, playerScore.Points);
+                this.database.Entry(first).CurrentValues.SetValues(playerScore);
+            }
+            else
+            {
+                this.database.Scores.Add(playerScore);
+            }
         }
 
         await this.database.SaveChangesAsync();
