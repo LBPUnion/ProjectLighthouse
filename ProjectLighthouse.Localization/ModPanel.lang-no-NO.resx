@@ -23,4 +23,10 @@
   <data name="greeting" xml:space="preserve">
         <value>Velkommen til moderasjonpanelet, {0}!</value>
     </data>
+  <data name="banned_users" xml:space="preserve">
+        <value>Banned Users</value>
+    </data>
+  <data name="hidden_levels" xml:space="preserve">
+        <value>Hidden Levels</value>
+    </data>
 </root>
