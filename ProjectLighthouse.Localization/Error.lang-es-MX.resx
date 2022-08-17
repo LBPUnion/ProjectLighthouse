@@ -18,30 +18,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>The username field is blank.</value>
+        <value>El campo de nombre de usuario está en blanco.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>The username you've chosen is already taken.</value>
+        <value>El nombre de usuario que ha elegido ya está tomado.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>Password field is required.</value>
+        <value>Se requiere un campo de contraseña.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Passwords do not match!</value>
+        <value>¡ las contraseñas no coinciden!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
-        <value>Invalid Token</value>
+        <value>Token no válido</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>You must complete the captcha correctly.</value>
+        <value>Debe completar el captcha correctamente.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
-        <value>The email address you've chosen is already taken.</value>
+        <value>El correo electrónico que has elegido ya está tomado.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Email address field is required.</value>
+        <value>Se requiere un campo de correo electrónico.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
-        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
+        <value>Te han prohibido. Póngase en contacto con un administrador para obtener más información. \nRazón:{0}</value>
     </data>
 </root>
