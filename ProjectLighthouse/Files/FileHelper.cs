@@ -40,6 +40,7 @@ public static class FileHelper
             LbpFileType.Script => false,
             LbpFileType.Level => true,
             LbpFileType.Voice => true,
+            LbpFileType.Quest => true,
             LbpFileType.Plan => true,
             LbpFileType.Jpeg => true,
             LbpFileType.Png => true,
@@ -121,6 +122,7 @@ public static class FileHelper
             "VOPb" => LbpFileType.Voice,
             "LVLb" => LbpFileType.Level,
             "PLNb" => LbpFileType.Plan,
+            "QSTb" => LbpFileType.Quest,
             _ => readAlternateHeader(reader),
         };
     }
