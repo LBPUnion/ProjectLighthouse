@@ -24,9 +24,9 @@
         <value>Willkommen beim Moderationsmenü, {0}!</value>
     </data>
   <data name="banned_users" xml:space="preserve">
-        <value>Banned Users</value>
+        <value>Gebannte Spieler</value>
     </data>
   <data name="hidden_levels" xml:space="preserve">
-        <value>Hidden Levels</value>
+        <value>Versteckte Levels</value>
     </data>
 </root>
