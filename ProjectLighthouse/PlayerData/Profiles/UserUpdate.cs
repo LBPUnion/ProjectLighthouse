@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -16,6 +17,10 @@ public class UserUpdate
 
     [XmlElement("planets")]
     public string? PlanetHash { get; set; }
+
+    [XmlArray("slots")]
+    [XmlArrayItem("slot")]
+    public List<UserUpdateSlot>? Slots { get; set; }
 
     [XmlElement("yay2")]
     public string? YayHash { get; set; }

@@ -3,10 +3,10 @@ using System.Text.Json;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -122,6 +122,27 @@ public class UserController : ControllerBase
         if (update.MehHash != null) user.MehHash = update.MehHash;
 
         if (update.BooHash != null) user.BooHash = update.BooHash;
+        
+        if (update.Slots != null)
+        {
+            foreach (UserUpdateSlot? updateSlot in update.Slots)
+            {
+                // ReSharper disable once MergeIntoNegatedPattern
+                if (updateSlot.Type != SlotType.User || updateSlot.Location == null || updateSlot.SlotId == 0) continue;
+
+                Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == updateSlot.SlotId);
+                if (slot == null) continue;
+
+                if (slot.CreatorId != gameToken.UserId) continue;
+
+                Location? loc = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == slot.LocationId);
+
+                if (loc == null) throw new ArgumentNullException();
+
+                loc.X = updateSlot.Location.X;
+                loc.Y = updateSlot.Location.Y;
+            }
+        }
 
         if (update.PlanetHash != null)
         {
