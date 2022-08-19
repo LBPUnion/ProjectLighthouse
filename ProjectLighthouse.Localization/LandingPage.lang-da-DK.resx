@@ -30,15 +30,15 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>Der er ingen brugere online. Hvorfor ikke hoppe på?</value>
+        <value>There are no people online. Why not hop on?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>Der er 1 bruger online:</value>
+        <value>There is 1 person currently online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>Der er {0} brugere online:</value>
+        <value>There are currently {0} people online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
