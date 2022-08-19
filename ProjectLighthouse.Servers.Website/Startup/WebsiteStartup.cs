@@ -1,8 +1,11 @@
 using System.Globalization;
+using System.Reflection;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
+using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
 using Microsoft.Extensions.Hosting.Internal;
@@ -26,7 +29,14 @@ public class WebsiteStartup
     {
         services.AddControllers();
         #if DEBUG
-        services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation();
+        services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation((options) =>
+        {
+            // jank but works
+            string projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
+            
+            options.FileProviders.Clear();
+            options.FileProviders.Add(new PhysicalFileProvider(projectDir));
+        });
         #else
         services.AddRazorPages().WithRazorPagesAtContentRoot();
         #endif
