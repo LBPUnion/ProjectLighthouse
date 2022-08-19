@@ -7,11 +7,6 @@
         <RootNamespace>LBPUnion.ProjectLighthouse.Servers.Website</RootNamespace>
         <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-        <RazorCompileOnPublish>false</RazorCompileOnPublish>
-        <RazorCompileOnBuild>false</RazorCompileOnBuild>
-    </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\ProjectLighthouse.Localization\ProjectLighthouse.Localization.csproj" />
