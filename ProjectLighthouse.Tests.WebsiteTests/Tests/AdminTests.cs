@@ -13,7 +13,7 @@ namespace ProjectLighthouse.Tests.WebsiteTests.Tests;
 
 public class AdminTests : LighthouseWebTest
 {
-    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]";
+    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[1]";
 
     [DatabaseFact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
