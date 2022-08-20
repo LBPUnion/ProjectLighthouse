@@ -40,13 +40,19 @@
     
     @if (Model.Type.AffectsLevel())
     {
-        Slot slot = await Model.GetSlotAsync(database);
-        <p><strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name</a></p>
+        Slot? slot = await Model.GetSlotAsync(database);
+        if (slot != null)
+        {
+            <p><strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name</a></p>
+        }
     }
     else if (Model.Type.AffectsUser())
     {
-        User user = await Model.GetUserAsync(database);
-        <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
+        User? user = await Model.GetUserAsync(database);
+        if (user != null)
+        {
+            <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
+        }
     }
     
     <h3>Reason</h3>

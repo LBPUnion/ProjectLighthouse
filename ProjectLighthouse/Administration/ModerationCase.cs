@@ -42,16 +42,16 @@ public class ModerationCase
     public int AffectedId { get; set; }
 
     #region Get affected id result
-    public Task<User> GetUserAsync(Database database)
+    public Task<User?> GetUserAsync(Database database)
     {
         Debug.Assert(this.Type.AffectsUser());
-        return database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId)!;
+        return database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId);
     }
     
-    public Task<Slot> GetSlotAsync(Database database)
+    public Task<Slot?> GetSlotAsync(Database database)
     {
         Debug.Assert(this.Type.AffectsLevel());
-        return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId)!;
+        return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId);
     }
     #endregion
 
