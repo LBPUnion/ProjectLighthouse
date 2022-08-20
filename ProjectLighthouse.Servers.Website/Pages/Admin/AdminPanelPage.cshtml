@@ -24,7 +24,7 @@
 
 @if (!this.Request.IsMobile())
 {
-    <div class="ui center aligned grid">
+    <div class="ui grid">
         @foreach (AdminPanelStatistic statistic in Model.Statistics)
         {
             @await Html.PartialAsync("Partials/AdminPanelStatisticPartial", statistic)
@@ -41,7 +41,7 @@ else
     }
 }
 
-<a class="ui blue button" href="/moderation">
+<a class="ui green button" href="/moderation">
     <i class="user shield icon"></i>
     <span>View Mod Panel</span>
 </a>

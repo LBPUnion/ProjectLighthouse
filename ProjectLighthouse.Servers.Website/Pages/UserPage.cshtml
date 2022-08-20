@@ -4,6 +4,7 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
 
@@ -13,6 +14,9 @@
 
     Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
     Model.Description = Model.ProfileUser!.Biography;
+
+    bool isMobile = this.Request.IsMobile();
+    string language = Model.GetLanguage();
 }
 
 @if (Model.ProfileUser.IsBanned)
@@ -34,7 +38,7 @@
     </div>
 }
 
-<div class="ui grid">
+<div class="@(isMobile ? "" : "ui grid")">
     <div class="eight wide column">
         @await Html.PartialAsync("Partials/UserCardPartial", Model.ProfileUser, new ViewDataDictionary(ViewData)
         {
@@ -74,8 +78,17 @@
                 <i class="key icon"></i>
                 <span>@Model.Translate(GeneralStrings.ResetPassword)</span>
             </a>
+
+            <a href="/logout" class="ui red button">
+                <i class="user slash icon"></i>
+                @Model.Translate(BaseLayoutStrings.HeaderLogout)
+            </a>
         }
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
     <div class="eight wide column">
         <div class="ui blue segment">
             <h2>@Model.Translate(ProfileStrings.Biography)</h2>
@@ -89,12 +102,20 @@
             }
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
     <div class="eight wide column">
         <div class="ui red segment">
             <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
             <p>@Model.Translate(GeneralStrings.Soon)</p>
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 </div>
 
 
@@ -106,15 +127,20 @@
         <div class="ui center aligned grid">
             @foreach (Photo photo in Model.Photos)
             {
-                <div class="eight wide column">
-                    @await Html.PartialAsync("Partials/PhotoPartial", photo)
+                string width = isMobile ? "sixteen" : "eight";
+                <div class="@width wide column">
+                    @await photo.ToHtml(Html, ViewData, language)
                 </div>
             }
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 }
 
-@await Html.PartialAsync("Partials/CommentsPartial")
+@await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language))
 
 @if (Model.User != null && Model.User.IsModerator)
 {
@@ -156,4 +182,8 @@
             @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
         }
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 }

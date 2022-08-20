@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Middlewares;
+using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
@@ -77,6 +78,7 @@ public class WebsiteStartup
 
         app.UseForwardedHeaders();
 
+        app.UseMiddleware<HandlePageErrorMiddleware>();
         app.UseMiddleware<RequestLogMiddleware>();
 
         app.UseRouting();

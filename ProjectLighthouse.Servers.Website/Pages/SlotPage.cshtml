@@ -5,6 +5,7 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.PlayerData.Reviews
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotPage
 
 @{
@@ -15,6 +16,7 @@
     Model.Description = HttpUtility.HtmlDecode(Model.Slot?.Description ?? "");
 
     bool isMobile = this.Request.IsMobile();
+    string language = Model.GetLanguage();
 }
 
 @if (Model.Slot!.Hidden)
@@ -46,13 +48,17 @@
 })
 <br>
 
-<div class="ui grid">
+<div class="@(isMobile ? "" : "ui grid")">
     <div class="eight wide column">
         <div class="ui blue segment">
             <h2>Description</h2>
             <p style="overflow-wrap: anywhere">@HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model.Slot?.Description) ? "This level has no description." : Model.Slot.Description)</p>
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
     <div class="eight wide column">
         <div class="ui red segment">
             <h2>Tags</h2>
@@ -72,9 +78,17 @@
             }
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
     <div class="eight wide column">
-        @await Html.PartialAsync("Partials/CommentsPartial")
+        @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language))
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
     <div class="eight wide column">
         <div class="ui purple segment">
             <h2>Reviews</h2>
@@ -173,6 +187,10 @@
                 }
             }
         </div>
+        @if (isMobile)
+        {
+            <br/>
+        }
     </div>
 </div>
 
@@ -185,11 +203,15 @@
             @foreach (Photo photo in Model.Photos)
             {
                 <div class="eight wide column">
-                    @await Html.PartialAsync("Partials/PhotoPartial", photo)
+                    @await photo.ToHtml(Html, ViewData, language)
                 </div>
             }
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 }
 
 @if (Model.User != null && Model.User.IsModerator)
@@ -201,7 +223,7 @@
         {
             <a href="/moderation/slot/@Model.Slot.SlotId/removeTeamPick">
                 <div class="ui pink button">
-                    <i class="ribbon icon"></i>
+                    <i class="star icon"></i>
                     <span>Remove Team Pick</span>
                 </div>
             </a>
@@ -210,7 +232,7 @@
         {
             <a href="/moderation/slot/@Model.Slot?.SlotId/teamPick">
                 <div class="ui pink button">
-                    <i class="ribbon icon"></i>
+                    <i class="star icon"></i>
                     <span>Team Pick</span>
                 </div>
             </a>
@@ -241,4 +263,8 @@
             </a>
         }
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 }

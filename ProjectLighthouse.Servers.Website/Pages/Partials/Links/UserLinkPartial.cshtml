@@ -1,0 +1,11 @@
+@using LBPUnion.ProjectLighthouse.Localization
+@model LBPUnion.ProjectLighthouse.PlayerData.Profiles.User
+
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+}
+
+<a href="/user/@Model.UserId" title="@Model.Status.ToTranslatedString(language)" class="user-link">
+    <img src="/gameAssets/@Model.WebsiteAvatarHash" alt=""/>
+    @Model.Username
+</a>

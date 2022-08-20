@@ -7,6 +7,8 @@
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = Model.Translate(BaseLayoutStrings.HeaderSlots);
+
+    bool isMobile = Model.Request.IsMobile();
 }
 
 <p>There are @Model.SlotCount total levels!</p>
@@ -21,7 +23,6 @@
 
 @foreach (Slot slot in Model.Slots)
 {
-    bool isMobile = Model.Request.IsMobile();
     <div class="ui segment">
         @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
         {

@@ -6,7 +6,7 @@
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts.BaseLayout
 
 @{
-    if (Model!.User == null)
+    if (Model.User == null)
     {
         Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLoginRegister, "/login", "sign in"));
     }
@@ -16,30 +16,22 @@
         {
             Model.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAuthentication, "/authentication", "key"));
         }
-        Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderProfile, "/user/" + Model.User.UserId, "user alternate"));
 
         @if (Model.User.IsAdmin)
         {
-            Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAdminPanel, "/admin", "cogs"));
+            Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAdminPanel, "/admin", "wrench", "yellow"));
         }
         else if (Model.User.IsModerator)
         {
-            Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderModPanel, "/moderation", "user shield"));
+            Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderModPanel, "/moderation", "user shield", "green"));
         }
-        Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLogout, "/logout", "user alternate slash")); // should always be last
     }
 
     Model.IsMobile = Model.Request.IsMobile();
 
-    string title;
-    if (Model.Title == string.Empty)
-    {
-        title = ServerConfiguration.Instance.Customization.ServerName;
-    }
-    else
-    {
-        title = $"{Model.Title} - {ServerConfiguration.Instance.Customization.ServerName}";
-    }
+    string title = Model.Title == string.Empty 
+        ? ServerConfiguration.Instance.Customization.ServerName 
+        : $"{Model.Title} - {ServerConfiguration.Instance.Customization.ServerName}";
 }
 
 <!DOCTYPE html>
@@ -48,7 +40,7 @@
 <head>
     <title>@title</title>
     <link rel="stylesheet" type="text/css" href="~/css/styles.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/semantic.min.css">
 
     @* Favicon *@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -85,37 +77,56 @@
 <body>
 <div class="pageContainer">
     <header class="lighthouse-header">
-        <div class="ui attached menu">
+        <div class="ui inverted attached menu">
             <div class="ui container">
                 @{
                     string mobileIconStyle = Model.IsMobile ? "margin-right: 0;" : "";
                 }
-                @foreach (PageNavigationItem navigationItem in Model!.NavigationItems)
+
+                <a class="item home-logo" href="/">
+                    <img src="~/logo-mono.png" alt="Home" class="logo-mono"/>
+                    <img src="~/logo-color.png" alt="Home" class="logo-color"/>
+                </a>
+                @foreach (PageNavigationItem navigationItem in Model.NavigationItems)
                 {
                     <a class="item" href="@navigationItem.Url">
                         @if (navigationItem.Icon != null)
                         {
-                            <i class="@navigationItem.Icon icon" style="@mobileIconStyle"></i>
+                            <i class="@navigationItem.CustomColor @navigationItem.Icon icon" style="@mobileIconStyle"></i>
                         }
 
                         @if (!Model.IsMobile)
                         {
-                            @Model.Translate(navigationItem.Name)
+                            <span class="ui inline @navigationItem.CustomColor text">@Model.Translate(navigationItem.Name)</span>
                         }
                     </a>
                 }
                 <div class="right menu">
-                    @foreach (PageNavigationItem navigationItem in Model!.NavigationItemsRight)
+                    @foreach (PageNavigationItem navigationItem in Model.NavigationItemsRight)
                     {
                         <a class="item" href="@navigationItem.Url">
                             @if (navigationItem.Icon != null)
                             {
-                                <i class="@navigationItem.Icon icon" style="@mobileIconStyle"></i>
+                                <i class="@navigationItem.CustomColor @navigationItem.Icon icon" style="@mobileIconStyle"></i>
                             }
 
                             @if (!Model.IsMobile)
                             {
-                                @Model.Translate(navigationItem.Name)
+                                <span class="ui inline @navigationItem.CustomColor text">@Model.Translate(navigationItem.Name)</span>
+                            }
+                        </a>
+                    }
+                    
+                    @if (Model.User != null)
+                    {
+                        <a class="item" href="/user/@Model.User.UserId">
+                            <img src="/gameAssets/@Model.User.WebsiteAvatarHash" 
+                                 onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'"
+                                 alt=""
+                                 class="lighthouse-avatar"/>
+                            @if (!Model.IsMobile)
+                            {
+                                <b class="lighthouse-name">@Model.User.Username</b>
                             }
                         </a>
                     }
@@ -123,7 +134,7 @@
             </div>
         </div>
         <noscript>
-            <div class="ui bottom attached yellow message small">
+            <div class="ui bottom attached red message">
                 <div class="ui container">
                     <div style="display: flex; align-items: center; font-size: 1.2rem;">
                         <i class="warning icon"></i>
@@ -160,13 +171,19 @@
     </header>
     <div class="main">
         <div class="ui container">
-            <br>
-            @if (Model.ShowTitleInPage)
-            {
-                <h1>@Model.Title</h1>
+            @{
+                // on mobile, only show page contents
+                string segment = Model.IsMobile ? "" : "ui attached segment";
             }
-            @RenderBody()
-            <div style="height: 50px;"></div> @* makes it look nicer *@
+            <div class="@segment">
+                <div style="height: 17px"></div>
+                @if (Model.ShowTitleInPage)
+                {
+                    <h1 class="lighthouse-title">@Model.Title</h1>
+                }
+                @RenderBody()
+                <div style="height: 17px"></div>
+            </div>
         </div>
     </div>
     <footer>

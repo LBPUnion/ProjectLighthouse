@@ -13,7 +13,7 @@ namespace ProjectLighthouse.Tests.WebsiteTests.Tests;
 
 public class AdminTests : LighthouseWebTest
 {
-    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]";
+    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[1]";
 
     [DatabaseFact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
@@ -37,7 +37,7 @@ public class AdminTests : LighthouseWebTest
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.Contains("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
+        Assert.Contains("Admin", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
     }
 
     [DatabaseFact]
@@ -62,6 +62,6 @@ public class AdminTests : LighthouseWebTest
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.DoesNotContain("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
+        Assert.DoesNotContain("Admin", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
     }
 }

@@ -1,12 +1,15 @@
 @page "/photos/{pageNumber:int}"
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.PhotosPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = Model.Translate(BaseLayoutStrings.HeaderPhotos);
+
+    string language = Model.GetLanguage();
 }
 
 <p>There are @Model.PhotoCount total photos!</p>
@@ -22,7 +25,7 @@
 @foreach (Photo photo in Model.Photos)
 {
     <div class="ui segment">
-        @await Html.PartialAsync("Partials/PhotoPartial", photo)
+        @await photo.ToHtml(Html, ViewData, language)
     </div>
 }
 

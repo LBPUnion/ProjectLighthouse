@@ -1,6 +1,13 @@
 ﻿@using System.Web
 @using System.IO
+@using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+}
+
 <div class="ui yellow segment" id="comments">
     <h2>Comments</h2>
     @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
@@ -66,7 +73,7 @@
             </div>
 
             <div class="comment">
-                <b><a href="/user/@comment.PosterUserId">@comment.Poster.Username</a>: </b>
+                <b>@await comment.Poster.ToLink(Html, ViewData, language): </b>
                 @if (comment.Deleted)
                 {
                     <i>

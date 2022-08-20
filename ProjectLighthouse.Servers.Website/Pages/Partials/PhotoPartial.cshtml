@@ -1,9 +1,14 @@
 @using System.Globalization
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Levels
+@using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.PlayerData
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.PlayerData.Photo
 
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+}
 
 <div style="position: relative">
     <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId" width="1920" height="1080"
@@ -16,10 +21,14 @@
 
 <p>
     <i>
-        Taken by
-        <b>
-            <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a>
-        </b>
+        Taken
+        @if (Model.Creator != null)
+        {
+            <span>by</span>
+            <b>
+                @await Model.Creator.ToLink(Html, ViewData, language)
+            </b>
+        }
         @if (Model.Slot != null)
         {
             switch (Model.Slot.Type)
@@ -44,13 +53,16 @@
     </i>
 </p>
 
-<p>
-    <b>Photo contains @Model.Subjects.Count @(Model.Subjects.Count == 1 ? "person" : "people"):</b>
-</p>
+@if (Model.Subjects.Count > 0)
+{
+    <p>
+        <b>Photo contains @Model.Subjects.Count @(Model.Subjects.Count == 1 ? "person" : "people"):</b>
+    </p>
+}
 <div id="hover-subjects-@Model.PhotoId">
     @foreach (PhotoSubject subject in Model.Subjects)
     {
-        <a href="/user/@subject.UserId">@subject.User.Username</a>
+        @await subject.User.ToLink(Html, ViewData, language)
     }
 </div>
 
