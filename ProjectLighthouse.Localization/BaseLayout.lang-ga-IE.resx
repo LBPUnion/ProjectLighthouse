@@ -50,7 +50,7 @@
         <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
   <data name="header_adminPanel" xml:space="preserve">
-        <value>Painéal Riaracháin</value>
+        <value>Admin</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
   <data name="header_logout" xml:space="preserve">
