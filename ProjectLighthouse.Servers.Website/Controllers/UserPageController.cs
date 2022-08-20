@@ -31,6 +31,17 @@ public class UserPageController : ControllerBase
         return this.Redirect($"~/user/{id}#{commentId}");
     }
 
+    [HttpGet("deleteComment/{commentId:int}")]
+    public async Task<IActionResult> DeleteComment([FromRoute] int id, [FromRoute] int commentId)
+    {
+        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        await this.database.DeleteComment(token.UserId, commentId);
+
+        return this.Redirect($"~/user/{id}#comments");
+    }
+
     [HttpPost("postComment")]
     public async Task<IActionResult> PostComment([FromRoute] int id, [FromForm] string? msg)
     {

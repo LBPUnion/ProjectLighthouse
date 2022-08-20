@@ -176,19 +176,53 @@ public class Database : DbContext
         return true;
     }
 
+    public async Task<bool> DeleteComment(int userId, int commentId)
+    {
+        Comment? comment = await this.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+        if (comment == null) return false;
+
+        if (comment.PosterUserId != userId)
+        {
+            if (comment.Type == CommentType.Profile)
+            {
+                // if you aren't the poster and aren't the profile owner
+                if (comment.TargetId != userId)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                Slot? slot = await this.Slots.FirstOrDefaultAsync(s => s.SlotId == comment.TargetId);
+                // if you aren't the creator of the level
+                if (slot == null || slot.CreatorId != userId)
+                {
+                    return false;
+                }
+            }
+        }
+
+        comment.Deleted = true;
+        comment.DeletedBy = await this.Users.Where(u => u.UserId == userId).Select(u => u.Username).FirstOrDefaultAsync();
+        comment.DeletedType = "user";
+
+        await this.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<bool> PostComment(int userId, int targetId, CommentType type, string message)
     {
         if (message.Length > 100) return false;
 
         if (type == CommentType.Profile)
         {
-            User? targetUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == targetId);
-            if (targetUser == null) return false;
+            bool userExists = await this.Users.AnyAsync(u => u.UserId == targetId);
+            if (!userExists) return false;
         }
         else
         {
-            Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
-            if (targetSlot == null) return false;
+            bool slotExists = await this.Slots.AnyAsync(u => u.SlotId == targetId);
+            if (!slotExists) return false;
         }
 
         this.Comments.Add

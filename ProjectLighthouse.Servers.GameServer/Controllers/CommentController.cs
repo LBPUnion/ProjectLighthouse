@@ -116,7 +116,7 @@ public class CommentController : ControllerBase
 
         int targetId = slotId;
 
-        if (type == CommentType.Profile) targetId = this.database.Users.First(u => u.Username == username).UserId;
+        if (type == CommentType.Profile) targetId = await this.database.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
 
         if (slotType == "developer") targetId = await SlotHelper.GetPlaceholderSlotId(this.database, targetId, SlotType.Developer);
 
@@ -133,40 +133,10 @@ public class CommentController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
-        if (comment == null) return this.NotFound();
+        if (username == null && (SlotHelper.IsTypeInvalid(slotType) || slotId == 0)) return this.BadRequest();
 
-        if (comment.Type == CommentType.Level && (SlotHelper.IsTypeInvalid(slotType) || slotId == 0)) return this.BadRequest();
-
-        if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
-
-        // if you are not the poster
-        if (comment.PosterUserId != token.UserId)
-        {
-            if (comment.Type == CommentType.Profile)
-            {
-                // if you aren't the poster and aren't the profile owner
-                if (comment.TargetId != token.UserId)
-                {
-                    return this.StatusCode(403, "");
-                }
-            }
-            else
-            {
-                Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == comment.TargetId);
-                // if you aren't the creator of the level
-                if (slot == null || slot.CreatorId != token.UserId || slotId != slot.SlotId)
-                {
-                    return this.StatusCode(403, "");
-                }
-            }
-        }
-
-        comment.Deleted = true;
-        comment.DeletedBy = await this.database.UsernameFromGameToken(token);
-        comment.DeletedType = "user";
-
-        await this.database.SaveChangesAsync();
+        bool success = await this.database.DeleteComment(token.UserId, commentId);
+        if (!success) return this.BadRequest();
 
         return this.Ok();
     }

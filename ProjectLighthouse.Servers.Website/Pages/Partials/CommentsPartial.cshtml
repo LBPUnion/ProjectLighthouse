@@ -6,7 +6,17 @@
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+
+    int slotCreatorId = (int?)ViewData["SlotCreatorId"] ?? 0;
 }
+
+<script>
+  function confirmDeletion(commentId){
+      if (window.confirm("Are you sure you want to delete this comment?\nThis action cannot be undone.")){
+          window.location.href = "@Url.RouteUrl(ViewContext.RouteData.Values)/deleteComment/" + commentId;
+      }          
+  }
+</script>
 
 <div class="ui yellow segment" id="comments">
     <h2>Comments</h2>
@@ -83,6 +93,12 @@
                 else
                 {
                     <span>@decodedMessage</span>
+                }
+                @if ((Model.User?.UserId == comment.PosterUserId || Model.User?.UserId == slotCreatorId) && !comment.Deleted)
+                {
+                    <button class="ui red icon button" style="display:inline-flex; float: right" onclick="confirmDeletion(@comment.CommentId)">
+                        <i class="trash icon"></i>
+                    </button>
                 }
                 <p>
                     <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>

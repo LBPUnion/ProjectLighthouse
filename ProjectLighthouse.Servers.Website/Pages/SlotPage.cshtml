@@ -83,7 +83,11 @@
         <br/>
     }
     <div class="eight wide column">
-        @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language))
+        @{
+            ViewDataDictionary data = ViewData.WithLang(language);
+            data.Add("SlotCreatorId", Model.Slot!.CreatorId);
+        }
+        @await Html.PartialAsync("Partials/CommentsPartial", data)
     </div>
     @if (isMobile)
     {
