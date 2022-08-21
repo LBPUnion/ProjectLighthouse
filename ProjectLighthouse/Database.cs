@@ -476,6 +476,7 @@ public class Database : DbContext
     public async Task RemoveUser(User? user)
     {
         if (user == null) return;
+        if (user.Username.Length == 0) return; // don't delete the placeholder user
 
         if (user.Location != null) this.Locations.Remove(user.Location);
         LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
