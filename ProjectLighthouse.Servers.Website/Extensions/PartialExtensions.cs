@@ -1,4 +1,3 @@
-using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Html;
@@ -27,8 +26,23 @@ public static class PartialExtensions
         }
     }
 
-    public static Task<IHtmlContent> ToLink<T>(this User user, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language) 
-        => helper.PartialAsync("Partials/Links/UserLinkPartial", user, viewData.WithLang(language));
+    public static Task<IHtmlContent> ToLink<T>
+    (
+        this User user,
+        IHtmlHelper<T> helper,
+        ViewDataDictionary<T> viewData,
+        string language,
+        bool includeUserStatus = false
+    )
+    {
+        if(viewData.ContainsKey("IncludeStatus"))
+            viewData.Remove("IncludeStatus");
+        if(includeUserStatus)
+            viewData.Add("IncludeStatus", true);
+
+        return helper.PartialAsync("Partials/Links/UserLinkPartial", user, viewData.WithLang(language));
+    } 
+        
 
     public static Task<IHtmlContent> ToHtml<T>(this Photo photo, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language)
         => helper.PartialAsync("Partials/PhotoPartial", photo, viewData.WithLang(language));

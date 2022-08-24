@@ -93,7 +93,7 @@ public class User
                 p.PhotoId,
                 p.PhotoSubjectCollection,
             }).ToList();
-        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Contains(ps.ToString())) select v.PhotoId).ToList();
+        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Split(",").Contains(ps.ToString())) select v.PhotoId).ToList();
         return this.database.Photos.Count(p => photoIds.Any(pId => p.PhotoId == pId) && p.CreatorId != this.UserId);
     }
 
