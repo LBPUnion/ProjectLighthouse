@@ -53,10 +53,12 @@ public class SlotsPage : BaseLayout
         }
 
         this.SearchValue = name.Trim();
+        
+        string trimmedSearch = finalSearch.ToString().Trim();
 
         this.SlotCount = await this.Database.Slots.Include(p => p.Creator)
             .Where(p => p.Type == SlotType.User && !p.Hidden)
-            .Where(p => p.Name.Contains(finalSearch.ToString()))
+            .Where(p => p.Name.Contains(trimmedSearch))
             .Where(p => p.Creator != null && (targetAuthor == null || string.Equals(p.Creator.Username.ToLower(), targetAuthor.ToLower())))
             .Where(p => p.Creator != null && (!p.SubLevel || p.Creator == this.User))
             .Where(p => targetGame == null || p.GameVersion == targetGame)
@@ -69,7 +71,7 @@ public class SlotsPage : BaseLayout
 
         this.Slots = await this.Database.Slots.Include(p => p.Creator)
             .Where(p => p.Type == SlotType.User && !p.Hidden)
-            .Where(p => p.Name.Contains(finalSearch.ToString()))
+            .Where(p => p.Name.Contains(trimmedSearch))
             .Where(p => p.Creator != null && (targetAuthor == null || string.Equals(p.Creator.Username.ToLower(), targetAuthor.ToLower())))
             .Where(p => p.Creator != null && (!p.SubLevel || p.Creator == this.User))
             .Where(p => p.Creator!.LevelVisibility == PrivacyType.All) // TODO: change check for when user is logged in
