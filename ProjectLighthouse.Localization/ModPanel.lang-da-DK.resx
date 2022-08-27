@@ -24,9 +24,9 @@
         <value>Velkommen til moderationspanel, {0}!</value>
     </data>
   <data name="banned_users" xml:space="preserve">
-        <value>Banned Users</value>
+        <value>Banned brugere</value>
     </data>
   <data name="hidden_levels" xml:space="preserve">
-        <value>Hidden Levels</value>
+        <value>Skjulte Baner</value>
     </data>
 </root>
