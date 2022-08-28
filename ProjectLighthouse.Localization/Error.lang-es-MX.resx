@@ -27,7 +27,7 @@
         <value>Se requiere un campo de contraseña.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>¡ las contraseñas no coinciden!</value>
+        <value>¡Las contraseñas no coinciden!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
         <value>Token no válido</value>
@@ -42,6 +42,6 @@
         <value>Se requiere un campo de correo electrónico.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
-        <value>Te han prohibido. Póngase en contacto con un administrador para obtener más información. \nRazón:{0}</value>
+        <value>Te han prohibido acceso. Póngase en contacto con un administrador para obtener más información. \nRazón:{0}</value>
     </data>
 </root>
