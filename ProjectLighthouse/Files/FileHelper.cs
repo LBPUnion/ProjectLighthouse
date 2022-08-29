@@ -87,7 +87,7 @@ public static class FileHelper
 
         int curOffset = 8;
         int dependencyTableOffset = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[curOffset..]);
-        if(dependencyTableOffset == 0 || dependencyTableOffset > file.Data.Length) return dependencies;
+        if(dependencyTableOffset <= 0 || dependencyTableOffset > file.Data.Length) return dependencies;
         
         curOffset = dependencyTableOffset;
         int dependencyTableSize = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[dependencyTableOffset..]);
