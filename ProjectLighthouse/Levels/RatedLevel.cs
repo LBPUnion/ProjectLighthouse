@@ -23,4 +23,6 @@ public class RatedLevel
     public int Rating { get; set; }
 
     public double RatingLBP1 { get; set; }
+
+    public string TagLBP1 { get; set; }
 }

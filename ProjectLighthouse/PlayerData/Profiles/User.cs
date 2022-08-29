@@ -141,6 +141,9 @@ public class User
     public string BooHash { get; set; } = "";
     public string MehHash { get; set; } = "";
 
+    public long LastLogin { get; set; } = -1;
+    public long LastLogout { get; set; } = -1;
+
     [NotMapped]
     [JsonIgnore]
     public UserStatus Status => new(this.database, this.UserId);

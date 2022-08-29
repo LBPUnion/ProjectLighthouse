@@ -5,10 +5,8 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +42,7 @@ public class ReviewController : ControllerBase
                 SlotId = slotId,
                 UserId = token.UserId,
                 Rating = 0,
+                TagLBP1 = "",
             };
             this.database.RatedLevels.Add(ratedLevel);
         }
@@ -62,7 +61,7 @@ public class ReviewController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
+        Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
 
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
@@ -73,6 +72,7 @@ public class ReviewController : ControllerBase
                 SlotId = slotId,
                 UserId = token.UserId,
                 RatingLBP1 = 0,
+                TagLBP1 = "",
             };
             this.database.RatedLevels.Add(ratedLevel);
         }
@@ -113,7 +113,14 @@ public class ReviewController : ControllerBase
             this.database.Reviews.Add(review);
         }
         review.Thumb = newReview.Thumb;
-        review.LabelCollection = newReview.LabelCollection;
+        List<string> labels = new(newReview.LabelCollection.Split(","));
+        // Remove invalid labels
+        for (int i = labels.Count - 1; i >= 0; i--)
+        {
+            if (!LabelHelper.IsValidLabel(labels[i])) labels.Remove(labels[i]);
+        }
+        review.LabelCollection = string.Join(",", labels);
+        
         review.Text = newReview.Text;
         review.Deleted = false;
         review.Timestamp = TimeHelper.UnixTimeMilliseconds();
@@ -127,6 +134,7 @@ public class ReviewController : ControllerBase
                 SlotId = slotId,
                 UserId = token.UserId,
                 RatingLBP1 = 0,
+                TagLBP1 = "",
             };
             this.database.RatedLevels.Add(ratedLevel);
         }

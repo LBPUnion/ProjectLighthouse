@@ -4,7 +4,6 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +38,12 @@ public class ScoreController : ControllerBase
         Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
         if (score == null) return this.BadRequest();
 
+        if (score.PlayerIds.Length == 0) return this.BadRequest();
+
+        if (score.Points < 0) return this.BadRequest();
+
+        if (score.Type is > 4 or < 1) return this.BadRequest();
+
         SanitizationHelper.SanitizeStringsInClass(score);
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
@@ -60,6 +65,9 @@ public class ScoreController : ControllerBase
             case GameVersion.LittleBigPlanet3:
                 slot.PlaysLBP3Complete++;
                 break;
+            case GameVersion.LittleBigPlanetPSP: break;
+            case GameVersion.Unknown: break;
+            default: throw new ArgumentOutOfRangeException();
         }
 
         // Submit scores from all players in lobby

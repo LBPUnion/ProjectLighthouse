@@ -76,6 +76,10 @@ public class GameServerStartup
                 // Client digest check.
                 if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie) || authCookie == null) authCookie = string.Empty;
                 string digestPath = context.Request.Path;
+                #if !DEBUG
+                const string url = "/LITTLEBIGPLANETPS3_XML";
+                string strippedPath = digestPath.Contains(url) ? digestPath[url.Length..] : "";
+                #endif
                 Stream body = context.Request.Body;
 
                 bool usedAlternateDigestKey = false;
@@ -113,6 +117,16 @@ public class GameServerStartup
                             }
                         }
                     }
+                    #if !DEBUG
+                    // The game doesn't start sending digests until after the announcement so if it's not one of those requests
+                    // and it doesn't include a digest we need to reject the request 
+                    else if (!strippedPath.Equals("/login") && !strippedPath.Equals("/eula") && !strippedPath.Equals("/announce"))
+                    {
+                        context.Response.StatusCode = 403;
+                        context.Abort();
+                        return;
+                    }
+                    #endif
 
                     context.Response.Headers.Add("X-Digest-B", clientRequestDigest);
                     context.Request.Body.Position = 0;
@@ -141,6 +155,7 @@ public class GameServerStartup
                 }
 
                 // Copy the buffered response to the actual response stream.
+                context.Response.Headers.Add("Content-Length", responseBuffer.Length.ToString());
                 responseBuffer.Position = 0;
                 await responseBuffer.CopyToAsync(oldResponseStream);
                 context.Response.Body = oldResponseStream;

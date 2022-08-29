@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Match.Rooms;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Tickets;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -121,6 +120,8 @@ public class LoginController : ControllerBase
         // We just logged in with the token. Mark it as used so someone else doesnt try to use it,
         // and so we don't pick the same token up when logging in later.
         token.Used = true;
+
+        user.LastLogin = TimeHelper.TimestampMillis;
 
         await this.database.SaveChangesAsync();
 
