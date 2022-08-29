@@ -120,7 +120,7 @@ public class GameServerStartup
                     #if !DEBUG
                     // The game doesn't start sending digests until after the announcement so if it's not one of those requests
                     // and it doesn't include a digest we need to reject the request 
-                    else if (!strippedPath.Equals("/login") && !strippedPath.Equals("/eula") && !strippedPath.Equals("/announce"))
+                    else if (!ServerStatics.IsUnitTesting && (!strippedPath.Equals("/login") && !strippedPath.Equals("/eula") && !strippedPath.Equals("/announce")))
                     {
                         context.Response.StatusCode = 403;
                         context.Abort();
