@@ -85,6 +85,12 @@ public class ResourcesController : ControllerBase
             return this.Conflict();
         }
 
+        if (!FileHelper.AreDependenciesSafe(file))
+        {
+            Logger.Warn($"File has unsafe dependencies (hash: {hash}, type: {file.FileType}", LogArea.Resources);
+            return this.Conflict();
+        }
+
         string calculatedHash = file.Hash;
         if (calculatedHash != hash)
         {

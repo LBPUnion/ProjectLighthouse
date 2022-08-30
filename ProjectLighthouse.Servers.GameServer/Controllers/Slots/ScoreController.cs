@@ -118,7 +118,6 @@ public class ScoreController : ControllerBase
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
     public async Task<IActionResult> TopScores(string slotType, int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
-        // Get username
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 

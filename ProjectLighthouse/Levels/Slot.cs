@@ -115,6 +115,7 @@ public class Slot
         {
             if (this.GameVersion != GameVersion.LittleBigPlanet1) return Array.Empty<string>();
 
+            // Sort tags by most popular
             SortedDictionary<string, int> occurrences = new();
             foreach (RatedLevel r in this.database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0))
             {
@@ -123,7 +124,7 @@ public class Slot
                 else
                     occurrences[r.TagLBP1]++;
             }
-            return occurrences.OrderBy(r => r.Value).Take(10).Select(r => r.Key).ToArray();
+            return occurrences.OrderBy(r => r.Value).Select(r => r.Key).ToArray();
         }
     }
 
@@ -315,9 +316,8 @@ public class Slot
                           (fullSerialization ? LbpSerializer.StringElement("moveRequired", this.MoveRequired) : "") +
                           (fullSerialization ? LbpSerializer.StringElement("crossControlRequired", this.CrossControllerRequired) : "") +
                           (yourRatingStats != null ?
-                              this.GameVersion == GameVersion.LittleBigPlanet1 ?
-                                  LbpSerializer.StringElement("yourRating", yourRatingStats.RatingLBP1)
-                                  : LbpSerializer.StringElement("yourDPadRating", yourRatingStats.Rating)
+                              LbpSerializer.StringElement<double>("yourRating", yourRatingStats.RatingLBP1, true) +
+                              LbpSerializer.StringElement<int>("yourDPadRating", yourRatingStats.Rating, true)
                               : "") +
                           (yourVisitedStats != null ?
                               LbpSerializer.StringElement("yourlbp1PlayCount", yourVisitedStats.PlaysLBP1) +
@@ -328,9 +328,8 @@ public class Slot
                           LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("photoCount", this.Photos) +
                           LbpSerializer.StringElement("authorPhotoCount", this.PhotosWithAuthor) +
-                          (this.GameVersion == GameVersion.LittleBigPlanet1 ? 
-                              (fullSerialization ? LbpSerializer.StringElement<string>("tags", this.LevelTags.FirstOrDefault(), true) : "") :
-                              (fullSerialization ? LbpSerializer.StringElement("labels", this.AuthorLabels) : "")) +
+                          (fullSerialization ? LbpSerializer.StringElement<string>("tags", string.Join(",", this.LevelTags), true) : "") +
+                          (fullSerialization ? LbpSerializer.StringElement<string>("labels", this.AuthorLabels, true) : "") +
                           LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
                           LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
                           (fullSerialization ?

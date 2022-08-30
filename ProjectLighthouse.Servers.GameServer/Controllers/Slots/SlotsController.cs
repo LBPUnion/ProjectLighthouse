@@ -203,21 +203,21 @@ public class SlotsController : ControllerBase
 
         string[] tags = targetSlot.LevelTags;
 
-        List<int> slotIds = this.database.RatedLevels
+        List<int> slotIdsWithTag = this.database.RatedLevels
             .Where(r => r.TagLBP1.Length > 0)
             .Where(r => tags.Contains(r.TagLBP1))
             .Select(r => r.SlotId)
             .ToList();
 
         IQueryable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .Where(s => slotIds.Contains(s.SlotId))
+            .Where(s => slotIdsWithTag.Contains(s.SlotId))
             .OrderByDescending(s => s.PlaysLBP1)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
 
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = slotIds.Count;
+        int total = slotIdsWithTag.Count;
 
         return this.Ok(this.GenerateSlotsResponse(response, start, total));
     }
@@ -255,20 +255,20 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        List<int> slotIds = await this.database.RatedLevels.Where(r => r.TagLBP1.Length > 0)
+        List<int> slotIdsWithTag = await this.database.RatedLevels.Where(r => r.TagLBP1.Length > 0)
             .Where(r => r.TagLBP1 == tag)
             .Select(s => s.SlotId)
             .ToListAsync();
 
         IQueryable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .Where(s => slotIds.Contains(s.SlotId))
+            .Where(s => slotIdsWithTag.Contains(s.SlotId))
             .OrderByDescending(s => s.PlaysLBP1)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
 
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await this.database.Slots.CountAsync(s => s.AuthorLabels.Contains(tag));
+        int total = slotIdsWithTag.Count;
 
         return this.Ok(this.GenerateSlotsResponse(response, start, total));
     }

@@ -86,11 +86,20 @@ public class GameServerStartup
 
                 if (computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
                 {
-                    string clientRequestDigest = await CryptoHelper.ComputeDigest
-                        (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey);
+                    // The game sets X-Digest-B on a resource upload instead of X-Digest-A
+                    string digestHeaderKey = "X-Digest-A";
+                    bool excludeBodyFromDigest = false;
+                    if (digestPath.Contains("/upload/"))
+                    {
+                        digestHeaderKey = "X-Digest-B";
+                        excludeBodyFromDigest = true;
+                    }
 
-                    // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
-                    if (context.Request.Headers.TryGetValue("X-Digest-A", out StringValues sentDigest))
+                    string clientRequestDigest = await CryptoHelper.ComputeDigest
+                        (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey, excludeBodyFromDigest);
+
+                    // Check the digest we've just calculated against the digest header if the game set the header. They should match.
+                    if (context.Request.Headers.TryGetValue(digestHeaderKey, out StringValues sentDigest))
                     {
                         if (clientRequestDigest != sentDigest)
                         {
@@ -101,7 +110,7 @@ public class GameServerStartup
                             body.Position = 0;
 
                             clientRequestDigest = await CryptoHelper.ComputeDigest
-                                (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.AlternateDigestKey);
+                                (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.AlternateDigestKey, excludeBodyFromDigest);
                             if (clientRequestDigest != sentDigest)
                             {
                                 #if DEBUG
@@ -112,7 +121,6 @@ public class GameServerStartup
                                 #endif
                                 // We still failed to validate. Abort the request.
                                 context.Response.StatusCode = 403;
-                                context.Abort();
                                 return;
                             }
                         }
@@ -123,7 +131,6 @@ public class GameServerStartup
                     else if (!ServerStatics.IsUnitTesting && (!strippedPath.Equals("/login") && !strippedPath.Equals("/eula") && !strippedPath.Equals("/announce")))
                     {
                         context.Response.StatusCode = 403;
-                        context.Abort();
                         return;
                     }
                     #endif

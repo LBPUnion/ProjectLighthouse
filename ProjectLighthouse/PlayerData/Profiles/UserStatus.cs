@@ -13,8 +13,8 @@ public class UserStatus
     public GameVersion? CurrentVersion { get; set; }
     public Platform? CurrentPlatform { get; set; }
     public Room? CurrentRoom { get; set; }
-    public long LastLogin { get; set; } = -1;
-    public long LastLogout { get; set; } = -1;
+    public long LastLogin { get; set; }
+    public long LastLogout { get; set; }
 
     public UserStatus()
     {}
@@ -41,8 +41,8 @@ public class UserStatus
                 u.LastLogin,
                 u.LastLogout,
             }).FirstOrDefault();
-        this.LastLogin = loginTimestamps?.LastLogin ?? -1;
-        this.LastLogout = loginTimestamps?.LastLogout ?? -1;
+        this.LastLogin = loginTimestamps?.LastLogin ?? 0;
+        this.LastLogout = loginTimestamps?.LastLogout ?? 0;
 
        this.CurrentRoom = RoomHelper.FindRoomByUserId(userId);
     }

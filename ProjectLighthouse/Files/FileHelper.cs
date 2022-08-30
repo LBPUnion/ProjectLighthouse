@@ -25,12 +25,8 @@ public static class FileHelper
 
     public static string GetResourcePath(string hash) => Path.Combine(ResourcePath, hash);
 
-    public static bool IsFileSafe(LbpFile file)
+    public static bool AreDependenciesSafe(LbpFile file)
     {
-        if (!ServerConfiguration.Instance.CheckForUnsafeFiles) return true;
-
-        if (file.FileType == LbpFileType.Unknown) return false;
-
         // recursively check if dependencies are safe
         List<ResourceDescriptor> dependencies = ParseDependencyList(file);
         foreach (ResourceDescriptor resource in dependencies)
@@ -38,6 +34,7 @@ public static class FileHelper
             if (resource.IsGuidResource()) continue;
 
             LbpFile? r = LbpFile.FromHash(resource.Hash);
+            // If the resource hasn't been uploaded yet then we just go off it's included resource type
             if (r == null)
                 if (resource.IsScriptType())
                     return false;
@@ -46,6 +43,15 @@ public static class FileHelper
 
             if (!IsFileSafe(r)) return false;
         }
+
+        return true;
+    }
+
+    public static bool IsFileSafe(LbpFile file)
+    {
+        if (!ServerConfiguration.Instance.CheckForUnsafeFiles) return true;
+
+        if (file.FileType == LbpFileType.Unknown) return false;
 
         return file.FileType switch
         {
@@ -79,7 +85,7 @@ public static class FileHelper
             return dependencies;
         }
 
-        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..8]);
+        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..]);
 
         // Data format is 'borrowed' from: https://github.com/ennuo/toolkit/blob/main/src/main/java/ennuo/craftworld/resources/Resource.java#L191
 
@@ -133,12 +139,12 @@ public static class FileHelper
         const ushort lbpVitaDescriptor = 0x4431;
         // There are like 1600 revisions so this doesn't cover everything
 
-        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..8]);
+        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..]);
 
         if (revision >= 0x271)
         {
             // construct a 16 bit number from 2 individual bytes
-            ushort branchDescriptor = BinaryPrimitives.ReadUInt16BigEndian(file.Data.AsSpan()[12..13]);
+            ushort branchDescriptor = BinaryPrimitives.ReadUInt16BigEndian(file.Data.AsSpan()[12..]);
             if (revision == lbpVitaLatest && branchDescriptor == lbpVitaDescriptor) return GameVersion.LittleBigPlanetVita;
         }
 

@@ -141,8 +141,8 @@ public class User
     public string BooHash { get; set; } = "";
     public string MehHash { get; set; } = "";
 
-    public long LastLogin { get; set; } = -1;
-    public long LastLogout { get; set; } = -1;
+    public long LastLogin { get; set; }
+    public long LastLogout { get; set; }
 
     [NotMapped]
     [JsonIgnore]

@@ -30,7 +30,7 @@ public static class CryptoHelper
         return BCryptHash(Sha256Hash(bytes));
     }
 
-    public static async Task<string> ComputeDigest(string path, string authCookie, Stream body, string digestKey)
+    public static async Task<string> ComputeDigest(string path, string authCookie, Stream body, string digestKey, bool excludeBody = false)
     {
         MemoryStream memoryStream = new();
 
@@ -43,7 +43,10 @@ public static class CryptoHelper
         byte[] bodyBytes = memoryStream.ToArray();
 
         using IncrementalHash sha1 = IncrementalHash.CreateHash(HashAlgorithmName.SHA1);
-        sha1.AppendData(bodyBytes);
+        // LBP games will sometimes opt to calculate the digest without the body
+        // (one example is resource upload requests)
+        if(!excludeBody)
+            sha1.AppendData(bodyBytes);
         if (cookieBytes.Length > 0) sha1.AppendData(cookieBytes);
         sha1.AppendData(pathBytes);
         sha1.AppendData(keyBytes);

@@ -46,7 +46,7 @@ public static class LabelHelper
 
     public static string TranslateTag(string tag)
     {
-        if (tag.Contains("TAG_")) return tag.Replace("TAG_", "");
+        if (tag.Contains("TAG_")) return tag.Replace("TAG_", "").Replace("_", "-");
 
         // ReSharper disable once ConvertIfStatementToReturnStatement
         if (translationTable.ContainsKey(tag)) return translationTable[tag];

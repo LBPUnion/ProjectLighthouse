@@ -4,7 +4,7 @@ namespace LBPUnion.ProjectLighthouse.Levels;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-// I would remove the LABEL_ prefix, but some of the tags start with numbers and thus don't compile
+// I would remove the LABEL prefix, but some of the tags start with numbers and won't compile
 public enum LevelLabels
 {
     LABEL_SinglePlayer,
