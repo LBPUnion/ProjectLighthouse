@@ -82,6 +82,6 @@ public class Review
                             LbpSerializer.StringElement("thumbsdown", this.ThumbsDown) +
                             LbpSerializer.StringElement("yourthumb", yourRatingStats?.Thumb ?? 0);
 
-        return LbpSerializer.TaggedStringElement("reviews", reviewData, "id", this.SlotId + "." + this.Reviewer?.Username);
+        return LbpSerializer.TaggedStringElement("review", reviewData, "id", this.SlotId + "." + this.Reviewer?.Username);
     }
 }
