@@ -457,7 +457,6 @@ public class Database : DbContext
             if(user != null) user.LastLogout = TimeHelper.TimestampMillis;
             this.GameTokens.Remove(token);
         }
-        this.GameTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
         this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
         this.EmailVerificationTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
         this.EmailSetTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
