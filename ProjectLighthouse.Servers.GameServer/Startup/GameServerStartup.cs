@@ -1,4 +1,3 @@
-using System.IO.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -161,8 +160,11 @@ public class GameServerStartup
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
 
+                // Add a content-length header if it isn't present to disable response chunking
+                if(!context.Response.Headers.ContainsKey("Content-Length"))
+                    context.Response.Headers.Add("Content-Length", responseBuffer.Length.ToString());
+
                 // Copy the buffered response to the actual response stream.
-                context.Response.Headers.Add("Content-Length", responseBuffer.Length.ToString());
                 responseBuffer.Position = 0;
                 await responseBuffer.CopyToAsync(oldResponseStream);
                 context.Response.Body = oldResponseStream;
