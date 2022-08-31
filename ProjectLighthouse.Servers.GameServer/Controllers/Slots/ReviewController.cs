@@ -25,7 +25,7 @@ public class ReviewController : ControllerBase
     }
 
     // LBP1 rating
-    [HttpPost("rate/user/{slotId}")]
+    [HttpPost("rate/user/{slotId:int}")]
     public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
@@ -178,7 +178,7 @@ public class ReviewController : ControllerBase
                 if (review == null) return current;
 
                 RatedReview? yourThumb = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
-                return current + review.Serialize(null, yourThumb);
+                return current + review.Serialize(yourThumb);
             }
         );
         string response = LbpSerializer.TaggedStringElement
@@ -191,7 +191,7 @@ public class ReviewController : ControllerBase
                     "hint_start", pageStart + pageSize
                 },
                 {
-                    "hint", reviewList.LastOrDefault()!.Timestamp // not sure
+                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0 // timestamp of last review
                 },
             }
         );
@@ -230,7 +230,7 @@ public class ReviewController : ControllerBase
                 if (review == null) return current;
 
                 RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
-                return current + review.Serialize(null, ratedReview);
+                return current + review.Serialize(ratedReview);
             }
         );
 
@@ -244,7 +244,7 @@ public class ReviewController : ControllerBase
                     "hint_start", pageStart
                 },
                 {
-                    "hint", reviewList.LastOrDefault()!.Timestamp // Seems to be the timestamp of oldest
+                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0 // Seems to be the timestamp of oldest
                 },
             }
         );
