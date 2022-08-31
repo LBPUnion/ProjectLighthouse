@@ -44,6 +44,16 @@ public static class LabelHelper
 
     public static bool IsValidLabel(string label) => Enum.IsDefined(typeof(LevelLabels), label);
 
+    public static string RemoveInvalidLabels(string authorLabels)
+    {
+        List<string> labels = new(authorLabels.Split(","));
+        for (int i = labels.Count - 1; i >= 0; i--)
+        {
+            if (!IsValidLabel(labels[i])) labels.Remove(labels[i]);
+        }
+        return string.Join(",", labels);
+    }
+
     public static string TranslateTag(string tag)
     {
         if (tag.Contains("TAG_")) return tag.Replace("TAG_", "").Replace("_", "-");

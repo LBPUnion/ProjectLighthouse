@@ -43,7 +43,7 @@ public class SearchController : ControllerBase
         string[] keywords = query.Split(" ");
 
         IQueryable<Slot> dbQuery = this.database.Slots.ByGameVersion(gameToken.GameVersion, false, true)
-            .Where(s => s.Type == SlotType.Developer)
+            .Where(s => s.Type == SlotType.User)
             .OrderBy(s => !s.TeamPick)
             .ThenByDescending(s => s.FirstUploaded)
             .Where(s => s.SlotId >= 0); // dumb query to conv into IQueryable

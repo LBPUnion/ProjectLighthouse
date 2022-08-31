@@ -113,13 +113,7 @@ public class ReviewController : ControllerBase
             this.database.Reviews.Add(review);
         }
         review.Thumb = newReview.Thumb;
-        List<string> labels = new(newReview.LabelCollection.Split(","));
-        // Remove invalid labels
-        for (int i = labels.Count - 1; i >= 0; i--)
-        {
-            if (!LabelHelper.IsValidLabel(labels[i])) labels.Remove(labels[i]);
-        }
-        review.LabelCollection = string.Join(",", labels);
+        review.LabelCollection = LabelHelper.RemoveInvalidLabels(newReview.LabelCollection);
         
         review.Text = newReview.Text;
         review.Deleted = false;
@@ -191,7 +185,7 @@ public class ReviewController : ControllerBase
                     "hint_start", pageStart + pageSize
                 },
                 {
-                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0 // timestamp of last review
+                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0
                 },
             }
         );
