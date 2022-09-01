@@ -5,6 +5,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/")]
+[Produces("text/xml")]
 public class DeveloperController : Controller
 {
 
