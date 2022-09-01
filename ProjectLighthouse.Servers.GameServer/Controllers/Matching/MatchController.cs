@@ -25,6 +25,27 @@ public class MatchController : ControllerBase
         this.database = database;
     }
 
+    [HttpPost("developer_videos")]
+    public async Task<IActionResult> DeveloperVideos([FromQuery] string language)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+
+        if (token == null) return this.StatusCode(403, "");
+
+        return this.Ok("<videos></videos>");
+    }
+
+    [HttpPost("gameState")]
+    [Produces("text/html")]
+    public async Task<IActionResult> Gamestate()
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+
+        if (token == null) return this.StatusCode(403, "");
+
+        return this.Ok("VALID");
+    }
+
     [HttpPost("match")]
     [Produces("text/plain")]
     public async Task<IActionResult> Match()
