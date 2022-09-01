@@ -16,7 +16,7 @@ public class DeveloperController : Controller
         this.database = database;
     }
 
-    [HttpGet("/developer_videos")]
+    [HttpGet("developer_videos")]
     public async Task<IActionResult> DeveloperVideos()
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
