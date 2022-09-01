@@ -1,6 +1,5 @@
 @page "/authentication"
 @using LBPUnion.ProjectLighthouse.PlayerData
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.ExternalAuth.AuthenticationPage
 
 @{
@@ -42,7 +41,7 @@ else
 
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
 {
-    DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(authAttempt.Timestamp);
+    DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(authAttempt.Timestamp).ToLocalTime();
     <div class="ui red segment">
         <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>

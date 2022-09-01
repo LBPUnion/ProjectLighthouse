@@ -1,4 +1,3 @@
-using System.IO.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -76,17 +75,30 @@ public class GameServerStartup
                 // Client digest check.
                 if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie) || authCookie == null) authCookie = string.Empty;
                 string digestPath = context.Request.Path;
+                #if !DEBUG
+                const string url = "/LITTLEBIGPLANETPS3_XML";
+                string strippedPath = digestPath.Contains(url) ? digestPath[url.Length..] : "";
+                #endif
                 Stream body = context.Request.Body;
 
                 bool usedAlternateDigestKey = false;
 
                 if (computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
                 {
-                    string clientRequestDigest = await CryptoHelper.ComputeDigest
-                        (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey);
+                    // The game sets X-Digest-B on a resource upload instead of X-Digest-A
+                    string digestHeaderKey = "X-Digest-A";
+                    bool excludeBodyFromDigest = false;
+                    if (digestPath.Contains("/upload/"))
+                    {
+                        digestHeaderKey = "X-Digest-B";
+                        excludeBodyFromDigest = true;
+                    }
 
-                    // Check the digest we've just calculated against the X-Digest-A header if the game set the header. They should match.
-                    if (context.Request.Headers.TryGetValue("X-Digest-A", out StringValues sentDigest))
+                    string clientRequestDigest = await CryptoHelper.ComputeDigest
+                        (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey, excludeBodyFromDigest);
+
+                    // Check the digest we've just calculated against the digest header if the game set the header. They should match.
+                    if (context.Request.Headers.TryGetValue(digestHeaderKey, out StringValues sentDigest))
                     {
                         if (clientRequestDigest != sentDigest)
                         {
@@ -97,7 +109,7 @@ public class GameServerStartup
                             body.Position = 0;
 
                             clientRequestDigest = await CryptoHelper.ComputeDigest
-                                (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.AlternateDigestKey);
+                                (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.AlternateDigestKey, excludeBodyFromDigest);
                             if (clientRequestDigest != sentDigest)
                             {
                                 #if DEBUG
@@ -108,11 +120,20 @@ public class GameServerStartup
                                 #endif
                                 // We still failed to validate. Abort the request.
                                 context.Response.StatusCode = 403;
-                                context.Abort();
                                 return;
                             }
                         }
                     }
+                    #if !DEBUG
+                    // The game doesn't start sending digests until after the announcement so if it's not one of those requests
+                    // and it doesn't include a digest we need to reject the request 
+                    else if (!ServerStatics.IsUnitTesting && !strippedPath.Equals("/login") && !strippedPath.Equals("/eula") 
+                             && !strippedPath.Equals("/announce") && !strippedPath.Equals("/status"))
+                    {
+                        context.Response.StatusCode = 403;
+                        return;
+                    }
+                    #endif
 
                     context.Response.Headers.Add("X-Digest-B", clientRequestDigest);
                     context.Request.Body.Position = 0;
@@ -139,6 +160,10 @@ public class GameServerStartup
                     string serverDigest = await CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer, digestKey);
                     context.Response.Headers.Add("X-Digest-A", serverDigest);
                 }
+
+                // Add a content-length header if it isn't present to disable response chunking
+                if(!context.Response.Headers.ContainsKey("Content-Length"))
+                    context.Response.Headers.Add("Content-Length", responseBuffer.Length.ToString());
 
                 // Copy the buffered response to the actual response stream.
                 responseBuffer.Position = 0;

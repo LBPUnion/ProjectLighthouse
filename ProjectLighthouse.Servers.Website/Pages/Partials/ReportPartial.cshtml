@@ -26,7 +26,7 @@
 
         <br>
         <div>
-            <b>Report time: </b>@(DateTimeOffset.FromUnixTimeMilliseconds(Model.Timestamp).ToString("R"))
+            <b>Report time: </b>@(DateTimeOffset.FromUnixTimeMilliseconds(Model.Timestamp).ToLocalTime().ToString("R"))
         </div>
         <div>
             <b>Report reason: </b>@Model.Type

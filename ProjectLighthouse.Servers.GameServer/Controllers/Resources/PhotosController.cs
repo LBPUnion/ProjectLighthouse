@@ -228,6 +228,20 @@ public class PhotosController : ControllerBase
 
             this.database.PhotoSubjects.RemoveWhere(p => p.PhotoSubjectId == subjectId);
         }
+
+        HashSet<string> photoResources = new(){photo.LargeHash, photo.SmallHash, photo.MediumHash, photo.PlanHash,};
+        foreach (string hash in photoResources)
+        {
+            if (System.IO.File.Exists(Path.Combine("png", $"{hash}.png")))
+            {
+                System.IO.File.Delete(Path.Combine("png", $"{hash}.png"));
+            }
+            if (System.IO.File.Exists(Path.Combine("r", hash)))
+            {
+                System.IO.File.Delete(Path.Combine("r", hash));
+            }
+        }
+
         this.database.Photos.Remove(photo);
         await this.database.SaveChangesAsync();
         return this.Ok();

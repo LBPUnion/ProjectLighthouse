@@ -1,6 +1,8 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,6 +24,28 @@ public static class FileHelper
     public static readonly string ResourcePath = Path.Combine(Environment.CurrentDirectory, "r");
 
     public static string GetResourcePath(string hash) => Path.Combine(ResourcePath, hash);
+
+    public static bool AreDependenciesSafe(LbpFile file)
+    {
+        // recursively check if dependencies are safe
+        List<ResourceDescriptor> dependencies = ParseDependencyList(file);
+        foreach (ResourceDescriptor resource in dependencies)
+        {
+            if (resource.IsGuidResource()) continue;
+
+            LbpFile? r = LbpFile.FromHash(resource.Hash);
+            // If the resource hasn't been uploaded yet then we just go off it's included resource type
+            if (r == null)
+                if (resource.IsScriptType())
+                    return false;
+                else
+                    continue;
+
+            if (!IsFileSafe(r)) return false;
+        }
+
+        return true;
+    }
 
     public static bool IsFileSafe(LbpFile file)
     {
@@ -52,6 +76,57 @@ public static class FileHelper
         };
     }
 
+    private static List<ResourceDescriptor> ParseDependencyList(LbpFile file)
+    {
+
+        List<ResourceDescriptor> dependencies = new();
+        if (file.FileType == LbpFileType.Unknown || file.Data.Length < 0xb || file.Data[3] != 'b')
+        {
+            return dependencies;
+        }
+
+        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..]);
+
+        // Data format is 'borrowed' from: https://github.com/ennuo/toolkit/blob/main/src/main/java/ennuo/craftworld/resources/Resource.java#L191
+
+        if (revision < 0x109) return dependencies;
+
+        int curOffset = 8;
+        int dependencyTableOffset = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[curOffset..]);
+        if(dependencyTableOffset <= 0 || dependencyTableOffset > file.Data.Length) return dependencies;
+        
+        curOffset = dependencyTableOffset;
+        int dependencyTableSize = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[dependencyTableOffset..]);
+        curOffset += 4;
+        for (int i = 0; i < dependencyTableSize; ++i)
+        {
+            byte hashType = file.Data[curOffset];
+            curOffset += 1;
+            ResourceDescriptor resource = new();
+            switch (hashType)
+            {
+                case 1:
+                {
+                    byte[] hashBytes = new byte[0x14];
+                    Buffer.BlockCopy(file.Data, curOffset, hashBytes, 0, 0x14);
+                    curOffset += 0x14;
+                    resource.Hash = BitConverter.ToString(hashBytes).Replace("-", "");
+                    break;
+                }
+                case 2:
+                {
+                    resource.Hash = "g" + BinaryPrimitives.ReadUInt32BigEndian(file.Data.AsSpan()[curOffset..]);
+                    curOffset += 4;
+                    break;
+                }
+            }
+            resource.Type = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[curOffset..]);
+            curOffset += 4;
+            dependencies.Add(resource);
+        }
+        return dependencies;
+    }
+
     public static GameVersion ParseLevelVersion(LbpFile file)
     {
         if (file.FileType != LbpFileType.Level || file.Data.Length < 16 || file.Data[3] != 'b') return GameVersion.Unknown;
@@ -63,22 +138,15 @@ public static class FileHelper
         const ushort lbpVitaLatest = 0x3E2;
         const ushort lbpVitaDescriptor = 0x4431;
         // There are like 1600 revisions so this doesn't cover everything
-        uint revision = 0;
 
-        // construct a 32 bit number from 4 individual bytes
-        for (int i = 4; i <= 7; i++)
-        {
-            revision <<= 8;
-            revision |= file.Data[i];
-        }
+        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..]);
 
         if (revision >= 0x271)
         {
             // construct a 16 bit number from 2 individual bytes
-            ushort branchDescriptor = (ushort) (file.Data[12] << 8 | file.Data[13]);
+            ushort branchDescriptor = BinaryPrimitives.ReadUInt16BigEndian(file.Data.AsSpan()[12..]);
             if (revision == lbpVitaLatest && branchDescriptor == lbpVitaDescriptor) return GameVersion.LittleBigPlanetVita;
         }
-
 
         GameVersion version = GameVersion.Unknown;
         if (revision <= lbp1Latest)

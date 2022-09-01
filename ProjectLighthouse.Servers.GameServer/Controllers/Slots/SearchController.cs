@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -20,7 +21,7 @@ public class SearchController : ControllerBase
 
     [HttpGet("searchLBP3")]
     public Task<IActionResult> SearchSlotsLBP3([FromQuery] int pageSize, [FromQuery] int pageStart, [FromQuery] string textFilter) 
-        => SearchSlots(textFilter, pageSize, pageStart, "results");
+        => this.SearchSlots(textFilter, pageSize, pageStart, "results");
 
     [HttpGet("search")]
     public async Task<IActionResult> SearchSlots(
@@ -41,8 +42,8 @@ public class SearchController : ControllerBase
 
         string[] keywords = query.Split(" ");
 
-        IQueryable<Slot> dbQuery = this.database.Slots.Include(s => s.Creator)
-            .Include(s => s.Location)
+        IQueryable<Slot> dbQuery = this.database.Slots.ByGameVersion(gameToken.GameVersion, false, true)
+            .Where(s => s.Type == SlotType.User)
             .OrderBy(s => !s.TeamPick)
             .ThenByDescending(s => s.FirstUploaded)
             .Where(s => s.SlotId >= 0); // dumb query to conv into IQueryable

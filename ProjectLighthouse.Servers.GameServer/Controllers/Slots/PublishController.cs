@@ -146,6 +146,8 @@ public class PublishController : ControllerBase
         slot.GameVersion = slotVersion;
         if (slotVersion == GameVersion.Unknown) slot.GameVersion = gameToken.GameVersion;
 
+        slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(slot.AuthorLabels);
+
         // Republish logic
         if (slot.SlotId != 0)
         {

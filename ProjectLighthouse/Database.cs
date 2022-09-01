@@ -451,7 +451,12 @@ public class Database : DbContext
 
     public async Task RemoveExpiredTokens()
     {
-        this.GameTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+        foreach (GameToken token in this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToList())
+        {
+            User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+            if(user != null) user.LastLogout = TimeHelper.TimestampMillis;
+            this.GameTokens.Remove(token);
+        }
         this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
         this.EmailVerificationTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
         this.EmailSetTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);

@@ -5,10 +5,8 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +25,7 @@ public class ReviewController : ControllerBase
     }
 
     // LBP1 rating
-    [HttpPost("rate/user/{slotId}")]
+    [HttpPost("rate/user/{slotId:int}")]
     public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
@@ -44,6 +42,7 @@ public class ReviewController : ControllerBase
                 SlotId = slotId,
                 UserId = token.UserId,
                 Rating = 0,
+                TagLBP1 = "",
             };
             this.database.RatedLevels.Add(ratedLevel);
         }
@@ -62,7 +61,7 @@ public class ReviewController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
+        Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
 
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
@@ -73,6 +72,7 @@ public class ReviewController : ControllerBase
                 SlotId = slotId,
                 UserId = token.UserId,
                 RatingLBP1 = 0,
+                TagLBP1 = "",
             };
             this.database.RatedLevels.Add(ratedLevel);
         }
@@ -113,7 +113,8 @@ public class ReviewController : ControllerBase
             this.database.Reviews.Add(review);
         }
         review.Thumb = newReview.Thumb;
-        review.LabelCollection = newReview.LabelCollection;
+        review.LabelCollection = LabelHelper.RemoveInvalidLabels(newReview.LabelCollection);
+        
         review.Text = newReview.Text;
         review.Deleted = false;
         review.Timestamp = TimeHelper.UnixTimeMilliseconds();
@@ -127,6 +128,7 @@ public class ReviewController : ControllerBase
                 SlotId = slotId,
                 UserId = token.UserId,
                 RatingLBP1 = 0,
+                TagLBP1 = "",
             };
             this.database.RatedLevels.Add(ratedLevel);
         }
@@ -170,7 +172,7 @@ public class ReviewController : ControllerBase
                 if (review == null) return current;
 
                 RatedReview? yourThumb = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
-                return current + review.Serialize(null, yourThumb);
+                return current + review.Serialize(yourThumb);
             }
         );
         string response = LbpSerializer.TaggedStringElement
@@ -183,7 +185,7 @@ public class ReviewController : ControllerBase
                     "hint_start", pageStart + pageSize
                 },
                 {
-                    "hint", reviewList.LastOrDefault()!.Timestamp // not sure
+                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0
                 },
             }
         );
@@ -222,7 +224,7 @@ public class ReviewController : ControllerBase
                 if (review == null) return current;
 
                 RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
-                return current + review.Serialize(null, ratedReview);
+                return current + review.Serialize(ratedReview);
             }
         );
 
@@ -236,7 +238,7 @@ public class ReviewController : ControllerBase
                     "hint_start", pageStart
                 },
                 {
-                    "hint", reviewList.LastOrDefault()!.Timestamp // Seems to be the timestamp of oldest
+                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0 // Seems to be the timestamp of oldest
                 },
             }
         );

@@ -3,6 +3,8 @@
 @using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Files
+@using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.PlayerData.Reviews
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
@@ -63,8 +65,19 @@
         <div class="ui red segment">
             <h2>Tags</h2>
             @{
-                string[] authorLabels = Model.Slot?.AuthorLabels.Split(",") ?? new string[]{};
-                if (authorLabels.Length == 1) // ..?? ok c#
+                
+                string[] authorLabels;
+                if (Model.Slot?.GameVersion == GameVersion.LittleBigPlanet1)
+                {
+                    authorLabels = Model.Slot?.LevelTags ?? Array.Empty<string>();
+                }
+                else
+                {
+                    authorLabels = Model.Slot?.AuthorLabels.Split(",") ?? Array.Empty<string>();
+                    // Split() returns an array with an empty character for some reason
+                    if (authorLabels.Length == 1) authorLabels = Array.Empty<string>();
+                }
+                if (authorLabels.Length == 0)
                 {
                     <p>This level has no tags.</p>
                 }
@@ -72,7 +85,7 @@
                 {
                     foreach (string label in authorLabels.Where(label => !string.IsNullOrEmpty(label)))
                     {
-                        <div class="ui blue label">@label.Replace("LABEL_", "")</div>
+                        <div class="ui blue label">@LabelHelper.TranslateTag(label)</div>
                     }
                 }
             }
@@ -121,7 +134,7 @@
                     _ => throw new ArgumentOutOfRangeException(),
                     }) ?? "";
 
-                if (string.IsNullOrWhiteSpace(faceHash))
+                if (string.IsNullOrWhiteSpace(faceHash) || !FileHelper.ResourceExists(faceHash))
                 {
                     faceHash = ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash;
                 }
@@ -163,7 +176,7 @@
                             {
                                 @foreach (string reviewLabel in review.Labels)
                                 {
-                                    <div class="ui blue label">@reviewLabel.Replace("LABEL_", "")</div>
+                                    <div class="ui blue label">@LabelHelper.TranslateTag(reviewLabel)</div>
                                 }
                             }
                             @if (string.IsNullOrWhiteSpace(review.Text))

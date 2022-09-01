@@ -39,7 +39,7 @@ public static class SlotHelper
         };
     }
 
-    private static readonly SemaphoreSlim semaphore = new(1, 1); 
+    private static readonly SemaphoreSlim semaphore = new(1, 1);
 
     public static async Task<int> GetPlaceholderSlotId(Database database, int guid, SlotType slotType)
     {

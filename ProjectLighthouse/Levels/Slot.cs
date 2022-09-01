@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -106,6 +108,25 @@ public class Slot
 
     [XmlElement("authorLabels")]
     public string AuthorLabels { get; set; } = "";
+
+    public string[] LevelTags
+    {
+        get
+        {
+            if (this.GameVersion != GameVersion.LittleBigPlanet1) return Array.Empty<string>();
+
+            // Sort tags by most popular
+            SortedDictionary<string, int> occurrences = new();
+            foreach (RatedLevel r in this.database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0))
+            {
+                if (!occurrences.ContainsKey(r.TagLBP1))
+                    occurrences.Add(r.TagLBP1, 1);
+                else
+                    occurrences[r.TagLBP1]++;
+            }
+            return occurrences.OrderBy(r => r.Value).Select(r => r.Key).ToArray();
+        }
+    }
 
     [XmlElement("background")]
     [JsonIgnore]
@@ -216,9 +237,7 @@ public class Slot
     public double RatingLBP1 {
         get {
             IQueryable<RatedLevel> ratedLevels = this.database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.RatingLBP1 > 0);
-            if (!ratedLevels.Any()) return 3.0;
-
-            return Enumerable.Average(ratedLevels, r => r.RatingLBP1);
+            return ratedLevels.Any() ? ratedLevels.Average(r => r.RatingLBP1) : 3.0;
         }
     }
 
@@ -297,8 +316,8 @@ public class Slot
                           (fullSerialization ? LbpSerializer.StringElement("moveRequired", this.MoveRequired) : "") +
                           (fullSerialization ? LbpSerializer.StringElement("crossControlRequired", this.CrossControllerRequired) : "") +
                           (yourRatingStats != null ?
-                              LbpSerializer.StringElement("yourRating", yourRatingStats.RatingLBP1) +
-                              LbpSerializer.StringElement("yourDPadRating", yourRatingStats.Rating)
+                              LbpSerializer.StringElement<double>("yourRating", yourRatingStats.RatingLBP1, true) +
+                              LbpSerializer.StringElement<int>("yourDPadRating", yourRatingStats.Rating, true)
                               : "") +
                           (yourVisitedStats != null ?
                               LbpSerializer.StringElement("yourlbp1PlayCount", yourVisitedStats.PlaysLBP1) +
@@ -309,7 +328,8 @@ public class Slot
                           LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("photoCount", this.Photos) +
                           LbpSerializer.StringElement("authorPhotoCount", this.PhotosWithAuthor) +
-                          (fullSerialization ? LbpSerializer.StringElement("labels", this.AuthorLabels) : "") +
+                          (fullSerialization ? LbpSerializer.StringElement<string>("tags", string.Join(",", this.LevelTags), true) : "") +
+                          (fullSerialization ? LbpSerializer.StringElement<string>("labels", this.AuthorLabels, true) : "") +
                           LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
                           LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
                           (fullSerialization ?
