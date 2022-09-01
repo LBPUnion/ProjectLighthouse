@@ -25,6 +25,17 @@ public class MatchController : ControllerBase
         this.database = database;
     }
 
+    [HttpPost("gameState")]
+    [Produces("text/plain")]
+    public async Task<IActionResult> GameState()
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+
+        if (token == null) return this.StatusCode(403, "");
+
+        return this.Ok("VALID");
+    }
+
     [HttpPost("match")]
     [Produces("text/plain")]
     public async Task<IActionResult> Match()

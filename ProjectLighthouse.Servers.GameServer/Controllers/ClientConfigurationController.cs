@@ -38,8 +38,8 @@ public class ClientConfigurationController : ControllerBase
     }
 
     [HttpGet("t_conf")]
-    [Produces("text/json")]
-    public IActionResult Conf() => this.Ok("[{\"StatusCode\":200}]");
+    [Produces("text/xml")]
+    public IActionResult Conf() => this.Ok("<t_enable>false</t_enable>");
 
     [HttpGet("farc_hashes")]
     public IActionResult FarcHashes() => this.Ok();
