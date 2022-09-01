@@ -25,19 +25,9 @@ public class MatchController : ControllerBase
         this.database = database;
     }
 
-    [HttpPost("developer_videos")]
-    public async Task<IActionResult> DeveloperVideos([FromQuery] string language)
-    {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-
-        if (token == null) return this.StatusCode(403, "");
-
-        return this.Ok("<videos></videos>");
-    }
-
     [HttpPost("gameState")]
     [Produces("text/html")]
-    public async Task<IActionResult> Gamestate()
+    public async Task<IActionResult> GameState()
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
 
