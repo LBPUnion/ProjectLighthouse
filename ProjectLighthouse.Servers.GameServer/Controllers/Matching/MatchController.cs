@@ -26,7 +26,7 @@ public class MatchController : ControllerBase
     }
 
     [HttpPost("gameState")]
-    [Produces("text/html")]
+    [Produces("text/plain")]
     public async Task<IActionResult> GameState()
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
