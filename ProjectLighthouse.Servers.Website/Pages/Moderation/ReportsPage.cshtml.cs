@@ -51,11 +51,11 @@ public class ReportsPage : BaseLayout
 
         foreach (GriefReport r in this.Reports)
         {
-            r.XmlPlayers = (ReportPlayer[])JsonSerializer.Deserialize(r.Players, typeof(ReportPlayer[]))!;
+            r.XmlPlayers = (ReportPlayer[]?)JsonSerializer.Deserialize(r.Players, typeof(ReportPlayer[])) ?? Array.Empty<ReportPlayer>();
 
-            r.XmlBounds = new Marqee()
+            r.XmlBounds = new Marqee
             {
-                Rect = (Rectangle)JsonSerializer.Deserialize(r.Bounds, typeof(Rectangle))!,
+                Rect = (Rectangle?)JsonSerializer.Deserialize(r.Bounds, typeof(Rectangle)) ?? new Rectangle(),
             };
         }
 

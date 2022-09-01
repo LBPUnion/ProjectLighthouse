@@ -25,13 +25,13 @@ public class ReportPage : BaseLayout
             .FirstOrDefaultAsync(r => r.ReportId == reportId);
         if (report == null) return this.NotFound();
 
-        report.XmlPlayers = (ReportPlayer[])JsonSerializer.Deserialize(report.Players,
-            typeof(ReportPlayer[]))!;
+        report.XmlPlayers = (ReportPlayer[]?)JsonSerializer.Deserialize(report.Players,
+            typeof(ReportPlayer[])) ?? Array.Empty<ReportPlayer>();
 
         report.XmlBounds = new Marqee
         {
-            Rect = (Rectangle)JsonSerializer.Deserialize(report.Bounds,
-                typeof(Rectangle))!,
+            Rect = (Rectangle?)JsonSerializer.Deserialize(report.Bounds,
+                typeof(Rectangle)) ?? new Rectangle(),
         };
 
         this.Report = report;
