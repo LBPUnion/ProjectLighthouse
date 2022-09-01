@@ -38,7 +38,7 @@ public class ClientConfigurationController : ControllerBase
     }
 
     [HttpGet("t_conf")]
-    [Produces("text/plain")]
+    [Produces("text/xml")]
     public IActionResult Conf() => this.Ok("<t_enable>false</t_enable>");
 
     [HttpGet("farc_hashes")]
