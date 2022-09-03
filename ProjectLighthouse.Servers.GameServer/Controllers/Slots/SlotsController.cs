@@ -24,7 +24,7 @@ public class SlotsController : ControllerBase
         this.database = database;
     }
 
-    private string GenerateSlotsResponse(string slotAggregate, int start, int total) =>
+    private static string generateSlotsResponse(string slotAggregate, int start, int total) =>
         LbpSerializer.TaggedStringElement("slots",
             slotAggregate,
             new Dictionary<string, object>
@@ -47,21 +47,21 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        int targetUserId = await this.database.Users.Where(dbUser => dbUser.Username == u).Select(dbUser => dbUser.UserId).FirstOrDefaultAsync();
-        if (targetUserId == 0) return this.NotFound();
+        User? targetUser = await this.database.Users.Where(dbUser => dbUser.Username == u).FirstOrDefaultAsync();
+        if (targetUser == null) return this.NotFound();
 
         string response = Enumerable.Aggregate
         (
-            this.database.Slots.ByGameVersion(gameVersion, token.UserId == targetUserId, true)
-                .Where(s => s.CreatorId == targetUserId)
+            this.database.Slots.ByGameVersion(gameVersion, token.UserId == targetUser.UserId, true)
+                .Where(s => s.CreatorId == targetUser.UserId)
                 .Skip(Math.Max(0, pageStart - 1))
-                .Take(Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)),
+                .Take(Math.Min(pageSize, targetUser.UsedSlots)),
             string.Empty,
             (current, slot) => current + slot.Serialize(token.GameVersion)
         );
-        int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await this.database.Slots.CountAsync(s => s.CreatorId == targetUserId);
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        int start = pageStart + Math.Min(pageSize, targetUser.UsedSlots);
+        int total = await this.database.Slots.CountAsync(s => s.CreatorId == targetUser.UserId);
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slotList")]
@@ -183,7 +183,7 @@ public class SlotsController : ControllerBase
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCount();
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/like/{slotType}/{slotId:int}")]
@@ -219,7 +219,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = slotIdsWithTag.Count;
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/highestRated")]
@@ -242,7 +242,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCount(); 
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/tag")]
@@ -270,7 +270,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = slotIdsWithTag.Count;
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/mmpicks")]
@@ -292,7 +292,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.TeamPickCount();
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/lbp2luckydip")]
@@ -311,7 +311,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCount();
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/thumbs")]
@@ -343,7 +343,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCount();
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/mostUniquePlays")]
@@ -389,7 +389,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCount();
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slots/mostHearted")]
@@ -421,7 +421,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCount();
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
     
     // /slots/busiest?pageStart=1&pageSize=30&gameFilterType=both&players=1&move=true
@@ -477,7 +477,7 @@ public class SlotsController : ControllerBase
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = playersBySlotId.Count;
 
-        return this.Ok(this.GenerateSlotsResponse(response, start, total));
+        return this.Ok(generateSlotsResponse(response, start, total));
     }
 
 
