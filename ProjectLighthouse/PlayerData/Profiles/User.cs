@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
@@ -184,6 +185,10 @@ public class User
     /// ARRR! Forces the user to see Pirate English translations on the website.
     /// </summary>
     public bool IsAPirate { get; set; }
+
+    //TODO create migration
+    [NotMapped]
+    public string TimeZone { get; set; }
 
     public PrivacyType LevelVisibility { get; set; } = PrivacyType.All;
 

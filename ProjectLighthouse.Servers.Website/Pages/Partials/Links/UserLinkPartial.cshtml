@@ -3,9 +3,11 @@
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    bool includeStatus = (bool?)ViewData["IncludeStatus"] ?? false;
+    string userStatus = includeStatus ? Model.Status.ToTranslatedString(language) : "";
 }
 
-<a href="/user/@Model.UserId" title="@Model.Status.ToTranslatedString(language)" class="user-link">
+<a href="/user/@Model.UserId" title="@userStatus" class="user-link">
     <img src="/gameAssets/@Model.WebsiteAvatarHash" alt=""/>
     @Model.Username
 </a>

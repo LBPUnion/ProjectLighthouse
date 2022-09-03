@@ -56,7 +56,7 @@ public class UserStatus
 
         long timestamp = this.LastLogout;
         if (timestamp <= 0) timestamp = this.LastLogin;
-        string formattedTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).ToLocalTime().ToString("M/d/yyyy h:mm:ss tt");
+        string formattedTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).ToOffset(new TimeSpan(0, -5, 0, 0)).ToString("M/d/yyyy h:mm:ss tt ");
         return StatusStrings.LastOnline.Translate(language, formattedTime);
     }
 

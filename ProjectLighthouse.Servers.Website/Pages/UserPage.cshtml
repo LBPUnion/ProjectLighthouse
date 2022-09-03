@@ -72,13 +72,15 @@
                 </a>
             }
         }
+        @if (Model.ProfileUser == Model.User || (Model.User?.IsModerator ?? false))
+        {
+            <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/settings">
+                <i class="cog icon"></i>
+                <span>Settings</span>
+            </a>
+        }
         @if (Model.ProfileUser == Model.User)
         {
-            <a class="ui blue button" href="/passwordReset">
-                <i class="key icon"></i>
-                <span>@Model.Translate(GeneralStrings.ResetPassword)</span>
-            </a>
-
             <a href="/logout" class="ui red button">
                 <i class="user slash icon"></i>
                 @Model.Translate(BaseLayoutStrings.HeaderLogout)

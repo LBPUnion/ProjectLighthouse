@@ -27,8 +27,25 @@ public static class PartialExtensions
         }
     }
 
-    public static Task<IHtmlContent> ToLink<T>(this User user, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language) 
-        => helper.PartialAsync("Partials/Links/UserLinkPartial", user, viewData.WithLang(language));
+    private static ViewDataDictionary<T> WithKeyValue<T>(this ViewDataDictionary<T> viewData, string key, object value)
+    {
+        try
+        {
+            return new ViewDataDictionary<T>(viewData)
+            {
+                {
+                    key, value
+                },
+            };
+        }
+        catch
+        {
+            return viewData;
+        }
+    }
+
+    public static Task<IHtmlContent> ToLink<T>(this User user, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, bool includeStatus = false) 
+        => helper.PartialAsync("Partials/Links/UserLinkPartial", user, viewData.WithLang(language).WithKeyValue("IncludeStatus", includeStatus));
 
     public static Task<IHtmlContent> ToHtml<T>(this Photo photo, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language)
         => helper.PartialAsync("Partials/PhotoPartial", photo, viewData.WithLang(language));

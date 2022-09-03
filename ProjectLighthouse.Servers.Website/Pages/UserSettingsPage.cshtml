@@ -1,0 +1,110 @@
+﻿@page "/user/{userId:int}/settings"
+@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserSettingsPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.ShowTitleInPage = false;
+
+    Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
+
+    bool isMobile = this.Request.IsMobile();
+    string language = Model.GetLanguage();
+    
+    int size = isMobile ? 100 : 200;
+}
+
+<script>
+function onSubmit(e){
+    document.getElementById("avatar-encoded").value = selectedAvatar.toString();            
+    // document.getElementById("avatar").value = selectedAvatar.toString();            
+    
+    //TODO upload file data to separate endpoint and make form wait until it is done
+    
+    return true;
+}
+</script>
+
+<div class="@(isMobile ? "" : "ui center aligned grid")">
+    <div class="eight wide column">
+        <div class="ui blue segment">
+            <h1><i class="cog icon"></i>@Model.ProfileUser.Username's Settings</h1>
+            <div class="ui divider"></div>
+            <form id="form" method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/settings" onsubmit="onSubmit(this)">
+                @Html.AntiForgeryToken()
+                <div class="field">
+                    <div>
+                        <div class="cardIcon userCardIcon" id="userPicture" style="background-image: url('/gameAssets/@Model.ProfileUser.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px; background-position: center center; background-size: auto @(size)px; background-repeat: no-repeat; margin: auto"></div>
+                        <div class="ui fitted divider hidden"></div>
+                        <label for="avatar" class="ui green button" style="color: white; max-width: @(size)px">
+                            <i class="arrow circle up icon"></i>
+                            <span>Upload file</span>
+                        </label>
+                        <input style="display: none" type="file" id="avatar" accept="image/png, image/jpeg">
+                        <input type="hidden" name="avatar" id="avatar-encoded">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" id="username" value="@Model.ProfileUser.Username" placeholder="Username" readonly>
+                </div>
+                @if (ServerConfiguration.Instance.Mail.MailEnabled)
+                {
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="text" name="email" id="email" value="@Model.ProfileUser.EmailAddress" placeholder="Email Address" readonly>
+                    </div>
+                }
+                @if (Model.User == Model.ProfileUser)
+                {
+                    <div class="field">
+                        <label>Password</label>
+                        <a class="ui blue button" href="/passwordReset">
+                            <i class="key icon"></i>
+                            <span>@Model.Translate(GeneralStrings.ResetPassword)</span>
+                        </a>
+                    </div>
+                }
+                <div class="field">
+                    <label for="biography">Biography</label>
+                    <textarea name="biography" id="biography" spellcheck="false" placeholder="Biography">@Model.ProfileUser.Biography</textarea>
+                </div>
+                <div class="field">
+                    <label>Timezone</label>
+                    <select class="ui fluid dropdown" name="timezone">
+                        <option value="">Select Timezone</option>
+                        @foreach (TimeZoneInfo systemTimeZone in TimeZoneInfo.GetSystemTimeZones())
+                        {
+                            string selected = "";
+                            if (systemTimeZone.DisplayName.Equals("(UTC-06:00) Central Time (US & Canada)"))
+                            {
+                                selected = "selected=\"selected\"";
+                            }
+                            <option value="@systemTimeZone.Id" @selected>@systemTimeZone.DisplayName</option>
+
+                        }
+                    </select>
+                </div>
+                <button class="ui button blue" tabindex="0">Save Changes</button>
+                <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+  let selectedAvatar = "";
+  document.getElementById("avatar").onchange = function (e){
+      const file = e.target.files.item(0);
+      
+      const output = document.getElementById('userPicture');
+      const reader = new FileReader();
+      reader.onload = function(){
+          output.style.backgroundImage = "url(" + reader.result + ")";
+          selectedAvatar = reader.result;
+      };
+      reader.readAsDataURL(file);
+  }
+</script>
