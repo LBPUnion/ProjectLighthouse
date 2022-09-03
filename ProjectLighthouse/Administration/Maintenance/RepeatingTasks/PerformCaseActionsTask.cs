@@ -26,7 +26,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                 user = await @case.GetUserAsync(database);
                 if (user == null)
                 {
-                    Logger.Error($"Target user for case {@case.CaseId} is null (userId={@case.AffectedId}", LogArea.Maintenance);
+                    Logger.Error($"Target user for case {@case.CaseId} is null (userId={@case.AffectedId})", LogArea.Maintenance);
                     @case.Processed = true;
                     continue;
                 }
@@ -36,7 +36,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                 slot = await @case.GetSlotAsync(database);
                 if (slot == null)
                 {
-                    Logger.Error($"Target slot for case {@case.CaseId} is null (slotId={@case.AffectedId}", LogArea.Maintenance);
+                    Logger.Error($"Target slot for case {@case.CaseId} is null (slotId={@case.AffectedId})", LogArea.Maintenance);
                     // Just mark as processed, this needs to be handled better in the future
                     @case.Processed = true;
                     continue;
