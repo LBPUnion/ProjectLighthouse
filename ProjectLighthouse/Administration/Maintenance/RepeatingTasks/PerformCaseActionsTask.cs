@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,10 +24,23 @@ public class PerformCaseActionsTask : IRepeatingTask
             if (@case.Type.AffectsUser())
             {
                 user = await @case.GetUserAsync(database);
+                if (user == null)
+                {
+                    Logger.Error($"Target user for case {@case.CaseId} is null (userId={@case.AffectedId}", LogArea.Maintenance);
+                    @case.Processed = true;
+                    continue;
+                }
             }
             else if(@case.Type.AffectsLevel())
             {
                 slot = await @case.GetSlotAsync(database);
+                if (slot == null)
+                {
+                    Logger.Error($"Target slot for case {@case.CaseId} is null (slotId={@case.AffectedId}", LogArea.Maintenance);
+                    // Just mark as processed, this needs to be handled better in the future
+                    @case.Processed = true;
+                    continue;
+                }
             }
             
             if (@case.Expired || @case.Dismissed)
@@ -50,7 +64,6 @@ public class PerformCaseActionsTask : IRepeatingTask
                     {
                         slot!.Hidden = false;
                         slot.HiddenReason = "";
-                        
                         break;
                     }
                     case CaseType.LevelDisableComments:
