@@ -112,7 +112,7 @@ public class ReviewController : ControllerBase
             };
             this.database.Reviews.Add(review);
         }
-        review.Thumb = newReview.Thumb;
+        review.Thumb = Math.Clamp(newReview.Thumb, -1, 1);
         review.LabelCollection = LabelHelper.RemoveInvalidLabels(newReview.LabelCollection);
         
         review.Text = newReview.Text;
@@ -133,7 +133,7 @@ public class ReviewController : ControllerBase
             this.database.RatedLevels.Add(ratedLevel);
         }
 
-        ratedLevel.Rating = newReview.Thumb;
+        ratedLevel.Rating = Math.Clamp(newReview.Thumb, -1, 1);
 
         await this.database.SaveChangesAsync();
 
