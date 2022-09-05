@@ -9,7 +9,6 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.Types;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -27,20 +26,21 @@ public static class InfluxHelper
         GameVersion.LittleBigPlanetPSP,
     };
 
-    public static async void Log()
+    private static async void Log()
     {
         try
         {
+            await using Database database = new();
             using WriteApi writeApi = Client.GetWriteApi();
             PointData point = PointData.Measurement("lighthouse")
-                .Field("playerCount", await StatisticsHelper.RecentMatches())
-                .Field("slotCount", await StatisticsHelper.SlotCount());
+                .Field("playerCount", await StatisticsHelper.RecentMatches(database))
+                .Field("slotCount", await StatisticsHelper.SlotCount(database));
 
             foreach (GameVersion gameVersion in gameVersions)
             {
                 PointData gamePoint = PointData.Measurement("lighthouse")
                     .Tag("game", gameVersion.ToString())
-                    .Field("playerCountGame", await StatisticsHelper.RecentMatchesForGame(gameVersion));
+                    .Field("playerCountGame", await StatisticsHelper.RecentMatchesForGame(database, gameVersion));
 
                 writeApi.WritePoint(gamePoint, ServerConfiguration.Instance.InfluxDB.Bucket, ServerConfiguration.Instance.InfluxDB.Organization);
             }

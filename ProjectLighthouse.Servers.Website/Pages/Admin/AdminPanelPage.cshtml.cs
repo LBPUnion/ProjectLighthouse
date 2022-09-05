@@ -27,10 +27,10 @@ public class AdminPanelPage : BaseLayout
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
 
-        this.Statistics.Add(new AdminPanelStatistic("Users", await StatisticsHelper.UserCount(), "/admin/users"));
-        this.Statistics.Add(new AdminPanelStatistic("Slots", await StatisticsHelper.SlotCount()));
-        this.Statistics.Add(new AdminPanelStatistic("Photos", await StatisticsHelper.PhotoCount()));
-        this.Statistics.Add(new AdminPanelStatistic("API Keys", await StatisticsHelper.APIKeyCount(), "/admin/keys"));
+        this.Statistics.Add(new AdminPanelStatistic("Users", await StatisticsHelper.UserCount(this.Database), "/admin/users"));
+        this.Statistics.Add(new AdminPanelStatistic("Slots", await StatisticsHelper.SlotCount(this.Database)));
+        this.Statistics.Add(new AdminPanelStatistic("Photos", await StatisticsHelper.PhotoCount(this.Database)));
+        this.Statistics.Add(new AdminPanelStatistic("API Keys", await StatisticsHelper.APIKeyCount(this.Database), "/admin/keys"));
 
         if (!string.IsNullOrEmpty(command))
         {

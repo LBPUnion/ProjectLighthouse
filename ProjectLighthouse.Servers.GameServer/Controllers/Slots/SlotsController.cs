@@ -182,7 +182,7 @@ public class SlotsController : ControllerBase
 
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.SlotCount();
+        int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
         return this.Ok(generateSlotsResponse(response, start, total));
     }
 
@@ -238,9 +238,9 @@ public class SlotsController : ControllerBase
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
 
-        string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
+        string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.SlotCount(); 
+        int total = await StatisticsHelper.SlotCount(this.database); 
 
         return this.Ok(generateSlotsResponse(response, start, total));
     }
@@ -290,7 +290,7 @@ public class SlotsController : ControllerBase
             .Take(Math.Min(pageSize, 30));
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.TeamPickCount();
+        int total = await StatisticsHelper.TeamPickCount(this.database);
 
         return this.Ok(generateSlotsResponse(response, start, total));
     }
@@ -309,7 +309,7 @@ public class SlotsController : ControllerBase
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.SlotCount();
+        int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
 
         return this.Ok(generateSlotsResponse(response, start, total));
     }
@@ -341,7 +341,7 @@ public class SlotsController : ControllerBase
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.SlotCount();
+        int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
 
         return this.Ok(generateSlotsResponse(response, start, total));
     }
@@ -387,7 +387,7 @@ public class SlotsController : ControllerBase
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.SlotCount();
+        int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
 
         return this.Ok(generateSlotsResponse(response, start, total));
     }
@@ -419,7 +419,7 @@ public class SlotsController : ControllerBase
 
         string response = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.SlotCount();
+        int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
 
         return this.Ok(generateSlotsResponse(response, start, total));
     }

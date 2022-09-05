@@ -10,6 +10,14 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 /// </summary>
 public class StatisticsEndpoints : ApiEndpointController
 {
+
+    private readonly Database database;
+
+    public StatisticsEndpoints(Database database)
+    {
+        this.database = database;
+    }
+
     /// <summary>
     /// Gets everything that StatisticsHelper provides.
     /// </summary>
@@ -21,11 +29,11 @@ public class StatisticsEndpoints : ApiEndpointController
         (
             new StatisticsResponse
             {
-                Photos = await StatisticsHelper.PhotoCount(),
-                Slots = await StatisticsHelper.SlotCount(),
-                Users = await StatisticsHelper.UserCount(),
-                RecentMatches = await StatisticsHelper.RecentMatches(),
-                TeamPicks = await StatisticsHelper.TeamPickCount(),
+                Photos = await StatisticsHelper.PhotoCount(this.database),
+                Slots = await StatisticsHelper.SlotCount(this.database),
+                Users = await StatisticsHelper.UserCount(this.database),
+                RecentMatches = await StatisticsHelper.RecentMatches(this.database),
+                TeamPicks = await StatisticsHelper.TeamPickCount(this.database),
             }
         );
 }
