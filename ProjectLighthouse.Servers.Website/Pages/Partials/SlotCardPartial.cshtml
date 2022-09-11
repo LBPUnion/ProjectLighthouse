@@ -92,9 +92,11 @@
         </div>
         @if (Model.Creator != null)
         {
-            string date = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.FirstUploaded), timeZoneInfo).DateTime.ToShortDateString();
+            string date = "";
+            if(!mini)
+                date = " on " + TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.FirstUploaded), timeZoneInfo).DateTime.ToShortDateString();
             <p>
-                <i>Created by @await Model.Creator.ToLink(Html, ViewData, language) in @Model.GameVersion.ToPrettyString() on @date</i>
+                <i>Created by @await Model.Creator.ToLink(Html, ViewData, language) in @Model.GameVersion.ToPrettyString()@date</i>
             </p>
         }
     </div>
