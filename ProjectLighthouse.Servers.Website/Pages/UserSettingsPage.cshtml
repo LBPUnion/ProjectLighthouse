@@ -46,7 +46,7 @@ function onSubmit(e){
             <div class="ui divider"></div>
             <form id="form" method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/settings" onsubmit="onSubmit(event)">
                 @Html.AntiForgeryToken()
-                <div class="field">
+                <div class="field" style="display: flex; justify-content: center; align-items: center">
                     <div>
                         <div class="cardIcon userCardIcon" id="userPicture" style="background-image: url('/gameAssets/@Model.ProfileUser.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px; background-position: center center; background-size: auto @(size)px; background-repeat: no-repeat; margin: auto"></div>
                         <div class="ui fitted divider hidden"></div>

@@ -34,7 +34,7 @@ function onSubmit(){
             <div class="ui divider"></div>
             <form id="form" method="POST" class="ui form center aligned" action="/slot/@Model.Slot!.SlotId/settings" onsubmit="onSubmit()">
                 @Html.AntiForgeryToken()
-                <div class="field">
+                <div class="field" style="display: flex; justify-content: center; align-items: center;">
                     <div>
                         <div>
                                 <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">                                

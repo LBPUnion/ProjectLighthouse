@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
-using System.Net.Mail;
 using System.Text.RegularExpressions;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Files;
