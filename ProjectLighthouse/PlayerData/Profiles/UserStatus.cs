@@ -47,7 +47,7 @@ public class UserStatus
        this.CurrentRoom = RoomHelper.FindRoomByUserId(userId);
     }
 
-    private string FormatOfflineTimestamp(string language)
+    private string FormatOfflineTimestamp(string language, string timeZone)
     {
         if (this.LastLogout <= 0 && this.LastLogin <= 0)
         {
@@ -56,11 +56,12 @@ public class UserStatus
 
         long timestamp = this.LastLogout;
         if (timestamp <= 0) timestamp = this.LastLogin;
-        string formattedTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).ToOffset(new TimeSpan(0, -5, 0, 0)).ToString("M/d/yyyy h:mm:ss tt ");
+        TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+        string formattedTime = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(timestamp), timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt");
         return StatusStrings.LastOnline.Translate(language, formattedTime);
     }
 
-    public string ToTranslatedString(string language)
+    public string ToTranslatedString(string language, string timeZone)
     {
         this.CurrentVersion ??= GameVersion.Unknown;
         this.CurrentPlatform ??= Platform.Unknown;
@@ -69,7 +70,7 @@ public class UserStatus
         {
             StatusType.Online => StatusStrings.CurrentlyOnline.Translate(language, 
                 ((GameVersion)this.CurrentVersion).ToPrettyString(), (Platform)this.CurrentPlatform),
-            StatusType.Offline => this.FormatOfflineTimestamp(language),
+            StatusType.Offline => this.FormatOfflineTimestamp(language, timeZone),
             _ => GeneralStrings.Unknown.Translate(language),
         };
     }

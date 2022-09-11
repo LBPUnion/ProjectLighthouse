@@ -8,6 +8,8 @@
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
 <div style="position: relative">
@@ -26,7 +28,7 @@
         {
             <span>by</span>
             <b>
-                @await Model.Creator.ToLink(Html, ViewData, language)
+                @await Model.Creator.ToLink(Html, ViewData, language, timeZone)
             </b>
         }
         @if (Model.Slot != null)
@@ -49,7 +51,7 @@
                     break;
             }
         }
-        at @DateTime.UnixEpoch.AddSeconds(Model.Timestamp).ToString(CultureInfo.CurrentCulture)
+        at @TimeZoneInfo.ConvertTime(DateTime.UnixEpoch.AddSeconds(Model.Timestamp), timeZoneInfo).ToString(CultureInfo.CurrentCulture)
     </i>
 </p>
 
@@ -62,7 +64,7 @@
 <div id="hover-subjects-@Model.PhotoId">
     @foreach (PhotoSubject subject in Model.Subjects)
     {
-        @await subject.User.ToLink(Html, ViewData, language)
+        @await subject.User.ToLink(Html, ViewData, language, timeZone)
     }
 </div>
 

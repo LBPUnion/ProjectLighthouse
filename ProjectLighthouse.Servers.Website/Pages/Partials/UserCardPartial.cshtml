@@ -6,6 +6,7 @@
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
 }
 
 <div class="card">
@@ -28,7 +29,7 @@
             </h1>
         }
         <span>
-            <i>@Model.Status.ToTranslatedString(language)</i>
+            <i>@Model.Status.ToTranslatedString(language, timeZone)</i>
         </span>
         <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>

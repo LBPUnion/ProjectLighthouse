@@ -8,12 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DDSReader;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using Pfim;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -284,7 +284,7 @@ public static class FileHelper
 
     public static bool LbpFileToPNG(LbpFile file) => LbpFileToPNG(file.Data, file.Hash, file.FileType);
 
-    public static bool LbpFileToPNG(byte[] data, string hash, LbpFileType type)
+    private static bool LbpFileToPNG(byte[] data, string hash, LbpFileType type)
     {
         if (type != LbpFileType.Jpeg && type != LbpFileType.Png && type != LbpFileType.Texture) return false;
 
@@ -342,6 +342,7 @@ public static class FileHelper
             if (compressed[i] == decompressed[i])
             {
                 writer.Write(deflatedData);
+                continue;
             }
 
             Inflater inflater = new();
@@ -357,19 +358,25 @@ public static class FileHelper
 
     private static bool DDSToPNG(string hash, byte[] data)
     {
-        using MemoryStream stream = new();
-        DDSImage image = new(data);
+        Dds ddsImage = Dds.Create(data, new PfimConfig());
+        if(ddsImage.Compressed)
+            ddsImage.Decompress();
 
-        image.SaveAsPng(stream);
+        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+        Image image = ddsImage.Format switch
+        {
+            ImageFormat.Rgba32 => Image.LoadPixelData<Bgra32>(ddsImage.Data, ddsImage.Width, ddsImage.Height),
+            _ => throw new ArgumentOutOfRangeException($"ddsImage.Format is not supported: {ddsImage.Format}")
+        };
 
         Directory.CreateDirectory("png");
-        File.WriteAllBytes($"png/{hash}.png", stream.ToArray());
+        image.SaveAsPngAsync($"png/{hash}.png");
         return true;
     }
 
     private static bool JPGToPNG(string hash, byte[] data)
     {
-        using Image<Rgba32> image = Image.Load(data);
+        using Image image = Image.Load(data);
         using MemoryStream ms = new();
         image.SaveAsPng(ms);
 

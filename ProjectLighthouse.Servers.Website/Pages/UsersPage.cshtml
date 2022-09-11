@@ -2,7 +2,6 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UsersPage
 
 @{
@@ -34,6 +33,9 @@
             },
             {
                 "Language", Model.GetLanguage()
+            },
+            {
+                "TimeZone", Model.GetTimeZone()
             },
         })
     </div>

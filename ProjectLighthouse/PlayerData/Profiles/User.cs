@@ -180,15 +180,10 @@ public class User
     [JsonIgnore]
     public string? ApprovedIPAddress { get; set; }
     #nullable disable
-    
-    /// <summary>
-    /// ARRR! Forces the user to see Pirate English translations on the website.
-    /// </summary>
-    public bool IsAPirate { get; set; }
 
-    //TODO create migration
-    [NotMapped]
-    public string TimeZone { get; set; }
+    public string Language { get; set; } = "en";
+
+    public string TimeZone { get; set; } = TimeZoneInfo.Local.Id;
 
     public PrivacyType LevelVisibility { get; set; } = PrivacyType.All;
 

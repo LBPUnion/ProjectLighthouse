@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
@@ -46,18 +44,29 @@ public class BaseLayout : PageModel
     }
 
     private string? language;
+    private string? timeZone;
 
     public string GetLanguage()
     {
         if (ServerStatics.IsUnitTesting) return LocalizationManager.DefaultLang;
         if (this.language != null) return this.language;
 
-        if (this.User?.IsAPirate ?? false) return "en-PT"; 
+        if (this.User != null) return this.language = this.User.Language;
         
-        IRequestCultureFeature? requestCulture = Request.HttpContext.Features.Get<IRequestCultureFeature>();
+        IRequestCultureFeature? requestCulture = this.Request.HttpContext.Features.Get<IRequestCultureFeature>();
         if (requestCulture == null) return this.language = LocalizationManager.DefaultLang;
         
         return this.language = requestCulture.RequestCulture.UICulture.Name;
+    }
+
+    public string GetTimeZone()
+    {
+        if (ServerStatics.IsUnitTesting) return TimeZoneInfo.Local.Id;
+        if (this.timeZone != null) return this.timeZone;
+
+        string userTimeZone = this.User?.TimeZone ?? TimeZoneInfo.Local.Id;
+
+        return this.timeZone = userTimeZone;
     }
 
     public string Translate(TranslatableString translatableString) => translatableString.Translate(this.GetLanguage());

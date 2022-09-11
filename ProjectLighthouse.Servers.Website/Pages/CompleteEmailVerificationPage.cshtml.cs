@@ -3,7 +3,6 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +26,12 @@ public class CompleteEmailVerificationPage : BaseLayout
         if (emailVerifyToken == null)
         {
             this.Error = "Invalid verification token";
+            return this.Page();
+        }
+
+        if (DateTime.Now > emailVerifyToken.ExpiresAt)
+        {
+            this.Error = "This token has expired";
             return this.Page();
         }
 

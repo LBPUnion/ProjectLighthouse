@@ -1,7 +1,12 @@
 @using LBPUnion.ProjectLighthouse.Administration.Reports
 @model LBPUnion.ProjectLighthouse.Administration.Reports.GriefReport
 
-    <div class="ui segment">
+@{
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+}
+
+<div class="ui segment">
         <div>
             <canvas class="hide-subjects" id="canvas-subjects-@Model.ReportId" width="1920" height="1080"
                     style="position: absolute; transform: rotate(180deg)">
@@ -26,7 +31,7 @@
 
         <br>
         <div>
-            <b>Report time: </b>@(DateTimeOffset.FromUnixTimeMilliseconds(Model.Timestamp).ToLocalTime().ToString("R"))
+            <b>Report time: </b>@(TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.Timestamp), timeZoneInfo).ToString("R"))))
         </div>
         <div>
             <b>Report reason: </b>@Model.Type

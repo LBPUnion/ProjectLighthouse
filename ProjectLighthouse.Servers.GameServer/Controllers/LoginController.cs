@@ -67,8 +67,7 @@ public class LoginController : ControllerBase
             token = await this.database.AuthenticateUser(npTicket, ipAddress);
             if (token == null)
             {
-                Logger.Warn($"Unable to " +
-                            $"find/generate a token for username {npTicket.Username}", LogArea.Login);
+                Logger.Warn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
                 return this.StatusCode(403, ""); // If not, then 403.
             }
         }
@@ -78,6 +77,12 @@ public class LoginController : ControllerBase
         if (user == null || user.IsBanned)
         {
             Logger.Error($"Unable to find user {npTicket.Username} from token", LogArea.Login);
+            return this.StatusCode(403, "");
+        }
+
+        if (ServerConfiguration.Instance.Mail.MailEnabled && user.EmailAddress == null || !user.EmailAddressVerified)
+        {
+            Logger.Error($"Email address unverified for user {user.Username}", LogArea.Login);
             return this.StatusCode(403, "");
         }
 

@@ -11,8 +11,9 @@
     Layout = "Layouts/BaseLayout";
     Model.ShowTitleInPage = false;
     
-    bool isMobile = this.Request.IsMobile();
+    bool isMobile = Request.IsMobile();
     string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
 }
 <h1 class="lighthouse-welcome lighthouse-title">
     @Model.Translate(LandingPageStrings.Welcome, ServerConfiguration.Instance.Customization.ServerName)
@@ -48,7 +49,7 @@ else
     foreach (User user in Model.PlayersOnline)
     {
         i++; 
-        @await user.ToLink(Html, ViewData, language, true)if (i != Model.PlayersOnline.Count){<span>,</span>} @* whitespace has forced my hand *@
+        @await user.ToLink(Html, ViewData, language, timeZone, true)if (i != Model.PlayersOnline.Count){<span>,</span>} @* whitespace has forced my hand *@
     }
 }
 

@@ -1,6 +1,11 @@
 ﻿#nullable enable
+using System.ComponentModel.DataAnnotations;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
@@ -15,57 +20,80 @@ public class UserSettingsPage : BaseLayout
     public UserSettingsPage(Database database) : base(database)
     {}
 
-    private static byte[] ParseBase64(string base64)
+    private readonly Regex base64Regex = new(@"data:([^\/]+)\/([^;]+);base64,(.*)", RegexOptions.Compiled);
+
+    private async Task<string?> parseAvatar(string? avatar)
     {
-        Span<byte> buffer = new(new byte[base64.Length]);
-        Convert.TryFromBase64String(base64, buffer, out int _);
-        return buffer.ToArray();
+        if (string.IsNullOrWhiteSpace(avatar)) return null;
+
+        System.Text.RegularExpressions.Match match = this.base64Regex.Match(avatar);
+
+        if (!match.Success) return null;
+
+        if (match.Groups.Count != 4) return null;
+
+        byte[] data = Convert.FromBase64String(match.Groups[3].Value);
+
+        LbpFile file = new(data);
+
+        if (file.FileType is not (LbpFileType.Jpeg or LbpFileType.Png)) return null;
+
+        string assetsDirectory = FileHelper.ResourcePath;
+        string path = FileHelper.GetResourcePath(file.Hash);
+
+        FileHelper.EnsureDirectoryCreated(assetsDirectory);
+        await System.IO.File.WriteAllBytesAsync(path, file.Data);
+        return file.Hash;
     }
 
-    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string avatar, [FromForm] string username, [FromForm] string email, [FromForm] string biography, [FromForm] string timezone)
+    private static bool IsValidEmail(string? email) => !string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email);
+
+    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string? avatar, [FromForm] string? username, [FromForm] string? email, [FromForm] string? biography, [FromForm] string? timeZone, [FromForm] string? language)
     {
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
 
         if (this.User == null) return this.Redirect("~/user/" + userId);
 
-        if (!this.User.IsModerator || this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
+        if (!this.User.IsModerator && this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
-        if(string.IsNullOrWhiteSpace(avatar))
-        {
-            byte[] data = ParseBase64(avatar);
-            //TODO convert to png/jpeg format, calculate hash, and upload
-            //TODO #2 implement website upload endpoint
-            // this.ProfileUser.IconHash = "";
-        }
+        string? avatarHash = await this.parseAvatar(avatar);
 
-        if (!this.ProfileUser.Biography.Equals(biography))
-        {
+        if (avatarHash != null) this.ProfileUser.IconHash = avatarHash;
+
+        if (biography != null && !this.ProfileUser.Biography.Equals(SanitizationHelper.SanitizeString(biography)))
             this.ProfileUser.Biography = SanitizationHelper.SanitizeString(biography);
-        }
-        //TODO set user timezone
-        if (ServerConfiguration.Instance.Mail.MailEnabled)
+        
+        if (ServerConfiguration.Instance.Mail.MailEnabled && IsValidEmail(email) && this.User == this.ProfileUser || this.User.IsAdmin)
         {
-            //TODO 
-            if (this.ProfileUser.EmailAddress != email)
+            // if email hasn't already been used
+            if (this.Database.Users.Any(u => u.EmailAddress != null && u.EmailAddress.ToLower().Equals(email!.ToLower())))
             {
-                if (await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress != null && string.Equals(u.EmailAddress, email, StringComparison.CurrentCultureIgnoreCase)) == null)
+                if (this.ProfileUser.EmailAddress != email)
                 {
                     this.ProfileUser.EmailAddress = email;
-                }
-                else
-                {
-                    //TODO email is not verified
+                    this.ProfileUser.EmailAddressVerified = false;
                 }
             }
         }
 
-        Console.WriteLine("avatar: " + avatar);
-        Console.WriteLine("username: " + username);
-        Console.WriteLine("email: " + email);
-        Console.WriteLine("biography: " + biography);
-        Console.WriteLine("timezone: " + timezone);
+        if (this.ProfileUser == this.User)
+        {
+            if (language != null && this.ProfileUser.Language != language)
+            {
+                if (LocalizationManager.GetAvailableLanguages().Contains(language))
+                    this.ProfileUser.Language = language;
+            }
 
+            if (timeZone != null && this.ProfileUser.TimeZone != timeZone)
+            {
+                HashSet<string> timeZoneIds = TimeZoneInfo.GetSystemTimeZones().Select(t => t.Id).ToHashSet();
+                if (timeZoneIds.Contains(timeZone)) this.ProfileUser.TimeZone = timeZone;
+            }
+        }
+
+
+        await this.Database.SaveChangesAsync();
         return this.Redirect("~/user/" + userId);
     }
 
@@ -76,7 +104,7 @@ public class UserSettingsPage : BaseLayout
 
         if (this.User == null) return this.Redirect("~/user/" + userId);
 
-        if(!this.User.IsModerator || this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
+        if(!this.User.IsModerator && this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
         return this.Page();
     }

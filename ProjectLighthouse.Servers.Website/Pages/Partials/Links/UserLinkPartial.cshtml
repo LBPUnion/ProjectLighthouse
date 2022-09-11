@@ -3,8 +3,9 @@
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     bool includeStatus = (bool?)ViewData["IncludeStatus"] ?? false;
-    string userStatus = includeStatus ? Model.Status.ToTranslatedString(language) : "";
+    string userStatus = includeStatus ? Model.Status.ToTranslatedString(language, timeZone) : "";
 }
 
 <a href="/user/@Model.UserId" title="@userStatus" class="user-link">

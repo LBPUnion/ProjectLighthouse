@@ -1,6 +1,9 @@
 ﻿@page "/user/{userId:int}/settings"
+@using System.Globalization
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserSettingsPage
 
@@ -10,18 +13,27 @@
 
     Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
 
-    bool isMobile = this.Request.IsMobile();
-    string language = Model.GetLanguage();
-    
+    bool isMobile = Request.IsMobile();
+
     int size = isMobile ? 100 : 200;
 }
 
 <script>
 function onSubmit(e){
-    document.getElementById("avatar-encoded").value = selectedAvatar.toString();            
-    // document.getElementById("avatar").value = selectedAvatar.toString();            
-    
-    //TODO upload file data to separate endpoint and make form wait until it is done
+    document.getElementById("avatar-encoded").value = selectedAvatar.toString();
+    if (@ServerConfiguration.Instance.Mail.MailEnabled.ToString().ToLower()){
+        let newEmail = document.getElementById("email").value;
+        if (newEmail.length === 0){
+            e.preventDefault();
+            return false;
+        }
+        if (newEmail !== email){
+            if (!window.confirm("This action will change your email to '" + newEmail + "'\nYour old email will be removed from your account if you continue")){
+                e.preventDefault();
+                return false;
+            }
+        }
+    }
     
     return true;
 }
@@ -32,13 +44,13 @@ function onSubmit(e){
         <div class="ui blue segment">
             <h1><i class="cog icon"></i>@Model.ProfileUser.Username's Settings</h1>
             <div class="ui divider"></div>
-            <form id="form" method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/settings" onsubmit="onSubmit(this)">
+            <form id="form" method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/settings" onsubmit="onSubmit(event)">
                 @Html.AntiForgeryToken()
                 <div class="field">
                     <div>
                         <div class="cardIcon userCardIcon" id="userPicture" style="background-image: url('/gameAssets/@Model.ProfileUser.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px; background-position: center center; background-size: auto @(size)px; background-repeat: no-repeat; margin: auto"></div>
                         <div class="ui fitted divider hidden"></div>
-                        <label for="avatar" class="ui green button" style="color: white; max-width: @(size)px">
+                        <label for="avatar" class="ui blue button" style="color: white; max-width: @(size)px">
                             <i class="arrow circle up icon"></i>
                             <span>Upload file</span>
                         </label>
@@ -47,57 +59,75 @@ function onSubmit(e){
                     </div>
                 </div>
                 <div class="field">
-                    <label for="username">Username</label>
+                    <label style="text-align: left" for="username">@Model.Translate(GeneralStrings.Username)</label>
                     <input type="text" name="username" id="username" value="@Model.ProfileUser.Username" placeholder="Username" readonly>
                 </div>
-                @if (ServerConfiguration.Instance.Mail.MailEnabled)
+                @if (ServerConfiguration.Instance.Mail.MailEnabled && Model.User == Model.ProfileUser || (Model.User!.IsAdmin))
                 {
                     <div class="field">
-                        <label for="email">Email</label>
-                        <input type="text" name="email" id="email" value="@Model.ProfileUser.EmailAddress" placeholder="Email Address" readonly>
+                        <label style="text-align: left" for="email">Email</label>
+                        <input type="text" name="email" id="email" required value="@Model.ProfileUser.EmailAddress" placeholder="Email Address">
                     </div>
                 }
+                <div class="field">
+                    <label style="text-align: left" for="biography">@Model.Translate(ProfileStrings.Biography)</label>
+                    <textarea name="biography" id="biography" spellcheck="false" placeholder="Biography">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</textarea>
+                </div>
                 @if (Model.User == Model.ProfileUser)
                 {
                     <div class="field">
-                        <label>Password</label>
-                        <a class="ui blue button" href="/passwordReset">
-                            <i class="key icon"></i>
-                            <span>@Model.Translate(GeneralStrings.ResetPassword)</span>
-                        </a>
+                        <label style="text-align: left">Language</label>
+                        <select class="ui fluid dropdown" name="language">
+                            @foreach (string lang in LocalizationManager.GetAvailableLanguages())
+                            {
+                                string selected = "";
+                                if (lang.Equals(Model.ProfileUser.Language))
+                                {
+                                    selected = " selected=\"selected\"";
+                                }
+                                string langName = new CultureInfo(lang).DisplayName;
+                                if (lang == "en-PT") langName = "Pirate Speak (The Seven Seas)";
+                                <option value="@lang"@selected>@langName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label style="text-align: left">Timezone</label>
+                        <select class="ui fluid dropdown" name="timeZone">
+                            @foreach (TimeZoneInfo systemTimeZone in TimeZoneInfo.GetSystemTimeZones())
+                            {
+                                string selected = "";
+                                if (systemTimeZone.Id.Equals(Model.ProfileUser.TimeZone))
+                                {
+                                    selected = " selected=\"selected\"";
+                                }
+                                <option value="@systemTimeZone.Id"@selected>@systemTimeZone.DisplayName</option>
+                            }
+                        </select>
                     </div>
                 }
-                <div class="field">
-                    <label for="biography">Biography</label>
-                    <textarea name="biography" id="biography" spellcheck="false" placeholder="Biography">@Model.ProfileUser.Biography</textarea>
-                </div>
-                <div class="field">
-                    <label>Timezone</label>
-                    <select class="ui fluid dropdown" name="timezone">
-                        <option value="">Select Timezone</option>
-                        @foreach (TimeZoneInfo systemTimeZone in TimeZoneInfo.GetSystemTimeZones())
-                        {
-                            string selected = "";
-                            if (systemTimeZone.DisplayName.Equals("(UTC-06:00) Central Time (US & Canada)"))
-                            {
-                                selected = "selected=\"selected\"";
-                            }
-                            <option value="@systemTimeZone.Id" @selected>@systemTimeZone.DisplayName</option>
-
-                        }
-                    </select>
-                </div>
-                <button class="ui button blue" tabindex="0">Save Changes</button>
+                <button class="ui button green" tabindex="0">Save Changes</button>
                 <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
+                <div class="ui divider fitted hidden"></div>
+                @if (Model.User == Model.ProfileUser)
+                {
+                    <a class="ui blue button" href="/passwordReset">
+                        <i class="key icon"></i>
+                        @Model.Translate(GeneralStrings.ResetPassword)
+                    </a>
+                }
             </form>
         </div>
     </div>
 </div>
 
 <script>
+  const email = document.getElementById("email").value;
   let selectedAvatar = "";
   document.getElementById("avatar").onchange = function (e){
       const file = e.target.files.item(0);
+      if (file.type !== "image/jpeg" && file.type !== "image/png")
+          return;
       
       const output = document.getElementById('userPicture');
       const reader = new FileReader();

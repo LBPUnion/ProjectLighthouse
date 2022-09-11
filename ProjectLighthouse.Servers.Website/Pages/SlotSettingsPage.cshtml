@@ -1,0 +1,154 @@
+﻿@page "/slot/{slotId:int}/settings"
+@using System.Web
+@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Levels
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.PlayerData
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotSettingsPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.ShowTitleInPage = false;
+
+    Model.Title = HttpUtility.HtmlDecode(Model.Slot?.Name ?? "");
+
+    bool isMobile = Request.IsMobile();
+
+    int size = isMobile ? 100 : 200;
+}
+
+<script>
+function onSubmit(){
+    document.getElementById("avatar-encoded").value = selectedAvatar.toString();
+    document.getElementById("labels").value = serializeLabels();    
+    return true;
+}
+</script>
+
+<div class="@(isMobile ? "" : "ui center aligned grid")">
+    <div class="eight wide column">
+        <div class="ui blue segment">
+            <h1><i class="cog icon"></i>Slot Settings</h1>
+            <div class="ui divider"></div>
+            <form id="form" method="POST" class="ui form center aligned" action="/slot/@Model.Slot!.SlotId/settings" onsubmit="onSubmit()">
+                @Html.AntiForgeryToken()
+                <div class="field">
+                    <div>
+                        <div>
+                                <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">                                
+                                <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1;">
+                                <img id="slotIcon" class="cardIcon slotCardIcon" src="/gameAssets/@Model.Slot.IconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2" 
+                                                                     onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
+                            </div>
+                        <div class="ui fitted divider hidden"></div>
+                        <label for="avatar" class="ui blue button" style="color: white; max-width: @(size)px">
+                            <i class="arrow circle up icon"></i>
+                            <span>Upload file</span>
+                        </label>
+                        <input style="display: none" type="file" id="avatar" accept="image/png, image/jpeg">
+                        <input type="hidden" name="avatar" id="avatar-encoded">
+                    </div>
+                </div>
+                <div class="field">
+                    <label style="text-align: left" for="name">@Model.Translate(GeneralStrings.Username)</label>
+                    <input type="text" name="name" id="name" value="@HttpUtility.HtmlDecode(Model.Slot.Name)" placeholder="Name">
+                </div>
+                <div class="field">
+                    <label style="text-align: left" for="description">Description</label>
+                    <textarea name="description" id="description" spellcheck="false" placeholder="Description">@HttpUtility.HtmlDecode(Model.Slot.Description)</textarea>
+                </div>
+                @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
+                {
+                    <div class="field">
+                        <label style="text-align: left">Labels</label>
+                        @{
+                            foreach (string s in Enum.GetNames(typeof(LevelLabels)))
+                            {
+                                if (!LabelHelper.isValidForGame(s, Model.Slot.GameVersion)) continue;
+
+                                string color = "gray";
+                                if (Model.Slot.AuthorLabels.Contains(s)) color += " selected";
+
+                                <button type="button" onclick="labelButtonClick(event)" onmouseleave="onHoverStart(this)" onmouseenter="onHoverStart(this)" style="margin: .35em" class="ui button skew @color" id="@s">@LabelHelper.TranslateTag(s)</button>
+                            }
+                        }
+                        <input type="hidden" name="labels" id="labels">
+                    </div>
+                }
+                
+                <button class="ui button green" tabindex="0">Save Changes</button>
+                <a class="ui button red" href="/slot/@Model.Slot.SlotId">Discard Changes</a>
+                <div class="ui divider fitted hidden"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+  let selectedButtons = [];
+  function onHoverStart(btn){          
+      generateRandomSkew(btn);
+  }
+  function generateRandomSkew(element){
+      let rand = Math.random() * 6 - 3; 
+      element.style.setProperty("--skew", "rotate(" + rand + "deg)"); 
+  }
+  function setupButtons(){
+      const elements = document.getElementsByClassName("skew");
+      for (let i = 0; i < elements.length; i++) {
+          generateRandomSkew(elements[i]);
+          if (elements[i].classList.contains("selected"))
+            selectedButtons.push(elements[i]);
+      }
+  }
+  function serializeLabels(){
+      let labels = "";
+      for (let i = 0; i < selectedButtons.length; i++) {
+          if (selectedButtons[i] == null) continue;
+          labels += selectedButtons[i].id;
+          if (i !== selectedButtons.length - 1) {
+              labels += ",";
+          }
+      }
+      return labels;
+  }
+  function labelButtonClick(e){
+      e.preventDefault();
+      
+      const target = e.target;
+      target.blur();
+      if (target.classList.contains("selected")){
+          target.classList.remove("selected");
+      } else {
+          target.classList.add("selected");
+      }
+      if (selectedButtons.includes(target)){
+          let startIndex = selectedButtons.indexOf(target);
+          selectedButtons.splice(startIndex, 1);
+      } else {
+          selectedButtons.push(target);
+          if (selectedButtons.length > 5){
+              let removed = selectedButtons.shift();
+              removed.classList.remove("selected");
+          }
+      }      
+  }
+  setupButtons();
+
+  let selectedAvatar = "";
+  document.getElementById("avatar").onchange = function (e){
+      const file = e.target.files.item(0);
+      if (file.type !== "image/jpeg" && file.type !== "image/png")
+          return;
+      
+      const output = document.getElementById('slotIcon');
+      const reader = new FileReader();
+      reader.onload = function(){
+          output.src = reader.result;
+          selectedAvatar = reader.result;
+      };
+      reader.readAsDataURL(file);
+  }
+</script>
