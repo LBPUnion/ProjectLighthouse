@@ -21,7 +21,8 @@
 <script>
 function onSubmit(e){
     document.getElementById("avatar-encoded").value = selectedAvatar.toString();
-    if (@ServerConfiguration.Instance.Mail.MailEnabled.ToString().ToLower()){
+    @if(ServerConfiguration.Instance.Mail.MailEnabled){
+        <text>
         let newEmail = document.getElementById("email").value;
         if (newEmail.length === 0){
             e.preventDefault();
@@ -33,6 +34,7 @@ function onSubmit(e){
                 return false;
             }
         }
+        </text>
     }
     
     return true;
@@ -122,9 +124,15 @@ function onSubmit(e){
 </div>
 
 <script>
-  const email = document.getElementById("email").value;
-  let selectedAvatar = "";
-  document.getElementById("avatar").onchange = function (e){
+    @if (ServerConfiguration.Instance.Mail.MailEnabled)
+    {
+        <text>
+        const email = document.getElementById("email").value;
+        </text>
+    }
+    
+    let selectedAvatar = "";
+    document.getElementById("avatar").addEventListener("change", e => {
       const file = e.target.files.item(0);
       if (file.type !== "image/jpeg" && file.type !== "image/png")
           return;
@@ -136,5 +144,5 @@ function onSubmit(e){
           selectedAvatar = reader.result;
       };
       reader.readAsDataURL(file);
-  }
+  });
 </script>
