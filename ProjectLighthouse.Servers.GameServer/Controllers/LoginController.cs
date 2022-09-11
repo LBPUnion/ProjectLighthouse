@@ -80,7 +80,7 @@ public class LoginController : ControllerBase
             return this.StatusCode(403, "");
         }
 
-        if (ServerConfiguration.Instance.Mail.MailEnabled && user.EmailAddress == null || !user.EmailAddressVerified)
+        if (ServerConfiguration.Instance.Mail.MailEnabled && (user.EmailAddress == null || !user.EmailAddressVerified))
         {
             Logger.Error($"Email address unverified for user {user.Username}", LogArea.Login);
             return this.StatusCode(403, "");
