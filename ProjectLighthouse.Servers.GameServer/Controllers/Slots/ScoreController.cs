@@ -3,9 +3,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
@@ -29,20 +33,45 @@ public class ScoreController : ControllerBase
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
+        if (SlotHelper.IsTypeInvalid(slotType))
+        {
+            Logger.Warn($"Rejecting score upload, slot type is invalid (slotType={slotType}, user={username})", LogArea.Score);
+            return this.BadRequest();
+        }
 
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
         XmlSerializer serializer = new(typeof(Score));
         Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
-        if (score == null) return this.BadRequest();
+        if (score == null)
+        {
+            Logger.Warn($"Rejecting score upload, score is null (slotType={slotType}, slotId={id}, user={username})", LogArea.Score);
+            return this.BadRequest();
+        }
 
-        if (score.PlayerIds.Length == 0) return this.BadRequest();
+        if (score.PlayerIds.Length == 0)
+        {
+            Logger.Warn($"Rejecting score upload, there are 0 playerIds (slotType={slotType}, slotId={id}, user={username})", LogArea.Score);
+            return this.BadRequest();
+        }
 
-        if (score.Points < 0) return this.BadRequest();
+        if (score.Points < 0)
+        {
+            Logger.Warn($"Rejecting score upload, points value is less than 0 (points={score.Points}, user={username})", LogArea.Score);
+            return this.BadRequest();
+        }
 
-        if (score.Type is > 4 or < 1) return this.BadRequest();
+        // Score types:
+        // 1-4: Co-op with the number representing the number of players
+        // 5: leaderboard filtered by day (never uploaded with this id)
+        // 6: leaderboard filtered by week (never uploaded either)
+        // 7: Versus levels & leaderboard filtered by all time
+        if (score.Type is > 4 or < 1 && score.Type != 7)
+        {
+            Logger.Warn($"Rejecting score upload, score type is out of bounds (type={score.Type}, user={username})", LogArea.Score);
+            return this.BadRequest();
+        }
 
         SanitizationHelper.SanitizeStringsInClass(score);
 
@@ -51,7 +80,11 @@ public class ScoreController : ControllerBase
         score.SlotId = id;
 
         Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
-        if (slot == null) return this.BadRequest();
+        if (slot == null)
+        {
+            Logger.Warn($"Rejecting score upload, slot is null (slotId={score.SlotId}, slotType={slotType}, reqId={id}, user={username})", LogArea.Score);
+            return this.BadRequest();
+        }
 
         switch (token.GameVersion)
         {
@@ -109,10 +142,35 @@ public class ScoreController : ControllerBase
         return this.Ok(myRanking);
     }
 
-    [HttpGet("friendscores/user/{slotId:int}/{type:int}")]
-    public IActionResult FriendScores(int slotId, int type)
-        //=> await TopScores(slotId, type);
-        => this.Ok(LbpSerializer.BlankElement("scores"));
+    [HttpGet("friendscores/{slotType}/{slotId:int}/{type:int}")]
+    public async Task<IActionResult> FriendScores(string slotType, int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        if (pageSize <= 0) return this.BadRequest();
+
+        string username = await this.database.UsernameFromGameToken(token);
+
+        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
+
+        if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
+
+        UserFriendData? store = UserFriendStore.GetUserFriendData(token.UserId);
+        if (store == null) return this.Ok();
+
+        List<string> friendNames = new();
+
+        foreach (int friendId in store.FriendIds)
+        {
+            string? friendUsername = await this.database.Users.Where(u => u.UserId == friendId)
+                .Select(u => u.Username)
+                .FirstOrDefaultAsync();
+            if (friendUsername != null) friendNames.Add(friendUsername);
+        }
+
+        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, "scores", friendNames.ToArray())); 
+    }
 
     [HttpGet("topscores/{slotType}/{slotId:int}/{type:int}")]
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -140,7 +198,8 @@ public class ScoreController : ControllerBase
         string username,
         int pageStart = -1,
         int pageSize = 5,
-        string rootName = "scores"
+        string rootName = "scores",
+        string[]? playerIds = null
     )
     {
 
@@ -148,6 +207,8 @@ public class ScoreController : ControllerBase
         // var needed for Anonymous type returned from SELECT
         var rankedScores = this.database.Scores
             .Where(s => s.SlotId == slotId && s.Type == type)
+            .AsEnumerable()
+            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
             .ToList()

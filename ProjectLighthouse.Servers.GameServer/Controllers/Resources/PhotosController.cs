@@ -200,7 +200,7 @@ public class PhotosController : ControllerBase
             p.PhotoId,
             p.PhotoSubjectCollection,
         }).ToList();
-        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Contains(ps.ToString())) select v.PhotoId).ToList();
+        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Split(",").Contains(ps.ToString())) select v.PhotoId).ToList();
 
         string response = Enumerable.Aggregate(
             this.database.Photos.Where(p => photoIds.Any(id => p.PhotoId == id) && p.CreatorId != targetUserId)
@@ -221,7 +221,13 @@ public class PhotosController : ControllerBase
 
         Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
         if (photo == null) return this.NotFound();
-        if (photo.CreatorId != token.UserId) return this.StatusCode(401, "");
+
+        // If user isn't photo creator then check if they own the level
+        if (photo.CreatorId != token.UserId)
+        {
+            Slot? photoSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId && s.Type == SlotType.User);
+            if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.StatusCode(401, "");
+        }
         foreach (string idStr in photo.PhotoSubjectIds)
         {
             if (!int.TryParse(idStr, out int subjectId)) throw new InvalidCastException(idStr + " is not a valid number.");

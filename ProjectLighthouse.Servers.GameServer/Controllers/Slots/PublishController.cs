@@ -68,7 +68,7 @@ public class PublishController : ControllerBase
                 return this.BadRequest();
             }
         }
-        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > user.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
@@ -205,7 +205,7 @@ public class PublishController : ControllerBase
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
-        if (user.GetUsedSlotsForGame(slotVersion) > ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots)
+        if (user.GetUsedSlotsForGame(slotVersion) > user.EntitledSlots)
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
             return this.BadRequest();

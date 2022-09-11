@@ -9,15 +9,23 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Produces("text/plain")]
 public class StatisticsController : ControllerBase
 {
+
+    private readonly Database database;
+
+    public StatisticsController(Database database)
+    {
+        this.database = database;
+    }
+
     [HttpGet("playersInPodCount")]
     [HttpGet("totalPlayerCount")]
-    public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatches()).ToString()!);
+    public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatches(this.database)).ToString());
 
     [HttpGet("planetStats")]
     public async Task<IActionResult> PlanetStats()
     {
-        int totalSlotCount = await StatisticsHelper.SlotCount();
-        int mmPicksCount = await StatisticsHelper.TeamPickCount();
+        int totalSlotCount = await StatisticsHelper.SlotCount(this.database);
+        int mmPicksCount = await StatisticsHelper.TeamPickCount(this.database);
 
         return this.Ok
         (
@@ -27,5 +35,5 @@ public class StatisticsController : ControllerBase
     }
 
     [HttpGet("planetStats/totalLevelCount")]
-    public async Task<IActionResult> TotalLevelCount() => this.Ok((await StatisticsHelper.SlotCount()).ToString());
+    public async Task<IActionResult> TotalLevelCount() => this.Ok((await StatisticsHelper.SlotCount(this.database)).ToString());
 }

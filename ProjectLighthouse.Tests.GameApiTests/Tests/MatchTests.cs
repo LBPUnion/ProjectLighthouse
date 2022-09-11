@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
@@ -47,14 +48,16 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
 
         await semaphore.WaitAsync();
 
-        int oldPlayerCount = await StatisticsHelper.RecentMatches();
+        await using Database database = new();
+
+        int oldPlayerCount = await StatisticsHelper.RecentMatches(database);
 
         HttpResponseMessage result = await this.AuthenticatedUploadDataRequest
             ("LITTLEBIGPLANETPS3_XML/match", Encoding.ASCII.GetBytes("[UpdateMyPlayerData,[\"Player\":\"1984\"]]"), loginResult.AuthTicket);
 
         Assert.True(result.IsSuccessStatusCode);
 
-        int playerCount = await StatisticsHelper.RecentMatches();
+        int playerCount = await StatisticsHelper.RecentMatches(database);
 
         semaphore.Release();
         Assert.Equal(oldPlayerCount + 1, playerCount);
