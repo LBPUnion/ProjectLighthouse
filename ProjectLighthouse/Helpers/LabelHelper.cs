@@ -54,6 +54,7 @@ public static class LabelHelper
 
     private static readonly Dictionary<string, string> translationTable = new()
     {
+        {"Label_SinglePlayer", "Single Player"},
         {"LABEL_Quick", "Short"},
         {"LABEL_Competitive", "Versus"},
         {"LABEL_Puzzle", "Puzzler"},

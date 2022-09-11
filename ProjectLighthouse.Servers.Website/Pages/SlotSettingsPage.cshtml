@@ -68,8 +68,8 @@ function onSubmit(){
                             {
                                 if (!LabelHelper.isValidForGame(s, Model.Slot.GameVersion)) continue;
 
-                                string color = "gray";
-                                if (Model.Slot.AuthorLabels.Contains(s)) color += " selected";
+                                string color = "";
+                                if (Model.Slot.AuthorLabels.Contains(s)) color += "selected";
 
                                 <button type="button" onclick="labelButtonClick(event)" onmouseleave="onHoverStart(this)" onmouseenter="onHoverStart(this)" style="margin: .35em" class="ui button skew @color" id="@s">@LabelHelper.TranslateTag(s)</button>
                             }
