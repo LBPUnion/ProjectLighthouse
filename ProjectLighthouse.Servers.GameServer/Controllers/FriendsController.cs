@@ -4,9 +4,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.StorableLists;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,8 +54,7 @@ public class FriendsController : ControllerBase
             blockedUsers.Add(blockedUser.UserId);
         }
 
-        UserFriendData? friendStore = UserFriendStore.GetUserFriendData(token.UserId);
-        if (friendStore == null) friendStore = UserFriendStore.CreateUserFriendData(token.UserId);
+        UserFriendData friendStore = UserFriendStore.GetUserFriendData(token.UserId) ?? UserFriendStore.CreateUserFriendData(token.UserId);
 
         friendStore.FriendIds = friends.Select(u => u.UserId).ToList();
         friendStore.BlockedIds = blockedUsers;

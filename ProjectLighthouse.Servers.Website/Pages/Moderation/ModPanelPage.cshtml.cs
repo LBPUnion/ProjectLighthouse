@@ -21,15 +21,15 @@ public class ModPanelPage : BaseLayout
         
         this.Statistics.Add(new AdminPanelStatistic(
             statisticNamePlural: "Reports",
-            count: await StatisticsHelper.ReportCount(), 
+            count: await StatisticsHelper.ReportCount(this.Database), 
             viewAllEndpoint: "/moderation/reports/0")
         );
         
         this.Statistics.Add(new AdminPanelStatistic(
             statisticNamePlural: "Cases",
-            count: await StatisticsHelper.DismissedCaseCount(), 
+            count: await StatisticsHelper.DismissedCaseCount(this.Database), 
             viewAllEndpoint: "/moderation/cases/0",
-            secondStatistic: await StatisticsHelper.CaseCount())
+            secondStatistic: await StatisticsHelper.CaseCount(this.Database))
         );
 
         return this.Page();

@@ -47,7 +47,7 @@ public static class RepeatingTaskHandler
                     await task.Run(database);
                     task.LastRan = DateTime.Now;
 
-                    Logger.Debug($"Ran task \"{task.Name}\"", LogArea.Maintenace);
+                    Logger.Debug($"Ran task \"{task.Name}\"", LogArea.Maintenance);
                 }
 
                 taskQueue.Enqueue(task);
@@ -55,7 +55,7 @@ public static class RepeatingTaskHandler
             }
             catch(Exception e)
             {
-                Logger.Warn($"Error occured while processing repeating tasks: \n{e}", LogArea.Maintenace);
+                Logger.Warn($"Error occured while processing repeating tasks: \n{e}", LogArea.Maintenance);
             }
         }
     }
