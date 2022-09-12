@@ -101,6 +101,15 @@
         }
     </div>
     <div class="cardButtons">
+            <br>
+            @if (user != null && (user.IsModerator || user.UserId == Model.CreatorId))
+            {
+                <a class="ui blue tiny button" href="/slot/@Model.SlotId/settings" title="Settings">
+                    <i class="cog icon" style="margin: 0"></i>
+                </a>
+            }
+        </div>
+    <div class="cardButtons" style="margin-left: 0">
         <br>
         @if (user != null && !mini)
         {
@@ -129,15 +138,6 @@
                     <i class="bell icon" style="margin: 0"></i>
                 </a>
             }
-        }
-    </div>
-    <div class="cardButtons" style="margin-left: 0">
-        <br>
-        @if (user != null && (user.IsModerator || user.UserId == Model.CreatorId))
-        {
-            <a class="ui blue tiny button" href="/slot/@Model.SlotId/settings" title="Settings">
-                <i class="cog icon" style="margin: 0"></i>
-            </a>
         }
     </div>
 </div>

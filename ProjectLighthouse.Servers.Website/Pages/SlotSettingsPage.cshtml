@@ -81,6 +81,10 @@ function onSubmit(){
                 <button class="ui button green" tabindex="0">Save Changes</button>
                 <a class="ui button red" href="/slot/@Model.Slot.SlotId">Discard Changes</a>
                 <div class="ui divider fitted hidden"></div>
+                @if (Model.Slot.CreatorId == Model.User!.UserId)
+                {
+                    <button type="button" class="ui button red" onclick="confirmUnpublish()">Unpublish level</button>
+                }
             </form>
         </div>
     </div>
@@ -88,6 +92,16 @@ function onSubmit(){
 
 <script>
   let selectedButtons = [];
+  @if (Model.Slot.CreatorId == Model.User.UserId)
+  {
+  <text>
+    function confirmUnpublish(){
+          if (window.confirm("Are you sure you want to unpublish this level?\nThis action cannot be undone")){
+              window.location.href = "/slot/@Model.Slot.SlotId/unpublish";
+          }
+    }
+  </text>
+  }
   function onHoverStart(btn){          
       generateRandomSkew(btn);
   }
