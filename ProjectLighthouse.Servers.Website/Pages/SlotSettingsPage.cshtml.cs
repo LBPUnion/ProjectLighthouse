@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Text.RegularExpressions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
@@ -16,33 +15,7 @@ public class SlotSettingsPage : BaseLayout
     public SlotSettingsPage(Database database) : base(database)
     {}
 
-    private readonly Regex base64Regex = new(@"data:([^\/]+)\/([^;]+);base64,(.*)", RegexOptions.Compiled);
-
-    private async Task<string?> parseAvatar(string avatar)
-    {
-        if (string.IsNullOrWhiteSpace(avatar)) return null;
-
-        System.Text.RegularExpressions.Match match = this.base64Regex.Match(avatar);
-
-        if (!match.Success) return null;
-
-        if (match.Groups.Count != 4) return null;
-
-        byte[] data = Convert.FromBase64String(match.Groups[3].Value);
-
-        LbpFile file = new(data);
-
-        if (file.FileType is not (LbpFileType.Jpeg or LbpFileType.Png)) return null;
-
-        string assetsDirectory = FileHelper.ResourcePath;
-        string path = FileHelper.GetResourcePath(file.Hash);
-
-        FileHelper.EnsureDirectoryCreated(assetsDirectory);
-        await System.IO.File.WriteAllBytesAsync(path, file.Data);
-        return file.Hash;
-    }
-
-    public async Task<IActionResult> OnPost([FromRoute] int slotId, [FromForm] string avatar, [FromForm] string name, [FromForm] string description, string labels)
+    public async Task<IActionResult> OnPost([FromRoute] int slotId, [FromForm] string? avatar, [FromForm] string? name, [FromForm] string? description, string? labels)
     {
         this.Slot = await this.Database.Slots.FirstOrDefaultAsync(u => u.SlotId == slotId);
         if (this.Slot == null) return this.NotFound();
@@ -51,15 +24,18 @@ public class SlotSettingsPage : BaseLayout
 
         if (!this.User.IsModerator && this.User != this.Slot.Creator) return this.Redirect("~/slot/" + slotId);
 
-        string? avatarHash = await this.parseAvatar(avatar);
+        string? avatarHash = await FileHelper.ParseBase64Image(avatar);
 
         if (avatarHash != null) this.Slot.IconHash = avatarHash;
 
-        if (!string.IsNullOrEmpty(name)) this.Slot.Name = SanitizationHelper.SanitizeString(name);
-        
-        if (!string.IsNullOrEmpty(description)) this.Slot.Description = SanitizationHelper.SanitizeString(description);
+        name = SanitizationHelper.SanitizeString(name);
+        if (this.Slot.Name != name) this.Slot.Name = name;
 
-        if (!string.IsNullOrEmpty(labels)) this.Slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(SanitizationHelper.SanitizeString(labels));
+        description = SanitizationHelper.SanitizeString(description);
+        if (this.Slot.Description != description) this.Slot.Description = description;
+
+        labels = LabelHelper.RemoveInvalidLabels(SanitizationHelper.SanitizeString(labels));
+        if (this.Slot.AuthorLabels != labels) this.Slot.AuthorLabels = labels;
 
         // ReSharper disable once InvertIf
         if (this.Database.ChangeTracker.HasChanges())

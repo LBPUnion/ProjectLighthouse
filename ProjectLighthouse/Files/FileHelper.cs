@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip.Compression;
@@ -238,6 +239,34 @@ public static class FileHelper
     public static void EnsureDirectoryCreated(string path)
     {
         if (!Directory.Exists(path)) Directory.CreateDirectory(path ?? throw new ArgumentNullException(nameof(path)));
+    }
+
+    private static readonly Regex base64Regex = new(@"data:([^\/]+)\/([^;]+);base64,(.*)", RegexOptions.Compiled);
+
+    public static async Task<string?> ParseBase64Image(string? image)
+    {
+        if (string.IsNullOrWhiteSpace(image)) return null;
+
+        System.Text.RegularExpressions.Match match = base64Regex.Match(image);
+
+        if (!match.Success) return null;
+
+        if (match.Groups.Count != 4) return null;
+
+        byte[] data = Convert.FromBase64String(match.Groups[3].Value);
+
+        LbpFile file = new(data);
+
+        if (file.FileType is not (LbpFileType.Jpeg or LbpFileType.Png)) return null;
+
+        if (ResourceExists(file.Hash)) return file.Hash;
+
+        string assetsDirectory = ResourcePath;
+        string path = GetResourcePath(file.Hash);
+
+        EnsureDirectoryCreated(assetsDirectory);
+        await File.WriteAllBytesAsync(path, file.Data);
+        return file.Hash;
     }
 
     public static string[] ResourcesNotUploaded(params string[] hashes) => hashes.Where(hash => !ResourceExists(hash)).ToArray();

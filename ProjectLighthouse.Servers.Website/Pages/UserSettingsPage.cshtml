@@ -50,7 +50,7 @@ function onSubmit(e){
                 @Html.AntiForgeryToken()
                 <div class="field" style="display: flex; justify-content: center; align-items: center">
                     <div>
-                        <div class="cardIcon userCardIcon" id="userPicture" style="background-image: url('/gameAssets/@Model.ProfileUser.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px; background-position: center center; background-size: auto @(size)px; background-repeat: no-repeat; margin: auto"></div>
+                        <div class="cardIcon userCardIcon" id="userPicture" style="background-image: url('/gameAssets/@Model.ProfileUser.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px; background-position: center center; background-size: cover; background-repeat: no-repeat;"></div>
                         <div class="ui fitted divider hidden"></div>
                         <label for="avatar" class="ui blue button" style="color: white; max-width: @(size)px">
                             <i class="arrow circle up icon"></i>
