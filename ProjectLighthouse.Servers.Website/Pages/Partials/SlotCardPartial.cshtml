@@ -102,7 +102,7 @@
     </div>
     <div class="cardButtons">
             <br>
-            @if (user != null && (user.IsModerator || user.UserId == Model.CreatorId))
+            @if (user != null && !mini && (user.IsModerator || user.UserId == Model.CreatorId))
             {
                 <a class="ui blue tiny button" href="/slot/@Model.SlotId/settings" title="Settings">
                     <i class="cog icon" style="margin: 0"></i>
