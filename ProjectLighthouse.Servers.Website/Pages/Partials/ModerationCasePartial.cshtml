@@ -25,19 +25,19 @@
         Debug.Assert(Model.DismissedAt != null);
         
         <h3 class="ui @color header">
-            This case was dismissed by <a href="/user/@Model.Dismisser.UserId">@Model.Dismisser.Username</a> on @TimeZoneInfo.ConvertTime(Model.DismissedAt.Value, timeZoneInfo).ToString("MM/dd/yyyy @ h:mm tt").
+            This case was dismissed by <a href="/user/@Model.Dismisser.UserId">@Model.Dismisser.Username</a> on @TimeZoneInfo.ConvertTime(Model.DismissedAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
         </h3>
     }
     else if (Model.Expired && Model.ExpiresAt != null)
     {
         <h3 class="ui @color header">
-            This case expired on @TimeZoneInfo.ConvertTime(Model.ExpiresAt.Value, timeZoneInfo).ToString("MM/dd/yyyy @ h:mm tt").
+            This case expired on @TimeZoneInfo.ConvertTime(Model.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
         </h3>
     }
     
     <span>
         Case created by <a href="/user/@Model.Creator!.UserId">@Model.Creator.Username</a>
-        on @TimeZoneInfo.ConvertTime(Model.CreatedAt, timeZoneInfo).ToString("MM/dd/yyyy @ h:mm tt")
+        on @TimeZoneInfo.ConvertTime(Model.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
     </span><br>
     
     @if (Model.Type.AffectsLevel())

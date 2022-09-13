@@ -11,7 +11,7 @@ public static class PartialExtensions
 
     public static ViewDataDictionary<T> WithLang<T>(this ViewDataDictionary<T> viewData, string language) => WithKeyValue(viewData, "Language", language);
 
-    public static ViewDataDictionary<T> WithTime<T>(this ViewDataDictionary<T> viewData, string language) => WithKeyValue(viewData, "TimeZone", language);
+    public static ViewDataDictionary<T> WithTime<T>(this ViewDataDictionary<T> viewData, string timeZone) => WithKeyValue(viewData, "TimeZone", timeZone);
 
     private static ViewDataDictionary<T> WithKeyValue<T>(this ViewDataDictionary<T> viewData, string key, object value)
     {

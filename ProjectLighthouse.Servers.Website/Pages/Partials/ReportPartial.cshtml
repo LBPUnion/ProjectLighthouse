@@ -31,7 +31,7 @@
 
         <br>
         <div>
-            <b>Report time: </b>@(TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.Timestamp), timeZoneInfo).ToString("R"))))
+            <b>Report time: </b>@(TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.Timestamp), timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt"))
         </div>
         <div>
             <b>Report reason: </b>@Model.Type

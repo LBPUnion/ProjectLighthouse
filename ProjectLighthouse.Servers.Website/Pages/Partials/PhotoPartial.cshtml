@@ -51,7 +51,7 @@
                     break;
             }
         }
-        at @TimeZoneInfo.ConvertTime(DateTime.UnixEpoch.AddSeconds(Model.Timestamp), timeZoneInfo).ToString(CultureInfo.CurrentCulture)
+        at @TimeZoneInfo.ConvertTime(DateTime.UnixEpoch.AddSeconds(Model.Timestamp), timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt")
     </i>
 </p>
 

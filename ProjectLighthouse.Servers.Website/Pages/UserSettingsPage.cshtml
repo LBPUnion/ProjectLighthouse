@@ -64,7 +64,7 @@ function onSubmit(e){
                     <label style="text-align: left" for="username">@Model.Translate(GeneralStrings.Username)</label>
                     <input type="text" name="username" id="username" value="@Model.ProfileUser.Username" placeholder="Username" readonly>
                 </div>
-                @if (ServerConfiguration.Instance.Mail.MailEnabled && Model.User == Model.ProfileUser || (Model.User!.IsAdmin))
+                @if (ServerConfiguration.Instance.Mail.MailEnabled && (Model.User == Model.ProfileUser || Model.User!.IsAdmin))
                 {
                     <div class="field">
                         <label style="text-align: left" for="email">Email</label>

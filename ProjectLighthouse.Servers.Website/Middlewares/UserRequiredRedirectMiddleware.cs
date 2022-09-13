@@ -12,23 +12,35 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
     public override async Task InvokeAsync(HttpContext ctx, Database database)
     {
         User? user = database.UserFromWebRequest(ctx.Request);
-        if (user == null)
+        if (user == null || ctx.Request.Path.StartsWithSegments("/logout"))
         {
             await this.next(ctx);
             return;
         }
 
-        if (user.PasswordResetRequired && !ctx.Request.Path.StartsWithSegments("/passwordReset"))
+        if (user.PasswordResetRequired && !ctx.Request.Path.StartsWithSegments("/passwordResetRequired") &&
+            !ctx.Request.Path.StartsWithSegments("/passwordReset"))
         {
             ctx.Response.Redirect("/passwordResetRequired");
             return;
         }
 
-        if (ServerConfiguration.Instance.Mail.MailEnabled && !user.EmailAddressVerified 
-            && !ctx.Request.Path.StartsWithSegments("/login/sendVerificationEmail") && !ctx.Request.Path.StartsWithSegments("/verifyEmail"))
+        if (ServerConfiguration.Instance.Mail.MailEnabled)
         {
-            ctx.Response.Redirect("/login/sendVerificationEmail");
-            return;
+            // The normal flow is for users to set their email during login so just force them to log out
+            if (user.EmailAddress == null)
+            {
+                ctx.Response.Redirect("/logout");
+                return;
+            }
+
+            if (!user.EmailAddressVerified &&
+                !ctx.Request.Path.StartsWithSegments("/login/sendVerificationEmail") &&
+                !ctx.Request.Path.StartsWithSegments("/verifyEmail"))
+            {
+                ctx.Response.Redirect("/login/sendVerificationEmail");
+                return;
+            }
         }
 
         await this.next(ctx);
