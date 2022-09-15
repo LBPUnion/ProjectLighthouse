@@ -17,12 +17,14 @@ using LBPUnion.ProjectLighthouse.Types;
 
 namespace LBPUnion.ProjectLighthouse.Levels;
 
+// Placeholder for a proper Adventure Slot system, sit tight!
+
 /// <summary>
 ///     A LittleBigPlanet level.
 /// </summary>
 [XmlRoot("slot")]
-[XmlType("slot")]
-public class Slot
+[XmlType("advslot")]
+public class SubSlot
 {
     [NotMapped]
     [JsonIgnore]
@@ -49,45 +51,19 @@ public class Slot
     [XmlElement("id")]
     public int SlotId { get; set; }
 
-    public int InternalSlotId { get; set; }
-
     [XmlElement("name")]
     public string Name { get; set; } = "";
 
     [XmlElement("description")]
     public string Description { get; set; } = "";
 
-    [XmlElement("icon")]
-    public string IconHash { get; set; } = "";
-
-    [XmlElement("isAdventurePlanet")]
-    public bool isAdventurePlanet { get; set; }
-
     [XmlElement("rootLevel")]
     [JsonIgnore]
     public string RootLevel { get; set; } = "";
 
-    [JsonIgnore]
-    public string ResourceCollection { get; set; } = "";
-
-    [NotMapped]
-    [XmlElement("resource")]
-    [JsonIgnore]
-    public string[] Resources {
-        get => this.ResourceCollection.Split(",");
-        set => this.ResourceCollection = string.Join(',', value);
-    }
-
     [XmlIgnore]
     [JsonIgnore]
     public int LocationId { get; set; }
-
-    [XmlIgnore]
-    public int CreatorId { get; set; }
-
-    [ForeignKey(nameof(CreatorId))]
-    [JsonIgnore]
-    public User? Creator { get; set; }
 
     /// <summary>
     ///     The location of the level on the creator's earth
@@ -96,44 +72,6 @@ public class Slot
     [ForeignKey(nameof(LocationId))]
     [JsonIgnore]
     public Location? Location { get; set; }
-
-    [XmlElement("initiallyLocked")]
-    public bool InitiallyLocked { get; set; }
-
-    [XmlElement("isSubLevel")]
-    public bool SubLevel { get; set; }
-
-    [XmlElement("isLBP1Only")]
-    public bool Lbp1Only { get; set; }
-
-    [XmlElement("shareable")]
-    public int Shareable { get; set; }
-
-    [XmlElement("authorLabels")]
-    public string AuthorLabels { get; set; } = "";
-
-    public string[] LevelTags
-    {
-        get
-        {
-            if (this.GameVersion != GameVersion.LittleBigPlanet1) return Array.Empty<string>();
-
-            // Sort tags by most popular
-            SortedDictionary<string, int> occurrences = new();
-            foreach (RatedLevel r in this.database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0))
-            {
-                if (!occurrences.ContainsKey(r.TagLBP1))
-                    occurrences.Add(r.TagLBP1, 1);
-                else
-                    occurrences[r.TagLBP1]++;
-            }
-            return occurrences.OrderBy(r => r.Value).Select(r => r.Key).ToArray();
-        }
-    }
-
-    [XmlElement("background")]
-    [JsonIgnore]
-    public string BackgroundHash { get; set; } = "";
 
     [XmlElement("minPlayers")]
     public int MinimumPlayers { get; set; }
@@ -170,6 +108,13 @@ public class Slot
     [NotMapped]
     [JsonIgnore]
     public int Photos => this.database.Photos.Count(p => p.SlotId == this.SlotId);
+
+    [XmlIgnore]
+    public int CreatorId { get; set; }
+
+    [ForeignKey(nameof(CreatorId))]
+    [JsonIgnore]
+    public User? Creator { get; set; }
 
     [XmlIgnore]
     [NotMapped]
@@ -251,36 +196,12 @@ public class Slot
 
     [XmlElement("leveltype")]
     public string LevelType { get; set; } = "";
-
-    [XmlElement("vitaCrossControlRequired")]
-    public bool CrossControllerRequired { get; set; }
-
-    // Sub-slots offered by LBP Adventures
-    [NotMapped]
-    [XmlElement("slots")]
-    public SubSlot?[]? adventureSlots { get; set; } = null;
     
     [JsonIgnore]
     public bool Hidden { get; set; }
 
     [JsonIgnore]
     public string HiddenReason { get; set; } = "";
-
-    public string SerializeDevSlot()
-    {
-        int comments = this.Comments;
-        int photos = this.Photos;
-        int players = RoomHelper.Rooms
-            .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)
-            .Sum(r => r.PlayerIds.Count);
-
-        string slotData = LbpSerializer.StringElement("id", this.InternalSlotId) +
-                          LbpSerializer.StringElement("playerCount", players) +
-                          LbpSerializer.StringElement("commentCount", comments) +
-                          LbpSerializer.StringElement("photoCount", photos);
-
-        return LbpSerializer.TaggedStringElement("slot", slotData, "type", "developer");
-    }
 
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;
@@ -294,34 +215,18 @@ public class Slot
         bool fullSerialization = false
     )
     {
-        if (this.Type == SlotType.Developer) return this.SerializeDevSlot();
-        SubSlot?[]? adventureSlots = this.adventureSlots;
-        string? advSlotsSerialized = null;
-        if (this.isAdventurePlanet && this.adventureSlots != null) {
-            advSlotsSerialized = "";
-            foreach (var slot in adventureSlots!)
-            {
-                advSlotsSerialized += slot!.Serialize();
-            }
-        }
+        Console.WriteLine(this.ToString());
 
         int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
         
         string slotData = LbpSerializer.StringElement("id", this.SlotId) +
-                          LbpSerializer.StringElement("npHandle", this.Creator?.Username) +
                           LbpSerializer.StringElement("location", this.Location?.Serialize()) +
+                          LbpSerializer.StringElement("npHandle", this.Creator?.Username) +
                           LbpSerializer.StringElement("game", (int)this.GameVersion) +
                           LbpSerializer.StringElement("name", this.Name) +
                           LbpSerializer.StringElement("description", this.Description) +
                           LbpSerializer.StringElement("rootLevel", this.RootLevel) +
-                          LbpSerializer.StringElement("icon", this.IconHash) +
-                          LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
-                          LbpSerializer.StringElement("isSubLevel", this.SubLevel) +
-                          LbpSerializer.StringElement("isLBP1Only", this.Lbp1Only) +
-                          LbpSerializer.StringElement("isAdventurePlanet", this.isAdventurePlanet) +
-                          LbpSerializer.StringElement("background", this.BackgroundHash) +
-                          LbpSerializer.StringElement("shareable", this.Shareable) +
-                          LbpSerializer.StringElement("authorLabels", this.AuthorLabels) +
+                        //   LbpSerializer.StringElement("isAdventurePlanet", this.isAdventurePlanet) +
                           LbpSerializer.StringElement("leveltype", this.LevelType) +
                           LbpSerializer.StringElement("minPlayers", this.MinimumPlayers) +
                           LbpSerializer.StringElement("maxPlayers", this.MaximumPlayers) +
@@ -332,7 +237,6 @@ public class Slot
                           LbpSerializer.StringElement("playerCount", playerCount) +
                           LbpSerializer.StringElement("mmpick", this.TeamPick) +
                           (fullSerialization ? LbpSerializer.StringElement("moveRequired", this.MoveRequired) : "") +
-                          (fullSerialization ? LbpSerializer.StringElement("crossControlRequired", this.CrossControllerRequired) : "") +
                           (yourRatingStats != null ?
                               LbpSerializer.StringElement<double>("yourRating", yourRatingStats.RatingLBP1, true) +
                               LbpSerializer.StringElement<int>("yourDPadRating", yourRatingStats.Rating, true)
@@ -346,8 +250,6 @@ public class Slot
                           LbpSerializer.StringElement("commentCount", this.Comments) +
                           LbpSerializer.StringElement("photoCount", this.Photos) +
                           LbpSerializer.StringElement("authorPhotoCount", this.PhotosWithAuthor) +
-                          (fullSerialization ? LbpSerializer.StringElement<string>("tags", string.Join(",", this.LevelTags), true) : "") +
-                          (fullSerialization ? LbpSerializer.StringElement<string>("labels", this.AuthorLabels, true) : "") +
                           LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
                           LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
                           (fullSerialization ?
@@ -366,14 +268,9 @@ public class Slot
 
                           LbpSerializer.StringElement("lbp3PlayCount", this.PlaysLBP3) +
                           LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
-                          LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
-                          (gameVersion == GameVersion.LittleBigPlanetVita ?
-                              LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize))
-                              : "");
-        if (advSlotsSerialized != null) {
-            slotData += LbpSerializer.StringElement("slots", advSlotsSerialized);
-        }
+                          LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique);
 
+        Console.WriteLine(slotData);
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
     }
 }

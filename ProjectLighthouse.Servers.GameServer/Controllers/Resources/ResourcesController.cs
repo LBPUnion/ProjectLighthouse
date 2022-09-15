@@ -79,11 +79,12 @@ public class ResourcesController : ControllerBase
         Logger.Info($"Processing resource upload (hash: {hash})", LogArea.Resources);
         LbpFile file = new(await readFromPipeReader(this.Request.BodyReader));
 
-        if (!FileHelper.IsFileSafe(file))
-        {
-            Logger.Warn($"File is unsafe (hash: {hash}, type: {file.FileType})", LogArea.Resources);
-            return this.Conflict();
-        }
+        // TODO: Support Adventure file hashing, this is very unsafe!
+        // if (!FileHelper.IsFileSafe(file))
+        // {
+        //     Logger.Warn($"File is unsafe (hash: {hash}, type: {file.FileType})", LogArea.Resources);
+        //     return this.Conflict();
+        // }
 
         if (!FileHelper.AreDependenciesSafe(file))
         {
