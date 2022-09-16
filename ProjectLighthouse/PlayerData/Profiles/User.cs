@@ -49,7 +49,7 @@ public class User
 
     [NotMapped]
     [JsonIgnore]
-    public int Lists => 0;
+    public int Lists => this.database.Playlists.Count(p => p.CreatorId == this.UserId);
 
     /// <summary>
     ///     A user-customizable biography shown on the profile card
@@ -183,6 +183,7 @@ public class User
     /// <summary>
     /// ARRR! Forces the user to see Pirate English translations on the website.
     /// </summary>
+    [NotMapped]
     public bool IsAPirate { get; set; }
 
     public PrivacyType LevelVisibility { get; set; } = PrivacyType.All;
@@ -197,14 +198,14 @@ public class User
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                       LbpSerializer.StringElement("game", (int)gameVersion) +
                       this.serializeSlots(gameVersion) +
-                      LbpSerializer.StringElement<string>("lists", this.Lists, true) +
-                      LbpSerializer.StringElement<string>
+                      LbpSerializer.StringElement<int>("lists", this.Lists, true) +
+                      LbpSerializer.StringElement<int>
                       (
                           "lists_quota",
                           ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota,
                           true
                       ) + // technically not a part of the user but LBP expects it
-                      LbpSerializer.StringElement<string>("heartCount", this.Hearts, true) +
+                      LbpSerializer.StringElement<int>("heartCount", this.Hearts, true) +
                       this.serializeEarth(gameVersion) +
                       LbpSerializer.StringElement<string>("yay2", this.YayHash, true) +
                       LbpSerializer.StringElement<string>("boo2", this.BooHash, true) +
