@@ -146,7 +146,7 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment");
+        string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment", advId: score.AdvSlotId);
 
         return this.Ok(myRanking);
     }

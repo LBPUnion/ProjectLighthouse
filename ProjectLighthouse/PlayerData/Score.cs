@@ -22,7 +22,7 @@ public class Score
     public Slot Slot { get; set; }
 
     [XmlIgnore]
-    public int? AdvSlotId { get; set; } = null;
+    public int? AdvSlotId { get; set; }
 
     [XmlIgnore]
     [ForeignKey(nameof(AdvSlotId))]
