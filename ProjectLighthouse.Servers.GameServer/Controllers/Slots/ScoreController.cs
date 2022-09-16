@@ -26,7 +26,8 @@ public class ScoreController : ControllerBase
     }
 
     [HttpPost("scoreboard/{slotType}/{id:int}")]
-    public async Task<IActionResult> SubmitScore(string slotType, int id, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
+    [HttpPost("scoreboard/{slotType}/{id:int}/{advId:int}")]
+    public async Task<IActionResult> SubmitScore(string slotType, int id, int? advId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -78,6 +79,7 @@ public class ScoreController : ControllerBase
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
         score.SlotId = id;
+        score.AdvSlotId = advId;
 
         Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
         if (slot == null)
@@ -116,12 +118,19 @@ public class ScoreController : ControllerBase
                 Type = score.Type,
                 Points = score.Points,
                 SlotId = score.SlotId,
+                AdvSlotId = score.AdvSlotId
             };
 
-            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
-                .Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
+            IQueryable<Score> existingScore;
+            if(playerScore.AdvSlotId != 0) {
+                existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId && s.AdvSlotId == playerScore.AdvSlotId);
+                
+            }
+            else {
+                existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId);
+            }
+            existingScore = existingScore.Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
                 .Where(s => s.Type == playerScore.Type);
-
             if (existingScore.Any())
             {
                 Score first = existingScore.First(s => s.SlotId == playerScore.SlotId);
@@ -143,7 +152,8 @@ public class ScoreController : ControllerBase
     }
 
     [HttpGet("friendscores/{slotType}/{slotId:int}/{type:int}")]
-    public async Task<IActionResult> FriendScores(string slotType, int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+    [HttpGet("friendscores/{slotType}/{slotId:int}/{advId:int}/{type:int}")]
+    public async Task<IActionResult> FriendScores(string slotType, int slotId, int? advId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -169,12 +179,13 @@ public class ScoreController : ControllerBase
             if (friendUsername != null) friendNames.Add(friendUsername);
         }
 
-        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, "scores", friendNames.ToArray())); 
+        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, "scores", friendNames.ToArray(), advId)); 
     }
 
     [HttpGet("topscores/{slotType}/{slotId:int}/{type:int}")]
+    [HttpGet("topscores/{slotType}/{slotId:int}/{advId:int}/{type:int}")]
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    public async Task<IActionResult> TopScores(string slotType, int slotId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+    public async Task<IActionResult> TopScores(string slotType, int slotId, int? advId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -187,7 +198,7 @@ public class ScoreController : ControllerBase
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize));
+        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, advId: advId));
     }
 
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -199,15 +210,23 @@ public class ScoreController : ControllerBase
         int pageStart = -1,
         int pageSize = 5,
         string rootName = "scores",
-        string[]? playerIds = null
+        string[]? playerIds = null,
+        int? advId = null
     )
     {
 
+        
+        IQueryable<Score> scores;
+        if (advId != null) {
+            scores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type && s.AdvSlotId == advId);
+        }
+        else {
+            scores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type);
+        }
+
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
-        var rankedScores = this.database.Scores
-            .Where(s => s.SlotId == slotId && s.Type == type)
-            .AsEnumerable()
+        var rankedScores = scores.AsEnumerable()
             .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
