@@ -258,7 +258,7 @@ public class Slot
     // Sub-slots offered by LBP Adventures
     [NotMapped]
     [XmlElement("slots")]
-    public SubSlot?[]? adventureSlots { get; set; } = null;
+    public AdvSlot?[]? adventureSlots { get; set; } = null;
     
     [JsonIgnore]
     public bool Hidden { get; set; }
@@ -295,7 +295,7 @@ public class Slot
     )
     {
         if (this.Type == SlotType.Developer) return this.SerializeDevSlot();
-        SubSlot?[]? adventureSlots = this.adventureSlots;
+        AdvSlot?[]? adventureSlots = this.adventureSlots;
         string? advSlotsSerialized = null;
         if (this.isAdventurePlanet && this.adventureSlots != null) {
             advSlotsSerialized = "";
