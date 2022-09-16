@@ -92,20 +92,10 @@ public class PublishController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        // Check if the game is LBP3 
-        // This will run some checks in the future potentially?
-        string lbp3Check = Request.Query["game"];
-        if (lbp3Check == "lbp3") {
-            
-        }
-        Logger.Debug(lbp3Check, LogArea.Publish);
         // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
         Slot? slot = await this.getSlotFromBody();
-
-        // No longer needed
-        // bool? isLBP3Adventure = slot?.isAdventurePlanet;
 
         if (slot == null)
         {
@@ -131,15 +121,11 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        // TODO: Fix this.
-        // Strictly for for debugging purposes.
-        // Adventure resources are not recognized (yet)
-        // Corrupted levels can be uploaded due to this, do NOT use in production!
-        // if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
-        // {
-        //     Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
-        //     return this.BadRequest();
-        // }
+        if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
+        {
+            Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
+            return this.BadRequest();
+        }
 
         LbpFile? rootLevel = LbpFile.FromHash(slot.RootLevel);
 
@@ -148,12 +134,13 @@ public class PublishController : ControllerBase
             Logger.Warn("Rejecting level upload, unable to find rootLevel", LogArea.Publish);
             return this.BadRequest();
         }
-        // TODO: Implement Adventure File Type
-        // if (rootLevel.FileType != LbpFileType.Level)
-        // {
-        //     Logger.Warn("Rejecting level upload, rootLevel is not a level", LogArea.Publish);
-        //     return this.BadRequest();
-        // }
+
+        if (rootLevel.FileType != LbpFileType.Level &&
+            rootLevel.FileType != LbpFileType.Adventure)
+        {
+            Logger.Warn("Rejecting level upload, rootLevel is not a level or LBP 3 Adventure", LogArea.Publish);
+            return this.BadRequest();
+        }
 
         GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
 
