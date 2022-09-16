@@ -122,7 +122,7 @@ public class ScoreController : ControllerBase
             };
 
             IQueryable<Score> existingScore;
-            if(playerScore.AdvSlotId != 0) {
+            if(playerScore.AdvSlotId != null) {
                 existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId && s.AdvSlotId == playerScore.AdvSlotId);
                 
             }
