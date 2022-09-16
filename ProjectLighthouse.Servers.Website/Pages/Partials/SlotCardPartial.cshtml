@@ -50,6 +50,7 @@
         else
         {
             <img src="~/assets/advSlotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; opacity: 50%;">
+            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: -1;">
             <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; -webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" 
              onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
         }
