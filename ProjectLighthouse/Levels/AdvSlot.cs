@@ -81,10 +81,6 @@ public class AdvSlot
         bool fullSerialization = false
     )
     {
-        Console.WriteLine(this.ToString());
-
-        int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
-        
         string slotData = LbpSerializer.StringElement("id", this.SlotId) +
                           LbpSerializer.StringElement("name", this.Name) +
                           LbpSerializer.StringElement("description", this.Description) +
