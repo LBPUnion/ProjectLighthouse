@@ -5,7 +5,6 @@
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
 
 @{
@@ -15,8 +14,9 @@
     Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
     Model.Description = Model.ProfileUser!.Biography;
 
-    bool isMobile = this.Request.IsMobile();
+    bool isMobile = Request.IsMobile();
     string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
 }
 
 @if (Model.ProfileUser.IsBanned)
@@ -50,7 +50,10 @@
             },
             {
                 "Language", Model.GetLanguage()
-            }
+            },
+            {
+                "TimeZone", Model.GetTimeZone()
+            },
         })
     </div>
     <div class="eight wide right aligned column">
@@ -72,13 +75,15 @@
                 </a>
             }
         }
+        @if (Model.ProfileUser == Model.User || (Model.User?.IsModerator ?? false))
+        {
+            <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/settings">
+                <i class="cog icon"></i>
+                <span>Settings</span>
+            </a>
+        }
         @if (Model.ProfileUser == Model.User)
         {
-            <a class="ui blue button" href="/passwordReset">
-                <i class="key icon"></i>
-                <span>@Model.Translate(GeneralStrings.ResetPassword)</span>
-            </a>
-
             <a href="/logout" class="ui red button">
                 <i class="user slash icon"></i>
                 @Model.Translate(BaseLayoutStrings.HeaderLogout)
@@ -129,7 +134,7 @@
             {
                 string width = isMobile ? "sixteen" : "eight";
                 <div class="@width wide column">
-                    @await photo.ToHtml(Html, ViewData, language)
+                    @await photo.ToHtml(Html, ViewData, language, timeZone)
                 </div>
             }
         </div>
@@ -140,7 +145,7 @@
     }
 }
 
-@await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language))
+@await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
 
 @if (Model.User != null && Model.User.IsModerator)
 {

@@ -1,8 +1,6 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +28,7 @@ public class ModerationSlotController : ControllerBase
         slot.TeamPick = true;
 
         await this.database.SaveChangesAsync();
-        return this.Ok();
+        return this.Redirect("~/slot/" + id);
     }
 
     [HttpGet("removeTeamPick")]
@@ -44,7 +42,7 @@ public class ModerationSlotController : ControllerBase
         slot.TeamPick = false;
 
         await this.database.SaveChangesAsync();
-        return this.Ok();
+        return this.Redirect("~/slot/" + id);
     }
 
     [HttpGet("delete")]
@@ -58,6 +56,6 @@ public class ModerationSlotController : ControllerBase
 
         await this.database.RemoveSlot(slot);
 
-        return this.Ok();
+        return this.Redirect("~/slots/0");
     }
 }

@@ -1,12 +1,13 @@
 #nullable enable
+using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,8 @@ public class SetEmailForm : BaseLayout
     {}
 
     public EmailSetToken? EmailToken;
+
+    public string? Error { get; private set; }
 
     public async Task<IActionResult> OnGet(string? token = null)
     {
@@ -32,12 +35,20 @@ public class SetEmailForm : BaseLayout
         return this.Page();
     }
 
+    [SuppressMessage("ReSharper", "SpecifyStringComparison")]
     public async Task<IActionResult> OnPost(string emailAddress, string token)
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled) return this.NotFound();
 
         EmailSetToken? emailToken = await this.Database.EmailSetTokens.Include(t => t.User).FirstOrDefaultAsync(t => t.EmailToken == token);
         if (emailToken == null) return this.Redirect("/login");
+
+        if (await this.Database.Users.AnyAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == emailAddress.ToLower()))
+        {
+            this.Error = this.Translate(ErrorStrings.EmailTaken);
+            this.EmailToken = emailToken;
+            return this.Page();
+        }
 
         emailToken.User.EmailAddress = emailAddress;
         this.Database.EmailSetTokens.Remove(emailToken);

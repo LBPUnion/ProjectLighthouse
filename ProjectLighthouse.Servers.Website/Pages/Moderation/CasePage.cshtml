@@ -1,10 +1,13 @@
 @page "/moderation/cases/{pageNumber:int}"
 @using LBPUnion.ProjectLighthouse.Administration
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.CasePage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = "Cases";
+
+    string timeZone = Model.GetTimeZone();
 }
 
 <p>There are @Model.CaseCount total cases, @Model.DismissedCaseCount of which have been dismissed.</p>
@@ -20,5 +23,5 @@
 
 @foreach (ModerationCase @case in Model.Cases)
 {
-    @(await Html.PartialAsync("Partials/ModerationCasePartial", @case))
+    @(await Html.PartialAsync("Partials/ModerationCasePartial", @case, ViewData.WithTime(timeZone)))
 }
