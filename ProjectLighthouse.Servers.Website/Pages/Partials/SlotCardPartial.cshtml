@@ -42,16 +42,16 @@
     <div>
         @if (!isAdventure)
         {
-            <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute">
-            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: -1;">
-            <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px;"
+            <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">
+            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1;">
+            <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2;" 
              onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
         }
         else
         {
-            <img src="~/assets/advSlotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; opacity: 50%;">
-            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: -1;">
-            <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; -webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" 
+            <img src="~/assets/advSlotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 3; opacity: 50%;">
+            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; -webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain;">
+            <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: 100px; width: 100px; height: 100px; position: relative; z-index: 2; -webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" 
              onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
         }
         
