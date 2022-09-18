@@ -76,7 +76,6 @@ public class PhotosController : ControllerBase
                 case SlotType.Local:
                 case SlotType.Developer:
                 {
-                    // TODO: Verify that Sumo Digital story adventures use InternalSlotId or something else.
                     Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == photoSlot.SlotType && s.InternalSlotId == photoSlot.SlotId);
                     if (slot != null) 
                         photoSlot.SlotId = slot.SlotId;
