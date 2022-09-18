@@ -4,8 +4,8 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
@@ -13,6 +13,8 @@ public class SendVerificationEmailPage : BaseLayout
 {
     public SendVerificationEmailPage(Database database) : base(database)
     {}
+
+    public bool Success { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -33,29 +35,29 @@ public class SendVerificationEmailPage : BaseLayout
         }
         #endif
 
-        EmailVerificationToken verifyToken = new()
+        EmailVerificationToken? verifyToken = await this.Database.EmailVerificationTokens.FirstOrDefaultAsync(v => v.UserId == user.UserId); 
+        // If user doesn't have a token or it is expired then regenerate
+        if (verifyToken == null || DateTime.Now > verifyToken.ExpiresAt)
         {
-            UserId = user.UserId,
-            User = user,
-            EmailToken = CryptoHelper.GenerateAuthToken(),
-        };
+            verifyToken = new EmailVerificationToken
+            {
+                UserId = user.UserId,
+                User = user,
+                EmailToken = CryptoHelper.GenerateAuthToken(),
+                ExpiresAt = DateTime.Now.AddHours(6),
+            };
 
-        this.Database.EmailVerificationTokens.Add(verifyToken);
-
-        await this.Database.SaveChangesAsync();
+            this.Database.EmailVerificationTokens.Add(verifyToken);
+            await this.Database.SaveChangesAsync();
+        }
 
         string body = "Hello,\n\n" +
                       $"This email is a request to verify this email for your (likely new!) Project Lighthouse account ({user.Username}).\n\n" +
                       $"To verify your account, click the following link: {ServerConfiguration.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}\n\n\n" +
                       "If this wasn't you, feel free to ignore this email.";
 
-        if (SMTPHelper.SendEmail(user.EmailAddress, "Project Lighthouse Email Verification", body))
-        {
-            return this.Page();
-        }
-        else
-        {
-            throw new Exception("failed to send email");
-        }
+        this.Success = SMTPHelper.SendEmail(user.EmailAddress, "Project Lighthouse Email Verification", body);
+
+        return this.Page();
     }
 }

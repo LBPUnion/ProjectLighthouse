@@ -80,6 +80,7 @@ public class WebsiteStartup
 
         app.UseMiddleware<HandlePageErrorMiddleware>();
         app.UseMiddleware<RequestLogMiddleware>();
+        app.UseMiddleware<UserRequiredRedirectMiddleware>();
 
         app.UseRouting();
 

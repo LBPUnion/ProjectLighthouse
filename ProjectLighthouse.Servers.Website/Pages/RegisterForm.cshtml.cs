@@ -72,7 +72,7 @@ public class RegisterForm : BaseLayout
         }
 
         if (ServerConfiguration.Instance.Mail.MailEnabled &&
-            await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == emailAddress.ToLower()) != null)
+            await this.Database.Users.AnyAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == emailAddress.ToLower()))
         {
             this.Error = this.Translate(ErrorStrings.EmailTaken);
             return this.Page();
@@ -86,7 +86,7 @@ public class RegisterForm : BaseLayout
 
         if (this.Request.Query.ContainsKey("token"))
         {
-            await Database.RemoveRegistrationToken(this.Request.Query["token"]);
+            await this.Database.RemoveRegistrationToken(this.Request.Query["token"]);
         }
 
         User user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);

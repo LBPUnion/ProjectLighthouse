@@ -30,8 +30,9 @@ public static class SanitizationHelper
         }
     }
 
-    public static string SanitizeString(string input)
+    public static string SanitizeString(string? input)
     {
+        if (input == null) return "";
 
         foreach ((string? key, string? value) in charsToReplace)
         {

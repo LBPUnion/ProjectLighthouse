@@ -124,7 +124,7 @@ public static class LocalizationManager
             .Where(r => r != "resources")
             .ToList();
 
-        languages.Add(DefaultLang);
+        languages.Insert(0, DefaultLang);
 
         return languages;
     }

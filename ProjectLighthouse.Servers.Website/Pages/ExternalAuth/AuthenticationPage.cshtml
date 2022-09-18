@@ -5,6 +5,8 @@
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = "Authentication";
+    string timeZone = Model.GetTimeZone();
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
 @if (Model.AuthenticationAttempts.Count == 0)
@@ -41,9 +43,9 @@ else
 
 @foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
 {
-    DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(authAttempt.Timestamp).ToLocalTime();
+    DateTimeOffset timestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeSeconds(authAttempt.Timestamp), timeZoneInfo);
     <div class="ui red segment">
-        <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
+        <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("M/d/yyyy @ h:mm tt")</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
         <div>
             <a href="/authentication/autoApprove/@authAttempt.AuthenticationAttemptId">
                 <button class="ui small green button">
