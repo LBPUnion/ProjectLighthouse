@@ -88,7 +88,13 @@ function onSubmit(e){
                                     selected = " selected=\"selected\"";
                                 }
                                 string langName = new CultureInfo(lang).DisplayName;
-                                if (lang == "en-PT") langName = "Pirate Speak (The Seven Seas)";
+                                langName = lang switch
+                                {
+                                    "en-PT" => "Pirate Speak (The Seven Seas)",
+                                    "zh-CN" => "Simplified Chinese",
+                                    "zh-TW" => "Traditional Chinese",
+                                    _ => langName,
+                                    };
                                 <option value="@lang"@selected>@langName</option>
                             }
                         </select>
