@@ -356,6 +356,8 @@ public class Slot
                           (gameVersion == GameVersion.LittleBigPlanetVita ?
                               LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize))
                               : "");
+
+
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
     }
 }
