@@ -29,10 +29,10 @@ public class SlotSettingsPage : BaseLayout
         if (avatarHash != null) this.Slot.IconHash = avatarHash;
 
         name = SanitizationHelper.SanitizeString(name);
-        if (this.Slot.Name != name) this.Slot.Name = name;
+        if (this.Slot.Name != name && name.Length <= 64) this.Slot.Name = name;
 
         description = SanitizationHelper.SanitizeString(description);
-        if (this.Slot.Description != description) this.Slot.Description = description;
+        if (this.Slot.Description != description && description.Length <= 512) this.Slot.Description = description;
 
         labels = LabelHelper.RemoveInvalidLabels(SanitizationHelper.SanitizeString(labels));
         if (this.Slot.AuthorLabels != labels) this.Slot.AuthorLabels = labels;

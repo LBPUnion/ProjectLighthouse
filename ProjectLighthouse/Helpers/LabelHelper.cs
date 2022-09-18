@@ -110,6 +110,8 @@ public static class LabelHelper
     public static string RemoveInvalidLabels(string authorLabels)
     {
         List<string> labels = new(authorLabels.Split(","));
+        if (labels.Count > 5) labels = labels.GetRange(0, 5);
+
         for (int i = labels.Count - 1; i >= 0; i--)
         {
             if (!IsValidLabel(labels[i])) labels.Remove(labels[i]);

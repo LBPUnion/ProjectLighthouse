@@ -37,7 +37,7 @@ public class UserSettingsPage : BaseLayout
 
         biography = SanitizationHelper.SanitizeString(biography);
 
-        if (this.ProfileUser.Biography != biography) this.ProfileUser.Biography = biography;
+        if (this.ProfileUser.Biography != biography && biography.Length <= 512) this.ProfileUser.Biography = biography;
 
         if (ServerConfiguration.Instance.Mail.MailEnabled && IsValidEmail(email) && (this.User == this.ProfileUser || this.User.IsAdmin))
         {
