@@ -1,10 +1,12 @@
 ﻿@page "/moderation/reports/{pageNumber:int}"
 @using LBPUnion.ProjectLighthouse.Administration.Reports
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.ReportsPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = "Reports";
+    string timeZone = Model.GetTimeZone();
 }
 
 <p>There are @Model.ReportCount total reports.</p>
@@ -28,7 +30,7 @@
 
 @foreach (GriefReport report in Model.Reports)
 {
-    @await Html.PartialAsync("Partials/ReportPartial", report)
+    @await Html.PartialAsync("Partials/ReportPartial", report, ViewData.WithTime(timeZone))
 }
 
 @await Html.PartialAsync("Partials/RenderReportBoundsPartial")

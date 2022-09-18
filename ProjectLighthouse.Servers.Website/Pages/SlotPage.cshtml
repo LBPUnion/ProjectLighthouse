@@ -19,6 +19,7 @@
 
     bool isMobile = this.Request.IsMobile();
     string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
 }
 
 @if (Model.Slot!.Hidden)
@@ -96,7 +97,7 @@
         <br/>
     }
     <div class="eight wide column">
-        @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language))
+        @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
     </div>
     @if (isMobile)
     {
@@ -216,7 +217,7 @@
             @foreach (Photo photo in Model.Photos)
             {
                 <div class="eight wide column">
-                    @await photo.ToHtml(Html, ViewData, language)
+                    @await photo.ToHtml(Html, ViewData, language, timeZone)
                 </div>
             }
         </div>

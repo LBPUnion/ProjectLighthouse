@@ -6,6 +6,8 @@
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
 <div class="ui yellow segment" id="comments">
@@ -85,7 +87,7 @@
                     <span>@decodedMessage</span>
                 }
                 <p>
-                    <i>@timestamp.ToString("MM/dd/yyyy @ h:mm tt") UTC</i>
+                    <i>@TimeZoneInfo.ConvertTime(timestamp, timeZoneInfo).ToString("M/d/yyyy @ h:mm:ss tt")</i>
                 </p>
                 @if (i != Model.Comments.Count - 1)
                 {

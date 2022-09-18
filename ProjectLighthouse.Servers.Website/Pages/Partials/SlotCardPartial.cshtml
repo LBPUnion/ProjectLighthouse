@@ -18,6 +18,8 @@
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
     bool mini = (bool?)ViewData["IsMini"] ?? false;
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 
     bool isQueued = false;
     bool isHearted = false;
@@ -102,12 +104,24 @@
         </div>
         @if (Model.Creator != null)
         {
+            string date = "";
+            if(!mini)
+                date = " on " + TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.FirstUploaded), timeZoneInfo).DateTime.ToShortDateString();
             <p>
-                <i>Created by @await Model.Creator.ToLink(Html, ViewData, language) on @Model.GameVersion.ToPrettyString()</i>
+                <i>Created by @await Model.Creator.ToLink(Html, ViewData, language) in @Model.GameVersion.ToPrettyString()@date</i>
             </p>
         }
     </div>
     <div class="cardButtons">
+            <br>
+            @if (user != null && !mini && (user.IsModerator || user.UserId == Model.CreatorId))
+            {
+                <a class="ui blue tiny button" href="/slot/@Model.SlotId/settings" title="Settings">
+                    <i class="cog icon" style="margin: 0"></i>
+                </a>
+            }
+        </div>
+    <div class="cardButtons" style="margin-left: 0">
         <br>
         @if (user != null && !mini)
         {

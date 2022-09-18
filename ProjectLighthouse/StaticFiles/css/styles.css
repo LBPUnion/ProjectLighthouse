@@ -160,3 +160,26 @@ div.cardStatsUnderTitle > span {
 }
 
 /*#endregion Comments*/
+
+/*#region Slot labels */
+
+.selected {
+    color: #fff !important;
+    background-color: #0e91f5 !important;
+}
+
+.selected:hover {
+    background-color: #0084ea !important;
+}
+
+.skew {
+    --scale: scale(1, 1);
+    --skew: rotate(0deg);
+    transition: transform 0.25s !important;
+    transform: var(--skew) var(--scale);
+}
+.skew:hover {
+    --scale: scale(1.2, 1.2);
+}
+
+/*#endregion Slot labels */

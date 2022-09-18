@@ -53,8 +53,11 @@ public class ListController : ControllerBase
 
         return this.Ok
         (
-            LbpSerializer.TaggedStringElement
-                ("slots", response, "total", this.database.QueuedLevels.Include(q => q.User).Count(q => q.User.Username == username))
+            LbpSerializer.TaggedStringElement("slots", response, new Dictionary<string, object>
+            {
+                { "total", await this.database.QueuedLevels.CountAsync(q => q.UserId == token.UserId) },
+                { "hint_start", pageStart + Math.Min(pageSize, 30) },
+            })
         );
     }
 
@@ -136,7 +139,7 @@ public class ListController : ControllerBase
         (
             LbpSerializer.TaggedStringElement("favouriteSlots", response, new Dictionary<string, object>
             {
-                { "total", this.database.HeartedLevels.Count(q => q.UserId == targetUser.UserId) },
+                { "total", await this.database.HeartedLevels.CountAsync(q => q.UserId == targetUser.UserId) },
                 { "hint_start", pageStart + Math.Min(pageSize, 30) },
             })
         );
@@ -225,7 +228,7 @@ public class ListController : ControllerBase
         (
             LbpSerializer.TaggedStringElement("favouriteUsers", response, new Dictionary<string, object>
             {
-                { "total", this.database.HeartedProfiles.Count(q => q.UserId == targetUser.UserId) },
+                { "total", await this.database.HeartedProfiles.CountAsync(q => q.UserId == targetUser.UserId) },
                 { "hint_start", pageStart + Math.Min(pageSize, 30) },
             })
         );

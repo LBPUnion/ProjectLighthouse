@@ -7,7 +7,7 @@
 }
 <!--suppress GrazieInspection -->
 
-@if (!Model.User!.IsAPirate)
+@if (Model.User!.Language != "en-PT")
 {
     <p>So, ye wanna be a pirate? Well, ye came to the right place!</p>
     <p>Just click this 'ere button, and welcome aboard!</p>

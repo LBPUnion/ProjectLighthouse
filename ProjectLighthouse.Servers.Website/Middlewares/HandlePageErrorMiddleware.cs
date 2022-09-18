@@ -10,7 +10,6 @@ public class HandlePageErrorMiddleware : Middleware
     public override async Task InvokeAsync(HttpContext ctx)
     {
         await this.next(ctx);
-//        ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         if (ctx.Response.StatusCode == 404 && !ctx.Request.Path.StartsWithSegments("/gameAssets"))
         {
             try
@@ -20,7 +19,7 @@ public class HandlePageErrorMiddleware : Middleware
             finally
             {
                 // not much we can do to save us, carry on anyways
-                await next(ctx);
+                await this.next(ctx);
             }
         }
     }
