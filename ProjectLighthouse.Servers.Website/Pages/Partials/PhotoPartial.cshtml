@@ -37,14 +37,7 @@
             {
                 case SlotType.User:
                     <span>
-                        @if (Model.Slot.IsAdventurePlanet)
-                        {
-                            <span>on an adventure in </span>
-                        } 
-                        else 
-                        {
-                            <span>in level </span>
-                        }
+                        @(Model.Slot.IsAdventurePlanet ? "on an adventure in" : "in level")
                         <b><a href="/slot/@Model.SlotId">@HttpUtility.HtmlDecode(Model.Slot.Name)</a></b>
                     </span>
                     break;
