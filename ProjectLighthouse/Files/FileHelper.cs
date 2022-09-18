@@ -191,6 +191,7 @@ public static class FileHelper
             "VOPb" => LbpFileType.Voice,
             "LVLb" => LbpFileType.Level,
             "ADCb" => LbpFileType.Adventure,
+            "ADSb" => LbpFileType.Adventure,
             "PLNb" => LbpFileType.Plan,
             "QSTb" => LbpFileType.Quest,
             _ => readAlternateHeader(reader),

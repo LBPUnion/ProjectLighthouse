@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20220915154400_AddisAdventureColumn")]
+    [Migration("20220918154500_AddIsAdventureColumn")]
     public partial class AddisAdventureColumn : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<long>(
-                name: "isAdventurePlanet",
+                name: "IsAdventurePlanet",
                 table: "Slots",
                 type: "bool",
                 nullable: false,

@@ -215,18 +215,11 @@ public class ScoreController : ControllerBase
     )
     {
 
-        
-        IQueryable<Score> scores;
-        if (advId != null) {
-            scores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type && s.AdvSlotId == advId);
-        }
-        else {
-            scores = this.database.Scores.Where(s => s.SlotId == slotId && s.Type == type);
-        }
-
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
-        var rankedScores = scores.AsEnumerable()
+        var rankedScores = this.database.Scores.AsEnumerable()
+            .Where(s => s.SlotId == slotId && s.Type == type)
+            .Where(s => s.AdvSlotId == null || s.AdvSlotId == advId)
             .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)

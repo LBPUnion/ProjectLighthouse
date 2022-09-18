@@ -40,7 +40,8 @@ public class PublishController : ControllerBase
         GameToken gameToken = userAndToken.Value.Item2;
 
         Slot? slot = await this.getSlotFromBody();
-        if (slot == null) {
+        if (slot == null)
+        {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
             return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
         }
@@ -72,7 +73,7 @@ public class PublishController : ControllerBase
         {
             return this.StatusCode(403, "");
         }
-        
+
         slot.ResourceCollection += "," + slot.IconHash; // tells LBP to upload icon after we process resources here
 
         string resources = slot.Resources.Where
@@ -135,11 +136,21 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (rootLevel.FileType != LbpFileType.Level &&
-            rootLevel.FileType != LbpFileType.Adventure)
+        if (!slot.IsAdventurePlanet)
         {
-            Logger.Warn("Rejecting level upload, rootLevel is not a level or LBP 3 Adventure", LogArea.Publish);
-            return this.BadRequest();
+            if (rootLevel.FileType != LbpFileType.Level)
+            {
+                Logger.Warn("Rejecting level upload, rootLevel is not a level", LogArea.Publish);
+                return this.BadRequest();
+            }
+        }
+        else
+        {
+            if (rootLevel.FileType != LbpFileType.Adventure)
+            {
+                Logger.Warn("Rejecting level upload, rootLevel is not a LBP 3 Adventure", LogArea.Publish);
+                return this.BadRequest();
+            }      
         }
 
         GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
@@ -233,7 +244,7 @@ public class PublishController : ControllerBase
 
         this.database.Slots.Add(slot);
         await this.database.SaveChangesAsync();
-        
+
         if (user.LevelVisibility == PrivacyType.All)
         {
             await WebhookHelper.SendWebhook("New level published!",

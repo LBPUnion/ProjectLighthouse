@@ -61,7 +61,7 @@ public class Slot
     public string IconHash { get; set; } = "";
 
     [XmlElement("isAdventurePlanet")]
-    public bool isAdventurePlanet { get; set; }
+    public bool IsAdventurePlanet { get; set; }
 
     [XmlElement("rootLevel")]
     [JsonIgnore]
@@ -254,11 +254,6 @@ public class Slot
 
     [XmlElement("vitaCrossControlRequired")]
     public bool CrossControllerRequired { get; set; }
-
-    // Sub-slots offered by LBP Adventures
-    [NotMapped]
-    [XmlElement("slots")]
-    public AdvSlot?[]? adventureSlots { get; set; } = null;
     
     [JsonIgnore]
     public bool Hidden { get; set; }
@@ -295,18 +290,9 @@ public class Slot
     )
     {
         if (this.Type == SlotType.Developer) return this.SerializeDevSlot();
-        AdvSlot?[]? adventureSlots = this.adventureSlots;
-        string? advSlotsSerialized = null;
-        if (this.isAdventurePlanet && this.adventureSlots != null) {
-            advSlotsSerialized = "";
-            foreach (var slot in adventureSlots!)
-            {
-                advSlotsSerialized += slot!.Serialize();
-            }
-        }
 
         int playerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
-        
+
         string slotData = LbpSerializer.StringElement("id", this.SlotId) +
                           LbpSerializer.StringElement("npHandle", this.Creator?.Username) +
                           LbpSerializer.StringElement("location", this.Location?.Serialize()) +
@@ -318,7 +304,7 @@ public class Slot
                           LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
                           LbpSerializer.StringElement("isSubLevel", this.SubLevel) +
                           LbpSerializer.StringElement("isLBP1Only", this.Lbp1Only) +
-                          LbpSerializer.StringElement("isAdventurePlanet", this.isAdventurePlanet) +
+                          LbpSerializer.StringElement("isAdventurePlanet", this.IsAdventurePlanet) +
                           LbpSerializer.StringElement("background", this.BackgroundHash) +
                           LbpSerializer.StringElement("shareable", this.Shareable) +
                           LbpSerializer.StringElement("authorLabels", this.AuthorLabels) +
@@ -370,10 +356,6 @@ public class Slot
                           (gameVersion == GameVersion.LittleBigPlanetVita ?
                               LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize))
                               : "");
-        if (advSlotsSerialized != null) {
-            slotData += LbpSerializer.StringElement("slots", advSlotsSerialized);
-        }
-
         return LbpSerializer.TaggedStringElement("slot", slotData, "type", "user");
     }
 }
