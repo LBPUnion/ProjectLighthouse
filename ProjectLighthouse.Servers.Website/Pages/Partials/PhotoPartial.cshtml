@@ -35,7 +35,15 @@
             {
                 case SlotType.User:
                     <span>
-                        in level <b><a href="/slot/@Model.SlotId">@HttpUtility.HtmlDecode(Model.Slot.Name)</a></b>
+                        @if (Model.Slot.IsAdventurePlanet)
+                        {
+                            <span>on an adventure in </span>
+                        } 
+                        else 
+                        {
+                            <span>in level </span>
+                        }
+                        <b><a href="/slot/@Model.SlotId">@HttpUtility.HtmlDecode(Model.Slot.Name)</a></b>
                     </span>
                     break;
                 case SlotType.Developer:

@@ -58,19 +58,25 @@ public class PhotosController : ControllerBase
         {
             bool validLevel = false;
             PhotoSlot photoSlot = photo.XmlLevelInfo;
+            Slot? adventureSlot = null;
             if (photoSlot.SlotType is SlotType.Pod or SlotType.Local) photoSlot.SlotId = 0;
             switch (photoSlot.SlotType)
             {
                 case SlotType.User:
                 {
-                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.SlotId == photoSlot.SlotId);
+                    // We'll grab the slot by the RootLevel and see what happens from here.
+                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.ResourceCollection.Contains(photoSlot.RootLevel));
                     if (slot != null && !string.IsNullOrEmpty(slot.RootLevel)) validLevel = true;
+                    if (slot != null && slot.IsAdventurePlanet) {
+                        adventureSlot = slot;
+                    }
                     break;
                 }
                 case SlotType.Pod:
                 case SlotType.Local:
                 case SlotType.Developer:
                 {
+                    // TODO: Verify that Sumo Digital story adventures use InternalSlotId or something else.
                     Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == photoSlot.SlotType && s.InternalSlotId == photoSlot.SlotId);
                     if (slot != null) 
                         photoSlot.SlotId = slot.SlotId;
@@ -83,7 +89,8 @@ public class PhotosController : ControllerBase
                     break;
             }
 
-            if (validLevel) photo.SlotId = photo.XmlLevelInfo.SlotId;
+            if (validLevel && adventureSlot == null) photo.SlotId = photo.XmlLevelInfo.SlotId;
+            else if (validLevel && adventureSlot != null) photo.SlotId = adventureSlot.SlotId;
         }
 
         if (photo.Subjects.Count > 4) return this.BadRequest();
