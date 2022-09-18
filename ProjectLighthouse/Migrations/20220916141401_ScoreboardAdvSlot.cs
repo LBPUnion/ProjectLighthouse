@@ -13,11 +13,11 @@ namespace ProjectLighthouse.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "AdvSlotId",
+                name: "ChildSlotId",
                 table: "Scores",
                 type: "int",
-                nullable: true,
-                defaultValue: null);
+                nullable: false,
+                defaultValue: 0);
         }
     }
 }

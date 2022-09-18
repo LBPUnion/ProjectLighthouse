@@ -26,8 +26,8 @@ public class ScoreController : ControllerBase
     }
 
     [HttpPost("scoreboard/{slotType}/{id:int}")]
-    [HttpPost("scoreboard/{slotType}/{id:int}/{advId:int}")]
-    public async Task<IActionResult> SubmitScore(string slotType, int id, int? advId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
+    [HttpPost("scoreboard/{slotType}/{id:int}/{childId:int}")]
+    public async Task<IActionResult> SubmitScore(string slotType, int id, int? childId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -79,7 +79,7 @@ public class ScoreController : ControllerBase
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
         score.SlotId = id;
-        score.AdvSlotId = advId;
+        if (childId != 0) score.ChildSlotId = childId;
 
         Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
         if (slot == null)
@@ -118,19 +118,13 @@ public class ScoreController : ControllerBase
                 Type = score.Type,
                 Points = score.Points,
                 SlotId = score.SlotId,
-                AdvSlotId = score.AdvSlotId
+                ChildSlotId = score.ChildSlotId
             };
 
-            IQueryable<Score> existingScore;
-            if(playerScore.AdvSlotId != null) {
-                existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId && s.AdvSlotId == playerScore.AdvSlotId);
-                
-            }
-            else {
-                existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId);
-            }
-            existingScore = existingScore.Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
-                .Where(s => s.Type == playerScore.Type);
+            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
+            .Where(s => childId != 0 || s.ChildSlotId == childId)
+            .Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
+            .Where(s => s.Type == playerScore.Type);
             if (existingScore.Any())
             {
                 Score first = existingScore.First(s => s.SlotId == playerScore.SlotId);
@@ -146,14 +140,14 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment", advId: score.AdvSlotId);
+        string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment", childId: score.ChildSlotId);
 
         return this.Ok(myRanking);
     }
 
     [HttpGet("friendscores/{slotType}/{slotId:int}/{type:int}")]
-    [HttpGet("friendscores/{slotType}/{slotId:int}/{advId:int}/{type:int}")]
-    public async Task<IActionResult> FriendScores(string slotType, int slotId, int? advId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+    [HttpGet("friendscores/{slotType}/{slotId:int}/{childId:int}/{type:int}")]
+    public async Task<IActionResult> FriendScores(string slotType, int slotId, int? childId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -179,13 +173,13 @@ public class ScoreController : ControllerBase
             if (friendUsername != null) friendNames.Add(friendUsername);
         }
 
-        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, "scores", friendNames.ToArray(), advId)); 
+        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, "scores", friendNames.ToArray(), childId)); 
     }
 
     [HttpGet("topscores/{slotType}/{slotId:int}/{type:int}")]
-    [HttpGet("topscores/{slotType}/{slotId:int}/{advId:int}/{type:int}")]
+    [HttpGet("topscores/{slotType}/{slotId:int}/{childId:int}/{type:int}")]
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    public async Task<IActionResult> TopScores(string slotType, int slotId, int? advId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
+    public async Task<IActionResult> TopScores(string slotType, int slotId, int? childId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
@@ -198,7 +192,7 @@ public class ScoreController : ControllerBase
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, advId: advId));
+        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, childId: childId));
     }
 
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -211,7 +205,7 @@ public class ScoreController : ControllerBase
         int pageSize = 5,
         string rootName = "scores",
         string[]? playerIds = null,
-        int? advId = null
+        int? childId = 0
     )
     {
 
@@ -219,7 +213,7 @@ public class ScoreController : ControllerBase
         // var needed for Anonymous type returned from SELECT
         var rankedScores = this.database.Scores.AsEnumerable()
             .Where(s => s.SlotId == slotId && s.Type == type)
-            .Where(s => s.AdvSlotId == null || s.AdvSlotId == advId)
+            .Where(s => s.ChildSlotId == null || s.ChildSlotId == childId)
             .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
