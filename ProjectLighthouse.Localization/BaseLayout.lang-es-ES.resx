@@ -64,7 +64,7 @@
         <value>Página generada por {0}.</value>
     </data>
   <data name="generated_modified" xml:space="preserve">
-        <value>Esta página fue generada usando una versión modificada de Project Lighthouse. Por favor asegúrese de que está revelando correctamente el código principal a los usuarios que están usando está instancia</value>
+        <value>Esta página fue generada usando una versión modificada de Project Lighthouse. Por favor, asegúrese de que está revelando correctamente el código fuente a los usuarios que están usando está instancia</value>
     </data>
   <data name="js_warn" xml:space="preserve">
         <value>Aunque intentemos tener el mínimo de JavaScript posible, no podemos garantizar que todo funcione sin él. Le recomendamos que actives JavaScript para Project Lighthouse.</value>
