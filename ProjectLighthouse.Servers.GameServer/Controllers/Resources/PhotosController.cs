@@ -86,8 +86,7 @@ public class PhotosController : ControllerBase
                     break;
             }
 
-            if (validLevel && adventureSlot == null) photo.SlotId = photo.XmlLevelInfo.SlotId;
-            else if (validLevel && adventureSlot != null) photo.SlotId = adventureSlot.SlotId;
+            if (validLevel) photo.SlotId = (adventureSlot != null) ? adventureSlot.SlotId : photo.XmlLevelInfo.SlotId;
         }
 
         if (photo.Subjects.Count > 4) return this.BadRequest();
