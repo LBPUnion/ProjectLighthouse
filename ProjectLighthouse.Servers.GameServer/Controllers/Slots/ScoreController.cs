@@ -27,7 +27,7 @@ public class ScoreController : ControllerBase
 
     [HttpPost("scoreboard/{slotType}/{id:int}")]
     [HttpPost("scoreboard/{slotType}/{id:int}/{childId:int}")]
-    public async Task<IActionResult> SubmitScore(string slotType, int id, int? childId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
+    public async Task<IActionResult> SubmitScore(string slotType, int id, int childId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
