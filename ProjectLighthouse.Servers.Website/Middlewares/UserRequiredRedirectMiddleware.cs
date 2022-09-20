@@ -19,7 +19,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
         }
 
         // Request ends with a path (e.g. /css/style.css)
-        if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)))
+        if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)) || ctx.Request.Path.StartsWithSegments("/gameAssets"))
         {
             await this.next(ctx);
             return;
