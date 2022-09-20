@@ -58,7 +58,6 @@ public class PhotosController : ControllerBase
         {
             bool validLevel = false;
             PhotoSlot photoSlot = photo.XmlLevelInfo;
-            Slot? adventureSlot = null;
             if (photoSlot.SlotType is SlotType.Pod or SlotType.Local) photoSlot.SlotId = 0;
             switch (photoSlot.SlotType)
             {
@@ -66,8 +65,10 @@ public class PhotosController : ControllerBase
                 {
                     // We'll grab the slot by the RootLevel and see what happens from here.
                     Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.ResourceCollection.Contains(photoSlot.RootLevel));
-                    if (slot != null && !string.IsNullOrEmpty(slot.RootLevel)) validLevel = true;
-                    if (slot != null && slot.IsAdventurePlanet) adventureSlot = slot;
+                    if(slot == null) break;
+
+                    if (!string.IsNullOrEmpty(slot!.RootLevel)) validLevel = true;
+                    if (slot.IsAdventurePlanet) photoSlot.SlotId = slot.SlotId;
                     break;
                 }
                 case SlotType.Pod:
@@ -86,7 +87,7 @@ public class PhotosController : ControllerBase
                     break;
             }
 
-            if (validLevel) photo.SlotId = (adventureSlot != null) ? adventureSlot.SlotId : photo.XmlLevelInfo.SlotId;
+            if (validLevel) photo.SlotId = photo.XmlLevelInfo.SlotId;
         }
 
         if (photo.Subjects.Count > 4) return this.BadRequest();

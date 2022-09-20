@@ -79,7 +79,7 @@ public class ScoreController : ControllerBase
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
         score.SlotId = id;
-        if (childId != 0) score.ChildSlotId = childId;
+        score.ChildSlotId = childId;
 
         Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
         if (slot == null)
@@ -211,10 +211,11 @@ public class ScoreController : ControllerBase
 
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
-        var rankedScores = this.database.Scores.AsEnumerable()
+        var rankedScores = this.database.Scores
             .Where(s => s.SlotId == slotId && s.Type == type)
             .Where(s => s.ChildSlotId == null || s.ChildSlotId == childId)
             .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
+            .AsEnumerable()
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
             .ToList()

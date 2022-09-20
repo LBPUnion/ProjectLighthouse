@@ -23,8 +23,6 @@
 
     bool isQueued = false;
     bool isHearted = false;
-    bool isAdventure = Model.IsAdventurePlanet;
-    string advenStyleExt = isAdventure ? "-webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" : "";
 
     if (user != null)
     {
@@ -41,6 +39,8 @@
 <div class="card">
     @{
         int size = isMobile || mini ? 50 : 100;
+        bool isAdventure = Model.IsAdventurePlanet;
+        string advenStyleExt = isAdventure ? "-webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" : "";
     }
     <div>
         <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">
