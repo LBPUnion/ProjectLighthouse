@@ -24,6 +24,6 @@
         <value>Desconectado</value>
     </data>
   <data name="last_online" xml:space="preserve">
-        <value>Desconectado desde {0}</value>
+        <value>Desconectado desde el {0}</value>
     </data>
 </root>
