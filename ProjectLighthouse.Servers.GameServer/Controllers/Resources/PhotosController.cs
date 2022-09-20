@@ -63,8 +63,12 @@ public class PhotosController : ControllerBase
             {
                 case SlotType.User:
                 {
-                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.SlotId == photoSlot.SlotId);
-                    if (slot != null && !string.IsNullOrEmpty(slot.RootLevel)) validLevel = true;
+                    // We'll grab the slot by the RootLevel and see what happens from here.
+                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.ResourceCollection.Contains(photoSlot.RootLevel));
+                    if(slot == null) break;
+
+                    if (!string.IsNullOrEmpty(slot!.RootLevel)) validLevel = true;
+                    if (slot.IsAdventurePlanet) photoSlot.SlotId = slot.SlotId;
                     break;
                 }
                 case SlotType.Pod:

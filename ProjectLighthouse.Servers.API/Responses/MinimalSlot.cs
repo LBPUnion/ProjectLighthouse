@@ -10,6 +10,7 @@ public struct MinimalSlot
     public string Name { get; set; }
     public string IconHash { get; set; }
     public bool TeamPick { get; set; }
+    public bool IsAdventure { get; set; }
     public GameVersion GameVersion { get; set; }
     #if DEBUG
     public long FirstUploaded { get; set; }
@@ -22,6 +23,7 @@ public struct MinimalSlot
             Name = slot.Name,
             IconHash = slot.IconHash,
             TeamPick = slot.TeamPick,
+            IsAdventure = slot.IsAdventurePlanet,
             GameVersion = slot.GameVersion,
             #if DEBUG
             FirstUploaded = slot.FirstUploaded,

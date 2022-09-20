@@ -5,6 +5,7 @@ public enum LbpFileType
     Script, // .ff, FSH
     Texture, // TEX
     Level, // LVL
+    Adventure, // ADC, ADS
     CrossLevel, // PRF, Cross controller level
     FileArchive, // .farc, (ends with FARC)
     Plan, // PLN, uploaded with levels

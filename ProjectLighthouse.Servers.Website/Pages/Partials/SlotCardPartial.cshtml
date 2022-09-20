@@ -39,11 +39,13 @@
 <div class="card">
     @{
         int size = isMobile || mini ? 50 : 100;
+        bool isAdventure = Model.IsAdventurePlanet;
+        string advenStyleExt = isAdventure ? "-webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" : "";
     }
     <div>
-        <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3">
-        <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1;">
-        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2" 
+        <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">
+        <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(advenStyleExt)">
+        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(advenStyleExt)"  
              onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
     </div>
     <div class="cardStats">
