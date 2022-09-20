@@ -19,16 +19,22 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
         }
 
         // Request ends with a path (e.g. /css/style.css)
-        if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)))
+        if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)) || ctx.Request.Path.StartsWithSegments("/gameAssets"))
         {
             await this.next(ctx);
             return;
         }
 
-        if (user.PasswordResetRequired && !ctx.Request.Path.StartsWithSegments("/passwordResetRequired") &&
-            !ctx.Request.Path.StartsWithSegments("/passwordReset"))
+        if (user.PasswordResetRequired)
         {
-            ctx.Response.Redirect("/passwordResetRequired");
+            if (!ctx.Request.Path.StartsWithSegments("/passwordResetRequired") &&
+                !ctx.Request.Path.StartsWithSegments("/passwordReset"))
+            {
+                ctx.Response.Redirect("/passwordResetRequired");
+                return;
+            }
+
+            await this.next(ctx);
             return;
         }
 
