@@ -118,11 +118,11 @@ public class ScoreController : ControllerBase
                 Type = score.Type,
                 Points = score.Points,
                 SlotId = score.SlotId,
-                ChildSlotId = score.ChildSlotId
+                ChildSlotId = score.ChildSlotId,
             };
 
             IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
-            .Where(s => childId != 0 || s.ChildSlotId == childId)
+            .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
             .Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
             .Where(s => s.Type == playerScore.Type);
             if (existingScore.Any())
@@ -213,7 +213,7 @@ public class ScoreController : ControllerBase
         // var needed for Anonymous type returned from SELECT
         var rankedScores = this.database.Scores
             .Where(s => s.SlotId == slotId && s.Type == type)
-            .Where(s => s.ChildSlotId == null || s.ChildSlotId == childId)
+            .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
             .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
             .AsEnumerable()
             .OrderByDescending(s => s.Points)
