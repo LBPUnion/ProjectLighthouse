@@ -8,6 +8,24 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 public static class LabelHelper
 {
 
+    private static readonly List<string> lbpVitaLabels = new()
+    {
+        "LABEL_Arcade",
+        "LABEL_Co_op",
+        "LABEL_Precision",
+        "LABEL_Controlinator",
+        "LABEL_Flick",
+        "LABEL_Memoriser",
+        "LABEL_MultiLevel",
+        "LABEL_Portrait",
+        "LABEL_RearTouch",
+        "LABEL_SharedScreen",
+        "LABEL_Swipe",
+        "LABEL_Tap",
+        "LABEL_Tilt",
+        "LABEL_Touch",
+    };
+
     private static readonly List<string> lbp3Labels = new()
     {
         "LABEL_SINGLE_PLAYER",
@@ -72,6 +90,11 @@ public static class LabelHelper
         {"LABEL_HEROCAPE", "Hero Cape"},
         {"LABEL_MEMORISER", "Memorizer"},
         {"LABEL_WALLJUMP", "Wall Jump"},
+        {"Label_Controlinator", "Controllinator"},
+        {"LABEL_MultiLevel", "Multi Level"},
+        {"LABEL_Portrait", "Portrait View"},
+        {"LABEL_RearTouch", "Rear touch pad"},
+        {"LABEL_SharedScreen", "Shared Screen"},
         {"LABEL_SINGLE_PLAYER", "Single Player"},
         {"LABEL_TOP_DOWN", "Top Down"},
         {"LABEL_CO_OP", "Co-Op"},
@@ -97,15 +120,16 @@ public static class LabelHelper
         return gameVersion switch
         {
             GameVersion.LittleBigPlanet1 => IsValidTag(label),
-            GameVersion.LittleBigPlanet2 => IsValidLabel(label) && !lbp3Labels.Contains(label),
-            GameVersion.LittleBigPlanet3 => IsValidLabel(label),
+            GameVersion.LittleBigPlanet2 => IsValidLabel(label) && !lbp3Labels.Contains(label) && !lbpVitaLabels.Contains(label),
+            GameVersion.LittleBigPlanetVita => IsValidLabel(label) && !lbp3Labels.Contains(label),
+            GameVersion.LittleBigPlanet3 => IsValidLabel(label) && !lbpVitaLabels.Contains(label),
             _ => false,
         };
     }
 
     public static bool IsValidTag(string tag) => Enum.IsDefined(typeof(LevelTags), tag.Replace("TAG_", "").Replace("-", "_"));
 
-    public static bool IsValidLabel(string label) => Enum.IsDefined(typeof(LevelLabels), label);
+    private static bool IsValidLabel(string label) => Enum.IsDefined(typeof(LevelLabels), label.Replace("-", "_"));
 
     public static string RemoveInvalidLabels(string authorLabels)
     {

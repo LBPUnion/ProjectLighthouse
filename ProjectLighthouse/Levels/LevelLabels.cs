@@ -7,6 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Levels;
 // I would remove the LABEL prefix, but some of the tags start with numbers and won't compile
 public enum LevelLabels
 {
+    // Start LBP2 Labels
     LABEL_SinglePlayer,
     LABEL_Multiplayer,
     LABEL_Quick,
@@ -53,6 +54,22 @@ public enum LevelLabels
     LABEL_HEROCAPE,
     LABEL_MEMORISER,
     LABEL_WALLJUMP,
+    // Start LBP Vita Labels
+    LABEL_Arcade,
+    LABEL_Co_op,
+    LABEL_Precision,
+    LABEL_Controlinator,
+    LABEL_Flick,
+    LABEL_Memoriser,
+    LABEL_MultiLevel,
+    LABEL_Portrait,
+    LABEL_RearTouch,
+    LABEL_SharedScreen,
+    LABEL_Swipe,
+    LABEL_Tap,
+    LABEL_Tilt,
+    LABEL_Touch,
+    // Start LBP3 Labels
     LABEL_SINGLE_PLAYER,
     LABEL_RPG,
     LABEL_TOP_DOWN,
