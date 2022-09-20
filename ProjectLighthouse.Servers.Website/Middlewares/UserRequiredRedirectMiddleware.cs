@@ -18,6 +18,13 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
+        // Request ends with a path (e.g. /css/style.css)
+        if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)))
+        {
+            await this.next(ctx);
+            return;
+        }
+
         if (user.PasswordResetRequired && !ctx.Request.Path.StartsWithSegments("/passwordResetRequired") &&
             !ctx.Request.Path.StartsWithSegments("/passwordReset"))
         {
