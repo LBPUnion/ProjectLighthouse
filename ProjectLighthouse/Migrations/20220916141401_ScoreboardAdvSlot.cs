@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20220916141401_ScoreboardAdvSlot.cs")]
+    [Migration("20220916141401_ScoreboardAdvSlot")]
     public partial class CreateScoreboardAdvSlot : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
