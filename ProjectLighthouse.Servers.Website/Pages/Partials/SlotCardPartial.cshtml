@@ -43,9 +43,9 @@
         int size = isMobile || mini ? 50 : 100;
     }
     <div>
-            <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">
-            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(advenStyleExt)">
-            <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(advenStyleExt)"  
+        <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">
+        <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(advenStyleExt)">
+        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(advenStyleExt)"  
              onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
     </div>
     <div class="cardStats">
