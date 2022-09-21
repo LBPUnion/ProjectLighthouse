@@ -6,5 +6,5 @@ public class RateLimitConfiguration
 {
     public int RequestsPerInterval { get; set; } = 10;
     public int RequestInterval { get; set; } = 30;
-    public Dictionary<string, RateLimitOverride> RateLimitOverrides { get; set; } = new() { { "/upload", new RateLimitOverride() }, };
+    public Dictionary<string, RateLimitOverride> RateLimitOverrides { get; set; } = new() { { "/example/*/wildcard", new RateLimitOverride() }, };
 }
