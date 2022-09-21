@@ -59,29 +59,27 @@ public class UserEndpoints : ApiEndpointController
     [HttpPost("user/inviteToken")]
     public async Task<IActionResult> CreateUserInviteToken()
     {
-        if (Configuration.ServerConfiguration.Instance.Authentication.PrivateRegistration ||
-            Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        if (!Configuration.ServerConfiguration.Instance.Authentication.PrivateRegistration &&
+            !Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+            return this.NotFound();
+
+        string authHeader = this.Request.Headers["Authorization"];
+        if (string.IsNullOrWhiteSpace(authHeader)) return this.NotFound();
+
+        string authToken = authHeader[(authHeader.IndexOf(' ') + 1)..];
+
+        APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
+        if (apiKey == null) return this.StatusCode(403, null);
+
+        RegistrationToken token = new()
         {
+            Created = DateTime.Now,
+            Token = CryptoHelper.GenerateAuthToken(),
+        };
 
-            string authHeader = this.Request.Headers["Authorization"];
-            if (!string.IsNullOrWhiteSpace(authHeader))
-            {
-                string authToken = authHeader.Substring(authHeader.IndexOf(' ') + 1);
+        this.database.RegistrationTokens.Add(token);
+        await this.database.SaveChangesAsync();
 
-                APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
-                if (apiKey == null) return this.StatusCode(403, null);
-
-                RegistrationToken token = new();
-                token.Created = DateTime.Now;
-                token.Token = CryptoHelper.GenerateAuthToken();
-
-                this.database.RegistrationTokens.Add(token);
-                await this.database.SaveChangesAsync();
-
-                return Ok(token.Token);
-            }
-
-        }
-        return this.NotFound();
+        return this.Ok(token.Token);
     }
 }
