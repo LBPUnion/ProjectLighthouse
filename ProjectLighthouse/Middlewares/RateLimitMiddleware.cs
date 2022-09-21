@@ -49,16 +49,22 @@ public class RateLimitMiddleware : MiddlewareDBContext
             return;
         }
 
-        RateLimitOverride? rateLimit = GetRateLimitOverride(ctx.Request.Path);
+        RateLimitOptions? rateLimitOptions = GetRateLimitOverride(ctx.Request.Path);
 
-        RemoveExpiredEntries(rateLimit);
+        if (!IsRateLimitEnabled(rateLimitOptions))
+        {
+            await this.next(ctx);
+            return;
+        }
+
+        RemoveExpiredEntries(rateLimitOptions);
 
         Console.WriteLine(
             $@"[DEBUG]: path={ctx.Request.Path} ipAddress={address}, numRequestsForPath={GetNumRequestsForPath(address, ctx.Request.Path)+1}");
 
-        if (GetNumRequestsForPath(address, ctx.Request.Path) + 1 >= GetMaxNumRequests(rateLimit))
+        if (GetNumRequestsForPath(address, ctx.Request.Path) + 1 >= GetMaxNumRequests(rateLimitOptions))
         {
-            Console.WriteLine(@$"[DEBUG]: Next request expires in {recentRequests[address][0].Timestamp + GetRequestInterval(ctx.Request.Path, rateLimit) * 1000 - TimeHelper.TimestampMillis}");
+            Console.WriteLine(@$"[DEBUG]: Next request expires in {recentRequests[address][0].Timestamp + GetRequestInterval(rateLimitOptions) * 1000 - TimeHelper.TimestampMillis}");
             ctx.Response.StatusCode = 429;
             return;
         }
@@ -69,13 +75,15 @@ public class RateLimitMiddleware : MiddlewareDBContext
         await this.next(ctx);
     }
 
-    private static int GetMaxNumRequests(RateLimitOverride? rateLimitOverride) => rateLimitOverride?.RequestsPerInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.RequestsPerInterval;
+    private static int GetMaxNumRequests(RateLimitOptions? rateLimitOverride) => rateLimitOverride?.RequestsPerInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.RequestsPerInterval;
 
-    private static long GetRequestInterval(PathString path, RateLimitOverride? rateLimitOverride) => rateLimitOverride?.RequestsPerInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.RequestInterval;
+    public static bool IsRateLimitEnabled(RateLimitOptions? rateLimitOverride) => rateLimitOverride?.Enabled ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.Enabled;
 
-    private static RateLimitOverride? GetRateLimitOverride(PathString path)
+    private static long GetRequestInterval(RateLimitOptions? rateLimitOverride) => rateLimitOverride?.RequestsPerInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.RequestInterval;
+
+    private static RateLimitOptions? GetRateLimitOverride(PathString path)
     {
-        Dictionary<string, RateLimitOverride> overrides = ServerConfiguration.Instance.RateLimitConfiguration.RateLimitOverrides;
+        Dictionary<string, RateLimitOptions> overrides = ServerConfiguration.Instance.RateLimitConfiguration.RateLimitOverrides;
         return overrides.Keys.Where(s => new Regex(s.Replace("/", @"\/").Replace("*", ".*")).Match(path).Success).Select(s => overrides[s]).FirstOrDefault();
     }
 
@@ -84,12 +92,12 @@ public class RateLimitMiddleware : MiddlewareDBContext
         recentRequests.GetOrAdd(address, new List<LighthouseRequest>()).Add(LighthouseRequest.Create(path));
     }
 
-    private static void RemoveExpiredEntries(RateLimitOverride? rateLimitOverride)
+    private static void RemoveExpiredEntries(RateLimitOptions? rateLimitOverride)
     {
         for (int i = recentRequests.Count - 1; i >= 0; i--)
         {
             IPAddress address = recentRequests.ElementAt(i).Key;
-            recentRequests[address].RemoveAll(r => TimeHelper.TimestampMillis > r.Timestamp + GetRequestInterval(r.Path, rateLimitOverride));
+            recentRequests[address].RemoveAll(r => TimeHelper.TimestampMillis > r.Timestamp + GetRequestInterval(GetRateLimitOverride(r.Path)));
             // Remove empty entries
             if (recentRequests[address].Count == 0) recentRequests.TryRemove(address, out _);
         }

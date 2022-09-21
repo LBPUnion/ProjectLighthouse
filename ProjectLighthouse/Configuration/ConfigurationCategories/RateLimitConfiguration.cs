@@ -4,7 +4,17 @@ namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 
 public class RateLimitConfiguration
 {
-    public int RequestsPerInterval { get; set; } = 10;
-    public int RequestInterval { get; set; } = 30;
-    public Dictionary<string, RateLimitOverride> RateLimitOverrides { get; set; } = new() { { "/example/*/wildcard", new RateLimitOverride() }, };
+    public RateLimitOptions GlobalOptions { get; set; } = new();
+
+    public Dictionary<string, RateLimitOptions> RateLimitOverrides { get; set; } = new()
+    {
+        {
+            "/example/*/wildcard", new RateLimitOptions
+            {
+                RequestInterval = 5,
+                RequestsPerInterval = 10,
+                Enabled = true,
+            }
+        },
+    };
 }
