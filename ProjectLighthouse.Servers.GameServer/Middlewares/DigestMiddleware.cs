@@ -28,7 +28,7 @@ public class DigestMiddleware : Middleware
 
         bool usedAlternateDigestKey = false;
 
-        if (computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
+        if (this.computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
         {
             // The game sets X-Digest-B on a resource upload instead of X-Digest-A
             string digestHeaderKey = "X-Digest-A";
@@ -99,7 +99,7 @@ public class DigestMiddleware : Middleware
         responseBuffer.Position = 0;
 
         // Compute the server digest hash.
-        if (computeDigests)
+        if (this.computeDigests)
         {
             responseBuffer.Position = 0;
 
