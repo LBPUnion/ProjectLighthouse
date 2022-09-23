@@ -76,6 +76,8 @@ public class RegisterTests : LighthouseWebTest
         this.Driver.FindElement(By.Id("password")).SendKeys(password);
         this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
 
+        this.Driver.FindElement(By.Id("age-checkbox")).Click();
+
         this.Driver.FindElement(By.Id("submit")).Click();
 
         Assert.Contains("The username you've chosen is already taken.", this.Driver.PageSource);
