@@ -27,6 +27,8 @@ public class Playlist
     [JsonIgnore]
     public User? Creator { get; set; }
 
+    public int Hearts(Database database) => database.HeartedPlaylists.Count(p => p.HeartedPlaylistId == this.PlaylistId);
+
     public string SlotCollection { get; set; } = "";
 
     [JsonIgnore]
@@ -46,13 +48,11 @@ public class Playlist
         using Database database = new();
         string playlist = LbpSerializer.StringElement("id", this.PlaylistId) +
                           LbpSerializer.StringElement("author",
-                              LbpSerializer.StringElement("npHandle", this.Creator?.Username)) +
+                          LbpSerializer.StringElement("npHandle", this.Creator?.Username)) +
                           LbpSerializer.StringElement("name", this.Name) +
                           LbpSerializer.StringElement("description", this.Description) +
                           LbpSerializer.StringElement("levels", this.SlotIds.Length) +
-                          LbpSerializer.StringElement("thumbs", 0) +
-                          LbpSerializer.StringElement("plays", 0) +
-                          LbpSerializer.StringElement("unique_plays", 0) +
+                          LbpSerializer.StringElement("hearts", this.Hearts(database)) +
                           LbpSerializer.StringElement("levels_quota", ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota) +
                           this.SerializeIcons(database);
         
@@ -62,7 +62,7 @@ public class Playlist
     private string SerializeIcons(Database database)
     {
         string iconList = this.SlotIds.Select(id => database.Slots.FirstOrDefault(s => s.SlotId == id))
-            .Where(slot => slot != null)
+            .Where(slot => slot != null && slot.IconHash.Length > 0)
             .Aggregate(string.Empty, (current, slot) => current + LbpSerializer.StringElement("icon", slot?.IconHash));
         return LbpSerializer.StringElement("icons", iconList);
     }

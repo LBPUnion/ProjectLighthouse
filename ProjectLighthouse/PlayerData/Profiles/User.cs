@@ -118,6 +118,10 @@ public class User
 
     [NotMapped]
     [JsonIgnore]
+    public int HeartedPlaylists => this.database.HeartedPlaylists.Count(p => p.UserId == this.UserId);
+
+    [NotMapped]
+    [JsonIgnore]
     public int QueuedLevels => this.database.QueuedLevels.Count(p => p.UserId == this.UserId);
 
     [JsonIgnore]
@@ -218,6 +222,7 @@ public class User
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
                       LbpSerializer.StringElement<int>("favouriteSlotCount", this.HeartedLevels, true) +
                       LbpSerializer.StringElement<int>("favouriteUserCount", this.HeartedUsers, true) +
+                      LbpSerializer.StringElement<int>("favouritePlaylistCount", this.HeartedPlaylists, true) +
                       LbpSerializer.StringElement<int>("lolcatftwCount", this.QueuedLevels, true) +
                       LbpSerializer.StringElement<string>("pins", this.Pins, true);
 

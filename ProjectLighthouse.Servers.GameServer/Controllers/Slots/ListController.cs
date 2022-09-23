@@ -197,6 +197,69 @@ public class ListController : ControllerBase
 
     #endregion
 
+    #region Hearted Playlists
+
+    [HttpGet("favouritePlaylists/{username}")]
+    public async Task<IActionResult> GetFavouritePlaylists(string username, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        if (pageSize <= 0) return this.BadRequest();
+
+        User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (targetUser == null) return this.StatusCode(403, "");
+
+        IEnumerable<Playlist> heartedPlaylists = this.database.Playlists.Where(p => p.CreatorId == targetUser.UserId)
+            .Skip(Math.Max(0, pageStart - 1))
+            .Take(Math.Min(pageSize, 30))
+            .AsEnumerable();
+
+        string response = heartedPlaylists.Aggregate(string.Empty, (current, p) => current + p.Serialize());
+
+        return this.Ok
+        (
+            LbpSerializer.TaggedStringElement("favouritePlaylists", response, new Dictionary<string, object>
+            {
+                { "total", this.database.HeartedPlaylists.Count(p => p.UserId == targetUser.UserId) },
+                { "hint_start", pageStart + Math.Min(pageSize, 30) },
+            })
+        );
+    }
+
+    [HttpPost("favourite/playlist/{playlistId:int}")]
+    public async Task<IActionResult> AddFavouritePlaylist(int playlistId)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        if (user == null) return this.BadRequest();
+
+        Playlist? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
+        if (playlist == null) return this.NotFound();
+
+        await this.database.HeartPlaylist(token.UserId, playlist);
+
+        return await this.GetFavouritePlaylists(user.Username, 1, 30);
+    }
+
+    [HttpPost("unfavourite/slot/{playlistId:int}")]
+    public async Task<IActionResult> RemoveFavouritePlaylist(int playlistId)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        Playlist? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
+        if (playlist == null) return this.NotFound();
+
+        await this.database.UnheartPlaylist(token.UserId, playlist);
+
+        return this.Ok();
+    }
+
+    #endregion
+
     #endregion Levels
 
     #region Users
