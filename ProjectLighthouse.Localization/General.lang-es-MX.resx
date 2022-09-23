@@ -24,7 +24,7 @@
         <value>Contraseña</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Registro</value>
+        <value>Registrar</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>¿Olvidaste tu contraseña?</value>
@@ -39,18 +39,18 @@
         <value>Desconocido</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>¡Éxito!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Reset Password</value>
+        <value>Restablecer la contraseña</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Recent Activity</value>
+        <value>Actividad Reciente</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Coming soon!</value>
+        <value>¡Próximamente!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Most recent photos</value>
+        <value>Fotos más recientes</value>
     </data>
 </root>

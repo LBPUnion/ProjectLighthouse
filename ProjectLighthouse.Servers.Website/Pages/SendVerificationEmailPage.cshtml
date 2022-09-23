@@ -6,8 +6,15 @@
     Model.Title = "Verify Email Address";
 }
 
-<p>An email address on your account has been set, but hasn't been verified yet.</p>
-<p>To verify it, check the email sent to <a href="mailto:@Model.User?.EmailAddress">@Model.User?.EmailAddress</a> and click the link in the email.</p>
+@if (Model.Success)
+{
+    <p>An email address on your account has been set, but hasn't been verified yet.</p>
+    <p>To verify it, check the email sent to <a href="mailto:@Model.User?.EmailAddress">@Model.User?.EmailAddress</a> and click the link in the email.</p>
+}
+else
+{
+    <p>Failed to send email, please try again later</p>
+}
 
 <a href="/login/sendVerificationEmail">
     <div class="ui blue button">Resend email</div>

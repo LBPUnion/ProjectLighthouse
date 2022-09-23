@@ -21,22 +21,6 @@ public class RoomHelper
     public static readonly object RoomLock = new();
     public static StorableList<Room> Rooms => RoomStore.GetRooms();
 
-    public static void StartCleanupThread()
-    {
-        // ReSharper disable once FunctionNeverReturns
-        Task.Factory.StartNew
-        (
-            async () =>
-            {
-                while (true)
-                {
-                    CleanupRooms();
-                    await Task.Delay(10000);
-                }
-            }
-        );
-    }
-    
     private static int roomIdIncrement;
     internal static int RoomIdIncrement => roomIdIncrement++;
 
@@ -200,7 +184,7 @@ public class RoomHelper
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    public static void CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
+    public static Task CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
     {
         #if DEBUG
         Stopwatch stopwatch = new();
@@ -292,5 +276,7 @@ public class RoomHelper
                 Logger.Info(logText, LogArea.Match);
             }
         }
+
+        return Task.FromResult(0);
     }
 }

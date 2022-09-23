@@ -6,10 +6,59 @@ div.pageContainer {
 
 div.main {
     flex: 1;
+    background-color: #fafafa;
+}
+
+div.main > .ui.container > div.ui.attached.segment {
+    padding: 0 17px;
 }
 
 #lighthouse-debug-info > p {
     margin-bottom: 1px;
+}
+
+.lighthouse-avatar {
+    border-radius: .28571429rem;
+}
+
+.lighthouse-name {
+    margin-left: 10px;
+}
+
+.lighthouse-title {
+    margin-top: 0;
+}
+
+.user-link > img,
+.user-link > span {
+    vertical-align: middle;
+}
+
+.user-link > img {
+    height: 20px;
+    width: 20px;
+    border-radius: .28571429rem;
+    object-fit: cover;
+}
+
+.user-link {
+    padding-left: 3px;
+    padding-top: 5px;
+    display: inline-block;
+}
+
+.logo-color {
+    position: absolute;
+}
+
+.home-logo:hover > .logo-color {
+    opacity: 1;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.home-logo > .logo-color {
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
 }
 
 canvas.photo-subjects {
@@ -64,6 +113,7 @@ canvas.hide-subjects {
 }
 
 .cardStatsUnderTitle {
+    margin-top: 3px;
     margin-bottom: 10px;
 }
 
@@ -110,3 +160,26 @@ div.cardStatsUnderTitle > span {
 }
 
 /*#endregion Comments*/
+
+/*#region Slot labels */
+
+.selected {
+    color: #fff !important;
+    background-color: #0e91f5 !important;
+}
+
+.selected:hover {
+    background-color: #0084ea !important;
+}
+
+.skew {
+    --scale: scale(1, 1);
+    --skew: rotate(0deg);
+    transition: transform 0.25s !important;
+    transform: var(--skew) var(--scale);
+}
+.skew:hover {
+    --scale: scale(1.2, 1.2);
+}
+
+/*#endregion Slot labels */

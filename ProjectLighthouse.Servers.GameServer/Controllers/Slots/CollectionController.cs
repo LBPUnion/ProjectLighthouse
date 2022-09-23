@@ -24,7 +24,7 @@ public class CollectionController : ControllerBase
     }
 
     [HttpGet("user/{username}/playlists")]
-    public IActionResult GetUserPlaylists(string username) => this.Ok();
+    public IActionResult GetUserPlaylists(string username) => this.Ok("<playlists></playlists>");
 
     [HttpGet("searches")]
     [HttpGet("genres")]

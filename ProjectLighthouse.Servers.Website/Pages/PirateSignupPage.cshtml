@@ -1,0 +1,31 @@
+@page "/pirate"
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.PirateSignupPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "ARRRRRRRRRR!";
+}
+<!--suppress GrazieInspection -->
+
+@if (Model.User!.Language != "en-PT")
+{
+    <p>So, ye wanna be a pirate? Well, ye came to the right place!</p>
+    <p>Just click this 'ere button, and welcome aboard!</p>
+    <p>If you ever wanna walk the plank, come back 'ere.</p>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="submit" class="ui blue button" value="Aye aye, captain!"/>
+    </form>
+}
+else
+{
+    <p>Back so soon, aye?</p>
+    <p>If you're gonna walk the plank, then do it!</p>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="submit" class="ui red button" value="Walk the plank"/>
+    </form>
+}
+

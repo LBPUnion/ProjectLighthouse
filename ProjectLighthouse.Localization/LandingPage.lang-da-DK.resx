@@ -26,7 +26,7 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Du er i øjeblikket logget ind som {0}.</value>
+        <value>Hilsener, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
@@ -49,6 +49,6 @@
         <value>Seneste Baner</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>Seneste Team Picks</value>
+        <value>Seneste Teamets udvalgte</value>
     </data>
 </root>

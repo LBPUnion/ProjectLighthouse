@@ -50,12 +50,15 @@
         <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
   <data name="header_adminPanel" xml:space="preserve">
-        <value>Panel Administracyjny</value>
+        <value>Admin</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
   <data name="header_logout" xml:space="preserve">
         <value>Wyloguj</value>
         <comment>A shortcut to log you out of your account.</comment>
+    </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Panel Moderacji</value>
     </data>
   <data name="generated_by" xml:space="preserve">
         <value>Strona wygenerowana przez {0}.</value>
@@ -64,21 +67,21 @@
         <value>Ta strona została wygenerowana przy użyciu zmodyfikowanej wersji Projektu Lighthouse. Upewnij się, że poprawnie ujawniasz kod źródłowy wszystkim użytkownikom, którzy mogą używać tej instancji</value>
     </data>
   <data name="js_warn" xml:space="preserve">
-        <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
+        <value>Chociaż zamierzamy używać jak najmniejszą ilość JavaScript, nie możemy zagwarantować, że wszystko będzie działać bez niego. Zalecamy, żeby dodać JavaScript do białej listy dla Projektu Lighthouse.</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript is not enabled</value>
+        <value>JavaScript nie jest włączony</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
-        <value>Potential License Violation</value>
+        <value>Potencjalne Naruszenie Licencji</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the {0}.</value>
+        <value>Ta instancja jest instancją ze strony publicznej, która została zmodyfikowana bez opublikowanych zmian. Możesz naruszać {0}.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
-        <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
+        <value>Jeśli uważasz, że jest to błąd, utwórz problem z wyjściem {0} uruchomionym z katalogu głównego kodu źródłowego serwera w opisie naszego {1}trackera problemów{2}.</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
-        <value>If not, please publish the source code somewhere accessible to your users.</value>
+        <value>Jeśli nie, proszę opublikować kod źródłowy dostępny dla użytkowników.</value>
     </data>
 </root>

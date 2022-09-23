@@ -2,12 +2,12 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UsersPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = Model.Translate(BaseLayoutStrings.HeaderUsers);
+    bool isMobile = Model.Request.IsMobile();
 }
 
 <p>There are @Model.UserCount total users.</p>
@@ -22,7 +22,6 @@
 
 @foreach (User user in Model.Users)
 {
-    bool isMobile = Model.Request.IsMobile();
     <div class="ui segment">
         @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)
         {
@@ -34,6 +33,9 @@
             },
             {
                 "Language", Model.GetLanguage()
+            },
+            {
+                "TimeZone", Model.GetTimeZone()
             },
         })
     </div>

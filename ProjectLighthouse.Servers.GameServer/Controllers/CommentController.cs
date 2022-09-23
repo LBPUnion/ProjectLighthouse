@@ -26,12 +26,12 @@ public class CommentController : ControllerBase
     [HttpPost("rateComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
-        if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
+        if (username == null && (SlotHelper.IsTypeInvalid(slotType) || slotId == 0)) return this.BadRequest();
 
-        bool success = await this.database.RateComment(user, commentId, rating);
+        bool success = await this.database.RateComment(token.UserId, commentId, rating);
         if (!success) return this.BadRequest();
 
         return this.Ok();
@@ -41,8 +41,10 @@ public class CommentController : ControllerBase
     [HttpGet("userComments/{username}")]
     public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, string? slotType, int slotId)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        if (pageSize <= 0) return this.BadRequest();
 
         int targetId = slotId;
         CommentType type = CommentType.Level;
@@ -58,33 +60,45 @@ public class CommentController : ControllerBase
 
         if (type == CommentType.Level && slotType == "developer") targetId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
+        if (type == CommentType.Profile)
+        {
+            User? profile = await this.database.Users.FirstOrDefaultAsync(s => s.UserId == targetId);
+            if (profile == null) return this.BadRequest();
+            if (!profile.CommentsEnabled) return this.NotFound();
+        }
+        else
+        {
+            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == targetId);
+            if (slot == null) return this.BadRequest();
+            if (!slot.CommentsEnabled) return this.NotFound();
+        }
+
         List<Comment> comments = await this.database.Comments.Include
                 (c => c.Poster)
             .Where(c => c.TargetId == targetId && c.Type == type)
             .OrderByDescending(c => c.Timestamp)
-            .Skip(pageStart - 1)
+            .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync();
 
         string outputXml = comments.Aggregate
-            (string.Empty, (current, comment) => current + comment.Serialize(this.getReaction(user.UserId, comment.CommentId).Result));
+            (string.Empty, (current, comment) => current + comment.Serialize(this.getReaction(token.UserId, comment.CommentId).Result));
         return this.Ok(LbpSerializer.StringElement("comments", outputXml));
     }
 
     private async Task<int> getReaction(int userId, int commentId)
     {
-        Reaction? reaction = await this.database.Reactions.FirstOrDefaultAsync(r => r.UserId == userId && r.TargetId == commentId);
-        if (reaction == null) return 0;
-
-        return reaction.Rating;
+        return await this.database.Reactions.Where(r => r.UserId == userId && r.TargetId == commentId)
+            .Select(r => r.Rating)
+            .FirstOrDefaultAsync();
     }
 
     [HttpPost("postUserComment/{username}")]
     [HttpPost("postComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> PostComment(string? username, string? slotType, int slotId)
     {
-        User? poster = await this.database.UserFromGameRequest(this.Request);
-        if (poster == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -106,7 +120,7 @@ public class CommentController : ControllerBase
 
         if (slotType == "developer") targetId = await SlotHelper.GetPlaceholderSlotId(this.database, targetId, SlotType.Developer);
 
-        bool success = await this.database.PostComment(poster, targetId, type, comment.Message);
+        bool success = await this.database.PostComment(token.UserId, targetId, type, comment.Message);
         if (success) return this.Ok();
 
         return this.BadRequest();
@@ -116,8 +130,8 @@ public class CommentController : ControllerBase
     [HttpPost("deleteComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.NotFound();
@@ -127,12 +141,12 @@ public class CommentController : ControllerBase
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
         // if you are not the poster
-        if (comment.PosterUserId != user.UserId)
+        if (comment.PosterUserId != token.UserId)
         {
             if (comment.Type == CommentType.Profile)
             {
                 // if you aren't the poster and aren't the profile owner
-                if (comment.TargetId != user.UserId)
+                if (comment.TargetId != token.UserId)
                 {
                     return this.StatusCode(403, "");
                 }
@@ -141,7 +155,7 @@ public class CommentController : ControllerBase
             {
                 Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == comment.TargetId);
                 // if you aren't the creator of the level
-                if (slot == null || slot.CreatorId != user.UserId || slotId != slot.SlotId)
+                if (slot == null || slot.CreatorId != token.UserId || slotId != slot.SlotId)
                 {
                     return this.StatusCode(403, "");
                 }
@@ -149,7 +163,7 @@ public class CommentController : ControllerBase
         }
 
         comment.Deleted = true;
-        comment.DeletedBy = user.Username;
+        comment.DeletedBy = await this.database.UsernameFromGameToken(token);
         comment.DeletedType = "user";
 
         await this.database.SaveChangesAsync();

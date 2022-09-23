@@ -1,0 +1,44 @@
+@page "/moderation/hiddenLevels/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Levels
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.HiddenLevelsPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ModPanelStrings.HiddenLevels);
+    bool isMobile = Model.Request.IsMobile();
+}
+
+<p>There are @Model.SlotCount hidden levels.</p>
+
+@foreach (Slot slot in Model.Slots)
+{
+    <div class="ui segment">
+        @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
+        {
+            {
+                "User", Model.User
+            },
+            {
+                "CallbackUrl", $"~/moderation/hiddenLevels/{Model.PageNumber}"
+            },
+            {
+                "ShowLink", true
+            },
+            {
+                "IsMobile", isMobile
+            },
+        })
+    </div>
+}
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/moderation/hiddenLevels/@(Model.PageNumber - 1)">Previous Page</a>
+}
+@(Model.PageNumber + 1) / @(Model.PageAmount)
+@if (Model.PageNumber < Model.PageAmount - 1)
+{
+    <a href="/moderation/hiddenLevels/@(Model.PageNumber + 1)">Next Page</a>
+}

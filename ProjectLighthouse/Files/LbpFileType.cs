@@ -5,6 +5,7 @@ public enum LbpFileType
     Script, // .ff, FSH
     Texture, // TEX
     Level, // LVL
+    Adventure, // ADC, ADS
     CrossLevel, // PRF, Cross controller level
     FileArchive, // .farc, (ends with FARC)
     Plan, // PLN, uploaded with levels
@@ -13,5 +14,6 @@ public enum LbpFileType
     Painting, // PTG, paintings
     Jpeg, // JFIF / FIF, used in sticker switches,
     Png, // used in LBP Vita
+    Quest, // A LBP3 quest, used in the organizertron
     Unknown,
 }

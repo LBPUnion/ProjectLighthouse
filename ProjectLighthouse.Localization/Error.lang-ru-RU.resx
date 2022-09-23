@@ -18,13 +18,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>The username field is blank.</value>
+        <value>Поле имени пользователя пустое.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
         <value>Выбранное имя пользователя уже занято.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>Password field is required.</value>
+        <value>Требуется ввести пароль.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
         <value>Пароли не совпадают!</value>
@@ -36,10 +36,10 @@
         <value>Вы должны правильно завершить капчу.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
-        <value>The email address you've chosen is already taken.</value>
+        <value>Выбранный адрес электронной почты уже занят.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Email address field is required.</value>
+        <value>Введите адрес электронной почты.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
         <value>Вы были заблокированы. Пожалуйста, свяжитесь с администратором для получения дополнительной информации.\nПричина: {0}</value>

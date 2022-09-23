@@ -9,15 +9,15 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-        <PackageReference Include="Selenium.WebDriver" Version="4.3.0" />
-        <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="103.0.5060.13400" />
-        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+        <PackageReference Include="Selenium.WebDriver" Version="4.4.0" />
+        <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="105.0.5195.5200" />
+        <PackageReference Include="xunit" Version="2.4.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>

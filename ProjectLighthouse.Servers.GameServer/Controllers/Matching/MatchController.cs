@@ -25,6 +25,17 @@ public class MatchController : ControllerBase
         this.database = database;
     }
 
+    [HttpPost("gameState")]
+    [Produces("text/plain")]
+    public async Task<IActionResult> GameState()
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+
+        if (token == null) return this.StatusCode(403, "");
+
+        return this.Ok("VALID");
+    }
+
     [HttpPost("match")]
     [Produces("text/plain")]
     public async Task<IActionResult> Match()
@@ -86,9 +97,9 @@ public class MatchController : ControllerBase
 
         // Check how many people are online in release builds, disabled for debug for ..well debugging.
         #if DEBUG
-        if (matchData is FindBestRoom diveInData)
+        else if (matchData is FindBestRoom diveInData)
             #else
-        if (matchData is FindBestRoom diveInData && MatchHelper.UserLocations.Count > 1)
+        else if (matchData is FindBestRoom diveInData && MatchHelper.UserLocations.Count > 1)
             #endif
         {
             FindBestRoomResponse? response = RoomHelper.FindBestRoom
@@ -102,7 +113,7 @@ public class MatchController : ControllerBase
             return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
         }
 
-        if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
+        else if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
         {
             List<int> users = new();
             foreach (string playerUsername in createRoom.Players)
@@ -117,7 +128,7 @@ public class MatchController : ControllerBase
             RoomHelper.CreateRoom(users, gameToken.GameVersion, gameToken.Platform, createRoom.RoomSlot);
         }
 
-        if (matchData is UpdatePlayersInRoom updatePlayersInRoom)
+        else if (matchData is UpdatePlayersInRoom updatePlayersInRoom)
         {
             Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.HostId == user.UserId);
 
@@ -133,7 +144,7 @@ public class MatchController : ControllerBase
                 }
 
                 room.PlayerIds = users.Select(u => u.UserId).ToList();
-                RoomHelper.CleanupRooms(null, room);
+                await RoomHelper.CleanupRooms(null, room);
             }
         }
 

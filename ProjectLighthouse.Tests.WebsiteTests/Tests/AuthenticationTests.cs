@@ -78,7 +78,7 @@ public class AuthenticationTests : LighthouseWebTest
     [DatabaseFact]
     public async Task ShouldLoginWithInjectedCookie()
     {
-        const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/p[1]";
+        const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/div/p[1]";
 
         await using Database database = new();
         Random random = new();

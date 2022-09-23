@@ -26,11 +26,11 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Вы вошли как {0}</value>
+        <value>Приветствуем, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>Нет пользователей в сети. Почему бы и не поиграть?</value>
+        <value>Нет людей в сети. Почему бы не продолжить играть?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
@@ -38,7 +38,7 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>В настоящее время сейчас {0} онлайн:</value>
+        <value>В настоящее время {0} человек в сети:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">

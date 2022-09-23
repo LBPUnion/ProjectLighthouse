@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
@@ -12,7 +13,7 @@ namespace ProjectLighthouse.Tests.WebsiteTests.Tests;
 
 public class AdminTests : LighthouseWebTest
 {
-    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]";
+    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[1]";
 
     [DatabaseFact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
@@ -29,14 +30,14 @@ public class AdminTests : LighthouseWebTest
         };
 
         database.WebTokens.Add(webToken);
-        user.IsAdmin = true;
+        user.PermissionLevel = PermissionLevel.Administrator;
         await database.SaveChangesAsync();
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.Contains("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
+        Assert.Contains("Admin", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
     }
 
     [DatabaseFact]
@@ -54,13 +55,13 @@ public class AdminTests : LighthouseWebTest
         };
 
         database.WebTokens.Add(webToken);
-        user.IsAdmin = false;
+        user.PermissionLevel = PermissionLevel.Default;
         await database.SaveChangesAsync();
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/");
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.DoesNotContain("Admin Panel", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
+        Assert.DoesNotContain("Admin", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
     }
 }

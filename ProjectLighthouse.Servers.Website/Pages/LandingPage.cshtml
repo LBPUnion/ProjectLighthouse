@@ -4,14 +4,20 @@
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
 @using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.LandingPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.ShowTitleInPage = false;
-    bool isMobile = this.Request.IsMobile();
+    
+    bool isMobile = Request.IsMobile();
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
 }
-<h1>@Model.Translate(LandingPageStrings.Welcome, ServerConfiguration.Instance.Customization.ServerName)</h1>
+<h1 class="lighthouse-welcome lighthouse-title">
+    @Model.Translate(LandingPageStrings.Welcome, ServerConfiguration.Instance.Customization.ServerName)
+</h1>
 
 @if (Model.User != null)
 {
@@ -24,25 +30,26 @@
     }
 }
 
-@if (Model.PlayersOnlineCount == 1)
+@if (Model.PlayersOnline.Count == 1)
 {
     <p>@Model.Translate(LandingPageStrings.UsersSingle)</p>
-    @foreach (User user in Model.PlayersOnline)
-    {
-        <a href="/user/@user.UserId" title="@user.Status.ToString()">@user.Username</a>
-    }
 }
 
-else if (Model.PlayersOnlineCount == 0)
+else if (Model.PlayersOnline.Count == 0)
 {
     <p>@Model.Translate(LandingPageStrings.UsersNone)</p>
 }
 else
 {
-    <p>@Model.Translate(LandingPageStrings.UsersMultiple, Model.PlayersOnlineCount)</p>
-    @foreach (User user in Model.PlayersOnline)
+    <p>@Model.Translate(LandingPageStrings.UsersMultiple, Model.PlayersOnline.Count)</p>
+}
+
+@{
+    int i = 0;
+    foreach (User user in Model.PlayersOnline)
     {
-        <a href="/user/@user.UserId" title="@user.Status.ToString()">@user.Username</a>
+        i++; 
+        @await user.ToLink(Html, ViewData, language, timeZone, true)if (i != Model.PlayersOnline.Count){<span>,</span>} @* whitespace has forced my hand *@
     }
 }
 
@@ -50,8 +57,8 @@ else
 
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
-        <div class="ui pink segment">
-            <h1><i class="ribbon icon"></i>@Model.Translate(LandingPageStrings.LatestTeamPicks)</h1>
+        <div class="ui inverted pink segment">
+            <h1><i class="star icon"></i>@Model.Translate(LandingPageStrings.LatestTeamPicks)</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
                 @foreach (Slot slot in Model.LatestTeamPicks!) @* Can't reach a point where this is null *@
@@ -67,8 +74,8 @@ else
         <br>
     }
     <div class="eight wide column">
-        <div class="ui blue segment">
-            <h1><i class="certificate icon"></i>@Model.Translate(LandingPageStrings.NewestLevels)</h1>
+        <div class="ui inverted blue segment">
+            <h1><i class="globe americas icon"></i>@Model.Translate(LandingPageStrings.NewestLevels)</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
                 @foreach (Slot slot in Model.NewestLevels!) @* Can't reach a point where this is null *@

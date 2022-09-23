@@ -26,19 +26,19 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Tem sessão iniciada como {0}</value>
+        <value>Saudações, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>Não há utilizadores online. Por que não entrar?</value>
+        <value>Não há pessoas online. Por que não entrar?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>Há 1 utilizador online no momento:</value>
+        <value>Existe 1 utilizador online no momento:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>Atualmente, existem {0} utilizadores ‘online’:</value>
+        <value>Atualmente, estão {0} utilizadores online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">

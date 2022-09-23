@@ -1,9 +1,10 @@
 @page "/user/{userId:int}"
 @using System.Web
+@using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
-@using LBPUnion.ProjectLighthouse.Types
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
 
 @{
@@ -12,23 +13,23 @@
 
     Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
     Model.Description = Model.ProfileUser!.Biography;
+
+    bool isMobile = Request.IsMobile();
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
 }
 
-@if (Model.ProfileUser.Banned)
+@if (Model.ProfileUser.IsBanned)
 {
     <div class="ui inverted red segment">
         <h2>User is currently banned!</h2>
-        @if (Model.User != null && Model.User.IsAdmin)
+        @if (Model.User != null && Model.User.IsModerator)
         {
             <b>Reason:</b>
             <span>"@Model.ProfileUser.BannedReason"</span>
             <p>
-                <i>Note: Only you and other admins may view the ban reason.</i>
+                <i>Note: Only you and other moderators may view the ban reason.</i>
             </p>
-            <a class="ui inverted button" href="/admin/user/@Model.ProfileUser.UserId/unban">
-                <i class="ban icon"></i>
-                <span>Unban User</span>
-            </a>
         }
         else
         {
@@ -37,7 +38,7 @@
     </div>
 }
 
-<div class="ui grid">
+<div class="@(isMobile ? "" : "ui grid")">
     <div class="eight wide column">
         @await Html.PartialAsync("Partials/UserCardPartial", Model.ProfileUser, new ViewDataDictionary(ViewData)
         {
@@ -49,7 +50,10 @@
             },
             {
                 "Language", Model.GetLanguage()
-            }
+            },
+            {
+                "TimeZone", Model.GetTimeZone()
+            },
         })
     </div>
     <div class="eight wide right aligned column">
@@ -71,14 +75,25 @@
                 </a>
             }
         }
+        @if (Model.ProfileUser == Model.User || (Model.User?.IsModerator ?? false))
+        {
+            <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/settings">
+                <i class="cog icon"></i>
+                <span>Settings</span>
+            </a>
+        }
         @if (Model.ProfileUser == Model.User)
         {
-            <a class="ui blue button" href="/passwordReset">
-                <i class="key icon"></i>
-                <span>@Model.Translate(GeneralStrings.ResetPassword)</span>
+            <a href="/logout" class="ui red button">
+                <i class="user slash icon"></i>
+                @Model.Translate(BaseLayoutStrings.HeaderLogout)
             </a>
         }
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
     <div class="eight wide column">
         <div class="ui blue segment">
             <h2>@Model.Translate(ProfileStrings.Biography)</h2>
@@ -88,16 +103,24 @@
             }
             else
             {
-                <p>@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
+                <p style="overflow-wrap: anywhere;">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
             }
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
     <div class="eight wide column">
         <div class="ui red segment">
             <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
             <p>@Model.Translate(GeneralStrings.Soon)</p>
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 </div>
 
 
@@ -109,25 +132,30 @@
         <div class="ui center aligned grid">
             @foreach (Photo photo in Model.Photos)
             {
-                <div class="eight wide column">
-                    @await Html.PartialAsync("Partials/PhotoPartial", photo)
+                string width = isMobile ? "sixteen" : "eight";
+                <div class="@width wide column">
+                    @await photo.ToHtml(Html, ViewData, language, timeZone)
                 </div>
             }
         </div>
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 }
 
-@await Html.PartialAsync("Partials/CommentsPartial")
+@await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
 
-@if (Model.User != null && Model.User.IsAdmin)
+@if (Model.User != null && Model.User.IsModerator)
 {
-    <div class="ui yellow segment">
-        <h2>Admin Options</h2>
+    <div class="ui green segment">
+        <h2>Moderation Options</h2>
 
-        @if (!Model.ProfileUser.Banned)
+        @if (!Model.ProfileUser.IsBanned)
         {
             <div>
-                <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/ban">
+                <a class="ui red button" href="/moderation/newCase?type=@((int)CaseType.UserBan)&affectedId=@Model.ProfileUser.UserId">
                     <i class="ban icon"></i>
                     <span>Ban User</span>
                 </a>
@@ -135,14 +163,32 @@
             <div class="ui fitted hidden divider"></div>
         }
         
+        @if (Model.ProfileUser.CommentsEnabled)
+        {
+            <div>
+                <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
+                    <i class="lock icon"></i>
+                    <span>Disable Comments</span>
+                </a>
+            </div>
+            <div class="ui fitted hidden divider"></div>
+        }
+        
         <div>
-            <a class="ui red button" href="/admin/user/@Model.ProfileUser.UserId/wipePlanets">
+            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
                 <i class="trash alternate icon"></i>
                 <span>Wipe user's earth decorations</span>
             </a>
         </div>
         <div class="ui fitted hidden divider"></div>
         
-        @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
+        @if (Model.User.IsAdmin)
+        {
+            @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
+        }
     </div>
+    @if (isMobile)
+    {
+        <br/>
+    }
 }

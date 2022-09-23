@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Match.Rooms;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Tickets;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,17 +67,22 @@ public class LoginController : ControllerBase
             token = await this.database.AuthenticateUser(npTicket, ipAddress);
             if (token == null)
             {
-                Logger.Warn($"Unable to " +
-                            $"find/generate a token for username {npTicket.Username}", LogArea.Login);
+                Logger.Warn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
                 return this.StatusCode(403, ""); // If not, then 403.
             }
         }
 
         User? user = await this.database.UserFromGameToken(token, true);
 
-        if (user == null || user.Banned)
+        if (user == null || user.IsBanned)
         {
             Logger.Error($"Unable to find user {npTicket.Username} from token", LogArea.Login);
+            return this.StatusCode(403, "");
+        }
+
+        if (ServerConfiguration.Instance.Mail.MailEnabled && (user.EmailAddress == null || !user.EmailAddressVerified))
+        {
+            Logger.Error($"Email address unverified for user {user.Username}", LogArea.Login);
             return this.StatusCode(403, "");
         }
 
@@ -121,6 +125,8 @@ public class LoginController : ControllerBase
         // We just logged in with the token. Mark it as used so someone else doesnt try to use it,
         // and so we don't pick the same token up when logging in later.
         token.Used = true;
+
+        user.LastLogin = TimeHelper.TimestampMillis;
 
         await this.database.SaveChangesAsync();
 

@@ -26,19 +26,19 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Estás conectado actualmente como {0}</value>
+        <value>¡Bienvenido, {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>No hay usuarios en línea. ¿Por qué no subirse?</value>
+        <value>No hay usuarios en línea. ¿Por qué no te conectas?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>Hay 1 usuario actualmente en línea:</value>
+        <value>Hay 1 persona actualmente en línea:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>Actualmente hay {0} usuarios en línea:</value>
+        <value>Actualmente hay {0} personas en línea:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">

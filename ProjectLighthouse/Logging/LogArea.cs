@@ -22,4 +22,6 @@ public enum LogArea
     Command,
     Admin,
     Publish,
+    Maintenance,
+    Score,
 }

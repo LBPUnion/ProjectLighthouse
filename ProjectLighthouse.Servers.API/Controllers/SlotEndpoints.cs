@@ -31,6 +31,8 @@ public class SlotEndpoints : ApiEndpointController
     [ProducesResponseType(typeof(List<MinimalSlot>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSlots([FromQuery] int limit = 20, [FromQuery] int skip = 0)
     {
+        if (skip < 0) skip = 0;
+        if (limit < 0) limit = 0;
         limit = Math.Min(ServerStatics.PageSize, limit);
 
         IEnumerable<MinimalSlot> minimalSlots = (await this.database.Slots.OrderByDescending(s => s.FirstUploaded).Skip(skip).Take(limit).ToListAsync()).Select

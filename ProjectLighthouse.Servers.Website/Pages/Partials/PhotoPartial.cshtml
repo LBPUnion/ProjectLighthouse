@@ -1,8 +1,16 @@
 @using System.Globalization
+@using System.Web
 @using LBPUnion.ProjectLighthouse.Levels
+@using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.PlayerData
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.PlayerData.Photo
 
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+}
 
 <div style="position: relative">
     <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId" width="1920" height="1080"
@@ -15,17 +23,22 @@
 
 <p>
     <i>
-        Taken by
-        <b>
-            <a href="/user/@Model.Creator?.UserId">@Model.Creator?.Username</a>
-        </b>
+        Taken
+        @if (Model.Creator != null)
+        {
+            <span>by</span>
+            <b>
+                @await Model.Creator.ToLink(Html, ViewData, language, timeZone)
+            </b>
+        }
         @if (Model.Slot != null)
         {
             switch (Model.Slot.Type)
             {
                 case SlotType.User:
                     <span>
-                        in level <b><a href="/slot/@Model.SlotId">@Model.Slot.Name</a></b>
+                        @(Model.Slot.IsAdventurePlanet ? "on an adventure in" : "in level")
+                        <b><a href="/slot/@Model.SlotId">@HttpUtility.HtmlDecode(Model.Slot.Name)</a></b>
                     </span>
                     break;
                 case SlotType.Developer:
@@ -39,17 +52,20 @@
                     break;
             }
         }
-        at @DateTime.UnixEpoch.AddSeconds(Model.Timestamp).ToString(CultureInfo.CurrentCulture)
+        at @TimeZoneInfo.ConvertTime(DateTime.UnixEpoch.AddSeconds(Model.Timestamp), timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt")
     </i>
 </p>
 
-<p>
-    <b>Photo contains @Model.Subjects.Count @(Model.Subjects.Count == 1 ? "person" : "people"):</b>
-</p>
+@if (Model.Subjects.Count > 0)
+{
+    <p>
+        <b>Photo contains @Model.Subjects.Count @(Model.Subjects.Count == 1 ? "person" : "people"):</b>
+    </p>
+}
 <div id="hover-subjects-@Model.PhotoId">
     @foreach (PhotoSubject subject in Model.Subjects)
     {
-        <a href="/user/@subject.UserId">@subject.User.Username</a>
+        @await subject.User.ToLink(Html, ViewData, language, timeZone)
     }
 </div>
 

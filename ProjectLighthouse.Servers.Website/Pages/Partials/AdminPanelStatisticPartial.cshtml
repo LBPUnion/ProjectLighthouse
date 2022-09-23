@@ -5,13 +5,20 @@
         @if (Model.ViewAllEndpoint != null)
         {
             <h2>
-                <a href="/admin/@Model.ViewAllEndpoint">@Model.StatisticNamePlural</a>
+                <a href="@Model.ViewAllEndpoint">@Model.StatisticNamePlural</a>
             </h2>
         }
         else
         {
             <h2>@Model.StatisticNamePlural</h2>
         }
-        <h3>@Model.Count</h3>
+        @if (Model.SecondStatistic == null)
+        {
+            <h3>@Model.Count</h3>
+        }
+        else
+        {
+            <h3>@Model.Count / @Model.SecondStatistic</h3>
+        }
     </div>
 </div>

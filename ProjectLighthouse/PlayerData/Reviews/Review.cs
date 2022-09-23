@@ -60,11 +60,7 @@ public class Review
     [XmlElement("thumbsdown")]
     public int ThumbsDown { get; set; }
 
-    public string Serialize
-        (RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null)
-        => this.Serialize("review", yourLevelRating, yourRatingStats);
-
-    public string Serialize(string elementOverride, RatedLevel? yourLevelRating = null, RatedReview? yourRatingStats = null)
+    public string Serialize(RatedReview? yourRatingStats = null)
     {
         string deletedBy = this.DeletedBy switch
         {
@@ -74,7 +70,7 @@ public class Review
             _ => "none",
         };
 
-        string reviewData = LbpSerializer.TaggedStringElement("slot_id", this.SlotId, "type", this.Slot?.Type) +
+        string reviewData = LbpSerializer.TaggedStringElement("slot_id", this.SlotId, "type", this.Slot?.Type.ToString().ToLower()) +
                             LbpSerializer.StringElement("reviewer", this.Reviewer?.Username) +
                             LbpSerializer.StringElement("thumb", this.Thumb) +
                             LbpSerializer.StringElement("timestamp", this.Timestamp) +
@@ -86,6 +82,6 @@ public class Review
                             LbpSerializer.StringElement("thumbsdown", this.ThumbsDown) +
                             LbpSerializer.StringElement("yourthumb", yourRatingStats?.Thumb ?? 0);
 
-        return LbpSerializer.TaggedStringElement(elementOverride, reviewData, "id", this.SlotId + "." + this.Reviewer?.Username);
+        return LbpSerializer.TaggedStringElement("review", reviewData, "id", this.SlotId + "." + this.Reviewer?.Username);
     }
 }

@@ -61,7 +61,9 @@ public class Photo
             {
                 if (!int.TryParse(idStr, out int id)) throw new InvalidCastException(idStr + " is not a valid number.");
 
-                PhotoSubject? photoSubject = database.PhotoSubjects.Include(p => p.User).FirstOrDefault(p => p.PhotoSubjectId == id);
+                PhotoSubject? photoSubject = database.PhotoSubjects
+                    .Include(p => p.User)
+                    .FirstOrDefault(p => p.PhotoSubjectId == id);
                 if (photoSubject == null) continue;
 
                 response.Add(photoSubject);

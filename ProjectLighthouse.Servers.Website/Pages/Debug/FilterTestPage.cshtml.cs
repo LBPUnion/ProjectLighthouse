@@ -12,16 +12,13 @@ public class FilterTestPage : BaseLayout
 
     public string? FilteredText;
     public string? Text;
-
+    #if DEBUG
     public IActionResult OnGet(string? text = null)
     {
-        #if !DEBUG
-        return this.NotFound();
-        #endif
-
         if (text != null) this.FilteredText = CensorHelper.ScanMessage(text);
         this.Text = text;
 
         return this.Page();
     }
+    #endif
 }

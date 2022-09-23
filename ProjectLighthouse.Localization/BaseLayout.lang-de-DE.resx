@@ -57,6 +57,9 @@
         <value>Abmelden</value>
         <comment>A shortcut to log you out of your account.</comment>
     </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Moderationsmenü</value>
+    </data>
   <data name="generated_by" xml:space="preserve">
         <value>Diese Seite wurde von {0} generiert.</value>
     </data>
@@ -76,7 +79,7 @@
         <value>Dies ist eine öffentlich zugängliche Instanz, dessen Quellcode verändert aber nicht veröffentlicht wurde. Es könnte sein, dass du gegen die {0} verstoßt.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
-        <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
+        <value>Wenn du glaubst, dass dies ein Fehler ist, bitte erstelle ein Support-Ticket mit dem Output {0} von dem Kern des Server Quellcodes in der Beschreibung unseres {1}Fehler Finders{2}.</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
         <value>Falls nicht, veröffentliche den Quellcode irgendwo, wo die Nutzer deiner Instanz darauf zugreifen können.</value>

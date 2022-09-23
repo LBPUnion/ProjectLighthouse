@@ -11,18 +11,19 @@ public class ResourcesController : ControllerBase
     [HttpGet("/gameAssets/{hash}")]
     public IActionResult GetGameImage(string hash)
     {
-        string path = Path.Combine("png", $"{hash}.png");
+        string path = FileHelper.GetImagePath($"{hash}.png");
 
-        if (IOFile.Exists(path))
-        {
-            return this.File(IOFile.OpenRead(path), "image/png");
-        }
+        string fullPath = Path.GetFullPath(path);
+        string basePath = Path.GetFullPath(FileHelper.ImagePath);
+
+        // Prevent directory traversal attacks
+        if (!fullPath.StartsWith(basePath)) return this.BadRequest();
+
+        if (IOFile.Exists(path)) return this.File(IOFile.OpenRead(path), "image/png");
 
         LbpFile? file = LbpFile.FromHash(hash);
-        if (file != null && FileHelper.LbpFileToPNG(file))
-        {
-            return this.File(IOFile.OpenRead(path), "image/png");
-        }
+        if (file != null && FileHelper.LbpFileToPNG(file)) return this.File(IOFile.OpenRead(path), "image/png");
+
         return this.NotFound();
     }
 }

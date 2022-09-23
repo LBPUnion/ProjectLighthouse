@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="UserContentModel">
-    <attachedFolders />
+    <attachedFolders>
+      <Path>Documentation</Path>
+    </attachedFolders>
     <explicitIncludes>
       <Path>.config/dotnet-tools.json</Path>
       <Path>.github</Path>
@@ -9,7 +11,9 @@
       <Path>.idea</Path>
       <Path>CONTRIBUTING.md</Path>
       <Path>DatabaseMigrations</Path>
+      <Path>Documentation</Path>
       <Path>LICENSE</Path>
+      <Path>ProjectLighthouse.Localization</Path>
       <Path>ProjectLighthouse.sln.DotSettings</Path>
       <Path>ProjectLighthouse.sln.DotSettings.user</Path>
       <Path>README.md</Path>

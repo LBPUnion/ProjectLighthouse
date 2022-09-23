@@ -10,4 +10,5 @@ public enum TranslationAreas
     Register,
     Error,
     Profile,
+    ModPanel,
 }

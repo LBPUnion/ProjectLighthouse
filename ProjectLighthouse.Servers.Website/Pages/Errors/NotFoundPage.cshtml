@@ -1,0 +1,11 @@
+@page "/404"
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Errors.NotFoundPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Not Found";
+    Model.Description = "The page was not found.";
+}
+
+<p>@Model.Description</p>
+<p>This may be due to a lack of permission such as not being signed in, or maybe the page just isn't there.</p>

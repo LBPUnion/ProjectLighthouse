@@ -50,12 +50,15 @@
         <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
   <data name="header_adminPanel" xml:space="preserve">
-        <value>Administrasjon</value>
+        <value>Administrator</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
   <data name="header_logout" xml:space="preserve">
         <value>Logg ut</value>
         <comment>A shortcut to log you out of your account.</comment>
+    </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Mod panel</value>
     </data>
   <data name="generated_by" xml:space="preserve">
         <value>Side generert av {0}.</value>

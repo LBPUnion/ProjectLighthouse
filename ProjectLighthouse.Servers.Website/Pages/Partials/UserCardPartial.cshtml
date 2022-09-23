@@ -6,13 +6,14 @@
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
 }
 
 <div class="card">
     @{
         int size = isMobile ? 50 : 100;
     }
-    <div class="cardIcon userCardIcon" style="background-image: url('/gameAssets/@Model.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px; background-position: center center; background-size: auto @(size)px;">
+    <div class="cardIcon userCardIcon" style="background-image: url('/gameAssets/@Model.WebsiteAvatarHash'); min-width: @(size)px; width: @(size)px; height: @(size)px; background-position: center center; background-size: cover; background-repeat: no-repeat">
     </div>
     <div class="cardStats">
         @if (showLink)
@@ -27,9 +28,9 @@
                 @Model.Username
             </h1>
         }
-        <p>
-            <i>@Model.Status.ToTranslatedString(language)</i>
-        </p>
+        <span>
+            <i>@Model.Status.ToTranslatedString(language, timeZone)</i>
+        </span>
         <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
             <i class="blue comment icon" title="Comments"></i> <span>@Model.Comments</span>

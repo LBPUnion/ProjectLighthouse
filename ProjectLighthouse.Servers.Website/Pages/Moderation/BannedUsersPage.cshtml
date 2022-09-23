@@ -1,0 +1,44 @@
+@page "/moderation/bannedUsers/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.PlayerData.Profiles
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.BannedUsersPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ModPanelStrings.BannedUsers);
+    bool isMobile = Model.Request.IsMobile();
+}
+
+<p>There are @Model.UserCount banned users.</p>
+
+@foreach (User user in Model.Users)
+{
+    <div class="ui segment">
+        @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)
+        {
+            {
+                "ShowLink", true
+            },
+            {
+                "IsMobile", isMobile
+            },
+            {
+                "Language", Model.GetLanguage()
+            },
+            {
+                "TimeZone", Model.GetTimeZone()
+            },
+        })
+    </div>
+}
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/moderation/bannedUsers/@(Model.PageNumber - 1)">Previous Page</a>
+}
+@(Model.PageNumber + 1) / @(Model.PageAmount)
+@if (Model.PageNumber < Model.PageAmount - 1)
+{
+    <a href="/moderation/bannedUsers/@(Model.PageNumber + 1)">Next Page</a>
+}

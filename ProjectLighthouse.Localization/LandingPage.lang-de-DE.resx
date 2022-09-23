@@ -26,7 +26,7 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Du bist angemeldet als {0}</value>
+        <value>Willkommen, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
@@ -34,7 +34,7 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>Gerade ist 1 Spieler online:</value>
+        <value>Gerade ist ein Spieler online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">

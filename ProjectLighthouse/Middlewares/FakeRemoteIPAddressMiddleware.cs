@@ -11,10 +11,10 @@ public class FakeRemoteIPAddressMiddleware : Middleware
     public FakeRemoteIPAddressMiddleware(RequestDelegate next) : base(next)
     {}
 
-    public override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext ctx)
     {
-        httpContext.Connection.RemoteIpAddress = this.fakeIpAddress;
+        ctx.Connection.RemoteIpAddress = this.fakeIpAddress;
 
-        await this.next(httpContext);
+        await this.next(ctx);
     }
 }

@@ -4,9 +4,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.StorableLists;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,8 +24,8 @@ public class FriendsController : ControllerBase
     [HttpPost("npdata")]
     public async Task<IActionResult> NPData()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
 
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
@@ -56,8 +54,7 @@ public class FriendsController : ControllerBase
             blockedUsers.Add(blockedUser.UserId);
         }
 
-        UserFriendData? friendStore = UserFriendStore.GetUserFriendData(user.UserId);
-        if (friendStore == null) friendStore = UserFriendStore.CreateUserFriendData(user.UserId);
+        UserFriendData friendStore = UserFriendStore.GetUserFriendData(token.UserId) ?? UserFriendStore.CreateUserFriendData(token.UserId);
 
         friendStore.FriendIds = friends.Select(u => u.UserId).ToList();
         friendStore.BlockedIds = blockedUsers;

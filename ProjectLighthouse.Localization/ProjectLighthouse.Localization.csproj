@@ -36,6 +36,10 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Profile.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="ModPanel.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>ModPanel.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>

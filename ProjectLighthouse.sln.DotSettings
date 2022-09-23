@@ -87,6 +87,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=NP/@EntryIndexedValue">NP</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PNG/@EntryIndexedValue">PNG</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PS/@EntryIndexedValue">PS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PSN/@EntryIndexedValue">PSN</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PSP/@EntryIndexedValue">PSP</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RPCS/@EntryIndexedValue">RPCS</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SMTP/@EntryIndexedValue">SMTP</s:String>
@@ -101,6 +102,7 @@
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Affero/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=airfryer/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=ARRRRRRRRRR/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=asdf/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=BCAS/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=BCES/@EntryIndexedValue">True</s:Boolean>
@@ -112,7 +114,9 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Braaains/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=brun/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=deflater/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Dismisser/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=dpadrate/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=dumbass/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=ezoiar/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=farc/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=FLUSHALL/@EntryIndexedValue">True</s:Boolean>
@@ -147,6 +151,7 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=PCSF/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Sublevels/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Swingy/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=thumbsdown/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=thumbsup/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=topscores/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=UCAS/@EntryIndexedValue">True</s:Boolean>

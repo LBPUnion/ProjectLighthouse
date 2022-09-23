@@ -18,8 +18,6 @@ public class LandingPage : BaseLayout
     public int PendingAuthAttempts;
     public List<User> PlayersOnline = new();
 
-    public int PlayersOnlineCount;
-
     public List<Slot>? LatestTeamPicks;
     public List<Slot>? NewestLevels;
 
@@ -28,8 +26,6 @@ public class LandingPage : BaseLayout
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user != null && user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
-
-        this.PlayersOnlineCount = await StatisticsHelper.RecentMatches();
 
         if (user != null)
             this.PendingAuthAttempts = await this.Database.AuthenticationAttempts.Include
@@ -42,15 +38,18 @@ public class LandingPage : BaseLayout
 
         const int maxShownLevels = 5;
 
-        this.LatestTeamPicks = await this.Database.Slots.Where
-                (s => s.Type == SlotType.User)
+        this.LatestTeamPicks = await this.Database.Slots.Where(s => s.Type == SlotType.User && !s.SubLevel)
             .Where(s => s.TeamPick)
             .OrderByDescending(s => s.FirstUploaded)
             .Take(maxShownLevels)
             .Include(s => s.Creator)
             .ToListAsync();
 
-        this.NewestLevels = await this.Database.Slots.Where(s => s.Type == SlotType.User).OrderByDescending(s => s.FirstUploaded).Take(maxShownLevels).Include(s => s.Creator).ToListAsync();
+        this.NewestLevels = await this.Database.Slots.Where(s => s.Type == SlotType.User && !s.SubLevel)
+            .OrderByDescending(s => s.FirstUploaded)
+            .Take(maxShownLevels)
+            .Include(s => s.Creator)
+            .ToListAsync();
 
         return this.Page();
     }

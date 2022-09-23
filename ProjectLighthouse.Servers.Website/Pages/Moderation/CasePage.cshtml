@@ -1,0 +1,27 @@
+@page "/moderation/cases/{pageNumber:int}"
+@using LBPUnion.ProjectLighthouse.Administration
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.CasePage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Cases";
+
+    string timeZone = Model.GetTimeZone();
+}
+
+<p>There are @Model.CaseCount total cases, @Model.DismissedCaseCount of which have been dismissed.</p>
+
+<form action="/moderation/cases/0">
+    <div class="ui icon input">
+        <input type="text" autocomplete="off" name="name" placeholder="Search cases..." value="@Model.SearchValue">
+        <i class="search icon"></i>
+    </div>
+</form>
+
+<div class="ui divider"></div>
+
+@foreach (ModerationCase @case in Model.Cases)
+{
+    @(await Html.PartialAsync("Partials/ModerationCasePartial", @case, ViewData.WithTime(timeZone)))
+}

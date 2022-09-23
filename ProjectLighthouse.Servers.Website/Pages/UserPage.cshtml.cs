@@ -13,7 +13,7 @@ public class UserPage : BaseLayout
 {
     public List<Comment>? Comments;
 
-    public bool CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
+    public bool CommentsEnabled;
 
     public bool IsProfileUserHearted;
 
@@ -28,8 +28,32 @@ public class UserPage : BaseLayout
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
 
+        // Determine if user can view profile according to profileUser's privacy settings
+        if (this.User == null || !this.User.IsAdmin)
+        {
+            switch (this.ProfileUser.ProfileVisibility)
+            {
+                case PrivacyType.PSN:
+                {
+                    if (this.User != null) return this.NotFound();
+
+                    break;
+                }
+                case PrivacyType.Game:
+                {
+                    if (this.ProfileUser != this.User) return this.NotFound();
+
+                    break;
+                }
+                case PrivacyType.All: break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+
         this.Photos = await this.Database.Photos.Include(p => p.Slot).OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
-        if (this.CommentsEnabled)
+
+        this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.ProfileUser.CommentsEnabled;
+        if(this.CommentsEnabled)
         {
             this.Comments = await this.Database.Comments.Include(p => p.Poster)
                 .OrderByDescending(p => p.Timestamp)

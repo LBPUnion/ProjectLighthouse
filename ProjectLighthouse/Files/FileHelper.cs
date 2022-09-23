@@ -1,17 +1,20 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DDSReader;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using Pfim;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -21,7 +24,33 @@ public static class FileHelper
 {
     public static readonly string ResourcePath = Path.Combine(Environment.CurrentDirectory, "r");
 
+    public static readonly string ImagePath = Path.Combine(Environment.CurrentDirectory, "png");
+
     public static string GetResourcePath(string hash) => Path.Combine(ResourcePath, hash);
+
+    public static string GetImagePath(string hash) => Path.Combine(ImagePath, hash);
+
+    public static bool AreDependenciesSafe(LbpFile file)
+    {
+        // recursively check if dependencies are safe
+        List<ResourceDescriptor> dependencies = ParseDependencyList(file);
+        foreach (ResourceDescriptor resource in dependencies)
+        {
+            if (resource.IsGuidResource()) continue;
+
+            LbpFile? r = LbpFile.FromHash(resource.Hash);
+            // If the resource hasn't been uploaded yet then we just go off it's included resource type
+            if (r == null)
+                if (resource.IsScriptType())
+                    return false;
+                else
+                    continue;
+
+            if (!IsFileSafe(r)) return false;
+        }
+
+        return true;
+    }
 
     public static bool IsFileSafe(LbpFile file)
     {
@@ -39,7 +68,9 @@ public static class FileHelper
             LbpFileType.Texture => true,
             LbpFileType.Script => false,
             LbpFileType.Level => true,
+            LbpFileType.Adventure => true,
             LbpFileType.Voice => true,
+            LbpFileType.Quest => true,
             LbpFileType.Plan => true,
             LbpFileType.Jpeg => true,
             LbpFileType.Png => true,
@@ -49,6 +80,57 @@ public static class FileHelper
             _ => false,
             #endif
         };
+    }
+
+    private static List<ResourceDescriptor> ParseDependencyList(LbpFile file)
+    {
+
+        List<ResourceDescriptor> dependencies = new();
+        if (file.FileType == LbpFileType.Unknown || file.Data.Length < 0xb || file.Data[3] != 'b')
+        {
+            return dependencies;
+        }
+
+        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..]);
+
+        // Data format is 'borrowed' from: https://github.com/ennuo/toolkit/blob/main/src/main/java/ennuo/craftworld/resources/Resource.java#L191
+
+        if (revision < 0x109) return dependencies;
+
+        int curOffset = 8;
+        int dependencyTableOffset = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[curOffset..]);
+        if(dependencyTableOffset <= 0 || dependencyTableOffset > file.Data.Length) return dependencies;
+        
+        curOffset = dependencyTableOffset;
+        int dependencyTableSize = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[dependencyTableOffset..]);
+        curOffset += 4;
+        for (int i = 0; i < dependencyTableSize; ++i)
+        {
+            byte hashType = file.Data[curOffset];
+            curOffset += 1;
+            ResourceDescriptor resource = new();
+            switch (hashType)
+            {
+                case 1:
+                {
+                    byte[] hashBytes = new byte[0x14];
+                    Buffer.BlockCopy(file.Data, curOffset, hashBytes, 0, 0x14);
+                    curOffset += 0x14;
+                    resource.Hash = BitConverter.ToString(hashBytes).Replace("-", "");
+                    break;
+                }
+                case 2:
+                {
+                    resource.Hash = "g" + BinaryPrimitives.ReadUInt32BigEndian(file.Data.AsSpan()[curOffset..]);
+                    curOffset += 4;
+                    break;
+                }
+            }
+            resource.Type = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[curOffset..]);
+            curOffset += 4;
+            dependencies.Add(resource);
+        }
+        return dependencies;
     }
 
     public static GameVersion ParseLevelVersion(LbpFile file)
@@ -62,22 +144,15 @@ public static class FileHelper
         const ushort lbpVitaLatest = 0x3E2;
         const ushort lbpVitaDescriptor = 0x4431;
         // There are like 1600 revisions so this doesn't cover everything
-        uint revision = 0;
 
-        // construct a 32 bit number from 4 individual bytes
-        for (int i = 4; i <= 7; i++)
-        {
-            revision <<= 8;
-            revision |= file.Data[i];
-        }
+        int revision = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[4..]);
 
         if (revision >= 0x271)
         {
             // construct a 16 bit number from 2 individual bytes
-            ushort branchDescriptor = (ushort) (file.Data[12] << 8 | file.Data[13]);
+            ushort branchDescriptor = BinaryPrimitives.ReadUInt16BigEndian(file.Data.AsSpan()[12..]);
             if (revision == lbpVitaLatest && branchDescriptor == lbpVitaDescriptor) return GameVersion.LittleBigPlanetVita;
         }
-
 
         GameVersion version = GameVersion.Unknown;
         if (revision <= lbp1Latest)
@@ -120,7 +195,10 @@ public static class FileHelper
             "FSHb" => LbpFileType.Script,
             "VOPb" => LbpFileType.Voice,
             "LVLb" => LbpFileType.Level,
+            "ADCb" => LbpFileType.Adventure,
+            "ADSb" => LbpFileType.Adventure,
             "PLNb" => LbpFileType.Plan,
+            "QSTb" => LbpFileType.Quest,
             _ => readAlternateHeader(reader),
         };
     }
@@ -170,6 +248,34 @@ public static class FileHelper
         if (!Directory.Exists(path)) Directory.CreateDirectory(path ?? throw new ArgumentNullException(nameof(path)));
     }
 
+    private static readonly Regex base64Regex = new(@"data:([^\/]+)\/([^;]+);base64,(.*)", RegexOptions.Compiled);
+
+    public static async Task<string?> ParseBase64Image(string? image)
+    {
+        if (string.IsNullOrWhiteSpace(image)) return null;
+
+        System.Text.RegularExpressions.Match match = base64Regex.Match(image);
+
+        if (!match.Success) return null;
+
+        if (match.Groups.Count != 4) return null;
+
+        byte[] data = Convert.FromBase64String(match.Groups[3].Value);
+
+        LbpFile file = new(data);
+
+        if (file.FileType is not (LbpFileType.Jpeg or LbpFileType.Png)) return null;
+
+        if (ResourceExists(file.Hash)) return file.Hash;
+
+        string assetsDirectory = ResourcePath;
+        string path = GetResourcePath(file.Hash);
+
+        EnsureDirectoryCreated(assetsDirectory);
+        await File.WriteAllBytesAsync(path, file.Data);
+        return file.Hash;
+    }
+
     public static string[] ResourcesNotUploaded(params string[] hashes) => hashes.Where(hash => !ResourceExists(hash)).ToArray();
 
     public static void ConvertAllTexturesToPng()
@@ -214,7 +320,7 @@ public static class FileHelper
 
     public static bool LbpFileToPNG(LbpFile file) => LbpFileToPNG(file.Data, file.Hash, file.FileType);
 
-    public static bool LbpFileToPNG(byte[] data, string hash, LbpFileType type)
+    private static bool LbpFileToPNG(byte[] data, string hash, LbpFileType type)
     {
         if (type != LbpFileType.Jpeg && type != LbpFileType.Png && type != LbpFileType.Texture) return false;
 
@@ -272,6 +378,7 @@ public static class FileHelper
             if (compressed[i] == decompressed[i])
             {
                 writer.Write(deflatedData);
+                continue;
             }
 
             Inflater inflater = new();
@@ -287,19 +394,25 @@ public static class FileHelper
 
     private static bool DDSToPNG(string hash, byte[] data)
     {
-        using MemoryStream stream = new();
-        DDSImage image = new(data);
+        Dds ddsImage = Dds.Create(data, new PfimConfig());
+        if(ddsImage.Compressed)
+            ddsImage.Decompress();
 
-        image.SaveAsPng(stream);
+        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+        Image image = ddsImage.Format switch
+        {
+            ImageFormat.Rgba32 => Image.LoadPixelData<Bgra32>(ddsImage.Data, ddsImage.Width, ddsImage.Height),
+            _ => throw new ArgumentOutOfRangeException($"ddsImage.Format is not supported: {ddsImage.Format}")
+        };
 
         Directory.CreateDirectory("png");
-        File.WriteAllBytes($"png/{hash}.png", stream.ToArray());
+        image.SaveAsPngAsync($"png/{hash}.png");
         return true;
     }
 
     private static bool JPGToPNG(string hash, byte[] data)
     {
-        using Image<Rgba32> image = Image.Load(data);
+        using Image image = Image.Load(data);
         using MemoryStream ms = new();
         image.SaveAsPng(ms);
 

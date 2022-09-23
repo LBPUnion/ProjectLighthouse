@@ -1,7 +1,7 @@
 #nullable enable
+using System;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
 
@@ -13,6 +13,8 @@ public class UserStatus
     public GameVersion? CurrentVersion { get; set; }
     public Platform? CurrentPlatform { get; set; }
     public Room? CurrentRoom { get; set; }
+    public long LastLogin { get; set; }
+    public long LastLogout { get; set; }
 
     public UserStatus()
     {}
@@ -33,10 +35,33 @@ public class UserStatus
             this.CurrentPlatform = lastContact.Platform;
         }
 
-        this.CurrentRoom = RoomHelper.FindRoomByUserId(userId);
+        var loginTimestamps = database.Users.Where(u => u.UserId == userId)
+            .Select(u => new
+            {
+                u.LastLogin,
+                u.LastLogout,
+            }).FirstOrDefault();
+        this.LastLogin = loginTimestamps?.LastLogin ?? 0;
+        this.LastLogout = loginTimestamps?.LastLogout ?? 0;
+
+       this.CurrentRoom = RoomHelper.FindRoomByUserId(userId);
     }
 
-    public string ToTranslatedString(string language)
+    private string FormatOfflineTimestamp(string language, string timeZone)
+    {
+        if (this.LastLogout <= 0 && this.LastLogin <= 0)
+        {
+            return StatusStrings.Offline.Translate(language);
+        }
+
+        long timestamp = this.LastLogout;
+        if (timestamp <= 0) timestamp = this.LastLogin;
+        TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+        string formattedTime = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(timestamp), timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt");
+        return StatusStrings.LastOnline.Translate(language, formattedTime);
+    }
+
+    public string ToTranslatedString(string language, string timeZone)
     {
         this.CurrentVersion ??= GameVersion.Unknown;
         this.CurrentPlatform ??= Platform.Unknown;
@@ -44,8 +69,8 @@ public class UserStatus
         return this.StatusType switch
         {
             StatusType.Online => StatusStrings.CurrentlyOnline.Translate(language, 
-                ((GameVersion)this.CurrentVersion).ToPrettyString(), ((Platform)this.CurrentPlatform)),
-            StatusType.Offline => StatusStrings.Offline.Translate(language),
+                ((GameVersion)this.CurrentVersion).ToPrettyString(), (Platform)this.CurrentPlatform),
+            StatusType.Offline => this.FormatOfflineTimestamp(language, timeZone),
             _ => GeneralStrings.Unknown.Translate(language),
         };
     }
