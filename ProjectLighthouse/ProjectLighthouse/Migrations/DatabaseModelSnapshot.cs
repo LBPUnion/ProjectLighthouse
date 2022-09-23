@@ -730,8 +730,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("IconHash")
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("IsAPirate")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<string>("Language")
+                        .HasColumnType("longtext");
 
                     b.Property<long>("LastLogin")
                         .HasColumnType("bigint");
@@ -771,6 +771,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<int>("ProfileVisibility")
                         .HasColumnType("int");
+
+                    b.Property<string>("TimeZone")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Username")
                         .IsRequired()

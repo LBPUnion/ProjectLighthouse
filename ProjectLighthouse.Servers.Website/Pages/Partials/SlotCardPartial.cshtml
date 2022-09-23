@@ -18,6 +18,8 @@
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
     bool mini = (bool?)ViewData["IsMini"] ?? false;
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 
     bool isQueued = false;
     bool isHearted = false;
@@ -37,11 +39,13 @@
 <div class="card">
     @{
         int size = isMobile || mini ? 50 : 100;
+        bool isAdventure = Model.IsAdventurePlanet;
+        string advenStyleExt = isAdventure ? "-webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" : "";
     }
     <div>
-        <img src="~/assets/slotCardOverlay.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute">
-        <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: -1;">
-        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px;" 
+        <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">
+        <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(advenStyleExt)">
+        <img class="cardIcon slotCardIcon" src="/gameAssets/@iconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(advenStyleExt)"  
              onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
     </div>
     <div class="cardStats">
@@ -90,12 +94,24 @@
         </div>
         @if (Model.Creator != null)
         {
+            string date = "";
+            if(!mini)
+                date = " on " + TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.FirstUploaded), timeZoneInfo).DateTime.ToShortDateString();
             <p>
-                <i>Created by @await Model.Creator.ToLink(Html, ViewData, language) on @Model.GameVersion.ToPrettyString()</i>
+                <i>Created by @await Model.Creator.ToLink(Html, ViewData, language) in @Model.GameVersion.ToPrettyString()@date</i>
             </p>
         }
     </div>
     <div class="cardButtons">
+            <br>
+            @if (user != null && !mini && (user.IsModerator || user.UserId == Model.CreatorId))
+            {
+                <a class="ui blue tiny button" href="/slot/@Model.SlotId/settings" title="Settings">
+                    <i class="cog icon" style="margin: 0"></i>
+                </a>
+            }
+        </div>
+    <div class="cardButtons" style="margin-left: 0">
         <br>
         @if (user != null && !mini)
         {

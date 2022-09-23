@@ -1,9 +1,11 @@
 @page "/moderation/report/{reportId:int}"
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.ReportPage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = $"Report {Model.Report.ReportId}";
+    string timeZone = Model.GetTimeZone();
 }
 
 <script>
@@ -14,5 +16,5 @@
     let images = [];
 </script>
 
-@await Html.PartialAsync("Partials/ReportPartial", Model.Report)
+@await Html.PartialAsync("Partials/ReportPartial", Model.Report, ViewData.WithTime(timeZone))
 @await Html.PartialAsync("Partials/RenderReportBoundsPartial")

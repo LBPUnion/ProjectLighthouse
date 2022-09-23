@@ -60,6 +60,9 @@ public class Slot
     [XmlElement("icon")]
     public string IconHash { get; set; } = "";
 
+    [XmlElement("isAdventurePlanet")]
+    public bool IsAdventurePlanet { get; set; }
+
     [XmlElement("rootLevel")]
     [JsonIgnore]
     public string RootLevel { get; set; } = "";
@@ -301,6 +304,7 @@ public class Slot
                           LbpSerializer.StringElement("initiallyLocked", this.InitiallyLocked) +
                           LbpSerializer.StringElement("isSubLevel", this.SubLevel) +
                           LbpSerializer.StringElement("isLBP1Only", this.Lbp1Only) +
+                          LbpSerializer.StringElement("isAdventurePlanet", this.IsAdventurePlanet) +
                           LbpSerializer.StringElement("background", this.BackgroundHash) +
                           LbpSerializer.StringElement("shareable", this.Shareable) +
                           LbpSerializer.StringElement("authorLabels", this.AuthorLabels) +

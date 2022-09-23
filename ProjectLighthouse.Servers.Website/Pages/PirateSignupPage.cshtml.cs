@@ -1,8 +1,6 @@
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
@@ -24,7 +22,7 @@ public class PirateSignupPage : BaseLayout
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
-        user.IsAPirate = !user.IsAPirate;
+        user.Language = user.Language == "en-PT" ? "en" : "en-PT";
         await this.Database.SaveChangesAsync();
 
         return this.Redirect("/");

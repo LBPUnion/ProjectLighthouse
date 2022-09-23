@@ -25,6 +25,27 @@ public class SlotPageController : ControllerBase
         this.database = database;
     }
 
+    [HttpGet("unpublish")]
+    public async Task<IActionResult> UnpublishSlot([FromRoute] int id)
+    {
+        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        Slot? targetSlot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
+        if (targetSlot == null) return this.Redirect("~/slots/0");
+
+        if (targetSlot.Location == null) throw new ArgumentNullException();
+
+        if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
+
+        this.database.Locations.Remove(targetSlot.Location);
+        this.database.Slots.Remove(targetSlot);
+
+        await this.database.SaveChangesAsync();
+
+        return this.Redirect("~/slots/0");
+    }
+
     [HttpGet("rateComment")]
     public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int commentId, [FromQuery] int rating)
     {
