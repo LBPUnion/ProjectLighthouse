@@ -337,7 +337,7 @@ public class Slot
                           LbpSerializer.StringElement("firstPublished", this.FirstUploaded) +
                           LbpSerializer.StringElement("lastUpdated", this.LastUpdated) +
                           (fullSerialization ?
-                              yourReview?.Serialize() +
+                              yourReview?.Serialize(null, "yourReview") +
                               LbpSerializer.StringElement("reviewsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled) +
                               LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.CommentsEnabled)
                               : "") +
