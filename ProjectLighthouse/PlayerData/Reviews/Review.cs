@@ -60,7 +60,7 @@ public class Review
     [XmlElement("thumbsdown")]
     public int ThumbsDown { get; set; }
 
-    public string Serialize(RatedReview? yourRatingStats = null)
+    public string Serialize(RatedReview? yourRatingStats = null, string rootElement = "review")
     {
         string deletedBy = this.DeletedBy switch
         {
@@ -82,6 +82,6 @@ public class Review
                             LbpSerializer.StringElement("thumbsdown", this.ThumbsDown) +
                             LbpSerializer.StringElement("yourthumb", yourRatingStats?.Thumb ?? 0);
 
-        return LbpSerializer.TaggedStringElement("review", reviewData, "id", this.SlotId + "." + this.Reviewer?.Username);
+        return LbpSerializer.TaggedStringElement(rootElement, reviewData, "id", this.SlotId + "." + this.Reviewer?.Username);
     }
 }
