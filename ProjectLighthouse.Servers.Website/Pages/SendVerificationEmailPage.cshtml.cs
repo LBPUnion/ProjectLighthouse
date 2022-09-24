@@ -1,5 +1,7 @@
 #nullable enable
+using System.Collections.Concurrent;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
@@ -13,6 +15,9 @@ public class SendVerificationEmailPage : BaseLayout
 {
     public SendVerificationEmailPage(Database database) : base(database)
     {}
+
+    // (User id, timestamp of last request + 30 seconds)
+    private static readonly ConcurrentDictionary<int, long> recentlySentEmail = new();
 
     public bool Success { get; set; }
 
@@ -35,21 +40,33 @@ public class SendVerificationEmailPage : BaseLayout
         }
         #endif
 
-        EmailVerificationToken? verifyToken = await this.Database.EmailVerificationTokens.FirstOrDefaultAsync(v => v.UserId == user.UserId); 
-        // If user doesn't have a token or it is expired then regenerate
-        if (verifyToken == null || DateTime.Now > verifyToken.ExpiresAt)
+        // Remove expired entries
+        for (int i = recentlySentEmail.Count - 1; i >= 0; i--)
         {
-            verifyToken = new EmailVerificationToken
-            {
-                UserId = user.UserId,
-                User = user,
-                EmailToken = CryptoHelper.GenerateAuthToken(),
-                ExpiresAt = DateTime.Now.AddHours(6),
-            };
-
-            this.Database.EmailVerificationTokens.Add(verifyToken);
-            await this.Database.SaveChangesAsync();
+            KeyValuePair<int, long> entry = recentlySentEmail.ElementAt(i);
+            if (TimeHelper.TimestampMillis > recentlySentEmail[user.UserId]) recentlySentEmail.TryRemove(entry.Key, out _);
         }
+
+        if (recentlySentEmail.ContainsKey(user.UserId) && recentlySentEmail[user.UserId] > TimeHelper.TimestampMillis)
+        {
+            this.Success = true;
+            return this.Page();
+        }
+
+        string? existingToken = await this.Database.EmailVerificationTokens.Where(v => v.UserId == user.UserId).Select(v => v.EmailToken).FirstOrDefaultAsync();
+        if(existingToken != null)
+            this.Database.EmailVerificationTokens.RemoveWhere(t => t.EmailToken == existingToken);
+
+        EmailVerificationToken verifyToken = new()
+        {
+            UserId = user.UserId,
+            User = user,
+            EmailToken = CryptoHelper.GenerateAuthToken(),
+            ExpiresAt = DateTime.Now.AddHours(6),
+        };
+
+        this.Database.EmailVerificationTokens.Add(verifyToken);
+        await this.Database.SaveChangesAsync();
 
         string body = "Hello,\n\n" +
                       $"This email is a request to verify this email for your (likely new!) Project Lighthouse account ({user.Username}).\n\n" +
@@ -57,6 +74,9 @@ public class SendVerificationEmailPage : BaseLayout
                       "If this wasn't you, feel free to ignore this email.";
 
         this.Success = SMTPHelper.SendEmail(user.EmailAddress, "Project Lighthouse Email Verification", body);
+
+        // Don't send another email for 30 seconds
+        recentlySentEmail.TryAdd(user.UserId, TimeHelper.TimestampMillis + 30 * 1000);
 
         return this.Page();
     }
