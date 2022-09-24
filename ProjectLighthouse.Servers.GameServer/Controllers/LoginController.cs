@@ -1,7 +1,6 @@
 #nullable enable
 using System.Net;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
@@ -140,7 +139,7 @@ public class LoginController : ControllerBase
             {
                 AuthTicket = "MM_AUTH=" + token.UserToken,
                 ServerBrand = VersionHelper.EnvVer,
-                TitleStorageUrl = this.Request.GetBaseUrl() + "/LITTLEBIGPLANETPS3_XML",
+                TitleStorageUrl = ServerConfiguration.Instance.GameApiExternalUrl,
             }.Serialize()
         );
     }

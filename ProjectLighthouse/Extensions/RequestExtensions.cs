@@ -6,9 +6,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
@@ -31,28 +29,6 @@ public static class RequestExtensions
             BaseAddress = captchaUri,
         };
     }
-
-    #region URL stuff
-
-    public static string GetBaseUrl(this HttpRequest request)
-    {
-        // this sucks
-        string listenUrl = ServerStatics.ServerType switch
-        {
-            ServerType.GameServer => ServerConfiguration.Instance.GameApiListenUrl,
-            ServerType.Website => ServerConfiguration.Instance.WebsiteListenUrl,
-            ServerType.Api => ServerConfiguration.Instance.ApiListenUrl,
-            _ => ServerConfiguration.Instance.ExternalUrl,
-        };
-
-        string displayUrl = request.GetDisplayUrl();
-        if (!new Uri(displayUrl).IsDefaultPort) return displayUrl[..displayUrl.IndexOf(request.Path)];
-
-        displayUrl = displayUrl[..displayUrl.IndexOf(request.Path)] + ":" + listenUrl[(listenUrl.LastIndexOf(":", StringComparison.Ordinal)+1)..];
-        return displayUrl;
-    }
-
-    #endregion
     
     #region Mobile Checking
 

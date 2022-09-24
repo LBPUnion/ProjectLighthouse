@@ -23,7 +23,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 11;
+    public const int CurrentConfigVersion = 12;
 
     #region Meta
 
@@ -177,6 +177,7 @@ public class ServerConfiguration
     public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
     public string RedisConnectionString { get; set; } = "redis://localhost:6379";
     public string ExternalUrl { get; set; } = "http://localhost:10060";
+    public string GameApiExternalUrl { get; set; } = "http://localhost:10060/LITTLEBIGPLANETPS3_XML";
     public bool ConfigReloading { get; set; }
     public string EulaText { get; set; } = "";
 #if !DEBUG
