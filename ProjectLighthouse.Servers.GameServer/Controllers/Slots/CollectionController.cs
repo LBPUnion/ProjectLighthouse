@@ -1,5 +1,4 @@
 #nullable enable
-using System.Xml.Schema;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -120,7 +119,11 @@ public class CollectionController : ControllerBase
             (current, slot) => current + slot.Serialize());
         int total = this.database.Playlists.Count(p => p.CreatorId == userId);
 
-        return LbpSerializer.TaggedStringElement("playlists", response, "total", total);
+        return LbpSerializer.TaggedStringElement("playlists", response, new Dictionary<string, object>
+        {
+            {"total", total},
+            {"hint_start", total+1},
+        });
     }
 
     [HttpPost("playlists")]
