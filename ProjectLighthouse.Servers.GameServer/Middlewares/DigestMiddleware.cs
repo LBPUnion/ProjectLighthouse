@@ -39,11 +39,8 @@ public class DigestMiddleware : Middleware
                 excludeBodyFromDigest = true;
             }
 
-            string clientRequestDigest = await CryptoHelper.ComputeDigest(digestPath,
-                authCookie,
-                body,
-                ServerConfiguration.Instance.DigestKey.PrimaryDigestKey,
-                excludeBodyFromDigest);
+            string clientRequestDigest = await CryptoHelper.ComputeDigest
+                (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey, excludeBodyFromDigest);
 
             // Check the digest we've just calculated against the digest header if the game set the header. They should match.
             if (context.Request.Headers.TryGetValue(digestHeaderKey, out StringValues sentDigest))
@@ -56,11 +53,8 @@ public class DigestMiddleware : Middleware
                     // Reset the body stream
                     body.Position = 0;
 
-                    clientRequestDigest = await CryptoHelper.ComputeDigest(digestPath,
-                        authCookie,
-                        body,
-                        ServerConfiguration.Instance.DigestKey.AlternateDigestKey,
-                        excludeBodyFromDigest);
+                    clientRequestDigest = await CryptoHelper.ComputeDigest
+                        (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.AlternateDigestKey, excludeBodyFromDigest);
                     if (clientRequestDigest != sentDigest)
                     {
                         #if DEBUG
@@ -108,8 +102,7 @@ public class DigestMiddleware : Middleware
                 : ServerConfiguration.Instance.DigestKey.PrimaryDigestKey;
 
             // Compute the digest for the response.
-            string serverDigest =
-                await CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer, digestKey);
+            string serverDigest = await CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer, digestKey);
             context.Response.Headers.Add("X-Digest-A", serverDigest);
         }
 

@@ -17,12 +17,10 @@ public class SetLastContactMiddleware : MiddlewareDBContext
             // We begin by grabbing a token from the request, if this is a LBPPS3_XML request of course.
             GameToken? gameToken = await database.GameTokenFromRequest(context.Request);
 
-            if (gameToken != null && gameToken.GameVersion == GameVersion.LittleBigPlanet1)
+            if (gameToken?.GameVersion == GameVersion.LittleBigPlanet1)
                 // Ignore UserFromGameToken null because user must exist for a token to exist
-                await LastContactHelper.SetLastContact(database,
-                    (await database.UserFromGameToken(gameToken))!,
-                    GameVersion.LittleBigPlanet1,
-                    gameToken.Platform);
+                await LastContactHelper.SetLastContact
+                    (database, (await database.UserFromGameToken(gameToken))!, GameVersion.LittleBigPlanet1, gameToken.Platform);
         }
         #nullable disable
 

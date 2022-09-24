@@ -127,9 +127,7 @@ public class ServerConfiguration
             ServerConfiguration? configuration = fromFile(ConfigFileName);
             if (configuration == null)
             {
-                Logger.Warn(
-                    "The new configuration was unable to be loaded for some reason. The old config has been kept.",
-                    LogArea.Config);
+                Logger.Warn("The new configuration was unable to be loaded for some reason. The old config has been kept.", LogArea.Config);
                 return;
             }
 

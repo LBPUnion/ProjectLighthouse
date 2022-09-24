@@ -185,7 +185,8 @@ public class PublishController : ControllerBase
                 if (intendedVersion != GameVersion.Unknown && intendedVersion != slotVersion)
                 {
                     // Delete the useless rootLevel that lbp3 just uploaded
-                    FileHelper.DeleteResource(slot.RootLevel);
+                    if(slotVersion == GameVersion.LittleBigPlanet3)
+                        FileHelper.DeleteResource(slot.RootLevel);
 
                     slot.GameVersion = oldSlot.GameVersion;
                     slot.RootLevel = oldSlot.RootLevel;

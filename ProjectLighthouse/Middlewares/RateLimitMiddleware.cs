@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using Microsoft.AspNetCore.Http;
 
 namespace LBPUnion.ProjectLighthouse.Middlewares;
@@ -38,9 +39,9 @@ public class RateLimitMiddleware : MiddlewareDBContext
 
         PathString path = RemoveTrailingSlash(ctx.Request.Path.ToString());
 
-        RateLimitOptions? rateLimitOptions = GetRateLimitOverride(path);
+        RateLimitOptions? options = GetRateLimitOverride(path);
 
-        if (!IsRateLimitEnabled(rateLimitOptions))
+        if (!IsRateLimitEnabled(options))
         {
             await this.next(ctx);
             return;
@@ -48,29 +49,30 @@ public class RateLimitMiddleware : MiddlewareDBContext
 
         RemoveExpiredEntries();
 
-        if (GetNumRequestsForPath(address, path) + 1 >= GetMaxNumRequests(rateLimitOptions))
+        if (GetNumRequestsForPath(address, path) >= GetMaxNumRequests(options))
         {
+            Logger.Info($"Request limit reached for {address.ToString()} ({ctx.Request.Path})", LogArea.RateLimit);
             ctx.Response.Headers.Add("Retry-After", "" + Math.Ceiling((recentRequests[address][0].Expiration - TimeHelper.TimestampMillis) / 1000f));
             ctx.Response.StatusCode = 429;
             return;
         }
 
-        LogRequest(address, path, rateLimitOptions);
+        LogRequest(address, path, options);
 
         // Handle request as normal
         await this.next(ctx);
     }
 
-    private static int GetMaxNumRequests(RateLimitOptions? rateLimitOverride) => rateLimitOverride?.RequestsPerInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.RequestsPerInterval;
+    private static int GetMaxNumRequests(RateLimitOptions? options) => options?.RequestsPerInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.RequestsPerInterval;
 
-    public static bool IsRateLimitEnabled(RateLimitOptions? rateLimitOverride) => rateLimitOverride?.Enabled ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.Enabled;
+    private static bool IsRateLimitEnabled(RateLimitOptions? options) => options?.Enabled ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.Enabled;
 
-    private static long GetRequestInterval(RateLimitOptions? rateLimitOverride) => rateLimitOverride?.RequestInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.RequestInterval;
+    private static long GetRequestInterval(RateLimitOptions? options) => options?.RequestInterval ?? ServerConfiguration.Instance.RateLimitConfiguration.GlobalOptions.RequestInterval;
 
     private static RateLimitOptions? GetRateLimitOverride(PathString path)
     {
-        Dictionary<string, RateLimitOptions> overrides = ServerConfiguration.Instance.RateLimitConfiguration.RateLimitOverrides;
-        List<string> matchingOptions = overrides.Keys.Where(s => new Regex("^" + RemoveTrailingSlash(s).Replace("/", @"\/").Replace("*", ".*") + "$").Match(path).Success).ToList();
+        Dictionary<string, RateLimitOptions> overrides = ServerConfiguration.Instance.RateLimitConfiguration.OverrideOptions;
+        List<string> matchingOptions = overrides.Keys.Where(s => new Regex("^" + s.Replace("/", @"\/").Replace("*", ".*") + "$").Match(path).Success).ToList();
         if (matchingOptions.Count == 0) return null;
         // return 0 for equal, -1 for a, and 1 for b
         matchingOptions.Sort((a, b) =>
@@ -110,12 +112,12 @@ public class RateLimitMiddleware : MiddlewareDBContext
 
     private static string RemoveTrailingSlash(string s) => s.TrimEnd('/').TrimEnd('\\');
 
-    private static int GetNumRequestsForPath(IPAddress address, PathString pathString)
+    private static int GetNumRequestsForPath(IPAddress address, PathString path)
     {
         if (!recentRequests.ContainsKey(address)) return 0;
 
         List<LighthouseRequest> requests = recentRequests[address];
-        return requests.Count(r => r.Path == pathString);
+        return requests.Count(r => r.Path == path);
     }
 
     private class LighthouseRequest

@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Concurrent;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -16,7 +17,7 @@ public class SendVerificationEmailPage : BaseLayout
     {}
 
     // (User id, timestamp of last request + 30 seconds)
-    private static readonly Dictionary<int, long> recentlySentEmail = new();
+    private static readonly ConcurrentDictionary<int, long> recentlySentEmail = new();
 
     public bool Success { get; set; }
 
@@ -43,7 +44,7 @@ public class SendVerificationEmailPage : BaseLayout
         for (int i = recentlySentEmail.Count - 1; i >= 0; i--)
         {
             KeyValuePair<int, long> entry = recentlySentEmail.ElementAt(i);
-            if (TimeHelper.TimestampMillis > recentlySentEmail[user.UserId]) recentlySentEmail.Remove(entry.Key);
+            if (TimeHelper.TimestampMillis > recentlySentEmail[user.UserId]) recentlySentEmail.TryRemove(entry.Key, out _);
         }
 
         if (recentlySentEmail.ContainsKey(user.UserId) && recentlySentEmail[user.UserId] > TimeHelper.TimestampMillis)
@@ -75,7 +76,7 @@ public class SendVerificationEmailPage : BaseLayout
         this.Success = SMTPHelper.SendEmail(user.EmailAddress, "Project Lighthouse Email Verification", body);
 
         // Don't send another email for 30 seconds
-        recentlySentEmail.Add(user.UserId, TimeHelper.TimestampMillis + 30 * 1000);
+        recentlySentEmail.TryAdd(user.UserId, TimeHelper.TimestampMillis + 30 * 1000);
 
         return this.Page();
     }

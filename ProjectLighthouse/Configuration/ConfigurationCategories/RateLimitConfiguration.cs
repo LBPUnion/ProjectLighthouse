@@ -6,7 +6,7 @@ public class RateLimitConfiguration
 {
     public RateLimitOptions GlobalOptions { get; set; } = new();
 
-    public Dictionary<string, RateLimitOptions> RateLimitOverrides { get; set; } = new()
+    public Dictionary<string, RateLimitOptions> OverrideOptions { get; set; } = new()
     {
         {
             "/example/*/wildcard", new RateLimitOptions
