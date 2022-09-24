@@ -56,6 +56,12 @@ public class ResourcesController : ControllerBase
 
         string path = FileHelper.GetResourcePath(hash);
 
+        string fullPath = Path.GetFullPath(path);
+        string basePath = Path.GetFullPath(FileHelper.ResourcePath);
+
+        // Prevent directory traversal attacks
+        if (!fullPath.StartsWith(basePath)) return this.BadRequest();
+
         if (FileHelper.ResourceExists(hash)) return this.File(IOFile.OpenRead(path), "application/octet-stream");
 
         return this.NotFound();
