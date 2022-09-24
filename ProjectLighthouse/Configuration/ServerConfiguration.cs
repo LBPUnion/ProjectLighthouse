@@ -23,7 +23,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 10;
+    public const int CurrentConfigVersion = 12;
 
     #region Meta
 
@@ -39,7 +39,7 @@ public class ServerConfiguration
 
     #region Setup
 
-    private static FileSystemWatcher fileWatcher;
+    private static readonly FileSystemWatcher fileWatcher;
 
     // ReSharper disable once NotNullMemberIsNotInitialized
 #pragma warning disable CS8618
@@ -99,46 +99,53 @@ public class ServerConfiguration
         }
 
         // Set up reloading
-        if (Instance.ConfigReloading)
+        if (!Instance.ConfigReloading) return;
+
+        Logger.Info("Setting up config reloading...", LogArea.Config);
+        fileWatcher = new FileSystemWatcher
         {
-            Logger.Info("Setting up config reloading...", LogArea.Config);
-            fileWatcher = new FileSystemWatcher
-            {
-                Path = Environment.CurrentDirectory,
-                Filter = ConfigFileName,
-                NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
-            };
+            Path = Environment.CurrentDirectory,
+            Filter = ConfigFileName,
+            NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
+        };
 
-            fileWatcher.Changed += onConfigChanged; // add event handler
+        fileWatcher.Changed += onConfigChanged; // add event handler
 
-            fileWatcher.EnableRaisingEvents = true; // begin watching
-        }
+        fileWatcher.EnableRaisingEvents = true; // begin watching
     }
 #pragma warning restore CS8618
 
     private static void onConfigChanged(object sender, FileSystemEventArgs e)
     {
-        Debug.Assert(e.Name == ConfigFileName);
-        Logger.Info("Configuration file modified, reloading config...", LogArea.Config);
-        Logger.Warn("Some changes may not apply; they will require a restart of Lighthouse.", LogArea.Config);
-
-        ServerConfiguration? configuration = fromFile(ConfigFileName);
-        if (configuration == null)
+        try
         {
-            Logger.Warn("The new configuration was unable to be loaded for some reason. The old config has been kept.", LogArea.Config);
-            return;
+            fileWatcher.EnableRaisingEvents = false;
+            Debug.Assert(e.Name == ConfigFileName);
+            Logger.Info("Configuration file modified, reloading config...", LogArea.Config);
+            Logger.Warn("Some changes may not apply; they will require a restart of Lighthouse.", LogArea.Config);
+
+            ServerConfiguration? configuration = fromFile(ConfigFileName);
+            if (configuration == null)
+            {
+                Logger.Warn("The new configuration was unable to be loaded for some reason. The old config has been kept.", LogArea.Config);
+                return;
+            }
+
+            Instance = configuration;
+
+            Logger.Success("Successfully reloaded the configuration!", LogArea.Config);
         }
-
-        Instance = configuration;
-
-        Logger.Success("Successfully reloaded the configuration!", LogArea.Config);
+        finally
+        {
+            fileWatcher.EnableRaisingEvents = true;
+        }
     }
 
     private static INamingConvention namingConvention = CamelCaseNamingConvention.Instance;
 
     private static ServerConfiguration? fromFile(string path)
     {
-        IDeserializer deserializer = new DeserializerBuilder().WithNamingConvention(namingConvention).Build();
+        IDeserializer deserializer = new DeserializerBuilder().WithNamingConvention(namingConvention).IgnoreUnmatchedProperties().Build();
 
         string text;
 
@@ -163,12 +170,6 @@ public class ServerConfiguration
 
     #endregion
 
-    // TODO: Find a way to properly remove config options
-    // YamlDotNet hates that and it's fucking annoying.
-    // This seriously sucks. /rant
-    [Obsolete("Obsolete. Use the Website/GameApi/Api listen URLS instead.")]
-    public string ListenUrl { get; set; } = "http://localhost:10060";
-
     public string WebsiteListenUrl { get; set; } = "http://localhost:10060";
     public string GameApiListenUrl { get; set; } = "http://localhost:10061";
     public string ApiListenUrl { get; set; } = "http://localhost:10062";
@@ -176,6 +177,7 @@ public class ServerConfiguration
     public string DbConnectionString { get; set; } = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
     public string RedisConnectionString { get; set; } = "redis://localhost:6379";
     public string ExternalUrl { get; set; } = "http://localhost:10060";
+    public string GameApiExternalUrl { get; set; } = "http://localhost:10060/LITTLEBIGPLANETPS3_XML";
     public bool ConfigReloading { get; set; }
     public string EulaText { get; set; } = "";
 #if !DEBUG
@@ -197,4 +199,5 @@ public class ServerConfiguration
     public UserGeneratedContentLimitConfiguration UserGeneratedContentLimits { get; set; } = new();
     public WebsiteConfiguration WebsiteConfiguration { get; set; } = new();
     public CustomizationConfiguration Customization { get; set; } = new();
+    public RateLimitConfiguration RateLimitConfiguration { get; set; } = new();
 }

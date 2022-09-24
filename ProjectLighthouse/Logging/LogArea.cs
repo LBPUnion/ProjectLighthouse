@@ -24,4 +24,5 @@ public enum LogArea
     Publish,
     Maintenance,
     Score,
+    RateLimit,
 }
