@@ -71,7 +71,7 @@ information.
 |----------|------------------------|-------------------------------------------|-------------------------------|
 | LBP1     | Compatible             | Compatible                                | No next-gen equivalent        |
 | LBP2     | Compatible             | Compatible                                | No next-gen equivalent        |
-| LBP3     | Mostly compatible      | Compatible                         | Incompatible                  |
+| LBP3     | Mostly compatible      | Compatible                                | Incompatible                  |
 | LBP Vita | Compatible             | Incompatible, PSN not supported on Vita3k | No next-gen equivalent        |
 | LBP PSP  | Potentially compatible | Incompatible, PSN not supported on PPSSPP | Potentially Compatible        |
 
