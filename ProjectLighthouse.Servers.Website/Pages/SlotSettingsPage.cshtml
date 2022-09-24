@@ -39,11 +39,11 @@ function onSubmit(){
                 <div class="field" style="display: flex; justify-content: center; align-items: center;">
                     <div>
                         <div>
-                                <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">                                
-                                <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(advenStyleExt)">
-                                <img id="slotIcon" class="cardIcon slotCardIcon" src="/gameAssets/@Model.Slot.IconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(advenStyleExt)" 
+                            <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">                                
+                            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(advenStyleExt)">
+                            <img id="slotIcon" class="cardIcon slotCardIcon" src="/gameAssets/@Model.Slot.IconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(advenStyleExt)" 
                                                                      onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
-                            </div>
+                        </div>
                         <div class="ui fitted divider hidden"></div>
                         <label for="avatar" class="ui blue button" style="color: white; max-width: @(size)px">
                             <i class="arrow circle up icon"></i>
