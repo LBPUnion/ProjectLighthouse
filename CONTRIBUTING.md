@@ -14,7 +14,7 @@ Once you've gotten MySQL running you can run Lighthouse. It will take care of th
 
 ## Connecting (PS3)
 
-You can use UnionRemotePatcher to manually patch your EBOOT.BIN, it works over the network and automatically downloads, decrypts, patches, encrypts, and uploads your PSN and Disc EBOOTs - https://pages.lbpunion.com/unionremotepatcher-guide.
+You can use [UnionPatcher's Remote Patch utility](https://github.com/LBPUnion/UnionPatcher) to manually patch your EBOOT.BIN; it works over the network and automatically downloads, decrypts, patches, encrypts, and uploads your PSN and Disc EBOOTs.
 
 If you are using **RPCS3**, continue scrolling for the manual method.
 
