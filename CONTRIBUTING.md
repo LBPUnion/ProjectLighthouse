@@ -17,11 +17,10 @@ Once you've gotten MySQL running you can run Lighthouse. It will take care of th
 PS3 is difficult to set up, so I will be going over how to set up RPCS3 instead. A guide will be coming for PS3 closer
 to release. You can also follow this guide if you want to learn how to modify your EBOOT.
 
-Start by getting a copy of LittleBigPlanet 1/2 installed. (Check the LittleBigPlanet 1 section, since you'll need to do
+Start by getting a copy of LittleBigPlanet 1/2/3 installed. (Check the LittleBigPlanet 1 section, since you'll need to do
 extra steps for your game to not crash upon entering pod computer). 
 
-The game can be a digital copy (NPUA80472/NPUA80662) or a disc copy (
-BCUS98148/BCUS98245).
+The game can be a digital copy (NPUA80472/NPUA80662/NPUA81116) or a disc copy (BCUS98148/BCUS98245/BCUS98362).
 
 Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binaries can be found by reading the `README.md`
 file.
