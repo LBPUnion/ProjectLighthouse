@@ -27,11 +27,14 @@ public static class ServerStatics
     // FIXME: This needs to go at some point.
     public static bool IsUnitTesting => AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.FullName!.StartsWith("xunit"));
 
-    #if DEBUG
-    public const bool IsDebug = true;
-    #else
-    public const bool IsDebug = false;
-    #endif
+    public static bool IsDebug()
+    {
+        #if DEBUG
+        return true;
+        #else
+        return false;
+        #endif
+    }
 
     /// <summary>
     /// The servertype, determined on startup. Shouldn't be null unless very very early in startup.

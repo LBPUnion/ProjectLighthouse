@@ -144,9 +144,7 @@
                 </div>
             </div>
         </noscript>
-        @* ReSharper disable HeuristicUnreachableCode *@
-        @* ReSharper disable CSharpWarnings::CS0162 *@
-        @if (!ServerStatics.IsDebug && VersionHelper.IsDirty)
+        @if (!ServerStatics.IsDebug() && VersionHelper.IsDirty)
         {
             <div class="ui bottom attached red message large">
                 <div class="ui container">
@@ -166,8 +164,6 @@
                 </div>
             </div>
         }
-        @* ReSharper restore CSharpWarnings::CS0162 *@
-        @* ReSharper restore HeuristicUnreachableCode *@
     </header>
     <div class="main">
         <div class="ui container">
@@ -197,7 +193,7 @@
                 }
             </div>
         </div>
-        @if (ServerStatics.IsDebug)
+        @if (ServerStatics.IsDebug())
         {
             <div class="ui red attached inverted segment">
                 <div class="ui container">
