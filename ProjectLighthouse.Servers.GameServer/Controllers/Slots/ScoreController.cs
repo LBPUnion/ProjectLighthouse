@@ -214,8 +214,8 @@ public class ScoreController : ControllerBase
         var rankedScores = this.database.Scores
             .Where(s => s.SlotId == slotId && s.Type == type)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
-            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
             .AsEnumerable()
+            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
             .ToList()

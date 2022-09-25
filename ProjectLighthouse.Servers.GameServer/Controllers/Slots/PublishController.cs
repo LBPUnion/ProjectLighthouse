@@ -60,12 +60,12 @@ public class PublishController : ControllerBase
             Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
             if (oldSlot == null)
             {
-                Logger.Warn("Rejecting level reupload, could not find old slot", LogArea.Publish);
+                Logger.Warn("Rejecting level republish, could not find old slot", LogArea.Publish);
                 return this.NotFound();
             }
             if (oldSlot.CreatorId != user.UserId)
             {
-                Logger.Warn("Rejecting level reupload, old slot's creator is not publishing user", LogArea.Publish);
+                Logger.Warn("Rejecting level republish, old slot's creator is not publishing user", LogArea.Publish);
                 return this.BadRequest();
             }
         }
@@ -87,7 +87,7 @@ public class PublishController : ControllerBase
     ///     Endpoint actually used to publish a level
     /// </summary>
     [HttpPost("publish")]
-    public async Task<IActionResult> Publish()
+    public async Task<IActionResult> Publish([FromQuery] string? game)
     {
         (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
 
@@ -176,6 +176,22 @@ public class PublishController : ControllerBase
             {
                 Logger.Warn("Rejecting level republish, old level not owned by current user", LogArea.Publish);
                 return this.BadRequest();
+            }
+
+            // I hate lbp3
+            if (game != null)
+            {
+                GameVersion intendedVersion = FromAbbreviation(game);
+                if (intendedVersion != GameVersion.Unknown && intendedVersion != slotVersion)
+                {
+                    // Delete the useless rootLevel that lbp3 just uploaded
+                    if(slotVersion == GameVersion.LittleBigPlanet3)
+                        FileHelper.DeleteResource(slot.RootLevel);
+
+                    slot.GameVersion = oldSlot.GameVersion;
+                    slot.RootLevel = oldSlot.RootLevel;
+                    slot.ResourceCollection = oldSlot.ResourceCollection;
+                }
             }
 
             oldSlot.Location.X = slot.Location.X;
@@ -275,6 +291,19 @@ public class PublishController : ControllerBase
         await this.database.SaveChangesAsync();
 
         return this.Ok();
+    }
+
+    private static GameVersion FromAbbreviation(string abbr)
+    {
+        return abbr switch
+        {
+            "lbp1" => GameVersion.LittleBigPlanet1,
+            "lbp2" => GameVersion.LittleBigPlanet2,
+            "lbp3" => GameVersion.LittleBigPlanet3,
+            "lbpv" => GameVersion.LittleBigPlanetVita,
+            "lbppsp" => GameVersion.LittleBigPlanetPSP,
+            _ => GameVersion.Unknown,
+        };
     }
 
     private async Task<Slot?> getSlotFromBody()

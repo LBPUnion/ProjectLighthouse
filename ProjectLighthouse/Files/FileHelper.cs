@@ -231,6 +231,15 @@ public static class FileHelper
 
     public static bool ResourceExists(string hash) => File.Exists(GetResourcePath(hash));
 
+    public static void DeleteResource(string hash)
+    {
+        // sanity check so someone doesn't somehow delete the entire resource folder
+        if (ResourceExists(hash) && (File.GetAttributes(hash) & FileAttributes.Directory) != FileAttributes.Directory)
+        {
+            File.Delete(GetResourcePath(hash));
+        }
+    }
+
     public static int ResourceSize(string hash)
     {
         try
