@@ -210,7 +210,7 @@ public class ListController : ControllerBase
         int targetUserId = await this.database.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
         if (targetUserId == 0) return this.StatusCode(403, "");
 
-        IEnumerable<Playlist> heartedPlaylists = this.database.Playlists.Where(p => p.CreatorId == targetUserId)
+        IEnumerable<Playlist> heartedPlaylists = this.database.Playlists.Include(p => p.Creator).Where(p => p.CreatorId == targetUserId)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .AsEnumerable();
@@ -233,14 +233,12 @@ public class ListController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        string username = await this.database.UsernameFromGameToken(token);
-
         Playlist? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
         if (playlist == null) return this.NotFound();
 
         await this.database.HeartPlaylist(token.UserId, playlist);
 
-        return await this.GetFavouritePlaylists(username, 1, 30);
+        return this.Ok();
     }
 
     [HttpPost("unfavourite/slot/{playlistId:int}")]
