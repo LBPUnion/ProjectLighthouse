@@ -44,13 +44,28 @@ public class SendVerificationEmailPage : BaseLayout
         for (int i = recentlySentEmail.Count - 1; i >= 0; i--)
         {
             KeyValuePair<int, long> entry = recentlySentEmail.ElementAt(i);
-            if (TimeHelper.TimestampMillis > recentlySentEmail[user.UserId]) recentlySentEmail.TryRemove(entry.Key, out _);
+            bool valueExists = recentlySentEmail.TryGetValue(entry.Key, out long timestamp);
+            if (!valueExists)
+            {
+                recentlySentEmail.TryRemove(entry.Key, out _);
+                continue;
+            }
+            if (TimeHelper.TimestampMillis > timestamp) recentlySentEmail.TryRemove(entry.Key, out _);
         }
 
-        if (recentlySentEmail.ContainsKey(user.UserId) && recentlySentEmail[user.UserId] > TimeHelper.TimestampMillis)
+
+        if (recentlySentEmail.ContainsKey(user.UserId))
         {
-            this.Success = true;
-            return this.Page();
+            bool valueExists = recentlySentEmail.TryGetValue(user.UserId, out long timestamp);
+            if (!valueExists)
+            {
+                recentlySentEmail.TryRemove(user.UserId, out _);
+            } 
+            else if (timestamp > TimeHelper.TimestampMillis)
+            {
+                this.Success = true;
+                return this.Page();
+            }
         }
 
         string? existingToken = await this.Database.EmailVerificationTokens.Where(v => v.UserId == user.UserId).Select(v => v.EmailToken).FirstOrDefaultAsync();
