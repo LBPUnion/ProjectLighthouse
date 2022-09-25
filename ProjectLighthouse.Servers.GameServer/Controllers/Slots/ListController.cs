@@ -210,10 +210,8 @@ public class ListController : ControllerBase
         int targetUserId = await this.database.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
         if (targetUserId == 0) return this.StatusCode(403, "");
 
-        IEnumerable<Playlist> heartedPlaylists = this.database.Playlists.Include(p => p.Creator).Where(p => p.CreatorId == targetUserId)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
-            .AsEnumerable();
+        IEnumerable<Playlist> heartedPlaylists = this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
+            .Include(p => p.Playlist).Include(p => p.Playlist.Creator).OrderByDescending(p => p.HeartedPlaylistId).Select(p => p.Playlist);
 
         string response = heartedPlaylists.Aggregate(string.Empty, (current, p) => current + p.Serialize());
 
