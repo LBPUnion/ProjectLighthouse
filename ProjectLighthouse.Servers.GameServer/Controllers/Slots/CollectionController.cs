@@ -25,7 +25,6 @@ public class CollectionController : ControllerBase
         this.database = database;
     }
 
-
     [HttpGet("playlists/{playlistId:int}/slots")]
     public async Task<IActionResult> GetPlaylistSlots(int playlistId)
     {
@@ -67,13 +66,7 @@ public class CollectionController : ControllerBase
             return this.Ok(this.GetUserPlaylists(token.UserId));
         }
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        
-        string rootElement = bodyString.Contains("levels") ? "levels" : "playlist"; // I hate lbp3
-        XmlSerializer serializer = new(typeof(Playlist), new XmlRootAttribute(rootElement));
-        Playlist? newPlaylist = (Playlist?)serializer.Deserialize(new StringReader(bodyString));
+        Playlist? newPlaylist = await this.getPlaylistFromBody();
 
         if (newPlaylist == null) return this.BadRequest();
 
@@ -96,15 +89,9 @@ public class CollectionController : ControllerBase
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(newPlaylist.Name))
-        {
-            targetPlaylist.Name = newPlaylist.Name;
-        }
+        if (!string.IsNullOrWhiteSpace(newPlaylist.Name)) targetPlaylist.Name = newPlaylist.Name;
 
-        if (!string.IsNullOrWhiteSpace(newPlaylist.Description))
-        {
-            targetPlaylist.Description = newPlaylist.Description;
-        }
+        if (!string.IsNullOrWhiteSpace(newPlaylist.Description)) targetPlaylist.Description = newPlaylist.Description;
 
         await this.database.SaveChangesAsync();
 
@@ -136,17 +123,11 @@ public class CollectionController : ControllerBase
 
         if (playlistCount > ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota) return this.BadRequest();
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Playlist), new XmlRootAttribute("playlist"));
-        Playlist? playlist = (Playlist?)serializer.Deserialize(new StringReader(bodyString));
+        Playlist? playlist = await this.getPlaylistFromBody();
 
         if (playlist == null) return this.BadRequest();
 
         playlist.CreatorId = token.UserId;
-
-        SanitizationHelper.SanitizeStringsInClass(playlist);
 
         this.database.Playlists.Add(playlist);
 
@@ -262,4 +243,19 @@ public class CollectionController : ControllerBase
             )
         );
     }
+
+    private async Task<Playlist?> getPlaylistFromBody()
+    {
+        this.Request.Body.Position = 0;
+        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+
+        string rootElement = bodyString.Contains("levels") ? "levels" : "playlist";
+        XmlSerializer serializer = new(typeof(Playlist), new XmlRootAttribute(rootElement));
+        Playlist? playlist = (Playlist?)serializer.Deserialize(new StringReader(bodyString));
+
+        SanitizationHelper.SanitizeStringsInClass(playlist);
+
+        return playlist;
+    }
+
 }
