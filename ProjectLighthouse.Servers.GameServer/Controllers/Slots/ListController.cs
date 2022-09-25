@@ -241,7 +241,7 @@ public class ListController : ControllerBase
         return this.Ok();
     }
 
-    [HttpPost("unfavourite/slot/{playlistId:int}")]
+    [HttpPost("unfavourite/playlist/{playlistId:int}")]
     public async Task<IActionResult> RemoveFavouritePlaylist(int playlistId)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
