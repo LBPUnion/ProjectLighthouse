@@ -139,6 +139,7 @@ public class LoginController : ControllerBase
             {
                 AuthTicket = "MM_AUTH=" + token.UserToken,
                 ServerBrand = VersionHelper.EnvVer,
+                TitleStorageUrl = ServerConfiguration.Instance.GameApiExternalUrl,
             }.Serialize()
         );
     }
