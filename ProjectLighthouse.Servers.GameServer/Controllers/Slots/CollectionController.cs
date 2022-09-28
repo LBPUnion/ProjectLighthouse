@@ -249,7 +249,7 @@ public class CollectionController : ControllerBase
         this.Request.Body.Position = 0;
         string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-        string rootElement = bodyString.Contains("levels") ? "levels" : "playlist";
+        string rootElement = bodyString.StartsWith("<playlist>") ? "playlist" : "levels";
         XmlSerializer serializer = new(typeof(Playlist), new XmlRootAttribute(rootElement));
         Playlist? playlist = (Playlist?)serializer.Deserialize(new StringReader(bodyString));
 
