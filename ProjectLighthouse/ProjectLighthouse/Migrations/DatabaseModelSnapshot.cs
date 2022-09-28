@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.8")
+                .HasAnnotation("ProductVersion", "6.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.CompletedMigration", b =>
@@ -172,6 +172,55 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("HeartedLevels");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.HeartedPlaylist", b =>
+                {
+                    b.Property<int>("HeartedPlaylistId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlaylistId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("HeartedPlaylistId");
+
+                    b.HasIndex("PlaylistId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HeartedPlaylists");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.Playlist", b =>
+                {
+                    b.Property<int>("PlaylistId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SlotCollection")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("PlaylistId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.ToTable("Playlists");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.QueuedLevel", b =>
                 {
                     b.Property<int>("QueuedLevelId")
@@ -272,6 +321,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<int>("InternalSlotId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsAdventurePlanet")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<long>("LastUpdated")
                         .HasColumnType("bigint");
@@ -903,6 +955,9 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("ChildSlotId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PlayerIdCollection")
                         .HasColumnType("longtext");
 
@@ -987,6 +1042,36 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Slot");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.HeartedPlaylist", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Levels.Playlist", "Playlist")
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Playlist");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.Playlist", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Levels.QueuedLevel", b =>

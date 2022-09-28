@@ -30,6 +30,7 @@ public class Database : DbContext
     public DbSet<QueuedLevel> QueuedLevels { get; set; }
     public DbSet<HeartedLevel> HeartedLevels { get; set; }
     public DbSet<HeartedProfile> HeartedProfiles { get; set; }
+    public DbSet<HeartedPlaylist> HeartedPlaylists { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<GameToken> GameTokens { get; set; }
     public DbSet<WebToken> WebTokens { get; set; }
@@ -51,6 +52,7 @@ public class Database : DbContext
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
     public DbSet<RegistrationToken> RegistrationTokens { get; set; }
     public DbSet<APIKey> APIKeys { get; set; }
+    public DbSet<Playlist> Playlists { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
@@ -227,6 +229,28 @@ public class Database : DbContext
     {
         HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
+
+        await this.SaveChangesAsync();
+    }
+
+    public async Task HeartPlaylist(int userId, Playlist heartedPlaylist)
+    {
+        HeartedPlaylist? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
+        if (heartedList != null) return;
+
+        this.HeartedPlaylists.Add(new HeartedPlaylist()
+        {
+            PlaylistId = heartedPlaylist.PlaylistId,
+            UserId = userId,
+        });
+
+        await this.SaveChangesAsync();
+    }
+
+    public async Task UnheartPlaylist(int userId, Playlist heartedPlaylist)
+    {
+        HeartedPlaylist? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
+        if (heartedList != null) this.HeartedPlaylists.Remove(heartedList);
 
         await this.SaveChangesAsync();
     }
