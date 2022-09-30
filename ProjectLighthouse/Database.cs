@@ -53,6 +53,8 @@ public class Database : DbContext
     public DbSet<RegistrationToken> RegistrationTokens { get; set; }
     public DbSet<APIKey> APIKeys { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
+    public DbSet<News> News { get; set; }
+    public DbSet<ActivityStream> Stream { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
