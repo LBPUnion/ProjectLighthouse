@@ -27,7 +27,7 @@ public class LoginForm : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(username))
         {
-            this.Error = this.Translate(ErrorStrings.UsernameInvalid);
+            this.Error = ServerConfiguration.Instance.Mail.MailEnabled ? this.Translate(ErrorStrings.UsernameInvalid) : this.Translate(ErrorStrings.EmailInvalid);
             return this.Page();
         }
 
@@ -43,7 +43,23 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        User? user;
+
+        if (!ServerConfiguration.Instance.Mail.MailEnabled)
+        {
+            user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        }
+        else
+        {
+            user = await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress == username);
+            if (user == null)
+            {
+                User? noEmailUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
+                if (noEmailUser != null && noEmailUser.EmailAddress == null) user = noEmailUser;
+
+            }
+        }
+
         if (user == null)
         {
             Logger.Warn($"User {username} failed to login on web due to invalid username", LogArea.Login);

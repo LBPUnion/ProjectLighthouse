@@ -54,4 +54,7 @@
     <data name="recent_photos" xml:space="preserve">
         <value>Most recent photos</value>
     </data>
+    <data name="email" xml:space="preserve">
+        <value>Email</value>
+    </data>
 </root>

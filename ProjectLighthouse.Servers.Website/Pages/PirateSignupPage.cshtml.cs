@@ -12,7 +12,7 @@ public class PirateSignupPage : BaseLayout
     public IActionResult OnGet()
     {
         User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null) return this.RedirectToPage("/login");
+        if (user == null) return this.Redirect("/login");
         
         return this.Page();
     }

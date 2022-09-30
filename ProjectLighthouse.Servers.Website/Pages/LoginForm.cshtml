@@ -41,9 +41,12 @@
     <input type="hidden" id="redirect" name="redirect">
 
     <div class="field">
-        <label>@Model.Translate(GeneralStrings.Username)</label>
+        @{
+            string username = ServerConfiguration.Instance.Mail.MailEnabled ? Model.Translate(GeneralStrings.Email) : Model.Translate(GeneralStrings.Username);
+        }
+        <label>@username</label>
         <div class="ui left icon input">
-            <input type="text" name="username" id="text" placeholder="@Model.Translate(GeneralStrings.Username)">
+            <input type="text" name="username" id="text" placeholder="@username">
             <i class="user icon"></i>
         </div>
     </div>
@@ -75,9 +78,9 @@
         }       
     </div>
     <br/>
-        <a href="/passwordResetRequest">
-            <div class="ui button">
-                @Model.Translate(GeneralStrings.ForgotPassword)
-            </div>
-        </a>
+    <a href="/passwordResetRequest">
+        <div class="ui button">
+            @Model.Translate(GeneralStrings.ForgotPassword)
+        </div>
+    </a>
 </form>

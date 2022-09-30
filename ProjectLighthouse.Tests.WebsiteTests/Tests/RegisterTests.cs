@@ -28,6 +28,8 @@ public class RegisterTests : LighthouseWebTest
         this.Driver.FindElement(By.Id("password")).SendKeys(password);
         this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
 
+        this.Driver.FindElement(By.Id("age-checkbox")).Click();
+
         this.Driver.FindElement(By.Id("submit")).Click();
 
         User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -50,6 +52,8 @@ public class RegisterTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("password")).SendKeys(password);
         this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password + "a");
+
+        this.Driver.FindElement(By.Id("age-checkbox")).Click();
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
@@ -75,6 +79,8 @@ public class RegisterTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("password")).SendKeys(password);
         this.Driver.FindElement(By.Id("confirmPassword")).SendKeys(password);
+
+        this.Driver.FindElement(By.Id("age-checkbox")).Click();
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
