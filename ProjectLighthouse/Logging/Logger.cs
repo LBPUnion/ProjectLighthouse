@@ -23,11 +23,11 @@ public class Logger
 
     public void AddLogger(ILogger logger)
     {
-        loggers.Add(logger);
-        LogDebug("Initialized " + logger.GetType().Name, LogArea.Logger);
+        this.loggers.Add(logger);
+        this.LogDebug("Initialized " + logger.GetType().Name, LogArea.Logger);
     }
 
-    private LogTrace getTrace(int extraTraceLines = 0)
+    private static LogTrace getTrace(int extraTraceLines = 0)
     {
         const int depth = 5;
         const int skipDepth = depth - 2;
@@ -79,7 +79,7 @@ public class Logger
     /// <param name="logLine">The logLine to send to the queue.</param>
     private void queueLog(LogLine logLine)
     {
-        logQueue.Enqueue(logLine);
+        this.logQueue.Enqueue(logLine);
     }
 
     [SuppressMessage("ReSharper", "FunctionNeverReturns")]
@@ -91,7 +91,7 @@ public class Logger
             {
                 while (true)
                 {
-                    bool logged = queueLoop();
+                    bool logged = this.queueLoop();
                     Thread.Sleep(logged ? 10 : 100);
                     // We wait 100ms if we dont log since it's less likely that the program logged again.
                     // If we did log, wait 10ms before looping again.
@@ -102,17 +102,17 @@ public class Logger
         );
 
         // Flush the log queue when we're exiting.
-        AppDomain.CurrentDomain.UnhandledException += Flush;
-        AppDomain.CurrentDomain.ProcessExit += Flush;
+        AppDomain.CurrentDomain.UnhandledException += this.Flush;
+        AppDomain.CurrentDomain.ProcessExit += this.Flush;
     }
 
     /// <summary>
     /// Logs everything in the queue to all loggers immediately.
     /// This is a helper function to allow for this function to be easily added to events.
     /// </summary>
-    public void Flush(object? _, EventArgs __)
+    private void Flush(object? _, EventArgs __)
     {
-        Flush();
+        this.Flush();
     }
 
     /// <summary>
@@ -120,9 +120,9 @@ public class Logger
     /// </summary>
     public void Flush()
     {
-        while (logQueue.TryDequeue(out LogLine line))
+        while (this.logQueue.TryDequeue(out LogLine line))
         {
-            foreach (ILogger logger in loggers)
+            foreach (ILogger logger in this.loggers)
             {
                 logger.Log(line);
             }
@@ -135,18 +135,14 @@ public class Logger
     /// <returns></returns>
     private bool queueLoop()
     {
-        bool logged = false;
-        if (logQueue.TryDequeue(out LogLine line))
-        {
-            logged = true;
+        if (!this.logQueue.TryDequeue(out LogLine line)) return false;
 
-            foreach (ILogger logger in loggers)
-            {
-                logger.Log(line);
-            }
+        foreach (ILogger logger in this.loggers)
+        {
+            logger.Log(line);
         }
 
-        return logged;
+        return true;
     }
 
     #endregion
@@ -212,7 +208,7 @@ public class Logger
 
     public void Log(string text, string area, LogLevel level, int extraTraceLines = 0)
     {
-        queueLog(new LogLine
+        this.queueLog(new LogLine
         {
             Level = level,
             Message = text,

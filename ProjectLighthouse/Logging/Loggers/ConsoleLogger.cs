@@ -14,6 +14,15 @@ public class ConsoleLogger : ILogger
             // The following is scuffed.
             // Beware~
 
+            string time = DateTime.Now.ToString("MM/dd/yyyy-HH:mm:ss.fff");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write('[');
+            Console.ForegroundColor = logLine.Level.ToColor();
+            Console.Write(time);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(']');
+            Console.Write(' ');
+
             // Write the level! [Success]
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write('[');
@@ -42,7 +51,8 @@ public class ConsoleLogger : ILogger
                     Console.Write(logLine.Trace.Section);
                 }
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("> ");
+                Console.Write('>');
+                Console.Write(' ');
                 Console.ForegroundColor = oldForegroundColor;
             }
 

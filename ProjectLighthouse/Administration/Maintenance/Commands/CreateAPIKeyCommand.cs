@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands
 {
-    public class CreateAPIKeyCommand : ICommand
+    public class CreateApiKeyCommand : ICommand
     {
         public string Name() => "Create API Key";
         public string[] Aliases() => new[] { "createAPIKey", };
@@ -15,8 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands
 
         public async Task Run(string[] args, Logger logger)
         {
-            APIKey key = new();
-            key.Description = args[0];
+            APIKey key = new() { Description = args[0], };
             if (string.IsNullOrWhiteSpace(key.Description))
             {
                 key.Description = "<no description specified>";

@@ -12,9 +12,9 @@ public class FileLogger : ILogger
     public void Log(LogLine line)
     {
         FileHelper.EnsureDirectoryCreated(logsDirectory);
-
-        string contentFile = $"[{ServerStatics.ServerType}] [{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
-        string contentAll = $"[{ServerStatics.ServerType}] [{line.Area}:{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
+        string time = DateTime.Now.ToString("MM/dd/yyyy-HH:mm:ss.fff");
+        string contentFile = $"[{time}] [{ServerStatics.ServerType}] [{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
+        string contentAll = $"[{time}] [{ServerStatics.ServerType}] [{line.Area}:{line.Level}] <{line.Trace.Name}:{line.Trace.Section}> {line.Message}\n";
 
         try
         {
