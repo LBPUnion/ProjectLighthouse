@@ -146,44 +146,35 @@ public class ActivityStream {
             switch (eventType)
             {
                 case EventType.UploadPhoto:
+                    interactionEvent += LbpSerializer.StringElement("photo_id", objects[index]);
+                    goto case EventType.PlayLevel;
+
                 case EventType.DpadRating:
+                    interactionEvent += LbpSerializer.StringElement("dpad_rating", objects[index]);
+                    goto case EventType.PlayLevel;
+
                 case EventType.Score:
+                    interactionEvent += LbpSerializer.StringElement("score", objects[index]) +
+                                        LbpSerializer.StringElement("user_count", 1); // TODO: use score id, get score from database. For now this will be static 1 players.
+                    goto case EventType.PlayLevel;
+
                 case EventType.PublishLevel:
                 case EventType.HeartLevel:
                 case EventType.PlayLevel:
                     interactionEvent += LbpSerializer.TaggedStringElement("object_slot_id", this.TargetId, "type", "user");
                     groupType = "level";
                     break;
-                case EventType.HeartUser:
+
                 case EventType.CommentUser:
+                    interactionEvent += LbpSerializer.StringElement("comment_id", objects[index]);
+                    goto case EventType.HeartUser;
+
+                case EventType.HeartUser:
                     if (target == null) return "";
                     interactionEvent += LbpSerializer.StringElement("object_user", target.Username);
                     groupType = "user";
                     break;
-                default:
-                    break;
-            }
-            switch (eventType)
-            {
-                case EventType.UploadPhoto:
-                    interactionEvent += LbpSerializer.StringElement("photo_id", objects[index]);
-                    break;
-                case EventType.DpadRating:
-                    interactionEvent += LbpSerializer.StringElement("dpad_rating", objects[index]);
-                    break;
-                case EventType.Score:
-                    interactionEvent += LbpSerializer.StringElement("score", objects[index]) +
-                                        LbpSerializer.StringElement("user_count", 1); // TODO: use score id, get score from database. For now this will be static 1 players.
-                    break;
-                case EventType.HeartLevel:
-                case EventType.PlayLevel:
-                case EventType.HeartUser:
-                    interactionEvent += LbpSerializer.StringElement("count", 1); // TODO: Count how many times this level was replayed by the actor in a 30 minute timespan.
-                    break;
-                case EventType.CommentUser:
-                    interactionEvent += LbpSerializer.StringElement("comment_id", objects[index]);
-                    break;
-                case EventType.PublishLevel:
+
                 default:
                     break;
             }
