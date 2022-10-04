@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20220928195400_AddStreamNews")]
+    [Migration("20221003230800_AddStreamNews")]
     public partial class AddStreamNews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,14 +15,17 @@ namespace ProjectLighthouse.Migrations
             migrationBuilder.CreateTable(
                 name: "Stream",
                 columns: table => new {
-                    PostId = table.Column<int>(type: "int", nullable: false),
-                    PostType = table.Column<string>(type: "tinytext", nullable: false),
+                    ActivityId = table.Column<int>(type: "int", nullable: false),
                     Timestamp = table.Column<long>(type: "bigint", nullable: false),
-                    ReferencedId = table.Column<int>(type: "int", nullable: false),
-                    ActorId = table.Column<int>(type: "int", nullable: false)
+                    ActorId = table.Column<int>(type: "int", nullable: false),
+                    TargetId = table.Column<int>(type: "int", nullable: false),
+                    ObjectCollection = table.Column<int>(type: "int", nullable: false),
+                    EventTypeCollection = table.Column<string>(type: "text", nullable: false),
+                    EventTimestampCollection = table.Column<string>(type: "text", nullable: false),
+                    InteractCollection = table.Column<string>(type: "text", nullable: false) // This won't be used yet but will be in the future.
                 },
                 constraints: table => {
-                    table.PrimaryKey("PK_Stream", x => x.PostId);
+                    table.PrimaryKey("PK_Stream", x => x.ActivityId);
                     table.ForeignKey(
                         name: "FK_Stream_Users_UserId",
                         column: s => s.ActorId,

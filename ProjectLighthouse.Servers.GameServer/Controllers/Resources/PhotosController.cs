@@ -141,6 +141,16 @@ public class PhotosController : ControllerBase
         return this.Ok();
     }
 
+    [HttpGet("photo/{id:int}")]
+    public async Task<IActionResult> SlotPhotos(int id)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        Photo photo = await this.database.Photos.Include(p => p.Creator).FirstAsync(p => p.PhotoId == id);
+        return this.Ok(photo.Serialize());
+    }
+
     [HttpGet("photos/{slotType}/{id:int}")]
     public async Task<IActionResult> SlotPhotos([FromQuery] int pageStart, [FromQuery] int pageSize, string slotType, int id)
     {
