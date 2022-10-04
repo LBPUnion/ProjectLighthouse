@@ -53,4 +53,7 @@
   <data name="recent_photos" xml:space="preserve">
         <value>Fotos más recientes</value>
     </data>
+  <data name="email" xml:space="preserve">
+        <value>Correo</value>
+    </data>
 </root>

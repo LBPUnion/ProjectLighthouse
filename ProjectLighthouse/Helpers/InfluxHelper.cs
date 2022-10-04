@@ -34,7 +34,9 @@ public static class InfluxHelper
             using WriteApi writeApi = Client.GetWriteApi();
             PointData point = PointData.Measurement("lighthouse")
                 .Field("playerCount", await StatisticsHelper.RecentMatches(database))
-                .Field("slotCount", await StatisticsHelper.SlotCount(database));
+                .Field("slotCount", await StatisticsHelper.SlotCount(database))
+                .Field("userCount", await StatisticsHelper.UserCount(database))
+                .Field("photoCount", await StatisticsHelper.PhotoCount(database));
 
             foreach (GameVersion gameVersion in gameVersions)
             {

@@ -67,7 +67,7 @@ function onSubmit(e){
                 @if (ServerConfiguration.Instance.Mail.MailEnabled && (Model.User == Model.ProfileUser || Model.User!.IsAdmin))
                 {
                     <div class="field">
-                        <label style="text-align: left" for="email">Email</label>
+                        <label style="text-align: left" for="email">@Model.Translate(GeneralStrings.Email)</label>
                         <input type="text" name="email" id="email" required value="@Model.ProfileUser.EmailAddress" placeholder="Email Address">
                     </div>
                 }

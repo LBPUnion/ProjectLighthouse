@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -20,7 +21,7 @@ public class PasswordResetRequestForm : BaseLayout
     { }
 
     [UsedImplicitly]
-    public async Task<IActionResult> OnPost(string username)
+    public async Task<IActionResult> OnPost(string email)
     {
 
         if (!ServerConfiguration.Instance.Mail.MailEnabled)
@@ -29,17 +30,24 @@ public class PasswordResetRequestForm : BaseLayout
             return this.Page();
         }
 
-        if (string.IsNullOrWhiteSpace(username))
+        if (string.IsNullOrWhiteSpace(email))
         {
-            this.Error = "The username field is required.";
+            this.Error = "The email field is required.";
             return this.Page();
         }
 
-        User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (!new EmailAddressAttribute().IsValid(email))
+        {
+            this.Error = "This email is in an invalid format";
+            return this.Page();
+        }
+
+        User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress == email && u.EmailAddressVerified);
 
         if (user == null)
         {
-            this.Error = "User does not exist.";
+            this.Status = $"A password reset request has been sent to the email {email}. " +
+                          "If you do not receive an email verify that you have entered the correct email address";
             return this.Page();
         }
 
@@ -59,8 +67,9 @@ public class PasswordResetRequestForm : BaseLayout
 
         this.Database.PasswordResetTokens.Add(token);
         await this.Database.SaveChangesAsync();
-        
-        this.Status = $"Password reset email sent to {CensorHelper.MaskEmail(user.EmailAddress)}.";
+
+        this.Status = $"A password reset request has been sent to the email {email}. " +
+                      "If you do not receive an email verify that you have entered the correct email address";
         return this.Page();
     }
     public void OnGet() => this.Page();

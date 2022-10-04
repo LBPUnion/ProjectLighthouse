@@ -10,7 +10,7 @@ public class AspNetToLighthouseLogger : Microsoft.Extensions.Logging.ILogger
     public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
     public bool IsEnabled(AspLogLevel logLevel) => true;
 
-    public string Category { get; init; }
+    private string Category { get; init; }
 
     public AspNetToLighthouseLogger(string category)
     {
@@ -21,7 +21,7 @@ public class AspNetToLighthouseLogger : Microsoft.Extensions.Logging.ILogger
     {
         LogLevel level = logLevel.ToLighthouseLevel();
 
-        Logger.Instance.Log(state.ToString(), this.Category, level, 4);
+        Logger.Instance.Log(state.ToString() ?? string.Empty, this.Category, level, 4);
 
         if (exception == null) return;
 

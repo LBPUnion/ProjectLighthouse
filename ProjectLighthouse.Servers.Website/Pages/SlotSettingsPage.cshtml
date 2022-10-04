@@ -4,7 +4,6 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Levels
-@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotSettingsPage
 
@@ -18,7 +17,7 @@
 
     int size = isMobile ? 100 : 200;
     bool isAdventure = Model.Slot?.IsAdventurePlanet ?? false;
-    string advenStyleExt = isAdventure ? "-webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" : "";
+    string adventureStyle = isAdventure ? "-webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" : "";
 }
 
 <script>
@@ -32,7 +31,7 @@ function onSubmit(){
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
         <div class="ui blue segment">
-            <h1><i class="cog icon"></i>Slot Settings</h1>
+            <h1><i class="cog icon"></i>Level Settings</h1>
             <div class="ui divider"></div>
             <form id="form" method="POST" class="ui form center aligned" action="/slot/@Model.Slot!.SlotId/settings" onsubmit="onSubmit()">
                 @Html.AntiForgeryToken()
@@ -40,8 +39,8 @@ function onSubmit(){
                     <div>
                         <div>
                             <img src=@(isAdventure ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png") style="min-width: @(size)px; width: @(size)px; height: @(size)px; pointer-events: none; position: absolute; z-index: 3;">                                
-                            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(advenStyleExt)">
-                            <img id="slotIcon" class="cardIcon slotCardIcon" src="/gameAssets/@Model.Slot.IconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(advenStyleExt)" 
+                            <img src="~/assets/slotCardBackground.png" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: absolute; z-index: 1; @(adventureStyle)">
+                            <img id="slotIcon" class="cardIcon slotCardIcon" src="/gameAssets/@Model.Slot.IconHash" style="min-width: @(size)px; width: @(size)px; height: @(size)px; position: relative; z-index: 2; @(adventureStyle)" 
                                                                      onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
                         </div>
                         <div class="ui fitted divider hidden"></div>
@@ -54,7 +53,7 @@ function onSubmit(){
                     </div>
                 </div>
                 <div class="field">
-                    <label style="text-align: left" for="name">@Model.Translate(GeneralStrings.Username)</label>
+                    <label style="text-align: left" for="name">Name</label>
                     <input type="text" name="name" id="name" value="@HttpUtility.HtmlDecode(Model.Slot.Name)" placeholder="Name">
                 </div>
                 <div class="field">

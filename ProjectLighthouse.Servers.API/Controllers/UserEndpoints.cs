@@ -39,6 +39,17 @@ public class UserEndpoints : ApiEndpointController
         return this.Ok(user);
     }
 
+    [HttpGet("username/{username}")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUser(string username)
+    {
+        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (user == null) return this.NotFound();
+
+        return this.Ok(user);
+    }
+
     /// <summary>
     /// Gets a user and their information from the database.
     /// </summary>
