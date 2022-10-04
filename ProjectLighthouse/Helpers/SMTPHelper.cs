@@ -17,7 +17,7 @@ public static class SMTPHelper
         client = new SmtpClient(ServerConfiguration.Instance.Mail.Host, ServerConfiguration.Instance.Mail.Port)
         {
             EnableSsl = ServerConfiguration.Instance.Mail.UseSSL,
-            Credentials = new NetworkCredential(ServerConfiguration.Instance.Mail.FromAddress, ServerConfiguration.Instance.Mail.Password),
+            Credentials = new NetworkCredential(ServerConfiguration.Instance.Mail.Username, ServerConfiguration.Instance.Mail.Password),
         };
 
         fromAddress = new MailAddress(ServerConfiguration.Instance.Mail.FromAddress, ServerConfiguration.Instance.Mail.FromName);

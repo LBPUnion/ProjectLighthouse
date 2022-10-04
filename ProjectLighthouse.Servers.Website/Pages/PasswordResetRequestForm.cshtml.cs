@@ -46,7 +46,7 @@ public class PasswordResetRequestForm : BaseLayout
 
         if (user == null)
         {
-            this.Status = $"A password reset request has been sent to the email {email}.\n" +
+            this.Status = $"A password reset request has been sent to the email {email}. " +
                           "If you do not receive an email verify that you have entered the correct email address";
             return this.Page();
         }
@@ -68,7 +68,7 @@ public class PasswordResetRequestForm : BaseLayout
         this.Database.PasswordResetTokens.Add(token);
         await this.Database.SaveChangesAsync();
 
-        this.Status = $"A password reset request has been sent to the email {email}." +
+        this.Status = $"A password reset request has been sent to the email {email}. " +
                       "If you do not receive an email verify that you have entered the correct email address";
         return this.Page();
     }
