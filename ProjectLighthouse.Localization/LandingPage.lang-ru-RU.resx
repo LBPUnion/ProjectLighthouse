@@ -30,7 +30,7 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>Нет людей в сети. Почему бы не продолжить играть?</value>
+        <value>Нет людей в сети. Почему бы вам не зайти?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
