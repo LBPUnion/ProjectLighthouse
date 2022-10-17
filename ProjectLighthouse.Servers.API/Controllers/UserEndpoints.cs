@@ -68,7 +68,8 @@ public class UserEndpoints : ApiEndpointController
     }
 
     [HttpPost("user/inviteToken")]
-    public async Task<IActionResult> CreateUserInviteToken()
+    [HttpPost("user/inviteToken/{username}")]
+    public async Task<IActionResult> CreateUserInviteToken([FromRoute] string? username)
     {
         if (!Configuration.ServerConfiguration.Instance.Authentication.PrivateRegistration &&
             !Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
@@ -86,6 +87,7 @@ public class UserEndpoints : ApiEndpointController
         {
             Created = DateTime.Now,
             Token = CryptoHelper.GenerateAuthToken(),
+            Username = username,
         };
 
         this.database.RegistrationTokens.Add(token);

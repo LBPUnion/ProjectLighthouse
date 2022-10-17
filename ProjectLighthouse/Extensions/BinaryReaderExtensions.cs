@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.IO;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
@@ -15,19 +16,19 @@ public static class BinaryReaderExtensions
         return b;
     }
 
-    public static ushort ReadUInt16BE(this BinaryReader binRdr) => BitConverter.ToUInt16(binRdr.ReadBytesRequired(sizeof(ushort)).Reverse(), 0);
+    public static ushort ReadUInt16BE(this BinaryReader binRdr) => BinaryPrimitives.ReadUInt16BigEndian(binRdr.ReadBytesRequired(sizeof(ushort)));
 
-    public static short ReadInt16BE(this BinaryReader binRdr) => BitConverter.ToInt16(binRdr.ReadBytesRequired(sizeof(short)).Reverse(), 0);
+    public static short ReadInt16BE(this BinaryReader binRdr) => BinaryPrimitives.ReadInt16BigEndian(binRdr.ReadBytesRequired(sizeof(short)));
 
-    public static uint ReadUInt32BE(this BinaryReader binRdr) => BitConverter.ToUInt32(binRdr.ReadBytesRequired(sizeof(uint)).Reverse(), 0);
+    public static uint ReadUInt32BE(this BinaryReader binRdr) => BinaryPrimitives.ReadUInt32BigEndian(binRdr.ReadBytesRequired(sizeof(uint)));
 
-    public static int ReadInt32BE(this BinaryReader binRdr) => BitConverter.ToInt32(binRdr.ReadBytesRequired(sizeof(int)).Reverse(), 0);
+    public static int ReadInt32BE(this BinaryReader binRdr) => BinaryPrimitives.ReadInt32BigEndian(binRdr.ReadBytesRequired(sizeof(int)));
 
-    public static ulong ReadUInt64BE(this BinaryReader binRdr) => BitConverter.ToUInt32(binRdr.ReadBytesRequired(sizeof(ulong)).Reverse(), 0);
+    public static ulong ReadUInt64BE(this BinaryReader binRdr) => BinaryPrimitives.ReadUInt64BigEndian(binRdr.ReadBytesRequired(sizeof(ulong)));
 
-    public static long ReadInt64BE(this BinaryReader binRdr) => BitConverter.ToInt32(binRdr.ReadBytesRequired(sizeof(long)).Reverse(), 0);
+    public static long ReadInt64BE(this BinaryReader binRdr) => BinaryPrimitives.ReadInt64BigEndian(binRdr.ReadBytesRequired(sizeof(long)));
 
-    public static byte[] ReadBytesRequired(this BinaryReader binRdr, int byteCount)
+    private static byte[] ReadBytesRequired(this BinaryReader binRdr, int byteCount)
     {
         byte[] result = binRdr.ReadBytes(byteCount);
 

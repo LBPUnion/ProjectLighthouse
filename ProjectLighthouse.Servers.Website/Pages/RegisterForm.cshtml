@@ -41,7 +41,14 @@
     <div class="field">
         <label>Username</label>
         <div class="ui left icon input">
-            <input type="text" name="username" id="text" placeholder="Username" pattern="^[a-zA-Z0-9_.-]*$" minlength="3" maxlength="16">
+            @{
+                string extra = "";
+                if (Model.Username != null)
+                {
+                    extra = "value=\"" + Model.User + "\" readonly";
+                }
+            }
+            <input type="text" name="username" id="text" placeholder="Username" pattern="^[a-zA-Z0-9_.-]*$" minlength="3" maxlength="16" @extra>
             <i class="user icon"></i>
         </div>
     </div>

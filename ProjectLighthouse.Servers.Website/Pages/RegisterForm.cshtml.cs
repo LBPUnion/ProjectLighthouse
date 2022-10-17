@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +19,8 @@ public class RegisterForm : BaseLayout
 
     public string? Error { get; private set; }
 
+    public string? Username { get; set; }
+
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
     public async Task<IActionResult> OnPost(string username, string password, string confirmPassword, string emailAddress)
@@ -30,6 +31,8 @@ public class RegisterForm : BaseLayout
             {
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
+
+                username = (await this.Database.RegistrationTokens.FirstAsync(r => r.Token == this.Request.Query["token"])).Username;
             }
             else
             {
@@ -119,6 +122,8 @@ public class RegisterForm : BaseLayout
             {
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
+
+                this.Username = this.Database.RegistrationTokens.First(r => r.Token == this.Request.Query["token"]).Username;
             }
             else
             {
