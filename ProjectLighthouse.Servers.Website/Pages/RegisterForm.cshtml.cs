@@ -32,7 +32,7 @@ public class RegisterForm : BaseLayout
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
-                username = (await this.Database.RegistrationTokens.FirstAsync(r => r.Token == this.Request.Query["token"])).Username;
+                username = (await this.Database.RegistrationTokens.FirstAsync(r => r.Token == this.Request.Query["token"].ToString())).Username;
             }
             else
             {
@@ -123,7 +123,7 @@ public class RegisterForm : BaseLayout
                 if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
-                this.Username = this.Database.RegistrationTokens.First(r => r.Token == this.Request.Query["token"]).Username;
+                this.Username = this.Database.RegistrationTokens.First(r => r.Token == this.Request.Query["token"].ToString()).Username;
             }
             else
             {
