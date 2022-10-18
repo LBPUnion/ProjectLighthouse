@@ -64,7 +64,7 @@
         <value>Strona wygenerowana przez {0}.</value>
     </data>
   <data name="generated_modified" xml:space="preserve">
-        <value>Ta strona została wygenerowana przy użyciu zmodyfikowanej wersji Projektu Lighthouse. Upewnij się, że poprawnie ujawniasz kod źródłowy wszystkim użytkownikom, którzy mogą używać tej instancji</value>
+        <value>Ta strona została wygenerowana przy użyciu zmodyfikowanej wersji Projektu Lighthouse. Upewnij się, że poprawnie ujawniasz kod źródłowy wszystkim użytkownikom, którzy mogą używać tej instancji.</value>
     </data>
   <data name="js_warn" xml:space="preserve">
         <value>Chociaż zamierzamy używać jak najmniejszą ilość JavaScript, nie możemy zagwarantować, że wszystko będzie działać bez niego. Zalecamy, żeby dodać JavaScript do białej listy dla Projektu Lighthouse.</value>
