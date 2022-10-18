@@ -58,7 +58,7 @@
         <comment>A shortcut to log you out of your account.</comment>
     </data>
   <data name="header_modPanel" xml:space="preserve">
-        <value>Панель модов</value>
+        <value>Панель модератора</value>
     </data>
   <data name="generated_by" xml:space="preserve">
         <value>Страница создана {0}</value>
