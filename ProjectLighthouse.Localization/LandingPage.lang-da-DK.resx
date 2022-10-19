@@ -22,33 +22,33 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>Velkommen til {0}!</value>
+        <value>Welcome to {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Hilsener, {0}.</value>
+        <value>Greetings, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>Der er ingen brugere online. Hvorfor ikke hoppe på?</value>
+        <value>There are no people online. Why not hop on?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>Der er 1 bruger online:</value>
+        <value>There is 1 person currently online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>Der er {0} brugere online:</value>
+        <value>There are currently {0} people online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
-        <value>Du har {0} godkendelsesforsøg afventende. Klik her for at se dem.</value>
+        <value>You have {0} authentication attempts pending. Click here to view them.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>Seneste Baner</value>
+        <value>Newest Levels</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>Seneste Teamets udvalgte</value>
+        <value>Latest Team Picks</value>
     </data>
 </root>
