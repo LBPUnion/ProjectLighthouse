@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LBPUnion.ProjectLighthouse.Helpers;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 
@@ -26,6 +27,16 @@ public class ModerationSlotController : ControllerBase
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
         slot.TeamPick = true;
+
+        // Send webhook with slot.Name and slot.Creator.Username
+        if (slot.Creator != null)
+        {
+            await WebhookHelper.SendWebhook("Team Pick", $"Level {slot.Name} by {slot.Creator.Username} has been marked as a team pick.");
+        }
+        else
+        {
+            await WebhookHelper.SendWebhook("Team Pick", $"Level {slot.Name} has been marked as a team pick.");
+        }
 
         await this.database.SaveChangesAsync();
         return this.Redirect("~/slot/" + id);
