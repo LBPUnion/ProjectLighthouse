@@ -18,30 +18,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>Käyttäjänimen kenttä on tyhjä.</value>
+        <value>The username field is blank.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>Valitsemasi käyttäjänimi on jo käytössä.</value>
+        <value>The username you've chosen is already taken.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>"Salasana" kenttä on pakollinen.</value>
+        <value>Password field is required.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Salasanat eivät täsmää!</value>
+        <value>Passwords do not match!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
-        <value>Istuntokohtainen avain ei kelpaa</value>
+        <value>Invalid Token</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>Sinun täytyy suorittaa captcha oikein.</value>
+        <value>You must complete the captcha correctly.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
-        <value>Valitsemasi sähköpostiosoite on jo käytössä.</value>
+        <value>The email address you've chosen is already taken.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Sähköpostiosoite on pakollinen.</value>
+        <value>Email address field is required.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
-        <value>Sinulle on annettu porttikielto. Ota yhteyttä järjestelmänvalvojaan saadaksesi lisätietoja. \nSyy: {0}</value>
+        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
     </data>
 </root>
