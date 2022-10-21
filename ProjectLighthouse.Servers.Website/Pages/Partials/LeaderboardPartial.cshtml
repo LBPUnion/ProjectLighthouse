@@ -1,0 +1,62 @@
+﻿@using LBPUnion.ProjectLighthouse
+@using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.PlayerData
+@using LBPUnion.ProjectLighthouse.PlayerData.Profiles
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using Microsoft.EntityFrameworkCore
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    bool canDelete = (bool?)ViewData["CanDelete"] ?? false;
+}
+<div class="ui blue segment" id="leaderboard">
+    <h2>Leaderboard</h2>
+    @if (Model.Scores.Count == 0)
+    {
+        <p>There are no scores.</p>
+    }
+    else
+    {
+        int count = Model.Scores.Count;
+        <p>There @(count == 1 ? "is" : "are") @count score@(count == 1 ? "" : "s").</p>
+    }
+    <div class="ui list">
+    @for(int i = 0; i < Model.Scores.Count; i++)
+    {
+        Score score = Model.Scores[i];
+        Console.WriteLine(@$"{score.ScoreId}, {score.SlotId}, {score.PlayerIdCollection}");
+        string[] playerIds = score.PlayerIds;
+        Database database = Model.Database;          
+        <div class="item">
+       
+            <span class="ui large text">
+            @if(canDelete)
+            {
+                <a href="/deleteScore/@score.ScoreId" style="color: orangered; "><i class="trash icon"></i></a>            
+            }               
+                <b>@(i+1):</b>                 
+                <span class="ui text">@score.Points points</span>
+            </span>
+            <div class="content">
+                @* <div class="header"><b>@score.Points points</b></div> *@
+                @* <div class="description">-  <b>@score.Points points</b></div> *@
+                <div class="list" style="padding-top: 0">
+                    @for (int j = 0; j < playerIds.Length; j++)
+                    {
+                        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == playerIds[j]);
+                        Console.WriteLine(j + @" - " + playerIds[j] + @": " + (user == null));
+                        if (user == null) continue;
+                        <div class="item">
+                            <i class="minus icon" style="padding-top: 9px"></i>
+                            <div class="content" style="padding-left: 0">
+                                @await user.ToLink(Html, ViewData, language, timeZone)
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+    }
+    </div>
+</div>

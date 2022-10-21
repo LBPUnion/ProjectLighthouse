@@ -16,6 +16,7 @@ public class SlotPage : BaseLayout
     public List<Comment> Comments = new();
     public List<Review> Reviews = new();
     public List<Photo> Photos = new();
+    public List<Score> Scores = new();
 
     public bool CommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
@@ -90,6 +91,12 @@ public class SlotPage : BaseLayout
         this.Photos = await this.Database.Photos.Include(p => p.Creator)
             .OrderByDescending(p => p.Timestamp)
             .Where(r => r.SlotId == id)
+            .Take(10)
+            .ToListAsync();
+
+        this.Scores = await this.Database.Scores.OrderByDescending(s => s.Points)
+            .ThenByDescending(s => s.ScoreId)
+            .Where(s => s.SlotId == id)
             .Take(10)
             .ToListAsync();
 

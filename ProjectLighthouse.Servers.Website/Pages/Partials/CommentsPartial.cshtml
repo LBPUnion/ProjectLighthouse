@@ -8,6 +8,7 @@
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+    bool canDelete = (bool?)ViewData["CanDelete"] ?? false;
 }
 
 <div class="ui yellow segment" id="comments">
@@ -85,6 +86,12 @@
                 else
                 {
                     <span>@decodedMessage</span>
+                }
+                @if (canDelete)
+                {
+                    <button class="ui red icon button" style="display:inline-flex; float: right" onclick="confirmDeletion(@comment.CommentId)">
+                        <i class="trash icon"></i>
+                    </button>
                 }
                 <p>
                     <i>@TimeZoneInfo.ConvertTime(timestamp, timeZoneInfo).ToString("M/d/yyyy @ h:mm:ss tt")</i>

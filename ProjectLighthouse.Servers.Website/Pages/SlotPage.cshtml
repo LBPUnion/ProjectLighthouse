@@ -97,7 +97,8 @@
         <br/>
     }
     <div class="eight wide column">
-        @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
+        @await Html.PartialAsync("Partials/CommentsPartial", 
+            ViewData.WithLang(language).WithTime(timeZone).CanDelete((Model.User?.IsModerator ?? false) || Model.User == Model.Slot?.Creator))
     </div>
     @if (isMobile)
     {
@@ -205,6 +206,10 @@
         {
             <br/>
         }
+    </div>
+    <div class="eight wide column">
+            @await Html.PartialAsync("Partials/LeaderboardPartial", 
+                ViewData.WithLang(language).WithTime(timeZone).CanDelete(Model.User?.IsModerator ?? false))
     </div>
 </div>
 

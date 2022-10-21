@@ -13,6 +13,8 @@ public static class PartialExtensions
 
     public static ViewDataDictionary<T> WithTime<T>(this ViewDataDictionary<T> viewData, string timeZone) => WithKeyValue(viewData, "TimeZone", timeZone);
 
+    public static ViewDataDictionary<T> CanDelete<T>(this ViewDataDictionary<T> viewData, bool canDelete) => WithKeyValue(viewData, "CanDelete", canDelete);
+
     private static ViewDataDictionary<T> WithKeyValue<T>(this ViewDataDictionary<T> viewData, string key, object value)
     {
         try
