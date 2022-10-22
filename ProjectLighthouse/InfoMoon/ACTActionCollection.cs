@@ -20,5 +20,5 @@ public class ACTActionCollection {
     public long ActionTimestamp { get; set; }
 
     public int? Interaction { get; set; }
-    public int? Interaction2 { get; set; }
+    public long? Interaction2 { get; set; }
 }

@@ -166,6 +166,9 @@ public class Activity
             case EventType.PublishLevel:
                 return LbpSerializer.StringElement("republish", group.Interaction) +
                        LbpSerializer.StringElement("count", group.Interaction2);
+            case EventType.Review:
+                return LbpSerializer.StringElement("review_id", group.Interaction) +
+                       LbpSerializer.StringElement("review_modified", group.Interaction2);
             default: return "";
         }
     }

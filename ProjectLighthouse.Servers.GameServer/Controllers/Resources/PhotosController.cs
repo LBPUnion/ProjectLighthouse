@@ -127,6 +127,10 @@ public class PhotosController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
+        int slotId = 1;
+        if (photo.SlotId != null) slotId = (int)photo.SlotId;
+        await this.database.PostActivity(ActivityCategory.Level, slotId, photo.CreatorId, EventType.UploadPhoto, photo.PhotoId);
+
         await WebhookHelper.SendWebhook
         (
             new EmbedBuilder

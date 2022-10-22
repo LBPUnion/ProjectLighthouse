@@ -84,6 +84,7 @@ public class EnterLevelController : ControllerBase
         }
 
         await this.database.SaveChangesAsync();
+        await this.database.PostActivity(ActivityCategory.Level, slotId, token.UserId, EventType.PlayLevel, 1);
 
         return this.Ok();
     }

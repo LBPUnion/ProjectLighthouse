@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20221021184305_AddActActionNews")]
+    [Migration("20221021184304_AddActActionNews")]
     public partial class AddStreamNews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +36,7 @@ namespace ProjectLighthouse.Migrations
                     ActionType = table.Column<int>(type: "tinyint", nullable: false),
                     ActionTimestamp = table.Column<long>(type: "bigint", nullable: false),
                     Interaction = table.Column<int>(type: "int", nullable: false),
-                    Interaction2 = table.Column<int>(type: "int", nullable: false)
+                    Interaction2 = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table => {
                     table.PrimaryKey("PK_ACTActionCollection", x => x.ActionId);

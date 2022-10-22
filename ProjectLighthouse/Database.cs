@@ -207,7 +207,14 @@ public class Database : DbContext
 
         this.Comments.Add(newComment);
         await this.SaveChangesAsync();
-        await this.PostActivity(ActivityCategory.User, targetId, userId, EventType.CommentUser, this, newComment.CommentId);
+        if(type == CommentType.Profile)
+        {
+            await this.PostActivity(ActivityCategory.User, targetId, userId, EventType.CommentUser, newComment.CommentId);
+        }
+        else
+        {
+            await this.PostActivity(ActivityCategory.Level, targetId, userId, EventType.CommentLevel, newComment.CommentId);
+        }
 
         return true;
     }
@@ -227,6 +234,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
+        await this.PostActivity(ActivityCategory.User, heartedUser.UserId, userId, EventType.HeartUser);
     }
 
     public async Task UnheartUser(int userId, User heartedUser)
@@ -274,6 +282,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
+        await this.PostActivity(ActivityCategory.Level, heartedSlot.SlotId, userId, EventType.HeartLevel);
     }
 
     public async Task UnheartLevel(int userId, Slot heartedSlot)
@@ -482,9 +491,8 @@ public class Database : DbContext
         int destinationId,  
         int actorId,
         EventType actionType,
-        Database database,
         int interact1 = 0,
-        int interact2 = 0
+        long interact2 = 0
     )
     {
         ACTActionCollection newAction = new ACTActionCollection();

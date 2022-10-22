@@ -18,6 +18,8 @@ public enum EventType
     HeartLevel,
     HeartUser,
     PlayLevel,
+    PublishPlaylist,
+    // Unused
     LevelInteraction,
     Other
 }
@@ -52,6 +54,8 @@ public static class ActivityHelper
             case EventType.CommentUser:
             case EventType.HeartUser:
                 return "object_user";
+            case EventType.PublishPlaylist:
+                return "object_playlist_id";
         }
     }
     
