@@ -24,6 +24,16 @@ public class ReviewController : ControllerBase
         this.database = database;
     }
 
+    [HttpGet("review/user/{slotId:int}/{userName}")]
+    public async Task<IActionResult> GetReview(int slotId, string userName)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403);
+        if (userName == null) return this.BadRequest();
+        Review? targetReview = await this.database.Reviews.Include(r => r.Reviewer).FirstOrDefaultAsync(r => r.SlotId == slotId && r.Reviewer!.Username == userName);
+        return this.Ok(targetReview?.Serialize());
+    }
+
     // LBP1 rating
     [HttpPost("rate/user/{slotId:int}")]
     public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
