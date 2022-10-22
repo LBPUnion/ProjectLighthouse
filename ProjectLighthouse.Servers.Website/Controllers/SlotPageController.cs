@@ -65,7 +65,7 @@ public class SlotPageController : ControllerBase
 
         if (msg == null)
         {
-            Logger.Error($"Refusing to post comment from {token.UserId} on user {id}, {nameof(msg)} is null", LogArea.Comments);
+            Logger.Error($"Refusing to post comment from {token.UserId} on slot {id}, {nameof(msg)} is null", LogArea.Comments);
             return this.Redirect("~/slot/" + id);
         }
 
