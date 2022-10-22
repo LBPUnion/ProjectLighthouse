@@ -6,15 +6,15 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.InfoMoon;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
-public class StreamController : ControllerBase
+public class ActivityController : ControllerBase
 {
     private readonly Database database;
-    public StreamController(Database database)
+    public ActivityController(Database database)
     {
         this.database = database;
     }
@@ -28,36 +28,41 @@ public class StreamController : ControllerBase
         if (token == null) return this.StatusCode(403, "");
         GameVersion gameVersion = token.GameVersion;
 
-        IEnumerable<ActivityStream> streamsList = this.database.Stream
-            .Include(s => s.Actor)
-            .Where(s => s.Timestamp < timestamp && s.Timestamp > endTimestamp)
-            .OrderByDescending(s => s.Timestamp)
+        // TODO: Filter. Don't show events from everyone.
+        IEnumerable<Activity> streamsList = this.database.Activity
+            .Where(a => a.Timestamp < timestamp && a.Timestamp > endTimestamp)
+            .OrderByDescending(a => a.Timestamp)
             .ToList();
         string streams = "";
         string news = "";
         string slots = "";
         string users = "";
-        foreach (ActivityStream article in streamsList)
+        foreach (Activity article in streamsList)
         {
-            string[] eventTypes = article.EventTypes;
-            switch (eventTypes[0])
+            streams += await article.SerializeAsync();
+            switch((ActivityCategory)article.Category)
             {
-                case "news_post":
-                    News? newsObject = await this.database.News.FirstOrDefaultAsync(n => n.NewsId == article.TargetId);
-                    if (newsObject != null) news += newsObject.Serialize();
-                    break;
-                default:
-                    Slot? pickedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == article.TargetId);
-                    if (pickedSlot == null) break;
-                    User? creator = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == pickedSlot.CreatorId);
-                    if (pickedSlot != null && creator != null)
+                case ActivityCategory.TeamPick:
+                case ActivityCategory.Level:
+                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == article.DestinationId);
+                    slots += slot?.Serialize();
+                    foreach (int id in article.Actors)
                     {
-                        slots += pickedSlot.Serialize(GameVersion.LittleBigPlanet3, fullSerialization: true);
-                        users += creator.Serialize(token.GameVersion);
+                        User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == id);
+                        users += user?.Serialize();
+                    }
+                    break;
+                case ActivityCategory.News:
+                    news += "";
+                    break;
+                case ActivityCategory.User:
+                    foreach (int id in article.Actors)
+                    {
+                        User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == id);
+                        users += user?.Serialize();
                     }
                     break;
             }
-            streams += await article.Serialize();
         }
         return this.Ok(
             LbpSerializer.StringElement("stream",
@@ -70,4 +75,5 @@ public class StreamController : ControllerBase
             )
         );
     }
+    // Database.cs logic will be moved here in the future
 }

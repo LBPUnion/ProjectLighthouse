@@ -269,6 +269,9 @@ public class PublishController : ControllerBase
 
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
+        // TODO: Handle republish (Interact 1)
+        await this.database.PostActivity(ActivityCategory.Level, slot.SlotId, slot.CreatorId, EventType.PublishLevel, this.database, 0, 1);
+
         return this.Ok(slot.Serialize(gameToken.GameVersion));
     }
 

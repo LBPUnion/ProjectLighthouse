@@ -54,7 +54,8 @@ public class Database : DbContext
     public DbSet<APIKey> APIKeys { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<News> News { get; set; }
-    public DbSet<ActivityStream> Stream { get; set; }
+    public DbSet<Activity> Activity { get; set; }
+    public DbSet<ACTActionCollection> ACTActionCollection { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
@@ -195,18 +196,19 @@ public class Database : DbContext
             if (targetSlot == null) return false;
         }
 
-        this.Comments.Add
-        (
-            new Comment
-            {
-                PosterUserId = userId,
-                TargetId = targetId,
-                Type = type,
-                Message = message,
-                Timestamp = TimeHelper.UnixTimeMilliseconds(),
-            }
-        );
+        Comment newComment = new Comment 
+        {
+            PosterUserId = userId,
+            TargetId = targetId,
+            Type = type,
+            Message = message,
+            Timestamp = TimeHelper.UnixTimeMilliseconds(),
+        };
+
+        this.Comments.Add(newComment);
         await this.SaveChangesAsync();
+        await this.PostActivity(ActivityCategory.User, targetId, userId, EventType.CommentUser, this, newComment.CommentId);
+
         return true;
     }
 
@@ -473,6 +475,53 @@ public class Database : DbContext
         }
 
         return true;
+    }
+
+    public async Task PostActivity(
+        ActivityCategory category, 
+        int destinationId,  
+        int actorId,
+        EventType actionType,
+        Database database,
+        int interact1 = 0,
+        int interact2 = 0
+    )
+    {
+        ACTActionCollection newAction = new ACTActionCollection();
+            newAction.ActionTimestamp = TimeHelper.UnixTimeMilliseconds();
+            newAction.ActionType = (Int16)actionType;
+            newAction.ActorId = actorId;
+            newAction.ObjectId = destinationId;
+            newAction.Interaction = interact1;
+            newAction.Interaction2 = interact2;
+
+            this.ACTActionCollection.Add(newAction);
+            await this.SaveChangesAsync();
+            int collectionId = newAction.ActionId;
+
+        Activity? previousCheck = this.Activity.AsEnumerable().LastOrDefault(a => a.Actors.Contains(actorId));
+        if
+        (
+            previousCheck != null && 
+            (ActivityCategory)previousCheck.Category == category && 
+            previousCheck.DestinationId == destinationId &&
+            previousCheck.Timestamp > TimeHelper.TimestampMillis - 1_800_000 // 30 Minutes
+        ) 
+        {
+            previousCheck.ActionCollection += ","+collectionId;
+        }
+        else
+        {
+            Activity newActivity = new Activity();
+            newActivity.Timestamp = TimeHelper.UnixTimeMilliseconds();
+            newActivity.Category = (Int16)category;
+            newActivity.DestinationId = destinationId;
+            newActivity.ActionCollection += collectionId;
+            newActivity.ActorCollection += actorId;
+
+            this.Activity.Add(newActivity);
+        }
+        await this.SaveChangesAsync();
     }
 
     public async Task RemoveExpiredTokens()
