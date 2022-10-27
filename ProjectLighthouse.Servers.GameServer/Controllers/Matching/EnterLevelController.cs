@@ -56,6 +56,9 @@ public class EnterLevelController : ControllerBase
                 SlotId = slotId,
                 UserId = token.UserId,
             };
+
+            await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, slotId, EventType.PlayLevel, 1);
+
             this.database.VisitedLevels.Add(v);
         }
         else
@@ -84,7 +87,6 @@ public class EnterLevelController : ControllerBase
         }
 
         await this.database.SaveChangesAsync();
-        await this.database.PostActivity(ActivityCategory.Level, slotId, token.UserId, EventType.PlayLevel, 1);
 
         return this.Ok();
     }

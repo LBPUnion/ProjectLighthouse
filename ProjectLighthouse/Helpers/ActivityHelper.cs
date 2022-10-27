@@ -18,18 +18,16 @@ public enum EventType
     HeartLevel,
     HeartUser,
     PlayLevel,
-    PublishPlaylist,
-    // Unused
-    LevelInteraction,
-    Other
+    PublishPlaylist
 }
 
 public enum ActivityCategory
 {
-    News,
-    TeamPick,
-    Level,
-    User
+    News = 0,
+    TeamPick = 1,
+    Level = 2,
+    User = 3,
+    Comment = 4
 }
 
 public static class ActivityHelper
@@ -41,7 +39,6 @@ public static class ActivityHelper
             case EventType.News:
                 return "news_id";
             case EventType.TeamPick:
-            case EventType.LevelInteraction:
             case EventType.DpadRating:
             case EventType.Review:
             case EventType.Score:

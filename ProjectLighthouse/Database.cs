@@ -55,12 +55,12 @@ public class Database : DbContext
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<News> News { get; set; }
     public DbSet<Activity> Activity { get; set; }
-    public DbSet<ACTActionCollection> ACTActionCollection { get; set; }
+    public DbSet<ActivitySubject> ActivitySubject { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
-    #nullable enable
+#nullable enable
     public async Task<User> CreateUser(string username, string password, string? emailAddress = null)
     {
         if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
@@ -196,7 +196,7 @@ public class Database : DbContext
             if (targetSlot == null) return false;
         }
 
-        Comment newComment = new Comment 
+        Comment newComment = new Comment
         {
             PosterUserId = userId,
             TargetId = targetId,
@@ -207,13 +207,15 @@ public class Database : DbContext
 
         this.Comments.Add(newComment);
         await this.SaveChangesAsync();
-        if(type == CommentType.Profile)
+        if (type == CommentType.Profile)
         {
-            await this.PostActivity(ActivityCategory.User, targetId, userId, EventType.CommentUser, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityCategory.Comment, userId, targetId, EventType.CommentUser, newComment.CommentId);
+            // await this.PostActivity(ActivityCategory.User, targetId, userId, EventType.CommentUser, newComment.CommentId);
         }
         else
         {
-            await this.PostActivity(ActivityCategory.Level, targetId, userId, EventType.CommentLevel, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityCategory.Comment, userId, targetId, EventType.CommentLevel, newComment.CommentId);
+            // await this.PostActivity(ActivityCategory.Level, targetId, userId, EventType.CommentLevel, newComment.CommentId);
         }
 
         return true;
@@ -234,7 +236,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
-        await this.PostActivity(ActivityCategory.User, heartedUser.UserId, userId, EventType.HeartUser);
+        await this.CreateActivitySubject(ActivityCategory.User, userId, heartedUser.UserId, EventType.HeartUser);
     }
 
     public async Task UnheartUser(int userId, User heartedUser)
@@ -282,7 +284,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
-        await this.PostActivity(ActivityCategory.Level, heartedSlot.SlotId, userId, EventType.HeartLevel);
+        await this.CreateActivitySubject(ActivityCategory.Level, userId, heartedSlot.SlotId, EventType.HeartLevel);
     }
 
     public async Task UnheartLevel(int userId, Slot heartedSlot)
@@ -466,7 +468,7 @@ public class Database : DbContext
             await this.SaveChangesAsync();
             return null;
         }
-        
+
         return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
     }
 
@@ -486,49 +488,121 @@ public class Database : DbContext
         return true;
     }
 
-    public async Task PostActivity(
-        ActivityCategory category, 
-        int destinationId,  
-        int actorId,
-        EventType actionType,
+    public async Task CreateActivitySlot
+    (
+        int destinationId,
+        ActivityCategory category,
+        int? catalystId = null // Publishing 
+    )
+    {
+        Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => destinationId == a.TargetId && category == a.Category);
+        if (activity != null) return;
+
+        this.Activity.Add
+        (
+            new Activity
+            {
+                TargetType = (int)category,
+                TargetId = destinationId
+            }
+        );
+
+        await this.SaveChangesAsync();
+    }
+
+    public async Task AddActivityEvent(int targetId, ActivityCategory targetCategory, int eventId, int actorId)
+    {
+        Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
+        if (activity == null) {
+            await CreateActivitySlot(targetId, targetCategory); 
+            activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
+        }
+        if (activity == null) return;
+
+        // activity.EventCollection += "," + eventId;
+        if(!activity.Users.Contains(actorId)) {
+            activity.UserCollection += "," + actorId;
+        }
+        // char test1 = activity.EventCollection[0];
+        // char test2 = ","[0];
+        // bool test3 = (test1 == test2);
+        // string test4 = activity.EventCollection.Remove(0,1);
+
+        // if (activity.EventCollection[0] == ","[0]) activity.EventCollection = activity.EventCollection.Remove(0, 1);
+        if (activity.UserCollection[0] == ","[0]) activity.UserCollection = activity.UserCollection.Remove(0, 1);
+
+        await this.SaveChangesAsync();
+    }
+
+    public async Task DeleteActivitySlot
+    (
+        int targetId,
+        ActivityCategory targetCategory
+    )
+    {
+        Activity? activity = await this.Activity.FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
+        if (activity == null) return;
+
+        this.Activity.Remove(activity);
+
+        await this.SaveChangesAsync();
+    }
+
+    public async Task CreateActivitySubject
+    (
+        ActivityCategory category,
+        int sourceId,
+        int destinationId,
+        EventType eventType,
         int interact1 = 0,
         long interact2 = 0
     )
     {
-        ACTActionCollection newAction = new ACTActionCollection();
-            newAction.ActionTimestamp = TimeHelper.UnixTimeMilliseconds();
-            newAction.ActionType = (Int16)actionType;
-            newAction.ActorId = actorId;
-            newAction.ObjectId = destinationId;
-            newAction.Interaction = interact1;
-            newAction.Interaction2 = interact2;
-
-            this.ACTActionCollection.Add(newAction);
+        ActivitySubject? activitySubject = await this.ActivitySubject.FirstOrDefaultAsync(a =>
+            a.ActionType == (int)eventType &&
+            a.ActorId == sourceId &&
+            a.ObjectId == destinationId &&
+            a.ObjectType == (int)eventType
+            // a.Interaction == interact1 &&
+            // a.Interaction2 == interact2
+        );
+        if (activitySubject != null)
+        {
+            activitySubject.Interaction = interact1;
+            activitySubject.Interaction2 = interact2;
+            activitySubject.ActionTimestamp = TimeHelper.UnixTimeMilliseconds();
             await this.SaveChangesAsync();
-            int collectionId = newAction.ActionId;
-
-        Activity? previousCheck = this.Activity.AsEnumerable().LastOrDefault(a => a.Actors.Contains(actorId));
-        if
-        (
-            previousCheck != null && 
-            (ActivityCategory)previousCheck.Category == category && 
-            previousCheck.DestinationId == destinationId &&
-            previousCheck.Timestamp > TimeHelper.TimestampMillis - 1_800_000 // 30 Minutes
-        ) 
-        {
-            previousCheck.ActionCollection += ","+collectionId;
+            return;
         }
-        else
-        {
-            Activity newActivity = new Activity();
-            newActivity.Timestamp = TimeHelper.UnixTimeMilliseconds();
-            newActivity.Category = (Int16)category;
-            newActivity.DestinationId = destinationId;
-            newActivity.ActionCollection += collectionId;
-            newActivity.ActorCollection += actorId;
 
-            this.Activity.Add(newActivity);
-        }
+        ActivitySubject newActivitySubject = new ActivitySubject
+        {
+            ActionTimestamp = TimeHelper.UnixTimeMilliseconds(),
+            ActionType = (int)category, // Primary type
+            ActorId = sourceId,
+            ObjectId = destinationId,
+            ObjectType = (int)eventType, // Event type
+            Interaction = interact1,
+            Interaction2 = interact2
+        };
+
+        this.ActivitySubject.Add(newActivitySubject);
+
+        await this.SaveChangesAsync();
+
+        await this.AddActivityEvent(newActivitySubject.ObjectId, (ActivityCategory)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
+    }
+
+    public async Task DeleteActivitySubject
+    (
+        int subjectId
+    )
+    {
+        ActivitySubject? activitySubject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionId == subjectId);
+        if (activitySubject == null) return;
+
+        this.ActivitySubject.Remove(activitySubject);
+
         await this.SaveChangesAsync();
     }
 
@@ -537,7 +611,7 @@ public class Database : DbContext
         foreach (GameToken token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
         {
             User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
-            if(user != null) user.LastLogout = TimeHelper.TimestampMillis;
+            if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
             this.GameTokens.Remove(token);
         }
         this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
@@ -599,5 +673,5 @@ public class Database : DbContext
 
         if (saveChanges) await this.SaveChangesAsync();
     }
-    #nullable disable
+#nullable disable
 }

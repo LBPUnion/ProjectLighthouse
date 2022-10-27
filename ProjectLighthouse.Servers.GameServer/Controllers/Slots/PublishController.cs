@@ -160,6 +160,8 @@ public class PublishController : ControllerBase
 
         slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(slot.AuthorLabels);
 
+        int republish = 0;
+
         // Republish logic
         if (slot.SlotId != 0)
         {
@@ -228,6 +230,7 @@ public class PublishController : ControllerBase
                 slot.MaximumPlayers = 4;
             }
 
+            republish = 1;
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
@@ -267,10 +270,9 @@ public class PublishController : ControllerBase
                 $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}");
         }
 
-        Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
+        await this.database.CreateActivitySubject(ActivityCategory.Level, slot.CreatorId, slot.SlotId, EventType.PublishLevel, republish, 1);
 
-        // TODO: Handle republish (Interact 1)
-        await this.database.PostActivity(ActivityCategory.Level, slot.SlotId, slot.CreatorId, EventType.PublishLevel, 0, 1);
+        Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
         return this.Ok(slot.Serialize(gameToken.GameVersion));
     }

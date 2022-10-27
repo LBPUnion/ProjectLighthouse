@@ -23,13 +23,15 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet("userComment/{username}")]
-    public async Task<IActionResult> GetSingleComment([FromQuery] int commentId, string? username)
+    [HttpGet("comment/user/{slotId}")]
+    public async Task<IActionResult> GetSingleComment([FromQuery] int commentId, string? username, int? slotId)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403);
-        if (username == null) return this.BadRequest();
+        if (username == null && slotId == null) return this.BadRequest();
         User? userTarget = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-        if (userTarget == null) return this.StatusCode(404);
+        Slot? slotTarget = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        if (userTarget == null && slotTarget == null) return this.StatusCode(404);
 
         Comment? comment = await this.database.Comments.Include(c => c.Poster)
                                 .FirstOrDefaultAsync(c => c.CommentId == commentId);

@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20221021184304_AddActActionNews")]
-    public partial class AddStreamNews : Migration
+    [Migration("20221026021501_AddRecentActivityNews")]
+    public partial class AddRecentActivityNews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,31 +17,30 @@ namespace ProjectLighthouse.Migrations
                 name: "Activity",
                 columns: table => new {
                     ActivityId = table.Column<int>(type: "int", nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Category = table.Column<int>(type: "tinyint", nullable: false),
-                    Timestamp = table.Column<long>(type: "bigint", nullable: false),
-                    DestinationId = table.Column<int>(type: "int", nullable: false),
-                    ActionCollection = table.Column<string>(type: "text", nullable: false),
-                    ActorCollection = table.Column<string>(type: "text", nullable: false),
+                    TargetType = table.Column<int>(type: "tinyint", nullable: false),
+                    TargetId = table.Column<int>(type: "int", nullable: false),
+                    UserCollection = table.Column<string>(type: "mediumtext", nullable: false),
                 },
                 constraints: table => {
                     table.PrimaryKey("PK_Activity", x => x.ActivityId);
                 }
             );
             migrationBuilder.CreateTable(
-                name: "ACTActionCollection",
+                name: "ActivitySubject",
                 columns: table => new {
                     ActionId = table.Column<int>(type: "int", nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ActorId = table.Column<int>(type: "int", nullable: false),
-                    ObjectId = table.Column<int>(type: "int", nullable: false),
                     ActionType = table.Column<int>(type: "tinyint", nullable: false),
                     ActionTimestamp = table.Column<long>(type: "bigint", nullable: false),
+                    ActorId = table.Column<int>(type: "int", nullable: false),
+                    ObjectId = table.Column<int>(type: "int", nullable: false),
+                    ObjectType = table.Column<int>(type: "tinyint", nullable: false),
                     Interaction = table.Column<int>(type: "int", nullable: false),
                     Interaction2 = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table => {
-                    table.PrimaryKey("PK_ACTActionCollection", x => x.ActionId);
+                    table.PrimaryKey("PK_ActivitySubject", x => x.ActionId);
                     table.ForeignKey(
-                        name: "FK_ACTActionCollection_Users_UserId",
+                        name: "FK_ActivitySubject_Users_UserId",
                         column: a => a.ActorId,
                         principalTable: "Users",
                         principalColumn: "UserId",
@@ -72,7 +71,7 @@ namespace ProjectLighthouse.Migrations
             migrationBuilder.DropTable(
                 name: "Activity");
             migrationBuilder.DropTable(
-                name: "ACTActionCollection");
+                name: "ActivitySubject");
             migrationBuilder.DropTable(
                 name: "News");
         }

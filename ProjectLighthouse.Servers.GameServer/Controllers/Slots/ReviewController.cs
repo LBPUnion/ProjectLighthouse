@@ -60,7 +60,7 @@ public class ReviewController : ControllerBase
         ratedLevel.RatingLBP1 = Math.Max(Math.Min(5, rating), 0);
 
         await this.database.SaveChangesAsync();
-        await this.database.PostActivity(ActivityCategory.Level, ratedLevel.SlotId, token.UserId, EventType.LBP1Rate, rating);
+        await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.LBP1Rate, rating);
 
         return this.Ok();
     }
@@ -94,7 +94,7 @@ public class ReviewController : ControllerBase
         if (review != null) review.Thumb = ratedLevel.Rating;
 
         await this.database.SaveChangesAsync();
-        await this.database.PostActivity(ActivityCategory.Level, ratedLevel.SlotId, token.UserId, EventType.DpadRating, rating);
+        await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.DpadRating, rating);
 
         return this.Ok();
     }
@@ -148,7 +148,7 @@ public class ReviewController : ControllerBase
         ratedLevel.Rating = Math.Clamp(newReview.Thumb, -1, 1);
 
         await this.database.SaveChangesAsync();
-        await this.database.PostActivity(ActivityCategory.Level, ratedLevel.SlotId, token.UserId, EventType.Review, review.ReviewId, review.Timestamp);
+        await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.Review, review.ReviewId, review.Timestamp);
 
         return this.Ok();
     }
