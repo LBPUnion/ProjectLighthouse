@@ -224,19 +224,7 @@ public class User
                       LbpSerializer.StringElement<int>("favouriteUserCount", this.HeartedUsers, true) +
                       LbpSerializer.StringElement<int>("favouritePlaylistCount", this.HeartedPlaylists, true) +
                       LbpSerializer.StringElement<int>("lolcatftwCount", this.QueuedLevels, true) +
-                      LbpSerializer.StringElement<string>("pins", this.Pins, true) +
-                      LbpSerializer.StringElement<string>
-                    (
-                        "planets",
-                        gameVersion switch
-                        {
-                            GameVersion.LittleBigPlanet2 => this.PlanetHashLBP2,
-                            GameVersion.LittleBigPlanet3 => this.PlanetHashLBP3,
-                            GameVersion.LittleBigPlanetVita => this.PlanetHashLBPVita,
-                            _ => "", // other versions do not have custom planets
-                        },
-                        true
-                    );
+                      LbpSerializer.StringElement<string>("pins", this.Pins, true);
 
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }

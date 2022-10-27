@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20221026021501_AddRecentActivityNews")]
+    [Migration("20221026021502_AddRecentActivityNews")]
     public partial class AddRecentActivityNews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace ProjectLighthouse.Migrations
                     ActivityId = table.Column<int>(type: "int", nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     TargetType = table.Column<int>(type: "tinyint", nullable: false),
                     TargetId = table.Column<int>(type: "int", nullable: false),
-                    UserCollection = table.Column<string>(type: "mediumtext", nullable: false),
+                    UserCollection = table.Column<string>(type: "mediumtext", nullable: false)
                 },
                 constraints: table => {
                     table.PrimaryKey("PK_Activity", x => x.ActivityId);

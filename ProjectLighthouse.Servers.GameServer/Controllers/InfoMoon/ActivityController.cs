@@ -19,6 +19,31 @@ public class ActivityController : ControllerBase
         this.database = database;
     }
 
+    [HttpGet("stream/slot/{slotId}")]
+    public async Task<IActionResult> GetSlotActivity()
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        User? requestee = await this.database.UserFromGameRequest(this.Request);
+        if (requestee == null || token == null) return this.StatusCode(403, "");
+
+        // STUB
+
+        return this.Ok(LbpSerializer.BlankElement("stream"));
+    }
+
+    [HttpGet("stream2/{userId}")]
+    public async Task<IActionResult> GetUserActivity()
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        User? requestee = await this.database.UserFromGameRequest(this.Request);
+        if (requestee == null || token == null) return this.StatusCode(403, "");
+
+        // STUB
+
+        return this.Ok(LbpSerializer.BlankElement("stream"));
+    }
+
+    // This function gets global activity that is used on the Recent Activity
     [HttpPost("stream")]
     [HttpGet("stream")]
     public async Task<IActionResult> GetActivity
@@ -33,13 +58,26 @@ public class ActivityController : ControllerBase
     {
         // endTimestamp will report as 0 occasionally, this is automagically handled as 0
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        // I was unable to find a way of getting the user from the GameToken request.
         User? requestee = await this.database.UserFromGameRequest(this.Request);
         if (requestee == null || token == null) return this.StatusCode(403, "");
+        // LBP3 will send a second request for stream objects sent specifically at the beginning of time (0 ms since 1970), 
+        // if it does not receive a 200, it will start rapidly spamming requests. Thanks LBP3!
         if (timestamp == 0) return this.Ok(LbpSerializer.BlankElement("stream"));
+        // Used later to determine if the slot in question can be accessed by the requestee.
         GameVersion gameVersion = token.GameVersion;
 
         IEnumerable<Activity> activities = this.database.Activity
-            .AsEnumerable().Where(a => a.Users.AsEnumerable().Contains(requestee.UserId));
+            .AsEnumerable().Where(a => a.Users.AsEnumerable().Contains(requestee.UserId) || 
+                                    // Remove if filters out self
+                                    (
+                                        a.TargetType == (int)ActivityCategory.User ||
+                                        a.TargetType == (int)ActivityCategory.CommentUser ||
+                                        a.TargetType == (int)ActivityCategory.HeartUser
+                                    ) &&
+                                    a.TargetId == requestee.UserId
+                                 );
+
         if (excludeNews) activities = activities.Where(a => a.Category != ActivityCategory.News);
 
         string groups = "";
@@ -47,6 +85,8 @@ public class ActivityController : ControllerBase
         string users = "";
         string news = "";
 
+        long lastActTimestamp = 0;
+        long newActTimestamp = 0;
         foreach (Activity stream in activities.ToList())
         {
             List<int> idsToResolve = new List<int>();
@@ -71,7 +111,7 @@ public class ActivityController : ControllerBase
                 .Where(a => a.ActionTimestamp < timestamp && a.ActionTimestamp > endTimestamp)
                 .Where(a => a.ActionCategory == stream.Category && a.ObjectId == stream.TargetId)
                 .Where(a => idsToResolve.Contains(a.ActorId))
-                .OrderBy(a => a.ActionTimestamp);
+                .OrderByDescending(a => a.ActionTimestamp);
 
             ActivitySubject? catalyst = subjects.FirstOrDefault();
             groupData += LbpSerializer.StringElement("timestamp", catalyst?.ActionTimestamp);
@@ -90,6 +130,8 @@ public class ActivityController : ControllerBase
                     groupType = "level";
                     groupData += LbpSerializer.TaggedStringElement("slot_id", targetedSlot?.SlotId, "type", "user");
                     break;
+                case ActivityCategory.CommentUser:
+                case ActivityCategory.HeartUser:
                 case ActivityCategory.User:
                     User? targetedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == stream.TargetId);
                     users += targetedUser?.Serialize(gameVersion);
@@ -103,23 +145,65 @@ public class ActivityController : ControllerBase
                 List<string> subgroupData = new List<string>();
 
                 string subjectData = "";
-                string lastUser = "";
+
+                int lastType = 0;
+                int lastActivity = 0;
+                int lastActor = 0;
+
                 string eventData = "";
                 foreach (ActivitySubject subject in subjects.ToList())
                 {
+                    newActTimestamp = Math.Max(subject.ActionTimestamp, newActTimestamp);
                     User? actor = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(a => a.UserId == subject.ActorId);
                     if (actor == null) continue;
 
-                    if (lastUser == actor.Username)
+                    if (subject.ActionType == (int)ActivityCategory.HeartUser)
+                    {
+                        // DO. NOT. COMBINE. THESE.
+                        subjectData = LbpSerializer.StringElement("timestamp", subject.ActionTimestamp) +
+                                      LbpSerializer.StringElement("user_id", actor.Username);
+                        lastActivity = subject.ObjectId;
+                        lastType = subject.ActionType;
+                        lastActor = subject.ActorId;
+
+                        string waitSerialize = await subject.Serialize();
+                        eventData = waitSerialize;
+                        continue;
+                    }
+                    if (lastActivity == subject.ObjectId && lastType == subject.ActionType &&
+                        (lastActor == subject.ActorId || 
+                            (token.GameVersion == GameVersion.LittleBigPlanet3 ? 
+                                (subject.ActionType == (int)ActivityCategory.Comment || subject.ActionType == (int)ActivityCategory.CommentUser) : false
+                            )
+                        )
+                    )
                     {
                         string waitSerialize = await subject.Serialize();
                         eventData += waitSerialize;
+                    }
+                    else if (lastActivity == subject.ObjectId && lastType == subject.ActionType && lastActor != subject.ActorId)
+                    {
+                        subgroupData.Insert(0,
+                            LbpSerializer.TaggedStringElement("group",
+                                subjectData + LbpSerializer.StringElement("events", eventData)
+                            , "type", "user")
+                        );
+
+                        subjectData = LbpSerializer.StringElement("timestamp", subject.ActionTimestamp) +
+                                      LbpSerializer.StringElement("user_id", actor.Username);
+
+                        lastActivity = subject.ObjectId;
+                        lastType = subject.ActionType;
+                        lastActor = subject.ActorId;
+
+                        string waitSerialize = await subject.Serialize();
+                        eventData = waitSerialize;
                     }
                     else
                     {
                         if (eventData != "")
                         {
-                            subgroupData.Insert(0, 
+                            subgroupData.Insert(0,
                                 LbpSerializer.TaggedStringElement("group",
                                     subjectData + LbpSerializer.StringElement("events", eventData)
                                 , "type", "user")
@@ -128,12 +212,15 @@ public class ActivityController : ControllerBase
 
                         subjectData = LbpSerializer.StringElement("timestamp", subject.ActionTimestamp) +
                                       LbpSerializer.StringElement("user_id", actor.Username);
-                        lastUser = actor.Username;
+                        lastActivity = subject.ObjectId;
+                        lastType = subject.ActionType;
+                        lastActor = subject.ActorId;
+
                         string waitSerialize = await subject.Serialize();
                         eventData = waitSerialize;
                     }
                 }
-                subgroupData.Insert(0, 
+                subgroupData.Insert(0,
                     LbpSerializer.TaggedStringElement("group",
                         subjectData + LbpSerializer.StringElement("events", eventData)
                     , "type", "user")
@@ -145,10 +232,11 @@ public class ActivityController : ControllerBase
             }
             else
             {
-
+                // News Stub
             }
 
-            groups += LbpSerializer.TaggedStringElement("group", groupData, "type", groupType);
+            groups = groups.Insert(0, LbpSerializer.TaggedStringElement("group", groupData, "type", groupType));
+            lastActTimestamp = newActTimestamp;
         }
 
         return this.Ok(

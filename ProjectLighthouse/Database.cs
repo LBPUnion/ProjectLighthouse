@@ -209,13 +209,11 @@ public class Database : DbContext
         await this.SaveChangesAsync();
         if (type == CommentType.Profile)
         {
-            await this.CreateActivitySubject(ActivityCategory.Comment, userId, targetId, EventType.CommentUser, newComment.CommentId);
-            // await this.PostActivity(ActivityCategory.User, targetId, userId, EventType.CommentUser, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityCategory.CommentUser, userId, targetId, EventType.CommentUser, newComment.CommentId);
         }
         else
         {
             await this.CreateActivitySubject(ActivityCategory.Comment, userId, targetId, EventType.CommentLevel, newComment.CommentId);
-            // await this.PostActivity(ActivityCategory.Level, targetId, userId, EventType.CommentLevel, newComment.CommentId);
         }
 
         return true;
@@ -236,7 +234,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
-        await this.CreateActivitySubject(ActivityCategory.User, userId, heartedUser.UserId, EventType.HeartUser);
+        await this.CreateActivitySubject(ActivityCategory.HeartUser, userId, heartedUser.UserId, EventType.HeartUser);
     }
 
     public async Task UnheartUser(int userId, User heartedUser)

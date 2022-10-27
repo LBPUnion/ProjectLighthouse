@@ -27,7 +27,12 @@ public enum ActivityCategory
     TeamPick = 1,
     Level = 2,
     User = 3,
-    Comment = 4
+    // UNCOMBINABLES!
+    // The following can not be combined with any other event, 
+    // and in rare cases, themselves.
+    Comment = 4,
+    HeartUser = 5,
+    CommentUser = 6
 }
 
 public static class ActivityHelper

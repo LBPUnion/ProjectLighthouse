@@ -49,19 +49,6 @@ public class Activity
     }
 
     public int TargetId { get; set; }
-    public string EventCollection { get; set; } = "";
-    
-    [NotMapped]
-    public int[] Events
-    {
-        get
-        {
-            string[] actionIds = EventCollection.Split(",");
-            if (actionIds[0] == "") return new int[0];
-            return Array.ConvertAll(actionIds, a => int.Parse(a));
-        }
-        set => EventCollection = string.Join(",", value);
-    }
 
     public string UserCollection { get; set; } = "";
 
