@@ -86,7 +86,7 @@ public class ActivityController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         IEnumerable<Activity> activities = this.database.Activity
-            .AsEnumerable().Where(a => a.Users.AsEnumerable().Contains(requestee.UserId) || 
+            .AsEnumerable().Where(a => a.Users.AsEnumerable().Contains(requestee.UserId) ||
                                     // Remove if filters out self
                                     ((
                                         a.TargetType == (int)ActivityCategory.User ||
@@ -115,23 +115,9 @@ public class ActivityController : ControllerBase
                 idsToResolve.Add(hearted.HeartedUserId);
             }
 
-            foreach (int id in idsToResolve)
-            {
-                User? includedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == id);
-                users += includedUser?.Serialize(gameVersion);
-            }
 
             string groupData = "";
             string groupType = "";
-
-            IEnumerable<ActivitySubject> subjects = this.database.ActivitySubject.Include(a => a.Actor).AsEnumerable()
-                .Where(a => a.ActionTimestamp < timestamp && a.ActionTimestamp > endTimestamp)
-                .Where(a => a.ActionCategory == stream.Category && a.ObjectId == stream.TargetId)
-                .Where(a => idsToResolve.Contains(a.ActorId))
-                .OrderByDescending(a => a.ActionTimestamp);
-
-            ActivitySubject? catalyst = subjects.FirstOrDefault();
-            groupData += LbpSerializer.StringElement("timestamp", catalyst?.ActionTimestamp);
 
             bool invalid = false; // AFAIK C# does not support nested continue
             switch (stream.Category)
@@ -139,12 +125,12 @@ public class ActivityController : ControllerBase
                 default:
                 case ActivityCategory.Level:
                     Slot? targetedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == stream.TargetId);
-                    if 
+                    if
                     (
-                        token.GameVersion < targetedSlot?.GameVersion || 
+                        token.GameVersion < targetedSlot?.GameVersion ||
                         (
-                            (token.GameVersion == GameVersion.LittleBigPlanetVita || token.GameVersion == GameVersion.LittleBigPlanetPSP) && 
-                            (targetedSlot?.GameVersion != GameVersion.LittleBigPlanetVita || targetedSlot.GameVersion != GameVersion.LittleBigPlanetPSP)
+                            token.GameVersion == GameVersion.LittleBigPlanetVita &&
+                            targetedSlot?.GameVersion != GameVersion.LittleBigPlanetVita
                         )
                     )
                     {
@@ -154,8 +140,12 @@ public class ActivityController : ControllerBase
                     slots += targetedSlot?.Serialize(gameVersion);
                     if (targetedSlot != null)
                     {
-                        User? dontBreak = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == targetedSlot.CreatorId);
-                        users += dontBreak?.Serialize(gameVersion);
+                        User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == targetedSlot.CreatorId);
+                        if (user == requestee)
+                        {
+                            idsToResolve = idsToResolve.Concat(stream.Users).ToList();
+                        }
+                        users += user?.Serialize(gameVersion);
                     }
                     groupType = "level";
                     groupData += LbpSerializer.TaggedStringElement("slot_id", targetedSlot?.SlotId, "type", "user");
@@ -163,12 +153,31 @@ public class ActivityController : ControllerBase
                 case ActivityCategory.HeartUser:
                 case ActivityCategory.User:
                     User? targetedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == stream.TargetId);
+                    if (targetedUser == requestee)
+                    {
+                        idsToResolve = idsToResolve.Concat(stream.Users).ToList();
+                    }
                     users += targetedUser?.Serialize(gameVersion);
                     groupType = "user";
                     groupData += LbpSerializer.StringElement("user_id", targetedUser?.Username);
                     break;
             }
             if (invalid) continue;
+
+            foreach (int id in idsToResolve)
+            {
+                User? includedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == id);
+                users += includedUser?.Serialize(gameVersion);
+            }
+
+            IEnumerable<ActivitySubject> subjects = this.database.ActivitySubject.Include(a => a.Actor).AsEnumerable()
+                .Where(a => a.ActionTimestamp < timestamp && a.ActionTimestamp > endTimestamp)
+                .Where(a => a.ActionCategory == stream.Category && a.ObjectId == stream.TargetId)
+                .Where(a => idsToResolve.Contains(a.ActorId))
+                .OrderByDescending(a => a.ActionTimestamp);
+
+            ActivitySubject? catalyst = subjects.FirstOrDefault();
+            groupData += LbpSerializer.StringElement("timestamp", catalyst?.ActionTimestamp);
 
             if (stream.Category != ActivityCategory.News)
             {
@@ -207,8 +216,8 @@ public class ActivityController : ControllerBase
                         continue;
                     }
                     if (lastActivity == subject.ObjectId && lastType == subject.ActionType &&
-                        (lastActor == subject.ActorId || 
-                            (token.GameVersion == GameVersion.LittleBigPlanet3 ? 
+                        (lastActor == subject.ActorId ||
+                            (token.GameVersion == GameVersion.LittleBigPlanet3 ?
                                 subject.ActionType == (int)ActivityCategory.Comment : false
                             )
                         )
