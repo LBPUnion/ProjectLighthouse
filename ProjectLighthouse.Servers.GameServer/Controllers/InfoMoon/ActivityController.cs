@@ -19,6 +19,24 @@ public class ActivityController : ControllerBase
         this.database = database;
     }
 
+    // LittleBigPlanet InfoMoon
+    [HttpGet("news")]
+    public async Task<IActionResult> GetLBP1News()
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null || token.GameVersion != GameVersion.LittleBigPlanet1) return this.StatusCode(403, "");
+
+        List<News> newsObject = this.database.News.OrderByDescending(n => n.Timestamp).ToList();
+
+        string newsPrepped = "";
+        foreach (News news in newsObject)
+        {
+            newsPrepped += news.Serialize(token.GameVersion);
+        }
+
+        return this.Ok(LbpSerializer.StringElement("news", newsPrepped));
+    }
+
     [HttpGet("stream/slot/{slotId}")]
     public async Task<IActionResult> GetSlotActivity()
     {
