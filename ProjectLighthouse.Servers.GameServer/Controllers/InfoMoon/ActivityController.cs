@@ -88,12 +88,11 @@ public class ActivityController : ControllerBase
         IEnumerable<Activity> activities = this.database.Activity
             .AsEnumerable().Where(a => a.Users.AsEnumerable().Contains(requestee.UserId) || 
                                     // Remove if filters out self
-                                    (
+                                    ((
                                         a.TargetType == (int)ActivityCategory.User ||
-                                        a.TargetType == (int)ActivityCategory.CommentUser ||
                                         a.TargetType == (int)ActivityCategory.HeartUser
                                     ) &&
-                                    a.TargetId == requestee.UserId
+                                    a.TargetId == requestee.UserId)
                                  );
 
         if (excludeNews) activities = activities.Where(a => a.Category != ActivityCategory.News);
@@ -134,11 +133,24 @@ public class ActivityController : ControllerBase
             ActivitySubject? catalyst = subjects.FirstOrDefault();
             groupData += LbpSerializer.StringElement("timestamp", catalyst?.ActionTimestamp);
 
+            bool invalid = false; // AFAIK C# does not support nested continue
             switch (stream.Category)
             {
                 default:
                 case ActivityCategory.Level:
                     Slot? targetedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == stream.TargetId);
+                    if 
+                    (
+                        token.GameVersion < targetedSlot?.GameVersion || 
+                        (
+                            (token.GameVersion == GameVersion.LittleBigPlanetVita || token.GameVersion == GameVersion.LittleBigPlanetPSP) && 
+                            (targetedSlot?.GameVersion != GameVersion.LittleBigPlanetVita || targetedSlot.GameVersion != GameVersion.LittleBigPlanetPSP)
+                        )
+                    )
+                    {
+                        invalid = true;
+                        break;
+                    }
                     slots += targetedSlot?.Serialize(gameVersion);
                     if (targetedSlot != null)
                     {
@@ -148,7 +160,6 @@ public class ActivityController : ControllerBase
                     groupType = "level";
                     groupData += LbpSerializer.TaggedStringElement("slot_id", targetedSlot?.SlotId, "type", "user");
                     break;
-                case ActivityCategory.CommentUser:
                 case ActivityCategory.HeartUser:
                 case ActivityCategory.User:
                     User? targetedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == stream.TargetId);
@@ -157,6 +168,7 @@ public class ActivityController : ControllerBase
                     groupData += LbpSerializer.StringElement("user_id", targetedUser?.Username);
                     break;
             }
+            if (invalid) continue;
 
             if (stream.Category != ActivityCategory.News)
             {
@@ -177,6 +189,12 @@ public class ActivityController : ControllerBase
 
                     if (subject.ActionType == (int)ActivityCategory.HeartUser)
                     {
+                        subgroupData.Insert(0,
+                            LbpSerializer.TaggedStringElement("group",
+                                subjectData + LbpSerializer.StringElement("events", eventData)
+                            , "type", "user")
+                        );
+                        if (actor == requestee) continue; // Ignore if heart user actor is the requestee
                         // DO. NOT. COMBINE. THESE.
                         subjectData = LbpSerializer.StringElement("timestamp", subject.ActionTimestamp) +
                                       LbpSerializer.StringElement("user_id", actor.Username);
@@ -191,7 +209,7 @@ public class ActivityController : ControllerBase
                     if (lastActivity == subject.ObjectId && lastType == subject.ActionType &&
                         (lastActor == subject.ActorId || 
                             (token.GameVersion == GameVersion.LittleBigPlanet3 ? 
-                                (subject.ActionType == (int)ActivityCategory.Comment || subject.ActionType == (int)ActivityCategory.CommentUser) : false
+                                subject.ActionType == (int)ActivityCategory.Comment : false
                             )
                         )
                     )

@@ -209,7 +209,7 @@ public class Database : DbContext
         await this.SaveChangesAsync();
         if (type == CommentType.Profile)
         {
-            await this.CreateActivitySubject(ActivityCategory.CommentUser, userId, targetId, EventType.CommentUser, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityCategory.Comment, userId, targetId, EventType.CommentUser, newComment.CommentId);
         }
         else
         {
