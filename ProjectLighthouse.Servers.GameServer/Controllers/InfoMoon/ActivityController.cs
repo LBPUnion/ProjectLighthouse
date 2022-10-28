@@ -203,7 +203,7 @@ public class ActivityController : ControllerBase
                                 subjectData + LbpSerializer.StringElement("events", eventData)
                             , "type", "user")
                         );
-                        if (actor == requestee) continue; // Ignore if heart user actor is the requestee
+                        if (subject.ObjectId != requestee.UserId) continue; // Ignore if heart user TARGET is NOT THE requestee
                         // DO. NOT. COMBINE. THESE.
                         subjectData = LbpSerializer.StringElement("timestamp", subject.ActionTimestamp) +
                                       LbpSerializer.StringElement("user_id", actor.Username);
