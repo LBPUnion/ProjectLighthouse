@@ -39,38 +39,32 @@ public class CommentController : ControllerBase
 
     [HttpGet("comments/{slotType}/{slotId:int}")]
     [HttpGet("userComments/{username}")]
-    public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, string? slotType, int slotId)
+    public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int? pageSize, string? username, string? slotType, int? slotId)
     {
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
+        if (pageSize == null) pageSize = 30;
         if (pageSize <= 0) return this.BadRequest();
 
-        int targetId = slotId;
-        CommentType type = CommentType.Level;
-        if (!string.IsNullOrWhiteSpace(username))
-        {
-            targetId = this.database.Users.First(u => u.Username.Equals(username)).UserId;
+        CommentType type;
+        int targetId;
+
+        if (username != null) {
+            User? userTarget = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (!(userTarget?.CommentsEnabled ?? false)) return this.StatusCode(403);
             type = CommentType.Profile;
-        }
-        else
-        {
-            if (SlotHelper.IsTypeInvalid(slotType) || slotId == 0) return this.BadRequest();
-        }
-
-        if (type == CommentType.Level && slotType == "developer") targetId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
-
-        if (type == CommentType.Profile)
-        {
-            User? profile = await this.database.Users.FirstOrDefaultAsync(s => s.UserId == targetId);
-            if (profile == null) return this.BadRequest();
-            if (!profile.CommentsEnabled) return this.NotFound();
-        }
-        else
-        {
-            Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == targetId);
-            if (slot == null) return this.BadRequest();
-            if (!slot.CommentsEnabled) return this.NotFound();
+            targetId = userTarget.UserId;
+        } else if (!SlotHelper.IsTypeInvalid(slotType) && slotId != null) {
+            Slot? slotTarget = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+            if (!(slotTarget?.CommentsEnabled ?? false)) return this.StatusCode(403);
+            type = CommentType.Level;
+            targetId = slotId;
+            if (slotType == "developer") {
+                targetId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
+            }
+        } else {
+            return this.StatusCode(404);
         }
 
         List<Comment> comments = await this.database.Comments.Include
