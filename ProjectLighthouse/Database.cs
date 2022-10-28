@@ -517,16 +517,10 @@ public class Database : DbContext
         }
         if (activity == null) return;
 
-        // activity.EventCollection += "," + eventId;
         if(!activity.Users.Contains(actorId)) {
             activity.UserCollection += "," + actorId;
         }
-        // char test1 = activity.EventCollection[0];
-        // char test2 = ","[0];
-        // bool test3 = (test1 == test2);
-        // string test4 = activity.EventCollection.Remove(0,1);
 
-        // if (activity.EventCollection[0] == ","[0]) activity.EventCollection = activity.EventCollection.Remove(0, 1);
         if (activity.UserCollection[0] == ","[0]) activity.UserCollection = activity.UserCollection.Remove(0, 1);
 
         await this.SaveChangesAsync();
@@ -556,6 +550,20 @@ public class Database : DbContext
         long interact2 = 0
     )
     {
+        if (category == ActivityCategory.Level)
+        {
+            Slot? slot = await this.Slots.FirstOrDefaultAsync(s => s.SlotId == destinationId);
+            if 
+            (
+                slot != null && (
+                    slot.Type == SlotType.Pod || 
+                    slot.Type == SlotType.Developer || 
+                    slot.Type == SlotType.Local ||
+                    slot.Type == SlotType.Moon || 
+                    slot.Type == SlotType.DLC
+                )
+            ) return; // Do not log offline levels.
+        }
         ActivitySubject? activitySubject = await this.ActivitySubject.FirstOrDefaultAsync(a =>
             a.ActionType == (int)eventType &&
             a.ActorId == sourceId &&
@@ -591,10 +599,7 @@ public class Database : DbContext
         await this.AddActivityEvent(newActivitySubject.ObjectId, (ActivityCategory)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
     }
 
-    public async Task DeleteActivitySubject
-    (
-        int subjectId
-    )
+    public async Task DeleteActivitySubject(int subjectId)
     {
         ActivitySubject? activitySubject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionId == subjectId);
         if (activitySubject == null) return;
