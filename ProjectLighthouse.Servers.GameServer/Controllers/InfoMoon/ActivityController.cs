@@ -79,8 +79,7 @@ public class ActivityController : ControllerBase
         // I was unable to find a way of getting the user from the GameToken request.
         User? requestee = await this.database.UserFromGameRequest(this.Request);
         if (requestee == null || token == null) return this.StatusCode(403, "");
-        // LBP3 will send a second request for stream objects sent specifically at the beginning of time (0 ms since 1970), 
-        // if it does not receive a 200, it will start rapidly spamming requests. Thanks LBP3!
+        // LBP3 will send a second request for stream objects sent specifically at the beginning of time (0 ms since 1970)
         if (timestamp == 0) return this.Ok(LbpSerializer.BlankElement("stream"));
         // Used later to determine if the slot in question can be accessed by the requestee.
         GameVersion gameVersion = token.GameVersion;
@@ -194,7 +193,7 @@ public class ActivityController : ControllerBase
                 {
                     newActTimestamp = Math.Max(subject.ActionTimestamp, newActTimestamp);
                     User? actor = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(a => a.UserId == subject.ActorId);
-                    if (actor == null) continue;
+                    if (actor == null || (excludeMyself && actor == requestee)) continue;
 
                     if (subject.ActionType == (int)ActivityCategory.HeartUser)
                     {
