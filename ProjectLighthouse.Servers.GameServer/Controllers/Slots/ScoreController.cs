@@ -131,18 +131,29 @@ public class ScoreController : ControllerBase
                 playerScore.ScoreId = first.ScoreId;
                 playerScore.Points = Math.Max(first.Points, playerScore.Points);
                 this.database.Entry(first).CurrentValues.SetValues(playerScore);
+                ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => 
+                    a.ActionType == (int)ActivityType.Level && 
+                    a.ObjectType == (int)EventType.Score &&
+                    a.ObjectId == playerScore.SlotId &&
+                    a.ActorId == token.UserId
+                );
+                if (subject != null)
+                {
+                    subject.ActionTimestamp = TimeHelper.UnixTimeMilliseconds();
+                    subject.Interaction = playerScore.Points;
+                    this.database.Entry(subject).CurrentValues.SetValues(subject);
+                }
             }
             else
             {
                 this.database.Scores.Add(playerScore);
+                await this.database.CreateActivitySubject(ActivityType.Level, token.UserId, score.SlotId, EventType.Score, score.Points, score.PlayerIds.Count());
             }
         }
 
         await this.database.SaveChangesAsync();
 
         string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment", childId: score.ChildSlotId);
-        
-        await this.database.CreateActivitySubject(ActivityType.Level, token.UserId, score.SlotId, EventType.Score, score.Points, score.PlayerIds.Count());
 
         return this.Ok(myRanking);
     }
