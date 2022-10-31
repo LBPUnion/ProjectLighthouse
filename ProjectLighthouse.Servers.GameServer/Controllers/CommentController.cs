@@ -185,7 +185,7 @@ public class CommentController : ControllerBase
         comment.DeletedBy = await this.database.UsernameFromGameToken(token);
         comment.DeletedType = "user";
 
-        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.Comment && ((comment.Type == CommentType.Level) ? a.ObjectType == (int)EventType.CommentLevel : a.ObjectType == (int)EventType.CommentUser) && a.Interaction == comment.CommentId);
+        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Comment && ((comment.Type == CommentType.Level) ? a.ObjectType == (int)EventType.CommentLevel : a.ObjectType == (int)EventType.CommentUser) && a.Interaction == comment.CommentId);
         if (subject != null) await this.database.DeleteActivitySubject(subject);
 
         await this.database.SaveChangesAsync();

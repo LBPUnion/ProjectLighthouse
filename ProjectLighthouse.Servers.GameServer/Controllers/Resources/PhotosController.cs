@@ -129,7 +129,7 @@ public class PhotosController : ControllerBase
 
         int slotId = 1;
         if (photo.SlotId != null) slotId = (int)photo.SlotId;
-        await this.database.CreateActivitySubject(ActivityCategory.Level, photo.CreatorId, slotId, EventType.UploadPhoto, photo.PhotoId);
+        await this.database.CreateActivitySubject(Helpers.ActivityType.Level, photo.CreatorId, slotId, EventType.UploadPhoto, photo.PhotoId);
 
         await WebhookHelper.SendWebhook
         (
@@ -267,7 +267,7 @@ public class PhotosController : ControllerBase
         }
 
         this.database.Photos.Remove(photo);
-        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.Level && a.ObjectType == (int)EventType.UploadPhoto && a.Interaction == photo.PhotoId);
+        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)Helpers.ActivityType.Level && a.ObjectType == (int)EventType.UploadPhoto && a.Interaction == photo.PhotoId);
         if (subject != null) await this.database.DeleteActivitySubject(subject);
         await this.database.SaveChangesAsync();
         return this.Ok();

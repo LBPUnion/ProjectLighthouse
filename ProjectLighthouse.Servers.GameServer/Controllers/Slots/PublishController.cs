@@ -230,7 +230,7 @@ public class PublishController : ControllerBase
 
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
-            await this.database.CreateActivitySubject(ActivityCategory.Level, slot.CreatorId, slot.SlotId, EventType.PublishLevel, 1, 1);
+            await this.database.CreateActivitySubject(ActivityType.Level, slot.CreatorId, slot.SlotId, EventType.PublishLevel, 1, 1);
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
@@ -268,7 +268,7 @@ public class PublishController : ControllerBase
                 $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}");
         }
 
-        await this.database.CreateActivitySubject(ActivityCategory.Level, slot.CreatorId, slot.SlotId, EventType.PublishLevel, 0, 1);
+        await this.database.CreateActivitySubject(ActivityType.Level, slot.CreatorId, slot.SlotId, EventType.PublishLevel, 0, 1);
 
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
@@ -291,7 +291,7 @@ public class PublishController : ControllerBase
         this.database.Locations.Remove(slot.Location);
         this.database.Slots.Remove(slot);
 
-        await this.database.DeleteActivitySlot(slot.SlotId, ActivityCategory.Level);
+        await this.database.DeleteActivitySlot(slot.SlotId, ActivityType.Level);
         await this.database.SaveChangesAsync();
 
         return this.Ok();

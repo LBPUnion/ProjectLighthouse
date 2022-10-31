@@ -142,7 +142,7 @@ public class ScoreController : ControllerBase
 
         string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment", childId: score.ChildSlotId);
         
-        await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, score.SlotId, EventType.Score, score.Points, score.PlayerIds.Count());
+        await this.database.CreateActivitySubject(ActivityType.Level, token.UserId, score.SlotId, EventType.Score, score.Points, score.PlayerIds.Count());
 
         return this.Ok(myRanking);
     }

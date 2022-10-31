@@ -60,7 +60,7 @@ public class ReviewController : ControllerBase
         ratedLevel.RatingLBP1 = Math.Max(Math.Min(5, rating), 0);
 
         await this.database.SaveChangesAsync();
-        await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.LBP1Rate, rating);
+        await this.database.CreateActivitySubject(ActivityType.Level, token.UserId, ratedLevel.SlotId, EventType.LBP1Rate, rating);
 
         return this.Ok();
     }
@@ -94,7 +94,7 @@ public class ReviewController : ControllerBase
         if (review != null) review.Thumb = ratedLevel.Rating;
 
         await this.database.SaveChangesAsync();
-        await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.DpadRating, rating);
+        await this.database.CreateActivitySubject(ActivityType.Level, token.UserId, ratedLevel.SlotId, EventType.DpadRating, rating);
 
         return this.Ok();
     }
@@ -153,7 +153,7 @@ public class ReviewController : ControllerBase
         ratedLevel.Rating = Math.Clamp(newReview.Thumb, -1, 1);
 
         await this.database.SaveChangesAsync();
-        if (!existingReview) await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.Review, review.ReviewId, review.Timestamp);
+        if (!existingReview) await this.database.CreateActivitySubject(ActivityType.Level, token.UserId, ratedLevel.SlotId, EventType.Review, review.ReviewId, review.Timestamp);
 
         return this.Ok();
     }
@@ -338,7 +338,7 @@ public class ReviewController : ControllerBase
         review.Deleted = true;
         review.DeletedBy = DeletedBy.LevelAuthor;
 
-        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.Level && a.ObjectType == (int)EventType.Review && a.Interaction == review.ReviewId);
+        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Level && a.ObjectType == (int)EventType.Review && a.Interaction == review.ReviewId);
         if (subject != null) await this.database.DeleteActivitySubject(subject);
         await this.database.SaveChangesAsync();
         return this.Ok();

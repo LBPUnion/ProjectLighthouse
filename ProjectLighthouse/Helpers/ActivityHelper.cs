@@ -1,6 +1,3 @@
-using System;
-using System.ComponentModel;
-
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public enum EventType
@@ -17,22 +14,15 @@ public enum EventType
     PublishLevel,
     HeartLevel,
     HeartUser,
-    PlayLevel,
-    PublishPlaylist
+    PlayLevel
 }
 
-public enum ActivityCategory
+public enum ActivityType
 {
     News = 0,
     TeamPick = 1,
     Level = 2,
     User = 3,
-    // UNCOMBINABLES!
-    // The following can not be combined with any other event, 
-    // and in rare cases, themselves.
-    Comment = 4,
-    HeartUser = 5,
-    UserComment = 6,
 }
 
 public static class ActivityHelper
@@ -56,8 +46,6 @@ public static class ActivityHelper
             case EventType.CommentUser:
             case EventType.HeartUser:
                 return "object_user";
-            case EventType.PublishPlaylist:
-                return "object_playlist_id";
         }
     }
     

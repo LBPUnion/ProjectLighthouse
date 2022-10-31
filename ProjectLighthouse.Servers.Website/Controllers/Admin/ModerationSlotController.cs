@@ -29,7 +29,7 @@ public class ModerationSlotController : ControllerBase
         slot.TeamPick = true;
 
         await this.database.SaveChangesAsync();
-        await this.database.CreateActivitySlot(slot.SlotId, ActivityCategory.TeamPick, TimeHelper.UnixTimeMilliseconds());
+        await this.database.CreateActivitySlot(slot.SlotId, ActivityType.TeamPick, TimeHelper.UnixTimeMilliseconds());
 
         return this.Redirect("~/slot/" + id);
     }
@@ -45,7 +45,7 @@ public class ModerationSlotController : ControllerBase
         slot.TeamPick = false;
 
         await this.database.SaveChangesAsync();
-        await this.database.DeleteActivitySlot(slot.SlotId, ActivityCategory.TeamPick);
+        await this.database.DeleteActivitySlot(slot.SlotId, ActivityType.TeamPick);
 
         return this.Redirect("~/slot/" + id);
     }

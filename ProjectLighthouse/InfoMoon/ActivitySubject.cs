@@ -41,9 +41,9 @@ public class ActivitySubject {
     public int ActionType { get; set; }
 
     [NotMapped]
-    public ActivityCategory ActionCategory
+    public ActivityType ActionCategory
     {
-        get => (ActivityCategory)ActionType;
+        get => (ActivityType)ActionType;
         set => ActionType = (int)value;
     }
     public long ActionTimestamp { get; set; }

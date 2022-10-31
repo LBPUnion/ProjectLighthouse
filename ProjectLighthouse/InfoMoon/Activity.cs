@@ -42,9 +42,9 @@ public class Activity
     public int TargetType { get; set; }
 
     [NotMapped]
-    public ActivityCategory Category
+    public ActivityType Category
     {
-        get => (ActivityCategory)TargetType;
+        get => (ActivityType)TargetType;
         set => TargetType = (int)value;
     }
 

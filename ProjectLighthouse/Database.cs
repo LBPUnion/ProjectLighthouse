@@ -209,11 +209,11 @@ public class Database : DbContext
         await this.SaveChangesAsync();
         if (type == CommentType.Profile)
         {
-            await this.CreateActivitySubject(ActivityCategory.UserComment, userId, targetId, EventType.CommentUser, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityType.User, userId, targetId, EventType.CommentUser, newComment.CommentId);
         }
         else
         {
-            await this.CreateActivitySubject(ActivityCategory.Comment, userId, targetId, EventType.CommentLevel, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityType.Level, userId, targetId, EventType.CommentLevel, newComment.CommentId);
         }
 
         return true;
@@ -234,7 +234,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
-        await this.CreateActivitySubject(ActivityCategory.HeartUser, userId, heartedUser.UserId, EventType.HeartUser);
+        await this.CreateActivitySubject(ActivityType.User, userId, heartedUser.UserId, EventType.HeartUser);
     }
 
     public async Task UnheartUser(int userId, User heartedUser)
@@ -242,7 +242,7 @@ public class Database : DbContext
         HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
 
-        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.HeartUser && a.ActorId == userId && a.ObjectId == heartedUser.UserId);
+        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.HeartUser && a.ActorId == userId && a.ObjectId == heartedUser.UserId);
         if (subject != null) await this.DeleteActivitySubject(subject);
 
         await this.SaveChangesAsync();
@@ -285,7 +285,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
-        await this.CreateActivitySubject(ActivityCategory.Level, userId, heartedSlot.SlotId, EventType.HeartLevel);
+        await this.CreateActivitySubject(ActivityType.Level, userId, heartedSlot.SlotId, EventType.HeartLevel);
     }
 
     public async Task UnheartLevel(int userId, Slot heartedSlot)
@@ -293,7 +293,7 @@ public class Database : DbContext
         HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
 
-        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.Level && a.ActorId == userId && a.ObjectId == heartedSlot.SlotId);
+        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Level && a.ActorId == userId && a.ObjectId == heartedSlot.SlotId);
         if (subject != null) await this.DeleteActivitySubject(subject);
         
         await this.SaveChangesAsync();
@@ -495,7 +495,7 @@ public class Database : DbContext
     public async Task CreateActivitySlot
     (
         int destinationId,
-        ActivityCategory category,
+        ActivityType category,
         long? extraData = null // Sneaking data, used in Team Picks 
     )
     {
@@ -514,7 +514,7 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
-    public async Task AddActivityEvent(int targetId, ActivityCategory targetCategory, int eventId, int actorId)
+    public async Task AddActivityEvent(int targetId, ActivityType targetCategory, int eventId, int actorId)
     {
         Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
         if (activity == null) {
@@ -535,7 +535,7 @@ public class Database : DbContext
     public async Task DeleteActivitySlot
     (
         int targetId,
-        ActivityCategory targetCategory
+        ActivityType targetCategory
     )
     {
         Activity? activity = await this.Activity.FirstOrDefaultAsync(a => targetId == a.TargetId && (int)targetCategory == a.TargetType);
@@ -555,7 +555,7 @@ public class Database : DbContext
 
     public async Task CreateActivitySubject
     (
-        ActivityCategory category,
+        ActivityType category,
         int sourceId,
         int destinationId,
         EventType eventType,
@@ -563,7 +563,7 @@ public class Database : DbContext
         long interact2 = 0
     )
     {
-        if (category == ActivityCategory.Level)
+        if (category == ActivityType.Level)
         {
             Slot? slot = await this.Slots.FirstOrDefaultAsync(s => s.SlotId == destinationId);
             if 
@@ -607,7 +607,7 @@ public class Database : DbContext
 
         await this.SaveChangesAsync();
 
-        await this.AddActivityEvent(newActivitySubject.ObjectId, (ActivityCategory)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
+        await this.AddActivityEvent(newActivitySubject.ObjectId, (ActivityType)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
     }
 
     public async Task DeleteActivitySubject(ActivitySubject subject)

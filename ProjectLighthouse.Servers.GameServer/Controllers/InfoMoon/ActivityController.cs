@@ -104,16 +104,16 @@ public class ActivityController : ControllerBase
 
         IEnumerable<Activity> activities = this.database.Activity
             .AsEnumerable().Where(a =>
-                                    (!excludeNews && a.Category == ActivityCategory.News) ||
+                                    (!excludeNews && a.Category == ActivityType.News) ||
                                     (!excludeMyself && a.Users.AsEnumerable().Contains(requestee.UserId)) ||
                                     (!excludeFavouriteUsers && a.Users.AsEnumerable().Intersect(heartedUsers).Any()) ||
-                                    (!excludeNews && (a.TargetType == (int)ActivityCategory.News || 
-                                        (a.TargetType == (int)ActivityCategory.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
+                                    (!excludeNews && (a.TargetType == (int)ActivityType.News || 
+                                        (a.TargetType == (int)ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
                                     ) ||
                                     ((
-                                        a.TargetType == (int)ActivityCategory.User ||
-                                        a.TargetType == (int)ActivityCategory.HeartUser ||
-                                        a.TargetType == (int)ActivityCategory.UserComment
+                                        a.TargetType == (int)ActivityType.User ||
+                                        a.TargetType == (int)ActivityType.HeartUser ||
+                                        a.TargetType == (int)ActivityType.UserComment
                                     ) && a.TargetId == requestee.UserId)
                                  );
 
@@ -134,7 +134,7 @@ public class ActivityController : ControllerBase
             bool invalid = false; // AFAIK C# does not support nested continue
             switch (stream.Category)
             {
-                case ActivityCategory.News:
+                case ActivityType.News:
                     News? targetedPost = await this.database.News.FirstOrDefaultAsync(n => n.NewsId == stream.TargetId);
                     if (targetedPost == null) break;
                     news += targetedPost.Serialize();
@@ -142,7 +142,7 @@ public class ActivityController : ControllerBase
                     groupData += LbpSerializer.StringElement("news_id", targetedPost.NewsId);
                     genericTimestamp = targetedPost.Timestamp;
                     break;
-                case ActivityCategory.TeamPick:
+                case ActivityType.TeamPick:
                     Slot? targetedPick = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == stream.TargetId);
                     if (targetedPick == null) break;
                     slots += targetedPick.Serialize(gameVersion);
@@ -150,8 +150,8 @@ public class ActivityController : ControllerBase
                     groupData += LbpSerializer.TaggedStringElement("slot_id", targetedPick.SlotId, "type", "user");
                     genericTimestamp = long.Parse(stream.UserCollection); // Cheat if Team Pick
                     break;
-                case ActivityCategory.Comment:
-                case ActivityCategory.Level:
+                case ActivityType.Comment:
+                case ActivityType.Level:
                     if (subjectSlotIds.Contains(stream.TargetId)) break;
                     Slot? targetedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == stream.TargetId);
                     if (targetedSlot == null) break;
@@ -190,9 +190,9 @@ public class ActivityController : ControllerBase
                     groupType = "level";
                     groupData += LbpSerializer.TaggedStringElement("slot_id", targetedSlot.SlotId, "type", "user");
                     break;
-                case ActivityCategory.HeartUser:
-                case ActivityCategory.UserComment:
-                case ActivityCategory.User:
+                case ActivityType.HeartUser:
+                case ActivityType.UserComment:
+                case ActivityType.User:
                     User? targetedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == stream.TargetId);
                     if (targetedUser == null) break;
                     if (targetedUser == requestee)
@@ -207,7 +207,7 @@ public class ActivityController : ControllerBase
             if (invalid) continue; // Skip the iteration if the slot is invalid by filter or other reasons
 
 
-            if (stream.Category != ActivityCategory.News && stream.Category != ActivityCategory.TeamPick)
+            if (stream.Category != ActivityType.News && stream.Category != ActivityType.TeamPick)
             {
                 idsToResolve = idsToResolve.Distinct().ToList();
                 List<User> subjectActors = new List<User>();
@@ -273,7 +273,7 @@ public class ActivityController : ControllerBase
 
                 groupData += LbpSerializer.StringElement("subgroups", subgroups);
             }
-            else if (stream.Category == ActivityCategory.TeamPick)
+            else if (stream.Category == ActivityType.TeamPick)
             {
                 groupData += 
                     LbpSerializer.StringElement("timestamp", genericTimestamp) +
