@@ -90,7 +90,7 @@ public class ActivityController : ControllerBase
 
         List<int> idsToResolve = new List<int>();
         if (!excludeMyself) idsToResolve.Add(requestee.UserId);
-        IEnumerable<int> heartedUsers = new List<int>();
+        List<int> heartedUsers = new List<int>();
 
         if (!excludeFavouriteUsers)
         {
@@ -98,7 +98,7 @@ public class ActivityController : ControllerBase
             foreach (HeartedProfile hearted in requesteeHearts)
             {
                 idsToResolve.Add(hearted.HeartedUserId);
-                heartedUsers = heartedUsers.Append(hearted.HeartedUserId);
+                heartedUsers.Add(hearted.HeartedUserId);
             }
         }
 
@@ -106,7 +106,7 @@ public class ActivityController : ControllerBase
             .AsEnumerable().Where(a =>
                                     (!excludeNews && a.Category == ActivityType.News) ||
                                     (!excludeMyself && a.Users.AsEnumerable().Contains(requestee.UserId)) ||
-                                    (!excludeFavouriteUsers && a.Users.AsEnumerable().Intersect(heartedUsers).Any()) ||
+                                    (a.Users.AsEnumerable().Intersect(heartedUsers).Any()) ||
                                     (!excludeNews && (a.TargetType == (int)ActivityType.News || 
                                         (a.TargetType == (int)ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
                                     ) ||
