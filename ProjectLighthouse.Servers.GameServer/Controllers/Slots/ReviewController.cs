@@ -112,6 +112,7 @@ public class ReviewController : ControllerBase
 
         Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == token.UserId);
 
+        bool existingReview = false;
         if (review == null)
         {
             review = new Review
@@ -123,6 +124,10 @@ public class ReviewController : ControllerBase
                 ThumbsDown = 0,
             };
             this.database.Reviews.Add(review);
+        }
+        else
+        {
+            existingReview = true;
         }
         review.Thumb = Math.Clamp(newReview.Thumb, -1, 1);
         review.LabelCollection = LabelHelper.RemoveInvalidLabels(newReview.LabelCollection);
@@ -148,7 +153,7 @@ public class ReviewController : ControllerBase
         ratedLevel.Rating = Math.Clamp(newReview.Thumb, -1, 1);
 
         await this.database.SaveChangesAsync();
-        await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.Review, review.ReviewId, review.Timestamp);
+        if (!existingReview) await this.database.CreateActivitySubject(ActivityCategory.Level, token.UserId, ratedLevel.SlotId, EventType.Review, review.ReviewId, review.Timestamp);
 
         return this.Ok();
     }
@@ -333,6 +338,8 @@ public class ReviewController : ControllerBase
         review.Deleted = true;
         review.DeletedBy = DeletedBy.LevelAuthor;
 
+        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.Level && a.ObjectType == (int)EventType.Review && a.Interaction == review.ReviewId);
+        if (subject != null) await this.database.DeleteActivitySubject(subject);
         await this.database.SaveChangesAsync();
         return this.Ok();
     }

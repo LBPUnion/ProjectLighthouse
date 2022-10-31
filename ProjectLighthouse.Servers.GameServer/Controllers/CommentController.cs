@@ -22,6 +22,7 @@ public class CommentController : ControllerBase
         this.database = database;
     }
 
+    // This endpoint is triggered via the global, slot, user stream endpoint.
     [HttpGet("userComment/{username}")]
     [HttpGet("comment/user/{slotId}")]
     public async Task<IActionResult> GetSingleComment([FromQuery] int commentId, string? username, int? slotId)
@@ -183,6 +184,9 @@ public class CommentController : ControllerBase
         comment.Deleted = true;
         comment.DeletedBy = await this.database.UsernameFromGameToken(token);
         comment.DeletedType = "user";
+
+        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.Comment && ((comment.Type == CommentType.Level) ? a.ObjectType == (int)EventType.CommentLevel : a.ObjectType == (int)EventType.CommentUser) && a.Interaction == comment.CommentId);
+        if (subject != null) await this.database.DeleteActivitySubject(subject);
 
         await this.database.SaveChangesAsync();
 

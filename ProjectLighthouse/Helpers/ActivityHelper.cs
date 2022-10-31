@@ -32,6 +32,7 @@ public enum ActivityCategory
     // and in rare cases, themselves.
     Comment = 4,
     HeartUser = 5,
+    UserComment = 6,
 }
 
 public static class ActivityHelper

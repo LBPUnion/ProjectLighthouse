@@ -209,7 +209,7 @@ public class Database : DbContext
         await this.SaveChangesAsync();
         if (type == CommentType.Profile)
         {
-            await this.CreateActivitySubject(ActivityCategory.Comment, userId, targetId, EventType.CommentUser, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityCategory.UserComment, userId, targetId, EventType.CommentUser, newComment.CommentId);
         }
         else
         {
@@ -241,6 +241,9 @@ public class Database : DbContext
     {
         HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
+
+        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.HeartUser && a.ActorId == userId && a.ObjectId == heartedUser.UserId);
+        if (subject != null) await this.DeleteActivitySubject(subject);
 
         await this.SaveChangesAsync();
     }
@@ -290,6 +293,9 @@ public class Database : DbContext
         HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
 
+        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityCategory.Level && a.ActorId == userId && a.ObjectId == heartedSlot.SlotId);
+        if (subject != null) await this.DeleteActivitySubject(subject);
+        
         await this.SaveChangesAsync();
     }
 
@@ -532,8 +538,15 @@ public class Database : DbContext
         ActivityCategory targetCategory
     )
     {
-        Activity? activity = await this.Activity.FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
+        Activity? activity = await this.Activity.FirstOrDefaultAsync(a => targetId == a.TargetId && (int)targetCategory == a.TargetType);
         if (activity == null) return;
+
+        IEnumerable<ActivitySubject> associatedSubjects = this.ActivitySubject.Where(a => a.ActionType == (int)targetCategory && a.ObjectId == targetId);
+
+        foreach(ActivitySubject subject in associatedSubjects)
+        {
+            this.ActivitySubject.Remove(subject);
+        }
 
         this.Activity.Remove(activity);
 
@@ -569,8 +582,6 @@ public class Database : DbContext
             a.ActorId == sourceId &&
             a.ObjectId == destinationId &&
             a.ObjectType == (int)eventType
-            // a.Interaction == interact1 &&
-            // a.Interaction2 == interact2
         );
         if (activitySubject != null)
         {
@@ -599,12 +610,9 @@ public class Database : DbContext
         await this.AddActivityEvent(newActivitySubject.ObjectId, (ActivityCategory)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
     }
 
-    public async Task DeleteActivitySubject(int subjectId)
+    public async Task DeleteActivitySubject(ActivitySubject subject)
     {
-        ActivitySubject? activitySubject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionId == subjectId);
-        if (activitySubject == null) return;
-
-        this.ActivitySubject.Remove(activitySubject);
+        this.ActivitySubject.Remove(subject);
 
         await this.SaveChangesAsync();
     }
