@@ -24,6 +24,6 @@
         <value>Offline</value>
     </data>
   <data name="last_online" xml:space="preserve">
-        <value>Offline sedan {0}</value>
+        <value>Offline since {0}</value>
     </data>
 </root>

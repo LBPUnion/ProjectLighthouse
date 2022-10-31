@@ -18,22 +18,22 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>ユーザーネームを入力してください。</value>
+        <value>The username field is blank.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>このユーザー名は既に使用されています。</value>
+        <value>The username you've chosen is already taken.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>パスワードが必要です.</value>
+        <value>Password field is required.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>パスワードが一致しません。</value>
+        <value>Passwords do not match!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
-        <value>このトークンが無効です</value>
+        <value>Invalid Token</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>キャプチャを正しく完了してください</value>
+        <value>You must complete the captcha correctly.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
         <value>The email address you've chosen is already taken.</value>
