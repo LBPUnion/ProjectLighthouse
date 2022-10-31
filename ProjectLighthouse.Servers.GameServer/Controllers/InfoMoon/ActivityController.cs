@@ -111,9 +111,7 @@ public class ActivityController : ControllerBase
                                         (a.TargetType == (int)ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
                                     ) ||
                                     ((
-                                        a.TargetType == (int)ActivityType.User ||
-                                        a.TargetType == (int)ActivityType.HeartUser ||
-                                        a.TargetType == (int)ActivityType.UserComment
+                                        a.TargetType == (int)ActivityType.Profile
                                     ) && a.TargetId == requestee.UserId)
                                  );
 
@@ -150,7 +148,6 @@ public class ActivityController : ControllerBase
                     groupData += LbpSerializer.TaggedStringElement("slot_id", targetedPick.SlotId, "type", "user");
                     genericTimestamp = long.Parse(stream.UserCollection); // Cheat if Team Pick
                     break;
-                case ActivityType.Comment:
                 case ActivityType.Level:
                     if (subjectSlotIds.Contains(stream.TargetId)) break;
                     Slot? targetedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == stream.TargetId);
@@ -190,9 +187,7 @@ public class ActivityController : ControllerBase
                     groupType = "level";
                     groupData += LbpSerializer.TaggedStringElement("slot_id", targetedSlot.SlotId, "type", "user");
                     break;
-                case ActivityType.HeartUser:
-                case ActivityType.UserComment:
-                case ActivityType.User:
+                case ActivityType.Profile:
                     User? targetedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == stream.TargetId);
                     if (targetedUser == null) break;
                     if (targetedUser == requestee)
@@ -239,6 +234,7 @@ public class ActivityController : ControllerBase
                 string eventData = "";
                 foreach (ActivitySubject subject in subjects.ToList())
                 {
+                    if (subject.ObjectType == (int)EventType.HeartUser && subject.ObjectId != requestee.UserId) continue;
                     if (excludeMyself && subject.ActorId == requestee.UserId) continue;
                     if (lastActor == subject.ActorId)
                     {

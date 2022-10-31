@@ -169,6 +169,7 @@ public class CommentController : ControllerBase
                 {
                     return this.StatusCode(403, "");
                 }
+                ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Profile && comment.Type == CommentType.Profile && a.Interaction == comment.CommentId);
             }
             else
             {
@@ -178,15 +179,13 @@ public class CommentController : ControllerBase
                 {
                     return this.StatusCode(403, "");
                 }
+                ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Level && comment.Type == CommentType.Level && a.Interaction == comment.CommentId);
             }
         }
 
         comment.Deleted = true;
         comment.DeletedBy = await this.database.UsernameFromGameToken(token);
         comment.DeletedType = "user";
-
-        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Comment && ((comment.Type == CommentType.Level) ? a.ObjectType == (int)EventType.CommentLevel : a.ObjectType == (int)EventType.CommentUser) && a.Interaction == comment.CommentId);
-        if (subject != null) await this.database.DeleteActivitySubject(subject);
 
         await this.database.SaveChangesAsync();
 

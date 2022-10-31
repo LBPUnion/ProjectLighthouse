@@ -22,7 +22,7 @@ public enum ActivityType
     News = 0,
     TeamPick = 1,
     Level = 2,
-    User = 3,
+    Profile = 3,
 }
 
 public static class ActivityHelper

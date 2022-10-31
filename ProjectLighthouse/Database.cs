@@ -209,7 +209,7 @@ public class Database : DbContext
         await this.SaveChangesAsync();
         if (type == CommentType.Profile)
         {
-            await this.CreateActivitySubject(ActivityType.User, userId, targetId, EventType.CommentUser, newComment.CommentId);
+            await this.CreateActivitySubject(ActivityType.Profile, userId, targetId, EventType.CommentUser, newComment.CommentId);
         }
         else
         {
@@ -234,7 +234,7 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
-        await this.CreateActivitySubject(ActivityType.User, userId, heartedUser.UserId, EventType.HeartUser);
+        await this.CreateActivitySubject(ActivityType.Profile, userId, heartedUser.UserId, EventType.HeartUser);
     }
 
     public async Task UnheartUser(int userId, User heartedUser)
@@ -242,7 +242,7 @@ public class Database : DbContext
         HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
 
-        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.HeartUser && a.ActorId == userId && a.ObjectId == heartedUser.UserId);
+        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Profile && a.ActorId == userId && a.ObjectId == heartedUser.UserId);
         if (subject != null) await this.DeleteActivitySubject(subject);
 
         await this.SaveChangesAsync();
@@ -507,7 +507,7 @@ public class Database : DbContext
                                         TargetType = (int)category,
                                         TargetId = destinationId
                                     };
-        if (extraData != null) newActivitySlot.UserCollection = "${extraData}";
+        if (extraData != null) newActivitySlot.UserCollection = $"{extraData}";
 
         this.Activity.Add(newActivitySlot);
 
