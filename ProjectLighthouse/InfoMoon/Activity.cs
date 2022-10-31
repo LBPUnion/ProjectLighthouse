@@ -59,7 +59,11 @@ public class Activity
         {
             string[] userIds = UserCollection.Split(",");
             if (userIds[0] == "") return new int[0];
-            return Array.ConvertAll(userIds, u => int.Parse(u));
+            return Array.ConvertAll(userIds, u => {
+                int parsed = 0;
+                int.TryParse(u, out parsed);
+                return parsed;
+            });
         }
         set => UserCollection = string.Join(",", value);
     }

@@ -107,7 +107,9 @@ public class ActivityController : ControllerBase
                                     (!excludeNews && a.Category == ActivityCategory.News) ||
                                     (!excludeMyself && a.Users.AsEnumerable().Contains(requestee.UserId)) ||
                                     (!excludeFavouriteUsers && a.Users.AsEnumerable().Intersect(heartedUsers).Any()) ||
-                                    (!excludeNews && a.TargetType == (int)ActivityCategory.News) ||
+                                    (!excludeNews && (a.TargetType == (int)ActivityCategory.News || 
+                                        (a.TargetType == (int)ActivityCategory.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
+                                    ) ||
                                     ((
                                         a.TargetType == (int)ActivityCategory.User ||
                                         a.TargetType == (int)ActivityCategory.HeartUser ||
@@ -122,6 +124,8 @@ public class ActivityController : ControllerBase
 
         foreach (Activity stream in activities.ToList())
         {
+            long genericTimestamp = 0;
+
             string groupData = "";
             string groupType = "";
 
@@ -132,35 +136,43 @@ public class ActivityController : ControllerBase
             {
                 case ActivityCategory.News:
                     News? targetedPost = await this.database.News.FirstOrDefaultAsync(n => n.NewsId == stream.TargetId);
-                    news += targetedPost?.Serialize();
+                    if (targetedPost == null) break;
+                    news += targetedPost.Serialize();
                     groupType = "news";
-                    groupData += LbpSerializer.StringElement("news_id", targetedPost?.NewsId);
+                    groupData += LbpSerializer.StringElement("news_id", targetedPost.NewsId);
+                    genericTimestamp = targetedPost.Timestamp;
                     break;
                 case ActivityCategory.TeamPick:
-                    // LBP3 Team Pick STUB
+                    Slot? targetedPick = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == stream.TargetId);
+                    if (targetedPick == null) break;
+                    slots += targetedPick.Serialize(gameVersion);
+                    groupType = "level";
+                    groupData += LbpSerializer.TaggedStringElement("slot_id", targetedPick.SlotId, "type", "user");
+                    genericTimestamp = long.Parse(stream.UserCollection); // Cheat if Team Pick
                     break;
                 case ActivityCategory.Comment:
                 case ActivityCategory.Level:
                     if (subjectSlotIds.Contains(stream.TargetId)) break;
                     Slot? targetedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == stream.TargetId);
+                    if (targetedSlot == null) break;
                     if
                     (
-                        token.GameVersion < targetedSlot?.GameVersion ||
+                        token.GameVersion < targetedSlot.GameVersion ||
                         (
                             token.GameVersion == GameVersion.LittleBigPlanetVita &&
-                            targetedSlot?.GameVersion != GameVersion.LittleBigPlanetVita
+                            targetedSlot.GameVersion != GameVersion.LittleBigPlanetVita
                         ) ||
-                        (excludeMyLevels && targetedSlot?.CreatorId == requestee.UserId) ||
-                        (excludeFavouriteUsers && heartedUsers.Contains(targetedSlot?.CreatorId ?? 0)) ||
-                        (targetedSlot?.SubLevel ?? false) // This will be impossible
+                        (excludeMyLevels && targetedSlot.CreatorId == requestee.UserId) ||
+                        (excludeFavouriteUsers && heartedUsers.Contains(targetedSlot.CreatorId)) ||
+                        (targetedSlot.SubLevel) // This will be impossible
                     )
                     {
                         invalid = true;
                         break;
                     }
-                    if (targetedSlot == null) break;
                     subjectSlotIds.Add(stream.TargetId);
                     User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == targetedSlot.CreatorId);
+                    if (user == null) break;
                     if (user == requestee)
                     {
                         if (excludeMyLevels)
@@ -173,15 +185,16 @@ public class ActivityController : ControllerBase
                             idsToResolve = idsToResolve.Concat(stream.Users).ToList();
                         }
                     }
-                    users += user?.Serialize(gameVersion);
-                    slots += targetedSlot?.Serialize(gameVersion);
+                    users += user.Serialize(gameVersion);
+                    slots += targetedSlot.Serialize(gameVersion);
                     groupType = "level";
-                    groupData += LbpSerializer.TaggedStringElement("slot_id", targetedSlot?.SlotId, "type", "user");
+                    groupData += LbpSerializer.TaggedStringElement("slot_id", targetedSlot.SlotId, "type", "user");
                     break;
                 case ActivityCategory.HeartUser:
                 case ActivityCategory.UserComment:
                 case ActivityCategory.User:
                     User? targetedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == stream.TargetId);
+                    if (targetedUser == null) break;
                     if (targetedUser == requestee)
                     {
                         idsToResolve = idsToResolve.Concat(stream.Users).ToList();
@@ -193,27 +206,28 @@ public class ActivityController : ControllerBase
             }
             if (invalid) continue; // Skip the iteration if the slot is invalid by filter or other reasons
 
-            idsToResolve = idsToResolve.Distinct().ToList();
-            List<User> subjectActors = new List<User>();
-            foreach (int id in idsToResolve)
+
+            if (stream.Category != ActivityCategory.News && stream.Category != ActivityCategory.TeamPick)
             {
-                User? includedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == id);
-                if (includedUser == null) continue;
-                users += includedUser.Serialize(gameVersion);
-                subjectActors.Add(includedUser);
-            }
+                idsToResolve = idsToResolve.Distinct().ToList();
+                List<User> subjectActors = new List<User>();
+                foreach (int id in idsToResolve)
+                {
+                    User? includedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == id);
+                    if (includedUser == null) continue;
+                    users += includedUser.Serialize(gameVersion);
+                    subjectActors.Add(includedUser);
+                }
 
-            IEnumerable<ActivitySubject> subjects = this.database.ActivitySubject.Include(a => a.Actor).AsEnumerable()
-                .Where(a => a.ActionTimestamp < timestamp && a.ActionTimestamp > endTimestamp)
-                .Where(a => a.ActionCategory == stream.Category && a.ObjectId == stream.TargetId)
-                .Where(a => idsToResolve.Contains(a.ActorId))
-                .OrderBy(a => a.ActionTimestamp);
+                IEnumerable<ActivitySubject> subjects = this.database.ActivitySubject.Include(a => a.Actor).AsEnumerable()
+                    .Where(a => a.ActionTimestamp < timestamp && a.ActionTimestamp > endTimestamp)
+                    .Where(a => a.ActionCategory == stream.Category && a.ObjectId == stream.TargetId)
+                    .Where(a => idsToResolve.Contains(a.ActorId))
+                    .OrderBy(a => a.ActionTimestamp);
 
-            ActivitySubject? catalyst = subjects.FirstOrDefault();
-            groupData += LbpSerializer.StringElement("timestamp", catalyst?.ActionTimestamp);
+                ActivitySubject? catalyst = subjects.FirstOrDefault();
+                groupData += LbpSerializer.StringElement("timestamp", catalyst?.ActionTimestamp);
 
-            if (stream.Category != ActivityCategory.News)
-            {
                 List<string> subgroupData = new List<string>();
 
                 string subjectData = "";
@@ -259,9 +273,22 @@ public class ActivityController : ControllerBase
 
                 groupData += LbpSerializer.StringElement("subgroups", subgroups);
             }
+            else if (stream.Category == ActivityCategory.TeamPick)
+            {
+                groupData += 
+                    LbpSerializer.StringElement("timestamp", genericTimestamp) +
+                    LbpSerializer.StringElement("events",
+                    LbpSerializer.TaggedStringElement("event", 
+                        LbpSerializer.StringElement("timestamp", genericTimestamp) +
+                        LbpSerializer.TaggedStringElement("object_slot_id", stream.TargetId, "type", "user")
+                    , "type", "mm_pick_level")
+                );
+            }
             else
             {
-                groupData += LbpSerializer.StringElement("events",
+                groupData += 
+                    LbpSerializer.StringElement("timestamp", genericTimestamp) +
+                    LbpSerializer.StringElement("events",
                     LbpSerializer.TaggedStringElement("event", LbpSerializer.StringElement("news_id", stream.TargetId), "type", "news_post"));
             }
 

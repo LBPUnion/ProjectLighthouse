@@ -496,20 +496,20 @@ public class Database : DbContext
     (
         int destinationId,
         ActivityCategory category,
-        int? catalystId = null // Publishing 
+        long? extraData = null // Sneaking data, used in Team Picks 
     )
     {
         Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => destinationId == a.TargetId && category == a.Category);
         if (activity != null) return;
 
-        this.Activity.Add
-        (
-            new Activity
-            {
-                TargetType = (int)category,
-                TargetId = destinationId
-            }
-        );
+        Activity newActivitySlot = new Activity
+                                    {
+                                        TargetType = (int)category,
+                                        TargetId = destinationId
+                                    };
+        if (extraData != null) newActivitySlot.UserCollection = "${extraData}";
+
+        this.Activity.Add(newActivitySlot);
 
         await this.SaveChangesAsync();
     }
