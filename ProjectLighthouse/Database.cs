@@ -492,7 +492,7 @@ public class Database : DbContext
         return true;
     }
 
-    public async Task CreateActivitySlot
+    public async Task CreateActivity
     (
         int destinationId,
         ActivityType category,
@@ -514,11 +514,11 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
-    public async Task AddActivityEvent(int targetId, ActivityType targetCategory, int eventId, int actorId)
+    public async Task InsertEventToActivity(int targetId, ActivityType targetCategory, int eventId, int actorId)
     {
         Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
         if (activity == null) {
-            await CreateActivitySlot(targetId, targetCategory); 
+            await CreateActivity(targetId, targetCategory); 
             activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
         }
         if (activity == null) return;
@@ -532,7 +532,7 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
-    public async Task DeleteActivitySlot
+    public async Task DeleteActivity
     (
         int targetId,
         ActivityType targetCategory
@@ -607,7 +607,7 @@ public class Database : DbContext
 
         await this.SaveChangesAsync();
 
-        await this.AddActivityEvent(newActivitySubject.ObjectId, (ActivityType)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
+        await this.InsertEventToActivity(newActivitySubject.ObjectId, (ActivityType)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
     }
 
     public async Task DeleteActivitySubject(ActivitySubject subject)
@@ -671,6 +671,7 @@ public class Database : DbContext
         this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
         this.Reviews.RemoveRange(this.Reviews.Where(r => r.ReviewerId == user.UserId));
         this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
+        this.Activity.RemoveRange(this.Activity.Where(a => a.TargetType == (int)ActivityType.Profile && a.TargetId == user.UserId));
 
         this.Users.Remove(user);
 

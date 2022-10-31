@@ -291,7 +291,7 @@ public class PublishController : ControllerBase
         this.database.Locations.Remove(slot.Location);
         this.database.Slots.Remove(slot);
 
-        await this.database.DeleteActivitySlot(slot.SlotId, ActivityType.Level);
+        await this.database.DeleteActivity(slot.SlotId, ActivityType.Level);
         await this.database.SaveChangesAsync();
 
         return this.Ok();
