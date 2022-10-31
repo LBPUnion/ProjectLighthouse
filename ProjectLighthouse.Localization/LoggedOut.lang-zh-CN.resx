@@ -18,12 +18,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="logged_out" xml:space="preserve">
-        <value>登出</value>
+        <value>Logged Out</value>
     </data>
   <data name="logged_out_info" xml:space="preserve">
-        <value>您已成功注销。您将在 5 秒内被重定向，或者您可以点击下方手动进行重定向。</value>
+        <value>You have been successfully logged out. You will be redirected in 5 seconds, or you may click below to do so manually.</value>
     </data>
   <data name="redirect" xml:space="preserve">
-        <value>重定向</value>
+        <value>Redirect</value>
     </data>
 </root>

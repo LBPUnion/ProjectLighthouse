@@ -22,7 +22,7 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>歡迎來到 {0}！</value>
+        <value>Welcome to {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
@@ -42,13 +42,13 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
-        <value>您有 {0} 次身份驗證嘗試待處理。點擊此處查看。</value>
+        <value>You have {0} authentication attempts pending. Click here to view them.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>最新關卡</value>
+        <value>Newest Levels</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>最新球隊精選</value>
+        <value>Latest Team Picks</value>
     </data>
 </root>

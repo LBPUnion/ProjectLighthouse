@@ -18,15 +18,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="mod_panel_title" xml:space="preserve">
-        <value>Панель модерации</value>
+        <value>Moderation Panel</value>
     </data>
   <data name="greeting" xml:space="preserve">
-        <value>Добро пожаловать на панель модерации, {0}!</value>
+        <value>Welcome to the moderation panel, {0}!</value>
     </data>
   <data name="banned_users" xml:space="preserve">
-        <value>Заблокированные пользователи</value>
+        <value>Banned Users</value>
     </data>
   <data name="hidden_levels" xml:space="preserve">
-        <value>Скрытые уровни</value>
+        <value>Hidden Levels</value>
     </data>
 </root>

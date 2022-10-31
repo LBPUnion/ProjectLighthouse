@@ -18,42 +18,42 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username" xml:space="preserve">
-        <value>Nom d'utilisateur</value>
+        <value>Username</value>
     </data>
   <data name="password" xml:space="preserve">
-        <value>Mot de passe</value>
+        <value>Password</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Inscrire</value>
+        <value>Register</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
-        <value>Mot de passe oublié?</value>
+        <value>Forgot Password?</value>
     </data>
   <data name="error" xml:space="preserve">
-        <value>Oh oh!</value>
+        <value>Uh oh!</value>
     </data>
   <data name="log_in" xml:space="preserve">
-        <value>Ouvrir une session</value>
+        <value>Log In</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Inconnu</value>
+        <value>Unknown</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Réussi !</value>
+        <value>Success!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Réinitialiser le Mot de Passe</value>
+        <value>Reset Password</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Activité Récente</value>
+        <value>Recent Activity</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Bientôt Disponible !</value>
+        <value>Coming soon!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Photos les plus récentes</value>
+        <value>Most recent photos</value>
     </data>
   <data name="email" xml:space="preserve">
-        <value>Courriel</value>
+        <value>Email</value>
     </data>
 </root>
