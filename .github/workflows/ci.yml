@@ -35,7 +35,7 @@ jobs:
         run: mysql -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h 127.0.0.1 -e "CREATE DATABASE ${{ env.DB_DATABASE }};";
 
       - name: Install .NET 6.0
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: "6.0.x"
 
@@ -58,7 +58,7 @@ jobs:
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
           name: lighthouse-test-results-${{matrix.os.prettyName}}
@@ -67,7 +67,7 @@ jobs:
       - name: Process Test Results
         id: process-trx
         if: ${{ always() }}
-        uses: im-open/process-dotnet-test-results@v2.0.2
+        uses: im-open/process-dotnet-test-results@v2.2.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           create-status-check: false
