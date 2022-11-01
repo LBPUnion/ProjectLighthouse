@@ -115,17 +115,55 @@ public class ActivityController : ControllerBase
         }
 
         IEnumerable<Activity> activities = this.database.Activity
-            .AsEnumerable().Where(a =>
-                (!excludeMyLevels && a.ActivityType == ActivityType.Level && a.Extras[0] == requestee.UserId) ||
+            .Where(a =>
                 (!excludeNews && a.ActivityType == ActivityType.News) ||
-                (!excludeMyself && a.Extras.Contains(requestee.UserId)) ||
-                (!excludeFavouriteUsers && a.Extras.Intersect(heartedUsers).Any()) ||
-                (!excludeFriends && a.Extras.Intersect(friendUsers).Any()) ||
                 (!excludeNews && (a.ActivityType == ActivityType.News ||
                     (a.ActivityType == ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
                 ) ||
                 (a.ActivityType == ActivityType.Profile && a.ActivityTargetId == requestee.UserId)
-            );
+            ).AsEnumerable();
+
+        /* 
+            Workaround to avoid massive performance loss, at the cost of multiple smaller, raw, SQL queries.
+            EntityFramework does not support FIND_IN_SET, and thus we are required to use the raw SQL command, FIND_IN_SET
+            TODO: Investigate possibility of SQL Injection, this is VERY important to pay attention to! 
+                  Although SqlInterpolated mitigates this risk, it is imperative we ensure this is impossible.
+        */
+
+        if (!excludeMyLevels)
+        {
+            IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
+                $"SELECT * FROM Activity WHERE SUBSTRING_INDEX(ExtrasCollection, ',', 1) = {requestee.UserId}"
+                ).AsEnumerable();
+            if (activity != null) activities = activities.Concat(activity).Distinct();
+        }
+        if (!excludeMyself)
+        {
+            IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
+                    $"SELECT * FROM Activity WHERE FIND_IN_SET({requestee.UserId}, ExtrasCollection)"
+                ).AsEnumerable();
+            if (activity != null) activities = activities.Concat(activity).Distinct();
+        }
+        if (!excludeFavouriteUsers)
+        {
+            foreach (int id in heartedUsers)
+            {
+                IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
+                    $"SELECT * FROM Activity WHERE FIND_IN_SET({id}, ExtrasCollection)"
+                ).AsEnumerable();
+                if (activity != null) activities = activities.Concat(activity).Distinct();
+            }
+        }
+        if (!excludeFriends)
+        {
+            foreach (int id in friendUsers)
+            {
+                IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
+                    $"SELECT * FROM Activity WHERE FIND_IN_SET({id}, ExtrasCollection)"
+                ).AsEnumerable();
+                if (activity != null) activities = activities.Concat(activity).Distinct();
+            }
+        }
 
         string groups = "";
         string slots = "";
@@ -237,19 +275,21 @@ public class ActivityController : ControllerBase
             {
                 idsToResolve = idsToResolve.Distinct().ToList();
                 List<User> subjectActors = new List<User>();
+                IEnumerable<ActivitySubject> subjects = Enumerable.Empty<ActivitySubject>();
                 foreach (int id in idsToResolve)
                 {
                     User? includedUser = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == id);
                     if (includedUser == null) continue;
                     users += includedUser.Serialize(gameVersion);
                     subjectActors.Add(includedUser);
-                }
 
-                IEnumerable<ActivitySubject> subjects = this.database.ActivitySubject.Include(a => a.Actor).AsEnumerable()
-                    .Where(a => a.EventTimestamp < timestamp && a.EventTimestamp > endTimestamp)
-                    .Where(a => a.ActivityType == stream.ActivityType && a.ActivityObjectId == stream.ActivityTargetId)
-                    .Where(a => idsToResolve.Contains(a.ActorId))
-                    .OrderBy(a => a.EventTimestamp);
+                    subjects = subjects.Concat(
+                        this.database.ActivitySubject.FromSqlInterpolated(
+                            $"SELECT * FROM ActivitySubject WHERE EventTimestamp < {timestamp} and EventTimestamp > {endTimestamp} and ActivityType = {stream.ActivityType} and ActivityObjectId = {stream.ActivityTargetId} and FIND_IN_SET({id}, ActorId)"
+                        ).AsEnumerable()
+                    );
+                }
+                subjects = subjects.OrderBy(a => a.EventTimestamp);
 
                 ActivitySubject? catalyst = subjects.FirstOrDefault();
                 groupData += LbpSerializer.StringElement("timestamp", catalyst?.EventTimestamp);
