@@ -33,7 +33,10 @@
     </div>
 }
 
-<p><b>@Model.Translate(RegisterStrings.UsernameNotice)</b></p>
+@if (Model.Username == null)
+{
+    <p><b>@Model.Translate(RegisterStrings.UsernameNotice)</b></p>
+}
 
 <form class="ui form" onsubmit="return onSubmit(this)" method="post">
     @Html.AntiForgeryToken()
@@ -41,7 +44,14 @@
     <div class="field">
         <label>Username</label>
         <div class="ui left icon input">
-            <input type="text" name="username" id="text" placeholder="Username" pattern="^[a-zA-Z0-9_.-]*$" minlength="3" maxlength="16">
+            @{
+                string extra = "";
+                if (Model.Username != null)
+                {
+                    extra = "value=" + Model.Username + " readonly";
+                }
+            }
+            <input type="text" name="username" id="text" placeholder="Username" pattern="^[a-zA-Z0-9_.-]*$" minlength="3" maxlength="16" @extra>
             <i class="user icon"></i>
         </div>
     </div>

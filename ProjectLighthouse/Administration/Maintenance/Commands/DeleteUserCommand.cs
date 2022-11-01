@@ -34,5 +34,6 @@ public class DeleteUserCommand : ICommand
             }
 
         await this.database.RemoveUser(user);
+        logger.LogSuccess($"Successfully deleted user {user.Username}", LogArea.Command);
     }
 }
