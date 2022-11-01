@@ -104,9 +104,13 @@ public class RateLimitMiddleware : MiddlewareDBContext
         for (int i = recentRequests.Count - 1; i >= 0; i--)
         {
             IPAddress address = recentRequests.ElementAt(i).Key;
-            recentRequests[address].RemoveAll(r => TimeHelper.TimestampMillis > r.Expiration);
-            // Remove empty entries
-            if (recentRequests[address].Count == 0) recentRequests.TryRemove(address, out _);
+            bool exists = recentRequests.TryGetValue(address, out List<LighthouseRequest>? requests); 
+            if (!exists || recentRequests[address].Count == 0)
+            {
+                recentRequests.TryRemove(address, out _);
+                continue;
+            }
+            requests?.RemoveAll(r => TimeHelper.TimestampMillis > r.Expiration);
         }
     }
 
