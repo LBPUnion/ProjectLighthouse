@@ -518,7 +518,12 @@ public class Database : DbContext
     {
         Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
         if (activity == null) {
-            await CreateActivity(targetId, activityType); 
+            if (activityType == ActivityType.Level)
+            {
+                Slot? slot = await this.Slots.FirstOrDefaultAsync(s => s.SlotId == targetId);
+                if (slot != null) await CreateActivity(targetId, activityType, slot.CreatorId);
+                else return; 
+            }
             activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
         }
         if (activity == null) return;

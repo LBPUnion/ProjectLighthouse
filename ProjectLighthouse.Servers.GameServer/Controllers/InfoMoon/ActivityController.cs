@@ -88,8 +88,6 @@ public class ActivityController : ControllerBase
 
         IEnumerable<HeartedProfile> requesteeHearts = Enumerable.Empty<HeartedProfile>();
 
-        List<int> idsToResolve = new List<int>();
-        if (!excludeMyself) idsToResolve.Add(requestee.UserId);
         List<int> heartedUsers = new List<int>();
 
         if (!excludeFavouriteUsers)
@@ -97,17 +95,17 @@ public class ActivityController : ControllerBase
             requesteeHearts = this.database.HeartedProfiles.Where(h => h.UserId == requestee.UserId);
             foreach (HeartedProfile hearted in requesteeHearts)
             {
-                idsToResolve.Add(hearted.HeartedUserId);
                 heartedUsers.Add(hearted.HeartedUserId);
             }
         }
 
         IEnumerable<Activity> activities = this.database.Activity
             .AsEnumerable().Where(a =>
+                            (!excludeMyLevels && a.ActivityType == ActivityType.Level && a.Extras[0] == requestee.UserId) ||
                             (!excludeNews && a.ActivityType == ActivityType.News) ||
                             (!excludeMyself && a.Extras.Contains(requestee.UserId)) ||
-                            (a.Extras.Intersect(heartedUsers).Any()) ||
-                            (!excludeNews && (a.ActivityType == ActivityType.News || 
+                            (!excludeFavouriteUsers && a.Extras.Intersect(heartedUsers).Any()) ||
+                            (!excludeNews && (a.ActivityType == ActivityType.News ||
                                 (a.ActivityType == ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
                             ) ||
                             ((
@@ -122,6 +120,17 @@ public class ActivityController : ControllerBase
 
         foreach (Activity stream in activities.ToList())
         {
+            List<int> idsToResolve = new List<int>();
+            if (!excludeMyself) idsToResolve.Add(requestee.UserId);
+
+            if (!excludeFavouriteUsers)
+            {
+                foreach (int id in heartedUsers)
+                {
+                    idsToResolve.Add(id);
+                }
+            }
+
             long genericTimestamp = 0;
 
             string groupData = "";
@@ -135,6 +144,7 @@ public class ActivityController : ControllerBase
                 case ActivityType.News:
                     News? targetedPost = await this.database.News.FirstOrDefaultAsync(n => n.NewsId == stream.ActivityTargetId);
                     if (targetedPost == null) break;
+                    if (heartedUsers.Contains(targetedPost.CreatorId) && !excludeFavouriteUsers && excludeNews) break;
                     news += targetedPost.Serialize();
                     groupType = "news";
                     groupData += LbpSerializer.StringElement("news_id", targetedPost.NewsId);
@@ -271,10 +281,10 @@ public class ActivityController : ControllerBase
             }
             else if (stream.ActivityType == ActivityType.TeamPick)
             {
-                groupData += 
+                groupData +=
                     LbpSerializer.StringElement("timestamp", genericTimestamp) +
                     LbpSerializer.StringElement("events",
-                    LbpSerializer.TaggedStringElement("event", 
+                    LbpSerializer.TaggedStringElement("event",
                         LbpSerializer.StringElement("timestamp", genericTimestamp) +
                         LbpSerializer.TaggedStringElement("object_slot_id", stream.ActivityTargetId, "type", "user")
                     , "type", "mm_pick_level")
@@ -282,7 +292,7 @@ public class ActivityController : ControllerBase
             }
             else
             {
-                groupData += 
+                groupData +=
                     LbpSerializer.StringElement("timestamp", genericTimestamp) +
                     LbpSerializer.StringElement("events",
                     LbpSerializer.TaggedStringElement("event", LbpSerializer.StringElement("news_id", stream.ActivityTargetId), "type", "news_post"));
