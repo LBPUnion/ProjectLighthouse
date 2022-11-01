@@ -295,7 +295,7 @@ public class Database : DbContext
 
         ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActivityType == ActivityType.Level && a.ActorId == userId && a.ActivityObjectId == heartedSlot.SlotId);
         if (subject != null) await this.DeleteActivitySubject(subject);
-        
+
         await this.SaveChangesAsync();
     }
 
@@ -503,10 +503,10 @@ public class Database : DbContext
         if (activity != null) return;
 
         Activity newActivitySlot = new Activity
-                                    {
-                                        ActivityType = category,
-                                        ActivityTargetId = destinationId
-                                    };
+        {
+            ActivityType = category,
+            ActivityTargetId = destinationId
+        };
         if (extraData != null) newActivitySlot.ExtrasCollection = $"{extraData}";
 
         this.Activity.Add(newActivitySlot);
@@ -516,19 +516,27 @@ public class Database : DbContext
 
     public async Task InsertEventToActivity(int targetId, ActivityType activityType, int eventId, int actorId)
     {
-        Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
-        if (activity == null) {
+        Activity? activity = this.Activity.FirstOrDefault(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
+        if (activity == null)
+        {
             if (activityType == ActivityType.Level)
             {
                 Slot? slot = await this.Slots.FirstOrDefaultAsync(s => s.SlotId == targetId);
                 if (slot != null) await CreateActivity(targetId, activityType, slot.CreatorId);
-                else return; 
+                else return;
             }
-            activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
+            else
+            {
+                User? user = await this.Users.Include(u => u.Location).FirstOrDefaultAsync(s => s.UserId == targetId);
+                if (user != null) await CreateActivity(targetId, activityType);
+                else return;
+            }
+            activity = this.Activity.FirstOrDefault(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
         }
         if (activity == null) return;
 
-        if(!activity.Extras.Contains(actorId)) {
+        if (!activity.Extras.Contains(actorId))
+        {
             activity.ExtrasCollection += "," + actorId;
         }
 
@@ -548,7 +556,7 @@ public class Database : DbContext
 
         IEnumerable<ActivitySubject> associatedSubjects = this.ActivitySubject.Where(a => a.ActivityType == targetCategory && a.ActivityObjectId == targetId);
 
-        foreach(ActivitySubject subject in associatedSubjects)
+        foreach (ActivitySubject subject in associatedSubjects)
         {
             this.ActivitySubject.Remove(subject);
         }
@@ -571,13 +579,13 @@ public class Database : DbContext
         if (activityType == ActivityType.Level)
         {
             Slot? slot = await this.Slots.FirstOrDefaultAsync(s => s.SlotId == destinationId);
-            if 
+            if
             (
                 slot != null && (
-                    slot.Type == SlotType.Pod || 
-                    slot.Type == SlotType.Developer || 
+                    slot.Type == SlotType.Pod ||
+                    slot.Type == SlotType.Developer ||
                     slot.Type == SlotType.Local ||
-                    slot.Type == SlotType.Moon || 
+                    slot.Type == SlotType.Moon ||
                     slot.Type == SlotType.DLC
                 )
             ) return; // Do not log offline levels.
@@ -590,11 +598,21 @@ public class Database : DbContext
         );
         if (activitySubject != null)
         {
-            activitySubject.Interaction = interact1;
-            activitySubject.Interaction2 = interact2;
-            activitySubject.EventTimestamp = TimeHelper.UnixTimeMilliseconds();
-            await this.SaveChangesAsync();
-            return;
+            if 
+            (
+                activitySubject.EventType != EventType.CommentUser &&
+                activitySubject.EventType != EventType.CommentLevel &&
+                activitySubject.EventType != EventType.UploadPhoto
+            )
+            {
+
+                activitySubject.Interaction = interact1;
+                activitySubject.Interaction2 = interact2;
+                activitySubject.EventTimestamp = TimeHelper.UnixTimeMilliseconds();
+                await this.SaveChangesAsync();
+                return;
+
+            }
         }
 
         ActivitySubject newActivitySubject = new ActivitySubject
