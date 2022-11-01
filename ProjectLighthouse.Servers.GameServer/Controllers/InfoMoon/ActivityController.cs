@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -87,8 +88,10 @@ public class ActivityController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         IEnumerable<HeartedProfile> requesteeHearts = Enumerable.Empty<HeartedProfile>();
+        UserFriendData? requesteeFriends = new UserFriendData();
 
         List<int> heartedUsers = new List<int>();
+        List<int> friendUsers = new List<int>();
 
         if (!excludeFavouriteUsers)
         {
@@ -99,19 +102,30 @@ public class ActivityController : ControllerBase
             }
         }
 
+        if (!excludeFriends)
+        {
+            requesteeFriends = UserFriendStore.GetUserFriendData(requestee.UserId);
+            if (requesteeFriends != null)
+            {
+                foreach (int id in requesteeFriends.FriendIds)
+                {
+                    friendUsers.Add(id);
+                }
+            }
+        }
+
         IEnumerable<Activity> activities = this.database.Activity
             .AsEnumerable().Where(a =>
-                            (!excludeMyLevels && a.ActivityType == ActivityType.Level && a.Extras[0] == requestee.UserId) ||
-                            (!excludeNews && a.ActivityType == ActivityType.News) ||
-                            (!excludeMyself && a.Extras.Contains(requestee.UserId)) ||
-                            (!excludeFavouriteUsers && a.Extras.Intersect(heartedUsers).Any()) ||
-                            (!excludeNews && (a.ActivityType == ActivityType.News ||
-                                (a.ActivityType == ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
-                            ) ||
-                            ((
-                                a.ActivityType == ActivityType.Profile
-                            ) && a.ActivityTargetId == requestee.UserId)
-                            );
+                (!excludeMyLevels && a.ActivityType == ActivityType.Level && a.Extras[0] == requestee.UserId) ||
+                (!excludeNews && a.ActivityType == ActivityType.News) ||
+                (!excludeMyself && a.Extras.Contains(requestee.UserId)) ||
+                (!excludeFavouriteUsers && a.Extras.Intersect(heartedUsers).Any()) ||
+                (!excludeFriends && a.Extras.Intersect(friendUsers).Any()) ||
+                (!excludeNews && (a.ActivityType == ActivityType.News ||
+                    (a.ActivityType == ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
+                ) ||
+                (a.ActivityType == ActivityType.Profile && a.ActivityTargetId == requestee.UserId)
+            );
 
         string groups = "";
         string slots = "";
@@ -126,6 +140,13 @@ public class ActivityController : ControllerBase
             if (!excludeFavouriteUsers)
             {
                 foreach (int id in heartedUsers)
+                {
+                    idsToResolve.Add(id);
+                }
+            }
+            if (!excludeFriends)
+            {
+                foreach (int id in friendUsers)
                 {
                     idsToResolve.Add(id);
                 }
