@@ -17,21 +17,6 @@ using Microsoft.EntityFrameworkCore;
 
 public class Activity
 {
-    [NotMapped]
-    private Database? _database;
-
-    [NotMapped]
-    private Database database
-    {
-        get
-        {
-            if (this._database != null) return this._database;
-
-            return this._database = new Database();
-        }
-        set => this._database = value;
-    }
-
     [Key]
     public int ActivityId { get; set; }
     /*
@@ -39,25 +24,18 @@ public class Activity
         Where category is equal to USER and target id is equal to 1 get CREATOR OBJECT
         Event
     */
-    public int TargetType { get; set; }
+    public ActivityType ActivityType { get; set; }
+
+    public int ActivityTargetId { get; set; }
+
+    public string ExtrasCollection { get; set; } = "";
 
     [NotMapped]
-    public ActivityType Category
-    {
-        get => (ActivityType)TargetType;
-        set => TargetType = (int)value;
-    }
-
-    public int TargetId { get; set; }
-
-    public string UserCollection { get; set; } = "";
-
-    [NotMapped]
-    public int[] Users
+    public int[] Extras
     {
         get
         {
-            string[] userIds = UserCollection.Split(",");
+            string[] userIds = ExtrasCollection.Split(",");
             if (userIds[0] == "") return new int[0];
             return Array.ConvertAll(userIds, u => {
                 int parsed = 0;
@@ -65,6 +43,6 @@ public class Activity
                 return parsed;
             });
         }
-        set => UserCollection = string.Join(",", value);
+        set => ExtrasCollection = string.Join(",", value);
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20221026021502_AddRecentActivityNews")]
+    [Migration("20221026021503_AddRecentActivityNews")]
     public partial class AddRecentActivityNews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,9 +17,9 @@ namespace ProjectLighthouse.Migrations
                 name: "Activity",
                 columns: table => new {
                     ActivityId = table.Column<int>(type: "int", nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    TargetType = table.Column<int>(type: "tinyint", nullable: false),
-                    TargetId = table.Column<int>(type: "int", nullable: false),
-                    UserCollection = table.Column<string>(type: "mediumtext", nullable: false)
+                    ActivityType = table.Column<int>(type: "tinyint", nullable: false),
+                    ActivityTargetId = table.Column<int>(type: "int", nullable: false),
+                    ExtrasCollection = table.Column<string>(type: "mediumtext", nullable: false)
                 },
                 constraints: table => {
                     table.PrimaryKey("PK_Activity", x => x.ActivityId);
@@ -28,17 +28,17 @@ namespace ProjectLighthouse.Migrations
             migrationBuilder.CreateTable(
                 name: "ActivitySubject",
                 columns: table => new {
-                    ActionId = table.Column<int>(type: "int", nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ActionType = table.Column<int>(type: "tinyint", nullable: false),
-                    ActionTimestamp = table.Column<long>(type: "bigint", nullable: false),
+                    SubjectId = table.Column<int>(type: "int", nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ActorId = table.Column<int>(type: "int", nullable: false),
-                    ObjectId = table.Column<int>(type: "int", nullable: false),
-                    ObjectType = table.Column<int>(type: "tinyint", nullable: false),
+                    ActivityType = table.Column<int>(type: "tinyint", nullable: false),
+                    ActivityObjectId = table.Column<int>(type: "int", nullable: false),
+                    EventType = table.Column<int>(type: "tinyint", nullable: false),
+                    EventTimestamp = table.Column<long>(type: "bigint", nullable: false),
                     Interaction = table.Column<int>(type: "int", nullable: false),
                     Interaction2 = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table => {
-                    table.PrimaryKey("PK_ActivitySubject", x => x.ActionId);
+                    table.PrimaryKey("PK_ActivitySubject", x => x.SubjectId);
                     table.ForeignKey(
                         name: "FK_ActivitySubject_Users_UserId",
                         column: a => a.ActorId,

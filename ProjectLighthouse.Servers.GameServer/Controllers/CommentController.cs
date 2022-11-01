@@ -169,7 +169,7 @@ public class CommentController : ControllerBase
                 {
                     return this.StatusCode(403, "");
                 }
-                ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Profile && comment.Type == CommentType.Profile && a.Interaction == comment.CommentId);
+                ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActivityType == ActivityType.Profile && comment.Type == CommentType.Profile && a.Interaction == comment.CommentId);
             }
             else
             {
@@ -179,7 +179,7 @@ public class CommentController : ControllerBase
                 {
                     return this.StatusCode(403, "");
                 }
-                ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Level && comment.Type == CommentType.Level && a.Interaction == comment.CommentId);
+                ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActivityType == ActivityType.Level && comment.Type == CommentType.Level && a.Interaction == comment.CommentId);
             }
         }
 

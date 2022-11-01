@@ -267,7 +267,7 @@ public class PhotosController : ControllerBase
         }
 
         this.database.Photos.Remove(photo);
-        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)Helpers.ActivityType.Level && a.ObjectType == (int)EventType.UploadPhoto && a.Interaction == photo.PhotoId);
+        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActivityType == Helpers.ActivityType.Level && a.EventType == EventType.UploadPhoto && a.Interaction == photo.PhotoId);
         if (subject != null) await this.database.DeleteActivitySubject(subject);
         await this.database.SaveChangesAsync();
         return this.Ok();

@@ -27,9 +27,9 @@ public enum ActivityType
 
 public static class ActivityHelper
 {
-    public static string ObjectType(int action)
+    public static string ObjectType(EventType action)
     {
-        switch ((EventType)action)
+        switch (action)
         {
             case EventType.News:
                 return "news_id";
@@ -49,9 +49,9 @@ public static class ActivityHelper
         }
     }
     
-    public static string EventTypeAsString(int actionType)
+    public static string EventTypeAsString(EventType actionType)
     {
-        switch((EventType)actionType)
+        switch(actionType)
         {
             case EventType.News:
                 return "news_post";

@@ -132,14 +132,14 @@ public class ScoreController : ControllerBase
                 playerScore.Points = Math.Max(first.Points, playerScore.Points);
                 this.database.Entry(first).CurrentValues.SetValues(playerScore);
                 ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => 
-                    a.ActionType == (int)ActivityType.Level && 
-                    a.ObjectType == (int)EventType.Score &&
-                    a.ObjectId == playerScore.SlotId &&
+                    a.ActivityType == ActivityType.Level && 
+                    a.EventType == EventType.Score &&
+                    a.ActivityObjectId == playerScore.SlotId &&
                     a.ActorId == token.UserId
                 );
                 if (subject != null)
                 {
-                    subject.ActionTimestamp = TimeHelper.UnixTimeMilliseconds();
+                    subject.EventTimestamp = TimeHelper.UnixTimeMilliseconds();
                     subject.Interaction = playerScore.Points;
                     this.database.Entry(subject).CurrentValues.SetValues(subject);
                 }

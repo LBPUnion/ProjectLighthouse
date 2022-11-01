@@ -338,7 +338,7 @@ public class ReviewController : ControllerBase
         review.Deleted = true;
         review.DeletedBy = DeletedBy.LevelAuthor;
 
-        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Level && a.ObjectType == (int)EventType.Review && a.Interaction == review.ReviewId);
+        ActivitySubject? subject = await this.database.ActivitySubject.FirstOrDefaultAsync(a => a.ActivityType == ActivityType.Level && a.EventType == EventType.Review && a.Interaction == review.ReviewId);
         if (subject != null) await this.database.DeleteActivitySubject(subject);
         await this.database.SaveChangesAsync();
         return this.Ok();

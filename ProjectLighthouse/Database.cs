@@ -242,7 +242,7 @@ public class Database : DbContext
         HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
 
-        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Profile && a.ActorId == userId && a.ObjectId == heartedUser.UserId);
+        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActivityType == ActivityType.Profile && a.ActorId == userId && a.ActivityObjectId == heartedUser.UserId);
         if (subject != null) await this.DeleteActivitySubject(subject);
 
         await this.SaveChangesAsync();
@@ -293,7 +293,7 @@ public class Database : DbContext
         HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
 
-        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActionType == (int)ActivityType.Level && a.ActorId == userId && a.ObjectId == heartedSlot.SlotId);
+        ActivitySubject? subject = await this.ActivitySubject.FirstOrDefaultAsync(a => a.ActivityType == ActivityType.Level && a.ActorId == userId && a.ActivityObjectId == heartedSlot.SlotId);
         if (subject != null) await this.DeleteActivitySubject(subject);
         
         await this.SaveChangesAsync();
@@ -499,35 +499,35 @@ public class Database : DbContext
         long? extraData = null // Sneaking data, used in Team Picks 
     )
     {
-        Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => destinationId == a.TargetId && category == a.Category);
+        Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => destinationId == a.ActivityTargetId && category == a.ActivityType);
         if (activity != null) return;
 
         Activity newActivitySlot = new Activity
                                     {
-                                        TargetType = (int)category,
-                                        TargetId = destinationId
+                                        ActivityType = category,
+                                        ActivityTargetId = destinationId
                                     };
-        if (extraData != null) newActivitySlot.UserCollection = $"{extraData}";
+        if (extraData != null) newActivitySlot.ExtrasCollection = $"{extraData}";
 
         this.Activity.Add(newActivitySlot);
 
         await this.SaveChangesAsync();
     }
 
-    public async Task InsertEventToActivity(int targetId, ActivityType targetCategory, int eventId, int actorId)
+    public async Task InsertEventToActivity(int targetId, ActivityType activityType, int eventId, int actorId)
     {
-        Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
+        Activity? activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
         if (activity == null) {
-            await CreateActivity(targetId, targetCategory); 
-            activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.TargetId && targetCategory == a.Category);
+            await CreateActivity(targetId, activityType); 
+            activity = await this.Activity.AsAsyncEnumerable().FirstOrDefaultAsync(a => targetId == a.ActivityTargetId && activityType == a.ActivityType);
         }
         if (activity == null) return;
 
-        if(!activity.Users.Contains(actorId)) {
-            activity.UserCollection += "," + actorId;
+        if(!activity.Extras.Contains(actorId)) {
+            activity.ExtrasCollection += "," + actorId;
         }
 
-        if (activity.UserCollection[0] == ","[0]) activity.UserCollection = activity.UserCollection.Remove(0, 1);
+        if (activity.ExtrasCollection[0] == ","[0]) activity.ExtrasCollection = activity.ExtrasCollection.Remove(0, 1);
 
         await this.SaveChangesAsync();
     }
@@ -538,10 +538,10 @@ public class Database : DbContext
         ActivityType targetCategory
     )
     {
-        Activity? activity = await this.Activity.FirstOrDefaultAsync(a => targetId == a.TargetId && (int)targetCategory == a.TargetType);
+        Activity? activity = await this.Activity.FirstOrDefaultAsync(a => targetId == a.ActivityTargetId && targetCategory == a.ActivityType);
         if (activity == null) return;
 
-        IEnumerable<ActivitySubject> associatedSubjects = this.ActivitySubject.Where(a => a.ActionType == (int)targetCategory && a.ObjectId == targetId);
+        IEnumerable<ActivitySubject> associatedSubjects = this.ActivitySubject.Where(a => a.ActivityType == targetCategory && a.ActivityObjectId == targetId);
 
         foreach(ActivitySubject subject in associatedSubjects)
         {
@@ -555,7 +555,7 @@ public class Database : DbContext
 
     public async Task CreateActivitySubject
     (
-        ActivityType category,
+        ActivityType activityType,
         int sourceId,
         int destinationId,
         EventType eventType,
@@ -563,7 +563,7 @@ public class Database : DbContext
         long interact2 = 0
     )
     {
-        if (category == ActivityType.Level)
+        if (activityType == ActivityType.Level)
         {
             Slot? slot = await this.Slots.FirstOrDefaultAsync(s => s.SlotId == destinationId);
             if 
@@ -578,27 +578,27 @@ public class Database : DbContext
             ) return; // Do not log offline levels.
         }
         ActivitySubject? activitySubject = await this.ActivitySubject.FirstOrDefaultAsync(a =>
-            a.ActionType == (int)eventType &&
+            a.ActivityType == activityType &&
             a.ActorId == sourceId &&
-            a.ObjectId == destinationId &&
-            a.ObjectType == (int)eventType
+            a.ActivityObjectId == destinationId &&
+            a.EventType == eventType
         );
         if (activitySubject != null)
         {
             activitySubject.Interaction = interact1;
             activitySubject.Interaction2 = interact2;
-            activitySubject.ActionTimestamp = TimeHelper.UnixTimeMilliseconds();
+            activitySubject.EventTimestamp = TimeHelper.UnixTimeMilliseconds();
             await this.SaveChangesAsync();
             return;
         }
 
         ActivitySubject newActivitySubject = new ActivitySubject
         {
-            ActionTimestamp = TimeHelper.UnixTimeMilliseconds(),
-            ActionType = (int)category, // Primary type
+            EventTimestamp = TimeHelper.UnixTimeMilliseconds(),
+            ActivityType = activityType, // Activity type
             ActorId = sourceId,
-            ObjectId = destinationId,
-            ObjectType = (int)eventType, // Event type
+            ActivityObjectId = destinationId,
+            EventType = eventType, // Event type
             Interaction = interact1,
             Interaction2 = interact2
         };
@@ -607,7 +607,7 @@ public class Database : DbContext
 
         await this.SaveChangesAsync();
 
-        await this.InsertEventToActivity(newActivitySubject.ObjectId, (ActivityType)newActivitySubject.ActionType, newActivitySubject.ActionId, newActivitySubject.ActorId);
+        await this.InsertEventToActivity(newActivitySubject.ActivityObjectId, newActivitySubject.ActivityType, newActivitySubject.SubjectId, newActivitySubject.ActorId);
     }
 
     public async Task DeleteActivitySubject(ActivitySubject subject)
@@ -671,7 +671,7 @@ public class Database : DbContext
         this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
         this.Reviews.RemoveRange(this.Reviews.Where(r => r.ReviewerId == user.UserId));
         this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
-        this.Activity.RemoveRange(this.Activity.Where(a => a.TargetType == (int)ActivityType.Profile && a.TargetId == user.UserId));
+        this.Activity.RemoveRange(this.Activity.Where(a => a.ActivityType == ActivityType.Profile && a.ActivityTargetId == user.UserId));
 
         this.Users.Remove(user);
 
