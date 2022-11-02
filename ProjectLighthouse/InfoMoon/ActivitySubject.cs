@@ -45,7 +45,7 @@ public class ActivitySubject {
     public int? Interaction { get; set; }
     public long? Interaction2 { get; set; }
 
-    public async Task<string> Serialize()
+    public string Serialize()
     {
         string objectType = ActivityHelper.ObjectType(EventType);
 
@@ -55,8 +55,7 @@ public class ActivitySubject {
         {
             case LBPUnion.ProjectLighthouse.Helpers.EventType.CommentUser:
             case LBPUnion.ProjectLighthouse.Helpers.EventType.HeartUser:
-                User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == ActivityObjectId);
-                action += LbpSerializer.StringElement(objectType, user?.Username);
+                action += LbpSerializer.StringElement(objectType, Actor?.Username);
                 break;
             default:
                 action += LbpSerializer.TaggedStringElement(objectType, ActivityObjectId, "type", "user");

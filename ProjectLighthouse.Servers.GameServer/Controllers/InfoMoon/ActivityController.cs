@@ -83,7 +83,7 @@ public class ActivityController : ControllerBase
         // I was unable to find a way of getting the user from the GameToken request.
         User? requestee = await this.database.UserFromGameRequest(this.Request);
         if (requestee == null || token == null) return this.StatusCode(403, "");
-        if (endTimestamp == 0) endTimestamp = timestamp - 86_400_000; // Get a day's worth of info
+        if (endTimestamp == 0) endTimestamp = timestamp - 86_400_000; // Get a day's worth of info, the bigger the number, the greater the performance hit.
         // Used later to determine if the slot in question can be accessed by the requestee.
         GameVersion gameVersion = token.GameVersion;
 
@@ -93,12 +93,41 @@ public class ActivityController : ControllerBase
         List<int> heartedUsers = new List<int>();
         List<int> friendUsers = new List<int>();
 
+        /* 
+            Workaround to avoid massive performance loss.
+            EntityFramework does not support FIND_IN_SET, and thus we are required to use the raw SQL command, FIND_IN_SET
+            TODO: Investigate possibility of SQL Injection, this is VERY important to pay attention to! 
+                  Although SqlInterpolated mitigates this risk, it is imperative we ensure this is impossible.
+        */
+        IEnumerable<Activity> activities = this.database.Activity.Where(a => a.ActivityType == ActivityType.Profile && a.ActivityTargetId == requestee.UserId);
+
+        if (!excludeNews)
+        {
+            activities = activities.Where(a => a.ActivityType == ActivityType.News);
+            if (gameVersion == GameVersion.LittleBigPlanet3)
+            {
+                activities = activities.Where(a => a.ActivityType == ActivityType.TeamPick);
+            }
+        }
+
+        var actContext = this.database.Activity;
+
+        if (!excludeMyLevels)
+        {
+            activities = activities.Concat(actContext.FromSqlInterpolated($"SELECT * FROM Activity WHERE SUBSTRING_INDEX(ExtrasCollection, ',', 1) = {requestee.UserId}"));
+        }
+        if (!excludeMyself)
+        {
+            activities = activities.Concat(actContext.FromSqlInterpolated($"SELECT * FROM Activity WHERE FIND_IN_SET({requestee.UserId}, ExtrasCollection)"));
+        }
+
         if (!excludeFavouriteUsers)
         {
             requesteeHearts = this.database.HeartedProfiles.Where(h => h.UserId == requestee.UserId);
             foreach (HeartedProfile hearted in requesteeHearts)
             {
                 heartedUsers.Add(hearted.HeartedUserId);
+                activities = activities.Concat(actContext.FromSqlInterpolated($"SELECT * FROM Activity WHERE FIND_IN_SET({hearted.HeartedUserId}, ExtrasCollection)"));
             }
         }
 
@@ -110,60 +139,13 @@ public class ActivityController : ControllerBase
                 foreach (int id in requesteeFriends.FriendIds)
                 {
                     friendUsers.Add(id);
+                    activities = activities.Concat(actContext.FromSqlInterpolated($"SELECT * FROM Activity WHERE FIND_IN_SET({id}, ExtrasCollection)"));
                 }
             }
         }
 
-        IEnumerable<Activity> activities = this.database.Activity
-            .Where(a =>
-                (!excludeNews && a.ActivityType == ActivityType.News) ||
-                (!excludeNews && (a.ActivityType == ActivityType.News ||
-                    (a.ActivityType == ActivityType.TeamPick && gameVersion == GameVersion.LittleBigPlanet3))
-                ) ||
-                (a.ActivityType == ActivityType.Profile && a.ActivityTargetId == requestee.UserId)
-            ).AsEnumerable();
-
-        /* 
-            Workaround to avoid massive performance loss, at the cost of multiple smaller, raw, SQL queries.
-            EntityFramework does not support FIND_IN_SET, and thus we are required to use the raw SQL command, FIND_IN_SET
-            TODO: Investigate possibility of SQL Injection, this is VERY important to pay attention to! 
-                  Although SqlInterpolated mitigates this risk, it is imperative we ensure this is impossible.
-        */
-
-        if (!excludeMyLevels)
-        {
-            IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
-                $"SELECT * FROM Activity WHERE SUBSTRING_INDEX(ExtrasCollection, ',', 1) = {requestee.UserId}"
-                ).AsEnumerable();
-            if (activity != null) activities = activities.Concat(activity).Distinct();
-        }
-        if (!excludeMyself)
-        {
-            IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
-                    $"SELECT * FROM Activity WHERE FIND_IN_SET({requestee.UserId}, ExtrasCollection)"
-                ).AsEnumerable();
-            if (activity != null) activities = activities.Concat(activity).Distinct();
-        }
-        if (!excludeFavouriteUsers)
-        {
-            foreach (int id in heartedUsers)
-            {
-                IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
-                    $"SELECT * FROM Activity WHERE FIND_IN_SET({id}, ExtrasCollection)"
-                ).AsEnumerable();
-                if (activity != null) activities = activities.Concat(activity).Distinct();
-            }
-        }
-        if (!excludeFriends)
-        {
-            foreach (int id in friendUsers)
-            {
-                IEnumerable<Activity> activity = this.database.Activity.FromSqlInterpolated(
-                    $"SELECT * FROM Activity WHERE FIND_IN_SET({id}, ExtrasCollection)"
-                ).AsEnumerable();
-                if (activity != null) activities = activities.Concat(activity).Distinct();
-            }
-        }
+        // Make sure each request only appears once, execute, make sure each activity slot is unique
+        activities = activities.Distinct().AsEnumerable().Distinct().OrderBy(a => a.ActivityId);
 
         string groups = "";
         string slots = "";
@@ -275,6 +257,7 @@ public class ActivityController : ControllerBase
             {
                 idsToResolve = idsToResolve.Distinct().ToList();
                 List<User> subjectActors = new List<User>();
+
                 IEnumerable<ActivitySubject> subjects = Enumerable.Empty<ActivitySubject>();
                 foreach (int id in idsToResolve)
                 {
@@ -286,10 +269,10 @@ public class ActivityController : ControllerBase
                     subjects = subjects.Concat(
                         this.database.ActivitySubject.FromSqlInterpolated(
                             $"SELECT * FROM ActivitySubject WHERE EventTimestamp < {timestamp} and EventTimestamp > {endTimestamp} and ActivityType = {stream.ActivityType} and ActivityObjectId = {stream.ActivityTargetId} and FIND_IN_SET({id}, ActorId)"
-                        ).AsEnumerable()
+                        )
                     );
                 }
-                subjects = subjects.OrderBy(a => a.EventTimestamp);
+                subjects = subjects.AsEnumerable().OrderBy(a => a.EventTimestamp);
 
                 ActivitySubject? catalyst = subjects.FirstOrDefault();
                 groupData += LbpSerializer.StringElement("timestamp", catalyst?.EventTimestamp);
@@ -309,7 +292,7 @@ public class ActivityController : ControllerBase
                     if (excludeMyself && subject.ActorId == requestee.UserId) continue;
                     if (lastActor == subject.ActorId)
                     {
-                        string tSerialize = await subject.Serialize();
+                        string tSerialize = subject.Serialize();
                         eventData += tSerialize;
                     }
                     else
@@ -323,7 +306,7 @@ public class ActivityController : ControllerBase
                         subjectData = LbpSerializer.StringElement("timestamp", subject.EventTimestamp) +
                                       LbpSerializer.StringElement("user_id", subject.Actor?.Username);
 
-                        string tSerialize = await subject.Serialize();
+                        string tSerialize = subject.Serialize();
                         eventData = tSerialize;
                     }
                     lastActivity = subject.ActivityObjectId;
