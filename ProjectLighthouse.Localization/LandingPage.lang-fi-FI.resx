@@ -22,23 +22,23 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>Tervetuloa {0}!</value>
+        <value>Tervetuloa {0}iin!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Greetings, {0}.</value>
+        <value>Tervehdykset {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>There are no people online. Why not hop on?</value>
+        <value>Ketään ei ole online-tilassa.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>There is 1 person currently online:</value>
+        <value>Vain yksi henkilö on tällä hetkellä online-tilassa:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>There are currently {0} people online:</value>
+        <value>Tällä hetkellä on {0} henkilöä online-tilassa:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
