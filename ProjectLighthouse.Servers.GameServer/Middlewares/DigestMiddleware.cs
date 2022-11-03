@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Middlewares;
@@ -14,6 +15,7 @@ public class DigestMiddleware : Middleware
         this.computeDigests = computeDigests;
     }
 
+    #if !DEBUG
     private static readonly HashSet<string> exemptPathList = new()
     {
         "/login",
@@ -25,6 +27,7 @@ public class DigestMiddleware : Middleware
         "/network_settings.nws",
         "/ChallengeConfig.xml",
     };
+    #endif
 
     public override async Task InvokeAsync(HttpContext context)
     {
@@ -117,9 +120,28 @@ public class DigestMiddleware : Middleware
             context.Response.Headers.Add("X-Digest-A", serverDigest);
         }
 
-        // Add a content-length header if it isn't present to disable response chunking
-        if (!context.Response.Headers.ContainsKey("Content-Length"))
-            context.Response.Headers.Add("Content-Length", responseBuffer.Length.ToString());
+        if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate") && context.Response.ContentType == "text/xml")
+        {
+            context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
+            context.Response.Headers.Add("Vary", "Accept-Encoding");
+            MemoryStream resultStream = new();
+            await using ZLibStream stream = new(resultStream, CompressionMode.Compress, true);
+            await stream.WriteAsync(responseBuffer.ToArray());
+            stream.Close();
+        
+            resultStream.Position = 0;
+            context.Response.Headers.Add("Content-Length", resultStream.Length.ToString());
+            context.Response.Headers.Add("Content-Encoding", "deflate");
+            responseBuffer.SetLength(0);
+            await resultStream.CopyToAsync(responseBuffer);
+        }
+        else
+        {
+            string headerName = !context.Response.Headers.ContentLength.HasValue
+                ? "Content-Length"
+                : "X-Original-Content-Length";
+            context.Response.Headers.Add(headerName, responseBuffer.Length.ToString());
+        }
 
         // Copy the buffered response to the actual response stream.
         responseBuffer.Position = 0;
