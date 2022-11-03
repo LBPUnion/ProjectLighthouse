@@ -22,7 +22,7 @@ public class Score
     public Slot Slot { get; set; }
 
     [XmlIgnore]
-    public int? ChildSlotId { get; set; }
+    public int ChildSlotId { get; set; }
 
     [XmlElement("type")]
     public int Type { get; set; }

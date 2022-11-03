@@ -50,7 +50,7 @@
         <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
   <data name="header_adminPanel" xml:space="preserve">
-        <value>Admin</value>
+        <value>Ylläpitäjä</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
   <data name="header_logout" xml:space="preserve">
@@ -58,7 +58,7 @@
         <comment>A shortcut to log you out of your account.</comment>
     </data>
   <data name="header_modPanel" xml:space="preserve">
-        <value>Mod Panel</value>
+        <value>Moderaatiopaneeli</value>
     </data>
   <data name="generated_by" xml:space="preserve">
         <value>Sivun luoja {0}.</value>
@@ -67,21 +67,21 @@
         <value>Tämä sivu on luotu käyttäen muunneltua versiota Project Lighthouse. Varmista, että ilmoitat lähdekoodin oikein kaikille käyttäjille, jotka saattavat käyttää tätä instanssia.</value>
     </data>
   <data name="js_warn" xml:space="preserve">
-        <value>While we intend to have as little JavaScript as possible, we can not guarantee everything will work without it. We recommend that you whitelist JavaScript for Project Lighthouse.</value>
+        <value>Vaikka yritämme käyttää Javascriptiä niin vähän kuin on mahdollista, emme voi taata, että kaikki toimii ilman sitä. Suosittelemme Javascriptin sallimista tällä sivulla.</value>
     </data>
   <data name="js_warn_title" xml:space="preserve">
-        <value>JavaScript is not enabled</value>
+        <value>Javascript ei ole päällä.</value>
     </data>
   <data name="license_warn_title" xml:space="preserve">
-        <value>Potential License Violation</value>
+        <value>Mahdollinen lisenssi rike</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>This instance is a public-facing instance that has been modified without the changes published. You may be in violation of the {0}.</value>
+        <value>Tämä on julkinen yleisölle suunnattu esiintymä, jota on muokattu ilman, että muutoksia on julkaistu. Saatat rikkoa {0}.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
         <value>If you believe this is an error, please create an issue with the output of {0} ran from the root of the server source code in the description on our {1}issue tracker{2}.</value>
     </data>
   <data name="license_warn_3" xml:space="preserve">
-        <value>If not, please publish the source code somewhere accessible to your users.</value>
+        <value>Jos ei, julkaise lähdekoodisi jonnekin, jossa se on käyttäjillesi saatavissa.</value>
     </data>
 </root>
