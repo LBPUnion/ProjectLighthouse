@@ -315,6 +315,16 @@ public class Database : DbContext
 
     #endregion
 
+    #region User Helper Methods
+
+    public async Task<int> UserIdFromUsername(string? username)
+    {
+        if (username == null) return 0;
+        return await this.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
+    }
+
+    #endregion
+
     #region Game Token Shenanigans
 
     public async Task<string> UsernameFromGameToken(GameToken? token)
@@ -322,6 +332,13 @@ public class Database : DbContext
         if (token == null) return "";
 
         return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
+    }
+
+    public async Task<User?> UserFromGameToken(GameToken? token)
+    {
+        if (token == null) return null;
+
+        return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
     }
 
     private async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)
@@ -339,10 +356,6 @@ public class Database : DbContext
 
         return null;
     }
-
-    public async Task<User?> UserFromGameToken
-        (GameToken gameToken, bool allowUnapproved = false)
-        => await this.UserFromMMAuth(gameToken.UserToken, allowUnapproved);
 
     public async Task<User?> UserFromGameRequest(HttpRequest request, bool allowUnapproved = false)
     {
@@ -472,7 +485,7 @@ public class Database : DbContext
         foreach (GameToken token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
         {
             User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
-            if(user != null) user.LastLogout = TimeHelper.TimestampMillis;
+            if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
             this.GameTokens.Remove(token);
         }
         this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);

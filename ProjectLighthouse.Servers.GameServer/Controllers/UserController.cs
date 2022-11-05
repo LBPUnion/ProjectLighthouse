@@ -1,6 +1,5 @@
 #nullable enable
 using System.Text.Json;
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -8,12 +7,14 @@ using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class UserController : ControllerBase
@@ -50,8 +51,7 @@ public class UserController : ControllerBase
     [HttpGet("user/{username}")]
     public async Task<IActionResult> GetUser(string username)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         string? user = await this.getSerializedUser(username, token.GameVersion);
         if (user == null) return this.NotFound();
@@ -62,9 +62,6 @@ public class UserController : ControllerBase
     [HttpGet("users")]
     public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         List<string?> serializedUsers = new();
         foreach (string userId in u) serializedUsers.Add(await this.getSerializedUserPicture(userId));
 
@@ -76,12 +73,10 @@ public class UserController : ControllerBase
     [HttpPost("updateUser")]
     public async Task<IActionResult> UpdateUser()
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken token = this.GetToken();
 
-        if (userAndToken == null) return this.StatusCode(403, "");
-
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
+        User? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.StatusCode(403, "");
 
         UserUpdate? update = await this.DeserializeBody<UserUpdate>("updateUser", "user");
 
@@ -125,7 +120,7 @@ public class UserController : ControllerBase
                 Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == updateSlot.SlotId);
                 if (slot == null) continue;
 
-                if (slot.CreatorId != gameToken.UserId) continue;
+                if (slot.CreatorId != token.UserId) continue;
 
                 Location? loc = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == slot.LocationId);
 
@@ -138,7 +133,7 @@ public class UserController : ControllerBase
 
         if (update.PlanetHash != null)
         {
-            switch (gameToken.GameVersion)
+            switch (token.GameVersion)
             {
                 case GameVersion.LittleBigPlanet2: // LBP2 planets will apply to LBP3
                 {
@@ -161,7 +156,7 @@ public class UserController : ControllerBase
                 case GameVersion.Unknown:
                 default: // The rest do not support custom earths.
                 {
-                    throw new ArgumentException($"invalid gameVersion {gameToken.GameVersion} for setting earth");
+                    throw new ArgumentException($"invalid gameVersion {token.GameVersion} for setting earth");
                 }
             }
         }
@@ -182,7 +177,7 @@ public class UserController : ControllerBase
     [HttpPost("update_my_pins")]
     public async Task<IActionResult> UpdateMyPins()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
+        User? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.StatusCode(403, "");
 
         string pinsString = await new StreamReader(this.Request.Body).ReadToEndAsync();

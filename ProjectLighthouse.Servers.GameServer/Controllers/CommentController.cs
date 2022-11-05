@@ -6,12 +6,14 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class CommentController : ControllerBase
@@ -26,8 +28,7 @@ public class CommentController : ControllerBase
     [HttpPost("rateComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         // Return bad request if both are true or both are false
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
@@ -42,8 +43,7 @@ public class CommentController : ControllerBase
     [HttpGet("userComments/{username}")]
     public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, string? slotType, int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0 || pageStart < 0) return this.BadRequest();
 
@@ -86,7 +86,8 @@ public class CommentController : ControllerBase
 
     private async Task<int> getReaction(int userId, int commentId)
     {
-        return await this.database.Reactions.Where(r => r.UserId == userId && r.TargetId == commentId)
+        return await this.database.Reactions.Where(r => r.UserId == userId)
+            .Where(r => r.TargetId == commentId)
             .Select(r => r.Rating)
             .FirstOrDefaultAsync();
     }
@@ -95,8 +96,7 @@ public class CommentController : ControllerBase
     [HttpPost("postComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> PostComment(string? username, string? slotType, int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         Comment? comment = await this.DeserializeBody<Comment>();
         if (comment == null) return this.BadRequest();
@@ -116,10 +116,7 @@ public class CommentController : ControllerBase
         }
         else
         {
-            targetId = await this.database.Users.Where(u => u.Username == username)
-                .Where(u => u.CommentsEnabled)
-                .Select(u => u.UserId)
-                .FirstOrDefaultAsync();
+            targetId = await this.database.UserIdFromUsername(username!);
         }
 
         bool success = await this.database.PostComment(token.UserId, targetId, type, comment.Message);
@@ -132,8 +129,7 @@ public class CommentController : ControllerBase
     [HttpPost("deleteComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 

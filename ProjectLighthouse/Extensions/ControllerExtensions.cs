@@ -1,16 +1,27 @@
 ﻿#nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class ControllerExtensions
 {
+
+    public static GameToken GetToken(this ControllerBase controller)
+    {
+        GameToken? token = (GameToken?)(controller.HttpContext.Items["Token"] ?? null);
+        if (token == null) throw new ArgumentNullException($"GameToken was null even though authentication was successful {nameof(controller)}");
+
+        return token;
+    }
+
     public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[]? rootElements)
     {
         controller.Request.Body.Position = 0;

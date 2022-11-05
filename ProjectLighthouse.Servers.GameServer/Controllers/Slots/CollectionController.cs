@@ -7,12 +7,14 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class CollectionController : ControllerBase
@@ -27,9 +29,6 @@ public class CollectionController : ControllerBase
     [HttpGet("playlists/{playlistId:int}/slots")]
     public async Task<IActionResult> GetPlaylistSlots(int playlistId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         Playlist? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         if (targetPlaylist == null) return this.BadRequest();
 
@@ -49,8 +48,7 @@ public class CollectionController : ControllerBase
     [HttpPost("playlists/{playlistId:int}/order_slots")]
     public async Task<IActionResult> UpdatePlaylist(int playlistId, int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         Playlist? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         if (targetPlaylist == null) return this.BadRequest();
@@ -115,8 +113,7 @@ public class CollectionController : ControllerBase
     [HttpPost("playlists")]
     public async Task<IActionResult> CreatePlaylist()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         int playlistCount = await this.database.Playlists.CountAsync(p => p.CreatorId == token.UserId);
 
@@ -138,10 +135,7 @@ public class CollectionController : ControllerBase
     [HttpGet("user/{username}/playlists")]
     public async Task<IActionResult> GetUserPlaylists(string username)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
-        int targetUserId = await this.database.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
+        int targetUserId = await this.database.UserIdFromUsername(username);
         if (targetUserId == 0) return this.BadRequest();
 
         return this.Ok(this.GetUserPlaylists(targetUserId));
@@ -151,8 +145,9 @@ public class CollectionController : ControllerBase
     [HttpGet("genres")]
     public async Task<IActionResult> GenresAndSearches()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
-        if (user == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
+
+        User? user = await this.database.UserFromGameToken(token);
 
         string categoriesSerialized = CategoryHelper.Categories.Aggregate
         (
@@ -195,12 +190,9 @@ public class CollectionController : ControllerBase
     [HttpGet("searches/{endpointName}")]
     public async Task<IActionResult> GetCategorySlots(string endpointName, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken token = this.GetToken();
 
-        if (userAndToken == null) return this.StatusCode(403, "");
-
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
+        User? user = await this.database.UserFromGameToken(token);
 
         Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();
@@ -221,7 +213,7 @@ public class CollectionController : ControllerBase
             totalSlots = category.GetTotalSlots(this.database);
         }
 
-        string slotsSerialized = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(gameToken.GameVersion));
+        string slotsSerialized = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
 
         return this.Ok
         (

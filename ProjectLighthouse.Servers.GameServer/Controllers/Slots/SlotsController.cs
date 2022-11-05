@@ -8,12 +8,14 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class SlotsController : ControllerBase
@@ -38,38 +40,36 @@ public class SlotsController : ControllerBase
             });
 
     [HttpGet("slots/by")]
-    public async Task<IActionResult> SlotsBy([FromQuery] string u, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> SlotsBy([FromQuery(Name="u")] string username, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
         GameVersion gameVersion = token.GameVersion;
 
-        User? targetUser = await this.database.Users.Where(dbUser => dbUser.Username == u).FirstOrDefaultAsync();
-        if (targetUser == null) return this.NotFound();
+        int targetUserId = await this.database.UserIdFromUsername(username);
+        if (targetUserId == 0) return this.NotFound();
+
+        int usedSlots = this.database.Slots.Count(s => s.CreatorId == targetUserId);
 
         string response = Enumerable.Aggregate
         (
-            this.database.Slots.ByGameVersion(gameVersion, token.UserId == targetUser.UserId, true)
-                .Where(s => s.CreatorId == targetUser.UserId)
+            this.database.Slots.ByGameVersion(gameVersion, token.UserId == targetUserId, true)
+                .Where(s => s.CreatorId == targetUserId)
                 .Skip(Math.Max(0, pageStart - 1))
-                .Take(Math.Min(pageSize, targetUser.UsedSlots)),
+                .Take(Math.Min(pageSize, usedSlots)),
             string.Empty,
             (current, slot) => current + slot.Serialize(token.GameVersion)
         );
-        int start = pageStart + Math.Min(pageSize, targetUser.UsedSlots);
-        int total = await this.database.Slots.CountAsync(s => s.CreatorId == targetUser.UserId);
+        int start = pageStart + Math.Min(pageSize, usedSlots);
+        int total = await this.database.Slots.CountAsync(s => s.CreatorId == targetUserId);
         return this.Ok(generateSlotsResponse(response, start, total));
     }
 
     [HttpGet("slotList")]
     public async Task<IActionResult> GetSlotListAlt([FromQuery] int[] s)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         List<string?> serializedSlots = new();
         foreach (int slotId in s)
         {
@@ -93,9 +93,6 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/developer")]
     public async Task<IActionResult> StoryPlayers()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         List<int> activeSlotIds = RoomHelper.Rooms.Where(r => r.Slot.SlotType == SlotType.Developer).Select(r => r.Slot.SlotId).ToList();
 
         List<string> serializedSlots = new();
@@ -115,9 +112,6 @@ public class SlotsController : ControllerBase
     [HttpGet("s/developer/{id:int}")]
     public async Task<IActionResult> SDev(int id)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         int slotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
         Slot slot = await this.database.Slots.FirstAsync(s => s.SlotId == slotId);
 
@@ -127,8 +121,7 @@ public class SlotsController : ControllerBase
     [HttpGet("s/user/{id:int}")]
     public async Task<IActionResult> SUser(int id)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         GameVersion gameVersion = token.GameVersion;
 
@@ -168,8 +161,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots")]
     public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -189,8 +181,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/like/{slotType}/{slotId:int}")]
     public async Task<IActionResult> SimilarSlots([FromRoute] string slotType, [FromRoute] int slotId, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -225,8 +216,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/highestRated")]
     public async Task<IActionResult> HighestRatedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -248,8 +238,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/tag")]
     public async Task<IActionResult> SimilarSlots([FromQuery] string tag, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -276,8 +265,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/mmpicks")]
     public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -298,8 +286,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/lbp2luckydip")]
     public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -325,8 +312,7 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -357,8 +343,7 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -403,8 +388,7 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -435,8 +419,7 @@ public class SlotsController : ControllerBase
         [FromQuery] bool? move = null
     )
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -445,7 +428,7 @@ public class SlotsController : ControllerBase
         foreach (Room room in RoomHelper.Rooms)
         {
             // TODO: support developer slotTypes?
-            if(room.Slot.SlotType != SlotType.User) continue;
+            if (room.Slot.SlotType != SlotType.User) continue;
 
             if (!playersBySlotId.TryGetValue(room.Slot.SlotId, out int playerCount)) 
                 playersBySlotId.Add(room.Slot.SlotId, 0);
@@ -468,7 +451,7 @@ public class SlotsController : ControllerBase
         {
             Slot? slot = await this.database.Slots.ByGameVersion(token.GameVersion, false, true)
                 .FirstOrDefaultAsync(s => s.SlotId == slotId);
-            if(slot == null) continue; // shouldn't happen ever unless the room is borked
+            if (slot == null) continue; // shouldn't happen ever unless the room is borked
             
             slots.Add(slot);
         }

@@ -103,7 +103,7 @@ public static class FileHelper
 
         int curOffset = 8;
         int dependencyTableOffset = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[curOffset..]);
-        if(dependencyTableOffset <= 0 || dependencyTableOffset > file.Data.Length) return dependencies;
+        if (dependencyTableOffset <= 0 || dependencyTableOffset > file.Data.Length) return dependencies;
         
         curOffset = dependencyTableOffset;
         int dependencyTableSize = BinaryPrimitives.ReadInt32BigEndian(file.Data.AsSpan()[dependencyTableOffset..]);
@@ -167,7 +167,7 @@ public static class FileHelper
         {
             version = GameVersion.LittleBigPlanet3;
         }
-        else if(revision <= lbp2Latest)
+        else if (revision <= lbp2Latest)
         {
             version = GameVersion.LittleBigPlanet2;
         }
@@ -408,7 +408,7 @@ public static class FileHelper
     private static bool DDSToPNG(string hash, byte[] data)
     {
         Dds ddsImage = Dds.Create(data, new PfimConfig());
-        if(ddsImage.Compressed)
+        if (ddsImage.Compressed)
             ddsImage.Decompress();
 
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault

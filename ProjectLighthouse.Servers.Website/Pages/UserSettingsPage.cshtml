@@ -21,7 +21,7 @@
 <script>
 function onSubmit(e){
     document.getElementById("avatar-encoded").value = selectedAvatar.toString();
-    @if(ServerConfiguration.Instance.Mail.MailEnabled){
+    @if (ServerConfiguration.Instance.Mail.MailEnabled){
         <text>
         let newEmail = document.getElementById("email").value;
         if (newEmail.length === 0){
