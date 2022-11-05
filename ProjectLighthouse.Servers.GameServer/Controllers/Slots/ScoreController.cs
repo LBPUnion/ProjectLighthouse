@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -40,11 +41,7 @@ public class ScoreController : ControllerBase
             return this.BadRequest();
         }
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Score));
-        Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
+        Score? score = await this.DeserializeBody<Score>();
         if (score == null)
         {
             Logger.Warn($"Rejecting score upload, score is null (slotType={slotType}, slotId={id}, user={username})", LogArea.Score);

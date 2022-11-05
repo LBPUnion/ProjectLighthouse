@@ -1,5 +1,4 @@
 #nullable enable
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -93,7 +92,7 @@ public class ReviewController : ControllerBase
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.StatusCode(403, "");
 
-        Review? newReview = await this.getReviewFromBody();
+        Review? newReview = await this.DeserializeBody<Review>();
         if (newReview == null) return this.BadRequest();
 
         if (newReview.Text.Length > 512) return this.BadRequest();
@@ -322,16 +321,5 @@ public class ReviewController : ControllerBase
 
         await this.database.SaveChangesAsync();
         return this.Ok();
-    }
-
-    private async Task<Review?> getReviewFromBody()
-    {
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Review));
-        Review? review = (Review?)serializer.Deserialize(new StringReader(bodyString));
-        SanitizationHelper.SanitizeStringsInClass(review);
-        return review;
     }
 }

@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/")]
-//    [Produces("text/plain")]
+[Produces("text/xml")]
 public class EnterLevelController : ControllerBase
 {
     private readonly Database database;
@@ -48,6 +48,9 @@ public class EnterLevelController : ControllerBase
                 case GameVersion.LittleBigPlanet3:
                     slot.PlaysLBP3Unique++;
                     break;
+                case GameVersion.LittleBigPlanet1:
+                case GameVersion.LittleBigPlanetPSP:
+                case GameVersion.Unknown:
                 default: return this.BadRequest();
             }
 
@@ -76,9 +79,9 @@ public class EnterLevelController : ControllerBase
                 slot.PlaysLBP3++;
                 v.PlaysLBP3++;
                 break;
-            case GameVersion.LittleBigPlanetPSP: throw new NotImplementedException();
-            case GameVersion.Unknown:
             case GameVersion.LittleBigPlanet1:
+            case GameVersion.LittleBigPlanetPSP:
+            case GameVersion.Unknown:
             default:
                 return this.BadRequest();
         }

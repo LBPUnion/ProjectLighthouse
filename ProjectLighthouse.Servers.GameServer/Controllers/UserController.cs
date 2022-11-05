@@ -1,6 +1,7 @@
 #nullable enable
 using System.Text.Json;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
@@ -34,14 +35,11 @@ public class UserController : ControllerBase
     {
         // use an anonymous type to only fetch certain columns
         var partialUser = await this.database.Users.Where(u => u.Username == username)
-            .Select
-            (
-                u => new
-                {
-                    u.Username,
-                    u.IconHash,
-                }
-            )
+            .Select(u => new
+            {
+                u.Username,
+                u.IconHash,
+            })
             .FirstOrDefaultAsync();
         if (partialUser == null) return null;
 
@@ -82,16 +80,10 @@ public class UserController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-        // xml hack so we can use one class to deserialize different root names
-        string rootElement = bodyString.Contains("updateUser") ? "updateUser" : "user";
-        XmlSerializer serializer = new(typeof(UserUpdate), new XmlRootAttribute(rootElement));
-        UserUpdate? update = (UserUpdate?)serializer.Deserialize(new StringReader(bodyString));
+        UserUpdate? update = await this.DeserializeBody<UserUpdate>("updateUser", "user");
 
         if (update == null) return this.BadRequest();
 

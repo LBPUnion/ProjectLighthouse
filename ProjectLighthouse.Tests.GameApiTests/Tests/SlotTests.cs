@@ -57,9 +57,6 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
 
         await database.SaveChangesAsync();
 
-//            XmlSerializer serializer = new(typeof(Slot));
-//            Slot slot = (Slot)serializer.Deserialize(new StringReader(bodyString));
-
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage respMessageA = await this.AuthenticatedRequest

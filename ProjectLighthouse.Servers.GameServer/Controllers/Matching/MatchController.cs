@@ -44,7 +44,6 @@ public class MatchController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 

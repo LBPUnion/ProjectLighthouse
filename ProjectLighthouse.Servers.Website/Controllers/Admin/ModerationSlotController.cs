@@ -25,9 +25,11 @@ public class ModerationSlotController : ControllerBase
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+
         slot.TeamPick = true;
 
         await this.database.SaveChangesAsync();
+
         return this.Redirect("~/slot/" + id);
     }
 
@@ -39,9 +41,11 @@ public class ModerationSlotController : ControllerBase
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+
         slot.TeamPick = false;
 
         await this.database.SaveChangesAsync();
+
         return this.Redirect("~/slot/" + id);
     }
 

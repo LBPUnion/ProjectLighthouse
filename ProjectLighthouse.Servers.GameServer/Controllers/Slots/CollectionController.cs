@@ -1,7 +1,6 @@
 #nullable enable
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Levels.Categories;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -66,7 +65,7 @@ public class CollectionController : ControllerBase
             return this.Ok(this.GetUserPlaylists(token.UserId));
         }
 
-        Playlist? newPlaylist = await this.getPlaylistFromBody();
+        Playlist? newPlaylist = await this.DeserializeBody<Playlist>("playlist", "levels");
 
         if (newPlaylist == null) return this.BadRequest();
 
@@ -123,7 +122,7 @@ public class CollectionController : ControllerBase
 
         if (playlistCount > ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota) return this.BadRequest();
 
-        Playlist? playlist = await this.getPlaylistFromBody();
+        Playlist? playlist = await this.DeserializeBody<Playlist>("playlist");
 
         if (playlist == null) return this.BadRequest();
 
@@ -200,7 +199,6 @@ public class CollectionController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 
@@ -243,19 +241,4 @@ public class CollectionController : ControllerBase
             )
         );
     }
-
-    private async Task<Playlist?> getPlaylistFromBody()
-    {
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        string rootElement = bodyString.StartsWith("<playlist>") ? "playlist" : "levels";
-        XmlSerializer serializer = new(typeof(Playlist), new XmlRootAttribute(rootElement));
-        Playlist? playlist = (Playlist?)serializer.Deserialize(new StringReader(bodyString));
-
-        SanitizationHelper.SanitizeStringsInClass(playlist);
-
-        return playlist;
-    }
-
 }

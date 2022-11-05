@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -71,11 +72,7 @@ public class ClientConfigurationController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(PrivacySettings));
-        PrivacySettings? settings = (PrivacySettings?)serializer.Deserialize(new StringReader(bodyString));
+        PrivacySettings? settings = await this.DeserializeBody<PrivacySettings>();
         if (settings == null) return this.BadRequest();
         
         if (settings.LevelVisibility != null)

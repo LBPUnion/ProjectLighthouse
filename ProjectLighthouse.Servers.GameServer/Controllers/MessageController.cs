@@ -76,9 +76,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
     [HttpGet("notification")]
     public IActionResult Notification() => this.Ok();
+
     /// <summary>
     ///     Filters chat messages sent by a user.
-    ///     The reponse sent is the text that will appear in-game.
+    ///     The response sent is the text that will appear in-game.
     /// </summary>
     [HttpPost("filter")]
     public async Task<IActionResult> Filter()

@@ -24,7 +24,11 @@ public static class FileHelper
 {
     public static readonly string ResourcePath = Path.Combine(Environment.CurrentDirectory, "r");
 
+    public static readonly string FullResourcePath = Path.GetFullPath(ResourcePath);
+
     public static readonly string ImagePath = Path.Combine(Environment.CurrentDirectory, "png");
+
+    public static readonly string FullImagePath = Path.GetFullPath(ImagePath);
 
     public static string GetResourcePath(string hash) => Path.Combine(ResourcePath, hash);
 

@@ -1,6 +1,6 @@
 #nullable enable
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
@@ -35,11 +35,10 @@ public class PublishController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 
-        Slot? slot = await this.getSlotFromBody();
+        Slot? slot = await this.DeserializeBody<Slot>();
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
@@ -93,10 +92,9 @@ public class PublishController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
-        Slot? slot = await this.getSlotFromBody();
+        Slot? slot = await this.DeserializeBody<Slot>();
 
         if (slot == null)
         {
@@ -304,18 +302,5 @@ public class PublishController : ControllerBase
             "lbppsp" => GameVersion.LittleBigPlanetPSP,
             _ => GameVersion.Unknown,
         };
-    }
-
-    private async Task<Slot?> getSlotFromBody()
-    {
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Slot));
-        Slot? slot = (Slot?)serializer.Deserialize(new StringReader(bodyString));
-
-        SanitizationHelper.SanitizeStringsInClass(slot);
-
-        return slot;
     }
 }

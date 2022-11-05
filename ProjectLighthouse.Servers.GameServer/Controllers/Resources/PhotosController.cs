@@ -1,5 +1,4 @@
 #nullable enable
-using System.Xml.Serialization;
 using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -34,11 +33,7 @@ public class PhotosController : ControllerBase
 
         if (user.PhotosByMe >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Photo));
-        Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
+        Photo? photo = await this.DeserializeBody<Photo>();
         if (photo == null) return this.BadRequest();
 
         SanitizationHelper.SanitizeStringsInClass(photo);
@@ -67,7 +62,7 @@ public class PhotosController : ControllerBase
                     Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.ResourceCollection.Contains(photoSlot.RootLevel));
                     if(slot == null) break;
 
-                    if (!string.IsNullOrEmpty(slot!.RootLevel)) validLevel = true;
+                    if (!string.IsNullOrEmpty(slot.RootLevel)) validLevel = true;
                     if (slot.IsAdventurePlanet) photoSlot.SlotId = slot.SlotId;
                     break;
                 }
@@ -83,6 +78,10 @@ public class PhotosController : ControllerBase
                     validLevel = true;
                     break;
                 }
+                case SlotType.Moon:
+                case SlotType.Unknown:
+                case SlotType.Unknown2:
+                case SlotType.DLC:
                 default: Logger.Warn($"Invalid photo level type: {photoSlot.SlotType}", LogArea.Photos);
                     break;
             }

@@ -1,11 +1,10 @@
 ﻿#nullable enable
 using System.Text.Json;
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Administration.Reports;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
@@ -28,12 +27,7 @@ public class ReportController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(GriefReport));
-        GriefReport? report = (GriefReport?)serializer.Deserialize(new StringReader(bodyString));
-
+        GriefReport? report = await this.DeserializeBody<GriefReport>();
         if (report == null) return this.BadRequest();
 
         SanitizationHelper.SanitizeStringsInClass(report);

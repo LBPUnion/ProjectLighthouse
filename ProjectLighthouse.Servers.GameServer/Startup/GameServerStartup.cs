@@ -64,9 +64,9 @@ public class GameServerStartup
         app.UseForwardedHeaders();
 
         app.UseMiddleware<RequestLogMiddleware>();
+        app.UseMiddleware<RateLimitMiddleware>();
         app.UseMiddleware<DigestMiddleware>(computeDigests);
         app.UseMiddleware<SetLastContactMiddleware>();
-        app.UseMiddleware<RateLimitMiddleware>();
 
         app.UseRouting();
 
