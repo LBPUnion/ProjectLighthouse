@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,7 @@ public class ModerationSlotController : ControllerBase
 
         // Send webhook with slot.Name and slot.Creator.Username
         await WebhookHelper.SendWebhook("New Team Pick!", $"The level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId}) by **{slot.Creator?.Username}** has been team picked");
+
         await this.database.SaveChangesAsync();
         return this.Redirect("~/slot/" + id);
     }
