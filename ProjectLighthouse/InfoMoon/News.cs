@@ -20,25 +20,24 @@ public class News
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet2)
     {
-      string newsData = "";
-      if (gameVersion == GameVersion.LittleBigPlanet1)
-      {
-        // STUB
-      }
-      else
-      {
-        newsData = LbpSerializer.StringElement("id", this.NewsId) +
-                   LbpSerializer.StringElement("category", this.Category) +
-                   LbpSerializer.StringElement("title", this.Title) +
-                   LbpSerializer.StringElement("summary", this.Summary) +
-                   LbpSerializer.StringElement("text", this.Text) +
-                   LbpSerializer.StringElement("date", this.Timestamp) +
-                   LbpSerializer.StringElement("image",
-                    LbpSerializer.StringElement("alignment", this.ImageAlign) +
-                    LbpSerializer.StringElement("hash", this.ImageHash)
-                   );
-      }
-
-      return LbpSerializer.StringElement("item", newsData);
+        if (gameVersion == GameVersion.LittleBigPlanet1)
+        {
+            // STUB
+            return "";
+        }
+        else
+        {
+            string newsData = LbpSerializer.StringElement("id", this.NewsId) +
+                            LbpSerializer.StringElement("category", this.Category) +
+                            LbpSerializer.StringElement("title", this.Title) +
+                            LbpSerializer.StringElement("summary", this.Summary) +
+                            LbpSerializer.StringElement("text", this.Text) +
+                            LbpSerializer.StringElement("date", this.Timestamp) +
+                            LbpSerializer.StringElement("image",
+                                LbpSerializer.StringElement("alignment", this.ImageAlign) +
+                                LbpSerializer.StringElement("hash", this.ImageHash)
+                            );
+            return LbpSerializer.StringElement("item", newsData);
+        }
     }
 }
