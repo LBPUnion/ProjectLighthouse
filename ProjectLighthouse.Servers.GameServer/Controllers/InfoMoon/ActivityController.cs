@@ -98,6 +98,9 @@ public class ActivityController : ControllerBase
             EntityFramework does not support FIND_IN_SET, and thus we are required to use the raw SQL command, FIND_IN_SET
             TODO: Investigate possibility of SQL Injection, this is VERY important to pay attention to! 
                   Although SqlInterpolated mitigates this risk, it is imperative we ensure this is impossible.
+
+            Additionally, from what I am able to tell, MySQL, MariaDB, and other databases using RDBMS don't care much when 
+            using multiple small statements.
         */
         IEnumerable<Activity> activities = this.database.Activity.Where(a => a.ActivityType == ActivityType.Profile && a.ActivityTargetId == requestee.UserId);
 
@@ -110,7 +113,7 @@ public class ActivityController : ControllerBase
             }
         }
 
-        var actContext = this.database.Activity;
+        DbSet<Activity> actContext = this.database.Activity;
 
         if (!excludeMyLevels)
         {
@@ -145,7 +148,7 @@ public class ActivityController : ControllerBase
         }
 
         // Make sure each request only appears once, execute, make sure each activity slot is unique
-        activities = activities.Distinct().AsEnumerable().Distinct().OrderBy(a => a.ActivityId);
+        activities = activities.Distinct().OrderBy(a => a.ActivityId);
 
         string groups = "";
         string slots = "";
