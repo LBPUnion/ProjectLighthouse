@@ -24,7 +24,7 @@ public class ModerationSlotController : ControllerBase
         User? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        Slot? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
         slot.TeamPick = true;
 
