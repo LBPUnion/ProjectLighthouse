@@ -29,15 +29,7 @@ public class ModerationSlotController : ControllerBase
         slot.TeamPick = true;
 
         // Send webhook with slot.Name and slot.Creator.Username
-        if (slot.Creator != null)
-        {
-            await WebhookHelper.SendWebhook("Team Pick", $"Level {slot.Name} by {slot.Creator.Username} has been marked as a team pick.");
-        }
-        else
-        {
-            await WebhookHelper.SendWebhook("Team Pick", $"Level {slot.Name} has been marked as a team pick.");
-        }
-
+        await WebhookHelper.SendWebhook("New Team Pick!", $"The level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId}) by **{slot.Creator?.Username}** has been team picked");
         await this.database.SaveChangesAsync();
         return this.Redirect("~/slot/" + id);
     }
