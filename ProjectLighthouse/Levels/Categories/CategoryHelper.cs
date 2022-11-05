@@ -13,6 +13,7 @@ public static class CategoryHelper
         Categories.Add(new QueueCategory());
         Categories.Add(new HeartedCategory());
         Categories.Add(new LuckyDipCategory());
+        Categories.Add(new MostHeartedCategory());
 
         using Database database = new();
         foreach (DatabaseCategory category in database.CustomCategories) Categories.Add(new CustomCategory(category));
