@@ -1,0 +1,65 @@
+﻿@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@{
+    string submitUrl = (string?)ViewData["SubmitUrl"] ?? "/2fa";
+    string error = (string?)ViewData["Error"] ?? "";
+}
+
+<form action="@submitUrl" id="2fa-form" method="post">
+    @Html.AntiForgeryToken()
+    <div class="digits">
+        @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="ui negative message center aligned">
+                    <div class="header">
+                        @Model.Translate(GeneralStrings.Error)
+                    </div>
+                    <p style="white-space: pre-line">@Model.Error</p>
+                </div>
+            }
+        <div class="header">Two-Factor Authentication</div>
+        <input type="text" maxlength="1" id="digit1"/>
+        <input type="text" maxlength="1" id="digit2"/>
+        <input type="text" maxlength="1" id="digit3" class="middleDigit"/>
+        <input type="text" maxlength="1" id="digit4"/>
+        <input type="text" maxlength="1" id="digit5"/>
+        <input type="text" maxlength="1" id="digit6"/>
+        <input type="hidden" name="code" id="code">
+    </div>
+</form>
+<script>
+document.querySelector(".digits").addEventListener("keydown", function(event){
+    if (event.key === "Backspace") {
+        const target = event.target;
+        if (target.value === "" && target.previousElementSibling){
+            target.previousElementSibling.focus();
+        }
+    }
+});
+document.querySelector(".digits").addEventListener("input", function({ target, data }){
+
+    // Exclude non-numeric characters (if a value has been entered)
+    data && (target.value = data.replace(/[^0-9]/g,''));
+
+    const hasValue = target.value !== "";
+    const hasSibling = target.nextElementSibling;
+    const hasSiblingInput = hasSibling && target.nextElementSibling.nodeName === "INPUT" && target.nextElementSibling.getAttribute("type") === "text";
+    
+    if (hasValue && hasSiblingInput){
+        target.nextElementSibling.focus();  
+    } else {
+        let digit = "";
+        for (let i = 1; i <= 6; i++){
+            digit += document.getElementById("digit" + i).value;
+        }
+        document.getElementById("code").value = digit;
+        document.getElementById("2fa-form").submit();
+    }
+});
+if(performance.navigation.type === 2){
+   location.reload();
+}
+if (window.history.replaceState) {
+  window.history.replaceState(null, null, window.location.href);
+}
+</script>
+

@@ -1,0 +1,41 @@
+﻿@page "/setup2fa"
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor.SetupTwoFactorPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Setup Two Factor Authentication";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.QrCode))
+{
+    <div class="ui center segment center aligned">
+        <h2>Here is your Two Factor QR code</h2>
+        <img src="@Model.QrCode" alt="2 Factor QR Code"/>
+        <p>Once you have added this two factor code to your app of choice, enter a valid code below to finish the setup process</p>
+        
+        @await Html.PartialAsync("Partials/TwoFactorPartial", new ViewDataDictionary(ViewData)
+        {
+            {
+                "SubmitUrl", "/setup2fa"
+            },
+            {
+                "Error", Model.Error
+            },
+        })
+    </div>
+}
+else
+{
+    <div class="ui center segment center aligned">
+        <h1 class="ui negative message">IMPORTANT</h1>
+        <h2>Backup codes</h2>
+        <p>These codes will allow you to regain access to your account if you ever lose access to your 2FA device
+            <br/>Save these codes somewhere because otherwise you may be locked out of your account
+        </p>
+        <h3>@Model.User!.TwoFactorBackup.Replace(",", " ")</h3>
+        <a class="ui green button" href="/">
+            <i class="check icon"></i>
+            <span>I've saved these codes</span>
+        </a>
+    </div>
+}

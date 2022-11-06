@@ -185,13 +185,27 @@ public class User
     public string? ApprovedIPAddress { get; set; }
     #nullable disable
 
+    [JsonIgnore]
     public string Language { get; set; } = "en";
 
+    [JsonIgnore]
     public string TimeZone { get; set; } = TimeZoneInfo.Local.Id;
 
     public PrivacyType LevelVisibility { get; set; } = PrivacyType.All;
 
     public PrivacyType ProfileVisibility { get; set; } = PrivacyType.All;
+
+    [JsonIgnore]
+    public bool TwoFactorRequired => this.IsModerator;
+
+    [JsonIgnore]
+    public bool IsTwoFactorSetup => this.TwoFactorBackup?.Length > 0 && this.TwoFactorSecret?.Length > 0;
+
+    [JsonIgnore]
+    public string TwoFactorSecret { get; set; } = "";
+
+    [JsonIgnore]
+    public string TwoFactorBackup { get; set; } = "";
 
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;
