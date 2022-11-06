@@ -46,7 +46,7 @@ document.querySelector(".digits").addEventListener("input", function({ target, d
     
     if (hasValue && hasSiblingInput){
         target.nextElementSibling.focus();  
-    } else {
+    } else if (target.id === "digit6") {
         let digit = "";
         for (let i = 1; i <= 6; i++){
             digit += document.getElementById("digit" + i).value;

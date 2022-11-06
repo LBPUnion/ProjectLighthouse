@@ -93,7 +93,7 @@ public static class Base32Encoding
                 < 56 and > 49 => value - 24,
                 //97-122 == lowercase letters
                 < 123 and > 96 => value - 97,
-                _ => throw new ArgumentException(@"Character is not a Base32 character.", nameof(c))
+                _ => throw new ArgumentException(@"Character is not a Base32 character.", nameof(c)),
             };
         }
 
@@ -103,7 +103,7 @@ public static class Base32Encoding
             {
                 < 26 => (char)(b + 65),
                 < 32 => (char)(b + 24),
-                _ => throw new ArgumentException(@"Byte is not a Base32 value.", nameof(b))
+                _ => throw new ArgumentException(@"Byte is not a Base32 value.", nameof(b)),
             };
         }
     }

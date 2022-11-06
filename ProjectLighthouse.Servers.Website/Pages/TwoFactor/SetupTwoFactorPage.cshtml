@@ -32,7 +32,7 @@ else
         <p>These codes will allow you to regain access to your account if you ever lose access to your 2FA device
             <br/>Save these codes somewhere because otherwise you may be locked out of your account
         </p>
-        <h3>@Model.User!.TwoFactorBackup.Replace(",", " ")</h3>
+        <h3>@Model.User!.TwoFactorBackup.Replace(",", "<br>")</h3>
         <a class="ui green button" href="/">
             <i class="check icon"></i>
             <span>I've saved these codes</span>
