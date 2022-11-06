@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Levels.Categories;
 public class QueueCategory : CategoryWithUser
 {
     public override string Name { get; set; } = "My Queue";
-    public override string Description { get; set; } = "Your queued levels";
+    public override string Description { get; set; } = "Your queued content";
     public override string IconHash { get; set; } = "g820614";
     public override string Endpoint { get; set; } = "queue";
     public override Slot? GetPreviewSlot(Database database, User user)
