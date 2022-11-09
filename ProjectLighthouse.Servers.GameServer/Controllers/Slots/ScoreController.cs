@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Match.MatchCommands;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -67,6 +68,13 @@ public class ScoreController : ControllerBase
         if (score.Type is > 4 or < 1 && score.Type != 7)
         {
             Logger.Warn($"Rejecting score upload, score type is out of bounds (type={score.Type}, user={username})", LogArea.Score);
+            return this.BadRequest();
+        }
+
+        if (!score.PlayerIds.Contains(username))
+        {
+            Logger.Warn("Rejecting score upload, requester username is not present in playerIds" +
+                        $" (user={username}, playerIds={string.Join(",", score.PlayerIds)}", LogArea.Score);
             return this.BadRequest();
         }
 
