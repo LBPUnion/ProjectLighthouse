@@ -9,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.RecentActivity;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 
@@ -195,6 +196,8 @@ public class User
 
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;
+
+    public virtual ICollection<Activity> PlayerEvents { get; set; }
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {

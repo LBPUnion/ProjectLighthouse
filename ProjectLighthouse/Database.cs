@@ -14,6 +14,7 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
+using LBPUnion.ProjectLighthouse.RecentActivity;
 using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Http;
@@ -53,6 +54,8 @@ public class Database : DbContext
     public DbSet<RegistrationToken> RegistrationTokens { get; set; }
     public DbSet<APIKey> APIKeys { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
+    public DbSet<News> News { get; set; }
+    public DbSet<Activity> Activity { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);

@@ -1276,6 +1276,22 @@ namespace ProjectLighthouse.Migrations
 
                     b.Navigation("Location");
                 });
+            
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", b =>
+                {
+                    b.Navigation("PlayerEvents");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.RecentActivity.Activity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "Actor")
+                        .WithMany("PlayerEvents")
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Actor");
+                });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Reviews.RatedReview", b =>
                 {
