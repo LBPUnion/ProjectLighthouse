@@ -154,23 +154,19 @@ public class User
     public UserStatus Status => new(this.database, this.UserId);
 
     [JsonIgnore]
-    public bool IsBanned => this.PermissionLevel == PermissionLevel.Banned;
+    public bool IsBanned => this.PermissionLevel is PermissionLevel.Banned;
 
     [JsonIgnore]
-    public bool IsRestricted => this.PermissionLevel == PermissionLevel.Restricted ||
-                                this.PermissionLevel == PermissionLevel.Banned;
+    public bool IsRestricted => this.PermissionLevel is PermissionLevel.Restricted or PermissionLevel.Banned;
 
     [JsonIgnore]
-    public bool IsSilenced => this.PermissionLevel == PermissionLevel.Silenced || 
-                              this.PermissionLevel == PermissionLevel.Restricted ||
-                              this.PermissionLevel == PermissionLevel.Banned;
+    public bool IsSilenced => this.PermissionLevel is PermissionLevel.Silenced or PermissionLevel.Restricted or PermissionLevel.Banned;
 
     [JsonIgnore]
-    public bool IsModerator => this.PermissionLevel == PermissionLevel.Moderator ||
-                               this.PermissionLevel == PermissionLevel.Administrator;
+    public bool IsModerator => this.PermissionLevel is PermissionLevel.Moderator or PermissionLevel.Administrator;
 
     [JsonIgnore]
-    public bool IsAdmin => this.PermissionLevel == PermissionLevel.Administrator;
+    public bool IsAdmin => this.PermissionLevel is PermissionLevel.Administrator;
 
     [JsonIgnore]
     public PermissionLevel PermissionLevel { get; set; } = PermissionLevel.Default;

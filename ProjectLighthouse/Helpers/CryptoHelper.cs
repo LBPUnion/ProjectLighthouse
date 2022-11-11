@@ -46,7 +46,7 @@ public static class CryptoHelper
         using IncrementalHash sha1 = IncrementalHash.CreateHash(HashAlgorithmName.SHA1);
         // LBP games will sometimes opt to calculate the digest without the body
         // (one example is resource upload requests)
-        if(!excludeBody)
+        if (!excludeBody)
             sha1.AppendData(bodyBytes);
         if (cookieBytes.Length > 0) sha1.AppendData(cookieBytes);
         sha1.AppendData(pathBytes);

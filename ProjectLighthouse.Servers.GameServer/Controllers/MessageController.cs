@@ -1,14 +1,17 @@
 #nullable enable
 using System.Globalization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/plain")]
 public class MessageController : ControllerBase
@@ -35,20 +38,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     }
 
     [HttpGet("eula")]
-    public async Task<IActionResult> Eula()
-    {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        // ReSharper disable once ConvertIfStatementToReturnStatement
-        if (token == null) return this.StatusCode(403, "");
-
-        return this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
-    }
+    public IActionResult Eula() => this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
 
     [HttpGet("announce")]
     public async Task<IActionResult> Announce()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         string username = await this.database.UsernameFromGameToken(token);
 
@@ -76,16 +71,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
     [HttpGet("notification")]
     public IActionResult Notification() => this.Ok();
+
     /// <summary>
     ///     Filters chat messages sent by a user.
-    ///     The reponse sent is the text that will appear in-game.
+    ///     The response sent is the text that will appear in-game.
     /// </summary>
     [HttpPost("filter")]
     public async Task<IActionResult> Filter()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         string response = await new StreamReader(this.Request.Body).ReadToEndAsync();
 

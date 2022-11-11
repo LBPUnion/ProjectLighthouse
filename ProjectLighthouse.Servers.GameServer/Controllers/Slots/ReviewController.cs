@@ -1,5 +1,4 @@
 #nullable enable
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -7,12 +6,14 @@ using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class ReviewController : ControllerBase
@@ -28,8 +29,7 @@ public class ReviewController : ControllerBase
     [HttpPost("rate/user/{slotId:int}")]
     public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         Slot? slot = await this.database.Slots.Include(s => s.Creator).Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
@@ -58,8 +58,7 @@ public class ReviewController : ControllerBase
     [HttpPost("dpadrate/user/{slotId:int}")]
     public async Task<IActionResult> DPadRate(int slotId, [FromQuery] int rating)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
@@ -90,10 +89,9 @@ public class ReviewController : ControllerBase
     [HttpPost("postReview/user/{slotId:int}")]
     public async Task<IActionResult> PostReview(int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
-        Review? newReview = await this.getReviewFromBody();
+        Review? newReview = await this.DeserializeBody<Review>();
         if (newReview == null) return this.BadRequest();
 
         if (newReview.Text.Length > 512) return this.BadRequest();
@@ -143,8 +141,7 @@ public class ReviewController : ControllerBase
     [HttpGet("reviewsFor/user/{slotId:int}")]
     public async Task<IActionResult> ReviewsFor(int slotId, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -195,14 +192,13 @@ public class ReviewController : ControllerBase
     [HttpGet("reviewsBy/{username}")]
     public async Task<IActionResult> ReviewsBy(string username, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
         GameVersion gameVersion = token.GameVersion;
 
-        int targetUserId = await this.database.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
+        int targetUserId = await this.database.UserIdFromUsername(username);
 
         if (targetUserId == 0) return this.BadRequest();
 
@@ -249,10 +245,9 @@ public class ReviewController : ControllerBase
     [HttpPost("rateReview/user/{slotId:int}/{username}")]
     public async Task<IActionResult> RateReview(int slotId, string username, [FromQuery] int rating = 0)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
-        int reviewerId = await this.database.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
+        int reviewerId = await this.database.UserIdFromUsername(username);
         if (reviewerId == 0) return this.StatusCode(400, "");
 
         Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
@@ -303,15 +298,14 @@ public class ReviewController : ControllerBase
     [HttpPost("deleteReview/user/{slotId:int}/{username}")]
     public async Task<IActionResult> DeleteReview(int slotId, string username)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         int creatorId = await this.database.Slots.Where(s => s.SlotId == slotId).Select(s => s.CreatorId).FirstOrDefaultAsync();
         if (creatorId == 0) return this.StatusCode(400, "");
 
         if (token.UserId != creatorId) return this.StatusCode(403, "");
 
-        int reviewerId = await this.database.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
+        int reviewerId = await this.database.UserIdFromUsername(username);
         if (reviewerId == 0) return this.StatusCode(400, "");
 
         Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
@@ -322,16 +316,5 @@ public class ReviewController : ControllerBase
 
         await this.database.SaveChangesAsync();
         return this.Ok();
-    }
-
-    private async Task<Review?> getReviewFromBody()
-    {
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Review));
-        Review? review = (Review?)serializer.Deserialize(new StringReader(bodyString));
-        SanitizationHelper.SanitizeStringsInClass(review);
-        return review;
     }
 }

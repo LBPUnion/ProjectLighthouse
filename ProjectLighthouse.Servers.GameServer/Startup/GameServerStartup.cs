@@ -3,6 +3,9 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
@@ -20,6 +23,19 @@ public class GameServerStartup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = "tokenAuth";
+            options.AddScheme<TokenAuthHandler>("tokenAuth", null);
+        });
+
+        services.AddAuthorization(o =>
+        {
+            AuthorizationPolicyBuilder builder = new("tokenAuth");
+            builder = builder.RequireClaim("userId");
+            o.DefaultPolicy = builder.Build();
+        });
 
         services.AddMvc
         (
@@ -64,11 +80,13 @@ public class GameServerStartup
         app.UseForwardedHeaders();
 
         app.UseMiddleware<RequestLogMiddleware>();
+        app.UseMiddleware<RateLimitMiddleware>();
         app.UseMiddleware<DigestMiddleware>(computeDigests);
         app.UseMiddleware<SetLastContactMiddleware>();
-        app.UseMiddleware<RateLimitMiddleware>();
 
         app.UseRouting();
+
+        app.UseAuthorization();
 
         app.UseEndpoints(endpoints => endpoints.MapControllers());
         app.UseEndpoints(endpoints => endpoints.MapRazorPages());
