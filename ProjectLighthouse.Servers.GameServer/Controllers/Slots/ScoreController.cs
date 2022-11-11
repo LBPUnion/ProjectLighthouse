@@ -1,21 +1,21 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Match.MatchCommands;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class ScoreController : ControllerBase
@@ -73,8 +73,11 @@ public class ScoreController : ControllerBase
 
         if (!score.PlayerIds.Contains(username))
         {
+            this.Request.Body.Position = 0;
+            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
             Logger.Warn("Rejecting score upload, requester username is not present in playerIds" +
-                        $" (user={username}, playerIds={string.Join(",", score.PlayerIds)}", LogArea.Score);
+                        $" (user={username}, playerIds={string.Join(",", score.PlayerIds)}, " +
+                        $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={score.SlotId}, slotType={slotType}, body='{bodyString}')", LogArea.Score);
             return this.BadRequest();
         }
 
