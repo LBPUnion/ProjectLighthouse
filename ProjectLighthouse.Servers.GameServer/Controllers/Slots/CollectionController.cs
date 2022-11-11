@@ -148,6 +148,7 @@ public class CollectionController : ControllerBase
         GameToken token = this.GetToken();
 
         User? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.StatusCode(403, "");
 
         string categoriesSerialized = CategoryHelper.Categories.Aggregate
         (
@@ -193,6 +194,7 @@ public class CollectionController : ControllerBase
         GameToken token = this.GetToken();
 
         User? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.StatusCode(403, "");
 
         Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();
