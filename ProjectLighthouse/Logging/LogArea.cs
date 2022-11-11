@@ -25,4 +25,5 @@ public enum LogArea
     Maintenance,
     Score,
     RateLimit,
+    Deserialization,
 }

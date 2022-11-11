@@ -31,7 +31,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                     continue;
                 }
             }
-            else if(@case.Type.AffectsLevel())
+            else if (@case.Type.AffectsLevel())
             {
                 slot = await @case.GetSlotAsync(database);
                 if (slot == null)

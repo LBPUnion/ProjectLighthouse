@@ -1,7 +1,6 @@
 @page "/admin/users"
 @using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
-@using LBPUnion.ProjectLighthouse.Types
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminPanelUsersPage
 
 @{
@@ -61,7 +60,7 @@
                         <select name="role" class="ui selection dropdown">
                             @foreach (PermissionLevel level in Enum.GetValues<PermissionLevel>())
                             {
-                                if(level < 0) continue;
+                                if (level < 0) continue;
                                 string selected = level == user.PermissionLevel ? " selected" : "";
                         
                                 <option value="@((int)level)"@selected>@level.ToString()</option>

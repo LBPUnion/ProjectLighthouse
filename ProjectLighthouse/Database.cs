@@ -175,6 +175,7 @@ public class Database : DbContext
         comment.ThumbsDown = boo;
         comment.ThumbsUp = yay;
         await this.SaveChangesAsync();
+
         return true;
     }
 
@@ -184,13 +185,19 @@ public class Database : DbContext
 
         if (type == CommentType.Profile)
         {
-            User? targetUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == targetId);
-            if (targetUser == null) return false;
+            int targetUserId = await this.Users.Where(u => u.UserId == targetId)
+                .Where(u => u.CommentsEnabled)
+                .Select(u => u.UserId)
+                .FirstOrDefaultAsync();
+            if (targetUserId == 0) return false;
         }
         else
         {
-            Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
-            if (targetSlot == null) return false;
+            int targetSlotId = await this.Slots.Where(s => s.SlotId == targetId)
+                .Where(s => s.CommentsEnabled && !s.Hidden)
+                .Select(s => s.SlotId)
+                .FirstOrDefaultAsync();
+            if (targetSlotId == 0) return false;
         }
 
         this.Comments.Add
@@ -205,6 +212,7 @@ public class Database : DbContext
             }
         );
         await this.SaveChangesAsync();
+
         return true;
     }
 
@@ -307,6 +315,16 @@ public class Database : DbContext
 
     #endregion
 
+    #region User Helper Methods
+
+    public async Task<int> UserIdFromUsername(string? username)
+    {
+        if (username == null) return 0;
+        return await this.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
+    }
+
+    #endregion
+
     #region Game Token Shenanigans
 
     public async Task<string> UsernameFromGameToken(GameToken? token)
@@ -316,7 +334,14 @@ public class Database : DbContext
         return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
     }
 
-    public async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)
+    public async Task<User?> UserFromGameToken(GameToken? token)
+    {
+        if (token == null) return null;
+
+        return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+    }
+
+    private async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)
     {
         if (ServerStatics.IsUnitTesting) allowUnapproved = true;
         GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
@@ -324,19 +349,13 @@ public class Database : DbContext
         if (token == null) return null;
         if (!allowUnapproved && !token.Approved) return null;
 
-        if (DateTime.Now > token.ExpiresAt)
-        {
-            this.Remove(token);
-            await this.SaveChangesAsync();
-            return null;
-        }
+        if (DateTime.Now <= token.ExpiresAt) return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
 
-        return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        this.Remove(token);
+        await this.SaveChangesAsync();
+
+        return null;
     }
-
-    public async Task<User?> UserFromGameToken
-        (GameToken gameToken, bool allowUnapproved = false)
-        => await this.UserFromMMAuth(gameToken.UserToken, allowUnapproved);
 
     public async Task<User?> UserFromGameRequest(HttpRequest request, bool allowUnapproved = false)
     {
@@ -356,14 +375,12 @@ public class Database : DbContext
         if (token == null) return null;
         if (!allowUnapproved && !token.Approved) return null;
 
-        if (DateTime.Now > token.ExpiresAt)
-        {
-            this.Remove(token);
-            await this.SaveChangesAsync();
-            return null;
-        }
+        if (DateTime.Now <= token.ExpiresAt) return token;
 
-        return token;
+        this.Remove(token);
+        await this.SaveChangesAsync();
+
+        return null;
     }
 
     public async Task<(User, GameToken)?> UserAndGameTokenFromRequest(HttpRequest request, bool allowUnapproved = false)
@@ -383,7 +400,6 @@ public class Database : DbContext
         }
 
         User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
-
         if (user == null) return null;
 
         return (user, token);
@@ -400,19 +416,17 @@ public class Database : DbContext
         return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
     }
 
-    public User? UserFromLighthouseToken(string lighthouseToken)
+    private User? UserFromLighthouseToken(string lighthouseToken)
     {
         WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
 
-        if (DateTime.Now > token.ExpiresAt)
-        {
-            this.Remove(token);
-            this.SaveChanges();
-            return null;
-        }
+        if (DateTime.Now <= token.ExpiresAt) return this.Users.FirstOrDefault(u => u.UserId == token.UserId);
 
-        return this.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == token.UserId);
+        this.Remove(token);
+        this.SaveChanges();
+
+        return null;
     }
 
     public User? UserFromWebRequest(HttpRequest request)
@@ -429,48 +443,41 @@ public class Database : DbContext
         WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
 
-        if (DateTime.Now > token.ExpiresAt)
-        {
-            this.Remove(token);
-            this.SaveChanges();
-            return null;
-        }
+        if (DateTime.Now <= token.ExpiresAt) return token;
 
-        return token;
+        this.Remove(token);
+        this.SaveChanges();
+
+        return null;
+
     }
 
     public async Task<User?> UserFromPasswordResetToken(string resetToken)
     {
         PasswordResetToken? token = await this.PasswordResetTokens.FirstOrDefaultAsync(token => token.ResetToken == resetToken);
-        if (token == null)
-        {
-            return null;
-        }
+        if (token == null) return null;
 
-        if (token.Created < DateTime.Now.AddHours(-1)) // if token is expired
-        {
-            this.PasswordResetTokens.Remove(token);
-            await this.SaveChangesAsync();
-            return null;
-        }
-        
-        return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
+        if (token.Created >= DateTime.Now.AddHours(-1))
+            return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
+
+        this.PasswordResetTokens.Remove(token);
+        await this.SaveChangesAsync();
+
+        return null;
     }
 
     public bool IsRegistrationTokenValid(string tokenString)
     {
         RegistrationToken? token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
-
         if (token == null) return false;
 
-        if (token.Created < DateTime.Now.AddDays(-7)) // if token is expired
-        {
-            this.RegistrationTokens.Remove(token);
-            this.SaveChanges();
-            return false;
-        }
+        if (token.Created >= DateTime.Now.AddDays(-7)) return true;
 
-        return true;
+        this.RegistrationTokens.Remove(token);
+        this.SaveChanges();
+
+        return false;
+
     }
 
     public async Task RemoveExpiredTokens()
@@ -478,7 +485,7 @@ public class Database : DbContext
         foreach (GameToken token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
         {
             User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
-            if(user != null) user.LastLogout = TimeHelper.TimestampMillis;
+            if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
             this.GameTokens.Remove(token);
         }
         this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
@@ -491,10 +498,10 @@ public class Database : DbContext
     public async Task RemoveRegistrationToken(string tokenString)
     {
         RegistrationToken? token = await this.RegistrationTokens.FirstOrDefaultAsync(t => t.Token == tokenString);
-
         if (token == null) return;
 
         this.RegistrationTokens.Remove(token);
+
         await this.SaveChangesAsync();
     }
 
@@ -508,6 +515,7 @@ public class Database : DbContext
         if (user.Username.Length == 0) return; // don't delete the placeholder user
 
         if (user.Location != null) this.Locations.Remove(user.Location);
+
         LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
         if (lastContact != null) this.LastContacts.Remove(lastContact);
 
@@ -536,6 +544,7 @@ public class Database : DbContext
     public async Task RemoveSlot(Slot slot, bool saveChanges = true)
     {
         if (slot.Location != null) this.Locations.Remove(slot.Location);
+
         this.Slots.Remove(slot);
 
         if (saveChanges) await this.SaveChangesAsync();
