@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -30,8 +31,7 @@ public class ScoreController : ControllerBase
     [HttpPost("scoreboard/{slotType}/{id:int}/{childId:int}")]
     public async Task<IActionResult> SubmitScore(string slotType, int id, int childId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         string username = await this.database.UsernameFromGameToken(token);
 
@@ -41,11 +41,7 @@ public class ScoreController : ControllerBase
             return this.BadRequest();
         }
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Score));
-        Score? score = (Score?)serializer.Deserialize(new StringReader(bodyString));
+        Score? score = await this.DeserializeBody<Score>();
         if (score == null)
         {
             Logger.Warn($"Rejecting score upload, score is null (slotType={slotType}, slotId={id}, user={username})", LogArea.Score);
@@ -157,8 +153,7 @@ public class ScoreController : ControllerBase
     [HttpGet("friendscores/{slotType}/{slotId:int}/{childId:int}/{type:int}")]
     public async Task<IActionResult> FriendScores(string slotType, int slotId, int? childId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -189,8 +184,7 @@ public class ScoreController : ControllerBase
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
     public async Task<IActionResult> TopScores(string slotType, int slotId, int? childId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 

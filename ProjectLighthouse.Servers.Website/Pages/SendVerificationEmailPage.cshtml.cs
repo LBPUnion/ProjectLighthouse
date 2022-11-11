@@ -69,7 +69,7 @@ public class SendVerificationEmailPage : BaseLayout
         }
 
         string? existingToken = await this.Database.EmailVerificationTokens.Where(v => v.UserId == user.UserId).Select(v => v.EmailToken).FirstOrDefaultAsync();
-        if(existingToken != null)
+        if (existingToken != null)
             this.Database.EmailVerificationTokens.RemoveWhere(t => t.EmailToken == existingToken);
 
         EmailVerificationToken verifyToken = new()

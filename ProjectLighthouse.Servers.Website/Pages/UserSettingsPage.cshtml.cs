@@ -79,7 +79,7 @@ public class UserSettingsPage : BaseLayout
 
         if (this.User == null) return this.Redirect("~/user/" + userId);
 
-        if(!this.User.IsModerator && this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
+        if (!this.User.IsModerator && this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
         return this.Page();
     }

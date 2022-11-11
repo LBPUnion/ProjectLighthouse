@@ -54,7 +54,6 @@ public class ServerConfiguration
         // If a valid YML configuration is available!
         if (File.Exists(ConfigFileName) && (tempConfig = fromFile(ConfigFileName)) != null)
         {
-            //            Instance = JsonSerializer.Deserialize<ServerConfiguration>(configFile) ?? throw new ArgumentNullException(nameof(ConfigFileName));
             Instance = tempConfig;
 
             if (Instance.ConfigVersion < CurrentConfigVersion)
