@@ -22,27 +22,36 @@ public static class ControllerExtensions
         return token;
     }
 
-    public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[]? rootElements)
+    public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[] rootElements)
     {
         controller.Request.Body.Position = 0;
         string bodyString = await new StreamReader(controller.Request.Body).ReadToEndAsync();
 
         try
         {
-            XmlRootAttribute? attr = null;
-            if (rootElements != null)
+            XmlRootAttribute? root = null;
+            if (rootElements.Length > 0)
             {
-                // This throws an exception if bodyString isn't the right rootElement which is caught by the deserializer
-                attr = new XmlRootAttribute(rootElements.First(e => bodyString.StartsWith($@"<{e}>")));
+                string? matchedRoot = rootElements.FirstOrDefault(e => bodyString.StartsWith($@"<{e}>"));
+                if (matchedRoot == null)
+                {
+                    Logger.Error($"[{controller.ControllerContext.ActionDescriptor.ActionName}] " +
+                                 $"Failed to deserialize {typeof(T).Name}: Unable to match root element", LogArea.Deserialization);
+                    Logger.Error($"{bodyString}", LogArea.Deserialization);
+                    return default;
+                }
+                root = new XmlRootAttribute(matchedRoot);
             }
-            XmlSerializer serializer = new(typeof(T), attr);
+            XmlSerializer serializer = new(typeof(T), root);
             T? obj = (T?)serializer.Deserialize(new StringReader(bodyString));
             SanitizationHelper.SanitizeStringsInClass(obj);
             return obj;
         }
-        catch
+        catch (Exception e)
         {
-            Logger.Error($"Failed to parse {typeof(T).Name}: {bodyString}", LogArea.Deserialization);
+            Logger.Error($"[{controller.ControllerContext.ActionDescriptor.ActionName}] " +
+                         $"Failed to deserialize {typeof(T).Name}: {e.Message}", LogArea.Deserialization);
+            Logger.Error($"{bodyString}", LogArea.Deserialization);
         }
         return default;
     }

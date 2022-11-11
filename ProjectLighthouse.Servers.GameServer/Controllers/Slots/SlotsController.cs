@@ -55,8 +55,8 @@ public class SlotsController : ControllerBase
 
         string response = Enumerable.Aggregate
         (
-            this.database.Slots.ByGameVersion(gameVersion, token.UserId == targetUserId, true)
-                .Where(s => s.CreatorId == targetUserId)
+            this.database.Slots.Where(s => s.CreatorId == targetUserId)
+                .ByGameVersion(gameVersion, token.UserId == targetUserId, true)
                 .Skip(Math.Max(0, pageStart - 1))
                 .Take(Math.Min(pageSize, usedSlots)),
             string.Empty,
@@ -249,8 +249,8 @@ public class SlotsController : ControllerBase
             .Select(s => s.SlotId)
             .ToListAsync();
 
-        IQueryable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .Where(s => slotIdsWithTag.Contains(s.SlotId))
+        IQueryable<Slot> slots = this.database.Slots.Where(s => slotIdsWithTag.Contains(s.SlotId))
+            .ByGameVersion(gameVersion, false, true)
             .OrderByDescending(s => s.PlaysLBP1)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));
@@ -271,8 +271,8 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        IQueryable<Slot> slots = this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .Where(s => s.TeamPick)
+        IQueryable<Slot> slots = this.database.Slots.Where(s => s.TeamPick)
+            .ByGameVersion(gameVersion, false, true)
             .OrderByDescending(s => s.LastUpdated)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30));

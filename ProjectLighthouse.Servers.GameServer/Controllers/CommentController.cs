@@ -136,6 +136,8 @@ public class CommentController : ControllerBase
         Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.NotFound();
 
+        if (comment.Deleted) return this.Ok();
+
         bool canDelete;
         if (comment.Type == CommentType.Profile)
         {
