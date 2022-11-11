@@ -16,7 +16,7 @@
                     <p style="white-space: pre-line">@Model.Error</p>
                 </div>
             }
-        <div class="header">Two-Factor Authentication</div>
+        <div class="header">@Model.Translate(TwoFactorStrings.TwoFactor)</div>
         <input type="text" maxlength="1" id="digit1"/>
         <input type="text" maxlength="1" id="digit2"/>
         <input type="text" maxlength="1" id="digit3" class="middleDigit"/>
@@ -24,6 +24,7 @@
         <input type="text" maxlength="1" id="digit5"/>
         <input type="text" maxlength="1" id="digit6"/>
         <input type="hidden" name="code" id="code">
+        @* TODO implement backup code entry *@
     </div>
 </form>
 <script>

@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Web;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
@@ -111,7 +112,7 @@ public class SetupTwoFactorPage : BaseLayout
             return this.Page();
         }
         this.QrCode = getQrCode(user);
-        this.Error = "Invalid 2FA Code";
+        this.Error = this.Translate(TwoFactorStrings.InvalidCode);
 
         return this.Page();
     }

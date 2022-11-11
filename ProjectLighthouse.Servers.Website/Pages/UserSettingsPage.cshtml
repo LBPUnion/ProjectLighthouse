@@ -123,6 +123,21 @@ function onSubmit(e){
                         <i class="key icon"></i>
                         @Model.Translate(GeneralStrings.ResetPassword)
                     </a>
+                    @if (Model.ProfileUser.IsTwoFactorSetup)
+                    {
+                        <a class="ui red button" href="/disable2fa">
+                            <i class="key icon"></i>
+                            @Model.Translate(TwoFactorStrings.DisableTwoFactor)
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="ui green button" href="/setup2fa">
+                            <i class="key icon"></i>
+                            @Model.Translate(TwoFactorStrings.EnableTwoFactor)
+                        </a>
+                    }
+                    
                 }
             </form>
         </div>
