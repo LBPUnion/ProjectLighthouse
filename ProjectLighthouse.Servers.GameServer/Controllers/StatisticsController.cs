@@ -2,6 +2,8 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.PlayerData;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
@@ -25,17 +27,20 @@ public class StatisticsController : ControllerBase
 
     [HttpGet("planetStats")]
     public async Task<IActionResult> PlanetStats()
-    {
-        int totalSlotCount = await StatisticsHelper.SlotCount(this.database);
+    {User? user = await this.database.UserFromGameRequest(this.Request);
+
+        int totalSlotCount = await StatisticsHelper.SlotCountForGame(this.database, (GameVersion)user.Game);
         int mmPicksCount = await StatisticsHelper.TeamPickCount(this.database);
 
         return this.Ok
         (
-            LbpSerializer.StringElement
-                ("planetStats", LbpSerializer.StringElement("totalSlotCount", totalSlotCount) + LbpSerializer.StringElement("mmPicksCount", mmPicksCount))
+           LbpSerializer.StringElement
+                ("planetStats", LbpSerializer.StringElement("totalSlotCount", totalSlotCount) + LbpSerializer.StringElement("mmPicksCount", mmPicksCount)+LbpSerializer.StringElement("GAMEVERSION",user.Game))
         );
     }
 
     [HttpGet("planetStats/totalLevelCount")]
-    public async Task<IActionResult> TotalLevelCount() => this.Ok((await StatisticsHelper.SlotCount(this.database)).ToString());
-}
+    public async Task<IActionResult> TotalLevelCount() {
+int  a = await StatisticsHelper.SlotCountForGame(this.database, PlayerData.GameVersion.LittleBigPlanet1);
+return this.Ok (a.ToString());
+}}
