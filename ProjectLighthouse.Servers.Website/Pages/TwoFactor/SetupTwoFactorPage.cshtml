@@ -10,7 +10,7 @@
 @if (!string.IsNullOrWhiteSpace(Model.QrCode))
 {
     <div class="ui center segment center aligned">
-        <h2>@TwoFactorStrings.QrTitle</h2>
+        <h2>@Model.Translate(TwoFactorStrings.QrTitle)</h2>
         @if (Model.User?.TwoFactorRequired ?? false)
         {
             <p>@Model.Translate(TwoFactorStrings.TwoFactorRequired)</p>
