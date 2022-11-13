@@ -1,4 +1,5 @@
 #nullable enable
+using System.Buffers.Text;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -102,6 +103,11 @@ public class LoginForm : BaseLayout
 
             return this.Redirect("/login/setEmail?token=" + emailSetToken.EmailToken);
         }
+
+        // if (user.IsTwoFactorSetup)
+        // {
+        //        this.Redirect("/2fa?login=" + Convert.ToBase64String(user + ""))
+        // }
 
         WebToken webToken = new()
         {
