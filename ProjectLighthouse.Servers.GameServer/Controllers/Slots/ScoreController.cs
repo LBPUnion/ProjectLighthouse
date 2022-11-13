@@ -48,6 +48,10 @@ public class ScoreController : ControllerBase
             return this.BadRequest();
         }
 
+        // This only seems to happens on lbp2 versus levels, not sure why
+        if(score.PlayerIdCollection.Contains(':'))
+            score.PlayerIdCollection = score.PlayerIdCollection.Replace(':', ',');
+
         if (score.PlayerIds.Length == 0)
         {
             Logger.Warn($"Rejecting score upload, there are 0 playerIds (slotType={slotType}, slotId={id}, user={username})", LogArea.Score);
@@ -77,7 +81,7 @@ public class ScoreController : ControllerBase
             string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
             Logger.Warn("Rejecting score upload, requester username is not present in playerIds" +
                         $" (user={username}, playerIds={string.Join(",", score.PlayerIds)}, " +
-                        $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={score.SlotId}, slotType={slotType}, body='{bodyString}')", LogArea.Score);
+                        $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={id}, slotType={slotType}, body='{bodyString}')", LogArea.Score);
             return this.BadRequest();
         }
 
@@ -169,7 +173,10 @@ public class ScoreController : ControllerBase
         UserFriendData? store = UserFriendStore.GetUserFriendData(token.UserId);
         if (store == null) return this.Ok();
 
-        List<string> friendNames = new();
+        List<string> friendNames = new()
+        {
+            username,
+        };
 
         foreach (int friendId in store.FriendIds)
         {
