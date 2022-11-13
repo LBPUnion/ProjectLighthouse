@@ -61,6 +61,60 @@ public class Database : DbContext
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
     #nullable enable
+
+    public async Task NewEvent(User actor, TargetType targetType, int target, EventType eventType, long[] interactions)
+    {
+        if (interactions.Count() != 2) return;
+        Activity newAct = new Activity() 
+        {
+            EventType = eventType,
+            TargetType = targetType,
+            TargetId = target,
+            Actor = actor
+        };
+        Activity? existingAct = await this.Activity
+            .Where(a => a.EventType == eventType)
+            .Where(a => a.TargetType == targetType)
+            .Where(a => a.TargetId == target)
+            .Include(a => a.Actor)
+            .Where(a => a.Actor == actor)
+            .FirstOrDefaultAsync();
+        if (existingAct != null)
+        {
+            switch (eventType)
+            {
+                case EventType.Score:
+                    existingAct.Interaction1 = interactions[0];
+                    existingAct.Interaction2 = interactions[1];
+                    await this.SaveChangesAsync();
+                    break;
+                default:
+                    break;
+            }
+        }
+        newAct.Interaction1 = interactions[0];
+        newAct.Interaction2 = interactions[1];
+        await this.SaveChangesAsync();
+    }
+
+    public async Task DeleteEvent(User actor, TargetType targetType, int target, EventType eventType, long[] interactions)
+    {
+        if (interactions.Count() != 2) return;
+
+        Activity? activity = await this.Activity
+            .Where(a => a.EventType == eventType)
+            .Where(a => a.TargetType == targetType)
+            .Where(a => a.TargetId == target)
+            .Where(a => a.Interaction1 == interactions[0])
+            .Where(a => a.Interaction2 == interactions[1])
+            .Include(a => a.Actor)
+            .Where(a => a.Actor == actor)
+            .FirstOrDefaultAsync();
+        if (activity == null) return;
+        this.Activity.Remove(activity);
+        await this.SaveChangesAsync();
+    }
+
     public async Task<User> CreateUser(string username, string password, string? emailAddress = null)
     {
         if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");

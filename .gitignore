@@ -34,6 +34,9 @@ npTicket*
 r.tar.gz
 lighthouse.yml.configme
 
+# macOS Junk
+.DS_Store
+
 # MSBuild stuff
 bin/
 obj/
