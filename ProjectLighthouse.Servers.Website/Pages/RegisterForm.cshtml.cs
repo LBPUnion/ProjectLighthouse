@@ -29,10 +29,16 @@ public class RegisterForm : BaseLayout
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
+                string token = this.Request.Query["token"];
+                if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
-                username = (await this.Database.RegistrationTokens.FirstAsync(r => r.Token == this.Request.Query["token"].ToString())).Username;
+                string? tokenUsername = await this.Database.RegistrationTokens.Where(r => r.Token == token)
+                    .Select(u => u.Username)
+                    .FirstOrDefaultAsync();
+                if (tokenUsername == null) return this.BadRequest();
+
+                username = tokenUsername;
             }
             else
             {
@@ -113,17 +119,21 @@ public class RegisterForm : BaseLayout
 
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet()
     {
         this.Error = string.Empty;
         if (ServerConfiguration.Instance.Authentication.PrivateRegistration)
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
+                string token = this.Request.Query["token"];
+                if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
-                this.Username = this.Database.RegistrationTokens.First(r => r.Token == this.Request.Query["token"].ToString()).Username;
+                string? tokenUsername = await this.Database.RegistrationTokens.Where(r => r.Token == token)
+                    .Select(u => u.Username)
+                    .FirstAsync();
+                this.Username = tokenUsername;
             }
             else
             {
