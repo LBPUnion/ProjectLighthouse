@@ -8,12 +8,14 @@ using LBPUnion.ProjectLighthouse.Match.MatchCommands;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class MatchController : ControllerBase
@@ -27,26 +29,16 @@ public class MatchController : ControllerBase
 
     [HttpPost("gameState")]
     [Produces("text/plain")]
-    public async Task<IActionResult> GameState()
-    {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-
-        if (token == null) return this.StatusCode(403, "");
-
-        return this.Ok("VALID");
-    }
+    public IActionResult GameState() => this.Ok("VALID");
 
     [HttpPost("match")]
     [Produces("text/plain")]
     public async Task<IActionResult> Match()
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken token = this.GetToken();
 
-        if (userAndToken == null) return this.StatusCode(403, "");
-
-        // ReSharper disable once PossibleInvalidOperationException
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
+        User? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.StatusCode(403, "");
 
         #region Parse match data
 
@@ -81,70 +73,74 @@ public class MatchController : ControllerBase
 
         #endregion
 
-        await LastContactHelper.SetLastContact(this.database, user, gameToken.GameVersion, gameToken.Platform);
+        await LastContactHelper.SetLastContact(this.database, user, token.GameVersion, token.Platform);
 
         #region Process match data
 
-        if (matchData is UpdateMyPlayerData playerData)
+        switch (matchData)
         {
-            MatchHelper.SetUserLocation(user.UserId, gameToken.UserLocation);
-            Room? room = RoomHelper.FindRoomByUser(user.UserId, gameToken.GameVersion, gameToken.Platform, true);
-
-            if (playerData.RoomState != null)
-                if (room != null && Equals(room.HostId, user.UserId))
-                    room.State = (RoomState)playerData.RoomState;
-        }
-
-        // Check how many people are online in release builds, disabled for debug for ..well debugging.
-        #if DEBUG
-        else if (matchData is FindBestRoom diveInData)
-            #else
-        else if (matchData is FindBestRoom diveInData && MatchHelper.UserLocations.Count > 1)
-            #endif
-        {
-            FindBestRoomResponse? response = RoomHelper.FindBestRoom
-                (user, gameToken.GameVersion, diveInData.RoomSlot, gameToken.Platform, gameToken.UserLocation);
-
-            if (response == null) return this.NotFound();
-
-            string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
-            foreach (Player player in response.Players) MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
-
-            return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
-        }
-
-        else if (matchData is CreateRoom createRoom && MatchHelper.UserLocations.Count >= 1)
-        {
-            List<int> users = new();
-            foreach (string playerUsername in createRoom.Players)
+            case UpdateMyPlayerData playerData:
             {
-                User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                if (player != null) users.Add(player.UserId);
-                else return this.BadRequest();
+                MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
+                Room? room = RoomHelper.FindRoomByUser(user.UserId, token.GameVersion, token.Platform, true);
+
+                if (playerData.RoomState != null)
+                    if (room != null && Equals(room.HostId, user.UserId))
+                        room.State = (RoomState)playerData.RoomState;
+                break;
             }
-
-            // Create a new one as requested
-            RoomHelper.CreateRoom(users, gameToken.GameVersion, gameToken.Platform, createRoom.RoomSlot);
-        }
-
-        else if (matchData is UpdatePlayersInRoom updatePlayersInRoom)
-        {
-            Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.HostId == user.UserId);
-
-            if (room != null)
+            // Check how many people are online in release builds, disabled for debug for ..well debugging.
+            #if DEBUG
+            case FindBestRoom diveInData:
+            #else
+            case FindBestRoom diveInData when MatchHelper.UserLocations.Count > 1:
+            #endif
             {
-                List<User> users = new();
-                foreach (string playerUsername in updatePlayersInRoom.Players)
+                FindBestRoomResponse? response = RoomHelper.FindBestRoom
+                    (user, token.GameVersion, diveInData.RoomSlot, token.Platform, token.UserLocation);
+
+                if (response == null) return this.NotFound();
+
+                string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
+                foreach (Player player in response.Players) MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
+
+                return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
+            }
+            case CreateRoom createRoom when MatchHelper.UserLocations.Count >= 1:
+            {
+                List<int> users = new();
+                foreach (string playerUsername in createRoom.Players)
                 {
                     User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                    if (player != null) users.Add(player);
+                    if (player != null) users.Add(player.UserId);
                     else return this.BadRequest();
                 }
 
-                room.PlayerIds = users.Select(u => u.UserId).ToList();
-                await RoomHelper.CleanupRooms(null, room);
+                // Create a new one as requested
+                RoomHelper.CreateRoom(users, token.GameVersion, token.Platform, createRoom.RoomSlot);
+                break;
+            }
+            case UpdatePlayersInRoom updatePlayersInRoom:
+            {
+                Room? room = RoomHelper.Rooms.FirstOrDefault(r => r.HostId == user.UserId);
+
+                if (room != null)
+                {
+                    List<User> users = new();
+                    foreach (string playerUsername in updatePlayersInRoom.Players)
+                    {
+                        User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                        if (player != null) users.Add(player);
+                        else return this.BadRequest();
+                    }
+
+                    room.PlayerIds = users.Select(u => u.UserId).ToList();
+                    await RoomHelper.CleanupRooms(null, room);
+                }
+
+                break;
             }
         }
 

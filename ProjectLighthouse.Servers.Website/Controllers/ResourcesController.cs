@@ -14,10 +14,9 @@ public class ResourcesController : ControllerBase
         string path = FileHelper.GetImagePath($"{hash}.png");
 
         string fullPath = Path.GetFullPath(path);
-        string basePath = Path.GetFullPath(FileHelper.ImagePath);
 
         // Prevent directory traversal attacks
-        if (!fullPath.StartsWith(basePath)) return this.BadRequest();
+        if (!fullPath.StartsWith(FileHelper.FullImagePath)) return this.BadRequest();
 
         if (IOFile.Exists(path)) return this.File(IOFile.OpenRead(path), "image/png");
 

@@ -1,5 +1,4 @@
 #nullable enable
-using System.Xml.Serialization;
 using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -9,12 +8,14 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Resources;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class PhotosController : ControllerBase
@@ -29,16 +30,12 @@ public class PhotosController : ControllerBase
     [HttpPost("uploadPhoto")]
     public async Task<IActionResult> UploadPhoto()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
+        User? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.StatusCode(403, "");
 
         if (user.PhotosByMe >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Photo));
-        Photo? photo = (Photo?)serializer.Deserialize(new StringReader(bodyString));
+        Photo? photo = await this.DeserializeBody<Photo>();
         if (photo == null) return this.BadRequest();
 
         SanitizationHelper.SanitizeStringsInClass(photo);
@@ -65,9 +62,9 @@ public class PhotosController : ControllerBase
                 {
                     // We'll grab the slot by the RootLevel and see what happens from here.
                     Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.ResourceCollection.Contains(photoSlot.RootLevel));
-                    if(slot == null) break;
+                    if (slot == null) break;
 
-                    if (!string.IsNullOrEmpty(slot!.RootLevel)) validLevel = true;
+                    if (!string.IsNullOrEmpty(slot.RootLevel)) validLevel = true;
                     if (slot.IsAdventurePlanet) photoSlot.SlotId = slot.SlotId;
                     break;
                 }
@@ -83,6 +80,10 @@ public class PhotosController : ControllerBase
                     validLevel = true;
                     break;
                 }
+                case SlotType.Moon:
+                case SlotType.Unknown:
+                case SlotType.Unknown2:
+                case SlotType.DLC:
                 default: Logger.Warn($"Invalid photo level type: {photoSlot.SlotType}", LogArea.Photos);
                     break;
             }
@@ -103,10 +104,8 @@ public class PhotosController : ControllerBase
             subjectUserIds.Add(subject.Username);
         }
 
-        foreach (PhotoSubject subject in photo.Subjects)
+        foreach (PhotoSubject subject in photo.Subjects.Where(subject => !string.IsNullOrEmpty(subject.Username)))
         {
-            if (string.IsNullOrEmpty(subject.Username)) continue;
-
             subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
 
             if (subject.User == null) continue;
@@ -144,9 +143,6 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/{slotType}/{id:int}")]
     public async Task<IActionResult> SlotPhotos([FromQuery] int pageStart, [FromQuery] int pageSize, string slotType, int id)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         if (pageSize <= 0) return this.BadRequest();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
@@ -166,12 +162,9 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/by")]
     public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         if (pageSize <= 0) return this.BadRequest();
 
-        int targetUserId = await this.database.Users.Where(u => u.Username == user).Select(u => u.UserId).FirstOrDefaultAsync();
+        int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
         List<Photo> photos = await this.database.Photos.Include
@@ -188,12 +181,9 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/with")]
     public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         if (pageSize <= 0) return this.BadRequest();
 
-        int targetUserId = await this.database.Users.Where(u => u.Username == user).Select(u => u.UserId).FirstOrDefaultAsync();
+        int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
         List<int> photoSubjectIds = new();
@@ -220,8 +210,7 @@ public class PhotosController : ControllerBase
     [HttpPost("deletePhoto/{id:int}")]
     public async Task<IActionResult> DeletePhoto(int id)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         Photo? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
         if (photo == null) return this.NotFound();
@@ -234,7 +223,9 @@ public class PhotosController : ControllerBase
         }
         foreach (string idStr in photo.PhotoSubjectIds)
         {
-            if (!int.TryParse(idStr, out int subjectId)) throw new InvalidCastException(idStr + " is not a valid number.");
+            if (string.IsNullOrWhiteSpace(idStr)) continue;
+
+            if (!int.TryParse(idStr, out int subjectId)) continue;
 
             this.database.PhotoSubjects.RemoveWhere(p => p.PhotoSubjectId == subjectId);
         }

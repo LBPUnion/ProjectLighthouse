@@ -27,12 +27,14 @@ public class ModerationSlotController : ControllerBase
 
         Slot? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+
         slot.TeamPick = true;
 
         // Send webhook with slot.Name and slot.Creator.Username
         await WebhookHelper.SendWebhook("New Team Pick!", $"The level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId}) by **{slot.Creator?.Username}** has been team picked");
 
         await this.database.SaveChangesAsync();
+
         return this.Redirect("~/slot/" + id);
     }
 
@@ -44,9 +46,11 @@ public class ModerationSlotController : ControllerBase
 
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
+
         slot.TeamPick = false;
 
         await this.database.SaveChangesAsync();
+
         return this.Redirect("~/slot/" + id);
     }
 

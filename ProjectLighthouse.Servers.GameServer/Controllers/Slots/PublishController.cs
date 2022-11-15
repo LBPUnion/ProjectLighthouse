@@ -1,6 +1,6 @@
 #nullable enable
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
@@ -8,12 +8,14 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
 public class PublishController : ControllerBase
@@ -31,15 +33,12 @@ public class PublishController : ControllerBase
     [HttpPost("startPublish")]
     public async Task<IActionResult> StartPublish()
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken token = this.GetToken();
 
-        if (userAndToken == null) return this.StatusCode(403, "");
+        User? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
-
-        Slot? slot = await this.getSlotFromBody();
+        Slot? slot = await this.DeserializeBody<Slot>();
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
@@ -69,7 +68,7 @@ public class PublishController : ControllerBase
                 return this.BadRequest();
             }
         }
-        else if (user.GetUsedSlotsForGame(gameToken.GameVersion) > user.EntitledSlots)
+        else if (user.GetUsedSlotsForGame(token.GameVersion) > user.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
@@ -89,14 +88,12 @@ public class PublishController : ControllerBase
     [HttpPost("publish")]
     public async Task<IActionResult> Publish([FromQuery] string? game)
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken token = this.GetToken();
 
-        if (userAndToken == null) return this.StatusCode(403, "");
+        User? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
-        Slot? slot = await this.getSlotFromBody();
+        Slot? slot = await this.DeserializeBody<Slot>();
 
         if (slot == null)
         {
@@ -156,7 +153,7 @@ public class PublishController : ControllerBase
         GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
 
         slot.GameVersion = slotVersion;
-        if (slotVersion == GameVersion.Unknown) slot.GameVersion = gameToken.GameVersion;
+        if (slotVersion == GameVersion.Unknown) slot.GameVersion = token.GameVersion;
 
         slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(slot.AuthorLabels);
 
@@ -185,7 +182,7 @@ public class PublishController : ControllerBase
                 if (intendedVersion != GameVersion.Unknown && intendedVersion != slotVersion)
                 {
                     // Delete the useless rootLevel that lbp3 just uploaded
-                    if(slotVersion == GameVersion.LittleBigPlanet3)
+                    if (slotVersion == GameVersion.LittleBigPlanet3)
                         FileHelper.DeleteResource(slot.RootLevel);
 
                     slot.GameVersion = oldSlot.GameVersion;
@@ -230,7 +227,7 @@ public class PublishController : ControllerBase
 
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
-            return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
+            return this.Ok(oldSlot.Serialize(token.GameVersion));
         }
 
         if (user.GetUsedSlotsForGame(slotVersion) > user.EntitledSlots)
@@ -269,14 +266,13 @@ public class PublishController : ControllerBase
 
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
-        return this.Ok(slot.Serialize(gameToken.GameVersion));
+        return this.Ok(slot.Serialize(token.GameVersion));
     }
 
     [HttpPost("unpublish/{id:int}")]
     public async Task<IActionResult> Unpublish(int id)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -304,18 +300,5 @@ public class PublishController : ControllerBase
             "lbppsp" => GameVersion.LittleBigPlanetPSP,
             _ => GameVersion.Unknown,
         };
-    }
-
-    private async Task<Slot?> getSlotFromBody()
-    {
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(Slot));
-        Slot? slot = (Slot?)serializer.Deserialize(new StringReader(bodyString));
-
-        SanitizationHelper.SanitizeStringsInClass(slot);
-
-        return slot;
     }
 }

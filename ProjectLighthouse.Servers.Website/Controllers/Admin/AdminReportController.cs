@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using LBPUnion.ProjectLighthouse.Administration.Reports;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +31,7 @@ public class AdminReportController : ControllerBase
             report.JpegHash,
             report.GriefStateHash,
         };
-        if(report.LevelType != "user")
+        if (report.LevelType != "user")
             hashes.Add(report.InitialStateHash);
         foreach (string hash in hashes)
         {

@@ -89,7 +89,7 @@ public static class MaintenanceHelper
             exception = e;
         }
         
-        if(!success)
+        if (!success)
         {
             Logger.Error($"Could not run migration {migrationTask.Name()}", LogArea.Database);
             if (exception != null) Logger.Error(exception.ToDetailedException(), LogArea.Database);

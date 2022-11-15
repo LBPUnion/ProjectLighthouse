@@ -83,6 +83,12 @@ public class UserEndpoints : ApiEndpointController
         APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
         if (apiKey == null) return this.StatusCode(403, null);
 
+        if (!string.IsNullOrWhiteSpace(username))
+        {
+            bool userExists = await this.database.Users.AnyAsync(u => u.Username == username);
+            if (userExists) return this.BadRequest();
+        }
+
         RegistrationToken token = new()
         {
             Created = DateTime.Now,
