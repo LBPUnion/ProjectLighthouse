@@ -141,14 +141,12 @@ function onSubmit(e){
     let selectedAvatar = "";
     document.getElementById("avatar").addEventListener("change", e => {
       const file = e.target.files.item(0);
-      Image img = System.Drawing.Image.FromFile(file);
-      int width = img.Width;
-      int height = img.Height;
-      int minSize = 1;
-      int maxSize = 1024;
+      const img = System.Drawing.Image.FromFile(file);
+      const minSize = 1;
+      const maxSize = 1024;
       if (file.type !== "image/jpeg" && file.type !== "image/png")
           return;
-      if (!(height <= maxSize && height >= minSize) && (width !== height))
+      if (!(img.Height <= maxSize && img.Height >= minSize) && (img.Width !== img.Height))
           return;
       
       const output = document.getElementById('userPicture');
