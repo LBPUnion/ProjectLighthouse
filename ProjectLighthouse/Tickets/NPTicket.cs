@@ -51,9 +51,13 @@ public class NPTicket
         new BigInteger("b07bc0f0addb97657e9f389039e8d2b9c97dc2a31d3042e7d0479b93", 16),
         new BigInteger("d81c42b0abdf6c42191a31e31f93342f8f033bd529c2c57fdb5a0a7d", 16));
 
+    private static readonly ECPoint psnPublic = secp192K1.Curve.CreatePoint(
+        new BigInteger("5e2d338f12e31a9350ca42854296bebf58c2dacbfd13bf2a", 16),
+        new BigInteger("1a4fa06072821dd1e6f8581aba64f725e7d0c8a061d408eb", 16));
+
     private ECDomainParameters getCurveParams() => this.IsRpcn() ? secp224K1 : secp192K1;
 
-    private static ECPoint getPublicKey() => rpcnPublic;
+    private ECPoint getPublicKey() => this.IsRpcn() ? rpcnPublic : psnPublic;
 
     private static ECDomainParameters FromX9EcParams(X9ECParameters param) =>
         new(param.Curve, param.G, param.N, param.H, param.GetSeed());
@@ -61,10 +65,17 @@ public class NPTicket
     private bool ValidateSignature()
     {
         //TODO support psn
-        if (!this.IsRpcn()) return true;
+        // if (!this.IsRpcn()) return true;
+        Console.WriteLine("pub key: " + this.getPublicKey());
+        Console.WriteLine("is rpcn: " + this.IsRpcn());
+        Console.WriteLine("curve params: " + this.getCurveParams().H);
+        Console.WriteLine("curve params: " + this.getCurveParams().Curve.B);
 
-        ECPublicKeyParameters pubKey = new(getPublicKey(), this.getCurveParams());
-        ISigner signer = SignerUtilities.GetSigner("SHA-224withECDSA");
+        ECPublicKeyParameters pubKey = new(this.getPublicKey(), this.getCurveParams());
+        string algo = this.IsRpcn() ? "SHA-224" : "SHA-1";
+        Console.WriteLine(@"using algo " + algo);
+
+        ISigner signer = SignerUtilities.GetSigner($"{algo}withECDSA");
         signer.Init(false, pubKey);
 
         signer.BlockUpdate(this.ticketBody);
@@ -81,7 +92,7 @@ public class NPTicket
         },
         {
             Platform.PS3, new byte[]{ 0x71, 0x9F, 0x1D, 0x4A, }
-        }
+        },
     };
 
     private static bool Read21Ticket(NPTicket npTicket, TicketReader reader)
@@ -116,8 +127,6 @@ public class NPTicket
             Console.WriteLine(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ident)} == {Convert.ToHexString(identifierByPlatform[npTicket.Platform])}");
             return false;
         }
-        
-        //TODO check platform and ident
 
         npTicket.ticketSignature = reader.ReadTicketBinary();
         return true;
@@ -135,7 +144,7 @@ public class NPTicket
         ushort ticketLen = reader.ReadUInt16BE(); // Ticket length, we don't care about this
         if (ticketLen != data.Length - 0x8)
         {
-            Console.WriteLine("Ticket length mismatch");
+            Console.WriteLine(@$"Ticket length mismatch, expected={ticketLen}, actual={data.Length - 0x8}");
             return false;
         }
 

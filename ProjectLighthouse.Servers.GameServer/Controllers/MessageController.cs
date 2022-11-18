@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +39,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     }
 
     [HttpGet("eula")]
-    public IActionResult Eula() => this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
+    public async Task<IActionResult> Eula()
+    {
+        // we don't want client to finish authentication for testing
+        User? user = await this.database.UserFromGameToken(this.GetToken());
+        if (user?.Username == "vSlendyy") return this.StatusCode(403, "");
+
+        return this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
+    } 
 
     [HttpGet("announce")]
     public async Task<IActionResult> Announce()
