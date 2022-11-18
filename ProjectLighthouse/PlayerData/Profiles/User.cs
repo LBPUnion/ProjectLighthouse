@@ -137,6 +137,9 @@ public class User
     public string PlanetHashLBPVita { get; set; } = "";
 
     [JsonIgnore]
+    public string PlanetHashCrossControl { get; set; } = "";
+
+    [JsonIgnore]
     public int Hearts => this.database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
 
     [JsonIgnore]
@@ -205,6 +208,7 @@ public class User
                           true
                       ) + // technically not a part of the user but LBP expects it
                       LbpSerializer.StringElement<int>("heartCount", this.Hearts, true) +
+                      this.serializeCrossControlPlanet(gameVersion) +
                       this.serializeEarth(gameVersion) +
                       LbpSerializer.StringElement<string>("yay2", this.YayHash, true) +
                       LbpSerializer.StringElement<string>("boo2", this.BooHash, true) +
@@ -223,6 +227,12 @@ public class User
                       LbpSerializer.StringElement<string>("pins", this.Pins, true);
 
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
+    }
+
+    private string serializeCrossControlPlanet(GameVersion gameVersion)
+    {
+        if (gameVersion != GameVersion.LittleBigPlanet2) return "";
+        return LbpSerializer.StringElement("crossControlPlanet", this.PlanetHashCrossControl);
     }
 
     private string serializeEarth(GameVersion gameVersion)
