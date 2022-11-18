@@ -19,7 +19,7 @@ public class UserUpdate
     public string? PlanetHash { get; set; }
 
     [XmlElement("crossControlPlanet")]
-    public string? LBP2CrossControlPlanetHash { get; set; }
+    public string? PlanetHashLBP2CC { get; set; }
 
     [XmlArray("slots")]
     [XmlArrayItem("slot")]

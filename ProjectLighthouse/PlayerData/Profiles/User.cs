@@ -131,13 +131,13 @@ public class User
     public string PlanetHashLBP2 { get; set; } = "";
 
     [JsonIgnore]
+    public string PlanetHashLBP2CC { get; set; } = "";
+
+    [JsonIgnore]
     public string PlanetHashLBP3 { get; set; } = "";
 
     [JsonIgnore]
     public string PlanetHashLBPVita { get; set; } = "";
-
-    [JsonIgnore]
-    public string PlanetHashCrossControl { get; set; } = "";
 
     [JsonIgnore]
     public int Hearts => this.database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
@@ -208,7 +208,6 @@ public class User
                           true
                       ) + // technically not a part of the user but LBP expects it
                       LbpSerializer.StringElement<int>("heartCount", this.Hearts, true) +
-                      this.serializeCrossControlPlanet(gameVersion) +
                       this.serializeEarth(gameVersion) +
                       LbpSerializer.StringElement<string>("yay2", this.YayHash, true) +
                       LbpSerializer.StringElement<string>("boo2", this.BooHash, true) +
@@ -229,15 +228,9 @@ public class User
         return LbpSerializer.TaggedStringElement("user", user, "type", "user");
     }
 
-    private string serializeCrossControlPlanet(GameVersion gameVersion)
-    {
-        if (gameVersion != GameVersion.LittleBigPlanet2) return "";
-        return LbpSerializer.StringElement("crossControlPlanet", this.PlanetHashCrossControl);
-    }
-
     private string serializeEarth(GameVersion gameVersion)
     {
-        return LbpSerializer.StringElement<string>
+        string planets = LbpSerializer.StringElement<string>
         (
             "planets",
             gameVersion switch
@@ -249,6 +242,10 @@ public class User
             },
             true
         );
+        if (gameVersion == GameVersion.LittleBigPlanet2)
+            planets += LbpSerializer.StringElement("crossControlPlanet", this.PlanetHashLBP2CC);
+
+        return planets;
     }
 
     #region Slots

@@ -131,7 +131,7 @@ public class UserController : ControllerBase
             }
         }
 
-        if (update.LBP2CrossControlPlanetHash != null) user.PlanetHashCrossControl = update.LBP2CrossControlPlanetHash;
+        if (update.PlanetHashLBP2CC != null) user.PlanetHashLBP2CC = update.PlanetHashLBP2CC;
 
         if (update.PlanetHash != null)
         {
