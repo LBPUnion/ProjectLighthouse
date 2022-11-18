@@ -26,19 +26,19 @@
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Greetings, {0}.</value>
+        <value>Välkommen, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>There are no people online. Why not hop on?</value>
+        <value>Det finns inga användare online. Varför inte spela?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>There is 1 person currently online:</value>
+        <value>Det är 1 användare online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>There are currently {0} people online:</value>
+        <value>{0} användare är online:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">

@@ -63,14 +63,18 @@ public class LoginForm : BaseLayout
         if (user == null)
         {
             Logger.Warn($"User {username} failed to login on web due to invalid username", LogArea.Login);
-            this.Error = "The username or password you entered is invalid.";
+            this.Error = ServerConfiguration.Instance.Mail.MailEnabled
+                ? "The email or password you entered is invalid."
+                : "The username or password you entered is invalid.";
             return this.Page();
         }
 
         if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
         {
             Logger.Warn($"User {user.Username} (id: {user.UserId}) failed to login on web due to invalid password", LogArea.Login);
-            this.Error = "The username or password you entered is invalid.";
+            this.Error = ServerConfiguration.Instance.Mail.MailEnabled
+                ? "The email or password you entered is invalid."
+                : "The username or password you entered is invalid.";
             return this.Page();
         }
 

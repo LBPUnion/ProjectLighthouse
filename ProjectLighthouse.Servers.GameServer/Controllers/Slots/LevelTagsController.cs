@@ -1,12 +1,15 @@
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML")]
 [Produces("text/plain")]
 public class LevelTagsController : ControllerBase
@@ -34,15 +37,14 @@ public class LevelTagsController : ControllerBase
     }
 
     [HttpPost("tag/{slotType}/{id:int}")]
-    public async Task<IActionResult> PostTag([FromForm] string t, [FromRoute] string slotType, [FromRoute] int id)
-    {                                                                     
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+    public async Task<IActionResult> PostTag([FromForm(Name = "t")] string tagName, [FromRoute] string slotType, [FromRoute] int id)
+    {
+        GameToken token = this.GetToken();
 
         Slot? slot = await this.database.Slots.Where(s => s.SlotId == id).FirstOrDefaultAsync();
         if (slot == null) return this.BadRequest();
 
-        if (!LabelHelper.IsValidTag(t)) return this.BadRequest();
+        if (!LabelHelper.IsValidTag(tagName)) return this.BadRequest();
 
         if (token.UserId == slot.CreatorId) return this.BadRequest();
 
@@ -53,7 +55,7 @@ public class LevelTagsController : ControllerBase
         RatedLevel? rating = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == token.UserId && r.SlotId == slot.SlotId);
         if (rating == null) return this.BadRequest();
 
-        rating.TagLBP1 = t;
+        rating.TagLBP1 = tagName;
 
         await this.database.SaveChangesAsync();
 

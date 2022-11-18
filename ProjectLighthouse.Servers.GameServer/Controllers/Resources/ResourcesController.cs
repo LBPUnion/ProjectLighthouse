@@ -1,28 +1,23 @@
 #nullable enable
 using System.Buffers;
 using System.IO.Pipelines;
-using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Resources;
 
 [ApiController]
+[Authorize]
 [Produces("text/xml")]
 [Route("LITTLEBIGPLANETPS3_XML")]
 public class ResourcesController : ControllerBase
 {
-    private readonly Database database;
-
-    public ResourcesController(Database database)
-    {
-        this.database = database;
-    }
 
     [HttpPost("showModerated")]
     public IActionResult ShowModerated() => this.Ok(LbpSerializer.BlankElement("resources"));
@@ -31,14 +26,7 @@ public class ResourcesController : ControllerBase
     [HttpPost("showNotUploaded")]
     public async Task<IActionResult> FilterResources()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(ResourceList));
-        ResourceList? resourceList = (ResourceList?)serializer.Deserialize(new StringReader(bodyString));
-
+        ResourceList? resourceList = await this.DeserializeBody<ResourceList>();
         if (resourceList == null) return this.BadRequest();
 
         string resources = resourceList.Resources.Where
@@ -49,18 +37,14 @@ public class ResourcesController : ControllerBase
     }
 
     [HttpGet("r/{hash}")]
-    public async Task<IActionResult> GetResource(string hash)
+    public IActionResult GetResource(string hash)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         string path = FileHelper.GetResourcePath(hash);
 
         string fullPath = Path.GetFullPath(path);
-        string basePath = Path.GetFullPath(FileHelper.ResourcePath);
 
         // Prevent directory traversal attacks
-        if (!fullPath.StartsWith(basePath)) return this.BadRequest();
+        if (!fullPath.StartsWith(FileHelper.FullResourcePath)) return this.BadRequest();
 
         if (FileHelper.ResourceExists(hash)) return this.File(IOFile.OpenRead(path), "application/octet-stream");
 
@@ -72,15 +56,16 @@ public class ResourcesController : ControllerBase
     [HttpPost("upload/{hash}")]
     public async Task<IActionResult> UploadResource(string hash)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         string assetsDirectory = FileHelper.ResourcePath;
         string path = FileHelper.GetResourcePath(hash);
+        string fullPath = Path.GetFullPath(path);
 
         FileHelper.EnsureDirectoryCreated(assetsDirectory);
         // lbp treats code 409 as success and as an indicator that the file is already present
         if (FileHelper.ResourceExists(hash)) return this.Conflict();
+
+        // theoretically shouldn't be possible because of hash check but handle anyways
+        if (!fullPath.StartsWith(FileHelper.FullResourcePath)) return this.BadRequest();
 
         Logger.Info($"Processing resource upload (hash: {hash})", LogArea.Resources);
         LbpFile file = new(await readFromPipeReader(this.Request.BodyReader));

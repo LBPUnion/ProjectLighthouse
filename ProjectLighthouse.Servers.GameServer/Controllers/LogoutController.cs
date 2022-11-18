@@ -2,12 +2,14 @@
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/goodbye")]
 [Produces("text/xml")]
 public class LogoutController : ControllerBase
@@ -23,10 +25,9 @@ public class LogoutController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> OnPost()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
-        User? user = await this.database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
+        User? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
         user.LastLogout = TimeHelper.TimestampMillis;
