@@ -16,6 +16,9 @@ ProjectLighthouse/.vscode/launch.json
 .editorconfig
 launchSettings.json
 
+# macOS Junk
+.DS_Store
+
 # Lighthouse junk
 riderModule.iml
 r/
