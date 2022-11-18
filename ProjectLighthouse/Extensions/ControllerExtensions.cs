@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -29,9 +30,13 @@ public static class ControllerExtensions
 
         try
         {
+            // Prevent unescaped ampersands from causing deserialization to fail
+            bodyString = Regex.Replace(bodyString, "&(?!(amp|apos|quot|lt|gt);)", "&amp;");
+
             XmlRootAttribute? root = null;
             if (rootElements.Length > 0)
             {
+                //TODO: This doesn't support root tags with attributes, but it's only used in scenarios where there shouldn't any (UpdateUser and Playlists)
                 string? matchedRoot = rootElements.FirstOrDefault(e => bodyString.StartsWith($@"<{e}>"));
                 if (matchedRoot == null)
                 {
