@@ -184,8 +184,10 @@ public class User
     public string? ApprovedIPAddress { get; set; }
     #nullable disable
 
+    [JsonIgnore]
     public string Language { get; set; } = "en";
 
+    [JsonIgnore]
     public string TimeZone { get; set; } = TimeZoneInfo.Local.Id;
 
     public PrivacyType LevelVisibility { get; set; } = PrivacyType.All;
