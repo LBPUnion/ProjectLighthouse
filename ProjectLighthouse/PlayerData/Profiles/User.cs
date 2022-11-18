@@ -131,6 +131,9 @@ public class User
     public string PlanetHashLBP2 { get; set; } = "";
 
     [JsonIgnore]
+    public string PlanetHashLBP2CC { get; set; } = "";
+
+    [JsonIgnore]
     public string PlanetHashLBP3 { get; set; } = "";
 
     [JsonIgnore]
@@ -227,7 +230,7 @@ public class User
 
     private string serializeEarth(GameVersion gameVersion)
     {
-        return LbpSerializer.StringElement<string>
+        string planets = LbpSerializer.StringElement<string>
         (
             "planets",
             gameVersion switch
@@ -239,6 +242,10 @@ public class User
             },
             true
         );
+        if (gameVersion == GameVersion.LittleBigPlanet2)
+            planets += LbpSerializer.StringElement("crossControlPlanet", this.PlanetHashLBP2CC);
+
+        return planets;
     }
 
     #region Slots
