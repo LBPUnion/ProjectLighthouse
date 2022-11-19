@@ -28,9 +28,7 @@ public class StatisticsController : ControllerBase
     [HttpGet("planetStats")]
     public async Task<IActionResult> PlanetStats()
     {
-        
-    GameVersion getGameVersion = this.GetToken().GameVersion;
-    
+        GameVersion getGameVersion = this.GetToken().GameVersion;
 
         int totalSlotCount = await StatisticsHelper.SlotCountForGame(this.database, getGameVersion);
         int mmPicksCount = await StatisticsHelper.TeamPickCount(this.database);
@@ -43,7 +41,9 @@ public class StatisticsController : ControllerBase
     }
 
     [HttpGet("planetStats/totalLevelCount")]
-    public async Task<IActionResult> TotalLevelCount() {
-int a = await StatisticsHelper.SlotCountForGame(this.database, this.GetToken().GameVersion);
-return this.Ok (a.ToString());
-}}
+    public async Task<IActionResult> TotalLevelCount()
+    {
+        int a = await StatisticsHelper.SlotCountForGame(this.database, this.GetToken().GameVersion);
+        return this.Ok(a.ToString());
+    }
+}
