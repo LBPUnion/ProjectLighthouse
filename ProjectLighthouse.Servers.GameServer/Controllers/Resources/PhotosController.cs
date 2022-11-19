@@ -223,7 +223,9 @@ public class PhotosController : ControllerBase
         }
         foreach (string idStr in photo.PhotoSubjectIds)
         {
-            if (!int.TryParse(idStr, out int subjectId)) throw new InvalidCastException(idStr + " is not a valid number.");
+            if (string.IsNullOrWhiteSpace(idStr)) continue;
+
+            if (!int.TryParse(idStr, out int subjectId)) continue;
 
             this.database.PhotoSubjects.RemoveWhere(p => p.PhotoSubjectId == subjectId);
         }

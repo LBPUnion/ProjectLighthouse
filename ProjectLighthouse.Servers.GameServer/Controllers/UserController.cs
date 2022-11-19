@@ -109,7 +109,7 @@ public class UserController : ControllerBase
         if (update.MehHash != null) user.MehHash = update.MehHash;
 
         if (update.BooHash != null) user.BooHash = update.BooHash;
-        
+
         if (update.Slots != null)
         {
             foreach (UserUpdateSlot? updateSlot in update.Slots)
@@ -130,6 +130,8 @@ public class UserController : ControllerBase
                 loc.Y = updateSlot.Location.Y;
             }
         }
+
+        if (update.PlanetHashLBP2CC != null) user.PlanetHashLBP2CC = update.PlanetHashLBP2CC;
 
         if (update.PlanetHash != null)
         {

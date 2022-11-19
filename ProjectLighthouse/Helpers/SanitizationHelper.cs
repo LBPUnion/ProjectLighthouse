@@ -11,6 +11,8 @@ public static class SanitizationHelper
     private static readonly Dictionary<string, string> charsToReplace = new() {
         {"<", "&lt;"},
         {">", "&gt;"},
+        {"\"", "&quot;"},
+        {"'", "&apos;"},
     };
 
     public static void SanitizeStringsInClass(object? instance)
