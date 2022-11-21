@@ -1,8 +1,10 @@
 ﻿using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor;
 
@@ -12,28 +14,44 @@ public class TwoFactorLoginPage : BaseLayout
     { }
 
     public string Error { get; set; } = "";
+    public string RedirectUrl { get; set; } = "";
 
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet([FromQuery] string? redirect)
     {
+        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        this.RedirectUrl = redirect ?? "~/";
+
+        if (token.Verified) return this.Redirect(this.RedirectUrl);
+
+        User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
+        if (user == null) return this.Redirect("~/login");
+
+        if (!user.IsTwoFactorSetup) return this.Redirect(this.RedirectUrl);
 
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost([FromForm] string? code)
+    public async Task<IActionResult> OnPost([FromForm] string? code, [FromForm] string? redirect)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null) return this.Redirect("~/login");
 
-        if (!user.IsTwoFactorSetup) return this.RedirectToPage(nameof(UserSettingsPage));
+        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        this.RedirectUrl = redirect ?? "~/";
+
+        if (token.Verified) return this.Redirect(this.RedirectUrl);
+
+        User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
+        if (user == null) return this.Redirect("~/login");
 
         if (CryptoHelper.verifyCode(code, user.TwoFactorSecret))
         {
-            user.TwoFactorBackup = null;
-            user.TwoFactorSecret = null;
-
+            token.Verified = true;
             await this.Database.SaveChangesAsync();
 
-            return this.RedirectToPage(nameof(UserSettingsPage));
+            return this.Redirect(this.RedirectUrl);
         }
 
         this.Error = this.Translate(TwoFactorStrings.InvalidCode);

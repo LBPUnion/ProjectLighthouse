@@ -6,6 +6,8 @@ public static class TwoFactorStrings
     public static readonly TranslatableString DisableTwoFactor = create("disable_2fa");
 
     public static readonly TranslatableString TwoFactor = create("2fa");
+    public static readonly TranslatableString TwoFactorDescription = create("2fa_description");
+
     public static readonly TranslatableString TwoFactorRequired = create("2fa_required");
 
     public static readonly TranslatableString DisableTwoFactorDescription = create("disable_2fa_description");

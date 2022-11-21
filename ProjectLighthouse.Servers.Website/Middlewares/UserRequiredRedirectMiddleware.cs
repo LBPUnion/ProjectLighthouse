@@ -1,6 +1,8 @@
 ﻿using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Middlewares;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
 
@@ -17,6 +19,8 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             await this.next(ctx);
             return;
         }
+
+        WebToken token = await database.WebTokens.FirstAsync(t => t.UserId == user.UserId);
 
         // Request ends with a path (e.g. /css/style.css)
         if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)) || pathContains(ctx, "/gameAssets"))
@@ -60,6 +64,11 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
         if (user.TwoFactorRequired && !user.IsTwoFactorSetup && !pathContains(ctx, "/setup2fa"))
         {
             ctx.Response.Redirect("/setup2fa");
+        }
+
+        if (!token.Verified && !pathContains(ctx, "/2fa"))
+        {
+            ctx.Response.Redirect("/2fa");
         }
 
         await this.next(ctx);

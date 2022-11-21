@@ -54,4 +54,7 @@
     <data name="2fa_required" xml:space="preserve">
         <value>You are required to setup 2FA because of your role within this instance.</value>
     </data>
+    <data name="2fa_description" xml:space="preserve">
+        <value>Enter a valid 2FA code to continue</value>
+    </data>
 </root>

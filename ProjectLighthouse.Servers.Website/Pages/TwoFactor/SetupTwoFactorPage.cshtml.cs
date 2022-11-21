@@ -4,6 +4,7 @@ using System.Web;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
@@ -93,6 +94,9 @@ public class SetupTwoFactorPage : BaseLayout
 
     public async Task<IActionResult> OnPost([FromForm] string? code)
     {
+        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
@@ -103,10 +107,11 @@ public class SetupTwoFactorPage : BaseLayout
             List<int> backups = new();
             for (int i = 0; i < 4; i++)
             {
-                backups.Add(RandomNumberGenerator.GetInt32(100_000, 999_999));
+                //generate 4 8-digit codes
+                backups.Add(RandomNumberGenerator.GetInt32(10_000_000, 99_999_999));
             }
             user.TwoFactorBackup = string.Join(",", backups);
-
+            token.Verified = true;
             await this.Database.SaveChangesAsync();
 
             return this.Page();

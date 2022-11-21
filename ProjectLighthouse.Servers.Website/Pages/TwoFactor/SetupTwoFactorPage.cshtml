@@ -37,7 +37,12 @@ else
         <p>@Model.Translate(TwoFactorStrings.BackupCodeDescription)
             <br/>@Model.Translate(TwoFactorStrings.BackupCodeDescription2)
         </p>
-        <h3>@Model.User!.TwoFactorBackup.Replace(",", "<br>")</h3>
+        <h3>
+            @foreach (string backupCode in Model.User!.TwoFactorBackup.Split(","))
+            {
+                @backupCode<br/>
+            }
+        </h3>
         <a class="ui green button" href="/">
             <i class="check icon"></i>
             <span>@Model.Translate(TwoFactorStrings.BackupCodeConfirmation)</span>

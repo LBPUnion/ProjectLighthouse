@@ -14,4 +14,6 @@ public class WebToken
     public string UserToken { get; set; }
 
     public DateTime ExpiresAt { get; set; }
+
+    public bool Verified { get; set; }
 }

@@ -1,15 +1,16 @@
 ﻿@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @{
     string submitUrl = (string?)ViewData["SubmitUrl"] ?? "/2fa";
+    string callbackUrl = (string?)ViewData["CallbackUrl"] ?? "";
     string error = (string?)ViewData["Error"] ?? "";
 }
 
-<form action="@submitUrl" id="2fa-form" method="post">
+<form action="@submitUrl" id="2fa-form" method="post" autocomplete="off">
     @Html.AntiForgeryToken()
     <div class="digits">
         @if (!string.IsNullOrWhiteSpace(error))
             {
-                <div class="ui negative message center aligned">
+                <div class="ui negative message">
                     <div class="header">
                         @Model.Translate(GeneralStrings.Error)
                     </div>
@@ -23,7 +24,8 @@
         <input type="text" maxlength="1" id="digit4"/>
         <input type="text" maxlength="1" id="digit5"/>
         <input type="text" maxlength="1" id="digit6"/>
-        <input type="hidden" name="code" id="code">
+        <input type="hidden" name="code" id="code"/>
+        <input type="hidden" name="redirect" value="@callbackUrl">
         @* TODO implement backup code entry *@
     </div>
 </form>
@@ -36,8 +38,32 @@ document.querySelector(".digits").addEventListener("keydown", function(event){
         }
     }
 });
-document.querySelector(".digits").addEventListener("input", function({ target, data }){
+document.querySelector(".digits").addEventListener("paste", function (e){
+    e.preventDefault();
+    // common browser -> e.originalEvent.clipboardData
+    // uncommon browser -> window.clipboardData
+    const clipboardData = e.clipboardData || e.originalEvent.clipboardData || window.clipboardData;
+    const pastedData = clipboardData.getData('text');
+    console.log(pastedData);
+    if (pastedData.length !== 6) return;
+    pastedData && (pastedData.replace(/[^0-9]/g,''));
 
+    for (let i = 1; i <= 6; i++){
+        document.getElementById("digit" + i).value = pastedData[i-1];
+    }
+    submitForm();
+});
+
+function submitForm(){
+    let digit = "";
+    for (let i = 1; i <= 6; i++){
+        digit += document.getElementById("digit" + i).value;
+    }
+    document.getElementById("code").value = digit;
+    document.getElementById("2fa-form").submit();
+}
+
+document.querySelector(".digits").addEventListener("input", function({ target, data }){
     // Exclude non-numeric characters (if a value has been entered)
     data && (target.value = data.replace(/[^0-9]/g,''));
 
@@ -48,12 +74,7 @@ document.querySelector(".digits").addEventListener("input", function({ target, d
     if (hasValue && hasSiblingInput){
         target.nextElementSibling.focus();  
     } else if (target.id === "digit6") {
-        let digit = "";
-        for (let i = 1; i <= 6; i++){
-            digit += document.getElementById("digit" + i).value;
-        }
-        document.getElementById("code").value = digit;
-        document.getElementById("2fa-form").submit();
+        submitForm();
     }
 });
 if(performance.navigation.type === 2){

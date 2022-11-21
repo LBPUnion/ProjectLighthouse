@@ -815,6 +815,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("PlanetHashLBP2")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("PlanetHashLBP2CC")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PlanetHashLBP3")
                         .HasColumnType("longtext");
 
@@ -1000,6 +1003,9 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<string>("UserToken")
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("Verified")
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("TokenId");
 

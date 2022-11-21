@@ -125,7 +125,7 @@ function onSubmit(e){
                     </a>
                     @if (Model.ProfileUser.IsTwoFactorSetup)
                     {
-                        <a class="ui red button" href="/disable2fa">
+                        <a class="ui red button" href="/remove2fa">
                             <i class="key icon"></i>
                             @Model.Translate(TwoFactorStrings.DisableTwoFactor)
                         </a>
