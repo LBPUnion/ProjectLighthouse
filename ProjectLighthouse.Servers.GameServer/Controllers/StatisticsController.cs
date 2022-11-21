@@ -39,9 +39,5 @@ public class StatisticsController : ControllerBase
     }
 
     [HttpGet("planetStats/totalLevelCount")]
-    public async Task<IActionResult> TotalLevelCount()
-    {
-        int a = await StatisticsHelper.SlotCountForGame(this.database, this.GetToken().GameVersion);
-        return this.Ok(a.ToString());
-    }
+    public async Task<IActionResult> TotalLevelCount() => this.Ok((await StatisticsHelper.SlotCountForGame(this.database, this.GetToken().GameVersion)).toString());
 }
