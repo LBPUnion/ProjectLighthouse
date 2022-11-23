@@ -241,7 +241,7 @@ public class ScoreController : ControllerBase
             );
 
         // Find your score, since even if you aren't in the top list your score is pinned
-        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Contains(username)).MaxBy(rs => rs.Score.Points);
+        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Split(",").Contains(username)).MaxBy(rs => rs.Score.Points);
 
         // Paginated viewing: if not requesting pageStart, get results around user
         var pagedScores = rankedScores.Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3).Take(Math.Min(pageSize, 30));
