@@ -22,6 +22,25 @@ public class CommentController : ControllerBase
         this.database = database;
     }
 
+    // This endpoint is triggered via the global, slot, user stream endpoint.
+    [HttpGet("userComment/{username}")]
+    [HttpGet("comment/user/{slotId}")]
+    public async Task<IActionResult> GetSingleComment([FromQuery] int commentId, string? username, int? slotId)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403);
+        if (username == null && slotId == null) return this.BadRequest();
+        User? userTarget = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        Slot? slotTarget = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        if (userTarget == null && slotTarget == null) return this.StatusCode(404);
+
+        Comment? comment = await this.database.Comments.Include(c => c.Poster)
+                                .FirstOrDefaultAsync(c => c.CommentId == commentId);
+        if (comment == null) return this.StatusCode(404);
+
+        return this.Ok(comment.Serialize());
+    }
+
     [HttpPost("rateUserComment/{username}")]
     [HttpPost("rateComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)

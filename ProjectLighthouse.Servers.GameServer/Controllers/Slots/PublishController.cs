@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.RecentActivity;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -230,6 +231,9 @@ public class PublishController : ControllerBase
 
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
+
+            await this.database.NewEvent(slot.CreatorId, TargetType.Level, slot.SlotId, EventType.PublishLevel, new long[2] { 1, slot.MinimumPlayers });
+            
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }
 
@@ -265,6 +269,7 @@ public class PublishController : ControllerBase
         {
             await WebhookHelper.SendWebhook("New level published!",
                 $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}");
+            await this.database.NewEvent(slot.CreatorId, TargetType.Level, slot.SlotId, EventType.PublishLevel, new long[2] { 0, slot.MinimumPlayers });
         }
 
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
@@ -287,6 +292,9 @@ public class PublishController : ControllerBase
 
         this.database.Locations.Remove(slot.Location);
         this.database.Slots.Remove(slot);
+        
+        IEnumerable<Activity> activities = this.database.Activity.Where(a => a.TargetType == TargetType.Level).Where(a => a.TargetId == slot.SlotId);
+        this.database.Activity.RemoveRange(activities);
 
         await this.database.SaveChangesAsync();
 

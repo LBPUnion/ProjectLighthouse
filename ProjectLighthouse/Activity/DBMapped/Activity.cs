@@ -47,8 +47,8 @@ public class Activity
     {
         return LbpSerializer.TaggedStringElement("event",
             LbpSerializer.StringElement("timestamp", this.EventTimestamp) +
-            LbpSerializer.StringElement("user_id", this.Actor.Username) +
-            ActivityHelper.ObjectAsGroupId(this.TargetType, this.TargetId, this.database) +
+            LbpSerializer.StringElement("actor", this.Actor.Username) +
+            ActivityHelper.ObjectAsEventElement(this.TargetType, this.TargetId, this.database) +
             FormInteraction()
         , "type", ActivityHelper.EventTypeAsString(this.EventType));
     }

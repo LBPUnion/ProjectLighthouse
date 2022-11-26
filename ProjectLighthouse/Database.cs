@@ -60,12 +60,15 @@ public class Database : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
-    #nullable enable
+#nullable enable
 
-    public async Task NewEvent(User actor, TargetType targetType, int target, EventType eventType, long[] interactions)
+    public async Task NewEvent(int actorId, TargetType targetType, int target, EventType eventType, long[] interactions)
     {
         if (interactions.Count() != 2) return;
-        Activity newAct = new Activity() 
+        User? actor = this.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == actorId);
+        if (actor == null) return;
+
+        Activity newAct = new Activity()
         {
             EventType = eventType,
             TargetType = targetType,
@@ -84,22 +87,40 @@ public class Database : DbContext
             switch (eventType)
             {
                 case EventType.Score:
+                    existingAct.EventTimestamp = TimeHelper.TimestampMillis;
+                    existingAct.Interaction1 = interactions[0];
+                    if (existingAct.Interaction2 == interactions[1]) break;
+                    await this.SaveChangesAsync();
+                    return;
+                case EventType.PublishLevel:
+                    existingAct.EventTimestamp = TimeHelper.TimestampMillis;
                     existingAct.Interaction1 = interactions[0];
                     existingAct.Interaction2 = interactions[1];
                     await this.SaveChangesAsync();
-                    break;
+                    return;
+                case EventType.Review:
+                    existingAct.EventTimestamp = TimeHelper.TimestampMillis;
+                    existingAct.Interaction1 = interactions[0];
+                    existingAct.Interaction2 = TimeHelper.TimestampMillis;
+                    await this.SaveChangesAsync();
+                    return;
                 default:
                     break;
             }
         }
         newAct.Interaction1 = interactions[0];
         newAct.Interaction2 = interactions[1];
+        newAct.EventTimestamp = TimeHelper.TimestampMillis;
+        this.Activity.Add(newAct);
         await this.SaveChangesAsync();
     }
 
-    public async Task DeleteEvent(User actor, TargetType targetType, int target, EventType eventType, long[] interactions)
+    public async Task DeleteEvent(int actorId, TargetType targetType, int target, EventType eventType, long[] interactions)
     {
         if (interactions.Count() != 2) return;
+
+        User? actor = this.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == actorId);
+        if (actor == null) return;
 
         Activity? activity = await this.Activity
             .Where(a => a.EventType == eventType)
@@ -239,29 +260,37 @@ public class Database : DbContext
     {
         if (message.Length > 100) return false;
 
+        TargetType targetType;
+        EventType eventType;
         if (type == CommentType.Profile)
         {
             User? targetUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == targetId);
             if (targetUser == null) return false;
+            targetType = TargetType.Profile;
+            eventType = EventType.CommentUser;
         }
         else
         {
             Slot? targetSlot = await this.Slots.FirstOrDefaultAsync(u => u.SlotId == targetId);
             if (targetSlot == null) return false;
+            targetType = TargetType.Level;
+            eventType = EventType.CommentLevel;
         }
 
-        this.Comments.Add
-        (
-            new Comment
-            {
-                PosterUserId = userId,
-                TargetId = targetId,
-                Type = type,
-                Message = message,
-                Timestamp = TimeHelper.UnixTimeMilliseconds(),
-            }
-        );
+        Comment comment = new Comment
+        {
+            PosterUserId = userId,
+            TargetId = targetId,
+            Type = type,
+            Message = message,
+            Timestamp = TimeHelper.UnixTimeMilliseconds(),
+        };
+
+        this.Comments.Add(comment);
         await this.SaveChangesAsync();
+
+        await this.NewEvent(comment.PosterUserId, targetType, targetId, eventType, new long[2] { comment.CommentId, 0 });
+
         return true;
     }
 
@@ -280,6 +309,8 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
+
+        await this.NewEvent(userId, TargetType.Profile, heartedUser.UserId, EventType.HeartUser, new long[2]);
     }
 
     public async Task UnheartUser(int userId, User heartedUser)
@@ -288,6 +319,8 @@ public class Database : DbContext
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
 
         await this.SaveChangesAsync();
+
+        await this.DeleteEvent(userId, TargetType.Profile, heartedUser.UserId, EventType.HeartUser, new long[2]);
     }
 
     public async Task HeartPlaylist(int userId, Playlist heartedPlaylist)
@@ -327,6 +360,8 @@ public class Database : DbContext
         );
 
         await this.SaveChangesAsync();
+
+        await this.NewEvent(userId, TargetType.Level, heartedSlot.SlotId, EventType.HeartLevel, new long[2]);
     }
 
     public async Task UnheartLevel(int userId, Slot heartedSlot)
@@ -335,6 +370,8 @@ public class Database : DbContext
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
 
         await this.SaveChangesAsync();
+
+        await this.DeleteEvent(userId, TargetType.Level, heartedSlot.SlotId, EventType.HeartLevel, new long[2]);
     }
 
     public async Task QueueLevel(int userId, Slot queuedSlot)
@@ -510,7 +547,7 @@ public class Database : DbContext
             await this.SaveChangesAsync();
             return null;
         }
-        
+
         return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
     }
 
@@ -535,7 +572,7 @@ public class Database : DbContext
         foreach (GameToken token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
         {
             User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
-            if(user != null) user.LastLogout = TimeHelper.TimestampMillis;
+            if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
             this.GameTokens.Remove(token);
         }
         this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
@@ -584,6 +621,7 @@ public class Database : DbContext
         this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
         this.Reviews.RemoveRange(this.Reviews.Where(r => r.ReviewerId == user.UserId));
         this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));
+        this.Activity.RemoveRange(this.Activity.Include(a => a.Actor).Where(a => a.Actor == user));
 
         this.Users.Remove(user);
 
@@ -595,7 +633,10 @@ public class Database : DbContext
         if (slot.Location != null) this.Locations.Remove(slot.Location);
         this.Slots.Remove(slot);
 
+        IEnumerable<Activity> activities = this.Activity.Where(a => a.TargetType == TargetType.Level).Where(a => a.TargetId == slot.SlotId);
+        this.Activity.RemoveRange(activities);
+
         if (saveChanges) await this.SaveChangesAsync();
     }
-    #nullable disable
+#nullable disable
 }

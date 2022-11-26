@@ -24,6 +24,16 @@ public class ReviewController : ControllerBase
         this.database = database;
     }
 
+    [HttpGet("review/user/{slotId:int}/{userName}")]
+    public async Task<IActionResult> GetReview(int slotId, string userName)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403);
+        if (userName == null) return this.BadRequest();
+        Review? targetReview = await this.database.Reviews.Include(r => r.Reviewer).FirstOrDefaultAsync(r => r.SlotId == slotId && r.Reviewer!.Username == userName);
+        return this.Ok(targetReview?.Serialize());
+    }
+
     // LBP1 rating
     [HttpPost("rate/user/{slotId:int}")]
     public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
@@ -50,6 +60,8 @@ public class ReviewController : ControllerBase
         ratedLevel.RatingLBP1 = Math.Max(Math.Min(5, rating), 0);
 
         await this.database.SaveChangesAsync();
+
+        await this.database.NewEvent(slot.CreatorId, TargetType.Level, slot.SlotId, EventType.LBP1Rate, new long[2] { rating, 0 });
 
         return this.Ok();
     }
@@ -83,6 +95,8 @@ public class ReviewController : ControllerBase
         if (review != null) review.Thumb = ratedLevel.Rating;
 
         await this.database.SaveChangesAsync();
+
+        await this.database.NewEvent(slot.CreatorId, TargetType.Level, slotId, EventType.DpadRating, new long[2] { rating, 0 });
 
         return this.Ok();
     }
@@ -136,6 +150,8 @@ public class ReviewController : ControllerBase
         ratedLevel.Rating = Math.Clamp(newReview.Thumb, -1, 1);
 
         await this.database.SaveChangesAsync();
+
+        await this.database.NewEvent(ratedLevel.UserId, TargetType.Level, slotId, EventType.Review, new long[2] { ratedLevel.RatedLevelId, TimeHelper.TimestampMillis });
 
         return this.Ok();
     }

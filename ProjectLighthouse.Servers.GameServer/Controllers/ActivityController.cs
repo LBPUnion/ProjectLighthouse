@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.RecentActivity;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.PlayerData;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
@@ -41,7 +42,7 @@ public class ActivityController : ControllerBase
         return this.Ok(StreamBuilder(users, timestamp, endTimestamp));
     }
 
-    [HttpGet("stream/slot/{slotId}")]
+    [HttpGet("stream/slot/user/{slotId}")]
     public IActionResult GetSlotStream([FromQuery] long timestamp, int slotId)
     {
         long endTimestamp = timestamp - 86_400_000; // 1 Day
@@ -50,6 +51,19 @@ public class ActivityController : ControllerBase
         if (slotTarget == null) return this.BadRequest();
 
         return this.Ok(StreamBuilder(slotTarget.SlotId, timestamp, endTimestamp));
+    }
+
+    [HttpGet("stream")]
+    [HttpPost("stream")]
+    public async Task<IActionResult> GetGlobalStream([FromQuery] long timestamp) // I'll put filters here later
+    {
+        long endTimestamp = timestamp - 86_400_000; // 1 Day
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.BadRequest();
+        User? user = this.database.Users.Include(u => u.PlayerEvents.Where(e => e.EventTimestamp <= timestamp && e.EventTimestamp >= endTimestamp)).FirstOrDefault(u => u.UserId == token.UserId);
+        if (user == null) return this.BadRequest();
+
+        return this.Ok(StreamBuilder(new List<User>() {user}, timestamp, endTimestamp));
     }
 
     private string StreamBuilder(List<User> userTargets, long timestamp, long endTimestamp)
@@ -63,7 +77,7 @@ public class ActivityController : ControllerBase
 
     private string StreamBuilder(int slotTarget, long timestamp, long endTimestamp)
     {
-        IEnumerable<Activity> playerEvents = this.database.Activity.Where(a => a.TargetType == TargetType.Level).Where(a => a.TargetId == slotTarget);
+        IEnumerable<Activity> playerEvents = this.database.Activity.Include(a => a.Actor).Where(a => a.TargetType == TargetType.Level).Where(a => a.TargetId == slotTarget);
         return Build(playerEvents, timestamp, endTimestamp);
     }
 
@@ -76,9 +90,15 @@ public class ActivityController : ControllerBase
         StringBuilder groups = new StringBuilder();
         string objects = "";
 
+        List<Slot> slots = new List<Slot>();
+        List<User> users = new List<User>();
+
         List<RASubgroup> subgroups = new List<RASubgroup>();
-        foreach(Activity activity in playerEvents.OrderBy(p => p.EventTimestamp))
+        foreach(Activity activity in playerEvents.OrderByDescending(e => e.EventTimestamp))
         {
+            User? actor = this.database.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == activity.Actor.UserId);
+            if (actor == null) continue;
+            users.Add(actor);
             RASubgroup? subgroup = subgroups
                 .Where(s => s.HostId == activity.TargetId)
                 .Where(s => s.UserId == activity.Actor.Username)
@@ -93,6 +113,12 @@ public class ActivityController : ControllerBase
                 RASubgroup newSubgroup = new RASubgroup();
                 newSubgroup.HostType = activity.TargetType;
                 newSubgroup.HostId = activity.TargetId;
+                if (activity.TargetType == TargetType.Profile)
+                {
+                    User? user =  this.database.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == activity.TargetId);
+                    if (user == null) continue;
+                    newSubgroup.HostUsername = user.Username;
+                }
                 newSubgroup.Timestamp = activity.EventTimestamp;
                 newSubgroup.UserId = activity.Actor.Username;
                 newSubgroup.Events = new List<Activity>();
@@ -108,16 +134,44 @@ public class ActivityController : ControllerBase
             }
         }
 
-        foreach(RASubgroup subgroup in subgroups.OrderBy(s => s.Timestamp))
+        users = users.Distinct().ToList();
+
+        foreach(RASubgroup subgroup in subgroups.OrderByDescending(s => s.Timestamp))
         {
+            object? obj = ActivityHelper.ObjectFinder(this.database, subgroup.HostType, subgroup.HostId);
+            if (obj == null) continue;
+            if (obj as User != null) users.Add(obj as User);
+            else if (obj as Slot != null) slots.Add(obj as Slot);
+            string element;
+            if (subgroup.HostType == TargetType.Profile)
+            {
+                element = LbpSerializer.StringElement("user_id", subgroup.HostUsername);
+            }
+            else
+            {
+                element = LbpSerializer.TaggedStringElement("slot_id", subgroup.HostId, "type", "user");
+            }
             groups.Append(
                 LbpSerializer.TaggedStringElement("group",
                     LbpSerializer.StringElement("timestamp", subgroup.Timestamp) +
-                    ActivityHelper.ObjectAsGroupId(subgroup.HostType, subgroup.HostId, this.database) +
+                    element +
                     LbpSerializer.StringElement("subgroups", subgroup.SerializeSubgroup())
                 , "type", (subgroup.HostType == TargetType.Level ? "level" : "user"))
             );
         }
+
+        string usrstaging = "";
+        foreach(User user in users.Distinct())
+        {
+            usrstaging += user.Serialize(GameVersion.LittleBigPlanet3);
+        }
+
+        string slotstaging = "";
+        foreach(Slot slot in slots.Distinct())
+        {
+            slotstaging += slot.Serialize(GameVersion.LittleBigPlanet2);
+        }
+        objects = LbpSerializer.StringElement("slots", slotstaging) + LbpSerializer.StringElement("users", usrstaging);
 
         return LbpSerializer.StringElement("stream", returnText.ToString() + LbpSerializer.StringElement("groups", groups.ToString()) + objects);
     }

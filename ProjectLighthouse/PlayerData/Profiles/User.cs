@@ -197,6 +197,8 @@ public class User
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;
 
+    [JsonIgnore]
+    [XmlIgnore]
     public virtual ICollection<Activity> PlayerEvents { get; set; }
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)

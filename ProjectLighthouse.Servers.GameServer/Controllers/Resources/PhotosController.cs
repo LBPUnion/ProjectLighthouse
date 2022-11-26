@@ -26,6 +26,16 @@ public class PhotosController : ControllerBase
         this.database = database;
     }
 
+    [HttpGet("photo/{id:int}")]
+    public async Task<IActionResult> SlotPhotos(int id)
+    {
+        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
+        if (token == null) return this.StatusCode(403, "");
+
+        Photo photo = await this.database.Photos.Include(p => p.Creator).FirstAsync(p => p.PhotoId == id);
+        return this.Ok(photo.Serialize());
+    }
+
     [HttpPost("uploadPhoto")]
     public async Task<IActionResult> UploadPhoto()
     {
@@ -126,6 +136,11 @@ public class PhotosController : ControllerBase
         this.database.Photos.Add(photo);
 
         await this.database.SaveChangesAsync();
+
+        if (photo.Slot?.Type == SlotType.User && photo.SlotId != null)
+        {
+            await this.database.NewEvent(photo.CreatorId, TargetType.Level, photo.SlotId ?? 1, EventType.UploadPhoto, new long[2] { photo.PhotoId, 0 });
+        }
 
         await WebhookHelper.SendWebhook
         (

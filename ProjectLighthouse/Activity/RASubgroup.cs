@@ -9,6 +9,7 @@ namespace LBPUnion.ProjectLighthouse.RecentActivity;
 public class RASubgroup
 {
     public int HostId;
+    public string HostUsername = "";
     public TargetType HostType;
 
     public long Timestamp;

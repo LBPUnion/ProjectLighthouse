@@ -35,7 +35,7 @@ public enum EventType
 
 public class ActivityHelper
 {
-    public static string ObjectAsGroupId(TargetType targetType, int targetId, Database database)
+    public static string ObjectAsEventElement(TargetType targetType, int targetId, Database database)
     {
         switch (targetType)
         {
@@ -45,11 +45,28 @@ public class ActivityHelper
                 return LbpSerializer.TaggedStringElement("object_slot_id", targetId, "type", "user");
             case TargetType.Profile:
                 User? user = database.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == targetId);
-                return LbpSerializer.StringElement("object_user_id", user?.Username);
+                return LbpSerializer.StringElement("object_user", user?.Username);
             case TargetType.News:
                 return LbpSerializer.StringElement("news_id", targetId);
         }
     }
+
+    public static string ObjectAsGroupElement(TargetType targetType, int targetId, Database database)
+    {
+        switch (targetType)
+        {
+            default:
+            case TargetType.Level:
+            case TargetType.LBP3TeamPick:
+                return LbpSerializer.TaggedStringElement("slot_id", targetId, "type", "user");
+            case TargetType.Profile:
+                User? user = database.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == targetId);
+                return LbpSerializer.StringElement("user_id", user?.Username);
+            case TargetType.News:
+                return LbpSerializer.StringElement("news_id", targetId);
+        }
+    }
+
 
     public static string EventTypeAsString(EventType actionType)
     {
