@@ -169,9 +169,14 @@ div.cardStatsUnderTitle > span {
     outline: none;
 }
 
+.digits input {
+    user-select: text;
+}
+
 .digits {
     padding: 20px;
     display: inline-block;
+    user-select: none;
 }
 
 /* #endregion */

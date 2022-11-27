@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -98,8 +99,14 @@ public static class CryptoHelper
         return Base32Encoding.ToString(rand);
     }
 
-    public static bool verifyCode(string code, string secret)
+    private static bool VerifyBackup(string code, string backups) => backups.Split(",").Any(backup => ValuesEqual(code, backup));
+
+    public static bool VerifyCode(string code, string secret, string backups = "")
     {
+        if (!string.IsNullOrEmpty(backups) && code.Length == 8) return VerifyBackup(code, backups);
+
+        if (code.Length != 6) return false;
+        
         long window = TimeHelper.Timestamp / 30;
 
         byte[] secretBytes = Base32Encoding.ToBytes(secret);

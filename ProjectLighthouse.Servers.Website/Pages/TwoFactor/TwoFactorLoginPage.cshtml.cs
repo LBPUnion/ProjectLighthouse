@@ -46,7 +46,13 @@ public class TwoFactorLoginPage : BaseLayout
         User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
         if (user == null) return this.Redirect("~/login");
 
-        if (CryptoHelper.verifyCode(code, user.TwoFactorSecret))
+        if (!user.IsTwoFactorSetup)
+        {
+            token.Verified = true;
+            await this.Database.SaveChangesAsync();
+        }
+
+        if (CryptoHelper.VerifyCode(code, user.TwoFactorSecret, user.TwoFactorBackup))
         {
             token.Verified = true;
             await this.Database.SaveChangesAsync();
@@ -54,7 +60,7 @@ public class TwoFactorLoginPage : BaseLayout
             return this.Redirect(this.RedirectUrl);
         }
 
-        this.Error = this.Translate(TwoFactorStrings.InvalidCode);
+        this.Error = this.Translate(code?.Length == 8 ? TwoFactorStrings.InvalidCode : TwoFactorStrings.InvalidBackupCode);
         return this.Page();
     }
 }

@@ -41,7 +41,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
-        if (ServerConfiguration.Instance.Mail.MailEnabled)
+        if (ServerConfiguration.Instance.Mail.MailEnabled && !user.EmailAddressVerified)
         {
             // The normal flow is for users to set their email during login so just force them to log out
             if (user.EmailAddress == null)
@@ -61,14 +61,29 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
         }
 
         //TODO additional check if two factor is enabled
-        if (user.TwoFactorRequired && !user.IsTwoFactorSetup && !pathContains(ctx, "/setup2fa"))
+        Console.WriteLine(user.TwoFactorRequired);
+        Console.WriteLine(user.IsTwoFactorSetup);
+        if (user.TwoFactorRequired && !user.IsTwoFactorSetup)
         {
-            ctx.Response.Redirect("/setup2fa");
+            if (!pathContains(ctx, "/setup2fa"))
+            {
+                ctx.Response.Redirect("/setup2fa");
+                return;
+            }
+
+            await this.next(ctx);
+            return;
         }
 
-        if (!token.Verified && !pathContains(ctx, "/2fa"))
+        if (!token.Verified)
         {
-            ctx.Response.Redirect("/2fa");
+            if (!pathContains(ctx, "/2fa"))
+            {
+                ctx.Response.Redirect("/2fa");
+                return;
+            }
+            await this.next(ctx);
+            return;
         }
 
         await this.next(ctx);

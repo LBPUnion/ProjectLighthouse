@@ -29,7 +29,7 @@ public class DisableTwoFactorPage : BaseLayout
 
         if (!user.IsTwoFactorSetup) return this.RedirectToPage(nameof(UserSettingsPage));
 
-        if (CryptoHelper.verifyCode(code, user.TwoFactorSecret))
+        if (CryptoHelper.VerifyCode(code, user.TwoFactorSecret, user.TwoFactorBackup))
         {
             user.TwoFactorBackup = null;
             user.TwoFactorSecret = null;
@@ -39,7 +39,7 @@ public class DisableTwoFactorPage : BaseLayout
             return this.RedirectToPage(nameof(UserSettingsPage));
         }
 
-        this.Error = this.Translate(TwoFactorStrings.InvalidCode);
+        this.Error = this.Translate(code?.Length == 8 ? TwoFactorStrings.InvalidCode : TwoFactorStrings.InvalidBackupCode);
         return this.Page();
     }
 }

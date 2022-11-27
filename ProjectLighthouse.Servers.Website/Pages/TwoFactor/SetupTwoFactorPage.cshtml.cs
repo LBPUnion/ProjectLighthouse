@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -32,8 +33,6 @@ public class SetupTwoFactorPage : BaseLayout
 
         if (user.IsTwoFactorSetup) return this.RedirectToPage(nameof(LandingPage));
 
-        Console.WriteLine(user.IsTwoFactorSetup);
-
         // Don't regenerate the two factor secret if they accidentally refresh the page
         if (string.IsNullOrWhiteSpace(user.TwoFactorSecret)) user.TwoFactorSecret = CryptoHelper.GenerateTotpSecret();
 
@@ -64,8 +63,8 @@ public class SetupTwoFactorPage : BaseLayout
                 int offsetY = y + offset;
 
                 bool module =
-                    qrCodeData.ModuleMatrix[((offsetY + pixelsPerModule) / pixelsPerModule - 1)][
-                        ((offsetX + pixelsPerModule) / pixelsPerModule - 1)];
+                    qrCodeData.ModuleMatrix[(offsetY + pixelsPerModule) / pixelsPerModule - 1][
+                        (offsetX + pixelsPerModule) / pixelsPerModule - 1];
                 if (module)
                 {
                     span[x].X = dark.R / 255f;
@@ -102,13 +101,19 @@ public class SetupTwoFactorPage : BaseLayout
 
         if (user.IsTwoFactorSetup) return this.RedirectToPage(nameof(LandingPage));
 
-        if (CryptoHelper.verifyCode(code, user.TwoFactorSecret))
+        if (CryptoHelper.VerifyCode(code, user.TwoFactorSecret))
         {
-            List<int> backups = new();
-            for (int i = 0; i < 4; i++)
+            List<string> backups = new();
+            const string alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+            for (int i = 0; i < 6; i++)
             {
-                //generate 4 8-digit codes
-                backups.Add(RandomNumberGenerator.GetInt32(10_000_000, 99_999_999));
+                StringBuilder backupCode = new();
+                for (int j = 0; j < 10; j++)
+                {
+                    backupCode.Append(alphabet[RandomNumberGenerator.GetInt32(0, alphabet.Length)]);
+                    if (j == 4) backupCode.Append('-');
+                }
+                backups.Add(backupCode.ToString());
             }
             user.TwoFactorBackup = string.Join(",", backups);
             token.Verified = true;
