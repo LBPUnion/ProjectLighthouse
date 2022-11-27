@@ -227,7 +227,7 @@ public class ScoreController : ControllerBase
             .Where(s => s.SlotId == slotId && s.Type == type)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
             .AsEnumerable()
-            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
+            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Split(",").Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
             .ToList()
