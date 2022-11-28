@@ -120,7 +120,7 @@ public class DigestMiddleware : Middleware
             context.Response.Headers.Add("X-Digest-A", serverDigest);
         }
 
-        if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate") && context.Response.ContentType == "text/xml")
+        if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate") && context.Response.ContentType.Contains("text/xml"))
         {
             context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
             context.Response.Headers.Add("Vary", "Accept-Encoding");
