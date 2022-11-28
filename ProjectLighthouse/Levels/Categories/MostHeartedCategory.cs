@@ -10,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Levels.Categories;
 public class MostHeartedCategory : Category
 {
     Random rand = new();
-    public override string Name { get; set; } = "Most Hearted"; //test
+    public override string Name { get; set; } = "Most Hearted";
     public override string Description { get; set; } = "The Most Hearted Content";
     public override string IconHash { get; set; } = "g820607";
     public override string Endpoint { get; set; } = "mostHearted";
