@@ -227,7 +227,7 @@ public class ScoreController : ControllerBase
             .Where(s => s.SlotId == slotId && s.Type == type)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
             .AsEnumerable()
-            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Contains(id)))
+            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Split(",").Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
             .ToList()
@@ -241,7 +241,7 @@ public class ScoreController : ControllerBase
             );
 
         // Find your score, since even if you aren't in the top list your score is pinned
-        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Contains(username)).MaxBy(rs => rs.Score.Points);
+        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Split(",").Contains(username)).MaxBy(rs => rs.Score.Points);
 
         // Paginated viewing: if not requesting pageStart, get results around user
         var pagedScores = rankedScores.Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3).Take(Math.Min(pageSize, 30));
