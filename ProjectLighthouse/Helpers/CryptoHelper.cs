@@ -126,7 +126,7 @@ public static class CryptoHelper
 
     private static long generateTotpCode(byte[] secret, byte[] data)
     {
-        using HMACSHA256 hmac = new(secret);
+        using HMACSHA1 hmac = new(secret);
 
         byte[] computedHash = hmac.ComputeHash(data);
 
@@ -158,7 +158,7 @@ public static class CryptoHelper
         return result == 0;
     }
 
-    public static string GenerateTotpLink(string secret, string issuer, string username) => $"otpauth://totp/{issuer}:{username}?secret={secret}&issuer={issuer}&algorithm=SHA256&digits=6&period=30";
+    public static string GenerateTotpLink(string secret, string issuer, string username) => $"otpauth://totp/{issuer}:{username}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30";
 
     #endregion
 
