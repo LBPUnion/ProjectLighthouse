@@ -18,7 +18,6 @@ public class GameVersionHelper
         "BCUS98148",
         "BCAS20058",
         "BCJS30018",
-        "BCET70011",
         "BCUS98199",
         "BCJB95003",
         "NPEA00241",
@@ -36,6 +35,11 @@ public class GameVersionHelper
         "BCET70002",
         "NPHA80067",
         "NPJA90074",
+        //Move
+        "NPEA00243",
+        "NPUA80479",
+        "NPHA80093",
+        "NPJA00058",
     };
 
     // https://serialstation.com/games/35e69aba-1872-4fd7-9d39-11ce75924040
@@ -75,6 +79,7 @@ public class GameVersionHelper
         "BCET70055",
         "NPEA00449",
         "NPHA80261",
+        "NPUA80967",
     };
 
     // https://www.serialstation.com/games/b62d53d9-fdff-4463-8134-64b81e1cbd50
