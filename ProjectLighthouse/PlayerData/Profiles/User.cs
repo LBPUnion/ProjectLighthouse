@@ -195,7 +195,8 @@ public class User
     public PrivacyType ProfileVisibility { get; set; } = PrivacyType.All;
 
     [JsonIgnore]
-    public bool TwoFactorRequired => this.IsModerator;
+    public bool TwoFactorRequired => ServerConfiguration.Instance.TwoFactorConfiguration.RequireTwoFactor && 
+                                     this.PermissionLevel >= ServerConfiguration.Instance.TwoFactorConfiguration.RequiredTwoFactorLevel;
 
     [JsonIgnore]
     public bool IsTwoFactorSetup => this.TwoFactorBackup?.Length > 0 && this.TwoFactorSecret?.Length > 0;

@@ -34,7 +34,11 @@
             string formatted = TwoFactorStrings.TwoFactorBackup.Translate(Model.GetLanguage(), opening, closing);
             <div class="ui divider"></div>
             <div>@Html.Raw(formatted)</div>
-            <input type="text" maxlength="11" placeholder="XXXXX-XXXXX" name="backup" id="backup" style="display:none"/>
+            <div id="backup" style="display:none">
+                <input class="backup" type="text" maxlength="11" placeholder="XXXXX-XXXXX" name="backup" id="backup-input"/>
+                <div class="ui divider fitted hidden"></div>
+                <button class="ui green button" type="submit">Submit</button>
+            </div>
         }
     </div>
 </form>
@@ -42,8 +46,8 @@
 
 @if (allowBackupCodes)
 {
-    <text>
-document.getElementById("backup-link").addEventListener("click", function (e){
+<text>
+document.getElementById("backup-link").addEventListener("click", function (){
     let backupInput = document.getElementById("backup"); 
     if (backupInput.style.display === "none"){
         backupInput.style.display = "";
@@ -51,7 +55,7 @@ document.getElementById("backup-link").addEventListener("click", function (e){
         backupInput.style.display = "none";
     }
 });
-    </text>
+</text>
 }
 
 document.querySelector(".digits").addEventListener("keydown", function(event){
@@ -63,6 +67,7 @@ document.querySelector(".digits").addEventListener("keydown", function(event){
     }
 });
 document.querySelector(".digits").addEventListener("paste", function (e){
+    if (e.target.classList.contains("backup")) return;
     e.preventDefault();
     // common browser -> e.originalEvent.clipboardData
     // uncommon browser -> window.clipboardData
@@ -83,11 +88,16 @@ function submitForm(){
     for (let i = 1; i <= 6; i++){
         digit += document.getElementById("digit" + i).value;
     }
+    
     document.getElementById("code").value = digit;
+    // if a user submits a regular code, reset the backup
+    if (document.getElementById("backup-input"))
+        document.getElementById("backup-input").value = "";
     document.getElementById("2fa-form").submit();
 }
 
 document.querySelector(".digits").addEventListener("input", function({ target, data }){
+    if (data && target.classList.contains("backup")) return;
     // Exclude non-numeric characters (if a value has been entered)
     data && (target.value = data.replace(/[^0-9]/g,''));
 
@@ -101,7 +111,6 @@ document.querySelector(".digits").addEventListener("input", function({ target, d
 
     if (hasValue && hasSiblingInput){
         target.nextElementSibling.focus();
-        console.log("next sibling");
     }
 });
 if(performance.navigation.type === 2){

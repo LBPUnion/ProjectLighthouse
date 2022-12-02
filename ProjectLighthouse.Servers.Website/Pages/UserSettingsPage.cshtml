@@ -114,31 +114,37 @@ function onSubmit(e){
                         </select>
                     </div>
                 }
+                @if (Model.User == Model.ProfileUser)
+                {
+                    <div class="field">
+                        <label style="text-align: left">Authentication</label>
+                        <a class="ui blue button" href="/passwordReset">
+                            <i class="key icon"></i>
+                            @Model.Translate(GeneralStrings.ResetPassword)
+                        </a>
+                        @if (ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled)
+                        {
+                            @if (Model.ProfileUser.IsTwoFactorSetup)
+                            {
+                                <a class="ui red button" href="/remove2fa">
+                                    <i class="lock open icon"></i>
+                                    @Model.Translate(TwoFactorStrings.DisableTwoFactor)
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="ui green button" href="/setup2fa">
+                                    <i class="lock icon"></i>
+                                    @Model.Translate(TwoFactorStrings.EnableTwoFactor)
+                                </a>
+                            }
+                        }
+                    </div>
+                }
+                <div class="ui divider"></div>
                 <button class="ui button green" tabindex="0">Save Changes</button>
                 <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
                 <div class="ui divider fitted hidden"></div>
-                @if (Model.User == Model.ProfileUser)
-                {
-                    <a class="ui blue button" href="/passwordReset">
-                        <i class="key icon"></i>
-                        @Model.Translate(GeneralStrings.ResetPassword)
-                    </a>
-                    @if (Model.ProfileUser.IsTwoFactorSetup)
-                    {
-                        <a class="ui red button" href="/remove2fa">
-                            <i class="key icon"></i>
-                            @Model.Translate(TwoFactorStrings.DisableTwoFactor)
-                        </a>
-                    }
-                    else
-                    {
-                        <a class="ui green button" href="/setup2fa">
-                            <i class="key icon"></i>
-                            @Model.Translate(TwoFactorStrings.EnableTwoFactor)
-                        </a>
-                    }
-                    
-                }
             </form>
         </div>
     </div>

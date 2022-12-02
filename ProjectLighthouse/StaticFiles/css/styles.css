@@ -179,6 +179,14 @@ div.cardStatsUnderTitle > span {
     user-select: none;
 }
 
+.digits .backup {
+    display: block;
+    text-align: left;
+    margin: auto;
+    width: 14rem;
+    border-width: 2px;
+}
+
 /* #endregion */
 
 /*#region Comments*/

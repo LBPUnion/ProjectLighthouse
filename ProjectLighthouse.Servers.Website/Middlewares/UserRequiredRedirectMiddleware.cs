@@ -41,7 +41,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
-        if (ServerConfiguration.Instance.Mail.MailEnabled && !user.EmailAddressVerified)
+        if (!user.EmailAddressVerified && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             // The normal flow is for users to set their email during login so just force them to log out
             if (user.EmailAddress == null)
@@ -50,7 +50,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
                 return;
             }
 
-            if (!user.EmailAddressVerified && !pathContains(ctx, "/login/sendVerificationEmail", "/verifyEmail"))
+            if (!pathContains(ctx, "/login/sendVerificationEmail", "/verifyEmail"))
             {
                 ctx.Response.Redirect("/login/sendVerificationEmail");
                 return;
@@ -60,10 +60,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
-        //TODO additional check if two factor is enabled
-        Console.WriteLine(user.TwoFactorRequired);
-        Console.WriteLine(user.IsTwoFactorSetup);
-        if (user.TwoFactorRequired && !user.IsTwoFactorSetup)
+        if (user.TwoFactorRequired && !user.IsTwoFactorSetup && ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled)
         {
             if (!pathContains(ctx, "/setup2fa"))
             {
@@ -75,7 +72,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
-        if (!token.Verified)
+        if (!token.Verified && ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled)
         {
             if (!pathContains(ctx, "/2fa"))
             {

@@ -60,10 +60,10 @@
     <data name="2fa_backup_description" xml:space="preserve">
         <value>Alternatively, you can click {0}here{1} to enter one of your backup codes</value>
     </data>
-    <data name="invalid_timer" xml:space="preserve">
-        <value>Invalid Backup Code</value>
-    </data>
     <data name="backup_download" xml:space="preserve">
         <value>Download backup codes</value>
+    </data>
+    <data name="invalid_backup" xml:space="preserve">
+        <value>Invalid Backup Code</value>
     </data>
 </root>

@@ -5,20 +5,19 @@
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = @Model.Translate(TwoFactorStrings.EnableTwoFactor);
+    Model.Title = Model.Translate(TwoFactorStrings.EnableTwoFactor);
 }
 
 @if (!string.IsNullOrWhiteSpace(Model.QrCode))
 {
     <div class="ui center segment center aligned">
-        <h2>@Model.Translate(TwoFactorStrings.QrTitle)</h2>
         @if (Model.User?.TwoFactorRequired ?? false)
         {
-            <p>@Model.Translate(TwoFactorStrings.TwoFactorRequired)</p>
+            <h3>@Model.Translate(TwoFactorStrings.TwoFactorRequired)</h3>
         }
+        <h2>@Model.Translate(TwoFactorStrings.QrTitle)</h2>
         <img src="@Model.QrCode" alt="2 Factor QR Code"/>
         <p>@Model.Translate(TwoFactorStrings.QrDescription)</p>
-        
         @await Html.PartialAsync("Partials/TwoFactorPartial", new ViewDataDictionary(ViewData)
         {
             {

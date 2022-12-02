@@ -1,4 +1,5 @@
-﻿using LBPUnion.ProjectLighthouse.Helpers;
+﻿using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -14,6 +15,8 @@ public class DisableTwoFactorPage : BaseLayout
 
     public IActionResult OnGet()
     {
+        if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
+
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
@@ -22,24 +25,43 @@ public class DisableTwoFactorPage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost([FromForm] string? code)
+    public async Task<IActionResult> OnPost([FromForm] string? code, [FromForm] string? backup)
     {
+        if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
+
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         if (!user.IsTwoFactorSetup) return this.RedirectToPage(nameof(UserSettingsPage));
 
-        if (CryptoHelper.VerifyCode(code, user.TwoFactorSecret, user.TwoFactorBackup))
+        // if both are null or neither are null, there should only be one at at time
+        if (string.IsNullOrWhiteSpace(code) == string.IsNullOrWhiteSpace(backup))
         {
-            user.TwoFactorBackup = null;
-            user.TwoFactorSecret = null;
-
-            await this.Database.SaveChangesAsync();
-
-            return this.RedirectToPage(nameof(UserSettingsPage));
+            this.Error = this.Translate(TwoFactorStrings.InvalidCode);
+            return this.Page();
         }
 
-        this.Error = this.Translate(code?.Length == 8 ? TwoFactorStrings.InvalidCode : TwoFactorStrings.InvalidBackupCode);
-        return this.Page();
+        if (string.IsNullOrWhiteSpace(backup))
+        {
+            if (!CryptoHelper.VerifyCode(code, user.TwoFactorSecret))
+            {
+                this.Error = this.Translate(TwoFactorStrings.InvalidCode);
+                return this.Page();
+            }
+        }
+        else
+        {
+            if(!CryptoHelper.VerifyBackup(backup, user.TwoFactorBackup))
+            {
+                this.Error = this.Translate(TwoFactorStrings.InvalidBackupCode);
+                return this.Page();
+            }
+        }
+
+        user.TwoFactorBackup = null;
+        user.TwoFactorSecret = null;
+        await this.Database.SaveChangesAsync();
+
+        return this.RedirectToPage(nameof(UserSettingsPage));
     }
 }

@@ -99,12 +99,10 @@ public static class CryptoHelper
         return Base32Encoding.ToString(rand);
     }
 
-    private static bool VerifyBackup(string code, string backups) => backups.Split(",").Any(backup => ValuesEqual(code, backup));
+    public static bool VerifyBackup(string code, string backups) => backups.Split(",").Any(backup => ValuesEqual(code, backup));
 
-    public static bool VerifyCode(string code, string secret, string backups = "")
+    public static bool VerifyCode(string code, string secret)
     {
-        if (!string.IsNullOrEmpty(backups) && code.Length == 8) return VerifyBackup(code, backups);
-
         if (code.Length != 6) return false;
         
         long window = TimeHelper.Timestamp / 30;

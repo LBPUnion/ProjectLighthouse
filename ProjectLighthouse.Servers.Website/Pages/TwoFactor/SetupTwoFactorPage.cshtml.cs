@@ -28,10 +28,12 @@ public class SetupTwoFactorPage : BaseLayout
 
     public async Task<IActionResult> OnGet()
     {
+        if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
+
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        if (user.IsTwoFactorSetup) return this.RedirectToPage(nameof(LandingPage));
+        if (user.IsTwoFactorSetup) return this.Redirect("~/");
 
         // Don't regenerate the two factor secret if they accidentally refresh the page
         if (string.IsNullOrWhiteSpace(user.TwoFactorSecret)) user.TwoFactorSecret = CryptoHelper.GenerateTotpSecret();
@@ -93,18 +95,21 @@ public class SetupTwoFactorPage : BaseLayout
 
     public async Task<IActionResult> OnPost([FromForm] string? code)
     {
+        if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
+
         WebToken? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        if (user.IsTwoFactorSetup) return this.RedirectToPage(nameof(LandingPage));
+        if (user.IsTwoFactorSetup) return this.Redirect("~/");
 
         if (CryptoHelper.VerifyCode(code, user.TwoFactorSecret))
         {
             List<string> backups = new();
             const string alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+            // 6 backup codes, format = [0-9a-z]{5}-[0-9a-z]{5}
             for (int i = 0; i < 6; i++)
             {
                 StringBuilder backupCode = new();
