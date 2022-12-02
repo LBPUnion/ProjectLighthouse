@@ -1,16 +1,18 @@
 #nullable enable
-using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 public class FriendsController : ControllerBase
 {
@@ -24,14 +26,9 @@ public class FriendsController : ControllerBase
     [HttpPost("npdata")]
     public async Task<IActionResult> NPData()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(NPData));
-        NPData? npData = (NPData?)serializer.Deserialize(new StringReader(bodyString));
+        NPData? npData = await this.DeserializeBody<NPData>();
         if (npData == null) return this.BadRequest();
 
         SanitizationHelper.SanitizeStringsInClass(npData);
@@ -73,7 +70,6 @@ public class FriendsController : ControllerBase
 
         if (userAndToken == null) return this.StatusCode(403, "");
 
-        // ReSharper disable once PossibleInvalidOperationException
         User user = userAndToken.Value.Item1;
         GameToken gameToken = userAndToken.Value.Item2;
 

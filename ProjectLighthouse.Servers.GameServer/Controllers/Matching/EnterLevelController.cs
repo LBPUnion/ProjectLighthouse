@@ -1,15 +1,18 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
-//    [Produces("text/plain")]
+[Produces("text/xml")]
 public class EnterLevelController : ControllerBase
 {
     private readonly Database database;
@@ -22,8 +25,7 @@ public class EnterLevelController : ControllerBase
     [HttpPost("play/{slotType}/{slotId:int}")]
     public async Task<IActionResult> PlayLevel(string slotType, int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
@@ -33,13 +35,11 @@ public class EnterLevelController : ControllerBase
         Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
 
-        GameVersion gameVersion = token.GameVersion;
-
         IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);
         VisitedLevel? v;
         if (!visited.Any())
         {
-            switch (gameVersion)
+            switch (token.GameVersion)
             {
                 case GameVersion.LittleBigPlanet2:
                 case GameVersion.LittleBigPlanetVita:
@@ -48,6 +48,9 @@ public class EnterLevelController : ControllerBase
                 case GameVersion.LittleBigPlanet3:
                     slot.PlaysLBP3Unique++;
                     break;
+                case GameVersion.LittleBigPlanet1:
+                case GameVersion.LittleBigPlanetPSP:
+                case GameVersion.Unknown:
                 default: return this.BadRequest();
             }
 
@@ -65,7 +68,7 @@ public class EnterLevelController : ControllerBase
 
         if (v == null) return this.NotFound();
 
-        switch (gameVersion)
+        switch (token.GameVersion)
         {
             case GameVersion.LittleBigPlanet2:
             case GameVersion.LittleBigPlanetVita:
@@ -76,9 +79,9 @@ public class EnterLevelController : ControllerBase
                 slot.PlaysLBP3++;
                 v.PlaysLBP3++;
                 break;
-            case GameVersion.LittleBigPlanetPSP: throw new NotImplementedException();
-            case GameVersion.Unknown:
             case GameVersion.LittleBigPlanet1:
+            case GameVersion.LittleBigPlanetPSP:
+            case GameVersion.Unknown:
             default:
                 return this.BadRequest();
         }
@@ -92,8 +95,7 @@ public class EnterLevelController : ControllerBase
     [HttpPost("enterLevel/{slotType}/{slotId:int}")]
     public async Task<IActionResult> EnterLevel(string slotType, int slotId)
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
+        GameToken token = this.GetToken();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 

@@ -54,7 +54,7 @@ public class SlotSettingsPage : BaseLayout
 
         if (this.User == null) return this.Redirect("~/slot/" + slotId);
 
-        if(!this.User.IsModerator && this.User.UserId != this.Slot.CreatorId) return this.Redirect("~/slot/" + slotId);
+        if (!this.User.IsModerator && this.User.UserId != this.Slot.CreatorId) return this.Redirect("~/slot/" + slotId);
 
         return this.Page();
     }

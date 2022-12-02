@@ -72,7 +72,14 @@ public class LoginController : ControllerBase
             }
         }
 
-        User? user = await this.database.UserFromGameToken(token, true);
+        // The GameToken LINQ statement above is case insensitive so we check that they are equal here
+        if (token.User.Username != npTicket.Username)
+        {
+            Logger.Warn($"Username case does not match for user {npTicket.Username}, expected={token.User.Username}", LogArea.Login);
+            return this.StatusCode(403, "");
+        }
+
+        User? user = await this.database.UserFromGameToken(token);
 
         if (user == null || user.IsBanned)
         {

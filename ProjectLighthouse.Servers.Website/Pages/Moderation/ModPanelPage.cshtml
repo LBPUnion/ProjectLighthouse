@@ -14,7 +14,7 @@
     // Technically, this should never happen but I'm going to handle it anyways.
     if (!Model.User.IsModerator)
     {
-        if(Debugger.IsAttached) Debugger.Break();
+        if (Debugger.IsAttached) Debugger.Break();
         throw new Exception("Tried to render mod panel with user whose not mod somehow???");
     }
 }

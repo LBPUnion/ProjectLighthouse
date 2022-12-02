@@ -54,7 +54,7 @@ public static class StartupTasks
         using Database database = new();
         
         #if !DEBUG
-        if(serverType == ServerType.GameServer)
+        if (serverType == ServerType.GameServer)
         #endif
         migrateDatabase(database);
         

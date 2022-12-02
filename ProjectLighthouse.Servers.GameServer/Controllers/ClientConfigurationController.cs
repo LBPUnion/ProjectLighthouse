@@ -1,14 +1,17 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/plain")]
 public class ClientConfigurationController : ControllerBase
@@ -22,11 +25,8 @@ public class ClientConfigurationController : ControllerBase
 
     [HttpGet("network_settings.nws")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public async Task<IActionResult> NetworkSettings()
+    public IActionResult NetworkSettings()
     {
-        GameToken? token = await this.database.GameTokenFromRequest(this.Request);
-        if (token == null) return this.StatusCode(403, "");
-
         string hostname = ServerConfiguration.Instance.GameApiExternalUrl;
         return this.Ok
         (
@@ -52,7 +52,9 @@ public class ClientConfigurationController : ControllerBase
     [Produces("text/xml")]
     public async Task<IActionResult> GetPrivacySettings()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
+        GameToken token = this.GetToken();
+
+        User? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
         PrivacySettings ps = new()
@@ -71,11 +73,7 @@ public class ClientConfigurationController : ControllerBase
         User? user = await this.database.UserFromGameRequest(this.Request);
         if (user == null) return this.StatusCode(403, "");
 
-        this.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-
-        XmlSerializer serializer = new(typeof(PrivacySettings));
-        PrivacySettings? settings = (PrivacySettings?)serializer.Deserialize(new StringReader(bodyString));
+        PrivacySettings? settings = await this.DeserializeBody<PrivacySettings>();
         if (settings == null) return this.BadRequest();
         
         if (settings.LevelVisibility != null)
