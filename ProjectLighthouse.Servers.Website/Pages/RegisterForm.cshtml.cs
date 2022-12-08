@@ -29,7 +29,7 @@ public class RegisterForm : BaseLayout
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                string token = (string?)this.Request.Query["token"] ?? string.Empty;
+                string? token = this.Request.Query["token"];
                 if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
@@ -95,7 +95,7 @@ public class RegisterForm : BaseLayout
 
         if (this.Request.Query.ContainsKey("token"))
         {
-            await this.Database.RemoveRegistrationToken((string?)this.Request.Query["token"] ?? string.Empty);
+            await this.Database.RemoveRegistrationToken(this.Request.Query["token"]);
         }
 
         User user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
@@ -126,7 +126,7 @@ public class RegisterForm : BaseLayout
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                string token = (string?)this.Request.Query["token"] ?? string.Empty;
+                string? token = this.Request.Query["token"];
                 if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
