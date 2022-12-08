@@ -75,7 +75,7 @@ public class UserEndpoints : ApiEndpointController
             !Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
             return this.NotFound();
 
-        string authHeader = this.Request.Headers["Authorization"];
+        string authHeader = (string?)this.Request.Headers["Authorization"] ?? string.Empty;
         if (string.IsNullOrWhiteSpace(authHeader)) return this.NotFound();
 
         string authToken = authHeader[(authHeader.IndexOf(' ') + 1)..];
