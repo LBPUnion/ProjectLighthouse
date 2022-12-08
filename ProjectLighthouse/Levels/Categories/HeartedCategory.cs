@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Levels.Categories;
 
 public class HeartedCategory : CategoryWithUser
 {
-    public override string Name { get; set; } = "My Hearted Levels";
+    public override string Name { get; set; } = "My Hearted Content";
     public override string Description { get; set; } = "Content you've hearted";
     public override string IconHash { get; set; } = "g820611";
     public override string Endpoint { get; set; } = "hearted";
