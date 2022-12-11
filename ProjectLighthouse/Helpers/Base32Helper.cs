@@ -9,8 +9,8 @@ public static class Base32Encoding
         {
             if(string.IsNullOrEmpty(input)) throw new ArgumentNullException(nameof(input));
 
-            input = input.TrimEnd('='); //remove padding characters
-            int byteCount = input.Length * 5 / 8; //this must be TRUNCATED
+            input = input.TrimEnd('='); // remove padding characters
+            int byteCount = input.Length * 5 / 8; // this must be truncated
             byte[] returnArray = new byte[byteCount];
 
             byte curByte = 0, bitsRemaining = 8;
@@ -35,7 +35,7 @@ public static class Base32Encoding
                 }
             }
 
-            //if we didn't end with a full byte
+            // if we didn't end with a full byte
             if(arrayIndex != byteCount)
             {
                 returnArray[arrayIndex] = curByte;
@@ -73,10 +73,10 @@ public static class Base32Encoding
                 nextChar = (byte)((b << bitsRemaining) & 31);
             }
 
-            //if we didn't end with a full char
+            // if we didn't end with a full char
             if (arrayIndex == charCount) return new string(returnArray);
             returnArray[arrayIndex++] = ValueToChar(nextChar);
-            while(arrayIndex != charCount) returnArray[arrayIndex++] = '='; //padding
+            while(arrayIndex != charCount) returnArray[arrayIndex++] = '='; // padding
 
             return new string(returnArray);
         }
@@ -87,11 +87,11 @@ public static class Base32Encoding
 
             return value switch
             {
-                //65-90 == uppercase letters
+                // 65-90 == uppercase letters
                 < 91 and > 64 => value - 65,
-                //50-55 == numbers 2-7
+                // 50-55 == numbers 2-7
                 < 56 and > 49 => value - 24,
-                //97-122 == lowercase letters
+                // 97-122 == lowercase letters
                 < 123 and > 96 => value - 97,
                 _ => throw new ArgumentException(@"Character is not a Base32 character.", nameof(c)),
             };
