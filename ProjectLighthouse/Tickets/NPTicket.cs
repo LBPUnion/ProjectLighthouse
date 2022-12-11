@@ -3,14 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
-using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Tickets.Data;
+using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -44,6 +42,9 @@ public class NPTicket
 
     public GameVersion GameVersion { get; set; }
 
+    private static ECDomainParameters FromX9EcParams(X9ECParameters param) =>
+        new(param.Curve, param.G, param.N, param.H, param.GetSeed());
+
     private static readonly ECDomainParameters secp224K1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp224k1"));
     private static readonly ECDomainParameters secp192R1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp192r1"));
 
@@ -58,9 +59,6 @@ public class NPTicket
     private ECDomainParameters getCurveParams() => this.IsRpcn() ? secp224K1 : secp192R1;
 
     private ECPoint getPublicKey() => this.IsRpcn() ? rpcnPublic : psnPublic;
-
-    private static ECDomainParameters FromX9EcParams(X9ECParameters param) =>
-        new(param.Curve, param.G, param.N, param.H, param.GetSeed());
 
     private bool ValidateSignature()
     {
@@ -95,8 +93,8 @@ public class NPTicket
         npTicket.IssuedDate = reader.ReadTicketUInt64();
         npTicket.ExpireDate = reader.ReadTicketUInt64();
 
-        ulong uid = reader.ReadTicketUInt64(); // PSN User id, we don't care about this
-        Console.WriteLine(@$"npTicket uid = {uid}");
+        //TODO implement account linking
+        ulong uid = reader.ReadTicketUInt64();
 
         npTicket.Username = reader.ReadTicketString();
 
@@ -116,12 +114,32 @@ public class NPTicket
         Platform platform = npTicket.IsRpcn() ? Platform.RPCS3 : Platform.PS3;
         if (!ident.SequenceEqual(identifierByPlatform[platform]))
         {
-            Console.WriteLine(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ident)} == {Convert.ToHexString(identifierByPlatform[npTicket.Platform])}");
+            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ident)} == {Convert.ToHexString(identifierByPlatform[npTicket.Platform])}", LogArea.Login);
             return false;
         }
 
-        npTicket.ticketSignature = reader.ReadTicketBinary();
+        npTicket.ticketSignature = ParseSignature(reader.ReadTicketBinary());
         return true;
+    }
+
+    // Sometimes psn signatures have one or two extra empty bytes
+    // This is slow but it's better than carelessly chopping 0's
+    private static byte[] ParseSignature(byte[] signature)
+    {
+        for (int i = 0; i <= 2; i++)
+        {
+            try
+            {
+                Asn1Object.FromByteArray(signature);
+                break;
+            }
+            catch
+            {
+                signature = signature.SkipLast(1).ToArray();
+            }
+        }
+
+        return signature;
     }
 
     // Function is here for future use incase we ever need to read more from the ticket
@@ -133,26 +151,32 @@ public class NPTicket
 
         reader.ReadBytes(4); // Skip header
 
-        ushort ticketLen = reader.ReadUInt16BE(); // Ticket length, we don't care about this
+        ushort ticketLen = reader.ReadUInt16BE();
         if (ticketLen != data.Length - 0x8)
         {
-            Console.WriteLine(@$"Ticket length mismatch, expected={ticketLen}, actual={data.Length - 0x8}");
+            Logger.Warn(@$"Ticket length mismatch, expected={ticketLen}, actual={data.Length - 0x8}", LogArea.Login);
             return false;
         }
 
         long bodyStart = reader.BaseStream.Position;
         SectionHeader bodyHeader = reader.ReadSectionHeader();
-        
-        npTicket.ticketBody = data.AsSpan().Slice((int)bodyStart, bodyHeader.Length+4).ToArray();
-        
+
         Logger.Debug($"bodyHeader.Type is {bodyHeader.Type}, index={bodyStart}", LogArea.Login);
 
-        return npTicket.ticketVersion.ToString() switch
+        bool parsedSuccessfully = npTicket.ticketVersion.ToString() switch
         {
             "2.1" => Read21Ticket(npTicket, reader),
             "3.0" => Read30Ticket(npTicket, reader),
             _ => throw new NotImplementedException(),
         };
+
+        if (!parsedSuccessfully) return false;
+
+        npTicket.ticketBody = npTicket.IsRpcn() ?
+            data.AsSpan().Slice((int)bodyStart, bodyHeader.Length + 4).ToArray() :
+            data.AsSpan()[..(bodyHeader.Length + 0x1C)].ToArray();
+
+        return true;
     }
 
     /// <summary>
