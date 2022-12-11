@@ -14,8 +14,8 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class InfluxHelper
 {
-    public static readonly InfluxDBClient Client = InfluxDBClientFactory.Create
-        (url: ServerConfiguration.Instance.InfluxDB.Url, token: ServerConfiguration.Instance.InfluxDB.Token);
+    public static readonly InfluxDBClient Client = new(url: ServerConfiguration.Instance.InfluxDB.Url,
+        token: ServerConfiguration.Instance.InfluxDB.Token);
 
     private static readonly List<GameVersion> gameVersions = new()
     {
