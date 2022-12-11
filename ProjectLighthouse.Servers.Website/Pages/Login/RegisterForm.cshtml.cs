@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +19,8 @@ public class RegisterForm : BaseLayout
 
     public string? Error { get; private set; }
 
+    public string? Username { get; set; }
+
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
     public async Task<IActionResult> OnPost(string username, string password, string confirmPassword, string emailAddress)
@@ -28,8 +29,16 @@ public class RegisterForm : BaseLayout
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
+                string token = this.Request.Query["token"];
+                if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
+
+                string? tokenUsername = await this.Database.RegistrationTokens.Where(r => r.Token == token)
+                    .Select(u => u.Username)
+                    .FirstOrDefaultAsync();
+                if (tokenUsername == null) return this.BadRequest();
+
+                username = tokenUsername;
             }
             else
             {
@@ -110,15 +119,21 @@ public class RegisterForm : BaseLayout
 
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet()
     {
         this.Error = string.Empty;
         if (ServerConfiguration.Instance.Authentication.PrivateRegistration)
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                if (!this.Database.IsRegistrationTokenValid(this.Request.Query["token"]))
+                string token = this.Request.Query["token"];
+                if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
+
+                string? tokenUsername = await this.Database.RegistrationTokens.Where(r => r.Token == token)
+                    .Select(u => u.Username)
+                    .FirstAsync();
+                this.Username = tokenUsername;
             }
             else
             {

@@ -68,7 +68,8 @@ public class UserEndpoints : ApiEndpointController
     }
 
     [HttpPost("user/inviteToken")]
-    public async Task<IActionResult> CreateUserInviteToken()
+    [HttpPost("user/inviteToken/{username}")]
+    public async Task<IActionResult> CreateUserInviteToken([FromRoute] string? username)
     {
         if (!Configuration.ServerConfiguration.Instance.Authentication.PrivateRegistration &&
             !Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
@@ -82,10 +83,17 @@ public class UserEndpoints : ApiEndpointController
         APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
         if (apiKey == null) return this.StatusCode(403, null);
 
+        if (!string.IsNullOrWhiteSpace(username))
+        {
+            bool userExists = await this.database.Users.AnyAsync(u => u.Username == username);
+            if (userExists) return this.BadRequest();
+        }
+
         RegistrationToken token = new()
         {
             Created = DateTime.Now,
             Token = CryptoHelper.GenerateAuthToken(),
+            Username = username,
         };
 
         this.database.RegistrationTokens.Add(token);

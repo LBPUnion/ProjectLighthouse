@@ -873,6 +873,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Token")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Username")
+                        .HasColumnType("longtext");
+
                     b.HasKey("TokenId");
 
                     b.ToTable("RegistrationTokens");
