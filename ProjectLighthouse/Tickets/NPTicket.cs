@@ -16,6 +16,11 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 using Version = LBPUnion.ProjectLighthouse.Types.Version;
+#if DEBUG
+using System.Text;
+using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Configuration;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Tickets;
 
@@ -85,6 +90,26 @@ public class NPTicket
         },
     };
 
+    // Sometimes psn signatures have one or two extra empty bytes
+    // This is slow but it's better than carelessly chopping 0's
+    private static byte[] ParseSignature(byte[] signature)
+    {
+        for (int i = 0; i <= 2; i++)
+        {
+            try
+            {
+                Asn1Object.FromByteArray(signature);
+                break;
+            }
+            catch
+            {
+                signature = signature.SkipLast(1).ToArray();
+            }
+        }
+
+        return signature;
+    }
+
     private static bool Read21Ticket(NPTicket npTicket, TicketReader reader)
     {
         reader.ReadTicketString(); // "Serial id", but its apparently not what we're looking for
@@ -122,28 +147,44 @@ public class NPTicket
         return true;
     }
 
-    // Sometimes psn signatures have one or two extra empty bytes
-    // This is slow but it's better than carelessly chopping 0's
-    private static byte[] ParseSignature(byte[] signature)
+    private static bool Read30Ticket(NPTicket npTicket, TicketReader reader)
     {
-        for (int i = 0; i <= 2; i++)
+        reader.ReadTicketString(); // "Serial id", but its apparently not what we're looking for
+
+        npTicket.IssuerId = reader.ReadTicketUInt32();
+        npTicket.IssuedDate = reader.ReadTicketUInt64();
+        npTicket.ExpireDate = reader.ReadTicketUInt64();
+
+        ulong uid = reader.ReadTicketUInt64();
+
+        npTicket.Username = reader.ReadTicketString();
+
+        reader.ReadTicketString(); // Country
+        reader.ReadTicketString(); // Domain
+
+        npTicket.titleId = reader.ReadTicketString();
+
+        reader.ReadSectionHeader(); // date of birth section
+        reader.ReadBytes(4); // 4 bytes for year month and day
+        reader.ReadTicketUInt32();
+
+        reader.ReadSectionHeader(); // empty section?
+        reader.ReadTicketEmpty();
+
+        reader.ReadSectionHeader(); // footer header
+
+        byte[] ident = reader.ReadTicketBinary(); // 4 byte identifier
+        Platform platform = npTicket.IsRpcn() ? Platform.RPCS3 : Platform.PS3;
+        if (!ident.SequenceEqual(identifierByPlatform[platform]))
         {
-            try
-            {
-                Asn1Object.FromByteArray(signature);
-                break;
-            }
-            catch
-            {
-                signature = signature.SkipLast(1).ToArray();
-            }
+            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ident)} == {Convert.ToHexString(identifierByPlatform[npTicket.Platform])}",
+                LogArea.Login);
+            return false;
         }
 
-        return signature;
+        npTicket.ticketSignature = ParseSignature(reader.ReadTicketBinary());
+        return true;
     }
-
-    // Function is here for future use incase we ever need to read more from the ticket
-    private static bool Read30Ticket(NPTicket npTicket, TicketReader reader) => Read21Ticket(npTicket, reader);
 
     private static bool ReadTicket(byte[] data, NPTicket npTicket, TicketReader reader)
     {
@@ -165,16 +206,16 @@ public class NPTicket
 
         bool parsedSuccessfully = npTicket.ticketVersion.ToString() switch
         {
-            "2.1" => Read21Ticket(npTicket, reader),
-            "3.0" => Read30Ticket(npTicket, reader),
+            "2.1" => Read21Ticket(npTicket, reader), // used by ps3
+            "3.0" => Read30Ticket(npTicket, reader), // used by ps vita
             _ => throw new NotImplementedException(),
         };
 
         if (!parsedSuccessfully) return false;
 
-        npTicket.ticketBody = npTicket.IsRpcn() ?
-            data.AsSpan().Slice((int)bodyStart, bodyHeader.Length + 4).ToArray() :
-            data.AsSpan()[..(bodyHeader.Length + 0x1C)].ToArray();
+        npTicket.ticketBody = npTicket.IsRpcn()
+            ? data.AsSpan().Slice((int)bodyStart, bodyHeader.Length + 4).ToArray()
+            : data.AsSpan()[..data.AsSpan().IndexOf(npTicket.ticketSignature)].ToArray();
 
         return true;
     }
@@ -215,6 +256,17 @@ public class NPTicket
             if (!validTicket)
             {
                 Logger.Warn($"Failed to parse ticket from {npTicket.Username}", LogArea.Login);
+                return null;
+            }
+
+            if ((long)npTicket.IssuedDate > TimeHelper.TimestampMillis)
+            {
+                Logger.Warn($"Ticket isn't valid yet from {npTicket.Username}", LogArea.Login);
+                return null;
+            }
+            if (TimeHelper.TimestampMillis > (long)npTicket.ExpireDate)
+            {
+                Logger.Warn($"Ticket has expired from {npTicket.Username}", LogArea.Login);
                 return null;
             }
 

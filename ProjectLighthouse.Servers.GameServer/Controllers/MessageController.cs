@@ -61,7 +61,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             $"token.Used: {token.Used}\n" +
             $"token.UserLocation: {token.UserLocation}\n" +
             $"token.GameVersion: {token.GameVersion}\n" +
-            $"token.ExpiresAt: {token.ExpiresAt.ToString(CultureInfo.CurrentCulture)}\n" +
+            $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
             "---DEBUG INFO---" +
             #endif
             (string.IsNullOrWhiteSpace(announceText) ? "" : "\n")
