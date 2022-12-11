@@ -45,17 +45,17 @@ public class NPTicket
     public GameVersion GameVersion { get; set; }
 
     private static readonly ECDomainParameters secp224K1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp224k1"));
-    private static readonly ECDomainParameters secp192K1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp192k1"));
+    private static readonly ECDomainParameters secp192R1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp192r1"));
 
     private static readonly ECPoint rpcnPublic = secp224K1.Curve.CreatePoint(
         new BigInteger("b07bc0f0addb97657e9f389039e8d2b9c97dc2a31d3042e7d0479b93", 16),
         new BigInteger("d81c42b0abdf6c42191a31e31f93342f8f033bd529c2c57fdb5a0a7d", 16));
 
-    private static readonly ECPoint psnPublic = secp192K1.Curve.CreatePoint(
-        new BigInteger("5e2d338f12e31a9350ca42854296bebf58c2dacbfd13bf2a", 16),
-        new BigInteger("1a4fa06072821dd1e6f8581aba64f725e7d0c8a061d408eb", 16));
+    private static readonly ECPoint psnPublic = secp192R1.Curve.CreatePoint(
+        new BigInteger("39c62d061d4ee35c5f3f7531de0af3cf918346526edac727", 16),
+        new BigInteger("a5d578b55113e612bf1878d4cc939d61a41318403b5bdf86", 16));
 
-    private ECDomainParameters getCurveParams() => this.IsRpcn() ? secp224K1 : secp192K1;
+    private ECDomainParameters getCurveParams() => this.IsRpcn() ? secp224K1 : secp192R1;
 
     private ECPoint getPublicKey() => this.IsRpcn() ? rpcnPublic : psnPublic;
 
@@ -64,16 +64,8 @@ public class NPTicket
 
     private bool ValidateSignature()
     {
-        //TODO support psn
-        // if (!this.IsRpcn()) return true;
-        Console.WriteLine("pub key: " + this.getPublicKey());
-        Console.WriteLine("is rpcn: " + this.IsRpcn());
-        Console.WriteLine("curve params: " + this.getCurveParams().H);
-        Console.WriteLine("curve params: " + this.getCurveParams().Curve.B);
-
         ECPublicKeyParameters pubKey = new(this.getPublicKey(), this.getCurveParams());
         string algo = this.IsRpcn() ? "SHA-224" : "SHA-1";
-        Console.WriteLine(@"using algo " + algo);
 
         ISigner signer = SignerUtilities.GetSigner($"{algo}withECDSA");
         signer.Init(false, pubKey);
