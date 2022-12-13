@@ -1,0 +1,26 @@
+﻿@page "/2fa"
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor.TwoFactorLoginPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(TwoFactorStrings.TwoFactor);
+}
+
+
+<div class="ui center segment center aligned">
+    <h2>@Model.Translate(TwoFactorStrings.TwoFactor)</h2>
+    <p>@Model.Translate(TwoFactorStrings.TwoFactorDescription)</p>
+    @await Html.PartialAsync("Partials/TwoFactorPartial", new ViewDataDictionary(ViewData)
+    {
+        {
+            "SubmitUrl", "/2fa"
+        },
+        {
+            "Error", Model.Error
+        },
+        {
+            "CallbackUrl", Model.RedirectUrl
+        }
+    })
+</div>

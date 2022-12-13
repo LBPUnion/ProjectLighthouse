@@ -194,6 +194,19 @@ public class User
 
     public PrivacyType ProfileVisibility { get; set; } = PrivacyType.All;
 
+    [JsonIgnore]
+    public bool TwoFactorRequired => ServerConfiguration.Instance.TwoFactorConfiguration.RequireTwoFactor && 
+                                     this.PermissionLevel >= ServerConfiguration.Instance.TwoFactorConfiguration.RequiredTwoFactorLevel;
+
+    [JsonIgnore]
+    public bool IsTwoFactorSetup => this.TwoFactorBackup?.Length > 0 && this.TwoFactorSecret?.Length > 0;
+
+    [JsonIgnore]
+    public string TwoFactorSecret { get; set; } = "";
+
+    [JsonIgnore]
+    public string TwoFactorBackup { get; set; } = "";
+
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;
 

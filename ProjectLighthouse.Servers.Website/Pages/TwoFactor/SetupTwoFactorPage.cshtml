@@ -1,0 +1,87 @@
+﻿@page "/setup2fa"
+@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor.SetupTwoFactorPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(TwoFactorStrings.EnableTwoFactor);
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.QrCode))
+{
+    <div class="ui center segment center aligned">
+        @if (Model.User?.TwoFactorRequired ?? false)
+        {
+            <h3>@Model.Translate(TwoFactorStrings.TwoFactorRequired)</h3>
+        }
+        <h2>@Model.Translate(TwoFactorStrings.QrTitle)</h2>
+        <img src="@Model.QrCode" alt="2 Factor QR Code"/>
+        <p>@Model.Translate(TwoFactorStrings.QrDescription)</p>
+        @await Html.PartialAsync("Partials/TwoFactorPartial", new ViewDataDictionary(ViewData)
+        {
+            {
+                "SubmitUrl", "/setup2fa"
+            },
+            {
+                "Error", Model.Error
+            },
+            {
+                "BackupCodes", false
+            },
+        })
+    </div>
+}
+else
+{
+    <div class="ui center segment center aligned">
+        <h1 class="ui negative message">IMPORTANT</h1>
+        <h2>@Model.Translate(TwoFactorStrings.BackupCodeTitle)</h2>
+        <p>@Model.Translate(TwoFactorStrings.BackupCodeDescription)
+            <br/>@Model.Translate(TwoFactorStrings.BackupCodeDescription2)
+        </p>
+        <h3 id="codes">
+            @foreach (string backupCode in Model.User!.TwoFactorBackup.Split(","))
+            {
+                @backupCode<br/>
+            }
+        </h3>
+        <a class="ui blue button" onclick="saveCodes('@(ServerConfiguration.Instance.Customization.ServerName + "-backup-codes.txt")')">
+            <i class="arrow circle down icon"></i>
+            <span>@Model.Translate(TwoFactorStrings.DownloadBackupCodes)</span>
+        </a>
+        <a class="ui green button" href="/">
+            <i class="check icon"></i>
+            <span>@Model.Translate(TwoFactorStrings.BackupCodeConfirmation)</span>
+        </a>
+    </div>
+    <script>
+        function saveCodes(filename){
+            let codes = document.getElementById("codes");
+            let codeArray = codes.innerText.split("\n");
+            let serverName = "@ServerConfiguration.Instance.Customization.ServerName";
+            let username = "@Model.User.Username";
+            let data = "These are your " + serverName + " backup codes for account " + username + ".  Keep them safe!\n\n"
+            for (const code of codeArray){
+                data += code + "\n";
+            }
+            data = data.replace(/\n*$/, "");
+                
+            save(filename, data);
+        }
+        function save(filename, data) {
+            const blob = new Blob([data], {type: 'text/plain'});
+            if(window.navigator && window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveBlob(blob, filename);
+            }
+            else{
+                const elem = window.document.createElement('a');
+                elem.href = window.URL.createObjectURL(blob);
+                elem.download = filename;        
+                document.body.appendChild(elem);
+                elem.click();        
+                document.body.removeChild(elem);
+            }
+        }
+    </script>
+}
