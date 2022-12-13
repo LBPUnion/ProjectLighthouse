@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -18,6 +19,7 @@ public class UserPage : BaseLayout
     public bool IsProfileUserHearted;
 
     public List<Photo>? Photos;
+    public List<Slot>? Slots;
 
     public User? ProfileUser;
     public UserPage(Database database) : base(database)
@@ -51,6 +53,12 @@ public class UserPage : BaseLayout
         }
 
         this.Photos = await this.Database.Photos.Include(p => p.Slot).OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
+
+        this.Slots = await this.Database.Slots.Include(p => p.Creator)
+            .OrderByDescending(s => s.LastUpdated)
+            .Where(p => p.CreatorId == userId)
+            .Take(10)
+            .ToListAsync();
 
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.ProfileUser.CommentsEnabled;
         if (this.CommentsEnabled)
