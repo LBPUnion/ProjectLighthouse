@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -85,6 +87,80 @@ public static class CryptoHelper
         byte[] bytes = Convert.FromBase64String(base64);
         return Encoding.UTF8.GetString(bytes);
     }
+
+    #region Two Factor Authentication
+
+    public static string GenerateTotpSecret()
+    {
+        // RFC 4226 recommends the secret to be 160 bits i.e. 20 bytes
+        byte[] rand = (byte[])GenerateRandomBytes(20);
+
+        // Base 64 bad apparently
+        return Base32Encoding.ToString(rand);
+    }
+
+    public static bool VerifyBackup(string code, string backups) => backups.Split(",").Any(backup => ValuesEqual(code, backup));
+
+    public static bool VerifyCode(string code, string secret)
+    {
+        if (code.Length != 6) return false;
+        
+        long window = TimeHelper.Timestamp / 30;
+
+        byte[] secretBytes = Base32Encoding.ToBytes(secret);
+        for (int i = -1; i <= 1; i++)
+        {
+            byte[] windowBytes = BitConverter.GetBytes(window + i);
+            if (BitConverter.IsLittleEndian) windowBytes.Reverse();
+
+            long genCode = generateTotpCode(secretBytes, windowBytes);
+            string strCode = genCode.ToString();
+            strCode = strCode.Substring(strCode.Length - 6, 6);
+            if (ValuesEqual(strCode, code))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static long generateTotpCode(byte[] secret, byte[] data)
+    {
+        using HMACSHA1 hmac = new(secret);
+
+        byte[] computedHash = hmac.ComputeHash(data);
+
+        // The RFC has a hard coded index 19 in this value.
+        // This is the same thing but also accommodates SHA256 and SHA512
+        // hmacComputedHash[19] => hmacComputedHash[hmacComputedHash.Length - 1]
+
+        int offset = computedHash[^1] & 0xf;
+        return (computedHash[offset] & 0x7f) << 24 |
+               (computedHash[offset + 1] & 0xff) << 16 |
+               (computedHash[offset + 2] & 0xff) << 8 |
+               (computedHash[offset + 3] & 0xff) % 1000000;
+    }
+
+    // Constant time comparison of two values
+    private static bool ValuesEqual(string a, string b)
+    {
+        if (a.Length != b.Length)
+        {
+            return false;
+        }
+
+        int result = 0;
+        for (int i = 0; i < a.Length; i++)
+        {
+            result |= a[i] ^ b[i];
+        }
+
+        return result == 0;
+    }
+
+    public static string GenerateTotpLink(string secret, string issuer, string username) => $"otpauth://totp/{issuer}:{username}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30";
+
+    #endregion
 
     #region Hash Functions
 
