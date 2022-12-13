@@ -20,7 +20,7 @@ public class DisableTwoFactorPage : BaseLayout
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        if (!user.IsTwoFactorSetup) return this.RedirectToPage(nameof(UserSettingsPage));
+        if (!user.IsTwoFactorSetup) return this.Redirect("~/user/" + user.UserId + "/settings");
 
         return this.Page();
     }
@@ -32,7 +32,7 @@ public class DisableTwoFactorPage : BaseLayout
         User? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        if (!user.IsTwoFactorSetup) return this.RedirectToPage(nameof(UserSettingsPage));
+        if (!user.IsTwoFactorSetup) return this.Redirect("~/user/" + user.UserId + "/settings");
 
         // if both are null or neither are null, there should only be one at at time
         if (string.IsNullOrWhiteSpace(code) == string.IsNullOrWhiteSpace(backup))
@@ -62,6 +62,6 @@ public class DisableTwoFactorPage : BaseLayout
         user.TwoFactorSecret = null;
         await this.Database.SaveChangesAsync();
 
-        return this.RedirectToPage(nameof(UserSettingsPage));
+        return this.Redirect("~/user/" + user.UserId + "/settings");
     }
 }
