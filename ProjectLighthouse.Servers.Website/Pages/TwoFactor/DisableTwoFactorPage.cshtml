@@ -1,0 +1,23 @@
+﻿@page "/remove2fa"
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor.DisableTwoFactorPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(TwoFactorStrings.DisableTwoFactor);
+}
+
+
+<div class="ui center segment center aligned">
+    <h2>@Model.Translate(TwoFactorStrings.DisableTwoFactor)</h2>
+    <p>@Model.Translate(TwoFactorStrings.DisableTwoFactorDescription)</p>
+    @await Html.PartialAsync("Partials/TwoFactorPartial", new ViewDataDictionary(ViewData)
+    {
+        {
+            "SubmitUrl", "/remove2fa"
+        },
+        {
+            "Error", Model.Error
+        },
+    })
+</div>

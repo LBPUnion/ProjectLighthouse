@@ -32,7 +32,7 @@ public class DigestMiddleware : Middleware
     public override async Task InvokeAsync(HttpContext context)
     {
         // Client digest check.
-        if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie) || authCookie == null)
+        if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie))
             authCookie = string.Empty;
         string digestPath = context.Request.Path;
         #if !DEBUG
@@ -120,7 +120,7 @@ public class DigestMiddleware : Middleware
             context.Response.Headers.Add("X-Digest-A", serverDigest);
         }
 
-        if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate") && context.Response.ContentType.Contains("text/xml"))
+        if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate") && (context.Response.ContentType ?? string.Empty).Contains("text/xml"))
         {
             context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
             context.Response.Headers.Add("Vary", "Accept-Encoding");
