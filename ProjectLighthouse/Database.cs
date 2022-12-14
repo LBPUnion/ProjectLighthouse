@@ -452,8 +452,10 @@ public class Database : DbContext
 
     }
 
-    public async Task<User?> UserFromPasswordResetToken(string resetToken)
+    public async Task<User?> UserFromPasswordResetToken(string? resetToken)
     {
+        if (string.IsNullOrWhiteSpace(resetToken)) return null;
+
         PasswordResetToken? token = await this.PasswordResetTokens.FirstOrDefaultAsync(token => token.ResetToken == resetToken);
         if (token == null) return null;
 
@@ -466,8 +468,10 @@ public class Database : DbContext
         return null;
     }
 
-    public bool IsRegistrationTokenValid(string tokenString)
+    public bool IsRegistrationTokenValid(string? tokenString)
     {
+        if (string.IsNullOrWhiteSpace(tokenString)) return false;
+
         RegistrationToken? token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
         if (token == null) return false;
 
@@ -495,8 +499,10 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
-    public async Task RemoveRegistrationToken(string tokenString)
+    public async Task RemoveRegistrationToken(string? tokenString)
     {
+        if (string.IsNullOrWhiteSpace(tokenString)) return;
+
         RegistrationToken? token = await this.RegistrationTokens.FirstOrDefaultAsync(t => t.Token == tokenString);
         if (token == null) return;
 
