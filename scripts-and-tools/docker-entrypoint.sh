@@ -4,7 +4,7 @@ chown -R lighthouse:lighthouse /lighthouse/data
 
 if [ -d "/lighthouse/temp" ]; then
   cp -rf /lighthouse/temp/* /lighthouse/data
-  rm -rf temp
+  rm -rf /lighthouse/temp
 fi
 su -s /bin/sh -l lighthouse
 
