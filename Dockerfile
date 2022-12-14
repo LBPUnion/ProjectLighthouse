@@ -1,5 +1,5 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 WORKDIR /ProjectLighthouse
 COPY *.sln ./
 COPY **/*.csproj ./
@@ -16,7 +16,7 @@ COPY . .
 RUN dotnet publish -c Release -o /ProjectLighthouse/publish --no-restore
 
 # Final running container
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS final
 
 # Add non-root user
 RUN addgroup -S lighthouse --gid 1001 && \
