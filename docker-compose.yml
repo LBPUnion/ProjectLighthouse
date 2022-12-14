@@ -7,6 +7,7 @@ services:
     image: lighthouse:latest
     container_name: gameserver
     build: .
+    restart: unless-stopped
     ports:
       - "10061:10061"
     environment:
@@ -26,6 +27,7 @@ services:
     image: lighthouse:latest
     container_name: website
     build: .
+    restart: unless-stopped
     ports:
       - "10060:10060"
     environment:
@@ -47,6 +49,7 @@ services:
     image: lighthouse:latest
     container_name: api
     build: .
+    restart: unless-stopped
     ports:
       - "10062:10062"
     environment:
@@ -67,7 +70,7 @@ services:
   db:
     image: mariadb
     container_name: db
-    restart: always
+    restart: unless-stopped
     ports:
       - "3306:3306"
     environment:
@@ -82,7 +85,7 @@ services:
   redis:
     image: redis/redis-stack-server
     container_name: redis
-    restart: always
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
