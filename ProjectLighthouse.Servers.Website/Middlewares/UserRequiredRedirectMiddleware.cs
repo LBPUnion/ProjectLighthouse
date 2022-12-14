@@ -13,14 +13,19 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
 
     public override async Task InvokeAsync(HttpContext ctx, Database database)
     {
-        User? user = database.UserFromWebRequest(ctx.Request);
-        if (user == null || pathContains(ctx, "/logout"))
+        WebToken? token = database.WebTokenFromRequest(ctx.Request);
+        if (token == null || pathContains(ctx, "/logout"))
         {
             await this.next(ctx);
             return;
         }
 
-        WebToken token = await database.WebTokens.FirstAsync(t => t.UserId == user.UserId);
+        User? user = await database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        if (user == null)
+        {
+            await this.next(ctx);
+            return;
+        }
 
         // Request ends with a path (e.g. /css/style.css)
         if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)) || pathContains(ctx, "/gameAssets"))

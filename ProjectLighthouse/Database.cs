@@ -431,14 +431,14 @@ public class Database : DbContext
 
     public User? UserFromWebRequest(HttpRequest request)
     {
-        if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken) || lighthouseToken == null) return null;
+        if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken)) return null;
 
         return this.UserFromLighthouseToken(lighthouseToken);
     }
 
     public WebToken? WebTokenFromRequest(HttpRequest request)
     {
-        if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken) || lighthouseToken == null) return null;
+        if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken)) return null;
 
         WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
