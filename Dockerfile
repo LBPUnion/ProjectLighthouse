@@ -24,7 +24,7 @@ adduser -S lighthouse -G lighthouse -h /lighthouse --uid 1001 && \
 mkdir -p /lighthouse/data && \
 mkdir -p /lighthouse/app && \
 mkdir -p /lighthouse/temp && \
-apk add --no-cache icu-libs
+apk add --no-cache icu-libs su-exec
 
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
