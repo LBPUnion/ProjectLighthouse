@@ -26,7 +26,6 @@ services:
   website:
     image: lighthouse:latest
     container_name: website
-    build: .
     restart: unless-stopped
     ports:
       - "10060:10060"
@@ -48,7 +47,6 @@ services:
   api:
     image: lighthouse:latest
     container_name: api
-    build: .
     restart: unless-stopped
     ports:
       - "10062:10062"
