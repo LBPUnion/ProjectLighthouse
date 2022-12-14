@@ -258,7 +258,7 @@ public class User
             true
         );
         if (gameVersion == GameVersion.LittleBigPlanet2)
-            planets += LbpSerializer.StringElement("crossControlPlanet", this.PlanetHashLBP2CC);
+            planets += LbpSerializer.StringElement<string>("crossControlPlanet", this.PlanetHashLBP2CC, true);
 
         return planets;
     }
