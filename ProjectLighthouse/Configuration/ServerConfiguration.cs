@@ -23,7 +23,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 13;
+    public const int CurrentConfigVersion = 14;
 
     #region Meta
 
@@ -199,4 +199,5 @@ public class ServerConfiguration
     public WebsiteConfiguration WebsiteConfiguration { get; set; } = new();
     public CustomizationConfiguration Customization { get; set; } = new();
     public RateLimitConfiguration RateLimitConfiguration { get; set; } = new();
+    public TwoFactorConfiguration TwoFactorConfiguration { get; set; } = new();
 }

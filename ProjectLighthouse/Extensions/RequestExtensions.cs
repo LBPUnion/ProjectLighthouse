@@ -84,7 +84,7 @@ public static class RequestExtensions
             bool gotCaptcha = request.Form.TryGetValue(keyName, out StringValues values);
             if (!gotCaptcha) return false;
 
-            if (!await verifyCaptcha(values[0])) return false;
+            if (!await verifyCaptcha(values[0] ?? string.Empty)) return false;
         }
 
         return true;

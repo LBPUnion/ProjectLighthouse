@@ -29,7 +29,7 @@ public class RegisterForm : BaseLayout
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                string token = this.Request.Query["token"];
+                string? token = this.Request.Query["token"];
                 if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
@@ -126,7 +126,7 @@ public class RegisterForm : BaseLayout
         {
             if (this.Request.Query.ContainsKey("token"))
             {
-                string token = this.Request.Query["token"];
+                string? token = this.Request.Query["token"];
                 if (!this.Database.IsRegistrationTokenValid(token))
                     return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
 
