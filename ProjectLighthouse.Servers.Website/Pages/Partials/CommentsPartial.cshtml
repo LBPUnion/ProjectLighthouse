@@ -86,7 +86,7 @@
                 {
                     <span>@decodedMessage</span>
                 }
-                @if ((Model.User?.IsModerator || Model.User?.UserId == comment.PosterUserId || Model.User?.UserId == pageOwnerId) && !comment.Deleted)
+                @if (((Model.User?.IsModerator ?? false) || Model.User?.UserId == comment.PosterUserId || Model.User?.UserId == pageOwnerId) && !comment.Deleted)
                 {
                     <button class="ui red icon button" style="display:inline-flex; float: right" onclick="deleteComment(@comment.CommentId)">
                         <i class="trash icon"></i>
