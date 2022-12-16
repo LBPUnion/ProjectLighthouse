@@ -5,6 +5,7 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/LBPUnion/ProjectLighthouse)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/LBPUnion/ProjectLighthouse)
 ![Source Lines of Code](https://tokei.ekzhang.com/b1/github/LBPUnion/ProjectLighthouse)
+![Slendy Is A Nerd](https://img.shields.io/badge/Slendy-pushes%20straight%20to%20master-red)
 
 Project Lighthouse is a clean-room, open-source custom server for LittleBigPlanet. This is a project conducted by
 the [LBP Union Ministry of Technology Research and Development team](https://www.lbpunion.com/technology).
