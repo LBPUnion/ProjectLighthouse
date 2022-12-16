@@ -17,6 +17,19 @@ public static class CensorHelper
     {
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
+    
+    private static readonly string[] screamingInPain =
+    {
+        "AAAAAAAAAAAA", "AUGHHHHHHHHH", "ARGHHHHHHHHHHH",
+    };
+    
+    private static readonly string[] halfLife =
+    {
+        "hello, freeman!", "FOR GODS SAKES, OPEN THE SILO DOORS!", "FREEMAN, YOU FOOL!", "oh, fiddlesticks. what now?",
+        "my god, what are you doing?!", "oh dear.", "no...no! no! get it off me! get it off! get it off!", "good morning, gordon.",
+        "please see the Half-Life: Uplink section.", "AAAUUUUGH (elevator)", "don't be a fool!", "LOOK GORDON, ROPES!",
+        "why do we all have to wear these rediculous ties?",
+    };
 
     private static readonly string[] censorList = ResourceHelper.ReadManifestFile("chatCensoredList.txt").Replace("\r", "").Split("\n");
 
@@ -88,6 +101,22 @@ public static class CensorHelper
                     sb.Append(randomWord);
                 }
 
+                break;
+            case FilterMode.Scream:
+                lock(CryptoHelper.Random)
+                {
+                    string randomWord = screamingInPain[CryptoHelper.Random.Next(0, screamingInPain.Length -1)];
+                    sb.Append(randomWord);
+                }
+                
+                break;
+            case FilterMode.HalfLife:
+                lock(CryptoHelper.Random)
+                {
+                    string randomWord = halfLife[CryptoHelper.Random.Next(0, halfLife.Length -1)];
+                    sb.Append(randomWord);
+                }
+                
                 break;
         }
 
