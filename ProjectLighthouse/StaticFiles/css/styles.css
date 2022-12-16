@@ -72,6 +72,17 @@ canvas.hide-subjects {
     pointer-events: none;
 }
 
+.horizontal-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.horizontal-scroll {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
 /*#region Cards*/
 
 .card {

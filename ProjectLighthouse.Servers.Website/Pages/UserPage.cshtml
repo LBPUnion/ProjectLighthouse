@@ -125,43 +125,40 @@
 </div>
 
 <div class="ui grid">
-    @if (isMobile)
-    {
-        <div class="ui top attached tabular menu">
+    @{
+        string outerDiv = isMobile ?
+            "" :
+            "three wide column";
+        string innerDiv = isMobile ?
+            "ui top attached tabular menu horizontal-scroll" :
+            "ui vertical fluid tabular menu";
+    }
+    <div class="@outerDiv">
+        <div class="@innerDiv">
             <a class="item active lh-sidebar" target="lh-comments">
                 Comments
             </a>
             <a class="item lh-sidebar" target="lh-photos">
                 @Model.Translate(BaseLayoutStrings.HeaderPhotos)
             </a>
-
+                
             <a class="item lh-sidebar" target="lh-levels">
                 @Model.Translate(BaseLayoutStrings.HeaderSlots)
             </a>
             <a class="item lh-sidebar" target="lh-playlists">
                 Playlists
             </a>
+            @if (Model.User == Model.ProfileUser)
+            {
+                <a class="item lh-sidebar" target="lh-hearted">
+                    Hearted Levels
+                </a>
+                <a class="item lh-sidebar" target="lh-queued">
+                    Queued Levels
+                </a>
+            }
         </div>
-    }
-    else
-    {
-        <div class="three wide column">
-            <div class="ui vertical fluid tabular menu">
-                <a class="item active lh-sidebar" target="lh-comments">
-                    Comments
-                </a>
-                <a class="item lh-sidebar" target="lh-photos">
-                    @Model.Translate(BaseLayoutStrings.HeaderPhotos)
-                </a>
-                <a class="item lh-sidebar" target="lh-levels">
-                    @Model.Translate(BaseLayoutStrings.HeaderSlots)
-                </a>
-                <a class="item lh-sidebar" target="lh-playlists">
-                    Playlists
-                </a>
-            </div>
-        </div>
-    }
+    </div>
     @{
         string divLength = isMobile ? "sixteen" : "thirteen";
     }
@@ -188,10 +185,18 @@
                         <br/>
                     }
                 }
+                else
+                {
+                    <p>This user hasn't uploaded any photos</p>
+                }
             </div>
         </div>
         <div class="lh-content" id="lh-levels">
-            <div class="ui green segment">
+            <div class="ui green segment" id="levels">
+                @if (Model.HeartedSlots?.Count == 0)
+                {
+                    <p>This user hasn't published any levels</p>
+                }
                 @foreach (Slot slot in Model.Slots ?? new List<Slot>())
                 {
                     <div class="ui segment">
@@ -201,7 +206,7 @@
                                        "User", Model.User
                                    },
                                    {
-                                       "CallbackUrl", $"~/slots/"
+                                       "CallbackUrl", $"~/user/{Model.ProfileUser.UserId}#levels"
                                    },
                                    {
                                        "ShowLink", true
@@ -219,6 +224,73 @@
                 <p>@Model.Translate(GeneralStrings.Soon)</p>
             </div>
         </div>
+        @if (Model.User == Model.ProfileUser)
+        {
+            <div class="lh-content" id="lh-hearted">
+                <div class="ui pink segment" id="hearted">
+                    @if (Model.HeartedSlots?.Count == 0)
+                    {
+                        <p>You haven't hearted any levels</p>
+                    }
+                    else
+                    {
+                        <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
+                    }
+                    @foreach (Slot slot in Model.HeartedSlots ?? new List<Slot>())
+                    {
+                        <div class="ui segment">
+                            @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
+                                   {
+                                       {
+                                           "User", Model.User
+                                       },
+                                       {
+                                           "CallbackUrl", $"~/user/{Model.ProfileUser.UserId}#hearted"
+                                       },
+                                       {
+                                           "ShowLink", true
+                                       },
+                                       {
+                                           "IsMobile", isMobile
+                                       },
+                                   })
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="lh-content" id="lh-queued">
+                <div class="ui yellow segment" id="queued">
+                    @if (Model.QueuedSlots?.Count == 0)
+                    {
+                        <p>You haven't queued any levels</p>
+                    }
+                    else
+                    {
+                        <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
+                    }
+                    @foreach (Slot slot in Model.QueuedSlots ?? new List<Slot>())
+                    {
+                        <div class="ui segment">
+                            @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
+                                   {
+                                       {
+                                           "User", Model.User
+                                       },
+                                       {
+                                           "CallbackUrl", $"~/user/{Model.ProfileUser.UserId}#queued"
+                                       },
+                                       {
+                                           "ShowLink", true
+                                       },
+                                       {
+                                           "IsMobile", isMobile
+                                       },
+                                   })
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     </div>
 </div>
 

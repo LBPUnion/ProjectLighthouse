@@ -96,16 +96,22 @@
 </div>
     
 <div class="ui grid">
-    @if (isMobile)
-    {
-        <div class="ui top attached tabular menu">
+    @{
+        string outerDiv = isMobile ?
+            "" :
+            "three wide column";
+        string innerDiv = isMobile ?
+            "ui top attached tabular menu horizontal-scroll" :
+            "ui vertical fluid tabular menu";
+    }
+    <div class="@outerDiv">
+        <div class="@innerDiv">
             <a class="item active lh-sidebar" target="lh-comments">
                 Comments
             </a>
             <a class="item lh-sidebar" target="lh-photos">
                 @Model.Translate(BaseLayoutStrings.HeaderPhotos)
             </a>
-
             <a class="item lh-sidebar" target="lh-reviews">
                 Reviews
             </a>
@@ -113,26 +119,8 @@
                 Scores
             </a>
         </div>
-    }
-    else
-    {
-        <div class="three wide column">
-            <div class="ui vertical fluid tabular menu">
-                <a class="item active lh-sidebar" target="lh-comments">
-                    Comments
-                </a>
-                <a class="item lh-sidebar" target="lh-photos">
-                    @Model.Translate(BaseLayoutStrings.HeaderPhotos)
-                </a>
-                <a class="item lh-sidebar" target="lh-reviews">
-                    Reviews
-                </a>
-                <a class="item lh-sidebar" target="lh-scores">
-                    Scores
-                </a>
-            </div>
-        </div>
-    }
+    </div>
+
     @{
         string divLength = isMobile ? "sixteen" : "thirteen";
     }
