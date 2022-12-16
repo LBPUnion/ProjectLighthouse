@@ -19,9 +19,9 @@ public class PasswordResetPage : BaseLayout
     public async Task<IActionResult> OnPost(string password, string confirmPassword)
     {
         User? user;
-        if (Request.Query.ContainsKey("token"))
+        if (this.Request.Query.ContainsKey("token"))
         {
-            user = await this.Database.UserFromPasswordResetToken(Request.Query["token"][0]);
+            user = await this.Database.UserFromPasswordResetToken(this.Request.Query["token"][0]);
             if (user == null)
             {
                 this.Error = "This password reset link either is invalid or has expired. Please try again.";

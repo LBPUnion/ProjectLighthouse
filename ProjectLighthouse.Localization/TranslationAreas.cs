@@ -11,4 +11,5 @@ public enum TranslationAreas
     Error,
     Profile,
     ModPanel,
+    TwoFactor,
 }

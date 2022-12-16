@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>LBPUnion.ProjectLighthouse.Localization</RootNamespace>
@@ -39,6 +39,10 @@
         <EmbeddedResource Update="ModPanel.resx">
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>ModPanel.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="TwoFactor.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>TwoFactor.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
 

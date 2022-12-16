@@ -1,4 +1,5 @@
 #nullable enable
+using System.Web;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -9,7 +10,6 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -108,6 +108,7 @@ public class LoginForm : BaseLayout
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
             ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
+            Verified = !ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled || !user.IsTwoFactorSetup,
         };
 
         this.Database.WebTokens.Add(webToken);
@@ -127,6 +128,14 @@ public class LoginForm : BaseLayout
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
         if (ServerConfiguration.Instance.Mail.MailEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
+
+        if (!webToken.Verified)
+        {
+            return string.IsNullOrWhiteSpace(redirect)
+                ? this.Redirect("~/2fa")
+                : this.Redirect("~/2fa" + "?redirect=" + HttpUtility.UrlEncode(redirect));
+        }
+
 
         if (string.IsNullOrWhiteSpace(redirect))
         {

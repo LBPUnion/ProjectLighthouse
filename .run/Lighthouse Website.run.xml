@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Lighthouse Website" type="DotNetProject" factoryName=".NET Project">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/ProjectLighthouse.Servers.Website/bin/Debug/net6.0/LBPUnion.ProjectLighthouse.Servers.Website" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/ProjectLighthouse.Servers.Website/bin/Debug/net7.0/LBPUnion.ProjectLighthouse.Servers.Website" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ProjectLighthouse" />
     <option name="PASS_PARENT_ENVS" value="1" />
@@ -16,7 +16,7 @@
     <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="0" />
     <option name="PROJECT_KIND" value="DotNetCore" />
-    <option name="PROJECT_TFM" value="net6.0" />
+    <option name="PROJECT_TFM" value="net7.0" />
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="Development Databases" run_configuration_type="docker-deploy" />
       <option name="Build" />

@@ -1,0 +1,123 @@
+﻿@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@{
+    string submitUrl = (string?)ViewData["SubmitUrl"] ?? "/2fa";
+    string callbackUrl = (string?)ViewData["CallbackUrl"] ?? "";
+    string error = (string?)ViewData["Error"] ?? "";
+    bool allowBackupCodes = (bool?)ViewData["BackupCodes"] ?? true;
+}
+
+<form action="@submitUrl" id="2fa-form" method="post" autocomplete="off">
+    @Html.AntiForgeryToken()
+    <div class="digits" id="2fa">
+        @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="ui negative message">
+                    <div class="header">
+                        @Model.Translate(GeneralStrings.Error)
+                    </div>
+                    <p style="white-space: pre-line">@Model.Error</p>
+                </div>
+            }
+        <div class="header" id="header">@Model.Translate(TwoFactorStrings.TwoFactor)</div>
+        <input type="text" pattern="\d*" maxlength="1" id="digit1"/>
+        <input type="text" pattern="\d*" maxlength="1" id="digit2"/>
+        <input type="text" pattern="\d*" maxlength="1" id="digit3" class="middleDigit"/>
+        <input type="text" pattern="\d*" maxlength="1" id="digit4"/>
+        <input type="text" pattern="\d*" maxlength="1" id="digit5"/>
+        <input type="text" pattern="\d*" maxlength="1" id="digit6"/>
+        <input type="hidden" name="code" id="code"/>
+        <input type="hidden" name="redirect" value="@callbackUrl">
+        @if (allowBackupCodes)
+        {
+            const string opening = "<a id=\"backup-link\" style=\"cursor: pointer\">";
+            const string closing = "</a>";
+            string formatted = TwoFactorStrings.TwoFactorBackup.Translate(Model.GetLanguage(), opening, closing);
+            <div class="ui divider"></div>
+            <div>@Html.Raw(formatted)</div>
+            <div id="backup" style="display:none">
+                <input class="backup" type="text" maxlength="11" placeholder="XXXXX-XXXXX" name="backup" id="backup-input"/>
+                <div class="ui divider fitted hidden"></div>
+                <button class="ui green button" type="submit">Submit</button>
+            </div>
+        }
+    </div>
+</form>
+<script>
+
+@if (allowBackupCodes)
+{
+<text>
+document.getElementById("backup-link").addEventListener("click", function (){
+    let backupInput = document.getElementById("backup"); 
+    if (backupInput.style.display === "none"){
+        backupInput.style.display = "";
+    } else {
+        backupInput.style.display = "none";
+    }
+});
+</text>
+}
+
+document.querySelector(".digits").addEventListener("keydown", function(event){
+    if (event.key === "Backspace") {
+        const target = event.target;
+        if (target.value === "" && target.previousElementSibling){
+            target.previousElementSibling.focus();
+        }
+    }
+});
+document.querySelector(".digits").addEventListener("paste", function (e){
+    if (e.target.classList.contains("backup")) return;
+    e.preventDefault();
+    // common browser -> e.originalEvent.clipboardData
+    // uncommon browser -> window.clipboardData
+    const clipboardData = e.clipboardData || e.originalEvent.clipboardData || window.clipboardData;
+    const pastedData = clipboardData.getData('text');
+    if (pastedData.length !== 6) return;
+    
+    pastedData && (pastedData.replace(/[^0-9]/g,''));
+
+    for (let i = 1; i <= 6; i++){
+        document.getElementById("digit" + i).value = pastedData[i-1];
+    }
+    submitForm();
+});
+
+function submitForm(){
+    let digit = "";
+    for (let i = 1; i <= 6; i++){
+        digit += document.getElementById("digit" + i).value;
+    }
+    
+    document.getElementById("code").value = digit;
+    // if a user submits a regular code, reset the backup
+    if (document.getElementById("backup-input"))
+        document.getElementById("backup-input").value = "";
+    document.getElementById("2fa-form").submit();
+}
+
+document.querySelector(".digits").addEventListener("input", function({ target, data }){
+    if (data && target.classList.contains("backup")) return;
+    // Exclude non-numeric characters (if a value has been entered)
+    data && (target.value = data.replace(/[^0-9]/g,''));
+
+    const hasValue = target.value !== "";
+    const hasSibling = target.nextElementSibling;
+    const hasSiblingInput = hasSibling && target.nextElementSibling.nodeName === "INPUT" && target.nextElementSibling.getAttribute("type") === "text";
+    
+    if (target.id === "digit6"){
+        submitForm();
+    }
+
+    if (hasValue && hasSiblingInput){
+        target.nextElementSibling.focus();
+    }
+});
+if(performance.navigation.type === 2){
+   location.reload();
+}
+if (window.history.replaceState) {
+  window.history.replaceState(null, null, window.location.href);
+}
+</script>
+
