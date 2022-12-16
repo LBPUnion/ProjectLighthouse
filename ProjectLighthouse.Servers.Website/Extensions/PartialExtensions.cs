@@ -35,6 +35,6 @@ public static class PartialExtensions
     public static Task<IHtmlContent> ToLink<T>(this User user, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, string timeZone = "", bool includeStatus = false) 
         => helper.PartialAsync("Partials/Links/UserLinkPartial", user, viewData.WithLang(language).WithTime(timeZone).WithKeyValue("IncludeStatus", includeStatus));
 
-    public static Task<IHtmlContent> ToHtml<T>(this Photo photo, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, string timeZone)
-        => helper.PartialAsync("Partials/PhotoPartial", photo, viewData.WithLang(language).WithTime(timeZone));
+    public static Task<IHtmlContent> ToHtml<T>(this Photo photo, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, string timeZone, bool canDelete = false)
+        => helper.PartialAsync("Partials/PhotoPartial", photo, viewData.WithLang(language).WithTime(timeZone).CanDelete(canDelete));
 }

@@ -1,10 +1,9 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class LogoutPage : BaseLayout
 {

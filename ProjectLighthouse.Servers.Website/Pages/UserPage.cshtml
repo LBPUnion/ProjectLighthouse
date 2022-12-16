@@ -125,74 +125,100 @@
 </div>
 
 <div class="ui grid">
-    <div class="three wide column">
+    @if (isMobile)
+    {
+        <div class="ui top attached tabular menu">
+            <a class="item active lh-sidebar" target="lh-comments">
+                Comments
+            </a>
+            <a class="item lh-sidebar" target="lh-photos">
+                @Model.Translate(BaseLayoutStrings.HeaderPhotos)
+            </a>
+
+            <a class="item lh-sidebar" target="lh-levels">
+                @Model.Translate(BaseLayoutStrings.HeaderSlots)
+            </a>
+            <a class="item lh-sidebar" target="lh-playlists">
+                Playlists
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="three wide column">
             <div class="ui vertical fluid tabular menu">
-                <a class="item lh-sidebar" target="lh-photos">
-                    Photos
-                </a>
                 <a class="item active lh-sidebar" target="lh-comments">
                     Comments
                 </a>
-                <a class="item lh-sidebar" target="lh-levels">
-                    Levels
+                <a class="item lh-sidebar" target="lh-photos">
+                    @Model.Translate(BaseLayoutStrings.HeaderPhotos)
                 </a>
-                <a class="item lh-sidebar">
+                <a class="item lh-sidebar" target="lh-levels">
+                    @Model.Translate(BaseLayoutStrings.HeaderSlots)
+                </a>
+                <a class="item lh-sidebar" target="lh-playlists">
                     Playlists
                 </a>
             </div>
         </div>
-        <div class="twelve wide stretched column">
-            <div class="lh-content" id="lh-comments">
-                @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
-            </div>
-            <div class="lh-content" id="lh-photos">
-                <div class="ui purple segment" id="photos">
-                    <h2>@Model.Translate(GeneralStrings.RecentPhotos)</h2>
-                    @if (Model.Photos != null && Model.Photos.Count != 0)
-                    {
-                        <div class="ui center aligned grid">
-                            @foreach (Photo photo in Model.Photos)
-                            {
-                                string width = isMobile ? "sixteen" : "eight";
-                                <div class="@width wide column">
-                                    @await photo.ToHtml(Html, ViewData, language, timeZone)
-                                </div>
-                            }
-                        </div>
-                        @if (isMobile)
+    }
+    @{
+        string divLength = isMobile ? "sixteen" : "thirteen";
+    }
+    <div class="@divLength wide stretched column">
+        <div class="lh-content" id="lh-comments">
+            @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
+        </div>
+        <div class="lh-content" id="lh-photos">
+            <div class="ui purple segment" id="photos">
+                @if (Model.Photos != null && Model.Photos.Count != 0)
+                {
+                    <div class="ui center aligned grid">
+                        @foreach (Photo photo in Model.Photos)
                         {
-                            <br/>
+                            string width = isMobile ? "sixteen" : "eight";
+                            bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
+                            <div class="@width wide column">
+                                @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
+                            </div>
                         }
-                    }
-                </div>
-            </div>
-            <div class="lh-content" id="lh-levels">
-                <div class="ui green segment">
-                    <h2>Recent levels</h2>
-
-                    @foreach (Slot slot in Model.Slots ?? new List<Slot>())
+                    </div>
+                    @if (isMobile)
                     {
-                        <div class="ui segment">
-                            @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
-                                   {
-                                       {
-                                           "User", Model.User
-                                       },
-                                       {
-                                           "CallbackUrl", $"~/slots/"
-                                       },
-                                       {
-                                           "ShowLink", true
-                                       },
-                                       {
-                                           "IsMobile", isMobile
-                                       },
-                                   })
-                        </div>
+                        <br/>
                     }
-                </div>
+                }
             </div>
-        
+        </div>
+        <div class="lh-content" id="lh-levels">
+            <div class="ui green segment">
+                @foreach (Slot slot in Model.Slots ?? new List<Slot>())
+                {
+                    <div class="ui segment">
+                        @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
+                               {
+                                   {
+                                       "User", Model.User
+                                   },
+                                   {
+                                       "CallbackUrl", $"~/slots/"
+                                   },
+                                   {
+                                       "ShowLink", true
+                                   },
+                                   {
+                                       "IsMobile", isMobile
+                                   },
+                               })
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="lh-content" id="lh-playlists">
+            <div class="ui purple segment">
+                <p>@Model.Translate(GeneralStrings.Soon)</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -245,14 +271,15 @@
 <script>
 const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
 const contentElements = Array.from(document.querySelectorAll(".lh-content"));
-
+let selectedId = window.location.hash;
+if (selectedId.startsWith("#"))
+    selectedId = selectedId.substring(1);
+let selectedElement = document.getElementById(selectedId);
 // id = lh-sidebar element
 function setVisible(e){
-    console.log("setvisible id=" + e.id);
     let eTarget = document.getElementById(e.target);
     if (!e || !eTarget) return;
-    
-    console.log("setVisible(" + e.id + ") target=" + e.target);
+
     // make all active elements not active
     for (let active of document.getElementsByClassName("active")) {
         active.classList.remove("active");
@@ -277,4 +304,13 @@ sidebarElements.forEach(el => {
         setVisible(event.target)
     })
 })
+// set the active content window based on url
+if (selectedElement != null) {
+    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
+        selectedElement = selectedElement.parentElement;
+    }
+    
+    let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
+    setVisible(sidebarEle);
+}
 </script>

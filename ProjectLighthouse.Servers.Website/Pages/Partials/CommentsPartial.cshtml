@@ -8,11 +8,10 @@
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
-    bool canDelete = (bool?)ViewData["CanDelete"] ?? false;
+    int pageOwnerId = (int?)ViewData["PageOwner"] ?? 0;
 }
 
 <div class="ui yellow segment" id="comments">
-    <h2>Comments</h2>
     @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
     {
         <p>There are no comments.</p>
@@ -87,9 +86,9 @@
                 {
                     <span>@decodedMessage</span>
                 }
-                @if (canDelete)
+                @if ((Model.User?.IsModerator || Model.User?.UserId == comment.PosterUserId || Model.User?.UserId == pageOwnerId) && !comment.Deleted)
                 {
-                    <button class="ui red icon button" style="display:inline-flex; float: right" onclick="confirmDeletion(@comment.CommentId)">
+                    <button class="ui red icon button" style="display:inline-flex; float: right" onclick="deleteComment(@comment.CommentId)">
                         <i class="trash icon"></i>
                     </button>
                 }
@@ -103,4 +102,12 @@
             </div>
         </div>
     }
+    <script>
+        function deleteComment(commentId){
+            if (window.confirm("Are you sure you want to delete this?\nThis action cannot be undone.")){
+                window.location.hash = "comments";
+                window.location.href = "/moderation/deleteComment/" + commentId + "?callbackUrl=" + this.window.location;
+            }
+        }
+    </script>
 </div>

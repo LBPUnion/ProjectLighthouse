@@ -9,8 +9,7 @@
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     bool canDelete = (bool?)ViewData["CanDelete"] ?? false;
 }
-<div class="ui blue segment" id="leaderboard">
-    <h2>Leaderboard</h2>
+<div class="ui blue segment" id="scores">
     @if (Model.Scores.Count == 0)
     {
         <p>There are no scores.</p>
@@ -19,6 +18,7 @@
     {
         int count = Model.Scores.Count;
         <p>There @(count == 1 ? "is" : "are") @count score@(count == 1 ? "" : "s").</p>
+        <div class="ui divider"></div>
     }
     <div class="ui list">
     @for(int i = 0; i < Model.Scores.Count; i++)
@@ -28,23 +28,21 @@
         string[] playerIds = score.PlayerIds;
         Database database = Model.Database;          
         <div class="item">
-       
             <span class="ui large text">
-            @if(canDelete)
-            {
-                <a href="/deleteScore/@score.ScoreId" style="color: orangered; "><i class="trash icon"></i></a>            
-            }               
+                @if(canDelete)
+                {
+                    <button class="ui red icon button" style="display: inline-block; position: absolute; right: 1em" onclick="deleteScore(@score.ScoreId)">
+                        <i class="trash icon"></i>
+                    </button>            
+                }               
                 <b>@(i+1):</b>                 
                 <span class="ui text">@score.Points points</span>
             </span>
             <div class="content">
-                @* <div class="header"><b>@score.Points points</b></div> *@
-                @* <div class="description">-  <b>@score.Points points</b></div> *@
                 <div class="list" style="padding-top: 0">
                     @for (int j = 0; j < playerIds.Length; j++)
                     {
                         User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == playerIds[j]);
-                        Console.WriteLine(j + @" - " + playerIds[j] + @": " + (user == null));
                         if (user == null) continue;
                         <div class="item">
                             <i class="minus icon" style="padding-top: 9px"></i>
@@ -56,7 +54,18 @@
                 </div>
             </div>
         </div>
-        
+        @if (i != Model.Scores.Count - 1)
+        {
+            <div class="ui divider"></div>
+        }
     }
     </div>
+    <script>
+        function deleteScore(scoreId){
+            if (window.confirm("Are you sure you want to delete this?\nThis action cannot be undone.")){
+                window.location.hash = "scores";
+                window.location.href = "/moderation/deleteScore/" + scoreId + "?callbackUrl=" + this.window.location;
+            }
+        }
+    </script>
 </div>

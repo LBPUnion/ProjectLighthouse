@@ -1,12 +1,12 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LBPUnion.ProjectLighthouse.Helpers;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Moderator;
 
 [ApiController]
 [Route("moderation/slot/{id:int}")]
