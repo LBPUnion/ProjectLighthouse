@@ -62,9 +62,10 @@ public class Database : DbContext
 
 #nullable enable
 
-    public async Task NewEvent(int actorId, TargetType targetType, int target, EventType eventType, long[] interactions)
+    public async Task NewEvent(int actorId, TargetType targetType, int target, EventType eventType, params long[] interactions)
     {
-        if (interactions.Count() != 2) return;
+        if (interactions.Count() == 0) interactions = new long[2] {0, 0};
+        if (interactions.Count() < 2) interactions = new long[2] { interactions[0], 0};
         User? actor = this.Users.Include(u => u.Location).FirstOrDefault(u => u.UserId == actorId);
         if (actor == null) return;
 
@@ -88,8 +89,8 @@ public class Database : DbContext
             {
                 case EventType.Score:
                     existingAct.EventTimestamp = TimeHelper.TimestampMillis;
-                    existingAct.Interaction1 = interactions[0];
-                    if (existingAct.Interaction2 == interactions[1]) break;
+                    if (interactions[1] == existingAct.Interaction2) existingAct.Interaction1 = interactions[0];
+                    else break;
                     await this.SaveChangesAsync();
                     return;
                 case EventType.PublishLevel:
@@ -310,7 +311,7 @@ public class Database : DbContext
 
         await this.SaveChangesAsync();
 
-        await this.NewEvent(userId, TargetType.Profile, heartedUser.UserId, EventType.HeartUser, new long[2]);
+        await this.NewEvent(userId, TargetType.Profile, heartedUser.UserId, EventType.HeartUser);
     }
 
     public async Task UnheartUser(int userId, User heartedUser)
@@ -361,7 +362,7 @@ public class Database : DbContext
 
         await this.SaveChangesAsync();
 
-        await this.NewEvent(userId, TargetType.Level, heartedSlot.SlotId, EventType.HeartLevel, new long[2]);
+        await this.NewEvent(userId, TargetType.Level, heartedSlot.SlotId, EventType.HeartLevel);
     }
 
     public async Task UnheartLevel(int userId, Slot heartedSlot)

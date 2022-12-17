@@ -61,7 +61,7 @@ public class ReviewController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        await this.database.NewEvent(slot.CreatorId, TargetType.Level, slot.SlotId, EventType.LBP1Rate, new long[2] { rating, 0 });
+        await this.database.NewEvent(slot.CreatorId, TargetType.Level, slot.SlotId, EventType.LBP1Rate, rating, 0);
 
         return this.Ok();
     }
@@ -96,7 +96,7 @@ public class ReviewController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        await this.database.NewEvent(slot.CreatorId, TargetType.Level, slotId, EventType.DpadRating, new long[2] { rating, 0 });
+        await this.database.NewEvent(ratedLevel.UserId, TargetType.Level, slotId, EventType.DpadRating, new long[2] { rating, 0 });
 
         return this.Ok();
     }

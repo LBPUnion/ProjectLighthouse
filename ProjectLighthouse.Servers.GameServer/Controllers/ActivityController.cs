@@ -60,25 +60,66 @@ public class ActivityController : ControllerBase
         long endTimestamp = timestamp - 86_400_000; // 1 Day
         GameToken? token = await this.database.GameTokenFromRequest(this.Request);
         if (token == null) return this.BadRequest();
-        User? user = this.database.Users.Include(u => u.PlayerEvents.Where(e => e.EventTimestamp <= timestamp && e.EventTimestamp >= endTimestamp)).FirstOrDefault(u => u.UserId == token.UserId);
+        User? user = this.database.Users.Include(u => u.PlayerEvents).FirstOrDefault(u => u.UserId == token.UserId);
         if (user == null) return this.BadRequest();
+        IEnumerable<Activity> concerningMe = this.database.Activity
+            .Include(a => a.Actor)
+            .Where(a => a.TargetType == TargetType.Level)
+            .Where
+            (a => this.database.Slots
+                .Where(s => s.SlotId == a.TargetId)
+                .Where(s => s.CreatorId == user.UserId)
+                .Any()
+            ).AsEnumerable();
+        concerningMe = concerningMe.Concat(
+            this.database.Activity
+            .Include(a => a.Actor)
+            .Where(a => a.TargetType == TargetType.Profile)
+            .Where(a => a.TargetId == user.UserId)
+            .AsEnumerable()
+        );
 
-        return this.Ok(StreamBuilder(new List<User>() {user}, timestamp, endTimestamp));
+        return this.Ok(StreamBuilder(new List<User>() {user}, timestamp, endTimestamp, concerningMe));
     }
 
-    private string StreamBuilder(List<User> userTargets, long timestamp, long endTimestamp)
+    private string StreamBuilder(List<User> userTargets, long timestamp, long endTimestamp, IEnumerable<Activity>? additionalEvents = null)
     {
-        IEnumerable<Activity> playerEvents = Enumerable.Empty<Activity>();
+        IEnumerable<Activity> playerEvents = additionalEvents ?? Enumerable.Empty<Activity>();
 
         foreach (User userTarget in userTargets ) playerEvents = playerEvents.Concat(userTarget.PlayerEvents.AsEnumerable());
 
-        return Build(playerEvents, timestamp, endTimestamp);
+        return Build(playerEvents.Where(e => e.EventTimestamp <= timestamp && e.EventTimestamp >= endTimestamp), timestamp, endTimestamp);
     }
 
     private string StreamBuilder(int slotTarget, long timestamp, long endTimestamp)
     {
-        IEnumerable<Activity> playerEvents = this.database.Activity.Include(a => a.Actor).Where(a => a.TargetType == TargetType.Level).Where(a => a.TargetId == slotTarget);
-        return Build(playerEvents, timestamp, endTimestamp);
+        IEnumerable<Activity> playerEvents = this.database.Activity.Where(e => e.EventTimestamp <= timestamp && e.EventTimestamp >= endTimestamp).Include(a => a.Actor).Include(a => a.Actor.Location).Where(a => a.TargetType == TargetType.Level).Where(a => a.TargetId == slotTarget);
+        List<User> users = new List<User>();
+        StringBuilder groups = new StringBuilder();
+
+        List<RASubgroup> legacyEvents = PrepareSubgroups(playerEvents, ref users);
+        foreach(RASubgroup sraEvent in legacyEvents)
+        {
+            groups.Append(sraEvent.SerializeSubgroup());
+        }
+        
+        StringBuilder userStage = new StringBuilder();
+        foreach(User user in users)
+        {
+            userStage.Append(user.Serialize(GameVersion.LittleBigPlanet2));
+        }
+        StringBuilder returnText = new StringBuilder();
+
+        Slot? targetSlot = this.database.Slots.FirstOrDefault(s => s.SlotId == slotTarget);
+        if (targetSlot == null) return LbpSerializer.BlankElement("stream");
+        returnText.Append(
+            LbpSerializer.StringElement("start_timestamp", timestamp) +
+            LbpSerializer.StringElement("end_timestamp", endTimestamp) +
+            LbpSerializer.StringElement("groups", groups) +
+            LbpSerializer.StringElement("slots", targetSlot.Serialize()) +
+            LbpSerializer.StringElement("users", userStage)
+        );
+        return LbpSerializer.StringElement("stream", returnText);
     }
 
     private string Build(IEnumerable<Activity> playerEvents, long timestamp, long endTimestamp)
@@ -93,6 +134,60 @@ public class ActivityController : ControllerBase
         List<Slot> slots = new List<Slot>();
         List<User> users = new List<User>();
 
+        List<RASubgroup> subgroups = PrepareSubgroups(playerEvents, ref users);
+
+        users = users.Distinct().ToList();
+
+        foreach(RASubgroup subgroup in subgroups.OrderByDescending(s => s.Timestamp))
+        {
+            object? obj = ActivityHelper.ObjectFinder(this.database, subgroup.HostType, subgroup.HostId);
+            if (obj == null) continue;
+            if (obj as User != null)
+            {
+                User? objU = obj as User;
+                if (objU != null) users.Add(objU);
+            }
+            else if (obj as Slot != null)
+            {
+                Slot? objS = obj as Slot;
+                if (objS != null) slots.Add(objS);
+            };
+            string element;
+            if (subgroup.HostType == TargetType.Profile)
+            {
+                element = LbpSerializer.StringElement("user_id", subgroup.HostUsername);
+            }
+            else
+            {
+                element = LbpSerializer.TaggedStringElement("slot_id", subgroup.HostId, "type", "user");
+            }
+            groups.Append(
+                LbpSerializer.TaggedStringElement("group",
+                    LbpSerializer.StringElement("timestamp", subgroup.Timestamp) +
+                    element +
+                    LbpSerializer.StringElement("subgroups", subgroup.SerializeSubgroup())
+                , "type", (subgroup.HostType == TargetType.Level ? "level" : "user"))
+            );
+        }
+
+        string usrstaging = "";
+        foreach(User user in users.Distinct())
+        {
+            usrstaging += user.Serialize(GameVersion.LittleBigPlanet3);
+        }
+
+        string slotstaging = "";
+        foreach(Slot slot in slots.Distinct())
+        {
+            slotstaging += slot.Serialize(GameVersion.LittleBigPlanet2);
+        }
+        objects = LbpSerializer.StringElement("slots", slotstaging) + LbpSerializer.StringElement("users", usrstaging);
+
+        return LbpSerializer.StringElement("stream", returnText.ToString() + LbpSerializer.StringElement("groups", groups.ToString()) + objects);
+    }
+
+    private List<RASubgroup> PrepareSubgroups(IEnumerable<Activity> playerEvents, ref List<User> users)
+    {
         List<RASubgroup> subgroups = new List<RASubgroup>();
         foreach(Activity activity in playerEvents.OrderByDescending(e => e.EventTimestamp))
         {
@@ -133,46 +228,7 @@ public class ActivityController : ControllerBase
                 subgroups[index].Events = subgroup.Events;
             }
         }
-
         users = users.Distinct().ToList();
-
-        foreach(RASubgroup subgroup in subgroups.OrderByDescending(s => s.Timestamp))
-        {
-            object? obj = ActivityHelper.ObjectFinder(this.database, subgroup.HostType, subgroup.HostId);
-            if (obj == null) continue;
-            if (obj as User != null) users.Add(obj as User);
-            else if (obj as Slot != null) slots.Add(obj as Slot);
-            string element;
-            if (subgroup.HostType == TargetType.Profile)
-            {
-                element = LbpSerializer.StringElement("user_id", subgroup.HostUsername);
-            }
-            else
-            {
-                element = LbpSerializer.TaggedStringElement("slot_id", subgroup.HostId, "type", "user");
-            }
-            groups.Append(
-                LbpSerializer.TaggedStringElement("group",
-                    LbpSerializer.StringElement("timestamp", subgroup.Timestamp) +
-                    element +
-                    LbpSerializer.StringElement("subgroups", subgroup.SerializeSubgroup())
-                , "type", (subgroup.HostType == TargetType.Level ? "level" : "user"))
-            );
-        }
-
-        string usrstaging = "";
-        foreach(User user in users.Distinct())
-        {
-            usrstaging += user.Serialize(GameVersion.LittleBigPlanet3);
-        }
-
-        string slotstaging = "";
-        foreach(Slot slot in slots.Distinct())
-        {
-            slotstaging += slot.Serialize(GameVersion.LittleBigPlanet2);
-        }
-        objects = LbpSerializer.StringElement("slots", slotstaging) + LbpSerializer.StringElement("users", usrstaging);
-
-        return LbpSerializer.StringElement("stream", returnText.ToString() + LbpSerializer.StringElement("groups", groups.ToString()) + objects);
+        return subgroups;
     }
 }

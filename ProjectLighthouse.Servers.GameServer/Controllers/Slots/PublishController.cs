@@ -232,7 +232,7 @@ public class PublishController : ControllerBase
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
 
-            await this.database.NewEvent(slot.CreatorId, TargetType.Level, slot.SlotId, EventType.PublishLevel, new long[2] { 1, slot.MinimumPlayers });
+            await this.database.NewEvent(slot.CreatorId, TargetType.Level, slot.SlotId, EventType.PublishLevel, 1, slot.MinimumPlayers);
             
             return this.Ok(oldSlot.Serialize(gameToken.GameVersion));
         }

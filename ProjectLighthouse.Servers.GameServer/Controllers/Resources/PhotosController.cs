@@ -139,7 +139,7 @@ public class PhotosController : ControllerBase
 
         if (photo.Slot?.Type == SlotType.User && photo.SlotId != null)
         {
-            await this.database.NewEvent(photo.CreatorId, TargetType.Level, photo.SlotId ?? 1, EventType.UploadPhoto, new long[2] { photo.PhotoId, 0 });
+            await this.database.NewEvent(photo.CreatorId, TargetType.Level, photo.SlotId ?? 1, EventType.UploadPhoto, photo.PhotoId);
         }
 
         await WebhookHelper.SendWebhook

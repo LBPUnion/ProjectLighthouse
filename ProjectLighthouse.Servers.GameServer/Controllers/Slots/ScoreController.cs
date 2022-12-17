@@ -144,6 +144,9 @@ public class ScoreController : ControllerBase
             {
                 this.database.Scores.Add(playerScore);
             }
+
+            User? actor = await this.database.Users.FirstOrDefaultAsync(u => u.Username == player);
+            if (actor != null) await this.database.NewEvent(actor.UserId, TargetType.Level, playerScore.SlotId, EventType.Score, playerScore.Points, playerScore.Type);
         }
 
         await this.database.SaveChangesAsync();

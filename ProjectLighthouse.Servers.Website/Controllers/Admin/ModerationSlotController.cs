@@ -33,7 +33,7 @@ public class ModerationSlotController : ControllerBase
         await WebhookHelper.SendWebhook("New Team Pick!", $"The level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId}) by **{slot.Creator?.Username}** has been team picked");
 
         await this.database.SaveChangesAsync();
-        await this.database.NewEvent(user.UserId, TargetType.LBP3TeamPick, id, EventType.Public, new long[2] {0,0});
+        await this.database.NewEvent(user.UserId, TargetType.LBP3TeamPick, id, EventType.Public);
         return this.Redirect("~/slot/" + id);
     }
 
