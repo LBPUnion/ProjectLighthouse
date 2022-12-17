@@ -22,26 +22,20 @@
 @if (Model.User != null)
 {
     <p>@Model.Translate(LandingPageStrings.LoggedInAs, Model.User.Username)</p>
-    if (ServerConfiguration.Instance.Authentication.UseExternalAuth && Model.PendingAuthAttempts > 0)
-    {
-        <p>
-            <b><a href="/authentication">@Model.Translate(LandingPageStrings.AuthAttemptsPending, Model.PendingAuthAttempts)</a></b>
-        </p>
-    }
 }
 
-@if (Model.PlayersOnline.Count == 1)
-{
-    <p>@Model.Translate(LandingPageStrings.UsersSingle)</p>
-}
 
-else if (Model.PlayersOnline.Count == 0)
+@switch (Model.PlayersOnline.Count)
 {
-    <p>@Model.Translate(LandingPageStrings.UsersNone)</p>
-}
-else
-{
-    <p>@Model.Translate(LandingPageStrings.UsersMultiple, Model.PlayersOnline.Count)</p>
+    case 1:
+        <p>@Model.Translate(LandingPageStrings.UsersSingle)</p>
+        break;
+    case 0:
+        <p>@Model.Translate(LandingPageStrings.UsersNone)</p>
+        break;
+    default:
+        <p>@Model.Translate(LandingPageStrings.UsersMultiple, Model.PlayersOnline.Count)</p>
+        break;
 }
 
 @{

@@ -38,6 +38,8 @@ public class NPTicket
     public uint IssuerId { get; set; }
     public ulong IssuedDate { get; set; }
     public ulong ExpireDate { get; set; }
+    public ulong UserId { get; set; }
+    public string TicketSerial { get; set; } = "";
 
     private string? titleId { get; set; }
 
@@ -112,14 +114,13 @@ public class NPTicket
 
     private static bool Read21Ticket(NPTicket npTicket, TicketReader reader)
     {
-        reader.ReadTicketString(); // "Serial id", but its apparently not what we're looking for
+        npTicket.TicketSerial = CryptoHelper.Sha1Hash(reader.ReadTicketString()); // "Serial id", but its apparently not what we're looking for
 
         npTicket.IssuerId = reader.ReadTicketUInt32();
         npTicket.IssuedDate = reader.ReadTicketUInt64();
         npTicket.ExpireDate = reader.ReadTicketUInt64();
 
-        //TODO implement account linking
-        ulong uid = reader.ReadTicketUInt64();
+        npTicket.UserId = reader.ReadTicketUInt64();
 
         npTicket.Username = reader.ReadTicketString();
 
@@ -149,13 +150,13 @@ public class NPTicket
 
     private static bool Read30Ticket(NPTicket npTicket, TicketReader reader)
     {
-        reader.ReadTicketString(); // "Serial id", but its apparently not what we're looking for
+        npTicket.TicketSerial = CryptoHelper.Sha1Hash(reader.ReadTicketString()); // "Serial id", but its apparently not what we're looking for
 
         npTicket.IssuerId = reader.ReadTicketUInt32();
         npTicket.IssuedDate = reader.ReadTicketUInt64();
         npTicket.ExpireDate = reader.ReadTicketUInt64();
 
-        ulong uid = reader.ReadTicketUInt64();
+        npTicket.UserId = reader.ReadTicketUInt64();
 
         npTicket.Username = reader.ReadTicketString();
 
@@ -306,8 +307,7 @@ public class NPTicket
                 return null;
             }
 
-            bool valid = npTicket.ValidateSignature();
-            if (!valid)
+            if (ServerConfiguration.Instance.Authentication.VerifyTickets && !npTicket.ValidateSignature())
             {
                 Logger.Warn($"Failed to verify authenticity of ticket from user {npTicket.Username}", LogArea.Login);
                 return null;

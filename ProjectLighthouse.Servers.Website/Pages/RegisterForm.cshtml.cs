@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -25,30 +26,9 @@ public class RegisterForm : BaseLayout
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
     public async Task<IActionResult> OnPost(string username, string password, string confirmPassword, string emailAddress)
     {
-        if (ServerConfiguration.Instance.Authentication.PrivateRegistration)
-        {
-            if (this.Request.Query.ContainsKey("token"))
-            {
-                string? token = this.Request.Query["token"];
-                if (!this.Database.IsRegistrationTokenValid(token))
-                    return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
+        if (this.Database.UserFromWebRequest(this.Request) != null) return this.Redirect("~/");
 
-                string? tokenUsername = await this.Database.RegistrationTokens.Where(r => r.Token == token)
-                    .Select(u => u.Username)
-                    .FirstOrDefaultAsync();
-                if (tokenUsername == null) return this.BadRequest();
-
-                username = tokenUsername;
-            }
-            else
-            {
-                return this.NotFound();
-            }
-        }
-        else if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled)
-        {
-            return this.NotFound();
-        }
+        if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled) return this.NotFound();
 
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -74,7 +54,9 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        if (await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower()) != null)
+        //TODO rework registration
+        User? existingUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower() && u.Password == null);
+        if (existingUser != null)
         {
             this.Error = this.Translate(ErrorStrings.UsernameTaken);
             return this.Page();
@@ -93,12 +75,12 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        if (this.Request.Query.ContainsKey("token"))
-        {
-            await this.Database.RemoveRegistrationToken(this.Request.Query["token"]);
-        }
-
         User user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
+        if (existingUser != null)
+        {
+            user.Password = CryptoHelper.BCryptHash(password);
+            user.EmailAddress = emailAddress;
+        }
 
         WebToken webToken = new()
         {
@@ -119,28 +101,10 @@ public class RegisterForm : BaseLayout
 
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
-    public async Task<IActionResult> OnGet()
+    public IActionResult OnGet()
     {
         this.Error = string.Empty;
-        if (ServerConfiguration.Instance.Authentication.PrivateRegistration)
-        {
-            if (this.Request.Query.ContainsKey("token"))
-            {
-                string? token = this.Request.Query["token"];
-                if (!this.Database.IsRegistrationTokenValid(token))
-                    return this.StatusCode(403, this.Translate(ErrorStrings.TokenInvalid));
-
-                string? tokenUsername = await this.Database.RegistrationTokens.Where(r => r.Token == token)
-                    .Select(u => u.Username)
-                    .FirstAsync();
-                this.Username = tokenUsername;
-            }
-            else
-            {
-                return this.NotFound();
-            }
-        }
-        else if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        if (!ServerConfiguration.Instance.Authentication.RegistrationEnabled)
         {
             return this.NotFound();
         }

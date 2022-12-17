@@ -4,8 +4,10 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
@@ -57,10 +59,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             #if DEBUG
             "\n\n---DEBUG INFO---\n" +
             $"user.UserId: {token.UserId}\n" +
-            $"token.Approved: {token.Approved}\n" +
-            $"token.Used: {token.Used}\n" +
             $"token.UserLocation: {token.UserLocation}\n" +
             $"token.GameVersion: {token.GameVersion}\n" +
+            $"token.TicketHash: {token.TicketHash}\n" +
             $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
             "---DEBUG INFO---" +
             #endif
@@ -80,13 +81,30 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameToken token = this.GetToken();
 
-        string response = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        string message = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-        string scannedText = CensorHelper.ScanMessage(response);
+        if (message.StartsWith("/setemail"))
+        {
+            string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
+            if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
+
+            if (await this.database.Users.AnyAsync(u => u.EmailAddress == email)) return this.Ok();
+
+            User? user = await this.database.UserFromGameToken(token);
+            if (user == null || user.EmailAddress != null) return this.Ok();
+
+            user.EmailAddress = email;
+            user.EmailAddressVerified = true;
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        string scannedText = CensorHelper.ScanMessage(message);
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        Logger.Info($"{username}: {response} / {scannedText}", LogArea.Filter);
+        Logger.Info($"{username}: {message} / {scannedText}", LogArea.Filter);
 
         return this.Ok(scannedText);
     }

@@ -28,9 +28,8 @@ public class LandingPage : BaseLayout
         if (user != null && user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 
         if (user != null)
-            this.PendingAuthAttempts = await this.Database.AuthenticationAttempts.Include
-                    (a => a.GameToken)
-                .CountAsync(a => a.GameToken.UserId == user.UserId);
+            this.PendingAuthAttempts = await this.Database.PlatformLinkAttempts
+                .CountAsync(l => l.UserId == user.UserId);
 
         List<int> userIds = await this.Database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300).Select(l => l.UserId).ToListAsync();
 

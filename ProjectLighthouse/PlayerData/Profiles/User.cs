@@ -87,15 +87,14 @@ public class User
     private int PhotosWithMe()
     {
         List<int> photoSubjectIds = new();
-        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == this.UserId).Select(p => p.PhotoSubjectId));
+        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == this.UserId)
+            .Select(p => p.PhotoSubjectId));
 
-        var list = this.database.Photos.Select(p => new
-            {
-                p.PhotoId,
-                p.PhotoSubjectCollection,
-            }).ToList();
-        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Split(",").Contains(ps.ToString())) select v.PhotoId).ToList();
-        return this.database.Photos.Count(p => photoIds.Any(pId => p.PhotoId == pId) && p.CreatorId != this.UserId);
+        return (
+            from id in photoSubjectIds
+            from photo in this.database.Photos.Where(p => p.PhotoSubjectCollection.Contains(id.ToString())).ToList()
+            where photo.PhotoSubjectCollection.Split(",").Contains(id.ToString()) && photo.CreatorId != this.UserId
+            select id).Count();
     }
 
     [JsonIgnore]
@@ -179,11 +178,6 @@ public class User
     public string? BannedReason { get; set; }
     #nullable disable
 
-    #nullable enable
-    [JsonIgnore]
-    public string? ApprovedIPAddress { get; set; }
-    #nullable disable
-
     [JsonIgnore]
     public string Language { get; set; } = "en";
 
@@ -206,6 +200,12 @@ public class User
 
     [JsonIgnore]
     public string TwoFactorBackup { get; set; } = "";
+
+    [JsonIgnore]
+    public ulong LinkedRpcnId { get; set; }
+
+    [JsonIgnore]
+    public ulong LinkedPsnId { get; set; }
 
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;

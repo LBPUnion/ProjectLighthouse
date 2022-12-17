@@ -60,7 +60,7 @@ public class LoginForm : BaseLayout
             }
         }
 
-        if (user == null)
+        if (user == null || user.Password == null)
         {
             Logger.Warn($"User {username} failed to login on web due to invalid username", LogArea.Login);
             this.Error = ServerConfiguration.Instance.Mail.MailEnabled

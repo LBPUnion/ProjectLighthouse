@@ -170,7 +170,7 @@ public static class CryptoHelper
 
     public static string Sha1Hash(string str) => Sha1Hash(Encoding.UTF8.GetBytes(str));
 
-    public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(SHA1.Create().ComputeHash(bytes)).Replace("-", "");
+    public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(SHA1.HashData(bytes)).Replace("-", "");
 
     public static string BCryptHash(string str) => BCrypt.Net.BCrypt.HashPassword(str);
 

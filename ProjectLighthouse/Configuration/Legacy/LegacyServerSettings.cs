@@ -153,7 +153,6 @@ internal class LegacyServerSettings
         configuration.Authentication = new AuthenticationConfiguration
         {
             RegistrationEnabled = this.RegistrationEnabled,
-            UseExternalAuth = this.UseExternalAuth,
         };
 
         configuration.Captcha = new CaptchaConfiguration
