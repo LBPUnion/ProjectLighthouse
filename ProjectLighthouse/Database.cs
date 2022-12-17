@@ -100,9 +100,15 @@ public class Database : DbContext
                     await this.SaveChangesAsync();
                     return;
                 case EventType.Review:
-                    existingAct.EventTimestamp = TimeHelper.TimestampMillis;
+                    // Unneccesary?
+                    // existingAct.EventTimestamp = TimeHelper.TimestampMillis;
                     existingAct.Interaction1 = interactions[0];
                     existingAct.Interaction2 = TimeHelper.TimestampMillis;
+                    await this.SaveChangesAsync();
+                    return;
+                case EventType.PlayLevel:
+                    existingAct.EventTimestamp = TimeHelper.TimestampMillis;
+                    existingAct.Interaction1 = interactions[0];
                     await this.SaveChangesAsync();
                     return;
                 default:

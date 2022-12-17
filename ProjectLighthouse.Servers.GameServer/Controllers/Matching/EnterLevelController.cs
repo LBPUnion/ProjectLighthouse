@@ -83,6 +83,8 @@ public class EnterLevelController : ControllerBase
                 return this.BadRequest();
         }
 
+        await this.database.NewEvent(v.UserId, TargetType.Level, v.SlotId, EventType.PlayLevel, v.PlaysLBP2 + v.PlaysLBP3 + v.PlaysLBP1);
+
         await this.database.SaveChangesAsync();
 
         return this.Ok();
