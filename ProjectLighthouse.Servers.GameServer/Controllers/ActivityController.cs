@@ -10,11 +10,8 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
-// Prototyping
-
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/")]
-[Route("debug/")]
 [Produces("text/xml")]
 public class ActivityController : ControllerBase
 {
@@ -86,9 +83,13 @@ public class ActivityController : ControllerBase
     {
         IEnumerable<Activity> playerEvents = additionalEvents ?? Enumerable.Empty<Activity>();
 
-        foreach (User userTarget in userTargets ) playerEvents = playerEvents.Concat(userTarget.PlayerEvents.AsEnumerable()).Distinct();
+        foreach (User userTarget in userTargets ) playerEvents = playerEvents
+            .Concat(userTarget.PlayerEvents.AsEnumerable())
+            .Where(e => e.EventTimestamp <= timestamp)
+            .Where(e => e.EventTimestamp >= endTimestamp)
+            .Distinct();
 
-        return Build(playerEvents.Where(e => e.EventTimestamp <= timestamp && e.EventTimestamp >= endTimestamp), timestamp, endTimestamp);
+        return Build(playerEvents, timestamp, endTimestamp);
     }
 
     private string StreamBuilder(int slotTarget, long timestamp, long endTimestamp)
