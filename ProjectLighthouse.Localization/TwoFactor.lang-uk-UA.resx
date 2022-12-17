@@ -18,51 +18,51 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="enable_2fa" xml:space="preserve">
-        <value>Enable Two-Factor</value>
+        <value>Увімкнути двофакторний режим</value>
     </data>
   <data name="disable_2fa" xml:space="preserve">
-        <value>Disable Two-Factor</value>
+        <value>Вимкнути двофакторний режим</value>
     </data>
   <data name="qr_description" xml:space="preserve">
-        <value>Once you have added this two factor code to your app of choice, enter a valid code below to finish the setup process</value>
+        <value>Додавши цей двофакторний код до вибраної програми, введіть дійсний код нижче, щоб завершити процес налаштування</value>
     </data>
   <data name="qr_title" xml:space="preserve">
-        <value>Here is your Two-Factor QR code</value>
+        <value>Ось ваш двофакторний QR-код</value>
     </data>
   <data name="backup_title" xml:space="preserve">
-        <value>Backup codes</value>
+        <value>Резервні коди</value>
     </data>
   <data name="backup_description" xml:space="preserve">
-        <value>These codes will allow you to regain access to your account if you ever lose access to your 2FA device</value>
+        <value>Ці коди дозволять вам відновити доступ до свого облікового запису, якщо ви втратите доступ до свого пристрою 2FA</value>
     </data>
   <data name="backup_description2" xml:space="preserve">
-        <value>Save these codes somewhere because otherwise you may be locked out of your account</value>
+        <value>Збережіть ці коди десь, інакше ви можете втратити доступ до свого облікового запису</value>
     </data>
   <data name="backup_confirmation" xml:space="preserve">
-        <value>I've saved these codes</value>
+        <value>Я зберігаю ці коди</value>
     </data>
   <data name="invalid_code" xml:space="preserve">
-        <value>Invalid 2FA Code</value>
+        <value>Недійсний код 2FA</value>
     </data>
   <data name="disable_2fa_description" xml:space="preserve">
-        <value>To disable two-factor authentication, enter a correct code from your authenticator app.</value>
+        <value>Щоб вимкнути двофакторну автентифікацію, введіть правильний код із програми автентифікації.</value>
     </data>
   <data name="2fa" xml:space="preserve">
-        <value>Two-Factor Authentication</value>
+        <value>Двофакторна автентифікація</value>
     </data>
   <data name="2fa_required" xml:space="preserve">
-        <value>You are required to setup 2FA because of your role within this instance.</value>
+        <value>Ви повинні налаштувати 2FA через свою роль у цьому екземплярі.</value>
     </data>
   <data name="2fa_description" xml:space="preserve">
-        <value>Enter a valid 2FA code to continue</value>
+        <value>Щоб продовжити, введіть дійсний код 2FA</value>
     </data>
   <data name="2fa_backup_description" xml:space="preserve">
-        <value>Alternatively, you can click {0}here{1} to enter one of your backup codes</value>
+        <value>Крім того, ви можете натиснути {0}тут{1}, щоб ввести один зі своїх резервних кодів</value>
     </data>
   <data name="backup_download" xml:space="preserve">
-        <value>Download backup codes</value>
+        <value>Завантажити резервні коди</value>
     </data>
   <data name="invalid_backup" xml:space="preserve">
-        <value>Invalid Backup Code</value>
+        <value>Недійсний резервний код</value>
     </data>
 </root>
