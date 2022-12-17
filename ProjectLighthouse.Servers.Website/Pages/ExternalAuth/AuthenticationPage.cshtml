@@ -36,7 +36,7 @@
     <h3 style="display: inline-block">PSN: </h3>
     @if (Model.User?.LinkedPsnId != 0)
     {
-        <div class="ui blue button" style="cursor: default; pointer-events: none">
+        <div class="ui green button" style="cursor: default; pointer-events: none">
             Linked
         </div>
         <a href="/authentication/unlink/psn" style="display: block; color:  orangered">Click here to unlink this platform</a>
@@ -53,7 +53,7 @@
     <h3 style="display: inline-block">RPCN: </h3>
     @if (Model.User?.LinkedRpcnId != 0)
     {
-        <div class="ui blue button" style="cursor: default; pointer-events: none">
+        <div class="ui green button" style="cursor: default; pointer-events: none">
             Linked
         </div>
         <a href="/authentication/unlink/rpcn" style="display: block; color: orangered">Click here to unlink this platform</a>
