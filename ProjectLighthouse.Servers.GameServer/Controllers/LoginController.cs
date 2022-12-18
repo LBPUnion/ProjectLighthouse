@@ -77,8 +77,10 @@ public class LoginController : ControllerBase
             case Platform.Vita:
                 user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedPsnId == npTicket.UserId);
                 break;
-            case Platform.PSP:
             case Platform.UnitTest:
+                user = null;
+                break;
+            case Platform.PSP:
             case Platform.Unknown:
             default:
                 throw new ArgumentOutOfRangeException();
@@ -88,7 +90,7 @@ public class LoginController : ControllerBase
         if (user == null)
         {
             User? targetUsername = await this.database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
-            if (targetUsername != null)
+            if (targetUsername != null && !ServerStatics.IsUnitTesting)
             {
                 // WebToken? webToken = await this.database.WebTokens.Where(t => t.UserId == targetUsername.UserId)
                     // .Where(t => t.UserLocation == ipAddress)
