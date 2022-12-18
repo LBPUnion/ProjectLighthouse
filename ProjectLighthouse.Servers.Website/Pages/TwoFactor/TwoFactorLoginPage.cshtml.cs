@@ -31,9 +31,11 @@ public class TwoFactorLoginPage : BaseLayout
         User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
         if (user == null) return this.Redirect("~/login");
 
-        if (!user.IsTwoFactorSetup) return this.Redirect(this.RedirectUrl);
+        if (user.IsTwoFactorSetup) return this.Page();
 
-        return this.Page();
+        token.Verified = true;
+        await this.Database.SaveChangesAsync();
+        return this.Redirect(this.RedirectUrl);
     }
 
     public async Task<IActionResult> OnPost([FromForm] string? code, [FromForm] string? redirect, [FromForm] string? backup)
@@ -54,6 +56,7 @@ public class TwoFactorLoginPage : BaseLayout
         {
             token.Verified = true;
             await this.Database.SaveChangesAsync();
+            return this.Redirect(this.RedirectUrl);
         }
 
         // if both are null or neither are null, there should only be one at at time
