@@ -93,9 +93,10 @@ public class LoginController : ControllerBase
                 ulong targetPlatform = npTicket.Platform == Platform.RPCS3
                         ? targetUsername.LinkedRpcnId
                         : targetUsername.LinkedPsnId;
-                // try and link platform with account
+                // only make a link request if the user doesn't already have an account linked for that platform
                 if (targetPlatform == 0)
                 {
+                    // if there is already a pending link request don't create another
                     if (await this.database.PlatformLinkAttempts.AnyAsync(p =>
                             p.Platform == npTicket.Platform &&
                             p.PlatformId == npTicket.UserId &&
@@ -134,13 +135,17 @@ public class LoginController : ControllerBase
                 
             Logger.Success($"Created new user for {username}, platform={npTicket.Platform}", LogArea.Login);
         }
-        // if a user changes their username invalidate their other linked accounts
-        // because they will no longer have the same name
-        // TODO a psn user can probably steal an rpcs3 username, what the fuck do we do
         else if (user.Username != npTicket.Username)
         {
+            bool usernameExists = await this.database.Users.AnyAsync(u => u.Username == npTicket.Username);
+            if (usernameExists)
+            {
+                Logger.Warn($"{npTicket.Platform} user changed their name to a name that is already taken, oldName='{user.Username}', newName='{npTicket.Username}'", LogArea.Login);
+                return this.StatusCode(403, "");
+            }
             Logger.Info($"User's username has changed, old='{user.Username}', new='{npTicket.Username}', platform={npTicket.Platform}", LogArea.Login);
             user.Username = username;
+            // unlink other platforms because the names no longer match
             if (npTicket.Platform == Platform.RPCS3)
             {
                 user.LinkedPsnId = 0;
@@ -168,24 +173,13 @@ public class LoginController : ControllerBase
             return this.StatusCode(403, ""); // If not, then 403.
         }
 
-
-        // The GameToken LINQ statement above is case insensitive so we check that they are equal here
-        if (token.User.Username != npTicket.Username)
-        {
-            Logger.Warn($"Username case does not match for user {npTicket.Username}, expected={token.User.Username}", LogArea.Login);
-            return this.StatusCode(403, "");
-        }
-
         if (user.IsBanned)
         {
             Logger.Error($"User {npTicket.Username} tried to login but is banned", LogArea.Login);
             return this.StatusCode(403, "");
         }
 
-        await this.database.SaveChangesAsync();
-
         Logger.Success($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);
-        // After this point we are now considering this session as logged in.
 
         user.LastLogin = TimeHelper.TimestampMillis;
 
