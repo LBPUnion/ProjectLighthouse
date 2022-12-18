@@ -75,10 +75,8 @@ public class LoginController : ControllerBase
                 break;
             case Platform.PS3:
             case Platform.Vita:
-                user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedPsnId == npTicket.UserId);
-                break;
             case Platform.UnitTest:
-                user = null;
+                user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedPsnId == npTicket.UserId);
                 break;
             case Platform.PSP:
             case Platform.Unknown:
@@ -90,12 +88,9 @@ public class LoginController : ControllerBase
         if (user == null)
         {
             User? targetUsername = await this.database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
-            if (targetUsername != null && !ServerStatics.IsUnitTesting)
+            if (targetUsername != null)
             {
-                // WebToken? webToken = await this.database.WebTokens.Where(t => t.UserId == targetUsername.UserId)
-                    // .Where(t => t.UserLocation == ipAddress)
-                    // .FirstOrDefaultAsync();
-                    ulong targetPlatform = npTicket.Platform == Platform.RPCS3
+                ulong targetPlatform = npTicket.Platform == Platform.RPCS3
                         ? targetUsername.LinkedRpcnId
                         : targetUsername.LinkedPsnId;
                 // try and link platform with account
@@ -118,7 +113,7 @@ public class LoginController : ControllerBase
                     };
                     this.database.PlatformLinkAttempts.Add(linkAttempt);
                     await this.database.SaveChangesAsync();
-                    Logger.Success($"Linked {npTicket.Platform} account to user '{targetUsername.Username}'", LogArea.Login);
+                    Logger.Success($"Unlinked platform {npTicket.Platform} tried to login as user '{targetUsername.Username}'", LogArea.Login);
                     return this.StatusCode(403, "");
                 }
                 Logger.Warn($"New user tried to login but their name is already taken, username={username}", LogArea.Login);
