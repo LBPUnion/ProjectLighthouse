@@ -24,7 +24,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         this.Server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
         this.Client = this.Server.CreateClient();
     }
-    public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
+    public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = false)
     {
         if (number == -1) number = new Random().Next();
 

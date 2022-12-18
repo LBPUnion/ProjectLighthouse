@@ -242,6 +242,7 @@ public class NPTicket
                     ExpireDate = 0,
                     IssuedDate = 0,
                     Username = dataStr["unitTestTicket".Length..],
+                    UserId = ulong.Parse(dataStr["unitTestTicketunitTestUser".Length..]),
                 };
 
                 return npTicket;

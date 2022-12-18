@@ -55,7 +55,7 @@ public class RegisterForm : BaseLayout
         }
 
         //TODO rework registration
-        User? existingUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower() && u.Password == null);
+        User? existingUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
         if (existingUser != null)
         {
             this.Error = this.Translate(ErrorStrings.UsernameTaken);
