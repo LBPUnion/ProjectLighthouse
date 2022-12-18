@@ -22,33 +22,33 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>Welcome to {0}!</value>
+        <value>Ласкаво просимо до {0}!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Greetings, {0}.</value>
+        <value>Вітаємо, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>There are no people online. Why not hop on?</value>
+        <value>Немає людей у мережі. Чому б не продовжити грати?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>There is 1 person currently online:</value>
+        <value>Зараз у мережі 1 особа:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>There are currently {0} people online:</value>
+        <value>Наразі в мережі {0} людей:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
-        <value>You have {0} authentication attempts pending. Click here to view them.</value>
+        <value>У вас є {0} спроб автентифікації, що очікують на розгляд. Натисніть тут, щоб переглянути їх.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>Newest Levels</value>
+        <value>Найновіші рівні</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>Latest Team Picks</value>
+        <value>Останній вибір команди</value>
     </data>
 </root>
