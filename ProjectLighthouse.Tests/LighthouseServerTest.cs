@@ -49,7 +49,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return response;
     }
 
-    public async Task<LoginResult> Authenticate(int number = 0)
+    public async Task<LoginResult> Authenticate(int number = -1)
     {
         HttpResponseMessage response = await this.AuthenticateResponse(number);
 
