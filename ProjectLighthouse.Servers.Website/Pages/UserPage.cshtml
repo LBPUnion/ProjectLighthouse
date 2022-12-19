@@ -127,7 +127,7 @@
 <div class="ui grid">
     @{
         string outerDiv = isMobile ?
-            "" :
+            "horizontal-scroll" :
             "three wide column";
         string innerDiv = isMobile ?
             "ui top attached tabular menu horizontal-scroll" :
@@ -200,21 +200,7 @@
                 @foreach (Slot slot in Model.Slots ?? new List<Slot>())
                 {
                     <div class="ui segment">
-                        @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
-                               {
-                                   {
-                                       "User", Model.User
-                                   },
-                                   {
-                                       "CallbackUrl", $"~/user/{Model.ProfileUser.UserId}#levels"
-                                   },
-                                   {
-                                       "ShowLink", true
-                                   },
-                                   {
-                                       "IsMobile", isMobile
-                                   },
-                               })
+                        @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
                     </div>
                 }
             </div>
@@ -239,21 +225,7 @@
                     @foreach (Slot slot in Model.HeartedSlots ?? new List<Slot>())
                     {
                         <div class="ui segment">
-                            @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
-                                   {
-                                       {
-                                           "User", Model.User
-                                       },
-                                       {
-                                           "CallbackUrl", $"~/user/{Model.ProfileUser.UserId}#hearted"
-                                       },
-                                       {
-                                           "ShowLink", true
-                                       },
-                                       {
-                                           "IsMobile", isMobile
-                                       },
-                                   })
+                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#hearted", language, timeZone, isMobile, true)
                         </div>
                     }
                 </div>
@@ -271,21 +243,7 @@
                     @foreach (Slot slot in Model.QueuedSlots ?? new List<Slot>())
                     {
                         <div class="ui segment">
-                            @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
-                                   {
-                                       {
-                                           "User", Model.User
-                                       },
-                                       {
-                                           "CallbackUrl", $"~/user/{Model.ProfileUser.UserId}#queued"
-                                       },
-                                       {
-                                           "ShowLink", true
-                                       },
-                                       {
-                                           "IsMobile", isMobile
-                                       },
-                                   })
+                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#queued", language, timeZone, isMobile, true)
                         </div>
                     }
                 </div>

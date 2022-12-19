@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
@@ -82,7 +81,6 @@ public class UserPage : BaseLayout
                 .Where(s => s.Type == SlotType.User)
                 .Take(10)
                 .ToListAsync();
-            Console.WriteLine("user is profileuser");
         }
 
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.ProfileUser.CommentsEnabled;

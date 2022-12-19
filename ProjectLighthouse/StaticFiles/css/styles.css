@@ -81,6 +81,7 @@ canvas.hide-subjects {
     overflow-y: hidden;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+    width: 100%;
 }
 
 /*#region Cards*/

@@ -32,21 +32,7 @@
     </div>
 }
 
-@await Html.PartialAsync("Partials/SlotCardPartial", Model.Slot, new ViewDataDictionary(ViewData)
-{
-    {
-        "User", Model.User
-    },
-    {
-        "CallbackUrl", $"~/slot/{Model.Slot?.SlotId}"
-    },
-    {
-        "ShowLink", false
-    },
-    {
-        "IsMobile", Model.Request.IsMobile()
-    },
-})
+@await Model.Slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{Model.Slot?.SlotId}", language, timeZone, isMobile)
 <br>
 
 <div class="@(isMobile ? "" : "ui grid")">
@@ -98,7 +84,7 @@
 <div class="ui grid">
     @{
         string outerDiv = isMobile ?
-            "" :
+            "horizontal-scroll" :
             "three wide column";
         string innerDiv = isMobile ?
             "ui top attached tabular menu horizontal-scroll" :
