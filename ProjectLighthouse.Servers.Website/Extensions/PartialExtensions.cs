@@ -53,6 +53,7 @@ public static class PartialExtensions
                 .WithKeyValue("User", user)
                 .WithKeyValue("CallbackUrl", callbackUrl)
                 .WithKeyValue("ShowLink", showLink)
+                .WithKeyValue("IsMini", isMini)
                 .WithKeyValue("IsMobile", isMobile));
 
     public static Task<IHtmlContent> ToHtml<T>(this Photo photo, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, string timeZone, bool canDelete = false)
