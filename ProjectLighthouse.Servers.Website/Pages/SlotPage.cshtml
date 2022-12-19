@@ -122,7 +122,7 @@
                         @foreach (Photo photo in Model.Photos)
                         {
                             string width = isMobile ? "sixteen" : "eight";
-                            bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId || Model.User.UserId == Model.Slot?.SlotId);
+                            bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
                             <div class="@width wide column">
                                 @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
                             </div>
@@ -147,7 +147,7 @@
                            "isMobile", isMobile
                        },
                        {
-                           "CanDelete", (Model.User?.IsModerator ?? false) || Model.Slot?.CreatorId == Model.User?.UserId
+                           "CanDelete", Model.User?.IsModerator ?? false
                        },
                    })
         </div>

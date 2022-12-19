@@ -42,9 +42,7 @@ public class ModerationRemovalController : ControllerBase
             Score? score = await this.database.Scores.Include(s => s.Slot).FirstOrDefaultAsync(s => s.ScoreId == id);
             if (score == null) return null;
 
-            if (!user.IsModerator && score.Slot.CreatorId != user.UserId) return null;
-
-            return score;
+            return user.IsModerator ? score : null;
         });
     }
 
@@ -113,7 +111,7 @@ public class ModerationRemovalController : ControllerBase
             Photo? photo = await this.database.Photos.Include(p => p.Slot).FirstOrDefaultAsync(p => p.PhotoId == id);
             if (photo == null) return null;
 
-            if (!user.IsModerator && photo.Slot?.CreatorId != user.UserId) return null;
+            if (!user.IsModerator && photo.CreatorId != user.UserId) return null;
 
             return photo;
         });
