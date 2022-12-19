@@ -114,7 +114,7 @@ public class Database : DbContext
             UserLocation = userLocation,
             GameVersion = npTicket.GameVersion,
             Platform = npTicket.Platform,
-            TicketHash = npTicket.TicketSerial,
+            TicketHash = npTicket.TicketHash,
             // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
             ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
         };

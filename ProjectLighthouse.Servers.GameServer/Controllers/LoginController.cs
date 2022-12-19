@@ -1,6 +1,7 @@
 #nullable enable
 using System.Net;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Match.Rooms;
@@ -51,7 +52,7 @@ public class LoginController : ControllerBase
         if (remoteIpAddress == null)
         {
             Logger.Warn("unable to determine ip, rejecting login", LogArea.Login);
-            return this.StatusCode(403, ""); // 403 probably isnt the best status code for this, but whatever
+            return this.BadRequest();
         }
 
         string ipAddress = remoteIpAddress.ToString();
@@ -114,7 +115,7 @@ public class LoginController : ControllerBase
                     };
                     this.database.PlatformLinkAttempts.Add(linkAttempt);
                     await this.database.SaveChangesAsync();
-                    Logger.Success($"Unlinked platform {npTicket.Platform} tried to login as user '{targetUsername.Username}'", LogArea.Login);
+                    Logger.Success($"User '{npTicket.Username}' tried to login but platform isn't linked, platform={npTicket.Platform}", LogArea.Login);
                     return this.StatusCode(403, "");
                 }
                 Logger.Warn($"New user tried to login but their name is already taken, username={username}", LogArea.Login);
@@ -145,6 +146,7 @@ public class LoginController : ControllerBase
             }
             Logger.Info($"User's username has changed, old='{user.Username}', new='{npTicket.Username}', platform={npTicket.Platform}", LogArea.Login);
             user.Username = username;
+            this.database.PlatformLinkAttempts.RemoveWhere(p => p.UserId == user.UserId);
             // unlink other platforms because the names no longer match
             if (npTicket.Platform == Platform.RPCS3)
             {
@@ -156,9 +158,8 @@ public class LoginController : ControllerBase
             }
         }
 
-        // Get an existing token from the IP & username
         GameToken? token = await this.database.GameTokens.Include(t => t.User)
-            .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == npTicket.Username && t.TicketHash == npTicket.TicketSerial);
+            .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == npTicket.Username && t.TicketHash == npTicket.TicketHash);
 
         if (token != null)
         {
@@ -170,7 +171,7 @@ public class LoginController : ControllerBase
         if (token == null)
         {
             Logger.Warn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
-            return this.StatusCode(403, ""); // If not, then 403.
+            return this.StatusCode(403, "");
         }
 
         if (user.IsBanned)

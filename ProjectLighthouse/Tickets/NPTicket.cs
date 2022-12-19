@@ -39,7 +39,7 @@ public class NPTicket
     public ulong IssuedDate { get; set; }
     public ulong ExpireDate { get; set; }
     public ulong UserId { get; set; }
-    public string TicketSerial { get; set; } = "";
+    public string TicketHash { get; set; } = "";
 
     private string? titleId { get; set; }
 
@@ -85,7 +85,7 @@ public class NPTicket
     private static readonly Dictionary<Platform, byte[]> identifierByPlatform = new()
     {
         {
-            Platform.RPCS3, new byte[] { 0x52, 0x50, 0x43, 0x4E, }
+            Platform.RPCS3, "RPCN"u8.ToArray()
         },
         {
             Platform.PS3, new byte[]{ 0x71, 0x9F, 0x1D, 0x4A, }
@@ -114,7 +114,7 @@ public class NPTicket
 
     private static bool Read21Ticket(NPTicket npTicket, TicketReader reader)
     {
-        npTicket.TicketSerial = CryptoHelper.Sha1Hash(reader.ReadTicketString()); // "Serial id", but its apparently not what we're looking for
+        reader.ReadTicketString(); // serial id
 
         npTicket.IssuerId = reader.ReadTicketUInt32();
         npTicket.IssuedDate = reader.ReadTicketUInt64();
@@ -150,7 +150,7 @@ public class NPTicket
 
     private static bool Read30Ticket(NPTicket npTicket, TicketReader reader)
     {
-        npTicket.TicketSerial = CryptoHelper.Sha1Hash(reader.ReadTicketString()); // "Serial id", but its apparently not what we're looking for
+        reader.ReadTicketString(); // serial id
 
         npTicket.IssuerId = reader.ReadTicketUInt32();
         npTicket.IssuedDate = reader.ReadTicketUInt64();
@@ -316,6 +316,8 @@ public class NPTicket
 
             Logger.Success($"Verified ticket signature from {npTicket.Username}", LogArea.Login);
 
+            npTicket.TicketHash = CryptoHelper.Sha1Hash(data);
+
             #if DEBUG
             Logger.Debug("npTicket data:", LogArea.Login);
             Logger.Debug(JsonSerializer.Serialize(npTicket), LogArea.Login);
@@ -331,7 +333,6 @@ public class NPTicket
                 "Please let us know that this is a ticket version that is actually used on our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues !",
                 LogArea.Login
             );
-
             return null;
         }
         catch(Exception e)
