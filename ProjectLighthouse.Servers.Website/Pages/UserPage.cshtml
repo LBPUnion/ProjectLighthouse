@@ -2,6 +2,7 @@
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Administration
 @using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
@@ -123,29 +124,133 @@
     }
 </div>
 
-
-@if (Model.Photos != null && Model.Photos.Count != 0)
-{
-    <div class="ui purple segment">
-        <h2>@Model.Translate(GeneralStrings.RecentPhotos)</h2>
-
-        <div class="ui center aligned grid">
-            @foreach (Photo photo in Model.Photos)
+<div class="ui grid">
+    @{
+        string outerDiv = isMobile ?
+            "horizontal-scroll" :
+            "three wide column";
+        string innerDiv = isMobile ?
+            "ui top attached tabular menu horizontal-scroll" :
+            "ui vertical fluid tabular menu";
+    }
+    <div class="@outerDiv">
+        <div class="@innerDiv">
+            <a class="item active lh-sidebar" target="lh-comments">
+                Comments
+            </a>
+            <a class="item lh-sidebar" target="lh-photos">
+                @Model.Translate(BaseLayoutStrings.HeaderPhotos)
+            </a>
+                
+            <a class="item lh-sidebar" target="lh-levels">
+                @Model.Translate(BaseLayoutStrings.HeaderSlots)
+            </a>
+            <a class="item lh-sidebar" target="lh-playlists">
+                Playlists
+            </a>
+            @if (Model.User == Model.ProfileUser)
             {
-                string width = isMobile ? "sixteen" : "eight";
-                <div class="@width wide column">
-                    @await photo.ToHtml(Html, ViewData, language, timeZone)
-                </div>
+                <a class="item lh-sidebar" target="lh-hearted">
+                    Hearted Levels
+                </a>
+                <a class="item lh-sidebar" target="lh-queued">
+                    Queued Levels
+                </a>
             }
         </div>
     </div>
-    @if (isMobile)
-    {
-        <br/>
+    @{
+        string divLength = isMobile ? "sixteen" : "thirteen";
     }
-}
-
-@await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
+    <div class="@divLength wide stretched column">
+        <div class="lh-content" id="lh-comments">
+            @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
+        </div>
+        <div class="lh-content" id="lh-photos">
+            <div class="ui purple segment" id="photos">
+                @if (Model.Photos != null && Model.Photos.Count != 0)
+                {
+                    <div class="ui center aligned grid">
+                        @foreach (Photo photo in Model.Photos)
+                        {
+                            string width = isMobile ? "sixteen" : "eight";
+                            bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
+                            <div class="@width wide column">
+                                @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
+                            </div>
+                        }
+                    </div>
+                    @if (isMobile)
+                    {
+                        <br/>
+                    }
+                }
+                else
+                {
+                    <p>This user hasn't uploaded any photos</p>
+                }
+            </div>
+        </div>
+        <div class="lh-content" id="lh-levels">
+            <div class="ui green segment" id="levels">
+                @if (Model.HeartedSlots?.Count == 0)
+                {
+                    <p>This user hasn't published any levels</p>
+                }
+                @foreach (Slot slot in Model.Slots ?? new List<Slot>())
+                {
+                    <div class="ui segment">
+                        @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="lh-content" id="lh-playlists">
+            <div class="ui purple segment">
+                <p>@Model.Translate(GeneralStrings.Soon)</p>
+            </div>
+        </div>
+        @if (Model.User == Model.ProfileUser)
+        {
+            <div class="lh-content" id="lh-hearted">
+                <div class="ui pink segment" id="hearted">
+                    @if (Model.HeartedSlots?.Count == 0)
+                    {
+                        <p>You haven't hearted any levels</p>
+                    }
+                    else
+                    {
+                        <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
+                    }
+                    @foreach (Slot slot in Model.HeartedSlots ?? new List<Slot>())
+                    {
+                        <div class="ui segment">
+                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#hearted", language, timeZone, isMobile, true)
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="lh-content" id="lh-queued">
+                <div class="ui yellow segment" id="queued">
+                    @if (Model.QueuedSlots?.Count == 0)
+                    {
+                        <p>You haven't queued any levels</p>
+                    }
+                    else
+                    {
+                        <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
+                    }
+                    @foreach (Slot slot in Model.QueuedSlots ?? new List<Slot>())
+                    {
+                        <div class="ui segment">
+                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#queued", language, timeZone, isMobile, true)
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
 @if (Model.User != null && Model.User.IsModerator)
 {
@@ -192,3 +297,50 @@
         <br/>
     }
 }
+
+<script>
+const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
+const contentElements = Array.from(document.querySelectorAll(".lh-content"));
+let selectedId = window.location.hash;
+if (selectedId.startsWith("#"))
+    selectedId = selectedId.substring(1);
+let selectedElement = document.getElementById(selectedId);
+// id = lh-sidebar element
+function setVisible(e){
+    let eTarget = document.getElementById(e.target);
+    if (!e || !eTarget) return;
+
+    // make all active elements not active
+    for (let active of document.getElementsByClassName("active")) {
+        active.classList.remove("active");
+    }
+    // hide all content divs
+    for (let i = 0; i < contentElements.length; i++){
+        contentElements[i].style.display = "none";
+    }
+    // unhide content
+    eTarget.style.display = "";
+    
+    e.classList.add("active");
+}
+
+sidebarElements.forEach(el => {
+    if (el.classList.contains("active")){
+        setVisible(el);
+    }
+    el.addEventListener('click', event => {
+        if (!event.target.target) return;
+
+        setVisible(event.target)
+    })
+})
+// set the active content window based on url
+if (selectedElement != null) {
+    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
+        selectedElement = selectedElement.parentElement;
+    }
+    
+    let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
+    setVisible(sidebarEle);
+}
+</script>

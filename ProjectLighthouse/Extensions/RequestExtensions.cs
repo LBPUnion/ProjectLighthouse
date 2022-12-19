@@ -49,9 +49,11 @@ public static class RequestExtensions
     private static readonly HttpClient client;
 
     [SuppressMessage("ReSharper", "ArrangeObjectCreationWhenTypeNotEvident")]
-    private static async Task<bool> verifyCaptcha(string token)
+    private static async Task<bool> verifyCaptcha(string? token)
     {
         if (!ServerConfiguration.Instance.Captcha.CaptchaEnabled) return true;
+
+        if (token == null) return false;
 
         List<KeyValuePair<string, string>> payload = new()
         {
@@ -84,7 +86,7 @@ public static class RequestExtensions
             bool gotCaptcha = request.Form.TryGetValue(keyName, out StringValues values);
             if (!gotCaptcha) return false;
 
-            if (!await verifyCaptcha(values[0] ?? string.Empty)) return false;
+            if (!await verifyCaptcha(values[0])) return false;
         }
 
         return true;

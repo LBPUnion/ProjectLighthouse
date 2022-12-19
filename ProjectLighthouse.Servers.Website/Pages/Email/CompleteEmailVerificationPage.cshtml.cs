@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Email;
 
 public class CompleteEmailVerificationPage : BaseLayout
 {

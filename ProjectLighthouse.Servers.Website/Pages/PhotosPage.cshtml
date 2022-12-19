@@ -24,8 +24,9 @@
 
 @foreach (Photo photo in Model.Photos)
 {
+    bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
     <div class="ui segment">
-        @await photo.ToHtml(Html, ViewData, language, timeZone)
+        @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
     </div>
 }
 
