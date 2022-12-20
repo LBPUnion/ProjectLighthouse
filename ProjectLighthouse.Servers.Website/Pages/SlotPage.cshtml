@@ -112,7 +112,8 @@
     }
     <div class="@divLength wide stretched column">
         <div class="lh-content" id="lh-comments">
-            @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
+            @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+                   { { "PageOwner", Model.Slot?.CreatorId }, })
         </div>
         <div class="lh-content" id="lh-photos">
             <div class="ui purple segment" id="photos">

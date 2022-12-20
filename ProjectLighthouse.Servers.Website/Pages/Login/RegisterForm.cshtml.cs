@@ -114,7 +114,7 @@ public class RegisterForm : BaseLayout
 
         if (ServerConfiguration.Instance.Mail.MailEnabled) return this.Redirect("~/login/sendVerificationEmail");
 
-        return this.RedirectToPage(nameof(LandingPage));
+        return this.Redirect("~/");
     }
 
     [UsedImplicitly]
