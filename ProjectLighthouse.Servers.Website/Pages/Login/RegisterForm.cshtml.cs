@@ -11,7 +11,7 @@ using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class RegisterForm : BaseLayout
 {

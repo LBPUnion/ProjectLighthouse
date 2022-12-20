@@ -57,7 +57,7 @@
             <div class="ui left aligned segment">
                 @foreach (Slot slot in Model.LatestTeamPicks!) @* Can't reach a point where this is null *@
                 {
-                    @await Html.PartialAsync("Partials/SlotCardPartial", slot, Model.GetSlotViewData(slot.SlotId, isMobile))
+                    @await slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{slot.SlotId}", language, timeZone, isMobile, true, true)
                     <br>
                 }
             </div>
@@ -74,7 +74,7 @@
             <div class="ui left aligned segment">
                 @foreach (Slot slot in Model.NewestLevels!) @* Can't reach a point where this is null *@
                 {
-                    @await Html.PartialAsync("Partials/SlotCardPartial", slot, Model.GetSlotViewData(slot.SlotId, isMobile))
+                    @await slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{slot.SlotId}", language, timeZone, isMobile, true, true)
                     <br>
                 }
             </div>
