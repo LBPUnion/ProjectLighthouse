@@ -18,30 +18,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>The username field is blank.</value>
+        <value>Il campo del nome utente è vuoto.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>The username you've chosen is already taken.</value>
+        <value>Il nome utente che hai scelto è stato già preso.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>Password field is required.</value>
+        <value>Il campo della password è obbligatorio.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Passwords do not match!</value>
+        <value>Le password non corrispondono!</value>
     </data>
   <data name="token_invalid" xml:space="preserve">
-        <value>Invalid Token</value>
+        <value>Token non valido</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>You must complete the captcha correctly.</value>
+        <value>Devi completare il captcha correttamente.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
-        <value>The email address you've chosen is already taken.</value>
+        <value>L'indirizzo email che hai scelto è stato già preso.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Email address field is required.</value>
+        <value>Il campo dell'indirizzo email è obbligatorio.</value>
     </data>
   <data name="user_banned" xml:space="preserve">
-        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
+        <value>Sei stato bannato. Si prega di contattare un amministratore per ulteriori informazioni.\nMotivo: {0}</value>
     </data>
 </root>

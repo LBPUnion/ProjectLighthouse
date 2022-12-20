@@ -68,7 +68,6 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
             }
 
             LbpFile? file = LbpFile.FromHash(photo.LargeHash);
-//                Console.WriteLine(file.FileType, );
             if (file == null || file.FileType != LbpFileType.Jpeg && file.FileType != LbpFileType.Png)
             {
                 largeHashIsInvalidFile = true;

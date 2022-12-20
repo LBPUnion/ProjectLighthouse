@@ -131,7 +131,7 @@ public class SlotsController : ControllerBase
 
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == token.UserId);
         VisitedLevel? visitedLevel = await this.database.VisitedLevels.FirstOrDefaultAsync(r => r.SlotId == id && r.UserId == token.UserId);
-        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == id && r.ReviewerId == token.UserId);
+        Review? review = await this.database.Reviews.Include(r => r.Slot).FirstOrDefaultAsync(r => r.SlotId == id && r.ReviewerId == token.UserId);
         return this.Ok(slot.Serialize(gameVersion, ratedLevel, visitedLevel, review, true));
     }
 

@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -18,6 +19,10 @@ public class UserPage : BaseLayout
     public bool IsProfileUserHearted;
 
     public List<Photo>? Photos;
+    public List<Slot>? Slots;
+
+    public List<Slot>? HeartedSlots;
+    public List<Slot>? QueuedSlots;
 
     public User? ProfileUser;
     public UserPage(Database database) : base(database)
@@ -50,7 +55,33 @@ public class UserPage : BaseLayout
             }
         }
 
-        this.Photos = await this.Database.Photos.Include(p => p.Slot).OrderByDescending(p => p.Timestamp).Where(p => p.CreatorId == userId).Take(6).ToListAsync();
+        this.Photos = await this.Database.Photos.Include(p => p.Slot)
+            .OrderByDescending(p => p.Timestamp)
+            .Where(p => p.CreatorId == userId)
+            .Take(6)
+            .ToListAsync();
+
+        this.Slots = await this.Database.Slots.Include(p => p.Creator)
+            .OrderByDescending(s => s.LastUpdated)
+            .Where(p => p.CreatorId == userId)
+            .Take(10)
+            .ToListAsync();
+
+        if (this.User == this.ProfileUser)
+        {
+            this.QueuedSlots = await this.Database.QueuedLevels.Include(h => h.Slot)
+                .Where(h => this.User != null && h.UserId == this.User.UserId)
+                .Select(h => h.Slot)
+                .Where(s => s.Type == SlotType.User)
+                .Take(10)
+                .ToListAsync();
+            this.HeartedSlots = await this.Database.HeartedLevels.Include(h => h.Slot)
+                .Where(h => this.User != null && h.UserId == this.User.UserId)
+                .Select(h => h.Slot)
+                .Where(s => s.Type == SlotType.User)
+                .Take(10)
+                .ToListAsync();
+        }
 
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.ProfileUser.CommentsEnabled;
         if (this.CommentsEnabled)
@@ -70,12 +101,16 @@ public class UserPage : BaseLayout
 
         foreach (Comment c in this.Comments)
         {
-            Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.TargetId == c.CommentId);
+            Reaction? reaction = await this.Database.Reactions.Where(r => r.TargetId == c.TargetId)
+                .Where(r => r.UserId == this.User.UserId)
+                .FirstOrDefaultAsync();
             if (reaction != null) c.YourThumb = reaction.Rating;
         }
-        this.IsProfileUserHearted = await this.Database.HeartedProfiles.FirstOrDefaultAsync
-                                        (u => u.UserId == this.User.UserId && u.HeartedUserId == this.ProfileUser.UserId) !=
-                                    null;
+
+        this.IsProfileUserHearted = await this.Database.HeartedProfiles
+            .Where(h => h.HeartedUserId == this.ProfileUser.UserId)
+            .Where(h => h.UserId == this.User.UserId)
+            .AnyAsync();
 
         return this.Page();
     }

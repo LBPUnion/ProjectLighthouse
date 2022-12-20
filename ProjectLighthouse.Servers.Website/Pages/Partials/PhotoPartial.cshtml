@@ -1,4 +1,3 @@
-@using System.Globalization
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.Localization
@@ -9,15 +8,30 @@
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    bool canDelete = (bool?)ViewData["CanDelete"] ?? false;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
 <div style="position: relative">
+    @if (canDelete)
+    {
+        <button class="ui red icon button" style="position: absolute; right: 0.5em; top: 0.5em" onclick="deletePhoto(@Model.PhotoId)">
+            <i class="trash icon"></i>
+        </button>
+        <script>
+          function deletePhoto(photoId){
+              if (window.confirm("Are you sure you want to delete this?\nThis action cannot be undone.")){
+                  window.location.hash = "photos";
+                  window.location.href = "/moderation/deletePhoto/" + photoId + "?callbackUrl=" + this.window.location;
+              }          
+          }
+        </script>
+    }
     <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId" width="1920" height="1080"
             style="position: absolute; transform: rotate(180deg)">
     </canvas>
     <img id="game-image-@Model.PhotoId" src="/gameAssets/@Model.LargeHash"
-         style="width: 100%; height: auto; border-radius: .28571429rem;">
+         style="width: 100%; height: auto; border-radius: .28571429rem;" alt="Photo">
 </div>
 <br>
 
@@ -50,6 +64,12 @@
                 case SlotType.Local:
                     <span>in a level on the moon</span>
                     break;
+                case SlotType.Moon:
+                case SlotType.Unknown:
+                case SlotType.Unknown2:
+                case SlotType.DLC:
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
         at @TimeZoneInfo.ConvertTime(DateTime.UnixEpoch.AddSeconds(Model.Timestamp), timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt")

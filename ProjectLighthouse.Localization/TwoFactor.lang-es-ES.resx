@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="enable_2fa" xml:space="preserve">
+        <value>Activar Dos Factores</value>
+    </data>
+  <data name="disable_2fa" xml:space="preserve">
+        <value>Desactivar Dos Factores</value>
+    </data>
+  <data name="qr_description" xml:space="preserve">
+        <value>Una vez que hayas añadido este código de autenticación de dos factores a la aplicación de tu elección, introduce un código válido a continuación para finalizar el proceso de configuración</value>
+    </data>
+  <data name="qr_title" xml:space="preserve">
+        <value>Aquí está tu código QR de Dos Factores</value>
+    </data>
+  <data name="backup_title" xml:space="preserve">
+        <value>Códigos de respaldo</value>
+    </data>
+  <data name="backup_description" xml:space="preserve">
+        <value>Estos códigos te permitirán recuperar el acceso a tu cuenta si alguna vez pierdes el acceso a tu dispositivo A2F</value>
+    </data>
+  <data name="backup_description2" xml:space="preserve">
+        <value>Guarda estos códigos en algún lugar porque, de lo contrario, podrías estar bloqueado fuera de tu cuenta</value>
+    </data>
+  <data name="backup_confirmation" xml:space="preserve">
+        <value>He guardado estos códigos</value>
+    </data>
+  <data name="invalid_code" xml:space="preserve">
+        <value>Código A2F inválido</value>
+    </data>
+  <data name="disable_2fa_description" xml:space="preserve">
+        <value>Para desactivar la autenticación de dos factores, introduce un código correcto de tu aplicación de autenticación.</value>
+    </data>
+  <data name="2fa" xml:space="preserve">
+        <value>Autenticación de Dos Factores</value>
+    </data>
+  <data name="2fa_required" xml:space="preserve">
+        <value>Debes configurar A2F debido a tu rol dentro de esta instancia.</value>
+    </data>
+  <data name="2fa_description" xml:space="preserve">
+        <value>Introduzca un código A2F válido para continuar</value>
+    </data>
+  <data name="2fa_backup_description" xml:space="preserve">
+        <value>También puedes hacer clic {0}aquí{1} para introducir uno de tus códigos de respaldo</value>
+    </data>
+  <data name="backup_download" xml:space="preserve">
+        <value>Descargar los códigos de respaldo</value>
+    </data>
+  <data name="invalid_backup" xml:space="preserve">
+        <value>Código de Respaldo Inválido</value>
+    </data>
+</root>

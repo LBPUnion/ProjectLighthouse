@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="enable_2fa" xml:space="preserve">
+        <value>Увімкнути двофакторний режим</value>
+    </data>
+  <data name="disable_2fa" xml:space="preserve">
+        <value>Вимкнути двофакторний режим</value>
+    </data>
+  <data name="qr_description" xml:space="preserve">
+        <value>Додавши цей двофакторний код до вибраної програми, введіть дійсний код нижче, щоб завершити процес налаштування</value>
+    </data>
+  <data name="qr_title" xml:space="preserve">
+        <value>Ось ваш двофакторний QR-код</value>
+    </data>
+  <data name="backup_title" xml:space="preserve">
+        <value>Резервні коди</value>
+    </data>
+  <data name="backup_description" xml:space="preserve">
+        <value>Ці коди дозволять вам відновити доступ до свого облікового запису, якщо ви втратите доступ до свого пристрою 2FA</value>
+    </data>
+  <data name="backup_description2" xml:space="preserve">
+        <value>Збережіть ці коди десь, інакше ви можете втратити доступ до свого облікового запису</value>
+    </data>
+  <data name="backup_confirmation" xml:space="preserve">
+        <value>Я зберігаю ці коди</value>
+    </data>
+  <data name="invalid_code" xml:space="preserve">
+        <value>Недійсний код 2FA</value>
+    </data>
+  <data name="disable_2fa_description" xml:space="preserve">
+        <value>Щоб вимкнути двофакторну автентифікацію, введіть правильний код із програми автентифікації.</value>
+    </data>
+  <data name="2fa" xml:space="preserve">
+        <value>Двофакторна автентифікація</value>
+    </data>
+  <data name="2fa_required" xml:space="preserve">
+        <value>Ви повинні налаштувати 2FA через свою роль у цьому екземплярі.</value>
+    </data>
+  <data name="2fa_description" xml:space="preserve">
+        <value>Щоб продовжити, введіть дійсний код 2FA</value>
+    </data>
+  <data name="2fa_backup_description" xml:space="preserve">
+        <value>Крім того, ви можете натиснути {0}тут{1}, щоб ввести один зі своїх резервних кодів</value>
+    </data>
+  <data name="backup_download" xml:space="preserve">
+        <value>Завантажити резервні коди</value>
+    </data>
+  <data name="invalid_backup" xml:space="preserve">
+        <value>Недійсний резервний код</value>
+    </data>
+</root>
