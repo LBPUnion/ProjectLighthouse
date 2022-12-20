@@ -25,7 +25,7 @@ jobs:
 
       - name: Start MySQL
         if: ${{ matrix.os.database }}
-        uses: shogo82148/actions-setup-mysql@v1.13.0
+        uses: shogo82148/actions-setup-mysql@v1.14.1
         with:
           mysql-version: '8.0'
           root-password: ${{ env.DB_PASSWORD }}
@@ -67,7 +67,7 @@ jobs:
       - name: Process Test Results
         id: process-trx
         if: ${{ always() }}
-        uses: im-open/process-dotnet-test-results@v2.2.2
+        uses: im-open/process-dotnet-test-results@v2.2.5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           create-status-check: false
