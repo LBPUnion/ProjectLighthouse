@@ -137,10 +137,8 @@ public class LoginForm : BaseLayout
         }
 
 
-        if (string.IsNullOrWhiteSpace(redirect))
-        {
-            return this.RedirectToPage(nameof(LandingPage));
-        }
+        if (string.IsNullOrWhiteSpace(redirect)) return this.Redirect("~/");
+        
         return this.Redirect(redirect);
     }
 
@@ -148,7 +146,7 @@ public class LoginForm : BaseLayout
     public IActionResult OnGet()
     {
         if (this.Database.UserFromWebRequest(this.Request) != null) 
-            return this.RedirectToPage(nameof(LandingPage));
+            return this.Redirect("~/");
 
         return this.Page();
     }
