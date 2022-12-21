@@ -164,7 +164,8 @@
     }
     <div class="@divLength wide stretched column">
         <div class="lh-content" id="lh-comments">
-            @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
+            @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+                   { {"PageOwner", Model.ProfileUser.UserId}, })
         </div>
         <div class="lh-content" id="lh-photos">
             <div class="ui purple segment" id="photos">
@@ -193,7 +194,7 @@
         </div>
         <div class="lh-content" id="lh-levels">
             <div class="ui green segment" id="levels">
-                @if (Model.HeartedSlots?.Count == 0)
+                @if (Model.Slots?.Count == 0)
                 {
                     <p>This user hasn't published any levels</p>
                 }
