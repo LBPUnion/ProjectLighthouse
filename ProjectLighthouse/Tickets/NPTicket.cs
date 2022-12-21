@@ -314,8 +314,7 @@ public class NPTicket
                 return null;
             }
 
-            Logger.Success($"Verified ticket signature from {npTicket.Username}", LogArea.Login);
-
+            // Used to identify duplicate tickets
             npTicket.TicketHash = CryptoHelper.Sha1Hash(data);
 
             #if DEBUG

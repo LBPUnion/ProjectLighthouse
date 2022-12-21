@@ -83,7 +83,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string message = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-        if (message.StartsWith("/setemail"))
+        if (message.StartsWith("/setemail "))
         {
             string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
             if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
@@ -92,6 +92,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
             User? user = await this.database.UserFromGameToken(token);
             if (user == null || user.EmailAddress != null) return this.Ok();
+
+            PasswordResetToken resetToken = new()
+            {
+                Created = DateTime.Now,
+                UserId = user.UserId,
+                ResetToken = CryptoHelper.GenerateAuthToken(),
+            };
+
+            string messageBody = $"Hello, {user.Username}.\n\n" +
+                                 "A request to set your account's password was issued. If this wasn't you, this can probably be ignored.\n\n" +
+                                 $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be set at the following link:\n" +
+                                 $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={resetToken.ResetToken}";
+
+            SMTPHelper.SendEmail(user.EmailAddress, $"Project Lighthouse Password Setup Request for {user.Username}", messageBody);
+
+            this.database.PasswordResetTokens.Add(resetToken);
 
             user.EmailAddress = email;
             user.EmailAddressVerified = true;
