@@ -1,12 +1,10 @@
 @page "/slot/{id:int}"
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Administration
-@using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.Extensions
-@using LBPUnion.ProjectLighthouse.Files
 @using LBPUnion.ProjectLighthouse.Helpers
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.PlayerData
-@using LBPUnion.ProjectLighthouse.PlayerData.Reviews
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotPage
 
@@ -17,7 +15,7 @@
     Model.Title = HttpUtility.HtmlDecode(Model.Slot?.Name ?? "");
     Model.Description = HttpUtility.HtmlDecode(Model.Slot?.Description ?? "");
 
-    bool isMobile = this.Request.IsMobile();
+    bool isMobile = Request.IsMobile();
     string language = Model.GetLanguage();
     string timeZone = Model.GetTimeZone();
 }
@@ -34,21 +32,7 @@
     </div>
 }
 
-@await Html.PartialAsync("Partials/SlotCardPartial", Model.Slot, new ViewDataDictionary(ViewData)
-{
-    {
-        "User", Model.User
-    },
-    {
-        "CallbackUrl", $"~/slot/{Model.Slot?.SlotId}"
-    },
-    {
-        "ShowLink", false
-    },
-    {
-        "IsMobile", Model.Request.IsMobile()
-    },
-})
+@await Model.Slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{Model.Slot?.SlotId}", language, timeZone, isMobile)
 <br>
 
 <div class="@(isMobile ? "" : "ui grid")">
@@ -66,7 +50,6 @@
         <div class="ui red segment">
             <h2>Tags</h2>
             @{
-                
                 string[] authorLabels;
                 if (Model.Slot?.GameVersion == GameVersion.LittleBigPlanet1)
                 {
@@ -96,137 +79,92 @@
     {
         <br/>
     }
-    <div class="eight wide column">
-        @await Html.PartialAsync("Partials/CommentsPartial", ViewData.WithLang(language).WithTime(timeZone))
-    </div>
-    @if (isMobile)
-    {
-        <br/>
+</div>
+    
+<div class="ui grid">
+    @{
+        string outerDiv = isMobile ?
+            "horizontal-scroll" :
+            "three wide column";
+        string innerDiv = isMobile ?
+            "ui top attached tabular menu horizontal-scroll" :
+            "ui vertical fluid tabular menu";
     }
-    <div class="eight wide column">
-        <div class="ui purple segment">
-            <h2>Reviews</h2>
-            @if (Model.Reviews.Count == 0 && Model.ReviewsEnabled)
-            {
-                <p>There are no reviews.</p>
-            }
-            else if (!Model.ReviewsEnabled)
-            {
-                <b>
-                    <i>Reviews are disabled on this level.</i>
-                </b>
-            }
-            else
-            {
-                int count = Model.Reviews.Count;
-                <p>There @(count == 1 ? "is" : "are") @count review@(count == 1 ? "" : "s").</p>
-                <div class="ui divider"></div>
-            }
-
-
-            @for(int i = 0; i < Model.Reviews.Count; i++)
-            {
-                Review review = Model.Reviews[i];
-                string faceHash = (review.Thumb switch {
-                    -1 => review.Reviewer?.BooHash,
-                    0 => review.Reviewer?.MehHash,
-                    1 => review.Reviewer?.YayHash,
-                    
-                    _ => throw new ArgumentOutOfRangeException(),
-                    }) ?? "";
-
-                if (string.IsNullOrWhiteSpace(faceHash) || !FileHelper.ResourceExists(faceHash))
-                {
-                    faceHash = ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash;
-                }
-
-                string faceAlt = review.Thumb switch {
-                    -1 => "Boo!",
-                    0 => "Meh.",
-                    1 => "Yay!",
-                    
-                    _ => throw new ArgumentOutOfRangeException(),
-                    };
-
-                int size = isMobile ? 50 : 100;
-
-                <div class="card">
-                    <div>
-                        <img class="cardIcon slotCardIcon" src="@ServerConfiguration.Instance.ExternalUrl/gameAssets/@faceHash" alt="@faceAlt" title="@faceAlt" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
-                    </div>
-                    <div class="cardStats">
-                        <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
-                        @if (review.Deleted)
-                        {
-                            if (review.DeletedBy == DeletedBy.LevelAuthor)
-                            {
-                                <p>
-                                    <i>This review has been deleted by the level author.</i>
-                                </p>
-                            }
-                            else
-                            {
-                                <p>
-                                    <i>This review has been deleted by a moderator.</i>
-                                </p>
-                            }
-                        }
-                        else
-                        {
-                            @if (review.Labels.Length > 1)
-                            {
-                                @foreach (string reviewLabel in review.Labels)
-                                {
-                                    <div class="ui blue label">@LabelHelper.TranslateTag(reviewLabel)</div>
-                                }
-                            }
-                            @if (string.IsNullOrWhiteSpace(review.Text))
-                            {
-                                <p>
-                                    <i>This review contains no text.</i>
-                                </p>
-                            }
-                            else
-                            {
-                                {
-                                    <p>@HttpUtility.HtmlDecode(review.Text)</p>
-                                }
-                            }
-                        }
-                    </div>
-                </div>
-                @if (i != Model.Reviews.Count - 1)
-                {
-                    <div class="ui divider"></div>
-                }
-            }
+    <div class="@outerDiv">
+        <div class="@innerDiv">
+            <a class="item active lh-sidebar" target="lh-comments">
+                Comments
+            </a>
+            <a class="item lh-sidebar" target="lh-photos">
+                @Model.Translate(BaseLayoutStrings.HeaderPhotos)
+            </a>
+            <a class="item lh-sidebar" target="lh-reviews">
+                Reviews
+            </a>
+            <a class="item lh-sidebar" target="lh-scores">
+                Scores
+            </a>
         </div>
-        @if (isMobile)
-        {
-            <br/>
-        }
+    </div>
+
+    @{
+        string divLength = isMobile ? "sixteen" : "thirteen";
+    }
+    <div class="@divLength wide stretched column">
+        <div class="lh-content" id="lh-comments">
+            @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+                   { { "PageOwner", Model.Slot?.CreatorId }, })
+        </div>
+        <div class="lh-content" id="lh-photos">
+            <div class="ui purple segment" id="photos">
+                @if (Model.Photos.Count != 0)
+                {
+                    <div class="ui center aligned grid">
+                        @foreach (Photo photo in Model.Photos)
+                        {
+                            string width = isMobile ? "sixteen" : "eight";
+                            bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
+                            <div class="@width wide column">
+                                @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
+                            </div>
+                        }
+                    </div>
+                    @if (isMobile)
+                    {
+                        <br/>
+                    }
+                }
+                else
+                {
+                    <p>This level has no photos yet.</p>
+                }
+
+            </div>
+        </div>
+        <div class="lh-content" id="lh-reviews">
+            @await Html.PartialAsync("Partials/ReviewPartial", new ViewDataDictionary(ViewData)
+                   {
+                       {
+                           "isMobile", isMobile
+                       },
+                       {
+                           "CanDelete", Model.User?.IsModerator ?? false
+                       },
+                   })
+        </div>
+        <div class="lh-content" id="lh-scores">
+            <div class="eight wide column">
+                @await Html.PartialAsync("Partials/LeaderboardPartial", 
+                           ViewData.WithLang(language).WithTime(timeZone).CanDelete(Model.User?.IsModerator ?? false))
+            </div>
+        </div>
     </div>
 </div>
 
-@if (Model.Photos.Count != 0)
-{
-    <div class="ui purple segment">
-        <h2>Most recent photos</h2>
-
-        <div class="ui center aligned grid">
-            @foreach (Photo photo in Model.Photos)
-            {
-                <div class="eight wide column">
-                    @await photo.ToHtml(Html, ViewData, language, timeZone)
-                </div>
-            }
-        </div>
-    </div>
     @if (isMobile)
     {
         <br/>
     }
-}
 
 @if (Model.User != null && Model.User.IsModerator)
 {
@@ -282,3 +220,50 @@
         <br/>
     }
 }
+
+<script>
+const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
+const contentElements = Array.from(document.querySelectorAll(".lh-content"));
+let selectedId = window.location.hash;
+if (selectedId.startsWith("#"))
+    selectedId = selectedId.substring(1);
+let selectedElement = document.getElementById(selectedId);
+// id = lh-sidebar element
+function setVisible(e){
+    let eTarget = document.getElementById(e.target);
+    if (!e || !eTarget) return;
+
+    // make all active elements not active
+    for (let active of document.getElementsByClassName("active")) {
+        active.classList.remove("active");
+    }
+    // hide all content divs
+    for (let i = 0; i < contentElements.length; i++){
+        contentElements[i].style.display = "none";
+    }
+    // unhide content
+    eTarget.style.display = "";
+    
+    e.classList.add("active");
+}
+
+sidebarElements.forEach(el => {
+    if (el.classList.contains("active")){
+        setVisible(el);
+    }
+    el.addEventListener('click', event => {
+        if (!event.target.target) return;
+
+        setVisible(event.target)
+    })
+})
+// set the active content window based on url
+if (selectedElement != null) {
+    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
+        selectedElement = selectedElement.parentElement;
+    }
+    
+    let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
+    setVisible(sidebarEle);
+}
+</script>

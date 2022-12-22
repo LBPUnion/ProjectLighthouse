@@ -3,7 +3,7 @@ using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Moderator;
 
 [ApiController]
 [Route("moderation/case/{id:int}")]

@@ -2,6 +2,7 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotsPage
 
 @{
@@ -9,6 +10,8 @@
     Model.Title = Model.Translate(BaseLayoutStrings.HeaderSlots);
 
     bool isMobile = Model.Request.IsMobile();
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
 }
 
 <p>There are @Model.SlotCount total levels!</p>
@@ -24,21 +27,7 @@
 @foreach (Slot slot in Model.Slots)
 {
     <div class="ui segment">
-        @await Html.PartialAsync("Partials/SlotCardPartial", slot, new ViewDataDictionary(ViewData)
-        {
-            {
-                "User", Model.User
-            },
-            {
-                "CallbackUrl", $"~/slots/{Model.PageNumber}"
-            },
-            {
-                "ShowLink", true
-            },
-            {
-                "IsMobile", isMobile
-            },
-        })
+        @await slot.ToHtml(Html, ViewData, Model.User, $"~/slots/{Model.PageNumber}", language, timeZone, isMobile, true)
     </div>
 }
 

@@ -10,7 +10,7 @@ using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class RegisterForm : BaseLayout
 {
@@ -114,7 +114,7 @@ public class RegisterForm : BaseLayout
 
         if (ServerConfiguration.Instance.Mail.MailEnabled) return this.Redirect("~/login/sendVerificationEmail");
 
-        return this.RedirectToPage(nameof(LandingPage));
+        return this.Redirect("~/");
     }
 
     [UsedImplicitly]

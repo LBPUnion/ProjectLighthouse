@@ -1,0 +1,70 @@
+﻿@using LBPUnion.ProjectLighthouse
+@using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.PlayerData
+@using LBPUnion.ProjectLighthouse.PlayerData.Profiles
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using Microsoft.EntityFrameworkCore
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    bool canDelete = (bool?)ViewData["CanDelete"] ?? false;
+}
+<div class="ui blue segment" id="scores">
+    @if (Model.Scores.Count == 0)
+    {
+        <p>There are no scores.</p>
+    }
+    else
+    {
+        int count = Model.Scores.Count;
+        <p>There @(count == 1 ? "is" : "are") @count score@(count == 1 ? "" : "s").</p>
+        <div class="ui divider"></div>
+    }
+    <div class="ui list">
+    @for(int i = 0; i < Model.Scores.Count; i++)
+    {
+        Score score = Model.Scores[i];
+        string[] playerIds = score.PlayerIds;
+        Database database = Model.Database;          
+        <div class="item">
+            <span class="ui large text">
+                @if(canDelete)
+                {
+                    <button class="ui red icon button" style="display: inline-block; position: absolute; right: 1em" onclick="deleteScore(@score.ScoreId)">
+                        <i class="trash icon"></i>
+                    </button>            
+                }               
+                <b>@(i+1):</b>                 
+                <span class="ui text">@score.Points points</span>
+            </span>
+            <div class="content">
+                <div class="list" style="padding-top: 0">
+                    @for (int j = 0; j < playerIds.Length; j++)
+                    {
+                        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == playerIds[j]);
+                        if (user == null) continue;
+                        <div class="item">
+                            <i class="minus icon" style="padding-top: 9px"></i>
+                            <div class="content" style="padding-left: 0">
+                                @await user.ToLink(Html, ViewData, language, timeZone)
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        @if (i != Model.Scores.Count - 1)
+        {
+            <div class="ui divider"></div>
+        }
+    }
+    </div>
+    <script>
+        function deleteScore(scoreId){
+            if (window.confirm("Are you sure you want to delete this?\nThis action cannot be undone.")){
+                window.location.hash = "scores";
+                window.location.href = "/moderation/deleteScore/" + scoreId + "?callbackUrl=" + this.window.location;
+            }
+        }
+    </script>
+</div>
