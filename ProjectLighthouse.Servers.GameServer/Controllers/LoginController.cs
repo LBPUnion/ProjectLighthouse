@@ -85,40 +85,43 @@ public class LoginController : ControllerBase
                 throw new ArgumentOutOfRangeException();
         }
 
-        // create new user and link id
+        // If this user id hasn't been linked to any accounts
         if (user == null)
         {
+            // Check if there is an account with that username already 
             User? targetUsername = await this.database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
             if (targetUsername != null)
             {
                 ulong targetPlatform = npTicket.Platform == Platform.RPCS3
-                        ? targetUsername.LinkedRpcnId
-                        : targetUsername.LinkedPsnId;
+                    ? targetUsername.LinkedRpcnId
+                    : targetUsername.LinkedPsnId;
+
                 // only make a link request if the user doesn't already have an account linked for that platform
-                if (targetPlatform == 0)
+                if (targetPlatform != 0)
                 {
-                    // if there is already a pending link request don't create another
-                    if (await this.database.PlatformLinkAttempts.AnyAsync(p =>
-                            p.Platform == npTicket.Platform &&
-                            p.PlatformId == npTicket.UserId &&
-                            p.UserId == targetUsername.UserId))
-                    {
-                        return this.StatusCode(403, "");
-                    }
-                    PlatformLinkAttempt linkAttempt = new()
-                    {
-                        Platform = npTicket.Platform,
-                        UserId = targetUsername.UserId,
-                        IPAddress = ipAddress,
-                        Timestamp = TimeHelper.TimestampMillis,
-                        PlatformId = npTicket.UserId,
-                    };
-                    this.database.PlatformLinkAttempts.Add(linkAttempt);
-                    await this.database.SaveChangesAsync();
-                    Logger.Success($"User '{npTicket.Username}' tried to login but platform isn't linked, platform={npTicket.Platform}", LogArea.Login);
+                    Logger.Warn($"New user tried to login but their name is already taken, username={username}", LogArea.Login);
                     return this.StatusCode(403, "");
                 }
-                Logger.Warn($"New user tried to login but their name is already taken, username={username}", LogArea.Login);
+
+                // if there is already a pending link request don't create another
+                bool linkAttemptExists = await this.database.PlatformLinkAttempts.AnyAsync(p =>
+                    p.Platform == npTicket.Platform &&
+                    p.PlatformId == npTicket.UserId &&
+                    p.UserId == targetUsername.UserId);
+
+                if (linkAttemptExists) return this.StatusCode(403, "");
+
+                PlatformLinkAttempt linkAttempt = new()
+                {
+                    Platform = npTicket.Platform,
+                    UserId = targetUsername.UserId,
+                    IPAddress = ipAddress,
+                    Timestamp = TimeHelper.TimestampMillis,
+                    PlatformId = npTicket.UserId,
+                };
+                this.database.PlatformLinkAttempts.Add(linkAttempt);
+                await this.database.SaveChangesAsync();
+                Logger.Success($"User '{npTicket.Username}' tried to login but platform isn't linked, platform={npTicket.Platform}", LogArea.Login);
                 return this.StatusCode(403, "");
             }
 
@@ -136,12 +139,14 @@ public class LoginController : ControllerBase
                 
             Logger.Success($"Created new user for {username}, platform={npTicket.Platform}", LogArea.Login);
         }
+        // automatically change username if it doesn't match
         else if (user.Username != npTicket.Username)
         {
             bool usernameExists = await this.database.Users.AnyAsync(u => u.Username == npTicket.Username);
             if (usernameExists)
             {
-                Logger.Warn($"{npTicket.Platform} user changed their name to a name that is already taken, oldName='{user.Username}', newName='{npTicket.Username}'", LogArea.Login);
+                Logger.Warn($"{npTicket.Platform} user changed their name to a name that is already taken," +
+                            $" oldName='{user.Username}', newName='{npTicket.Username}'", LogArea.Login);
                 return this.StatusCode(403, "");
             }
             Logger.Info($"User's username has changed, old='{user.Username}', new='{npTicket.Username}', platform={npTicket.Platform}", LogArea.Login);
@@ -149,13 +154,11 @@ public class LoginController : ControllerBase
             this.database.PlatformLinkAttempts.RemoveWhere(p => p.UserId == user.UserId);
             // unlink other platforms because the names no longer match
             if (npTicket.Platform == Platform.RPCS3)
-            {
                 user.LinkedPsnId = 0;
-            }
             else
-            {
                 user.LinkedRpcnId = 0;
-            }
+
+            await this.database.SaveChangesAsync();
         }
 
         GameToken? token = await this.database.GameTokens.Include(t => t.User)

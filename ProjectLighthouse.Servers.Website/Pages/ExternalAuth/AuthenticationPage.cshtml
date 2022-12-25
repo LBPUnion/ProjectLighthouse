@@ -9,6 +9,19 @@
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
+@if (Model.LinkAttempts.Count == 0)
+{
+    <p>You have no pending link attempts.</p>
+}
+else
+{
+    <p>You have @Model.LinkAttempts.Count authentication attempts pending.</p>
+    @if (Model.IpAddress != null)
+    {
+        <p>This device's IP address is <b>@(Model.IpAddress.ToString())</b>. If this matches with a link attempt below, then it's safe to assume the link attempt came from the same network as this device.</p>
+    }
+}
+
 @foreach (PlatformLinkAttempt authAttempt in Model.LinkAttempts)
 {
     DateTimeOffset timestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(authAttempt.Timestamp), timeZoneInfo);
@@ -39,7 +52,9 @@
         <div class="ui green button" style="cursor: default; pointer-events: none">
             Linked
         </div>
-        <a href="/authentication/unlink/psn" style="display: block; color:  orangered">Click here to unlink this platform</a>
+        <a href="/authentication/unlink/psn" style="display: block; color:  orangered">
+            Click here to unlink this platform
+        </a>
     }
     else
     {
@@ -56,7 +71,9 @@
         <div class="ui green button" style="cursor: default; pointer-events: none">
             Linked
         </div>
-        <a href="/authentication/unlink/rpcn" style="display: block; color: orangered">Click here to unlink this platform</a>
+        <a href="/authentication/unlink/rpcn" style="display: block; color: orangered">
+            Click here to unlink this platform
+        </a>
     }
     else
     {

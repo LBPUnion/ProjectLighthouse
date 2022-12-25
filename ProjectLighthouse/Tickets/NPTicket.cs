@@ -136,11 +136,12 @@ public class NPTicket
 
         reader.ReadSectionHeader(); // footer header
 
-        byte[] ident = reader.ReadTicketBinary(); // 4 byte identifier
+        byte[] ticketIdent = reader.ReadTicketBinary(); // 4 byte identifier
         Platform platform = npTicket.IsRpcn() ? Platform.RPCS3 : Platform.PS3;
-        if (!ident.SequenceEqual(identifierByPlatform[platform]))
+        byte[] platformIdent = identifierByPlatform[platform];
+        if (!ticketIdent.SequenceEqual(platformIdent))
         {
-            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ident)} == {Convert.ToHexString(identifierByPlatform[npTicket.Platform])}", LogArea.Login);
+            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ticketIdent)} == {Convert.ToHexString(platformIdent)}", LogArea.Login);
             return false;
         }
 
@@ -174,12 +175,12 @@ public class NPTicket
 
         reader.ReadSectionHeader(); // footer header
 
-        byte[] ident = reader.ReadTicketBinary(); // 4 byte identifier
+        byte[] ticketIdent = reader.ReadTicketBinary(); // 4 byte identifier
         Platform platform = npTicket.IsRpcn() ? Platform.RPCS3 : Platform.PS3;
-        if (!ident.SequenceEqual(identifierByPlatform[platform]))
+        byte[] platformIdent = identifierByPlatform[platform]; 
+        if (!ticketIdent.SequenceEqual(platformIdent))
         {
-            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ident)} == {Convert.ToHexString(identifierByPlatform[npTicket.Platform])}",
-                LogArea.Login);
+            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ticketIdent)} == {Convert.ToHexString(platformIdent)}", LogArea.Login);
             return false;
         }
 
@@ -194,6 +195,7 @@ public class NPTicket
         reader.ReadBytes(4); // Skip header
 
         ushort ticketLen = reader.ReadUInt16BE();
+        // Subtract 8 bytes to account for ticket header
         if (ticketLen != data.Length - 0x8)
         {
             Logger.Warn(@$"Ticket length mismatch, expected={ticketLen}, actual={data.Length - 0x8}", LogArea.Login);

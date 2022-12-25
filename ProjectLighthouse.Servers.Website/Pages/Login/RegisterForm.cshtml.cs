@@ -74,11 +74,6 @@ public class RegisterForm : BaseLayout
         }
 
         User user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
-        if (existingUser != null)
-        {
-            user.Password = CryptoHelper.BCryptHash(password);
-            user.EmailAddress = emailAddress;
-        }
 
         WebToken webToken = new()
         {
@@ -92,9 +87,9 @@ public class RegisterForm : BaseLayout
 
         this.Response.Cookies.Append("LighthouseToken", webToken.UserToken);
 
-        if (ServerConfiguration.Instance.Mail.MailEnabled) return this.Redirect("~/login/sendVerificationEmail");
-
-        return this.Redirect("~/");
+        return ServerConfiguration.Instance.Mail.MailEnabled ? 
+            this.Redirect("~/login/sendVerificationEmail") : 
+            this.Redirect("~/");
     }
 
     [UsedImplicitly]

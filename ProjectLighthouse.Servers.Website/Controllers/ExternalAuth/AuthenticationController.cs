@@ -65,9 +65,10 @@ public class AuthenticationController : ControllerBase
             user.LinkedPsnId = linkAttempt.PlatformId;
         }
 
-        this.database.PlatformLinkAttempts.RemoveWhere(l => l.UserId == user.UserId);
+        this.database.PlatformLinkAttempts.Remove(linkAttempt);
 
         await this.database.SaveChangesAsync();
+
         return this.Redirect("~/authentication");
     }
 
