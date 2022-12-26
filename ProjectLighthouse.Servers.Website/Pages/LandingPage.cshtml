@@ -22,7 +22,7 @@
 @if (Model.User != null)
 {
     <p>@Model.Translate(LandingPageStrings.LoggedInAs, Model.User.Username)</p>
-    if (ServerConfiguration.Instance.Authentication.UseExternalAuth && Model.PendingAuthAttempts > 0)
+    if (Model.PendingAuthAttempts > 0)
     {
         <p>
             <b><a href="/authentication">@Model.Translate(LandingPageStrings.AuthAttemptsPending, Model.PendingAuthAttempts)</a></b>
@@ -30,18 +30,18 @@
     }
 }
 
-@if (Model.PlayersOnline.Count == 1)
-{
-    <p>@Model.Translate(LandingPageStrings.UsersSingle)</p>
-}
 
-else if (Model.PlayersOnline.Count == 0)
+@switch (Model.PlayersOnline.Count)
 {
-    <p>@Model.Translate(LandingPageStrings.UsersNone)</p>
-}
-else
-{
-    <p>@Model.Translate(LandingPageStrings.UsersMultiple, Model.PlayersOnline.Count)</p>
+    case 0:
+        <p>@Model.Translate(LandingPageStrings.UsersNone)</p>
+        break;
+    case 1:
+        <p>@Model.Translate(LandingPageStrings.UsersSingle)</p>
+        break;
+    default:
+        <p>@Model.Translate(LandingPageStrings.UsersMultiple, Model.PlayersOnline.Count)</p>
+        break;
 }
 
 @{
@@ -49,7 +49,12 @@ else
     foreach (User user in Model.PlayersOnline)
     {
         i++; 
-        @await user.ToLink(Html, ViewData, language, timeZone, true)if (i != Model.PlayersOnline.Count){<span>,</span>} @* whitespace has forced my hand *@
+        @await user.ToLink(Html, ViewData, language, timeZone, true)
+        @* whitespace has forced my hand *@
+        if (i != Model.PlayersOnline.Count)
+        {
+            <span>,</span>
+        } 
     }
 }
 

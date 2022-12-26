@@ -4,62 +4,38 @@
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Authentication";
+    Model.Title = "Linked Accounts";
     string timeZone = Model.GetTimeZone();
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
-@if (Model.AuthenticationAttempts.Count == 0)
+@if (Model.LinkAttempts.Count == 0)
 {
-    <p>You have no pending authentication attempts.</p>
+    <p>You have no pending link attempts.</p>
 }
 else
 {
-    <p>You have @Model.AuthenticationAttempts.Count authentication attempts pending.</p>
+    <p>You have @Model.LinkAttempts.Count authentication attempts pending.</p>
     @if (Model.IpAddress != null)
     {
-        <p>This device's IP address is <b>@(Model.IpAddress.ToString())</b>. If this matches with an authentication attempt below, then it's safe to assume the authentication attempt came from the same network as this device.</p>
+        <p>This device's IP address is <b>@(Model.IpAddress.ToString())</b>. If this matches with a link attempt below, then it's safe to assume the link attempt came from the same network as this device.</p>
     }
 }
 
-@if (Model.User!.ApprovedIPAddress != null)
+@foreach (PlatformLinkAttempt authAttempt in Model.LinkAttempts)
 {
-    <a href="/authentication/revokeAutoApproval">
-        <button class="ui red button">
-            <i class="trash icon"></i>
-            <span>Revoke automatically approved IP Address (@Model.User!.ApprovedIPAddress)</span>
-        </button>
-    </a>
-}
-@if (Model.AuthenticationAttempts.Count > 1)
-{
-    <a href="/authentication/denyAll">
-        <button class="ui red button">
-            <i class="x icon"></i>
-            <span>Deny all</span>
-        </button>
-    </a>    
-}
-
-@foreach (AuthenticationAttempt authAttempt in Model.AuthenticationAttempts)
-{
-    DateTimeOffset timestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeSeconds(authAttempt.Timestamp), timeZoneInfo);
+    DateTimeOffset timestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(authAttempt.Timestamp), timeZoneInfo);
     <div class="ui red segment">
-        <p>A <b>@authAttempt.Platform</b> authentication request was logged at <b>@timestamp.ToString("M/d/yyyy @ h:mm tt")</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
+        <p>A <b>@authAttempt.Platform</b> link request was logged at <b>@timestamp.ToString("M/d/yyyy @ h:mm tt")</b> from the IP address <b>@authAttempt.IPAddress</b>.</p>
+        <p><i class="yellow warning icon"></i> If you approve this request it will override any other linked accounts you have</p>
         <div>
-            <a href="/authentication/autoApprove/@authAttempt.AuthenticationAttemptId">
+            <a href="/authentication/approve/@authAttempt.PlatformLinkAttemptId">
                 <button class="ui small green button">
                     <i class="check icon"></i>
-                    <span>Automatically approve every time</span>
+                    <span>Approve</span>
                 </button>
             </a>
-            <a href="/authentication/approve/@authAttempt.AuthenticationAttemptId">
-                <button class="ui small yellow button">
-                    <i class="check icon"></i>
-                    <span>Approve this time</span>
-                </button>
-            </a>
-            <a href="/authentication/deny/@authAttempt.AuthenticationAttemptId">
+            <a href="/authentication/deny/@authAttempt.PlatformLinkAttemptId">
                 <button class="ui small red button">
                     <i class="x icon"></i>
                     <span>Deny</span>
@@ -68,3 +44,41 @@ else
         </div>
     </div>
 }
+
+<div style="display: inline-block">
+    <h3 style="display: inline-block">PSN: </h3>
+    @if (Model.User?.LinkedPsnId != 0)
+    {
+        <div class="ui green button" style="cursor: default; pointer-events: none">
+            Linked
+        </div>
+        <a href="/authentication/unlink/psn" style="display: block; color:  orangered">
+            Click here to unlink this platform
+        </a>
+    }
+    else
+    {
+        <button class="ui button" style="cursor: default; pointer-events: none">
+            Unlinked
+        </button>
+    }
+</div>
+<div class="ui divider"></div>
+<div>
+    <h3 style="display: inline-block">RPCN: </h3>
+    @if (Model.User?.LinkedRpcnId != 0)
+    {
+        <div class="ui green button" style="cursor: default; pointer-events: none">
+            Linked
+        </div>
+        <a href="/authentication/unlink/rpcn" style="display: block; color: orangered">
+            Click here to unlink this platform
+        </a>
+    }
+    else
+    {
+        <button class="ui button" style="cursor: default; pointer-events: none">
+            Unlinked
+        </button>
+    }
+</div>
