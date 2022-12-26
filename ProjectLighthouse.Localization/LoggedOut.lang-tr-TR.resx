@@ -18,12 +18,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="logged_out" xml:space="preserve">
-        <value>Logged Out</value>
+        <value>Çıkış Yapıldı</value>
     </data>
   <data name="logged_out_info" xml:space="preserve">
-        <value>You have been successfully logged out. You will be redirected in 5 seconds, or you may click below to do so manually.</value>
+        <value>Başarılı bir şekilde çıkış yaptınız. 5 saniye içinde yönlendirileceksiniz, veya bunu manuel olarak yapmak için aşağıya tıklayabilirsiniz.</value>
     </data>
   <data name="redirect" xml:space="preserve">
-        <value>Redirect</value>
+        <value>Yönlendirme</value>
     </data>
 </root>

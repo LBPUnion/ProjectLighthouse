@@ -18,12 +18,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="currently_online" xml:space="preserve">
-        <value>Currently playing {0} on {1}</value>
+        <value>Şu anda {1} üzerinde {0} oynuyor</value>
     </data>
   <data name="offline" xml:space="preserve">
-        <value>Offline</value>
+        <value>Çevrimdışı</value>
     </data>
   <data name="last_online" xml:space="preserve">
-        <value>Offline since {0}</value>
+        <value>{0} tarihinden beri çevrimdışı</value>
     </data>
 </root>
