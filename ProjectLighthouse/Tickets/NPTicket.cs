@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Tickets.Data;
+using LBPUnion.ProjectLighthouse.Configuration;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -19,7 +20,6 @@ using Version = LBPUnion.ProjectLighthouse.Types.Version;
 #if DEBUG
 using System.Text;
 using System.Text.Json;
-using LBPUnion.ProjectLighthouse.Configuration;
 #endif
 
 namespace LBPUnion.ProjectLighthouse.Tickets;
