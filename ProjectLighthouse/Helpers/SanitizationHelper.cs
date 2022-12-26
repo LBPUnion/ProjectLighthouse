@@ -16,9 +16,7 @@ public static class SanitizationHelper
         {"'", "&apos;"},
     };
 
-    public static bool IsValidEmail
-        (string? email) =>
-        !string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email);
+    public static bool IsValidEmail(string? email) => !string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email);
 
     public static void SanitizeStringsInClass(object? instance)
     {
