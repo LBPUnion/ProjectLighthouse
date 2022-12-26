@@ -71,8 +71,7 @@ public class UserEndpoints : ApiEndpointController
     [HttpPost("user/inviteToken/{username}")]
     public async Task<IActionResult> CreateUserInviteToken([FromRoute] string? username)
     {
-        if (!Configuration.ServerConfiguration.Instance.Authentication.PrivateRegistration &&
-            !Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        if (!Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
             return this.NotFound();
 
         string? authHeader = this.Request.Headers["Authorization"];

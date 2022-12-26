@@ -66,7 +66,7 @@ public class RegisterTests : LighthouseWebTest
     {
         await using Database database = new();
 
-        string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
+        string username = ("unitTestUser" + new Random().Next())[..16];
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
 
         await database.CreateUser(username, CryptoHelper.BCryptHash(password));

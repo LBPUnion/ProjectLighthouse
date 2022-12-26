@@ -24,11 +24,7 @@ public class GameToken
 
     public Platform Platform { get; set; }
 
-    // Set by /authentication webpage
-    public bool Approved { get; set; }
-
-    // Set to true on login
-    public bool Used { get; set; }
+    public string TicketHash { get; set; }
 
     public DateTime ExpiresAt { get; set; }
 }

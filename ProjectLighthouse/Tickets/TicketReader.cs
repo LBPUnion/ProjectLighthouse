@@ -19,18 +19,22 @@ public class TicketReader : BinaryReader
     {
         this.ReadByte();
 
-        SectionHeader sectionHeader = new();
-        sectionHeader.Type = (SectionType)this.ReadByte();
-        sectionHeader.Length = this.ReadUInt16BE();
+        SectionHeader sectionHeader = new()
+        {
+            Type = (SectionType)this.ReadByte(),
+            Length = this.ReadUInt16BE(),
+        };
 
         return sectionHeader;
     }
 
-    public DataHeader ReadDataHeader()
+    private DataHeader ReadDataHeader()
     {
-        DataHeader dataHeader = new();
-        dataHeader.Type = (DataType)this.ReadUInt16BE();
-        dataHeader.Length = this.ReadUInt16BE();
+        DataHeader dataHeader = new()
+        {
+            Type = (DataType)this.ReadUInt16BE(),
+            Length = this.ReadUInt16BE(),
+        };
 
         return dataHeader;
     }
@@ -38,7 +42,7 @@ public class TicketReader : BinaryReader
     public byte[] ReadTicketBinary()
     {
         DataHeader dataHeader = this.ReadDataHeader();
-        Debug.Assert(dataHeader.Type == DataType.Binary || dataHeader.Type == DataType.String);
+        Debug.Assert(dataHeader.Type is DataType.Binary or DataType.String);
 
         return this.ReadBytes(dataHeader.Length);
     }
@@ -53,10 +57,16 @@ public class TicketReader : BinaryReader
         return this.ReadUInt32BE();
     }
 
+    public void ReadTicketEmpty()
+    {
+        DataHeader dataHeader = this.ReadDataHeader();
+        Debug.Assert(dataHeader.Type == DataType.Empty);
+    }
+
     public ulong ReadTicketUInt64()
     {
         DataHeader dataHeader = this.ReadDataHeader();
-        Debug.Assert(dataHeader.Type == DataType.UInt64 || dataHeader.Type == DataType.Timestamp);
+        Debug.Assert(dataHeader.Type is DataType.UInt64 or DataType.Timestamp);
 
         return this.ReadUInt64BE();
     }

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Files;
@@ -19,8 +18,6 @@ public class UserSettingsPage : BaseLayout
     public UserSettingsPage(Database database) : base(database)
     {}
 
-    private static bool IsValidEmail(string? email) => !string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email);
-
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
     public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string? avatar, [FromForm] string? username, [FromForm] string? email, [FromForm] string? biography, [FromForm] string? timeZone, [FromForm] string? language)
     {
@@ -39,7 +36,9 @@ public class UserSettingsPage : BaseLayout
 
         if (this.ProfileUser.Biography != biography && biography.Length <= 512) this.ProfileUser.Biography = biography;
 
-        if (ServerConfiguration.Instance.Mail.MailEnabled && IsValidEmail(email) && (this.User == this.ProfileUser || this.User.IsAdmin))
+        if (ServerConfiguration.Instance.Mail.MailEnabled &&
+            SanitizationHelper.IsValidEmail(email) &&
+            (this.User == this.ProfileUser || this.User.IsAdmin))
         {
             // if email hasn't already been used
             if (!await this.Database.Users.AnyAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == email!.ToLower()))
