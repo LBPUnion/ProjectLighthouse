@@ -38,8 +38,9 @@ public class LoginController : ControllerBase
             npTicket = NPTicket.CreateFromBytes(loginData);
         }
 
-        if (npTicket == null)
+        catch
         {
+            npTicket = null;
             Logger.Warn("npTicket was null, rejecting login", LogArea.Login);
             return this.BadRequest();
         }
@@ -75,8 +76,6 @@ public class LoginController : ControllerBase
             case Platform.UnitTest:
                 user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedPsnId == npTicket.UserId);
                 break;
-            case Platform.PSP:
-            case Platform.Unknown:
             default:
                 throw new ArgumentOutOfRangeException();
         }
