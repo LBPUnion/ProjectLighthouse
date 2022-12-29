@@ -37,10 +37,13 @@ public class LoginController : ControllerBase
         {
             npTicket = NPTicket.CreateFromBytes(loginData);
         }
-
         catch
         {
             npTicket = null;
+        }
+
+        if (npTicket == null)
+        {
             Logger.Warn("npTicket was null, rejecting login", LogArea.Login);
             return this.BadRequest();
         }
