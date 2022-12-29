@@ -37,10 +37,6 @@ public class LoginController : ControllerBase
         {
             npTicket = NPTicket.CreateFromBytes(loginData);
         }
-        catch
-        {
-            npTicket = null;
-        }
 
         if (npTicket == null)
         {
