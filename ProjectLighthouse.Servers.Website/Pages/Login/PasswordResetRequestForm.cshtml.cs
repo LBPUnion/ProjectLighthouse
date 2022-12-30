@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -36,7 +35,7 @@ public class PasswordResetRequestForm : BaseLayout
             return this.Page();
         }
 
-        if (!new EmailAddressAttribute().IsValid(email))
+        if (!SanitizationHelper.IsValidEmail(email))
         {
             this.Error = "This email is in an invalid format";
             return this.Page();

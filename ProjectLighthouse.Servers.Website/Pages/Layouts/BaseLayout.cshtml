@@ -12,10 +12,7 @@
     }
     else
     {
-        if (ServerConfiguration.Instance.Authentication.UseExternalAuth)
-        {
-            Model.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAuthentication, "/authentication", "key"));
-        }
+        Model.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAuthentication, "/authentication", "key"));
 
         @if (Model.User.IsAdmin)
         {

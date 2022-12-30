@@ -1,12 +1,13 @@
 #nullable enable
-using System.Globalization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
@@ -58,11 +59,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             #if DEBUG
             "\n\n---DEBUG INFO---\n" +
             $"user.UserId: {token.UserId}\n" +
-            $"token.Approved: {token.Approved}\n" +
-            $"token.Used: {token.Used}\n" +
             $"token.UserLocation: {token.UserLocation}\n" +
             $"token.GameVersion: {token.GameVersion}\n" +
-            $"token.ExpiresAt: {token.ExpiresAt.ToString(CultureInfo.CurrentCulture)}\n" +
+            $"token.TicketHash: {token.TicketHash}\n" +
+            $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
             "---DEBUG INFO---" +
             #endif
             (string.IsNullOrWhiteSpace(announceText) ? "" : "\n")
@@ -81,13 +81,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameToken token = this.GetToken();
 
-        string response = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        string message = await new StreamReader(this.Request.Body).ReadToEndAsync();
 
-        string scannedText = CensorHelper.ScanMessage(response);
+        if (message.StartsWith("/setemail "))
+        {
+            string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
+            if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
+
+            if (await this.database.Users.AnyAsync(u => u.EmailAddress == email)) return this.Ok();
+
+            User? user = await this.database.UserFromGameToken(token);
+            if (user == null || user.EmailAddress != null) return this.Ok();
+
+            PasswordResetToken resetToken = new()
+            {
+                Created = DateTime.Now,
+                UserId = user.UserId,
+                ResetToken = CryptoHelper.GenerateAuthToken(),
+            };
+
+            string messageBody = $"Hello, {user.Username}.\n\n" +
+                                 "A request to set your account's password was issued. If this wasn't you, this can probably be ignored.\n\n" +
+                                 $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be set at the following link:\n" +
+                                 $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={resetToken.ResetToken}";
+
+            SMTPHelper.SendEmail(email, $"Project Lighthouse Password Setup Request for {user.Username}", messageBody);
+
+            this.database.PasswordResetTokens.Add(resetToken);
+
+            user.EmailAddress = email;
+            user.EmailAddressVerified = true;
+            await this.database.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
+        string scannedText = CensorHelper.ScanMessage(message);
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        Logger.Info($"{username}: {response} / {scannedText}", LogArea.Filter);
+        Logger.Info($"{username}: {message} / {scannedText}", LogArea.Filter);
 
         return this.Ok(scannedText);
     }

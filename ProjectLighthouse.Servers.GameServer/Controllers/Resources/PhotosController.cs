@@ -188,20 +188,14 @@ public class PhotosController : ControllerBase
 
         List<int> photoSubjectIds = new();
         photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == targetUserId).Select(p => p.PhotoSubjectId));
+        List<Photo> photos = (from id in photoSubjectIds from p in 
+            this.database.Photos.Include(p => p.Creator).Where(p => p.PhotoSubjectCollection.Contains(id.ToString()))
+            where p.PhotoSubjectCollection.Split(",").Contains(id.ToString()) && p.CreatorId != targetUserId select p).ToList();
 
-        var list = this.database.Photos.Select(p => new
-        {
-            p.PhotoId,
-            p.PhotoSubjectCollection,
-        }).ToList();
-        List<int> photoIds = (from v in list where photoSubjectIds.Any(ps => v.PhotoSubjectCollection.Split(",").Contains(ps.ToString())) select v.PhotoId).ToList();
-
-        string response = Enumerable.Aggregate(
-            this.database.Photos.Where(p => photoIds.Any(id => p.PhotoId == id) && p.CreatorId != targetUserId)
-                .OrderByDescending(s => s.Timestamp)
-                .Skip(Math.Max(0, pageStart - 1))
-                .Take(Math.Min(pageSize, 30)),
-            string.Empty,
+        string response = photos
+            .OrderByDescending(s => s.Timestamp)
+            .Skip(Math.Max(0, pageStart - 1))
+            .Take(Math.Min(pageSize, 30)).Aggregate(string.Empty,
             (current, photo) => current + photo.Serialize());
 
         return this.Ok(LbpSerializer.StringElement("photos", response));

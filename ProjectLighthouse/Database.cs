@@ -40,7 +40,6 @@ public class Database : DbContext
     public DbSet<LastContact> LastContacts { get; set; }
     public DbSet<VisitedLevel> VisitedLevels { get; set; }
     public DbSet<RatedLevel> RatedLevels { get; set; }
-    public DbSet<AuthenticationAttempt> AuthenticationAttempts { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<RatedReview> RatedReviews { get; set; }
     public DbSet<DatabaseCategory> CustomCategories { get; set; }
@@ -53,6 +52,7 @@ public class Database : DbContext
     public DbSet<RegistrationToken> RegistrationTokens { get; set; }
     public DbSet<APIKey> APIKeys { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
+    public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
@@ -102,9 +102,8 @@ public class Database : DbContext
         return user;
     }
 
-    public async Task<GameToken?> AuthenticateUser(NPTicket npTicket, string userLocation)
+    public async Task<GameToken?> AuthenticateUser(User? user, NPTicket npTicket, string userLocation)
     {
-        User? user = await this.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
         if (user == null) return null;
 
         GameToken gameToken = new()
@@ -115,6 +114,7 @@ public class Database : DbContext
             UserLocation = userLocation,
             GameVersion = npTicket.GameVersion,
             Platform = npTicket.Platform,
+            TicketHash = npTicket.TicketHash,
             // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
             ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
         };
@@ -341,13 +341,11 @@ public class Database : DbContext
         return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
     }
 
-    private async Task<User?> UserFromMMAuth(string authToken, bool allowUnapproved = false)
+    private async Task<User?> UserFromMMAuth(string authToken)
     {
-        if (ServerStatics.IsUnitTesting) allowUnapproved = true;
         GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == authToken);
 
         if (token == null) return null;
-        if (!allowUnapproved && !token.Approved) return null;
 
         if (DateTime.Now <= token.ExpiresAt) return await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
 
@@ -357,23 +355,20 @@ public class Database : DbContext
         return null;
     }
 
-    public async Task<User?> UserFromGameRequest(HttpRequest request, bool allowUnapproved = false)
+    public async Task<User?> UserFromGameRequest(HttpRequest request)
     {
-        if (ServerStatics.IsUnitTesting) allowUnapproved = true;
-        if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
+        if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth)) return null;
 
-        return await this.UserFromMMAuth(mmAuth, allowUnapproved);
+        return await this.UserFromMMAuth(mmAuth);
     }
 
-    public async Task<GameToken?> GameTokenFromRequest(HttpRequest request, bool allowUnapproved = false)
+    public async Task<GameToken?> GameTokenFromRequest(HttpRequest request)
     {
-        if (ServerStatics.IsUnitTesting) allowUnapproved = true;
-        if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
+        if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth)) return null;
 
         GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
 
         if (token == null) return null;
-        if (!allowUnapproved && !token.Approved) return null;
 
         if (DateTime.Now <= token.ExpiresAt) return token;
 
@@ -383,14 +378,12 @@ public class Database : DbContext
         return null;
     }
 
-    public async Task<(User, GameToken)?> UserAndGameTokenFromRequest(HttpRequest request, bool allowUnapproved = false)
+    public async Task<(User, GameToken)?> UserAndGameTokenFromRequest(HttpRequest request)
     {
-        if (ServerStatics.IsUnitTesting) allowUnapproved = true;
-        if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth) || mmAuth == null) return null;
+        if (!request.Cookies.TryGetValue("MM_AUTH", out string? mmAuth)) return null;
 
         GameToken? token = await this.GameTokens.FirstOrDefaultAsync(t => t.UserToken == mmAuth);
         if (token == null) return null;
-        if (!allowUnapproved && !token.Approved) return null;
 
         if (DateTime.Now > token.ExpiresAt)
         {
@@ -527,7 +520,6 @@ public class Database : DbContext
 
         foreach (Slot slot in this.Slots.Where(s => s.CreatorId == user.UserId)) await this.RemoveSlot(slot, false);
 
-        this.AuthenticationAttempts.RemoveRange(this.AuthenticationAttempts.Include(a => a.GameToken).Where(a => a.GameToken.UserId == user.UserId));
         this.HeartedProfiles.RemoveRange(this.HeartedProfiles.Where(h => h.UserId == user.UserId));
         this.PhotoSubjects.RemoveRange(this.PhotoSubjects.Where(s => s.UserId == user.UserId));
         this.HeartedLevels.RemoveRange(this.HeartedLevels.Where(h => h.UserId == user.UserId));

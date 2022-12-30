@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -33,7 +34,11 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         {
             await using Database database = new();
             if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
-                await database.CreateUser($"{username}{number}", CryptoHelper.BCryptHash($"unitTestPassword{number}"));
+            {
+                User user = await database.CreateUser($"{username}{number}", CryptoHelper.BCryptHash($"unitTestPassword{number}"));
+                user.LinkedPsnId = (ulong)number;
+                await database.SaveChangesAsync();
+            }
         }
 
         //TODO: generate actual tickets
@@ -44,7 +49,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return response;
     }
 
-    public async Task<LoginResult> Authenticate(int number = 0)
+    public async Task<LoginResult> Authenticate(int number = -1)
     {
         HttpResponseMessage response = await this.AuthenticateResponse(number);
 

@@ -64,7 +64,7 @@
         <value>Strona wygenerowana przez {0}.</value>
     </data>
   <data name="generated_modified" xml:space="preserve">
-        <value>Ta strona została wygenerowana przy użyciu zmodyfikowanej wersji Projektu Lighthouse. Upewnij się, że poprawnie ujawniasz kod źródłowy wszystkim użytkownikom, którzy mogą używać tej instancji</value>
+        <value>Ta strona została wygenerowana przy użyciu zmodyfikowanej wersji Projektu Lighthouse. Upewnij się, że poprawnie ujawniasz kod źródłowy wszystkim użytkownikom, którzy mogą używać tego serwera.</value>
     </data>
   <data name="js_warn" xml:space="preserve">
         <value>Chociaż zamierzamy używać jak najmniejszą ilość JavaScript, nie możemy zagwarantować, że wszystko będzie działać bez niego. Zalecamy, żeby dodać JavaScript do białej listy dla Projektu Lighthouse.</value>
@@ -76,7 +76,7 @@
         <value>Potencjalne Naruszenie Licencji</value>
     </data>
   <data name="license_warn_1" xml:space="preserve">
-        <value>Ta instancja jest instancją ze strony publicznej, która została zmodyfikowana bez opublikowanych zmian. Możesz naruszać {0}.</value>
+        <value>Ten serwer jest serwerem ze strony publicznej, która została zmodyfikowana bez opublikowanych zmian. Możesz naruszać {0}.</value>
     </data>
   <data name="license_warn_2" xml:space="preserve">
         <value>Jeśli uważasz, że jest to błąd, utwórz problem z wyjściem {0} uruchomionym z katalogu głównego kodu źródłowego serwera w opisie naszego {1}trackera problemów{2}.</value>

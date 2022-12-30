@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
@@ -14,6 +15,8 @@ public static class SanitizationHelper
         {"\"", "&quot;"},
         {"'", "&apos;"},
     };
+
+    public static bool IsValidEmail(string? email) => !string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email);
 
     public static void SanitizeStringsInClass(object? instance)
     {

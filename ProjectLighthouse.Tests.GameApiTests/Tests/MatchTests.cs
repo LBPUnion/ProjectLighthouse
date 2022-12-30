@@ -35,7 +35,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
         await semaphore.WaitAsync();
 
         HttpResponseMessage result = await this.AuthenticatedUploadDataRequest
-            ("LITTLEBIGPLANETPS3_XML/match", Encoding.ASCII.GetBytes("[UpdateMyPlayerData,[\"Player\":\"1984\"]]"), loginResult.AuthTicket);
+            ("LITTLEBIGPLANETPS3_XML/match", "[UpdateMyPlayerData,[\"Player\":\"1984\"]]"u8.ToArray(), loginResult.AuthTicket);
 
         semaphore.Release();
         Assert.True(result.IsSuccessStatusCode);
@@ -53,7 +53,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
         int oldPlayerCount = await StatisticsHelper.RecentMatches(database);
 
         HttpResponseMessage result = await this.AuthenticatedUploadDataRequest
-            ("LITTLEBIGPLANETPS3_XML/match", Encoding.ASCII.GetBytes("[UpdateMyPlayerData,[\"Player\":\"1984\"]]"), loginResult.AuthTicket);
+            ("LITTLEBIGPLANETPS3_XML/match", "[UpdateMyPlayerData,[\"Player\":\"1984\"]]"u8.ToArray(), loginResult.AuthTicket);
 
         Assert.True(result.IsSuccessStatusCode);
 
