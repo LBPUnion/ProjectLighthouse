@@ -47,6 +47,7 @@ obj/
 *.old
 BACKUP*
 backup*
+docker-compose.yml
 
 *.tmp
 *.bin
