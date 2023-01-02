@@ -14,7 +14,6 @@ public class SMTPHelper
 
     internal static readonly SMTPHelper Instance = new();
 
-    private readonly SmtpClient client;
     private readonly MailAddress fromAddress;
 
     private readonly ConcurrentQueue<EmailEntry> emailQueue = new();
@@ -29,11 +28,6 @@ public class SMTPHelper
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled) return;
 
-        this.client = new SmtpClient(ServerConfiguration.Instance.Mail.Host, ServerConfiguration.Instance.Mail.Port)
-        {
-            EnableSsl = ServerConfiguration.Instance.Mail.UseSSL,
-            Credentials = new NetworkCredential(ServerConfiguration.Instance.Mail.Username, ServerConfiguration.Instance.Mail.Password),
-        };
         this.fromAddress = new MailAddress(ServerConfiguration.Instance.Mail.FromAddress, ServerConfiguration.Instance.Mail.FromName);
 
         this.stopSignal = false;
@@ -49,7 +43,12 @@ public class SMTPHelper
 
             try
             {
-                this.client.Send(entry.Message);
+                using SmtpClient client = new(ServerConfiguration.Instance.Mail.Host, ServerConfiguration.Instance.Mail.Port)
+                {
+                    EnableSsl = ServerConfiguration.Instance.Mail.UseSSL,
+                    Credentials = new NetworkCredential(ServerConfiguration.Instance.Mail.Username, ServerConfiguration.Instance.Mail.Password),
+                };
+                await client.SendMailAsync(entry.Message);
                 entry.Result.SetResult(true);
             }
             catch (Exception e)
