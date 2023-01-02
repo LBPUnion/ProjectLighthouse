@@ -13,10 +13,6 @@ public sealed class DatabaseFactAttribute : FactAttribute
         ServerConfiguration.Instance = new ServerConfiguration
         {
             DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse",
-            Authentication =
-            {
-                VerifyTickets = false,
-            },
         };
         if (!ServerStatics.DbConnected) this.Skip = "Database not available";
         else
