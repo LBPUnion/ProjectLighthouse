@@ -20,7 +20,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     public async Task ShouldLoginWithGoodTicket()
     {
         string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username[.."unitTestUser".Length]);
+        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder()
             .SetUsername(username)
             .SetUserId(userId)
@@ -33,7 +33,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     public async Task ShouldNotLoginWithExpiredTicket()
     {
         string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username[.."unitTestUser".Length]);
+        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder()
             .SetUsername(username)
             .SetUserId(userId)
@@ -48,7 +48,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     public async Task ShouldNotLoginWithBadTitleId()
     {
         string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username[.."unitTestUser".Length]);
+        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder()
             .SetUsername(username)
             .SetUserId(userId)
@@ -63,7 +63,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     public async Task ShouldNotLoginWithBadSignature()
     {
         string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username[.."unitTestUser".Length]);
+        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder().SetUsername(username)
             .SetUserId(userId)
             .Build();
@@ -79,7 +79,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     public async Task ShouldNotLoginIfBanned()
     {
         string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username[.."unitTestUser".Length]);
+        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         await using Database database = new();
         User user = await database.Users.FirstAsync(u => u.Username == username);
         user.PermissionLevel = PermissionLevel.Banned;
