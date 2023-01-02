@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Tickets;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
-using User = LBPUnion.ProjectLighthouse.PlayerData.Profiles.User;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;
 
@@ -68,8 +68,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
             .SetUserId(userId)
             .Build();
 
-        ticketData[^2] = 0;
-        ticketData[^1] = 0;
+        ticketData[^21] = 0;
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
         Assert.False(response.IsSuccessStatusCode);
         Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
