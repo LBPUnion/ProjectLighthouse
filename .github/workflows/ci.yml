@@ -40,7 +40,7 @@ jobs:
           dotnet-version: "7.0.x"
 
       - name: Compile
-        run: |
+      - run: |
           - dotnet restore
           - dotnet build -c Release --no-restore
           - dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests
