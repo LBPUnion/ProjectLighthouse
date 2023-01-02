@@ -40,12 +40,12 @@ jobs:
           dotnet-version: "7.0.x"
 
       - name: Compile
-      - run: |
-          - dotnet restore
-          - dotnet build -c Release --no-restore
-          - dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests
-          - dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests.GameApiTests
-          - dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests.WebsiteTests
+        run: |
+          dotnet restore
+          dotnet build -c Release --no-restore
+          dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests
+          dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests.GameApiTests
+          dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests.WebsiteTests
 
       - name: Run tests on ProjectLighthouse.Tests
         continue-on-error: true
