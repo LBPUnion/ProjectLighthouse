@@ -229,8 +229,7 @@ public class NPTicket
     public static NPTicket? CreateFromBytes(byte[] data)
     {
         NPTicket npTicket = new();
-        #if DEBUG
-        if (data[0] == 'u' && ServerStatics.IsUnitTesting)
+        if (ServerStatics.IsUnitTesting && data[0] == 'u')
         {
             string dataStr = Encoding.UTF8.GetString(data);
             if (dataStr.StartsWith("unitTestTicket"))
@@ -250,7 +249,6 @@ public class NPTicket
                 return npTicket;
             }
         }
-        #endif
         try
         {
             using MemoryStream ms = new(data);
