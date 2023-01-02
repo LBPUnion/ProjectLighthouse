@@ -26,21 +26,30 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         this.Server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
         this.Client = this.Server.CreateClient();
     }
-    public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
+
+    public async Task<string> CreateRandomUser(int number = -1, bool createUser = true)
     {
         if (number == -1) number = new Random().Next();
-
         const string username = "unitTestUser";
+
         if (createUser)
         {
             await using Database database = new();
             if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
             {
-                User user = await database.CreateUser($"{username}{number}", CryptoHelper.BCryptHash($"unitTestPassword{number}"));
+                User user = await database.CreateUser($"{username}{number}",
+                    CryptoHelper.BCryptHash($"unitTestPassword{number}"));
                 user.LinkedPsnId = (ulong)number;
                 await database.SaveChangesAsync();
             }
         }
+
+        return $"{username}{number}";
+    }
+
+    public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
+    {
+        string username = await this.CreateRandomUser(number, createUser);
 
         byte[] ticketData = new TicketBuilder().SetUsername($"{username}{number}")
             .SetTitleId("UP9000-BCUS98372_00")

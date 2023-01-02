@@ -1,9 +1,15 @@
-﻿using System.Buffers.Binary;
+﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Tickets.Types;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Security;
 
 namespace LBPUnion.ProjectLighthouse.Tickets;
 
@@ -13,14 +19,16 @@ public class TicketBuilder
     private static uint _idDispenser;
 
     private string Username { get; set; } = "test";
-    private string TitleId { get; set; } = "test";
-    private ulong ExpirationTime { get; set; } = (ulong)TimeHelper.TimestampMillis;
-    private ulong IssueTime { get; set; } = (ulong)TimeHelper.TimestampMillis + 15 * 60 * 1000;
+    private string TitleId { get; set; } = "UP9000-BCUS98245_00";
+    private ulong IssueTime { get; set; } = (ulong)TimeHelper.TimestampMillis;
+    private ulong ExpirationTime { get; set; } = (ulong)TimeHelper.TimestampMillis + 15 * 60 * 1000;
     private uint IssuerId { get; set; } = 0x74657374;
     private ulong UserId { get; set; }
     private string Country { get; set; } = "br";
     private string Domain { get; set; } = "un";
     private uint Status { get; set; }
+
+    private static readonly BigInteger privateKey = new("0edab5a79f0fff1cafd80849f620363ca15bcb89197f153d", 16);  
 
     public byte[] Build()
     {
@@ -56,12 +64,12 @@ public class TicketBuilder
             new EmptyData(),
         };
         TicketData userBlob = new BlobData(0, userData);
-        List<TicketData> signature = new()
+        List<TicketData> footer = new()
         {
-            new BinaryData("bruh"u8.ToArray()),
+            new BinaryData("TEST"u8.ToArray()),
             new BinaryData(new byte[0x38]),
         };
-        TicketData footerBlob = new BlobData(2, signature);
+        TicketData footerBlob = new BlobData(2, footer);
         MemoryStream ms = new();
         BinaryWriter writer = new(ms);
         writer.Write(new byte[]{0x21, 0x01, 0x00, 0x00,});
@@ -71,7 +79,28 @@ public class TicketBuilder
         writer.Write(lenAsBytes);
         userBlob.Write(writer);
         footerBlob.Write(writer);
-        return ms.ToArray();
+        byte[] data = ms.ToArray();
+        // sign all data besides the signature
+        byte[] ticketData = data.AsSpan()[..(data.Length-0x38)].ToArray();
+        byte[] signature = SignData(ticketData);
+        if (signature.Length < 0x38)
+        {
+            Array.Resize(ref signature, 0x38);
+        }
+        ticketData = ticketData.Concat(signature).ToArray();
+        return ticketData;
+    }
+
+    private static byte[] SignData(byte[] data)
+    {
+        ECPrivateKeyParameters key = new(privateKey, NPTicket.Secp192R1);
+
+        ISigner signer = SignerUtilities.GetSigner("SHA-1withECDSA");
+        signer.Init(true, key);
+
+        signer.BlockUpdate(data);
+
+        return signer.GenerateSignature();
     }
 
     public TicketBuilder SetUsername(string username)
