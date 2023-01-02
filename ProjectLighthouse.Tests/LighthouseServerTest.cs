@@ -51,8 +51,8 @@ public class LighthouseServerTest<TStartup> where TStartup : class
     {
         string username = await this.CreateRandomUser(number, createUser);
 
-        byte[] ticketData = new TicketBuilder().SetUsername($"{username}{number}")
-            .SetTitleId("UP9000-BCUS98372_00")
+        byte[] ticketData = new TicketBuilder()
+            .SetUsername($"{username}{number}")
             .SetUserId((ulong)number)
             .Build();
 

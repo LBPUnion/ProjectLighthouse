@@ -64,10 +64,10 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
-        byte[] ticketData = new TicketBuilder().SetUsername(username)
+        byte[] ticketData = new TicketBuilder()
+            .SetUsername(username)
             .SetUserId(userId)
             .Build();
-
         ticketData[^21] = 0;
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
         Assert.False(response.IsSuccessStatusCode);
@@ -86,7 +86,8 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
 
         byte[] ticketData = new TicketBuilder()
             .SetUsername(username)
-            .SetUserId(userId).Build();
+            .SetUserId(userId)
+            .Build();
         HttpResponseMessage response =
             await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
         Assert.False(response.IsSuccessStatusCode);
