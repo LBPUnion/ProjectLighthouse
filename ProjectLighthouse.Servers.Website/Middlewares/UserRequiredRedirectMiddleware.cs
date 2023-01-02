@@ -11,7 +11,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
     public UserRequiredRedirectMiddleware(RequestDelegate next) : base(next)
     { }
 
-    public override async Task InvokeAsync(HttpContext ctx, Database database)
+    public override async Task InvokeAsync(HttpContext ctx, Database.Database database)
     {
         WebToken? token = database.WebTokenFromRequest(ctx.Request);
         if (token == null || pathContains(ctx, "/logout"))
@@ -30,6 +30,18 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
         // Request ends with a path (e.g. /css/style.css)
         if (!string.IsNullOrEmpty(Path.GetExtension(ctx.Request.Path)) || pathContains(ctx, "/gameAssets"))
         {
+            await this.next(ctx);
+            return;
+        }
+
+        if (!token.Verified && ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled)
+        {
+            if (!pathContains(ctx, "/2fa"))
+            {
+                ctx.Response.Redirect("/2fa");
+                return;
+            }
+
             await this.next(ctx);
             return;
         }
@@ -73,17 +85,6 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
                 return;
             }
 
-            await this.next(ctx);
-            return;
-        }
-
-        if (!token.Verified && ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled)
-        {
-            if (!pathContains(ctx, "/2fa"))
-            {
-                ctx.Response.Redirect("/2fa");
-                return;
-            }
             await this.next(ctx);
             return;
         }
