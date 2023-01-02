@@ -105,7 +105,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
                                  $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be set at the following link:\n" +
                                  $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={resetToken.ResetToken}";
 
-            SMTPHelper.SendEmail(user.EmailAddress, $"Project Lighthouse Password Setup Request for {user.Username}", messageBody);
+            SMTPHelper.SendEmail(email, $"Project Lighthouse Password Setup Request for {user.Username}", messageBody);
 
             this.database.PasswordResetTokens.Add(resetToken);
 
