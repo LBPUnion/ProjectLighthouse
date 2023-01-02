@@ -88,7 +88,7 @@ public class SendVerificationEmailPage : BaseLayout
                       $"To verify your account, click the following link: {ServerConfiguration.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}\n\n\n" +
                       "If this wasn't you, feel free to ignore this email.";
 
-        this.Success = SMTPHelper.SendEmail(user.EmailAddress, "Project Lighthouse Email Verification", body);
+        this.Success = await SMTPHelper.SendEmailAsync(user.EmailAddress, "Project Lighthouse Email Verification", body);
 
         // Don't send another email for 30 seconds
         recentlySentEmail.TryAdd(user.UserId, TimeHelper.TimestampMillis + 30 * 1000);

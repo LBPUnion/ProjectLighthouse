@@ -67,11 +67,17 @@ public class SMTPHelper
         Instance.emailThread.Dispose();
     }
 
-    public static bool SendEmail(string recipientAddress, string subject, string body)
+    public static void SendEmail(string recipientAddress, string subject, string body)
     {
         TaskCompletionSource<bool> resultTask = new();
         Instance.SendEmail(recipientAddress, subject, body, resultTask);
-        return resultTask.Task.Result;
+    }
+
+    public static Task<bool> SendEmailAsync(string recipientAddress, string subject, string body)
+    {
+        TaskCompletionSource<bool> resultTask = new();
+        Instance.SendEmail(recipientAddress, subject, body, resultTask);
+        return resultTask.Task;
     }
 
     public void SendEmail(string recipientAddress, string subject, string body, TaskCompletionSource<bool> resultTask)
