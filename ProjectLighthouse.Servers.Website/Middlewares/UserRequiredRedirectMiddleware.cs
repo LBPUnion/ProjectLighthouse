@@ -11,7 +11,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
     public UserRequiredRedirectMiddleware(RequestDelegate next) : base(next)
     { }
 
-    public override async Task InvokeAsync(HttpContext ctx, Database.Database database)
+    public override async Task InvokeAsync(HttpContext ctx, Database database)
     {
         WebToken? token = database.WebTokenFromRequest(ctx.Request);
         if (token == null || pathContains(ctx, "/logout"))
