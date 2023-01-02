@@ -40,20 +40,25 @@ jobs:
           dotnet-version: "7.0.x"
 
       - name: Compile
-        run: dotnet build -c Debug
+        run: |
+          - dotnet restore
+          - dotnet build -c Release --no-restore
+          - dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests
+          - dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests.GameApiTests
+          - dotnet build -c Release --no-restore --no-dependencies ProjectLighthouse.Tests.WebsiteTests
 
       - name: Run tests on ProjectLighthouse.Tests
         continue-on-error: true
-        run: dotnet test --no-build --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}-Tests.trx" ProjectLighthouse.Tests
+        run: dotnet test -c Release --no-build --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}-Tests.trx" ProjectLighthouse.Tests
 
       - name: Run tests on ProjectLighthouse.Tests.GameApiTests
         continue-on-error: true
-        run: dotnet test --no-build --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}-GameApiTests.trx" ProjectLighthouse.Tests.GameApiTests
+        run: dotnet test -c Release --no-build --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}-GameApiTests.trx" ProjectLighthouse.Tests.GameApiTests
 
       - name: Run tests on ProjectLighthouse.Tests.WebsiteTests
         if: ${{ matrix.os.webTest }}
         continue-on-error: true
-        run: dotnet test --no-build --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}-WebsiteTests.trx" ProjectLighthouse.Tests.WebsiteTests
+        run: dotnet test -c Release --no-build --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}-WebsiteTests.trx" ProjectLighthouse.Tests.WebsiteTests
       
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
