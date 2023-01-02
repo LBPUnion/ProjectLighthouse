@@ -10,8 +10,14 @@ public sealed class DatabaseFactAttribute : FactAttribute
 
     public DatabaseFactAttribute()
     {
-        ServerConfiguration.Instance = new ServerConfiguration();
-        ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse";
+        ServerConfiguration.Instance = new ServerConfiguration
+        {
+            DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse;database=lighthouse",
+            Authentication =
+            {
+                VerifyTickets = false,
+            },
+        };
         if (!ServerStatics.DbConnected) this.Skip = "Database not available";
         else
             lock(migrateLock)

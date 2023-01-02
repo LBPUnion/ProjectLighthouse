@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Tickets;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -41,11 +42,13 @@ public class LighthouseServerTest<TStartup> where TStartup : class
             }
         }
 
-        //TODO: generate actual tickets
-        string stringContent = $"unitTestTicket{username}{number}";
+        byte[] ticketData = new TicketBuilder().SetUsername($"{username}{number}")
+            .SetTitleId("UP9000-BCUS98372_00")
+            .SetUserId((ulong)number)
+            .Build();
 
         HttpResponseMessage response = await this.Client.PostAsync
-            ($"/LITTLEBIGPLANETPS3_XML/login?titleID={GameVersionHelper.LittleBigPlanet2TitleIds[0]}", new StringContent(stringContent));
+            ($"/LITTLEBIGPLANETPS3_XML/login?titleID={GameVersionHelper.LittleBigPlanet2TitleIds[0]}", new ByteArrayContent(ticketData));
         return response;
     }
 

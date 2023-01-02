@@ -230,26 +230,6 @@ public class NPTicket
     public static NPTicket? CreateFromBytes(byte[] data)
     {
         NPTicket npTicket = new();
-        if (ServerStatics.IsUnitTesting && data[0] == 'u')
-        {
-            string dataStr = Encoding.UTF8.GetString(data);
-            if (dataStr.StartsWith("unitTestTicket"))
-            {
-                npTicket = new NPTicket
-                {
-                    IssuerId = 0,
-                    ticketVersion = new Version(0, 0),
-                    Platform = Platform.UnitTest,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                    ExpireDate = 0,
-                    IssuedDate = 0,
-                    Username = dataStr["unitTestTicket".Length..],
-                    UserId = ulong.Parse(dataStr["unitTestTicketunitTestUser".Length..]),
-                };
-
-                return npTicket;
-            }
-        }
         try
         {
             using MemoryStream ms = new(data);
