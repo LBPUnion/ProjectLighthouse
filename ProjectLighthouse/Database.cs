@@ -91,13 +91,12 @@ public class Database : DbContext
 
         await this.SaveChangesAsync();
 
-        if (emailAddress != null && ServerConfiguration.Instance.Mail.MailEnabled)
-        {
-            string body = "An account for Project Lighthouse has been registered with this email address.\n\n" +
-                          $"You can login at {ServerConfiguration.Instance.ExternalUrl}.";
+        if (!ServerConfiguration.Instance.Mail.MailEnabled || emailAddress == null) return user;
 
-            SMTPHelper.SendEmail(emailAddress, "Project Lighthouse Account Created: " + username, body);
-        }
+        string body = "An account for Project Lighthouse has been registered with this email address.\n\n" +
+                      $"You can login at {ServerConfiguration.Instance.ExternalUrl}.";
+
+        SMTPHelper.SendEmail(emailAddress, "Project Lighthouse Account Created: " + username, body);
 
         return user;
     }
