@@ -36,7 +36,7 @@ logs/*
 npTicket*
 r.tar.gz
 lighthouse.yml.configme
-ProjectLighthouse\chatCensoredList.txt
+chatCensoredList.txt
 
 # MSBuild stuff
 bin/

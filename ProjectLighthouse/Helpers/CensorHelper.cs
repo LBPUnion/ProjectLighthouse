@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Types;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -17,6 +19,67 @@ public static class CensorHelper
     {
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
+
+    private static readonly string[] defaultCensoredList =
+    {
+        "cunt", "fag", "faggot", "horny", "kook", "kys", "loli", "nigga", "nigger", "penis", "pussy", "retard", "retarded", "vagina", "vore", "restitched", "h4h"
+    }
+
+    public const string ConfigFileName = "chatCensoredList.txt";
+
+    static CensorHelper()
+    {
+
+    CensorHelper? tempConfig;
+
+    if (File.Exists(ConfigFileName) && (tempConfig = fromFile(ConfigFileName)) != null) 
+    {
+        Instance = tempConfig;
+    }
+
+    else
+    {
+        new CensorHelper().writeConfig(ConfigFileName + ".configme");
+
+        Logger.Warn
+        (
+            "The chat censor list was not found. " +
+            "A default configuration file has been created for you at " +
+            $"{Path.Combine(Environment.CurrentDirectory, ConfigFileName + ".configme")}",
+            LogArea.Config
+        );
+
+        Environment.Exit(1);
+    }
+    
+    private static INamingConvention namingConvention = CamelCaseNamingConvention.Instance;
+
+    private static CensorHelper? fromFile(string path)
+    {
+        IDeserializer deserializer = new DeserializerBuilder().WithNamingConvention(namingConvention).IgnoreUnmatchedProperties().Build();
+
+        string text;
+
+        try
+        {
+            text = File.ReadAllText(path);
+        }
+        catch
+        {
+            return null;
+        }
+
+        return deserializer.Deserialize<CensorHelper>(text);
+    }
+
+    private void writeConfig(string path)
+    {
+        ISerializer serializer = new SerializerBuilder().WithNamingConvention(namingConvention).Build();
+
+        File.WriteAllText(path, serializer.Serialize(defaultCensoredList));
+    }
+
+    }
 
     private static readonly string[] censorList = ResourceHelper.ReadManifestFile("chatCensoredList.txt").Replace("\r", "").Split("\n");
 
