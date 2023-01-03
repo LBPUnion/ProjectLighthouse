@@ -120,7 +120,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        Logger.Info($"{username}: {message} / {scannedText}", LogArea.Filter);
+        if (ServerConfiguration.Instance.LogChatFiltering) Logger.Info($"{username}: {message} / {scannedText}", LogArea.Filter);
 
         return this.Ok(scannedText);
     }

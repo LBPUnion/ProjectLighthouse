@@ -185,6 +185,7 @@ public class ServerConfiguration
     public string AnnounceText { get; set; } = "You are now logged in as %user (id: %id).";
 #endif
     public bool CheckForUnsafeFiles { get; set; } = true;
+    public bool LogChatFiltering { get; set; } = false;
 
     public FilterMode UserInputFilterMode { get; set; } = FilterMode.None;
 
