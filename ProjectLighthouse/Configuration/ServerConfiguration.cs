@@ -23,7 +23,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 15;
+    public const int CurrentConfigVersion = 16;
 
     #region Meta
 
