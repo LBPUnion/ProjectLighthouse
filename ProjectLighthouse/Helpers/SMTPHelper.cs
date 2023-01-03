@@ -9,9 +9,8 @@ using LBPUnion.ProjectLighthouse.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
-public class SMTPHelper
+public partial class SMTPHelper
 {
-
     internal static readonly SMTPHelper Instance = new();
 
     private readonly MailAddress fromAddress;
