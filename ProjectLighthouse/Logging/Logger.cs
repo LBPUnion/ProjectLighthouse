@@ -74,6 +74,11 @@ public class Logger
     private readonly ConcurrentQueue<LogLine> logQueue = new();
 
     /// <summary>
+    /// Used to signal the logging loop that a new message has arrived
+    /// </summary>
+    private readonly SemaphoreSlim logSemaphore = new(0);
+
+    /// <summary>
     /// Adds a <see cref="LogLine"/> to the queue. Only used internally.
     /// </summary>
     /// <param name="logLine">The logLine to send to the queue.</param>
@@ -86,17 +91,12 @@ public class Logger
     public Logger() // Start queue thread on first Logger access
     {
         Task.Factory.StartNew
-        (
-            () =>
+        (async () =>
             {
                 while (true)
                 {
-                    bool logged = this.queueLoop();
-                    Thread.Sleep(logged ? 10 : 100);
-                    // We wait 100ms if we dont log since it's less likely that the program logged again.
-                    // If we did log, wait 10ms before looping again.
-
-                    // This is all so we use as little CPU as possible. This is an endless while loop, after all.
+                    await this.logSemaphore.WaitAsync();
+                    this.queueLoop();
                 }
             }
         );
@@ -133,16 +133,14 @@ public class Logger
     /// A function used by the queue thread 
     /// </summary>
     /// <returns></returns>
-    private bool queueLoop()
+    private void queueLoop()
     {
-        if (!this.logQueue.TryDequeue(out LogLine line)) return false;
+        if (!this.logQueue.TryDequeue(out LogLine line)) return;
 
         foreach (ILogger logger in this.loggers)
         {
             logger.Log(line);
         }
-
-        return true;
     }
 
     #endregion
@@ -215,6 +213,7 @@ public class Logger
             Area = area,
             Trace = getTrace(extraTraceLines),
         });
+        this.logSemaphore.Release();
     }
     #endregion
 }

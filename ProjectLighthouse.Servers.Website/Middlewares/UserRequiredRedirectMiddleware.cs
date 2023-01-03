@@ -34,6 +34,18 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
+        if (!token.Verified && ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled)
+        {
+            if (!pathContains(ctx, "/2fa"))
+            {
+                ctx.Response.Redirect("/2fa");
+                return;
+            }
+
+            await this.next(ctx);
+            return;
+        }
+
         if (user.PasswordResetRequired)
         {
             if (!pathContains(ctx, "/passwordResetRequired", "/passwordReset"))
@@ -46,15 +58,20 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
-        if (!user.EmailAddressVerified && ServerConfiguration.Instance.Mail.MailEnabled)
+        if (user.EmailAddress == null && ServerConfiguration.Instance.Mail.MailEnabled)
         {
-            // The normal flow is for users to set their email during login so just force them to log out
-            if (user.EmailAddress == null)
+            if (!pathContains(ctx, "/login/setEmail"))
             {
-                ctx.Response.Redirect("/logout");
+                ctx.Response.Redirect("/login/setEmail");
                 return;
             }
+            
+            await this.next(ctx);
+            return;
+        }
 
+        if (!user.EmailAddressVerified && ServerConfiguration.Instance.Mail.MailEnabled)
+        {
             if (!pathContains(ctx, "/login/sendVerificationEmail", "/verifyEmail"))
             {
                 ctx.Response.Redirect("/login/sendVerificationEmail");
@@ -73,17 +90,6 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
                 return;
             }
 
-            await this.next(ctx);
-            return;
-        }
-
-        if (!token.Verified && ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled)
-        {
-            if (!pathContains(ctx, "/2fa"))
-            {
-                ctx.Response.Redirect("/2fa");
-                return;
-            }
             await this.next(ctx);
             return;
         }

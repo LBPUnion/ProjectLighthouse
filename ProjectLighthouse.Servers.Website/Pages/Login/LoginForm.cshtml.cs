@@ -8,7 +8,6 @@ using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -85,24 +84,6 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        if (user.EmailAddress == null && ServerConfiguration.Instance.Mail.MailEnabled)
-        {
-            Logger.Warn($"User {user.Username} (id: {user.UserId}) failed to login; email not set", LogArea.Login);
-
-            EmailSetToken emailSetToken = new()
-            {
-                UserId = user.UserId,
-                User = user,
-                EmailToken = CryptoHelper.GenerateAuthToken(),
-                ExpiresAt = DateTime.Now + TimeSpan.FromHours(6),
-            };
-
-            this.Database.EmailSetTokens.Add(emailSetToken);
-            await this.Database.SaveChangesAsync();
-
-            return this.Redirect("/login/setEmail?token=" + emailSetToken.EmailToken);
-        }
-
         WebToken webToken = new()
         {
             UserId = user.UserId,
@@ -126,9 +107,6 @@ public class LoginForm : BaseLayout
 
         Logger.Success($"User {user.Username} (id: {user.UserId}) successfully logged in on web", LogArea.Login);
 
-        if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
-        if (ServerConfiguration.Instance.Mail.MailEnabled && !user.EmailAddressVerified) return this.Redirect("~/login/sendVerificationEmail");
-
         if (!webToken.Verified)
         {
             return string.IsNullOrWhiteSpace(redirect)
@@ -136,17 +114,20 @@ public class LoginForm : BaseLayout
                 : this.Redirect("~/2fa" + "?redirect=" + HttpUtility.UrlEncode(redirect));
         }
 
+        if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 
-        if (string.IsNullOrWhiteSpace(redirect)) return this.Redirect("~/");
-        
-        return this.Redirect(redirect);
+        return ServerConfiguration.Instance.Mail.MailEnabled switch
+        {
+            true when string.IsNullOrWhiteSpace(user.EmailAddress) => this.Redirect("~/login/setEmail"),
+            true when user.EmailAddressVerified => this.Redirect("~/login/sendVerificationEmail"),
+            _ => string.IsNullOrWhiteSpace(redirect) ? this.Redirect("~/") : this.Redirect(redirect),
+        };
     }
 
     [UsedImplicitly]
     public IActionResult OnGet()
     {
-        if (this.Database.UserFromWebRequest(this.Request) != null) 
-            return this.Redirect("~/");
+        if (this.Database.UserFromWebRequest(this.Request) != null) return this.Redirect("~/");
 
         return this.Page();
     }
