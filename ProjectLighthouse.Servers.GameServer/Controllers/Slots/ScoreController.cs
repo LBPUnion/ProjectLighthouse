@@ -29,7 +29,7 @@ public class ScoreController : ControllerBase
 
     [HttpPost("scoreboard/{slotType}/{id:int}")]
     [HttpPost("scoreboard/{slotType}/{id:int}/{childId:int}")]
-    public async Task<IActionResult> SubmitScore(string slotType, int id, int childId, [FromQuery] bool lbp1 = false, [FromQuery] bool lbp2 = false, [FromQuery] bool lbp3 = false)
+    public async Task<IActionResult> SubmitScore(string slotType, int id, int childId)
     {
         GameToken token = this.GetToken();
 
@@ -49,7 +49,7 @@ public class ScoreController : ControllerBase
         }
 
         // This only seems to happens on lbp2 versus levels, not sure why
-        if(score.PlayerIdCollection.Contains(':'))
+        if (score.PlayerIdCollection.Contains(':')) 
             score.PlayerIdCollection = score.PlayerIdCollection.Replace(':', ',');
 
         if (score.PlayerIds.Length == 0)
@@ -111,42 +111,34 @@ public class ScoreController : ControllerBase
             case GameVersion.LittleBigPlanet3:
                 slot.PlaysLBP3Complete++;
                 break;
-            case GameVersion.LittleBigPlanetPSP: break;
-            case GameVersion.Unknown: break;
+            case GameVersion.LittleBigPlanetPSP:
+            case GameVersion.Unknown:
             default: throw new ArgumentOutOfRangeException();
         }
 
-        // Submit scores from all players in lobby
-        foreach (string player in score.PlayerIds)
+        Score playerScore = new()
         {
-            List<string> players = new();
-            players.Add(player); // make sure this player is first
-            players.AddRange(score.PlayerIds.Where(p => p != player));
+            PlayerIdCollection = string.Join(',', score.PlayerIds),
+            Type = score.Type,
+            Points = score.Points,
+            SlotId = score.SlotId,
+            ChildSlotId = score.ChildSlotId,
+        };
 
-            Score playerScore = new()
-            {
-                PlayerIdCollection = string.Join(',', players),
-                Type = score.Type,
-                Points = score.Points,
-                SlotId = score.SlotId,
-                ChildSlotId = score.ChildSlotId,
-            };
-
-            IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
+        IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
             .Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
             .Where(s => s.Type == playerScore.Type);
-            if (existingScore.Any())
-            {
-                Score first = existingScore.First(s => s.SlotId == playerScore.SlotId);
-                playerScore.ScoreId = first.ScoreId;
-                playerScore.Points = Math.Max(first.Points, playerScore.Points);
-                this.database.Entry(first).CurrentValues.SetValues(playerScore);
-            }
-            else
-            {
-                this.database.Scores.Add(playerScore);
-            }
+        if (existingScore.Any())
+        {
+            Score first = existingScore.First(s => s.SlotId == playerScore.SlotId);
+            playerScore.ScoreId = first.ScoreId;
+            playerScore.Points = Math.Max(first.Points, playerScore.Points);
+            this.database.Entry(first).CurrentValues.SetValues(playerScore);
+        }
+        else
+        {
+            this.database.Scores.Add(playerScore);
         }
 
         await this.database.SaveChangesAsync();
