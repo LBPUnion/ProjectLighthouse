@@ -35,7 +35,7 @@ public class TicketBuilder
         uint ticketId = _idDispenser++;
         byte[] serialBytes = new byte[0x14];
         BinaryPrimitives.WriteUInt32BigEndian(serialBytes, ticketId);
-        // uint issuerId = 0x62727568;
+        
         byte[] onlineId = new byte[0x20];
         Encoding.ASCII.GetBytes(this.Username).CopyTo(onlineId, 0);
 
