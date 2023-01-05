@@ -116,13 +116,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             return this.Ok();
         }
 
-        string scannedText = CensorHelper.ScanMessage(message);
+        string filteredText = CensorHelper.ScanMessage(message);
 
         string username = await this.database.UsernameFromGameToken(token);
 
         if (ServerConfiguration.Instance.LogChatFiltering) 
-          Logger.Info($"{username}: {message} / {scannedText}", LogArea.Filter);
+          Logger.Info($"{username}: {message} / {filteredText}", LogArea.Filter);
 
-        return this.Ok(scannedText);
+        return this.Ok(filteredText);
     }
 }
