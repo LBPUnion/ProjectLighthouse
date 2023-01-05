@@ -23,7 +23,7 @@ public class ServerConfiguration
     // You can use an ObsoleteAttribute instead. Make sure you set it to error, though.
     //
     // Thanks for listening~
-    public const int CurrentConfigVersion = 15;
+    public const int CurrentConfigVersion = 16;
 
     #region Meta
 
@@ -185,6 +185,7 @@ public class ServerConfiguration
     public string AnnounceText { get; set; } = "You are now logged in as %user (id: %id).";
 #endif
     public bool CheckForUnsafeFiles { get; set; } = true;
+    public bool LogChatFiltering { get; set; } = false;
 
     public FilterMode UserInputFilterMode { get; set; } = FilterMode.None;
 
