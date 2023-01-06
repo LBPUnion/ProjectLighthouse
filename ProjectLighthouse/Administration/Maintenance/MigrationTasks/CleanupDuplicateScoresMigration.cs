@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MigrationTasks;
@@ -23,19 +23,26 @@ public class CleanupDuplicateScoresMigration : IMigrationTask
                          s.Type == score.Type &&
                          s.SlotId == score.SlotId &&
                          s.ScoreId != score.ScoreId &&
-                         s.ChildSlotId == score.ChildSlotId))
+                         s.ChildSlotId == score.ChildSlotId &&
+                         s.ScoreId > score.ScoreId))
             {
-                if (score.PlayerIds.Length != other.PlayerIds.Length || score.PlayerIds.Except(other.PlayerIds).Any())
+                if (score.PlayerIds.Length != other.PlayerIds.Length)
                     continue;
 
+                HashSet<string> hashSet = new(score.PlayerIds);
+
+                if (!other.PlayerIds.All(hashSet.Contains)) continue;
+
+                Logger.Info($"Removing score with id {other.ScoreId}, slotId={other.SlotId} main='{score.PlayerIdCollection}', duplicate={other.PlayerIdCollection}", LogArea.Score);
                 database.Scores.Remove(other);
                 duplicateScoreIds.Add(other.ScoreId);
             }
         }
 
+        Logger.Info($"Removed a total of {duplicateScoreIds.Count} duplicate scores", LogArea.Score);
         await database.SaveChangesAsync();
 
-        return false;
+        return true;
     }
 
 }
