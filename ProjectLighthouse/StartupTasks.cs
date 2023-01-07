@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
@@ -31,11 +32,15 @@ public static class StartupTasks
         Logger.Instance.AddLogger(new ConsoleLogger());
         Logger.Instance.AddLogger(new FileLogger());
 
+        // Load configurations
+        if (!loadConfigurations())
+        {
+            Logger.Error("Failed to load one or more configurations", LogArea.Config);
+            Environment.Exit(1);
+        }
+
         Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
-
-        // Referencing ServerConfiguration.Instance here loads the config, see ServerConfiguration.cs for more information
-        Logger.Success("Loaded config file version " + ServerConfiguration.Instance.ConfigVersion, LogArea.Startup);
 
         Logger.Info("Connecting to the database...", LogArea.Startup);
         bool dbConnected = ServerStatics.DbConnected;
@@ -109,6 +114,36 @@ public static class StartupTasks
 
         stopwatch.Stop();
         Logger.Success($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
+    }
+
+    private static bool loadConfigurations()
+    {
+        Assembly assembly = Assembly.GetAssembly(typeof(ConfigurationBase<>));
+        if (assembly == null) return false;
+        bool didLoad = true;
+        foreach (Type type in assembly.GetTypes()
+                     .Where(myType => myType.IsClass && !myType.IsAbstract && myType.BaseType?.Name == "ConfigurationBase`1"))
+        {
+            if (type.BaseType == null) continue;
+            if (type.BaseType.GetProperty("Instance") != null)
+            {
+                // force create lazy instance
+                type.BaseType.GetProperty("Instance")?.GetValue(null);
+            }
+
+            object objRef = type.BaseType.GetProperty("Instance")?.GetValue(null);
+            int configVersion = ((int?)type.GetProperty("ConfigVersion")?.GetValue(objRef)).GetValueOrDefault();
+            if (configVersion <= 0)
+            {
+                didLoad = false;
+            }
+            else
+            {
+                Logger.Success($"Successfully loaded {type.Name} version {configVersion}", LogArea.Startup);
+            }
+        }
+
+        return didLoad;
     }
 
     private static void migrateDatabase(Database database)
