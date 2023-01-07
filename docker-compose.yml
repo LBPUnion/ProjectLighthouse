@@ -1,28 +1,90 @@
-# MySQL Docker compose file for development purposes. DO NOT USE IN PRODUCTION!
-
 version: '3'
-
-services:
-  lighthouse-db:
-    image: mysql
-    environment:
-      MYSQL_DATABASE: 'lighthouse'
-      MYSQL_ROOT_PASSWORD: 'lighthouse'
-    ports:
-      - '3306:3306'
-    expose:
-      - '3306' # Expose port to localhost:3306
-    volumes:
-      - lighthouse-db:/var/lib/mysql
-  lighthouse-redis:
-    image: redis/redis-stack
-    ports:
-      - '6379:6379'
-      - '8001:8001'
-    expose:
-      - '6379'
-      - '8001'
-
-
 volumes:
-  lighthouse-db:
+  database:
+  redis:
+services:
+  gameserver:
+    image: lighthouse:latest
+    container_name: gameserver
+    build: .
+    restart: unless-stopped
+    ports:
+      - "10061:10061"
+    environment:
+      SERVER: GameServer
+    healthcheck:
+      test: wget --spider -t1 -nv http://localhost:10061/LITTLEBIGPLANETPS3_XML/status || exit 1
+      timeout: 10s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - "./data:/lighthouse/data:z"
+  website:
+    image: lighthouse:latest
+    container_name: website
+    restart: unless-stopped
+    ports:
+      - "10060:10060"
+    environment:
+      SERVER: Website
+    healthcheck:
+      test: wget --spider -t1 -nv http://localhost:10060/status || exit 1
+      timeout: 10s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+      gameserver:
+        condition: service_healthy
+    volumes:
+      - "./data:/lighthouse/data:z"
+  api:
+    image: lighthouse:latest
+    container_name: api
+    restart: unless-stopped
+    ports:
+      - "10062:10062"
+    environment:
+      SERVER: API
+    healthcheck:
+      test: wget --spider -t1 -nv http://localhost:10062/api/v1/status || exit 1
+      timeout: 10s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+      gameserver:
+        condition: service_healthy
+    volumes:
+      - "./data:/lighthouse/data:z"
+  db:
+    image: mariadb
+    container_name: db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: lighthouse
+      MARIADB_DATABASE: lighthouse
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=lighthouse --execute \"SHOW DATABASES;\""
+      timeout: 20s
+      retries: 10
+    volumes:
+      - "database:/var/lib/mysql"
+  redis:
+    image: redis/redis-stack-server
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - "redis:/var/lib/redis"
