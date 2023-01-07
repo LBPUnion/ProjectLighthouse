@@ -97,6 +97,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
             {
                 int newVersion = this.ConfigVersion;
                 Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {this.ConfigVersion}", LogArea.Config);
+                this.writeConfig(this.ConfigName + ".bak");
                 this.loadConfig(storedConfig);
                 this.ConfigVersion = newVersion;
                 this.writeConfig(this.ConfigName);
