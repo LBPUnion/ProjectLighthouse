@@ -119,7 +119,7 @@ public class CommentController : ControllerBase
             targetId = await this.database.UserIdFromUsername(username!);
         }
 
-        string scannedText = CensorHelper.ScanMessage(comment.Message);
+        string filteredText = CensorHelper.ScanMessage(comment.Message);
 
         bool success = await this.database.PostComment(token.UserId, targetId, type, scannedText);
         if (success) return this.Ok();
