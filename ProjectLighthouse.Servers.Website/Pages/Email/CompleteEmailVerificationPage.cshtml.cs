@@ -1,5 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -19,15 +21,14 @@ public class CompleteEmailVerificationPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled) return this.NotFound();
 
-        User? user = this.Database.UserFromWebRequest(this.Request);
-        if (user == null) return this.Redirect("~/login");
-
         EmailVerificationToken? emailVerifyToken = await this.Database.EmailVerificationTokens.FirstOrDefaultAsync(e => e.EmailToken == token);
         if (emailVerifyToken == null)
         {
             this.Error = "Invalid verification token";
             return this.Page();
         }
+
+        User user = await this.Database.Users.FirstAsync(u => u.UserId == emailVerifyToken.UserId);
 
         if (DateTime.Now > emailVerifyToken.ExpiresAt)
         {
@@ -44,9 +45,27 @@ public class CompleteEmailVerificationPage : BaseLayout
         this.Database.EmailVerificationTokens.Remove(emailVerifyToken);
 
         user.EmailAddressVerified = true;
-
         await this.Database.SaveChangesAsync();
 
-        return this.Page();
+        if (user.Password != null) return this.Page();
+
+        // if user's account was created automatically
+        WebToken webToken = new()
+        {
+            ExpiresAt = DateTime.Now.AddDays(7),
+            Verified = true,
+            UserId = user.UserId,
+            UserToken = CryptoHelper.GenerateAuthToken(),
+        };
+        user.PasswordResetRequired = true;
+        this.Database.WebTokens.Add(webToken);
+        await this.Database.SaveChangesAsync();
+        this.Response.Cookies.Append("LighthouseToken",
+            webToken.UserToken,
+            new CookieOptions
+            {
+                Expires = DateTimeOffset.Now.AddDays(7),
+            });
+        return this.Redirect("/passwordReset");
     }
 }
