@@ -20,7 +20,6 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     public static T Instance => sInstance.Value;
 
-    
     // ReSharper disable once UnusedMember.Global
     // Used with reflection to determine if the config was successfully loaded
     public static bool IsConfigured => sInstance.IsValueCreated;
@@ -100,19 +99,22 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     private void loadStoredConfig()
     {
-        this.configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName);
+        this.configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName, out bool createdNew);
+        Logger.Info($"Created config mutex - {this.ConfigName}, createdNew={createdNew}", LogArea.Config);
         try
         {
-            ConfigurationBase<T>? storedConfig;
-
+            Logger.Info($"Waiting to acquire mutex - {this.ConfigName}", LogArea.Config);
             this.configFileMutex.WaitOne();
+            Logger.Info($"Acquired mutex - {this.ConfigName}", LogArea.Config);
+
+            ConfigurationBase<T>? storedConfig;
 
             if (File.Exists(this.ConfigName) && (storedConfig = this.fromFile(this.ConfigName)) != null)
             {
-                if (storedConfig.ConfigVersion < this.ConfigVersion)
+                if (storedConfig.ConfigVersion < getVersion())
                 {
-                    int newVersion = this.ConfigVersion;
-                    Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {this.ConfigVersion}", LogArea.Config);
+                    int newVersion = getVersion();
+                    Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {newVersion}", LogArea.Config);
                     this.writeConfig(this.ConfigName + ".bak");
                     this.loadConfig(storedConfig);
                     this.ConfigVersion = newVersion;
@@ -142,8 +144,10 @@ public abstract class ConfigurationBase<T> where T : class, new()
         }
         finally
         {
+            Logger.Info($"About to dispose mutex - {this.ConfigName}", LogArea.Config);
             this.configFileMutex.ReleaseMutex();
             this.configFileMutex.Dispose();
+            Logger.Info($"Disposed mutex - {this.ConfigName}", LogArea.Config);
         }
     }
 
@@ -194,6 +198,13 @@ public abstract class ConfigurationBase<T> where T : class, new()
     private string serializeConfig() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build().Serialize(this);
 
     private void writeConfig(string path) => File.WriteAllText(path, this.serializeConfig());
+
+    private static int getVersion()
+    {
+        object instance = CreateInstanceOfT();
+        int? version = instance.GetType().GetProperty("ConfigVersion")?.GetValue(instance) as int?;
+        return version.GetValueOrDefault();
+    }
 
     private static T CreateInstanceOfT()
     {

@@ -63,7 +63,7 @@ public static class StartupTasks
         if (serverType == ServerType.GameServer)
         #endif
         migrateDatabase(database);
-        
+
         if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
         {
             Logger.Info("Influx logging is enabled. Starting influx logging...", LogArea.Startup);
@@ -92,10 +92,10 @@ public static class StartupTasks
         {
             FileHelper.ConvertAllTexturesToPng();
         }
-        
+
         Logger.Info("Initializing Redis...", LogArea.Startup);
         RedisDatabase.Initialize().Wait();
-        
+
         Logger.Info("Initializing repeating tasks...", LogArea.Startup);
         RepeatingTaskHandler.Initialize();
 
