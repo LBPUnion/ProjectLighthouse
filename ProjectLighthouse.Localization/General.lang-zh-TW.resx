@@ -24,7 +24,7 @@
         <value>密碼</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>註冊</value>
+        <value>Create an account</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>忘記密碼?</value>
