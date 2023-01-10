@@ -20,6 +20,11 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     public static T Instance => sInstance.Value;
 
+    
+    // ReSharper disable once UnusedMember.Global
+    // Used with reflection to determine if the config was successfully loaded
+    public static bool IsConfigured => sInstance.IsValueCreated;
+
     // Used to prevent an infinite loop of the config trying to load itself when deserializing
     // This is intentionally not released in the constructor
     private static readonly SemaphoreSlim constructorLock = new(1, 1);

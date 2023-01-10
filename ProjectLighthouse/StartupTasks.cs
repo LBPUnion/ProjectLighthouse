@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
@@ -32,14 +33,16 @@ public static class StartupTasks
         Logger.Instance.AddLogger(new ConsoleLogger());
         Logger.Instance.AddLogger(new FileLogger());
 
-        // Load configurations
+        Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
+
+        Logger.Info("Loading configurations...", LogArea.Startup);
         if (!loadConfigurations())
         {
             Logger.Error("Failed to load one or more configurations", LogArea.Config);
             Environment.Exit(1);
         }
 
-        Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
+        // Version info depends on ServerConfig 
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
 
         Logger.Info("Connecting to the database...", LogArea.Startup);
@@ -121,14 +124,19 @@ public static class StartupTasks
         Assembly assembly = Assembly.GetAssembly(typeof(ConfigurationBase<>));
         if (assembly == null) return false;
         bool didLoad = true;
-        foreach (Type type in assembly.GetTypes()
-                     .Where(myType => myType.IsClass && !myType.IsAbstract && myType.BaseType?.Name == "ConfigurationBase`1"))
+        foreach (Type type in assembly.GetTypes().Where(myType => myType.IsClass && !myType.IsAbstract && myType.BaseType?.Name == "ConfigurationBase`1"))
         {
             if (type.BaseType == null) continue;
             if (type.BaseType.GetProperty("Instance") != null)
             {
                 // force create lazy instance
                 type.BaseType.GetProperty("Instance")?.GetValue(null);
+                bool isConfigured = false;
+                while (!isConfigured)
+                {
+                    isConfigured = (bool)(type.BaseType.GetProperty("IsConfigured")?.GetValue(null) ?? false);
+                    Thread.Sleep(10);
+                }
             }
 
             object objRef = type.BaseType.GetProperty("Instance")?.GetValue(null);
