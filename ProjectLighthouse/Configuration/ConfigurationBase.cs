@@ -61,8 +61,11 @@ public abstract class ConfigurationBase<T> where T : class, new()
         if (ServerStatics.IsUnitTesting)
             return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
-        _configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName, out bool createdNew);
-        Logger.Info($"Created config mutex - {this.ConfigName}, createdNew={createdNew}", LogArea.Config);
+        // Trim ConfigName by 4 to remove the .yml
+        string mutexName = $"LighthouseConfig-{this.ConfigName[..^4]}";
+
+        _configFileMutex = new Mutex(false, mutexName, out bool createdNew);
+        Logger.Info($"Created config mutex - name={mutexName}, createdNew={createdNew}", LogArea.Config);
 
         this.loadStoredConfig();
 
