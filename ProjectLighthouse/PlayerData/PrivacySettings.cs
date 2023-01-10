@@ -1,10 +1,8 @@
 #nullable enable
-using System;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Configuration;
+namespace LBPUnion.ProjectLighthouse.PlayerData;
 
 [XmlRoot("privacySettings")]
 [XmlType("privacySettings")]
