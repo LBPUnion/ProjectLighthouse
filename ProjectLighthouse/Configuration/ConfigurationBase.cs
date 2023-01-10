@@ -28,7 +28,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
     // This is intentionally not released in the constructor
     private static readonly SemaphoreSlim constructorLock = new(1, 1);
 
-    // Semaphore for synchronizing processes so that only one process will read a config at a time
+    // Global mutex for synchronizing processes so that only one process can read a config at a time
     // Mostly useful for migrations so only one server will try to rewrite the config file
     private static Mutex? _configFileMutex;
 
@@ -64,8 +64,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
         // Trim ConfigName by 4 to remove the .yml
         string mutexName = $"Global\\LighthouseConfig-{this.ConfigName[..^4]}";
 
-        _configFileMutex = new Mutex(false, mutexName, out bool createdNew);
-        Logger.Info($"Created config mutex - name={mutexName}, createdNew={createdNew}", LogArea.Config);
+        _configFileMutex = new Mutex(false, mutexName);
 
         this.loadStoredConfig();
 
@@ -107,19 +106,17 @@ public abstract class ConfigurationBase<T> where T : class, new()
     {
         try
         {
-            Logger.Info($"Waiting to acquire mutex - {this.ConfigName}", LogArea.Config);
             _configFileMutex?.WaitOne();
-            Logger.Info($"Acquired mutex - {this.ConfigName}", LogArea.Config);
 
             ConfigurationBase<T>? storedConfig;
 
             if (File.Exists(this.ConfigName) && (storedConfig = this.fromFile(this.ConfigName)) != null)
             {
-                if (storedConfig.ConfigVersion < getVersion())
+                if (storedConfig.ConfigVersion < GetVersion())
                 {
-                    int newVersion = getVersion();
+                    int newVersion = GetVersion();
                     Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {newVersion}", LogArea.Config);
-                    this.writeConfig(this.ConfigName + ".bak");
+                    storedConfig.writeConfig(this.ConfigName + ".bak");
                     this.loadConfig(storedConfig);
                     this.ConfigVersion = newVersion;
                     this.writeConfig(this.ConfigName);
@@ -148,9 +145,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
         }
         finally
         {
-            Logger.Info($"About to release mutex - {this.ConfigName}", LogArea.Config);
             _configFileMutex?.ReleaseMutex();
-            Logger.Info($"Released mutex - {this.ConfigName}", LogArea.Config);
         }
     }
 
@@ -209,11 +204,16 @@ public abstract class ConfigurationBase<T> where T : class, new()
         constructorLock.Dispose();
     }
 
-    private static int getVersion()
+    public static int GetVersion() => version.Value;
+
+    private static readonly Lazy<int> version = new(fetchVersion);
+
+    // Obtain a fresh version of the class to get the coded config version
+    private static int fetchVersion()
     {
         object instance = CreateInstanceOfT();
-        int? version = instance.GetType().GetProperty("ConfigVersion")?.GetValue(instance) as int?;
-        return version.GetValueOrDefault();
+        int? ver = instance.GetType().GetProperty("ConfigVersion")?.GetValue(instance) as int?;
+        return ver.GetValueOrDefault();
     }
 
     private static T CreateInstanceOfT()
