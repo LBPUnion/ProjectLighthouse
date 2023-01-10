@@ -30,7 +30,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     // Semaphore for synchronizing processes so that only one process will read a config at a time
     // Mostly useful for migrations so only one server will try to rewrite the config file
-    private Mutex? configFileMutex;
+    private static Mutex? _configFileMutex;
 
     [YamlIgnore]
     public abstract string ConfigName { get; set; }
@@ -60,6 +60,9 @@ public abstract class ConfigurationBase<T> where T : class, new()
         constructorLock.Wait();
         if (ServerStatics.IsUnitTesting)
             return; // Unit testing, we don't want to read configurations here since the tests will provide their own
+
+        _configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName, out bool createdNew);
+        Logger.Info($"Created config mutex - {this.ConfigName}, createdNew={createdNew}", LogArea.Config);
 
         this.loadStoredConfig();
 
@@ -99,12 +102,10 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     private void loadStoredConfig()
     {
-        this.configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName, out bool createdNew);
-        Logger.Info($"Created config mutex - {this.ConfigName}, createdNew={createdNew}", LogArea.Config);
         try
         {
             Logger.Info($"Waiting to acquire mutex - {this.ConfigName}", LogArea.Config);
-            this.configFileMutex.WaitOne();
+            _configFileMutex?.WaitOne();
             Logger.Info($"Acquired mutex - {this.ConfigName}", LogArea.Config);
 
             ConfigurationBase<T>? storedConfig;
@@ -144,10 +145,9 @@ public abstract class ConfigurationBase<T> where T : class, new()
         }
         finally
         {
-            Logger.Info($"About to dispose mutex - {this.ConfigName}", LogArea.Config);
-            this.configFileMutex.ReleaseMutex();
-            this.configFileMutex.Dispose();
-            Logger.Info($"Disposed mutex - {this.ConfigName}", LogArea.Config);
+            Logger.Info($"About to release mutex - {this.ConfigName}", LogArea.Config);
+            _configFileMutex?.ReleaseMutex();
+            Logger.Info($"Released mutex - {this.ConfigName}", LogArea.Config);
         }
     }
 
@@ -198,6 +198,13 @@ public abstract class ConfigurationBase<T> where T : class, new()
     private string serializeConfig() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build().Serialize(this);
 
     private void writeConfig(string path) => File.WriteAllText(path, this.serializeConfig());
+
+    public void Dispose()
+    {
+        _configFileMutex?.Dispose();
+        _fileWatcher?.Dispose();
+        constructorLock.Dispose();
+    }
 
     private static int getVersion()
     {
