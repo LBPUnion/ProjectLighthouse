@@ -124,7 +124,7 @@ public static class StartupTasks
         Assembly assembly = Assembly.GetAssembly(typeof(ConfigurationBase<>));
         if (assembly == null) return false;
         bool didLoad = true;
-        foreach (Type type in assembly.GetTypes().Where(myType => myType.IsClass && !myType.IsAbstract && myType.BaseType?.Name == "ConfigurationBase`1"))
+        foreach (Type type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.BaseType?.Name == "ConfigurationBase`1"))
         {
             if (type.BaseType == null) continue;
             if (type.BaseType.GetProperty("Instance") != null)
