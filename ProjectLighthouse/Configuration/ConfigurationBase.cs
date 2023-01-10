@@ -62,7 +62,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
             return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
         // Trim ConfigName by 4 to remove the .yml
-        string mutexName = $"LighthouseConfig-{this.ConfigName[..^4]}";
+        string mutexName = $"Global\\LighthouseConfig-{this.ConfigName[..^4]}";
 
         _configFileMutex = new Mutex(false, mutexName, out bool createdNew);
         Logger.Info($"Created config mutex - name={mutexName}, createdNew={createdNew}", LogArea.Config);
