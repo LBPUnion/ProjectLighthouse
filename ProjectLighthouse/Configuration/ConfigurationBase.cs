@@ -26,7 +26,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     // Semaphore for synchronizing processes so that only one process will read a config at a time
     // Mostly useful for migrations so only one server will try to rewrite the config file
-    private Semaphore? configFileSemaphore;
+    private Mutex? configFileMutex;
 
     [YamlIgnore]
     public abstract string ConfigName { get; set; }
@@ -57,10 +57,10 @@ public abstract class ConfigurationBase<T> where T : class, new()
         if (ServerStatics.IsUnitTesting)
             return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
-        this.configFileSemaphore = new Semaphore(1, 1, "Lighthouse " + this.ConfigName);
+        this.configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName);
         try
         {
-            this.configFileSemaphore.WaitOne();
+            this.configFileMutex.WaitOne();
 
             this.loadStoredConfig();
 
@@ -79,7 +79,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
         }
         finally
         {
-            this.configFileSemaphore.Release();
+            this.configFileMutex.ReleaseMutex();
         }
     }
 
