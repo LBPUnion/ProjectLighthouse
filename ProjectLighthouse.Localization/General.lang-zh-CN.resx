@@ -24,7 +24,7 @@
         <value>密码</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>注册</value>
+        <value>Create an account</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>忘记密码?</value>

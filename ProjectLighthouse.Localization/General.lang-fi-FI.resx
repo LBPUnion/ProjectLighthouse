@@ -24,7 +24,7 @@
         <value>Salasana</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Rekisteröidy</value>
+        <value>Create an account</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>Unohditko salasanasi?</value>
