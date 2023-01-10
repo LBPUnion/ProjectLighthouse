@@ -62,30 +62,20 @@ public abstract class ConfigurationBase<T> where T : class, new()
         if (ServerStatics.IsUnitTesting)
             return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
-        this.configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName);
-        try
+        this.loadStoredConfig();
+
+        if (!this.ConfigReloading) return;
+
+        _fileWatcher = new FileSystemWatcher
         {
-            this.configFileMutex.WaitOne();
+            Path = Environment.CurrentDirectory,
+            Filter = this.ConfigName,
+            NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
+        };
 
-            this.loadStoredConfig();
+        _fileWatcher.Changed += this.onConfigChanged; // add event handler
 
-            if (!this.ConfigReloading) return;
-
-            _fileWatcher = new FileSystemWatcher
-            {
-                Path = Environment.CurrentDirectory,
-                Filter = this.ConfigName,
-                NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
-            };
-
-            _fileWatcher.Changed += this.onConfigChanged; // add event handler
-
-            _fileWatcher.EnableRaisingEvents = true; // begin watching
-        }
-        finally
-        {
-            this.configFileMutex.ReleaseMutex();
-        }
+        _fileWatcher.EnableRaisingEvents = true; // begin watching
     }
 
     internal void onConfigChanged(object sender, FileSystemEventArgs e)
@@ -110,39 +100,50 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     private void loadStoredConfig()
     {
-        ConfigurationBase<T>? storedConfig;
-
-        if (File.Exists(this.ConfigName) && (storedConfig = this.fromFile(this.ConfigName)) != null)
+        this.configFileMutex = new Mutex(false, "Lighthouse " + this.ConfigName);
+        try
         {
-            if (storedConfig.ConfigVersion < this.ConfigVersion)
+            ConfigurationBase<T>? storedConfig;
+
+            this.configFileMutex.WaitOne();
+
+            if (File.Exists(this.ConfigName) && (storedConfig = this.fromFile(this.ConfigName)) != null)
             {
-                int newVersion = this.ConfigVersion;
-                Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {this.ConfigVersion}", LogArea.Config);
-                this.writeConfig(this.ConfigName + ".bak");
-                this.loadConfig(storedConfig);
-                this.ConfigVersion = newVersion;
-                this.writeConfig(this.ConfigName);
+                if (storedConfig.ConfigVersion < this.ConfigVersion)
+                {
+                    int newVersion = this.ConfigVersion;
+                    Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {this.ConfigVersion}", LogArea.Config);
+                    this.writeConfig(this.ConfigName + ".bak");
+                    this.loadConfig(storedConfig);
+                    this.ConfigVersion = newVersion;
+                    this.writeConfig(this.ConfigName);
+                }
+                else
+                {
+                    this.loadConfig(storedConfig);
+                }
             }
-            else
+            else if (!File.Exists(this.ConfigName))
             {
-                this.loadConfig(storedConfig);
+                if (this.NeedsConfiguration)
+                {
+                    Logger.Warn("The configuration file was not found. " +
+                                "A blank configuration file has been created for you at " +
+                                $"{Path.Combine(Environment.CurrentDirectory, this.ConfigName + ".configme")}",
+                        LogArea.Config);
+                    this.writeConfig(this.ConfigName + ".configme");
+                    this.ConfigVersion = -1;
+                }
+                else
+                {
+                    this.writeConfig(this.ConfigName);
+                }
             }
         }
-        else if (!File.Exists(this.ConfigName))
+        finally
         {
-            if (this.NeedsConfiguration)
-            {
-                Logger.Warn("The configuration file was not found. " +
-                            "A blank configuration file has been created for you at " +
-                            $"{Path.Combine(Environment.CurrentDirectory, this.ConfigName + ".configme")}",
-                    LogArea.Config);
-                this.writeConfig(this.ConfigName + ".configme");
-                this.ConfigVersion = -1;
-            }
-            else
-            {
-                this.writeConfig(this.ConfigName);
-            }
+            this.configFileMutex.ReleaseMutex();
+            this.configFileMutex.Dispose();
         }
     }
 
