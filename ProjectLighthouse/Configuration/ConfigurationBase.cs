@@ -21,7 +21,12 @@ public abstract class ConfigurationBase<T> where T : class, new()
     public static T Instance => sInstance.Value;
 
     // Used to prevent an infinite loop of the config trying to load itself when deserializing
+    // This is intentionally not released in the constructor
     private static readonly SemaphoreSlim constructorLock = new(1, 1);
+
+    // Semaphore for synchronizing processes so that only one process will read a config at a time
+    // Mostly useful for migrations so only one server will try to rewrite the config file
+    private Semaphore? configFileSemaphore;
 
     [YamlIgnore]
     public abstract string ConfigName { get; set; }
@@ -30,12 +35,13 @@ public abstract class ConfigurationBase<T> where T : class, new()
     public abstract int ConfigVersion { get; set; }
 
     [YamlIgnore]
-    // Used to indicate whether the config will be generated with a .configme extension o rnot
+    // Used to indicate whether the config will be generated with a .configme extension or not
     public virtual bool NeedsConfiguration { get; set; } = true;
 
     [YamlMember(Order = -1)]
     public bool ConfigReloading { get; set; } = false;
 
+    // Used to listen for changes to the config file
     private static FileSystemWatcher? _fileWatcher;
 
     internal ConfigurationBase()
@@ -51,20 +57,30 @@ public abstract class ConfigurationBase<T> where T : class, new()
         if (ServerStatics.IsUnitTesting)
             return; // Unit testing, we don't want to read configurations here since the tests will provide their own
 
-        this.loadStoredConfig();
-
-        if (!this.ConfigReloading) return;
-
-        _fileWatcher = new FileSystemWatcher
+        this.configFileSemaphore = new Semaphore(1, 1, "Lighthouse " + this.ConfigName);
+        try
         {
-            Path = Environment.CurrentDirectory,
-            Filter = this.ConfigName,
-            NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
-        };
+            this.configFileSemaphore.WaitOne();
 
-        _fileWatcher.Changed += this.onConfigChanged; // add event handler
+            this.loadStoredConfig();
 
-        _fileWatcher.EnableRaisingEvents = true; // begin watching
+            if (!this.ConfigReloading) return;
+
+            _fileWatcher = new FileSystemWatcher
+            {
+                Path = Environment.CurrentDirectory,
+                Filter = this.ConfigName,
+                NotifyFilter = NotifyFilters.LastWrite, // only watch for writes to config file
+            };
+
+            _fileWatcher.Changed += this.onConfigChanged; // add event handler
+
+            _fileWatcher.EnableRaisingEvents = true; // begin watching
+        }
+        finally
+        {
+            this.configFileSemaphore.Release();
+        }
     }
 
     internal void onConfigChanged(object sender, FileSystemEventArgs e)
@@ -169,12 +185,9 @@ public abstract class ConfigurationBase<T> where T : class, new()
 
     public abstract ConfigurationBase<T> Deserialize(IDeserializer deserializer, string text);
 
-    private void writeConfig(string path)
-    {
-        ISerializer serializer = new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+    private string serializeConfig() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build().Serialize(this);
 
-        File.WriteAllText(path, serializer.Serialize(this));
-    }
+    private void writeConfig(string path) => File.WriteAllText(path, this.serializeConfig());
 
     private static T CreateInstanceOfT()
     {
