@@ -24,7 +24,7 @@
         <value>كلمة مرور</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>تسجيل</value>
+        <value>Create an account</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>هل نسيت كلمة المرور؟</value>

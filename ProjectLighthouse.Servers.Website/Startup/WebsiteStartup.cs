@@ -1,11 +1,9 @@
 using System.Globalization;
-using System.Reflection;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
@@ -76,9 +74,10 @@ public class WebsiteStartup
         app.UseDeveloperExceptionPage();
         #endif
 
+        app.UseStatusCodePagesWithReExecute("/404");
+
         app.UseForwardedHeaders();
 
-        app.UseMiddleware<HandlePageErrorMiddleware>();
         app.UseMiddleware<RequestLogMiddleware>();
         app.UseMiddleware<UserRequiredRedirectMiddleware>();
         app.UseMiddleware<RateLimitMiddleware>();

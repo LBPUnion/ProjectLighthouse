@@ -5,7 +5,7 @@ using IAspLogger = Microsoft.Extensions.Logging.ILogger;
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
 
 [ProviderAlias("Kettu")]
-public class AspNetToLighthouseLoggerProvider : ILoggerProvider, IDisposable
+public class AspNetToLighthouseLoggerProvider : ILoggerProvider
 {
     public void Dispose()
     {
