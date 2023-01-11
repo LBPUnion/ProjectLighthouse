@@ -66,14 +66,9 @@ public class FriendsController : ControllerBase
     [HttpGet("myFriends")]
     public async Task<IActionResult> MyFriends()
     {
-        (User, GameToken)? userAndToken = await this.database.UserAndGameTokenFromRequest(this.Request);
+        GameToken token = this.GetToken();
 
-        if (userAndToken == null) return this.StatusCode(403, "");
-
-        User user = userAndToken.Value.Item1;
-        GameToken gameToken = userAndToken.Value.Item2;
-
-        UserFriendData? friendStore = UserFriendStore.GetUserFriendData(user.UserId);
+        UserFriendData? friendStore = UserFriendStore.GetUserFriendData(token.UserId);
 
         if (friendStore == null)
             return this.Ok(LbpSerializer.BlankElement("myFriends"));
@@ -84,7 +79,7 @@ public class FriendsController : ControllerBase
             User? friend = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == friendId);
             if (friend == null) continue;
 
-            friends += friend.Serialize(gameToken.GameVersion);
+            friends += friend.Serialize(token.GameVersion);
         }
 
         return this.Ok(LbpSerializer.StringElement("myFriends", friends));

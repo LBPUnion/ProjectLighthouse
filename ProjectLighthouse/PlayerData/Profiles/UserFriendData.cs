@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Redis.OM.Modeling;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 
-[SuppressMessage("ReSharper", "CollectionNeverQueried.Global")]
-[Document(StorageType = StorageType.Json)]
+[Document(StorageType = StorageType.Json, Prefixes = new[] {"UserFriendData",})]
 public class UserFriendData
 {
     private int userId;
