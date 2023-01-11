@@ -46,51 +46,71 @@ public class NPTicket
     private byte[] ticketBody { get; set; } = Array.Empty<byte>();
 
     private byte[] ticketSignature { get; set; } = Array.Empty<byte>();
+    private byte[] ticketSignatureIdentifier { get; set; } = Array.Empty<byte>();
 
     public GameVersion GameVersion { get; set; }
 
     private static ECDomainParameters FromX9EcParams(X9ECParameters param) =>
         new(param.Curve, param.G, param.N, param.H, param.GetSeed());
 
-    private static readonly ECDomainParameters secp224K1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp224k1"));
-    private static readonly ECDomainParameters secp192R1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp192r1"));
+    public static readonly ECDomainParameters Secp224K1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp224k1"));
+    public static readonly ECDomainParameters Secp192R1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp192r1"));
 
-    private static readonly ECPoint rpcnPublic = secp224K1.Curve.CreatePoint(
+    private static readonly ECPoint rpcnPublic = Secp224K1.Curve.CreatePoint(
         new BigInteger("b07bc0f0addb97657e9f389039e8d2b9c97dc2a31d3042e7d0479b93", 16),
         new BigInteger("d81c42b0abdf6c42191a31e31f93342f8f033bd529c2c57fdb5a0a7d", 16));
 
-    private static readonly ECPoint psnPublic = secp192R1.Curve.CreatePoint(
+    private static readonly ECPoint psnPublic = Secp192R1.Curve.CreatePoint(
         new BigInteger("39c62d061d4ee35c5f3f7531de0af3cf918346526edac727", 16),
         new BigInteger("a5d578b55113e612bf1878d4cc939d61a41318403b5bdf86", 16));
 
-    private ECDomainParameters getCurveParams() => this.IsRpcn() ? secp224K1 : secp192R1;
+    private static readonly ECPoint unitTestPublic = Secp192R1.Curve.CreatePoint(
+        new BigInteger("b6f3374bde4ec23a25e1508889e7d7e71870ba74daf8654f", 16),
+        new BigInteger("738de93dad0fffb5642045439afaaf8c6fda319a72d2a584", 16));
 
-    private ECPoint getPublicKey() => this.IsRpcn() ? rpcnPublic : psnPublic;
+    internal class SignatureParams
+    {
+        public string HashAlgo { get; set; }
+        public ECPoint PublicKey { get; set; }
+        public ECDomainParameters CurveParams { get; set; }
+
+        public SignatureParams(string hashAlgo, ECPoint pubKey, ECDomainParameters curve)
+        {
+            this.HashAlgo = hashAlgo;
+            this.PublicKey = pubKey;
+            this.CurveParams = curve;
+        }
+    }
+
+    private readonly Dictionary<string, SignatureParams> signatureParamsMap = new()
+    {
+        //psn
+        { "719F1D4A", new SignatureParams("SHA-1", psnPublic, Secp192R1) },
+        //rpcn
+        { "5250434E", new SignatureParams("SHA-224", rpcnPublic, Secp224K1) },
+        //unit test
+        { "54455354", new SignatureParams("SHA-1", unitTestPublic, Secp192R1) },
+    };
 
     private bool ValidateSignature()
     {
-        ECPublicKeyParameters pubKey = new(this.getPublicKey(), this.getCurveParams());
-        string algo = this.IsRpcn() ? "SHA-224" : "SHA-1";
+        string identifierHex = Convert.ToHexString(this.ticketSignatureIdentifier);
+        if (!this.signatureParamsMap.ContainsKey(identifierHex))
+        {
+            Logger.Warn($"Unknown signature identifier in ticket: {identifierHex}, platform={this.Platform}", LogArea.Login);
+            return false;
+        }
 
-        ISigner signer = SignerUtilities.GetSigner($"{algo}withECDSA");
+        SignatureParams sigParams = this.signatureParamsMap[identifierHex];
+        ECPublicKeyParameters pubKey = new(sigParams.PublicKey, sigParams.CurveParams);
+
+        ISigner signer = SignerUtilities.GetSigner($"{sigParams.HashAlgo}withECDSA");
         signer.Init(false, pubKey);
 
         signer.BlockUpdate(this.ticketBody);
 
         return signer.VerifySignature(this.ticketSignature);
     }
-
-    private bool IsRpcn() => this.IssuerId == 0x33333333; 
-
-    private static readonly Dictionary<Platform, byte[]> identifierByPlatform = new()
-    {
-        {
-            Platform.RPCS3, "RPCN"u8.ToArray()
-        },
-        {
-            Platform.PS3, new byte[]{ 0x71, 0x9F, 0x1D, 0x4A, }
-        },
-    };
 
     // Sometimes psn signatures have one or two extra empty bytes
     // This is slow but it's better than carelessly chopping 0's
@@ -136,14 +156,7 @@ public class NPTicket
 
         reader.ReadSectionHeader(); // footer header
 
-        byte[] ticketIdent = reader.ReadTicketBinary(); // 4 byte identifier
-        Platform platform = npTicket.IsRpcn() ? Platform.RPCS3 : Platform.PS3;
-        byte[] platformIdent = identifierByPlatform[platform];
-        if (!ticketIdent.SequenceEqual(platformIdent))
-        {
-            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ticketIdent)} == {Convert.ToHexString(platformIdent)}", LogArea.Login);
-            return false;
-        }
+        npTicket.ticketSignatureIdentifier = reader.ReadTicketBinary();
 
         npTicket.ticketSignature = ParseSignature(reader.ReadTicketBinary());
         return true;
@@ -175,14 +188,7 @@ public class NPTicket
 
         reader.ReadSectionHeader(); // footer header
 
-        byte[] ticketIdent = reader.ReadTicketBinary(); // 4 byte identifier
-        Platform platform = npTicket.IsRpcn() ? Platform.RPCS3 : Platform.PS3;
-        byte[] platformIdent = identifierByPlatform[platform]; 
-        if (!ticketIdent.SequenceEqual(platformIdent))
-        {
-            Logger.Warn(@$"Identity sequence mismatch, platform={npTicket.Platform} - {Convert.ToHexString(ticketIdent)} == {Convert.ToHexString(platformIdent)}", LogArea.Login);
-            return false;
-        }
+        npTicket.ticketSignatureIdentifier = reader.ReadTicketBinary();
 
         npTicket.ticketSignature = ParseSignature(reader.ReadTicketBinary());
         return true;
@@ -216,9 +222,14 @@ public class NPTicket
 
         if (!parsedSuccessfully) return false;
 
-        npTicket.ticketBody = npTicket.IsRpcn()
-            ? data.AsSpan().Slice((int)bodyStart, bodyHeader.Length + 4).ToArray()
-            : data.AsSpan()[..data.AsSpan().IndexOf(npTicket.ticketSignature)].ToArray();
+        npTicket.ticketBody = Convert.ToHexString(npTicket.ticketSignatureIdentifier) switch
+        {
+            // rpcn
+            "5250434E" => data.AsSpan().Slice((int)bodyStart, bodyHeader.Length + 4).ToArray(),
+            // psn and unit test
+            "719F1D4A" or "54455354" => data.AsSpan()[..data.AsSpan().IndexOf(npTicket.ticketSignature)].ToArray(),
+            _ => throw new ArgumentOutOfRangeException(nameof(npTicket)),
+        };
 
         return true;
     }
@@ -229,28 +240,6 @@ public class NPTicket
     public static NPTicket? CreateFromBytes(byte[] data)
     {
         NPTicket npTicket = new();
-        #if DEBUG
-        if (data[0] == 'u' && ServerStatics.IsUnitTesting)
-        {
-            string dataStr = Encoding.UTF8.GetString(data);
-            if (dataStr.StartsWith("unitTestTicket"))
-            {
-                npTicket = new NPTicket
-                {
-                    IssuerId = 0,
-                    ticketVersion = new Version(0, 0),
-                    Platform = Platform.UnitTest,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                    ExpireDate = 0,
-                    IssuedDate = 0,
-                    Username = dataStr["unitTestTicket".Length..],
-                    UserId = ulong.Parse(dataStr["unitTestTicketunitTestUser".Length..]),
-                };
-
-                return npTicket;
-            }
-        }
-        #endif
         try
         {
             using MemoryStream ms = new(data);
@@ -263,14 +252,14 @@ public class NPTicket
                 return null;
             }
 
-            if ((long)npTicket.IssuedDate > TimeHelper.TimestampMillis)
+            if (npTicket.IssuedDate > (ulong)TimeHelper.TimestampMillis)
             {
-                Logger.Warn($"Ticket isn't valid yet from {npTicket.Username}", LogArea.Login);
+                Logger.Warn($"Ticket isn't valid yet from {npTicket.Username} ({npTicket.IssuedDate} > {(ulong)TimeHelper.TimestampMillis})", LogArea.Login);
                 return null;
             }
-            if (TimeHelper.TimestampMillis > (long)npTicket.ExpireDate)
+            if ((ulong)TimeHelper.TimestampMillis > npTicket.ExpireDate)
             {
-                Logger.Warn($"Ticket has expired from {npTicket.Username}", LogArea.Login);
+                Logger.Warn($"Ticket has expired from {npTicket.Username} ({(ulong)TimeHelper.TimestampMillis} > {npTicket.ExpireDate}", LogArea.Login);
                 return null;
             }
 
@@ -299,12 +288,13 @@ public class NPTicket
             {
                 0x100 => Platform.PS3,
                 0x33333333 => Platform.RPCS3,
+                0x74657374 => Platform.UnitTest,
                 _ => Platform.Unknown,
             };
 
             if (npTicket.Platform == Platform.PS3 && npTicket.GameVersion == GameVersion.LittleBigPlanetVita) npTicket.Platform = Platform.Vita;
 
-            if (npTicket.Platform == Platform.Unknown)
+            if (npTicket.Platform == Platform.Unknown || (npTicket.Platform == Platform.UnitTest && !ServerStatics.IsUnitTesting))
             {
                 Logger.Warn($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LogArea.Login);
                 return null;

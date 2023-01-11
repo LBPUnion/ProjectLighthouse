@@ -8,13 +8,12 @@ public static class VersionHelper
 {
     static VersionHelper()
     {
-        string commitNumber = "invalid";
         try
         {
             CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
             Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
-            commitNumber = $"{CommitHash}_{Build}";
-            FullRevision = (Branch == "main") ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
+            string commitNumber = $"{CommitHash}_{Build}";
+            FullRevision = Branch == "main" ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
 
             string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
 
@@ -35,7 +34,6 @@ public static class VersionHelper
             Logger.Error
             (
                 "Project Lighthouse was built incorrectly. Please make sure git is available when building.",
-//                "Because of this, you will not be notified of updates.",
                 LogArea.Startup
             );
             CommitHash = "invalid";
@@ -43,16 +41,15 @@ public static class VersionHelper
             CanCheckForUpdates = false;
         }
 
-        if (IsDirty)
-        {
-            Logger.Warn
-            (
-                "This is a modified version of Project Lighthouse. " +
-                "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
-                LogArea.Startup
-            );
-            CanCheckForUpdates = false;
-        }
+        if (!IsDirty) return;
+
+        Logger.Warn
+        (
+            "This is a modified version of Project Lighthouse. " +
+            "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
+            LogArea.Startup
+        );
+        CanCheckForUpdates = false;
     }
 
     public static string CommitHash { get; set; }

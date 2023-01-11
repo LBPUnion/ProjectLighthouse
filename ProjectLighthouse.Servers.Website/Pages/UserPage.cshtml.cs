@@ -70,13 +70,15 @@ public class UserPage : BaseLayout
         if (this.User == this.ProfileUser)
         {
             this.QueuedSlots = await this.Database.QueuedLevels.Include(h => h.Slot)
-                .Where(h => this.User != null && h.UserId == this.User.UserId)
-                .Select(h => h.Slot)
+                .Where(q => this.User != null && q.UserId == this.User.UserId)
+                .OrderByDescending(q => q.QueuedLevelId)
+                .Select(q => q.Slot)
                 .Where(s => s.Type == SlotType.User)
                 .Take(10)
                 .ToListAsync();
             this.HeartedSlots = await this.Database.HeartedLevels.Include(h => h.Slot)
                 .Where(h => this.User != null && h.UserId == this.User.UserId)
+                .OrderByDescending(h => h.HeartedLevelId)
                 .Select(h => h.Slot)
                 .Where(s => s.Type == SlotType.User)
                 .Take(10)

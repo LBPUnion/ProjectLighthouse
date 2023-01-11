@@ -6,7 +6,7 @@ using Redis.OM.Modeling;
 
 namespace LBPUnion.ProjectLighthouse.Match.Rooms;
 
-[Document(StorageType = StorageType.Json)]
+[Document(StorageType = StorageType.Json, Prefixes = new[]{"Room",})]
 public class Room
 {
     private int roomId;
