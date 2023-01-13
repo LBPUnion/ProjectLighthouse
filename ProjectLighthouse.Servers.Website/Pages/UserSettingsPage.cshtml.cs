@@ -30,7 +30,12 @@ public class UserSettingsPage : BaseLayout
 
         string? avatarHash = await FileHelper.ParseBase64Image(avatar);
 
-        if (avatarHash != null) this.ProfileUser.IconHash = avatarHash;
+        if (avatarHash != null)
+        {
+            // Delete old user icon
+            FileHelper.DeleteResource(this.ProfileUser.IconHash);
+            this.ProfileUser.IconHash = avatarHash;
+        }
 
         biography = SanitizationHelper.SanitizeString(biography);
 

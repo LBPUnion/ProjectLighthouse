@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
@@ -79,7 +78,7 @@ public static class FileHelper
             LbpFileType.Jpeg => true,
             LbpFileType.Png => true,
             #if DEBUG
-            _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
+            _ => throw new ArgumentOutOfRangeException(nameof(file), $@"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
             #else
             _ => false,
             #endif
@@ -234,13 +233,25 @@ public static class FileHelper
     }
 
     public static bool ResourceExists(string hash) => File.Exists(GetResourcePath(hash));
+    public static bool ImageExists(string hash) => File.Exists(GetImagePath(hash));
 
     public static void DeleteResource(string hash)
     {
+        // Prevent directory traversal attacks
+        if (!Path.GetFullPath(GetResourcePath(hash)).StartsWith(FullResourcePath)) return;
+
         // sanity check so someone doesn't somehow delete the entire resource folder
-        if (ResourceExists(hash) && (File.GetAttributes(hash) & FileAttributes.Directory) != FileAttributes.Directory)
+        if (ResourceExists(hash) && (File.GetAttributes(GetResourcePath(hash)) & FileAttributes.Directory) != FileAttributes.Directory)
         {
             File.Delete(GetResourcePath(hash));
+        }
+
+        string imageName = $"{hash}.png";
+        if (!Path.GetFullPath(GetImagePath(imageName)).StartsWith(FullImagePath)) return;
+
+        if (ImageExists(imageName) && (File.GetAttributes(GetImagePath(imageName)) & FileAttributes.Directory) != FileAttributes.Directory)
+        {
+            File.Delete(GetImagePath(imageName));
         }
     }
 
@@ -294,39 +305,33 @@ public static class FileHelper
     public static void ConvertAllTexturesToPng()
     {
         EnsureDirectoryCreated(Path.Combine(Environment.CurrentDirectory, "png"));
-        if (Directory.Exists("r"))
+        if (!Directory.Exists("r")) return;
+
+        Logger.Info("Converting all textures to PNG. This may take a while if this is the first time running this operation...", LogArea.Startup);
+
+        ConcurrentQueue<string> fileQueue = new();
+
+        foreach (string filename in Directory.GetFiles("r")) fileQueue.Enqueue(filename);
+
+        List<Task> taskList = new();
+
+        for (int i = 0; i < Environment.ProcessorCount; i++)
         {
-            Logger.Info("Converting all textures to PNG. This may take a while if this is the first time running this operation...", LogArea.Startup);
-
-            ConcurrentQueue<string> fileQueue = new();
-
-            foreach (string filename in Directory.GetFiles("r")) fileQueue.Enqueue(filename);
-
-            for(int i = 0; i < Environment.ProcessorCount; i++)
+            taskList.Add(Task.Factory.StartNew(() =>
             {
-                Task.Factory.StartNew
-                (
-                    () =>
+                while (fileQueue.TryDequeue(out string? filename))
+                {
+                    LbpFile? file = LbpFile.FromHash(filename.Replace("r" + Path.DirectorySeparatorChar, ""));
+
+                    if (file?.FileType is LbpFileType.Jpeg or LbpFileType.Png or LbpFileType.Texture)
                     {
-                        while (fileQueue.TryDequeue(out string? filename))
-                        {
-                            LbpFile? file = LbpFile.FromHash(filename.Replace("r" + Path.DirectorySeparatorChar, ""));
-                            if (file == null) continue;
-
-                            if (file.FileType == LbpFileType.Jpeg || file.FileType == LbpFileType.Png || file.FileType == LbpFileType.Texture)
-                            {
-                                LbpFileToPNG(file);
-                            }
-                        }
+                        LbpFileToPNG(file);
                     }
-                );
-            }
-
-            while (!fileQueue.IsEmpty)
-            {
-                Thread.Sleep(100);
-            }
+                }
+            }));
         }
+
+        Task.WaitAll(taskList.ToArray());
     }
 
     #region Images
@@ -355,8 +360,7 @@ public static class FileHelper
         }
         catch(Exception e)
         {
-            Console.WriteLine($"Error while converting {hash}:");
-            Console.WriteLine(e);
+            Logger.Error($"Error while converting {type} {hash}: \n{e}", LogArea.Resources);
             return false;
         }
     }

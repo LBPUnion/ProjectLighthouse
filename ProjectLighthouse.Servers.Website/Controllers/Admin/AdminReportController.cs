@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using LBPUnion.ProjectLighthouse.Administration.Reports;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,14 +36,7 @@ public class AdminReportController : ControllerBase
             hashes.Add(report.InitialStateHash);
         foreach (string hash in hashes)
         {
-            if (System.IO.File.Exists(Path.Combine("png", $"{hash}.png")))
-            {
-                System.IO.File.Delete(Path.Combine("png", $"{hash}.png"));
-            }
-            if (System.IO.File.Exists(Path.Combine("r", hash)))
-            {
-                System.IO.File.Delete(Path.Combine("r", hash));
-            }
+            FileHelper.DeleteResource(hash);
         }
         this.database.Reports.Remove(report);
 
