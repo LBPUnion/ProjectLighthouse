@@ -4,6 +4,7 @@ using LBPUnion.ProjectLighthouse.PlayerData;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 
