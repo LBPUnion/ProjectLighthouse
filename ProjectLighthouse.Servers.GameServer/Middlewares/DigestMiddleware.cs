@@ -57,8 +57,8 @@ public class DigestMiddleware : Middleware
              }
              if (useragent == "MM CHTTPClient LBP2 01.26")
 {
-     GameToken token = this.GetToken();
-     if (token.GameVersion == GameVersion.LittleBigPlanet2) {
+     GameToken? token = (GameToken?)(controller.HttpContext.Items["Token"] ?? null);
+     if (token.GameVersion == GameVersion.LittleBigPlanet2 || token == null) {
             context.Response.StatusCode = 403;
             return;
      }
