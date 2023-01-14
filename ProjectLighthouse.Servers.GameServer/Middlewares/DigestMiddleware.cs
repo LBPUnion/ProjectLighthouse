@@ -45,6 +45,13 @@ public class DigestMiddleware : Middleware
 
         if (this.computeDigests && digestPath.StartsWith("/LITTLEBIGPLANETPS3_XML"))
         {
+             if (context.Request.Headers.TryGetValue("User-Agent", out StringValues useragent))
+             {
+                if (useragent == "MM CHTTPClient $Id: HTTPClient.cpp 36247 2009-11-24 16:17:36Z paul $") {
+                    context.Response.StatusCode = 403;
+                    return;
+                }
+
             // The game sets X-Digest-B on a resource upload instead of X-Digest-A
             string digestHeaderKey = "X-Digest-A";
             bool excludeBodyFromDigest = false;
