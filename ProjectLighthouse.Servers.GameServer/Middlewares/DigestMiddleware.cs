@@ -55,19 +55,7 @@ public class DigestMiddleware : Middleware
                     return;
                 }
              }
-             if (useragent == "MM CHTTPClient LBP2 01.26")
-{
-     
-     GameToken? token = (GameToken?)(controller.HttpContext.Items["Token"] ?? null);
-if (token == null) {
-           context.Response.StatusCode = 403;
-            return;
-}
-     if (token.GameVersion == GameVersion.LittleBigPlanet2) {
-            context.Response.StatusCode = 403;
-            return;
-     }
-}
+
 
             // The game sets X-Digest-B on a resource upload instead of X-Digest-A
             string digestHeaderKey = "X-Digest-A";
