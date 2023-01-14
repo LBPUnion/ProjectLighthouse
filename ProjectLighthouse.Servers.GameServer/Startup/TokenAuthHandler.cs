@@ -43,7 +43,7 @@ public class TokenAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
                     return AuthenticateResult.Fail("Forbidden client");
                 }
                 else if (useragent == "MM CHTTPClient LBP2 01.26") {
-                    if (gameToken.GameVersion = GameVersion.LittleBigPlanet2) {
+                    if (gameToken.GameVersion == GameVersion.LittleBigPlanet2) {
                         return AuthenticateResult.Fail("Forbidden client");
                     }
                 }
