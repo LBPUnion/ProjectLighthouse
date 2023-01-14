@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using System.IO.Compression;
