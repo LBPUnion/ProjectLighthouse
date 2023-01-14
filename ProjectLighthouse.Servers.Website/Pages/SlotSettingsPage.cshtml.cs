@@ -26,12 +26,7 @@ public class SlotSettingsPage : BaseLayout
 
         string? avatarHash = await FileHelper.ParseBase64Image(avatar);
 
-        if (avatarHash != null)
-        {
-            // Delete old slot icon
-            FileHelper.DeleteResource(this.Slot.IconHash);
-            this.Slot.IconHash = avatarHash;
-        }
+        if (avatarHash != null) this.Slot.IconHash = avatarHash;
 
         name = SanitizationHelper.SanitizeString(name);
         if (this.Slot.Name != name && name.Length <= 64) this.Slot.Name = name;
