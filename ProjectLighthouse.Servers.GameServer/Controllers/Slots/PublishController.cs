@@ -107,11 +107,15 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
+        slot.Description = CensorHelper.FilterMessage(slot.Description);
+
         if (slot.Description.Length > 512)
         {
             Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)", LogArea.Publish);
             return this.BadRequest();
         }
+
+        slot.Name = CensorHelper.FilterMessage(slot.Name);
 
         if (slot.Name.Length > 64)
         {

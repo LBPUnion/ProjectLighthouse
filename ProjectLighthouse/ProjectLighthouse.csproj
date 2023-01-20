@@ -21,8 +21,8 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0-silver.1" />
-        <PackageReference Include="Redis.OM" Version="0.4.0" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+        <PackageReference Include="Redis.OM" Version="0.4.1" />
         <PackageReference Include="SharpZipLib" Version="1.4.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="YamlDotNet" Version="12.3.1" />
@@ -44,10 +44,6 @@
 		</EmbeddedResource>
 		<None Remove="gitUnpushed.txt" />
 		<EmbeddedResource Include="gitUnpushed.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<None Remove="chatCensoredList.txt" />
-		<EmbeddedResource Include="chatCensoredList.txt">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
     </ItemGroup>
