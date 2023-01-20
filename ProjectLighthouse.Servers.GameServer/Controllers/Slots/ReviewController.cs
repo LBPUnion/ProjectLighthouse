@@ -94,7 +94,7 @@ public class ReviewController : ControllerBase
         Review? newReview = await this.DeserializeBody<Review>();
         if (newReview == null) return this.BadRequest();
 
-        newReview.Text = CensorHelper.ScanMessage(newReview.Text);
+        newReview.Text = CensorHelper.FilterMessage(newReview.Text);
 
         if (newReview.Text.Length > 512) return this.BadRequest();
 

@@ -46,10 +46,6 @@
 		<EmbeddedResource Include="gitUnpushed.txt">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
-		<None Remove="chatCensoredList.txt" />
-		<EmbeddedResource Include="chatCensoredList.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

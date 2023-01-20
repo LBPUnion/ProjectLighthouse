@@ -33,6 +33,7 @@ public class UserSettingsPage : BaseLayout
         if (avatarHash != null) this.ProfileUser.IconHash = avatarHash;
 
         biography = SanitizationHelper.SanitizeString(biography);
+        biography = CensorHelper.FilterMessage(biography);
 
         if (this.ProfileUser.Biography != biography && biography.Length <= 512) this.ProfileUser.Biography = biography;
 

@@ -107,7 +107,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        slot.Description = CensorHelper.ScanMessage(slot.Description);
+        slot.Description = CensorHelper.FilterMessage(slot.Description);
 
         if (slot.Description.Length > 512)
         {
@@ -115,7 +115,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        slot.Name = CensorHelper.ScanMessage(slot.Name);
+        slot.Name = CensorHelper.FilterMessage(slot.Name);
 
         if (slot.Name.Length > 64)
         {

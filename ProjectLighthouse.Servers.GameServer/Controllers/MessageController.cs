@@ -116,7 +116,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             return this.Ok();
         }
 
-        string filteredText = CensorHelper.ScanMessage(message);
+        string filteredText = CensorHelper.FilterMessage(message);
 
         string username = await this.database.UsernameFromGameToken(token);
 
