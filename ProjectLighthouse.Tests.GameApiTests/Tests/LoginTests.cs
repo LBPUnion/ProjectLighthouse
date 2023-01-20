@@ -68,7 +68,14 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
             .SetUsername(username)
             .SetUserId(userId)
             .Build();
-        ticketData[^21] = 0;
+        // Create second ticket and replace the first tickets signature with the first.
+        byte[] ticketData2 = new TicketBuilder()
+            .SetUsername(username)
+            .SetUserId(userId)
+            .Build();
+
+        Array.Copy(ticketData2, ticketData2.Length - 0x38, ticketData, ticketData.Length - 0x38, 0x38);
+        
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
         Assert.False(response.IsSuccessStatusCode);
         Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
