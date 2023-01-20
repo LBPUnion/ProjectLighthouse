@@ -29,9 +29,11 @@ public class SlotSettingsPage : BaseLayout
         if (avatarHash != null) this.Slot.IconHash = avatarHash;
 
         name = SanitizationHelper.SanitizeString(name);
+        name = CensorHelper.FilterMessage(name);
         if (this.Slot.Name != name && name.Length <= 64) this.Slot.Name = name;
 
         description = SanitizationHelper.SanitizeString(description);
+        description = CensorHelper.FilterMessage(description);
         if (this.Slot.Description != description && description.Length <= 512) this.Slot.Description = description;
 
         labels = LabelHelper.RemoveInvalidLabels(SanitizationHelper.SanitizeString(labels));
