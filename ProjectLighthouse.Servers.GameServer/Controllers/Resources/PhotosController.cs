@@ -2,6 +2,7 @@
 using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -227,14 +228,7 @@ public class PhotosController : ControllerBase
         HashSet<string> photoResources = new(){photo.LargeHash, photo.SmallHash, photo.MediumHash, photo.PlanHash,};
         foreach (string hash in photoResources)
         {
-            if (System.IO.File.Exists(Path.Combine("png", $"{hash}.png")))
-            {
-                System.IO.File.Delete(Path.Combine("png", $"{hash}.png"));
-            }
-            if (System.IO.File.Exists(Path.Combine("r", hash)))
-            {
-                System.IO.File.Delete(Path.Combine("r", hash));
-            }
+            FileHelper.DeleteResource(hash);
         }
 
         this.database.Photos.Remove(photo);
