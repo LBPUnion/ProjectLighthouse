@@ -28,6 +28,7 @@ png/
 lighthouse.config.json
 lighthouse.yml
 lighthouse.yml.configme
+censor.yml
 gitBranch.txt
 gitVersion.txt
 gitRemotes.txt

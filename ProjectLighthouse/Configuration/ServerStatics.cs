@@ -14,7 +14,8 @@ public static class ServerStatics
         get {
             try
             {
-                return new Database().Database.CanConnect();
+                using Database db = new();
+                return db.Database.CanConnect();
             }
             catch(Exception e)
             {
