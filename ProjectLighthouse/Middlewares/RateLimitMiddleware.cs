@@ -13,16 +13,16 @@ using Microsoft.AspNetCore.Http;
 
 namespace LBPUnion.ProjectLighthouse.Middlewares;
 
-public class RateLimitMiddleware : MiddlewareDBContext
+public class RateLimitMiddleware : Middleware
 {
 
-    // (userId, requestData)
+    // (ipAddress, requestData)
     private static readonly ConcurrentDictionary<IPAddress, List<LighthouseRequest?>> recentRequests = new();
 
     public RateLimitMiddleware(RequestDelegate next) : base(next)
     { }
 
-    public override async Task InvokeAsync(HttpContext ctx, Database database)
+    public override async Task InvokeAsync(HttpContext ctx)
     {
         // We only want to rate limit POST requests
         if (ctx.Request.Method != "POST")
@@ -51,9 +51,9 @@ public class RateLimitMiddleware : MiddlewareDBContext
 
         if (GetNumRequestsForPath(address, path) >= GetMaxNumRequests(options))
         {
-            Logger.Info($"Request limit reached for {address.ToString()} ({ctx.Request.Path})", LogArea.RateLimit);
+            Logger.Info($"Request limit reached for {address} ({ctx.Request.Path})", LogArea.RateLimit);
             long nextExpiration = recentRequests[address][0]?.Expiration ?? TimeHelper.TimestampMillis;
-            ctx.Response.Headers.Add("Retry-After", "" + Math.Ceiling((nextExpiration - TimeHelper.TimestampMillis) / 1000f));
+            ctx.Response.Headers.TryAdd("Retry-After", "" + Math.Ceiling((nextExpiration - TimeHelper.TimestampMillis) / 1000f));
             ctx.Response.StatusCode = 429;
             return;
         }

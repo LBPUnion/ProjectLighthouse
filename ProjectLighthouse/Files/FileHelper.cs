@@ -274,6 +274,13 @@ public static class FileHelper
 
     private static readonly Regex base64Regex = new(@"data:([^\/]+)\/([^;]+);base64,(.*)", RegexOptions.Compiled);
 
+    private static byte[]? TryParseBase64Data(string b64)
+    {
+        Span<byte> buffer = new(new byte[b64.Length]);
+        bool valid = Convert.TryFromBase64String(b64, buffer, out _);
+        return valid ? buffer.ToArray() : null;
+    }
+
     public static async Task<string?> ParseBase64Image(string? image)
     {
         if (string.IsNullOrWhiteSpace(image)) return null;
@@ -284,7 +291,8 @@ public static class FileHelper
 
         if (match.Groups.Count != 4) return null;
 
-        byte[] data = Convert.FromBase64String(match.Groups[3].Value);
+        byte[]? data = TryParseBase64Data(match.Groups[3].Value);
+        if (data == null) return null;
 
         LbpFile file = new(data);
 
