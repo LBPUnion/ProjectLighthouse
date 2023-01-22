@@ -277,8 +277,8 @@ public static class FileHelper
     private static byte[]? TryParseBase64Data(string b64)
     {
         Span<byte> buffer = new(new byte[b64.Length]);
-        bool valid = Convert.TryFromBase64String(b64, buffer, out _);
-        return valid ? buffer.ToArray() : null;
+        bool valid = Convert.TryFromBase64String(b64, buffer, out int bytesWritten);
+        return valid ? buffer[..bytesWritten].ToArray() : null;
     }
 
     public static async Task<string?> ParseBase64Image(string? image)
