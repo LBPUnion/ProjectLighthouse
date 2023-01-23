@@ -19,8 +19,10 @@ public class Room
             this.roomId = value;
         }
     }
+    
+    
 
-    [RedisIdField]
+    [RedisIdField] 
     public string RedisId { get; set; }
 
     [Indexed]
@@ -43,16 +45,14 @@ public class Room
     public bool IsLookingForPlayers => this.State == RoomState.PlayingLevel || this.State == RoomState.DivingInWaiting;
 
     [JsonIgnore]
-    public int HostId {
-        get {
-            try
-            {
+    public int HostId
+    {
+        get
+        {
+            if (this.PlayerIds.Count > 0)
                 return this.PlayerIds[0];
-            }
-            catch
-            {
-                return -1;
-            }
+            
+            return -1;
         }
     }
 
