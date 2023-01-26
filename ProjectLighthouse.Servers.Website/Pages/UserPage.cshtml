@@ -27,7 +27,9 @@
         {
             <h3 style="margin-bottom:3px;"><i class="ban icon"></i> There is an active moderation case on this account.</h3>
             <b>Reason:</b>
-            <span>"@Model.ProfileUser.BannedReason"</span>
+            <span>"@Model.ProfileUser.BannedReason"</span><br>
+            <b>Case ID:</b>
+            <span>@Model.Case?.CaseId</span>
             <p>
                 <i>Only you and other moderators may view the ban reason.</i>
             </p>
@@ -269,8 +271,18 @@
             </div>
             <div class="ui fitted hidden divider"></div>
         }
+
+        @if (Model.ProfileUser.IsBanned && Model.Case != null)
+        {
+            <div>
+                <a class="ui red button" href="moderation/case/@Model.Case.CaseId/dismiss">
+                    <i class="unlock icon"></i>
+                    <span>Unban User</span>
+                </a>
+            </div>
+        }
         
-        @if (Model.ProfileUser.CommentsEnabled)
+        @if (Model.ProfileUser.CommentsEnabled && !Model.ProfileUser.IsBanned)
         {
             <div>
                 <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
@@ -284,7 +296,7 @@
         <div>
             <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
                 <i class="trash alternate icon"></i>
-                <span>Wipe user's earth decorations</span>
+                <span>Wipe User's Earth Decorations</span>
             </a>
         </div>
         <div class="ui fitted hidden divider"></div>
