@@ -16,11 +16,19 @@
     {
         <p>There are no comments.</p>
     }
+    else if (Model.ProfileUser.IsBanned)
+    {
+        <p>Comments are disabled because the user is banned.</p>
+    }
     else if (!Model.CommentsEnabled)
     {
         <b>
             <i>Comments are disabled.</i>
         </b>
+    }
+    else if (Model.Comments.Count > 50)
+    {
+        <p>There are more than 50 comments. Displaying the newest ones.</p>
     }
     else
     {
