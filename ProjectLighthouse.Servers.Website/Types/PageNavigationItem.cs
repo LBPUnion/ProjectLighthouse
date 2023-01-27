@@ -1,8 +1,8 @@
+﻿#nullable enable
+
 using LBPUnion.ProjectLighthouse.Localization;
 
-#nullable enable
-
-namespace LBPUnion.ProjectLighthouse.Types;
+namespace LBPUnion.ProjectLighthouse.Servers.Website.Types;
 
 public class PageNavigationItem
 {
@@ -13,6 +13,7 @@ public class PageNavigationItem
         this.Icon = icon;
         this.CustomColor = customColor;
     }
+
     public TranslatableString Name { get; set; }
     public string Url { get; set; }
     public string? Icon { get; set; }

@@ -3,10 +3,37 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Tickets.Data;
 using LBPUnion.ProjectLighthouse.Types;
 
 namespace LBPUnion.ProjectLighthouse.Tickets;
+
+public enum DataType : byte
+{
+    Empty = 0x00,
+    UInt32 = 0x01,
+    UInt64 = 0x02,
+    String = 0x04,
+    Timestamp = 0x07,
+    Binary = 0x08,
+}
+
+public enum SectionType : byte
+{
+    Body = 0x00,
+    Footer = 0x02,
+}
+
+public struct DataHeader
+{
+    public DataType Type;
+    public ushort Length;
+}
+
+public struct SectionHeader
+{
+    public SectionType Type;
+    public ushort Length;
+}
 
 public class TicketReader : BinaryReader
 {

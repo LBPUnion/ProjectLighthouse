@@ -19,6 +19,34 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace LBPUnion.ProjectLighthouse.Files;
 
+public enum LbpFileType
+{
+    Script, // .ff, FSH
+    Texture, // TEX
+    Level, // LVL
+    Adventure, // ADC, ADS
+    CrossLevel, // PRF, Cross controller level
+    FileArchive, // .farc, (ends with FARC)
+    Plan, // PLN, uploaded with levels
+    Voice, // VOP, voice data
+    MotionRecording, // used in LBP2+/V for the motion recorder
+    Painting, // PTG, paintings
+    Jpeg, // JFIF / FIF, used in sticker switches,
+    Png, // used in LBP Vita
+    Quest, // A LBP3 quest, used in the organizertron
+    Unknown,
+}
+
+internal class ResourceDescriptor
+{
+    public string Hash = "";
+    public int Type;
+
+    public bool IsScriptType() => this.Type == 0x11;
+
+    public bool IsGuidResource() => this.Hash.StartsWith("g");
+}
+
 public static class FileHelper
 {
     public static readonly string ResourcePath = Path.Combine(Environment.CurrentDirectory, "r");
@@ -78,7 +106,7 @@ public static class FileHelper
             LbpFileType.Jpeg => true,
             LbpFileType.Png => true,
             #if DEBUG
-            _ => throw new ArgumentOutOfRangeException(nameof(file), $@"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
+            _ => throw new ArgumentOutOfRangeException(nameof(file), @$"Unhandled file type ({file.FileType}) in FileHelper.IsFileSafe()"),
             #else
             _ => false,
             #endif

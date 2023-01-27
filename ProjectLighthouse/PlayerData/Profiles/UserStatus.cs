@@ -7,6 +7,12 @@ using LBPUnion.ProjectLighthouse.Match.Rooms;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 
+public enum StatusType
+{
+    Offline = 0,
+    Online = 1,
+}
+
 public class UserStatus
 {
     public StatusType StatusType { get; set; }

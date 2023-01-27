@@ -1,5 +1,3 @@
-using System;
-
 namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 
 public class AuthenticationConfiguration

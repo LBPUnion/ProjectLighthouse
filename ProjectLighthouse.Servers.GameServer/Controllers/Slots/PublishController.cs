@@ -219,7 +219,7 @@ public class PublishController : ControllerBase
             #endregion
 
             slot.FirstUploaded = oldSlot.FirstUploaded;
-            slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
+            slot.LastUpdated = TimeHelper.TimestampMillis;
 
             slot.TeamPick = oldSlot.TeamPick;
 
@@ -250,8 +250,8 @@ public class PublishController : ControllerBase
         await this.database.SaveChangesAsync();
         slot.LocationId = l.Id;
         slot.CreatorId = user.UserId;
-        slot.FirstUploaded = TimeHelper.UnixTimeMilliseconds();
-        slot.LastUpdated = TimeHelper.UnixTimeMilliseconds();
+        slot.FirstUploaded = TimeHelper.TimestampMillis;
+        slot.LastUpdated = TimeHelper.TimestampMillis;
 
         if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
         {
@@ -281,7 +281,7 @@ public class PublishController : ControllerBase
         Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        if (slot.Location == null) throw new ArgumentNullException();
+        if (slot.Location == null) throw new ArgumentNullException(nameof(id));
 
         if (slot.CreatorId != token.UserId) return this.StatusCode(403, "");
 

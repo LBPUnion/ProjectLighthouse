@@ -3,7 +3,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,7 +34,7 @@ public class SlotPageController : ControllerBase
         Slot? targetSlot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
         if (targetSlot == null) return this.Redirect("~/slots/0");
 
-        if (targetSlot.Location == null) throw new ArgumentNullException();
+        if (targetSlot.Location == null) throw new ArgumentNullException(nameof(id));
 
         if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
 

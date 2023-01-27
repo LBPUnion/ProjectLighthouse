@@ -18,7 +18,7 @@ public static class ControllerExtensions
     public static GameToken GetToken(this ControllerBase controller)
     {
         GameToken? token = (GameToken?)(controller.HttpContext.Items["Token"] ?? null);
-        if (token == null) throw new ArgumentNullException($"GameToken was null even though authentication was successful {nameof(controller)}");
+        if (token == null) throw new ArgumentNullException(nameof(controller), @$"GameToken was null even though authentication was successful {nameof(controller)}");
 
         return token;
     }
@@ -37,7 +37,7 @@ public static class ControllerExtensions
             if (rootElements.Length > 0)
             {
                 //TODO: This doesn't support root tags with attributes, but it's only used in scenarios where there shouldn't any (UpdateUser and Playlists)
-                string? matchedRoot = rootElements.FirstOrDefault(e => bodyString.StartsWith($@"<{e}>"));
+                string? matchedRoot = rootElements.FirstOrDefault(e => bodyString.StartsWith(@$"<{e}>"));
                 if (matchedRoot == null)
                 {
                     Logger.Error($"[{controller.ControllerContext.ActionDescriptor.ActionName}] " +

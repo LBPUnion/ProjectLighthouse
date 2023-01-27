@@ -12,7 +12,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Moderator;
 [Route("moderation")]
 public class ModerationRemovalController : ControllerBase
 {
-
     private readonly Database database;
 
     public ModerationRemovalController(Database database)

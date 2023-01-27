@@ -4,6 +4,7 @@ namespace LBPUnion.ProjectLighthouse.PlayerData;
 
 public class Reaction
 {
+    // ReSharper disable once UnusedMember.Global
     [Key]
     public int RatingId { get; set; }
 

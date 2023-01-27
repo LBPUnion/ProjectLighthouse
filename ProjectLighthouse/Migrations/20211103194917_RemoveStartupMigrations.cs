@@ -10,7 +10,7 @@ namespace ProjectLighthouse.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            long timestamp = TimeHelper.UnixTimeMilliseconds();
+            long timestamp = TimeHelper.TimestampMillis;
             
             // Fix timestamps
             migrationBuilder.Sql($"UPDATE Slots SET FirstUploaded = {timestamp} WHERE FirstUploaded = 0");

@@ -23,13 +23,13 @@ public static class WebhookHelper
         Moderation,
     }
     
-    private static readonly DiscordWebhookClient publicClient = (ServerConfiguration.Instance.DiscordIntegration.DiscordIntegrationEnabled
+    private static readonly DiscordWebhookClient publicClient = ServerConfiguration.Instance.DiscordIntegration.DiscordIntegrationEnabled
         ? new DiscordWebhookClient(ServerConfiguration.Instance.DiscordIntegration.Url)
-        : null);
+        : null;
 
-    private static readonly DiscordWebhookClient moderationClient = (ServerConfiguration.Instance.DiscordIntegration.DiscordIntegrationEnabled
+    private static readonly DiscordWebhookClient moderationClient = ServerConfiguration.Instance.DiscordIntegration.DiscordIntegrationEnabled
         ? new DiscordWebhookClient(ServerConfiguration.Instance.DiscordIntegration.ModerationUrl)
-        : null);
+        : null;
 
     public static readonly Color UnionColor = new(0, 140, 255);
 

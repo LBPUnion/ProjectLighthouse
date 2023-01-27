@@ -15,7 +15,6 @@ using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
 using LBPUnion.ProjectLighthouse.Tickets;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,7 +49,8 @@ public class Database : DbContext
     public DbSet<ModerationCase> Cases { get; set; }
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
     public DbSet<RegistrationToken> RegistrationTokens { get; set; }
-    public DbSet<APIKey> APIKeys { get; set; }
+    // ReSharper disable once InconsistentNaming
+    public DbSet<ApiKey> APIKeys { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
 
@@ -207,7 +207,7 @@ public class Database : DbContext
                 TargetId = targetId,
                 Type = type,
                 Message = message,
-                Timestamp = TimeHelper.UnixTimeMilliseconds(),
+                Timestamp = TimeHelper.TimestampMillis,
             }
         );
         await this.SaveChangesAsync();

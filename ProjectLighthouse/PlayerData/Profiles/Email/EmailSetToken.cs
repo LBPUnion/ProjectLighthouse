@@ -6,6 +6,7 @@ namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
 
 public class EmailSetToken
 {
+    // ReSharper disable once UnusedMember.Global
     [Key]
     public int EmailSetTokenId { get; set; }
 

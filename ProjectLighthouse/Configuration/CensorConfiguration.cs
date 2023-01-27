@@ -1,11 +1,24 @@
 ﻿using System.Collections.Generic;
-using LBPUnion.ProjectLighthouse.Types;
 using YamlDotNet.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
 
+public enum FilterMode
+{
+    None,
+    Asterisks,
+    Random,
+    Furry,
+}
+
 public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
 {
+    // HEY, YOU!
+    // THIS VALUE MUST BE INCREMENTED FOR EVERY CONFIG CHANGE!
+    //
+    // This is so Lighthouse can properly identify outdated configurations and update them with newer settings accordingly.
+    // If you are modifying anything here, this value MUST be incremented.
+    // Thanks for listening~
     public override int ConfigVersion { get; set; } = 1;
     public override string ConfigName { get; set; } = "censor.yml";
     public override bool NeedsConfiguration { get; set; } = false;

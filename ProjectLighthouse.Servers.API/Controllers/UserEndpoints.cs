@@ -5,8 +5,6 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-// ReSharper disable RouteTemplates.ActionRoutePrefixCanBeExtractedToControllerRoute
-
 namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 
 /// <summary>
@@ -79,7 +77,7 @@ public class UserEndpoints : ApiEndpointController
 
         string authToken = authHeader[(authHeader.IndexOf(' ') + 1)..];
 
-        APIKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
+        ApiKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
         if (apiKey == null) return this.StatusCode(403, null);
 
         if (!string.IsNullOrWhiteSpace(username))

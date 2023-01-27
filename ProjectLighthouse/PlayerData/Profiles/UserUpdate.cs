@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Levels;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 
@@ -33,4 +34,17 @@ public class UserUpdate
 
     [XmlElement("boo2")]
     public string? BooHash { get; set; }
+}
+
+[XmlRoot("slot")]
+public class UserUpdateSlot
+{
+    [XmlElement("type")]
+    public SlotType? Type { get; set; }
+
+    [XmlElement("id")]
+    public int? SlotId { get; set; }
+
+    [XmlElement("location")]
+    public Location? Location { get; set; }
 }

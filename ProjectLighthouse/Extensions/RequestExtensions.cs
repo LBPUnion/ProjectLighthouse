@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -74,24 +75,20 @@ public static class RequestExtensions
 
     public static async Task<bool> CheckCaptchaValidity(this HttpRequest request)
     {
-        if (ServerConfiguration.Instance.Captcha.CaptchaEnabled)
+        if (!ServerConfiguration.Instance.Captcha.CaptchaEnabled) return true;
+
+        string keyName = ServerConfiguration.Instance.Captcha.Type switch
         {
-            string keyName = ServerConfiguration.Instance.Captcha.Type switch
-            {
-                CaptchaType.HCaptcha => "h-captcha-response",
-                CaptchaType.ReCaptcha => "g-recaptcha-response",
-                _ => throw new ArgumentOutOfRangeException(),
-            };
+            CaptchaType.HCaptcha => "h-captcha-response",
+            CaptchaType.ReCaptcha => "g-recaptcha-response",
+            _ => throw new ArgumentOutOfRangeException(nameof(request), @$"Unknown captcha type: {ServerConfiguration.Instance.Captcha.Type}"),
+        };
             
-            bool gotCaptcha = request.Form.TryGetValue(keyName, out StringValues values);
-            if (!gotCaptcha) return false;
+        bool gotCaptcha = request.Form.TryGetValue(keyName, out StringValues values);
+        if (!gotCaptcha) return false;
 
-            if (!await verifyCaptcha(values[0])) return false;
-        }
-
-        return true;
+        return await verifyCaptcha(values[0]);
     }
-
     #endregion
 
 }

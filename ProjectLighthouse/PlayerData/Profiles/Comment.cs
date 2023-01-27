@@ -3,9 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+
+public enum CommentType
+{
+    Profile = 0,
+    Level = 1,
+}
 
 [XmlRoot("comment")]
 [XmlType("comment")]
@@ -71,8 +76,8 @@ public class Comment
            LbpSerializer.StringElement("timestamp", this.Timestamp) +
            LbpSerializer.StringElement("message", this.Message) +
            (this.Deleted ? LbpSerializer.StringElement("deleted", true) +
-             LbpSerializer.StringElement("deletedBy", this.DeletedBy) +
-             LbpSerializer.StringElement("deletedType", this.DeletedBy) : "") +
+           LbpSerializer.StringElement("deletedBy", this.DeletedBy) +
+           LbpSerializer.StringElement("deletedType", this.DeletedBy) : "") +
            LbpSerializer.StringElement("thumbsup", this.ThumbsUp) +
            LbpSerializer.StringElement("thumbsdown", this.ThumbsDown);
 

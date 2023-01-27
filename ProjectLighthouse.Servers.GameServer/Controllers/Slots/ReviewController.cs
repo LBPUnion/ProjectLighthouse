@@ -1,5 +1,4 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
@@ -117,7 +116,7 @@ public class ReviewController : ControllerBase
         
         review.Text = newReview.Text;
         review.Deleted = false;
-        review.Timestamp = TimeHelper.UnixTimeMilliseconds();
+        review.Timestamp = TimeHelper.TimestampMillis;
 
         // sometimes the game posts/updates a review rating without also calling dpadrate/user/etc (why??)
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);

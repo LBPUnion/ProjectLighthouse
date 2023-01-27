@@ -1,7 +1,7 @@
 ﻿@page "/admin/keys"
 
 @using LBPUnion.ProjectLighthouse.PlayerData
-@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminAPIKeyPageModel
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminApiKeyPageModel
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = "API Keys";
@@ -9,7 +9,7 @@
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
-    var token = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+    string? token = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
 
 <script>function deleteKey(keyID) {
@@ -39,7 +39,7 @@
 }
 
 <div class="ui four column grid">
-    @foreach (APIKey key in Model.APIKeys)
+    @foreach (ApiKey key in Model.ApiKeys)
     {
         <div id="keyitem-@key.Id" class="five wide column">
             <div class="ui blue segment">

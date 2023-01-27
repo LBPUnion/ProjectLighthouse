@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.Tickets.Data;
 using LBPUnion.ProjectLighthouse.Configuration;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X9;
@@ -154,7 +153,13 @@ public class NPTicket
         reader.ReadTicketEmpty(); // padding
         reader.ReadTicketEmpty();
 
-        reader.ReadSectionHeader(); // footer header
+        SectionHeader footer = reader.ReadSectionHeader(); // footer header
+        if (footer.Type != SectionType.Footer)
+        {
+            Logger.Warn(@$"Unexpected ticket footer header: expected={SectionType.Footer}, actual={footer}",
+                LogArea.Login);
+            return false;
+        }
 
         npTicket.ticketSignatureIdentifier = reader.ReadTicketBinary();
 
@@ -186,7 +191,13 @@ public class NPTicket
         reader.ReadSectionHeader(); // empty section?
         reader.ReadTicketEmpty();
 
-        reader.ReadSectionHeader(); // footer header
+        SectionHeader footer = reader.ReadSectionHeader(); // footer header
+        if (footer.Type != SectionType.Footer)
+        {
+            Logger.Warn(@$"Unexpected ticket footer header: expected={SectionType.Footer}, actual={footer}",
+                LogArea.Login);
+            return false;
+        }
 
         npTicket.ticketSignatureIdentifier = reader.ReadTicketBinary();
 
@@ -211,11 +222,17 @@ public class NPTicket
         long bodyStart = reader.BaseStream.Position;
         SectionHeader bodyHeader = reader.ReadSectionHeader();
 
+        if (bodyHeader.Type != SectionType.Body)
+        {
+            Logger.Warn(@$"Unexpected ticket body header: expected={SectionType.Body}, actual={bodyHeader}", LogArea.Login);
+            return false;
+        }
+
         Logger.Debug($"bodyHeader.Type is {bodyHeader.Type}, index={bodyStart}", LogArea.Login);
 
         bool parsedSuccessfully = npTicket.ticketVersion.ToString() switch
         {
-            "2.1" => Read21Ticket(npTicket, reader), // used by ps3
+            "2.1" => Read21Ticket(npTicket, reader), // used by ps3 and rpcs3
             "3.0" => Read30Ticket(npTicket, reader), // used by ps vita
             _ => throw new NotImplementedException(),
         };

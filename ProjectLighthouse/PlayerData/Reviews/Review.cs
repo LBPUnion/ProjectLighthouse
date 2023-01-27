@@ -2,12 +2,25 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.PlayerData.Reviews;
+
+[XmlRoot("deleted_by")]
+public enum DeletedBy
+{
+    [XmlEnum(Name = "none")]
+    None,
+
+    [XmlEnum(Name = "moderator")]
+    Moderator,
+
+    [XmlEnum(Name = "level_author")]
+    LevelAuthor,
+    // TODO: deletion types for comments (profile etc) 
+}
 
 [XmlRoot("review")]
 [XmlType("review")]

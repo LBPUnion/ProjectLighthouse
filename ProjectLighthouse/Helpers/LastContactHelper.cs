@@ -1,11 +1,11 @@
 #nullable enable
 using System.Linq;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.PlayerData;
+namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class LastContactHelper
 {
@@ -14,8 +14,6 @@ public static class LastContactHelper
     {
         LastContact? lastContact = await database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
 
-        // below makes it not look like trash
-        // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
         if (lastContact == null)
         {
             lastContact = new LastContact
