@@ -4,8 +4,8 @@
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = "Not Found";
-    Model.Description = "The page was not found.";
+    Model.Description = "The requested page or resource was not found.";
 }
 
 <p>@Model.Description</p>
-<p>This may be due to a lack of permission such as not being signed in, or maybe the page just isn't there.</p>
+<p>You may need to <a href="/login">sign in</a> to access the requested page.</p>
