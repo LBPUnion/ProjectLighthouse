@@ -153,9 +153,6 @@ public class UserController : ControllerBase
                     user.PlanetHashLBPVita = update.PlanetHash;
                     break;
                 }
-                case GameVersion.LittleBigPlanet1:
-                case GameVersion.LittleBigPlanetPSP:
-                case GameVersion.Unknown:
                 default: // The rest do not support custom earths.
                 {
                     throw new ArgumentException($"invalid gameVersion {token.GameVersion} for setting earth");
