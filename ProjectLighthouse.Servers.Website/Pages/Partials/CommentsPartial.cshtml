@@ -1,4 +1,4 @@
-﻿@using System.Web
+@using System.Web
 @using System.IO
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.PlayerData.Profiles
@@ -26,7 +26,7 @@
             <i>Comments are disabled.</i>
         </b>
     }
-    else if (Model.Comments.Count > 50)
+    else if (Model.Comments.Count >= 50)
     {
         <p>There are more than 50 comments. Displaying the newest ones.</p>
     }
@@ -36,7 +36,7 @@
         <p>There @(count == 1 ? "is" : "are") @count comment@(count == 1 ? "" : "s").</p>
     }
 
-    @if (Model.CommentsEnabled && Model.User != null)
+    @if (!Model.ProfileUser.IsBanned && Model.CommentsEnabled && Model.User != null)
     {
         <div class="ui divider"></div>
         <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment" method="post">
@@ -51,64 +51,67 @@
         }
     }
 
-    @for(int i = 0; i < Model.Comments.Count; i++)
+    @if (!Model.ProfileUser.IsBanned)
     {
-        Comment comment = Model.Comments[i];
-        DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000).ToLocalTime();
-        StringWriter messageWriter = new();
-        HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
+        @for(int i = 0; i < Model.Comments.Count; i++)
+        {
+            Comment comment = Model.Comments[i];
+            DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000).ToLocalTime();
+            StringWriter messageWriter = new();
+            HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
 
-        string decodedMessage = messageWriter.ToString();
-        string? url = Url.RouteUrl(ViewContext.RouteData.Values);
-        if (url == null) continue;
+            string decodedMessage = messageWriter.ToString();
+            string? url = Url.RouteUrl(ViewContext.RouteData.Values);
+            if (url == null) continue;
 
-        int rating = comment.ThumbsUp - comment.ThumbsDown;
+            int rating = comment.ThumbsUp - comment.ThumbsDown;
 
-        <div style="display: flex" id="@comment.CommentId">
-            @{
-                string style = "";
-                if (Model.User?.UserId == comment.PosterUserId)
-                {
-                    style = "pointer-events: none";
+            <div style="display: flex" id="@comment.CommentId">
+                @{
+                    string style = "";
+                    if (Model.User?.UserId == comment.PosterUserId)
+                    {
+                        style = "pointer-events: none";
+                    }
                 }
-            }
-            <div class="voting" style="@(style)">
-                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == 1 ? 0 : 1)">
-                    <i class="fitted @(comment.YourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
-                </a>
-                <span style="text-align: center; margin: auto; @(rating < 0 ? "margin-left: -5px" : "")">@(rating)</span>
-                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == -1 ? 0 : -1)">
-                    <i class="fitted @(comment.YourThumb == -1 ? "red" : "grey") arrow down link icon" style="display: block"></i>
-                </a>
-            </div>
+                <div class="voting" style="@(style)">
+                    <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == 1 ? 0 : 1)">
+                        <i class="fitted @(comment.YourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
+                    </a>
+                    <span style="text-align: center; margin: auto; @(rating < 0 ? "margin-left: -5px" : "")">@(rating)</span>
+                    <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == -1 ? 0 : -1)">
+                        <i class="fitted @(comment.YourThumb == -1 ? "red" : "grey") arrow down link icon" style="display: block"></i>
+                    </a>
+                </div>
 
-            <div class="comment">
-                <b>@await comment.Poster.ToLink(Html, ViewData, language): </b>
-                @if (comment.Deleted)
-                {
-                    <i>
+                <div class="comment">
+                    <b>@await comment.Poster.ToLink(Html, ViewData, language): </b>
+                    @if (comment.Deleted)
+                    {
+                        <i>
+                            <span>@decodedMessage</span>
+                        </i>
+                    }
+                    else
+                    {
                         <span>@decodedMessage</span>
-                    </i>
-                }
-                else
-                {
-                    <span>@decodedMessage</span>
-                }
-                @if (((Model.User?.IsModerator ?? false) || Model.User?.UserId == comment.PosterUserId || Model.User?.UserId == pageOwnerId) && !comment.Deleted)
-                {
-                    <button class="ui red icon button" style="display:inline-flex; float: right" onclick="deleteComment(@comment.CommentId)">
-                        <i class="trash icon"></i>
-                    </button>
-                }
-                <p>
-                    <i>@TimeZoneInfo.ConvertTime(timestamp, timeZoneInfo).ToString("M/d/yyyy @ h:mm:ss tt")</i>
-                </p>
-                @if (i != Model.Comments.Count - 1)
-                {
-                    <div class="ui divider"></div>
-                }
+                    }
+                    @if (((Model.User?.IsModerator ?? false) || Model.User?.UserId == comment.PosterUserId || Model.User?.UserId == pageOwnerId) && !comment.Deleted)
+                    {
+                        <button class="ui red icon button" style="display:inline-flex; float: right" onclick="deleteComment(@comment.CommentId)">
+                            <i class="trash icon"></i>
+                        </button>
+                    }
+                    <p>
+                        <i>@TimeZoneInfo.ConvertTime(timestamp, timeZoneInfo).ToString("M/d/yyyy @ h:mm:ss tt")</i>
+                    </p>
+                    @if (i != Model.Comments.Count - 1)
+                    {
+                        <div class="ui divider"></div>
+                    }
+                </div>
             </div>
-        </div>
+        }
     }
     <script>
         function deleteComment(commentId){
