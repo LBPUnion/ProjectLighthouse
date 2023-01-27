@@ -110,7 +110,6 @@ public static class GameVersionHelper
         "BCES02068",
         "BCAS20322",
         "BCJS30095",
-        "BCES01663",
         "BCUS98362",
         "NPUA81116",
         "NPEA00515",

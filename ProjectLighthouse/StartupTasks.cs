@@ -99,7 +99,7 @@ public static class StartupTasks
         Logger.Info("Initializing repeating tasks...", LogArea.Startup);
         RepeatingTaskHandler.Initialize();
 
-            // Create admin user if no users exist
+        // Create admin user if no users exist
         if (serverType == ServerType.Website && database.Users.CountAsync().Result == 0)
         {
             const string passwordClear = "lighthouse";
