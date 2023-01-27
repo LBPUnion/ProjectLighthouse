@@ -73,7 +73,6 @@ public static class SlotHelper
         await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
         try
         {
-
             User devCreator = new()
             {
                 Username = "",
@@ -91,7 +90,6 @@ public static class SlotHelper
             semaphore.Release();
         }
     }
-
 
     public static async Task<int> GetPlaceholderSlotId(Database database, int guid, SlotType slotType)
     {
@@ -131,5 +129,4 @@ public static class SlotHelper
             semaphore.Release();
         }
     }
-
 }

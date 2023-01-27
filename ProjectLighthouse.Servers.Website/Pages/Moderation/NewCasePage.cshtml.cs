@@ -21,8 +21,8 @@ public class NewCasePage : BaseLayout
         if (type == null) return this.BadRequest();
         if (affectedId == null) return this.BadRequest();
 
-        this.Type = (CaseType)type;
-        this.AffectedId = (int)affectedId;
+        this.Type = type.Value;
+        this.AffectedId = affectedId.Value;
         
         return this.Page();
     }
@@ -38,20 +38,19 @@ public class NewCasePage : BaseLayout
         reason ??= string.Empty;
         modNotes ??= string.Empty;
         
-        // this is fucking ugly
         // if id is invalid then return bad request
         if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
         
         ModerationCase @case = new()
         {
-            Type = (CaseType)type,
+            Type = type.Value,
             Reason = reason,
             ModeratorNotes = modNotes,
             ExpiresAt = expires,
             CreatedAt = DateTime.Now,
             CreatorId = user.UserId,
             CreatorUsername = user.Username,
-            AffectedId = (int)affectedId,
+            AffectedId = affectedId.Value,
         };
 
         this.Database.Cases.Add(@case);

@@ -40,7 +40,7 @@
     else if (Model.Expired)
     {
         <h3 class="ui @color header">
-            This case expired on @(TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")).
+            This case expired on @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
         </h3>
     }
 
