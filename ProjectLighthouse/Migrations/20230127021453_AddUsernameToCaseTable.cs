@@ -28,7 +28,7 @@ namespace ProjectLighthouse.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.Sql("UPDATE Cases INNER JOIN Users ON Cases.CreatorId = Users.UserId SET Cases.CreatorUsername = Users.Username WHERE Cases.CreatorUsername = '';");
-            migrationBuilder.Sql("UPDATE Cases INNER JOIN Users ON Cases.DismisserId = Users.UserId SET Cases.DismisserUsername = Users.Username WHERE Cases.DismisserUsername is NULL ;");
+            migrationBuilder.Sql("UPDATE Cases INNER JOIN Users ON Cases.DismisserId = Users.UserId SET Cases.DismisserUsername = Users.Username WHERE Cases.DismisserUsername is NULL;");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
