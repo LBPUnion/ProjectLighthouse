@@ -40,7 +40,7 @@ public class NewCasePage : BaseLayout
         
         // this is fucking ugly
         // if id is invalid then return bad request
-        if (!(await ((CaseType)type).IsIdValid((int)affectedId, this.Database))) return this.BadRequest();
+        if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
         
         ModerationCase @case = new()
         {
@@ -50,6 +50,7 @@ public class NewCasePage : BaseLayout
             ExpiresAt = expires,
             CreatedAt = DateTime.Now,
             CreatorId = user.UserId,
+            CreatorUsername = user.Username,
             AffectedId = (int)affectedId,
         };
 
