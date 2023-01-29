@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
-using LBPUnion.ProjectLighthouse.Files;
+using LBPUnion.ProjectLighthouse.Resources;
 using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests;
@@ -54,7 +53,7 @@ public class FileTypeTests
     [Fact]
     public void ShouldRecognizeGarbageAsUnknown()
     {
-        LbpFile file = new(Encoding.ASCII.GetBytes("free pc only $900"));
+        LbpFile file = new("free pc only $900"u8.ToArray());
         Assert.True(file.FileType == LbpFileType.Unknown);
     }
 }

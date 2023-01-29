@@ -1,13 +1,12 @@
 using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Users;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;

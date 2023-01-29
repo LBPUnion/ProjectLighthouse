@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
+using LBPUnion.ProjectLighthouse.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance;
 
@@ -62,7 +62,7 @@ public static class MaintenanceHelper
     public static async Task RunMaintenanceJob(string jobName)
     {
         IMaintenanceJob? job = MaintenanceJobs.FirstOrDefault(j => j.GetType().Name == jobName);
-        if (job == null) throw new ArgumentNullException();
+        if (job == null) throw new ArgumentNullException(nameof(jobName));
 
         await job.Run();
     }

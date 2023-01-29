@@ -4,8 +4,9 @@ using System.IO.Pipelines;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Resources;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
@@ -27,7 +28,7 @@ public class ResourcesController : ControllerBase
     public async Task<IActionResult> FilterResources()
     {
         ResourceList? resourceList = await this.DeserializeBody<ResourceList>();
-        if (resourceList == null) return this.BadRequest();
+        if (resourceList?.Resources == null) return this.BadRequest();
 
         string resources = resourceList.Resources.Where
                 (s => !FileHelper.ResourceExists(s))

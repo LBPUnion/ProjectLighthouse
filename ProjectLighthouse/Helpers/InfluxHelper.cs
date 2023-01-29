@@ -8,7 +8,7 @@ using InfluxDB.Client.Writes;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Users;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 

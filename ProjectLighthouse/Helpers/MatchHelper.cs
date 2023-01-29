@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using LBPUnion.ProjectLighthouse.Match.MatchCommands;
+using LBPUnion.ProjectLighthouse.Matchmaking.MatchCommands;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 

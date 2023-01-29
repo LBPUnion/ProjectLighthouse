@@ -1,10 +1,12 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
+using LBPUnion.ProjectLighthouse.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +36,7 @@ public class FriendsController : ControllerBase
         SanitizationHelper.SanitizeStringsInClass(npData);
 
         List<User> friends = new();
-        foreach (string friendName in npData.Friends)
+        foreach (string friendName in npData.Friends ?? new List<string>())
         {
             User? friend = await this.database.Users.FirstOrDefaultAsync(u => u.Username == friendName);
             if (friend == null) continue;
@@ -43,7 +45,7 @@ public class FriendsController : ControllerBase
         }
 
         List<int> blockedUsers = new();
-        foreach (string blockedUserName in npData.BlockedUsers)
+        foreach (string blockedUserName in npData.BlockedUsers ?? new List<string>())
         {
             User? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == blockedUserName);
             if (blockedUser == null) continue;

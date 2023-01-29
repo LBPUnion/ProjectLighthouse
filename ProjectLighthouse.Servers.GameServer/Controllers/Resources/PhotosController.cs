@@ -1,13 +1,14 @@
 #nullable enable
 using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Entities.Level;
+using LBPUnion.ProjectLighthouse.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +53,7 @@ public class PhotosController : ControllerBase
         photo.CreatorId = user.UserId;
         photo.Creator = user;
 
-        if (photo.XmlLevelInfo != null)
+        if (photo.XmlLevelInfo?.RootLevel != null)
         {
             bool validLevel = false;
             PhotoSlot photoSlot = photo.XmlLevelInfo;

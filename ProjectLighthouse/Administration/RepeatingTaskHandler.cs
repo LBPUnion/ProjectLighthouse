@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration;
 

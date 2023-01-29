@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 

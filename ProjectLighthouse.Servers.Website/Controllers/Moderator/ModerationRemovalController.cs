@@ -1,8 +1,5 @@
-﻿using LBPUnion.ProjectLighthouse.Administration;
-using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.PlayerData.Reviews;
-using LBPUnion.ProjectLighthouse.Types;
+﻿using LBPUnion.ProjectLighthouse.Entities.Level;
+using LBPUnion.ProjectLighthouse.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,7 +65,7 @@ public class ModerationRemovalController : ControllerBase
             case CommentType.Profile:
                 canDelete = user.UserId == comment.PosterUserId || user.UserId == comment.TargetId;
                 break;
-            default: throw new ArgumentOutOfRangeException();
+            default: throw new ArgumentOutOfRangeException(nameof(commentId));
         }
 
         if (!canDelete && !user.IsModerator) return this.Redirect(callbackUrl ?? "~/");

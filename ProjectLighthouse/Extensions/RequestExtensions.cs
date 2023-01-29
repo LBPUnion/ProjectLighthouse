@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
 
-public static class RequestExtensions
+public static partial class RequestExtensions
 {
     static RequestExtensions()
     {
@@ -34,14 +34,12 @@ public static class RequestExtensions
     #region Mobile Checking
 
     // yoinked and adapted from https://stackoverflow.com/a/68641796
+    [GeneratedRegex("Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|PlayStation Vita",
+        RegexOptions.IgnoreCase | RegexOptions.Multiline,
+        "en-US")]
+    private static partial Regex MobileCheckRegex();
 
-    private static readonly Regex mobileCheck = new
-    (
-        "Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|PlayStation Vita",
-        RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled
-    );
-
-    public static bool IsMobile(this HttpRequest request) => mobileCheck.IsMatch(request.Headers[HeaderNames.UserAgent].ToString());
+    public static bool IsMobile(this HttpRequest request) => MobileCheckRegex().IsMatch(request.Headers[HeaderNames.UserAgent].ToString());
 
     #endregion
 

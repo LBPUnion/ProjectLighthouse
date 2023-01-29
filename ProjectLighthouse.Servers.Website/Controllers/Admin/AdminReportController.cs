@@ -1,7 +1,7 @@
 ﻿#nullable enable
-using LBPUnion.ProjectLighthouse.Administration.Reports;
+using LBPUnion.ProjectLighthouse.Entities.Moderation;
+using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Files;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,14 +54,7 @@ public class AdminReportController : ControllerBase
         GriefReport? report = await this.database.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
         if (report == null) return this.NotFound();
 
-        if (System.IO.File.Exists(Path.Combine("png", $"{report.JpegHash}.png")))
-        {
-            System.IO.File.Delete(Path.Combine("png", $"{report.JpegHash}.png"));
-        }
-        if (System.IO.File.Exists(Path.Combine("r", report.JpegHash)))
-        {
-            System.IO.File.Delete(Path.Combine("r", report.JpegHash));
-        }
+        FileHelper.DeleteResource(report.JpegHash);
 
         this.database.Reports.Remove(report);
 

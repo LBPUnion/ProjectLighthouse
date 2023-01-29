@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Entities.Level;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Users;
 
 namespace LBPUnion.ProjectLighthouse.Levels.Categories;
 

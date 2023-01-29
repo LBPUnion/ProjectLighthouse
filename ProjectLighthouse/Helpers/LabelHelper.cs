@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Users;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 

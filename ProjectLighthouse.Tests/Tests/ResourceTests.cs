@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using LBPUnion.ProjectLighthouse.Files;
+using LBPUnion.ProjectLighthouse.Resources;
 using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests;

@@ -1,5 +1,6 @@
 using LBPUnion.ProjectLighthouse.Administration;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.Entities.Moderation;
+using LBPUnion.ProjectLighthouse.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

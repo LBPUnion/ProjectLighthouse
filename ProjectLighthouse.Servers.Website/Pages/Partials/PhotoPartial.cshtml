@@ -1,9 +1,9 @@
 @using System.Web
+@using LBPUnion.ProjectLighthouse.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Levels
 @using LBPUnion.ProjectLighthouse.Localization
-@using LBPUnion.ProjectLighthouse.PlayerData
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
-@model LBPUnion.ProjectLighthouse.PlayerData.Photo
+@model Photo
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;

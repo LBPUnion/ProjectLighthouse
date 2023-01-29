@@ -1,6 +1,7 @@
+using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Middlewares;
-using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Users;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 

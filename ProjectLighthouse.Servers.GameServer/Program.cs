@@ -1,7 +1,7 @@
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
+using LBPUnion.ProjectLighthouse.Misc;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer;

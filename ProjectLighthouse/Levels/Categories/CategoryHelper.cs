@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LBPUnion.ProjectLighthouse.Entities.Level;
 
 namespace LBPUnion.ProjectLighthouse.Levels.Categories;
 

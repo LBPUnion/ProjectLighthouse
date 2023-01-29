@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
 

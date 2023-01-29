@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
-using LBPUnion.ProjectLighthouse.Administration;
+using LBPUnion.ProjectLighthouse.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Users;
 using OpenQA.Selenium;
 using Xunit;
 
