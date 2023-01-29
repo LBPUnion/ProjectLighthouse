@@ -25,7 +25,7 @@
     <div class="ui inverted red segment">
         @if (Model.User != null && Model.User.IsModerator)
         {
-            <h3 style="margin-bottom:3px;"><i class="ban icon"></i> There is an active moderation case on this account.</h3>
+            <h3 style="margin-bottom:3px;"><i class="ban icon"></i> This user is currently banned.</h3>
             <b>Reason:</b>
             <span>"@Model.ProfileUser.BannedReason"</span>
             <p>
