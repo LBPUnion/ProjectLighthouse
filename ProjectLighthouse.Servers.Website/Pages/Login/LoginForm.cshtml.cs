@@ -119,7 +119,7 @@ public class LoginForm : BaseLayout
         return ServerConfiguration.Instance.Mail.MailEnabled switch
         {
             true when string.IsNullOrWhiteSpace(user.EmailAddress) => this.Redirect("~/login/setEmail"),
-            true when user.EmailAddressVerified => this.Redirect("~/login/sendVerificationEmail"),
+            true when !user.EmailAddressVerified => this.Redirect("~/login/sendVerificationEmail"),
             _ => string.IsNullOrWhiteSpace(redirect) ? this.Redirect("~/") : this.Redirect(redirect),
         };
     }
