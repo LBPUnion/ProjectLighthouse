@@ -27,6 +27,7 @@ public class ModerationCaseController : ControllerBase
         
         @case.DismissedAt = DateTime.Now;
         @case.DismisserId = user.UserId;
+        @case.DismisserUsername = user.Username;
         
         @case.Processed = false;
 
