@@ -23,18 +23,18 @@
 @if (Model.ProfileUser.IsBanned)
 {
     <div class="ui inverted red segment">
-        <h2>User is currently banned!</h2>
+        <h3 style="margin-bottom:3px;"><i class="ban icon"></i> This user is currently banned.</h3>
         @if (Model.User != null && Model.User.IsModerator)
         {
             <b>Reason:</b>
             <span>"@Model.ProfileUser.BannedReason"</span>
             <p>
-                <i>Note: Only you and other moderators may view the ban reason.</i>
+                <i>Only you and other moderators may view the ban reason.</i>
             </p>
         }
-        else
+        else 
         {
-            <p>For shame...</p>
+            <p>Users who engage in inappropriate, offensive, or violent actions will be moderated. Be sure to follow the rules!</p>
         }
     </div>
 }
@@ -164,8 +164,17 @@
     }
     <div class="@divLength wide stretched column">
         <div class="lh-content" id="lh-comments">
-            @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
-                   { {"PageOwner", Model.ProfileUser.UserId}, })
+            @if (Model.ProfileUser.IsBanned)
+            {
+                <div class="ui yellow segment" id="comments">
+                    <p>Comments are disabled because the user is banned.</p>
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+                    { {"PageOwner", Model.ProfileUser.UserId}, })
+            }
         </div>
         <div class="lh-content" id="lh-photos">
             <div class="ui purple segment" id="photos">
