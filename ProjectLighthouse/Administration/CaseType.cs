@@ -48,6 +48,6 @@ public static class CaseTypeExtensions
         if (type.AffectsUser()) return await database.Users.Has(u => u.UserId == affectedId);
         if (type.AffectsLevel()) return await database.Slots.Has(u => u.SlotId == affectedId);
 
-        throw new ArgumentOutOfRangeException();
+        throw new ArgumentOutOfRangeException(nameof(type));
     }
 }

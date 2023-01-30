@@ -517,6 +517,16 @@ public class Database : DbContext
         LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
         if (lastContact != null) this.LastContacts.Remove(lastContact);
 
+        foreach (ModerationCase modCase in await this.Cases
+                     .Where(c => c.CreatorId == user.UserId || c.DismisserId == user.UserId)
+                     .ToListAsync())
+        {
+            if(modCase.DismisserId == user.UserId)
+                modCase.DismisserId = null;
+            if(modCase.CreatorId == user.UserId)
+                modCase.CreatorId = await SlotHelper.GetPlaceholderUserId(this);
+        }
+
         foreach (Slot slot in this.Slots.Where(s => s.CreatorId == user.UserId)) await this.RemoveSlot(slot, false);
 
         this.HeartedProfiles.RemoveRange(this.HeartedProfiles.Where(h => h.UserId == user.UserId));

@@ -41,6 +41,56 @@ public static class SlotHelper
 
     private static readonly SemaphoreSlim semaphore = new(1, 1);
 
+    private static async Task<int> GetPlaceholderLocationId(Database database)
+    {
+        Location? devLocation = await database.Locations.FirstOrDefaultAsync(l => l.Id == 1);
+
+        if (devLocation != null) return devLocation.Id;
+
+        await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
+        try
+        {
+            devLocation = new Location
+            {
+                Id = 1,
+            };
+            database.Locations.Add(devLocation);
+            return devLocation.Id;
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+    }
+
+    public static async Task<int> GetPlaceholderUserId(Database database)
+    {
+        int devCreatorId = await database.Users.Where(u => u.Username.Length == 0)
+            .Select(u => u.UserId)
+            .FirstOrDefaultAsync();
+        if (devCreatorId != 0) return devCreatorId;
+
+        await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
+        try
+        {
+            User devCreator = new()
+            {
+                Username = "",
+                PermissionLevel = PermissionLevel.Banned,
+                Biography = "Placeholder author of story levels",
+                BannedReason = "Banned to not show in users list",
+                LocationId = await GetPlaceholderLocationId(database),
+            };
+            database.Users.Add(devCreator);
+            await database.SaveChangesAsync();
+            return devCreator.UserId;
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+    }
+
     public static async Task<int> GetPlaceholderSlotId(Database database, int guid, SlotType slotType)
     {
         int slotId = await database.Slots.Where(s => s.Type == slotType && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
@@ -58,31 +108,7 @@ public static class SlotHelper
 
             if (slotId != 0) return slotId;
 
-            Location? devLocation = await database.Locations.FirstOrDefaultAsync(l => l.Id == 1);
-            if (devLocation == null)
-            {
-                devLocation = new Location
-                {
-                    Id = 1,
-                };
-                database.Locations.Add(devLocation);
-            }
-
-            int devCreatorId = await database.Users.Where(u => u.Username.Length == 0).Select(u => u.UserId).FirstOrDefaultAsync();
-            if (devCreatorId == 0)
-            {
-                User devCreator = new()
-                {
-                    Username = "",
-                    PermissionLevel = PermissionLevel.Banned,
-                    Biography = "Placeholder author of story levels",
-                    BannedReason = "Banned to not show in users list",
-                    LocationId = devLocation.Id,
-                };
-                database.Users.Add(devCreator);
-                await database.SaveChangesAsync();
-                devCreatorId = devCreator.UserId;
-            }
+            int devCreatorId = await GetPlaceholderUserId(database);
 
             Slot slot = new()
             {
@@ -90,7 +116,7 @@ public static class SlotHelper
                 Description = $"Placeholder for {slotType} type level",
                 CreatorId = devCreatorId,
                 InternalSlotId = guid,
-                LocationId = devLocation.Id,
+                LocationId = await GetPlaceholderLocationId(database),
                 Type = slotType,
             };
 
@@ -103,5 +129,4 @@ public static class SlotHelper
             semaphore.Release();
         }
     }
-
 }

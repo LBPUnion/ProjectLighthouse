@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Administration.CompletedMigration", b =>
@@ -47,11 +47,18 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CreatorUsername")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime?>("DismissedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int?>("DismisserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("DismisserUsername")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("datetime(6)");

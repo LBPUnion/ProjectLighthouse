@@ -30,14 +30,18 @@ public class ModerationCase
 
     public DateTime? DismissedAt { get; set; }
     public bool Dismissed => this.DismissedAt != null;
+
     public int? DismisserId { get; set; }
+    public string? DismisserUsername { get; set; }
+
     [ForeignKey(nameof(DismisserId))]
-    public User? Dismisser { get; set; }
+    public virtual User? Dismisser { get; set; }
     
     public int CreatorId { get; set; }
-    
+    public required string CreatorUsername { get; set; }
+
     [ForeignKey(nameof(CreatorId))]
-    public User? Creator { get; set; }
+    public virtual User? Creator { get; set; }
     
     public int AffectedId { get; set; }
 
@@ -53,25 +57,5 @@ public class ModerationCase
         Debug.Assert(this.Type.AffectsLevel());
         return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId);
     }
-    #endregion
-
-    #region Case creators
-    #region Level
-
-    #endregion
-
-    #region User
-    public static ModerationCase NewBanCase(int caseCreator, int userId, string reason, string modNotes, DateTime caseExpires)
-        => new()
-        {
-            Type = CaseType.UserBan,
-            Reason = $"Banned for reason '{reason}'\nModeration notes: {modNotes}",
-            CreatorId = caseCreator,
-            CreatedAt = DateTime.Now,
-            ExpiresAt = caseExpires,
-            AffectedId = userId,
-        };
-
-    #endregion
     #endregion
 }
