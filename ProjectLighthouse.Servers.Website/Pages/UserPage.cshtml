@@ -167,7 +167,9 @@
         <div class="lh-content" id="lh-comments">
             @if (Model.ProfileUser.IsBanned)
             {
-                <p>Comments are disabled because the user is banned.</p>
+                <div class="ui yellow segment" id="comments">
+                    <p>Comments are disabled because the user is banned.</p>
+                </div>
             }
             else
             {
