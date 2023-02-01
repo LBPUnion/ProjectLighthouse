@@ -59,9 +59,6 @@ public static class StartupTasks
         if (!dbConnected) Environment.Exit(1);
         using Database database = new();
         
-        #if !DEBUG
-        if (serverType == ServerType.GameServer)
-        #endif
         migrateDatabase(database);
 
         if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
@@ -99,7 +96,7 @@ public static class StartupTasks
         Logger.Info("Initializing repeating tasks...", LogArea.Startup);
         RepeatingTaskHandler.Initialize();
 
-            // Create admin user if no users exist
+        // Create admin user if no users exist
         if (serverType == ServerType.Website && database.Users.CountAsync().Result == 0)
         {
             const string passwordClear = "lighthouse";
@@ -156,34 +153,47 @@ public static class StartupTasks
 
     private static void migrateDatabase(Database database)
     {
+        // This mutex is used to synchronize migrations across the GameServer, Website, and Api
+        // Without it, each server would try to simultaneously migrate the database resulting in undefined behavior
+        // It is only used for startup and immediately disposed after migrating
+        Stopwatch totalStopwatch = Stopwatch.StartNew();
+        Stopwatch stopwatch = Stopwatch.StartNew();
         Logger.Info("Migrating database...", LogArea.Database);
-        Stopwatch totalStopwatch = new();
-        Stopwatch stopwatch = new();
-        totalStopwatch.Start();
-        stopwatch.Start();
-
-        database.Database.MigrateAsync().Wait();
-        stopwatch.Stop();
-        Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
-        
-        stopwatch.Reset();
-        stopwatch.Start();
-
-        List<CompletedMigration> completedMigrations = database.CompletedMigrations.ToList();
-        List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
-            .Where(migrationTask => !completedMigrations
-                .Select(m => m.MigrationName)
-                .Contains(migrationTask.GetType().Name)
-            ).ToList();
-        
-        foreach (IMigrationTask migrationTask in migrationsToRun)
+        using Mutex mutex = new(false, "Global\\LighthouseDatabaseMigration");
+        try
         {
-            MaintenanceHelper.RunMigration(migrationTask, database).Wait();
-        }
+            mutex.WaitOne();
+            stopwatch.Stop();
+            Logger.Success($"Acquiring migration lock took {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
-        stopwatch.Stop();
-        totalStopwatch.Stop();
-        Logger.Success($"Extra migration tasks took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
-        Logger.Success($"Total migration took {totalStopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+            stopwatch.Restart();
+
+            database.Database.MigrateAsync().Wait();
+            stopwatch.Stop();
+            Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+
+            stopwatch.Restart();
+
+            List<CompletedMigration> completedMigrations = database.CompletedMigrations.ToList();
+            List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
+                .Where(migrationTask => !completedMigrations
+                    .Select(m => m.MigrationName)
+                    .Contains(migrationTask.GetType().Name)
+                ).ToList();
+
+            foreach (IMigrationTask migrationTask in migrationsToRun)
+            {
+                MaintenanceHelper.RunMigration(migrationTask, database).Wait();
+            }
+
+            stopwatch.Stop();
+            totalStopwatch.Stop();
+            Logger.Success($"Extra migration tasks took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+            Logger.Success($"Total migration took {totalStopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
     }
 }
