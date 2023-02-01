@@ -162,10 +162,8 @@ public static class StartupTasks
         Stopwatch stopwatch = Stopwatch.StartNew();
         Logger.Info("Migrating database...", LogArea.Database);
         MySqlDistributedLock mutex = new("LighthouseMigration", ServerConfiguration.Instance.DbConnectionString);
-        Logger.Info("Before mutex.AcquireAsync()", LogArea.Database);
         await using (await mutex.AcquireAsync())
         {
-            Logger.Info("After mutex.AcquireAsync()", LogArea.Database);
             stopwatch.Stop();
             Logger.Success($"Acquiring migration lock took {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
