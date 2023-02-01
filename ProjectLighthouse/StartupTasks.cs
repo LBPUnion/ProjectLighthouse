@@ -159,15 +159,17 @@ public static class StartupTasks
         Stopwatch totalStopwatch = Stopwatch.StartNew();
         Stopwatch stopwatch = Stopwatch.StartNew();
         Logger.Info("Migrating database...", LogArea.Database);
-        using Mutex mutex = new(false, "Global\\LighthouseDatabaseMigration");
+        using Mutex mutex = new(false, "Global\\LighthouseDatabaseMigration", out bool createdNew);
+        Logger.Info($"Initialized mutex, createdNew={createdNew}", LogArea.Database);
         try
         {
+            Logger.Info("Before mutex.WaitOne()", LogArea.Database);
             mutex.WaitOne();
+            Logger.Info("After mutex.WaitOne()", LogArea.Database);
             stopwatch.Stop();
             Logger.Success($"Acquiring migration lock took {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
             stopwatch.Restart();
-
             database.Database.MigrateAsync().Wait();
             stopwatch.Stop();
             Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
@@ -193,7 +195,9 @@ public static class StartupTasks
         }
         finally
         {
+            Logger.Info("About to release mutex", LogArea.Database);
             mutex.ReleaseMutex();
+            Logger.Info("Released mutex", LogArea.Database);
         }
     }
 }
