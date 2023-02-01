@@ -159,7 +159,7 @@ public static class StartupTasks
         Stopwatch totalStopwatch = Stopwatch.StartNew();
         Stopwatch stopwatch = Stopwatch.StartNew();
         Logger.Info("Migrating database...", LogArea.Database);
-        using Mutex mutex = new(false, "Global\\LighthouseDatabaseMigration", out bool createdNew);
+        Mutex mutex = new(false, "Global\\LighthouseDatabaseMigration", out bool createdNew);
         Logger.Info($"Initialized mutex, createdNew={createdNew}", LogArea.Database);
         try
         {
@@ -198,6 +198,8 @@ public static class StartupTasks
             Logger.Info("About to release mutex", LogArea.Database);
             mutex.ReleaseMutex();
             Logger.Info("Released mutex", LogArea.Database);
+            mutex.Dispose();
+            Logger.Info("Disposed mutex", LogArea.Database);
         }
     }
 }
