@@ -75,8 +75,9 @@ services:
       MARIADB_DATABASE: lighthouse
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=lighthouse --execute \"SHOW DATABASES;\""
-      timeout: 20s
-      retries: 10
+      timeout: 10s
+      interval: 5s
+      retries: 5
     volumes:
       - "database:/var/lib/mysql"
   redis:
