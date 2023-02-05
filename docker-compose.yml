@@ -23,6 +23,7 @@ services:
         condition: service_started
     volumes:
       - "./data:/lighthouse/data:z"
+      - "./data/.aspnet:/lighthouse/.aspnet:z"
   website:
     image: lighthouse:latest
     container_name: website
@@ -37,13 +38,12 @@ services:
       retries: 5
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       redis:
         condition: service_started
-      gameserver:
-        condition: service_healthy
     volumes:
       - "./data:/lighthouse/data:z"
+      - "./data/.aspnet:/lighthouse/.aspnet:z"
   api:
     image: lighthouse:latest
     container_name: api
@@ -58,13 +58,12 @@ services:
       retries: 5
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       redis:
         condition: service_started
-      gameserver:
-        condition: service_healthy
     volumes:
       - "./data:/lighthouse/data:z"
+      - "./data/.aspnet:/lighthouse/.aspnet:z"
   db:
     image: mariadb
     container_name: db
@@ -76,8 +75,9 @@ services:
       MARIADB_DATABASE: lighthouse
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=lighthouse --execute \"SHOW DATABASES;\""
-      timeout: 20s
-      retries: 10
+      timeout: 10s
+      interval: 5s
+      retries: 5
     volumes:
       - "database:/var/lib/mysql"
   redis:

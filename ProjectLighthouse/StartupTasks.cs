@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
@@ -18,6 +19,7 @@ using LBPUnion.ProjectLighthouse.Maintenance;
 using LBPUnion.ProjectLighthouse.Misc;
 using LBPUnion.ProjectLighthouse.StorableLists;
 using LBPUnion.ProjectLighthouse.Users;
+using Medallion.Threading.MySql;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse;
@@ -62,10 +64,7 @@ public static class StartupTasks
         if (!dbConnected) Environment.Exit(1);
         using Database database = new();
         
-        #if !DEBUG
-        if (serverType == ServerType.GameServer)
-        #endif
-        migrateDatabase(database);
+        migrateDatabase(database).Wait();
 
         if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
         {
@@ -157,36 +156,43 @@ public static class StartupTasks
         return didLoad;
     }
 
-    private static void migrateDatabase(Database database)
+    private static async Task migrateDatabase(Database database)
     {
+        // This mutex is used to synchronize migrations across the GameServer, Website, and Api
+        // Without it, each server would try to simultaneously migrate the database resulting in undefined behavior
+        // It is only used for startup and immediately disposed after migrating
+        Stopwatch totalStopwatch = Stopwatch.StartNew();
+        Stopwatch stopwatch = Stopwatch.StartNew();
         Logger.Info("Migrating database...", LogArea.Database);
-        Stopwatch totalStopwatch = new();
-        Stopwatch stopwatch = new();
-        totalStopwatch.Start();
-        stopwatch.Start();
-
-        database.Database.MigrateAsync().Wait();
-        stopwatch.Stop();
-        Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
-        
-        stopwatch.Reset();
-        stopwatch.Start();
-
-        List<CompletedMigration> completedMigrations = database.CompletedMigrations.ToList();
-        List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
-            .Where(migrationTask => !completedMigrations
-                .Select(m => m.MigrationName)
-                .Contains(migrationTask.GetType().Name)
-            ).ToList();
-        
-        foreach (IMigrationTask migrationTask in migrationsToRun)
+        MySqlDistributedLock mutex = new("LighthouseMigration", ServerConfiguration.Instance.DbConnectionString);
+        await using (await mutex.AcquireAsync())
         {
-            MaintenanceHelper.RunMigration(migrationTask, database).Wait();
-        }
+            stopwatch.Stop();
+            Logger.Success($"Acquiring migration lock took {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
-        stopwatch.Stop();
-        totalStopwatch.Stop();
-        Logger.Success($"Extra migration tasks took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
-        Logger.Success($"Total migration took {totalStopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+            stopwatch.Restart();
+            await database.Database.MigrateAsync();
+            stopwatch.Stop();
+            Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+
+            stopwatch.Restart();
+
+            List<CompletedMigration> completedMigrations = database.CompletedMigrations.ToList();
+            List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
+                .Where(migrationTask => !completedMigrations
+                    .Select(m => m.MigrationName)
+                    .Contains(migrationTask.GetType().Name)
+                ).ToList();
+
+            foreach (IMigrationTask migrationTask in migrationsToRun)
+            {
+                MaintenanceHelper.RunMigration(migrationTask, database).Wait();
+            }
+
+            stopwatch.Stop();
+            totalStopwatch.Stop();
+            Logger.Success($"Extra migration tasks took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+            Logger.Success($"Total migration took {totalStopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+        }
     }
 }
