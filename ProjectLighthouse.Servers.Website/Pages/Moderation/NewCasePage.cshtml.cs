@@ -1,7 +1,7 @@
-using LBPUnion.ProjectLighthouse.Entities.Moderation;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Moderation.Cases;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;

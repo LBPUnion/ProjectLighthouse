@@ -1,12 +1,12 @@
 #nullable enable
 using System;
 using System.Linq;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
-using LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
-namespace LBPUnion.ProjectLighthouse.Users;
+namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 public enum StatusType
 {

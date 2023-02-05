@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Token;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Token;
 
 public class ApiKey
 {

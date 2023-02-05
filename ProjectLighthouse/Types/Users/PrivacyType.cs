@@ -1,4 +1,4 @@
-namespace LBPUnion.ProjectLighthouse.Users;
+namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 /// <summary>
 /// Where user levels/profiles should show.

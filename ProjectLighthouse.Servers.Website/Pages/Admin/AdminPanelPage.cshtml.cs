@@ -1,12 +1,12 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Maintenance;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Servers.Website.Types;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
@@ -30,7 +30,7 @@ public class AdminPanelPage : BaseLayout
         this.Statistics.Add(new AdminPanelStatistic("Users", await StatisticsHelper.UserCount(this.Database), "/admin/users"));
         this.Statistics.Add(new AdminPanelStatistic("Slots", await StatisticsHelper.SlotCount(this.Database)));
         this.Statistics.Add(new AdminPanelStatistic("Photos", await StatisticsHelper.PhotoCount(this.Database)));
-        this.Statistics.Add(new AdminPanelStatistic("API Keys", await StatisticsHelper.APIKeyCount(this.Database), "/admin/keys"));
+        this.Statistics.Add(new AdminPanelStatistic("API Keys", await StatisticsHelper.ApiKeyCount(this.Database), "/admin/keys"));
 
         if (!string.IsNullOrEmpty(command))
         {

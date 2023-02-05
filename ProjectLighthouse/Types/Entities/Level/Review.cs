@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Entities.Interaction;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Level;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
 [XmlRoot("deleted_by")]
 public enum DeletedBy

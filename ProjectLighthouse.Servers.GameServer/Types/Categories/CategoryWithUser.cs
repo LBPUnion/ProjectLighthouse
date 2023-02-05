@@ -1,12 +1,13 @@
 #nullable enable
-using System.Collections.Generic;
 using System.Diagnostics;
-using LBPUnion.ProjectLighthouse.Entities.Level;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
-namespace LBPUnion.ProjectLighthouse.Levels.Categories;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public abstract class CategoryWithUser : Category
 {

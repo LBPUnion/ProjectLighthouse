@@ -2,13 +2,13 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
-using LBPUnion.ProjectLighthouse.Entities.Level;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Misc;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Misc;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;

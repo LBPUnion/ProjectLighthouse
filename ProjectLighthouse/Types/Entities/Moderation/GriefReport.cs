@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Moderation.Reports;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Moderation.Reports;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Moderation;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 
 [XmlRoot("griefReport")]
 public class GriefReport

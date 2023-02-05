@@ -1,8 +1,8 @@
 ﻿using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor;

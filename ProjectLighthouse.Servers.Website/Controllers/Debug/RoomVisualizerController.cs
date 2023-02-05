@@ -1,6 +1,5 @@
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

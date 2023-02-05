@@ -1,12 +1,12 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

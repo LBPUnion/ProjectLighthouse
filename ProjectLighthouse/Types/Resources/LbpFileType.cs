@@ -1,4 +1,4 @@
-﻿namespace LBPUnion.ProjectLighthouse.Resources;
+﻿namespace LBPUnion.ProjectLighthouse.Types.Resources;
 
 public enum LbpFileType
 {

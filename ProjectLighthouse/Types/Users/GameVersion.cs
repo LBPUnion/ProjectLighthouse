@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LBPUnion.ProjectLighthouse.Users;
+namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 public enum GameVersion
 {

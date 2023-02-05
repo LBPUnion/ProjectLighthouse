@@ -1,8 +1,8 @@
 @page "/admin"
 @using LBPUnion.ProjectLighthouse.Administration.Maintenance
 @using LBPUnion.ProjectLighthouse.Extensions
-@using LBPUnion.ProjectLighthouse.Maintenance
 @using LBPUnion.ProjectLighthouse.Servers.Website.Types
+@using LBPUnion.ProjectLighthouse.Types.Maintenance
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminPanelPage
 
 @{
@@ -21,7 +21,7 @@
     </div>
 }
 
-@if (!this.Request.IsMobile())
+@if (!Request.IsMobile())
 {
     <div class="ui grid">
         @foreach (AdminPanelStatistic statistic in Model.Statistics)

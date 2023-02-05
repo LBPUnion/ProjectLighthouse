@@ -3,12 +3,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Tickets;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

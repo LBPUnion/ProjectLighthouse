@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Level;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
 public class Playlist
 {

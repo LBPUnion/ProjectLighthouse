@@ -2,9 +2,9 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Entities.Level;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;

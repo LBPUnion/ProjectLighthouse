@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
-namespace LBPUnion.ProjectLighthouse.Maintenance;
+namespace LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public interface IMigrationTask

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Users;
+namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 /// <summary>
 ///     Response to POST /login

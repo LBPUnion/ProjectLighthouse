@@ -1,7 +1,7 @@
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Misc;
+namespace LBPUnion.ProjectLighthouse.Types.Misc;
 
 /// <summary>
 ///     The location of a slot on a planet.

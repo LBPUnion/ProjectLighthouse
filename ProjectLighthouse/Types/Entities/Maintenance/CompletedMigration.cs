@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using LBPUnion.ProjectLighthouse.Maintenance;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Maintenance;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 
 /// <summary>
 /// A record of the completion of a <see cref="IMigrationTask"/>.

@@ -5,11 +5,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
-using LBPUnion.ProjectLighthouse.Maintenance;
+using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
+using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance;
 

@@ -1,4 +1,4 @@
-namespace LBPUnion.ProjectLighthouse.Users;
+namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 public enum Platform
 {

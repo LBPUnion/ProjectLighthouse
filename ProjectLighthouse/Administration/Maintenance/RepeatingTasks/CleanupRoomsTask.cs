@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Maintenance;
-using LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.RepeatingTasks;
 

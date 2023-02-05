@@ -7,16 +7,16 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Entities.Interaction;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Files;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
-using LBPUnion.ProjectLighthouse.Misc;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Misc;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Level;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
 /// <summary>
 ///     A LittleBigPlanet level.

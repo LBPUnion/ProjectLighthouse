@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace LBPUnion.ProjectLighthouse.Logging;
+namespace LBPUnion.ProjectLighthouse.Types.Logging;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum LogArea

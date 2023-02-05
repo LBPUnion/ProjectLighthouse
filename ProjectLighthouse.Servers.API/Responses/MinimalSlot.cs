@@ -1,5 +1,5 @@
-using LBPUnion.ProjectLighthouse.Entities.Level;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 

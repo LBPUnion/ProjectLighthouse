@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Logging;
 
-namespace LBPUnion.ProjectLighthouse.Maintenance;
+namespace LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public interface ICommand

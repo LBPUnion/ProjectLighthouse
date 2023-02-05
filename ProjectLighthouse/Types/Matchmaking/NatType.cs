@@ -1,4 +1,4 @@
-namespace LBPUnion.ProjectLighthouse.Matchmaking;
+namespace LBPUnion.ProjectLighthouse.Types.Matchmaking;
 
 public enum NatType
 {

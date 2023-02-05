@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace LBPUnion.ProjectLighthouse.Maintenance;
+namespace LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 public interface IRepeatingTask
 {

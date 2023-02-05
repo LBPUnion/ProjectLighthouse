@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Levels;
+namespace LBPUnion.ProjectLighthouse.Types.Levels;
 
 public enum SlotType
 {

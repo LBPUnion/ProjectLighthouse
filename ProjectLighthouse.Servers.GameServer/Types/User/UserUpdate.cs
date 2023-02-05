@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.Misc;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 /// <summary>

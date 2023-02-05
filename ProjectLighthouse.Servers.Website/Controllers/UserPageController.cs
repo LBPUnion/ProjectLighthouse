@@ -1,8 +1,9 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

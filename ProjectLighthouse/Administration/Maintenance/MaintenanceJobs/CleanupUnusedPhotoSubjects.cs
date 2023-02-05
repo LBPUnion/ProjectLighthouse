@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Maintenance;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 

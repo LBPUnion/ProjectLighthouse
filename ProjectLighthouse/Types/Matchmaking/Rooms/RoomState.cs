@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+namespace LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum RoomState

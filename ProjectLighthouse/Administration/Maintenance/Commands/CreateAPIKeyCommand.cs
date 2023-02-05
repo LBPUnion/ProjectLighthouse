@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Maintenance;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands
 {

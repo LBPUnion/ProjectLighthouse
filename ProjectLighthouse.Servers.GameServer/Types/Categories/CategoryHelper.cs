@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using LBPUnion.ProjectLighthouse.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 
-namespace LBPUnion.ProjectLighthouse.Levels.Categories;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public static class CategoryHelper
 {

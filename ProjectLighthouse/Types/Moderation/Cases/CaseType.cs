@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Extensions;
 
-namespace LBPUnion.ProjectLighthouse.Moderation.Cases;
+namespace LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 
 // Next available ID for use: 6
 // PLEASE UPDATE THIS WHEN YOU ADD SOMETHING HERE!

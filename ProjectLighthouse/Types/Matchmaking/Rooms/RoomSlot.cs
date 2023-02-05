@@ -1,6 +1,6 @@
-using LBPUnion.ProjectLighthouse.Levels;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 
-namespace LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+namespace LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
 public class RoomSlot
 {

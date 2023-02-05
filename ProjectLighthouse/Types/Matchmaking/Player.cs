@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
-namespace LBPUnion.ProjectLighthouse.Matchmaking;
+namespace LBPUnion.ProjectLighthouse.Types.Matchmaking;
 
 [Serializable]
 public class Player

@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Entities.Level;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Moderation.Cases;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Moderation;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 #nullable enable
 
 public class ModerationCase

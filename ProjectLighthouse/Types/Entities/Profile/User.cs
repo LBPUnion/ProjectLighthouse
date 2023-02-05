@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Misc;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Misc;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Profile;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 public class User
 {

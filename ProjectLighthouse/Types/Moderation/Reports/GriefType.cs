@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Moderation.Reports;
+namespace LBPUnion.ProjectLighthouse.Types.Moderation.Reports;
 
 public enum GriefType
 {

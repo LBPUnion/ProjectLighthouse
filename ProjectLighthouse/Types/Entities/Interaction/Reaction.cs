@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Interaction;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 
 public class Reaction
 {

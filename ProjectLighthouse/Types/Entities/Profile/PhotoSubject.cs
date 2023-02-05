@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Profile;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 //    [XmlRoot("subject")]
 [XmlType("subject")]

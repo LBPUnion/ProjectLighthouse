@@ -1,10 +1,10 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Entities.Level;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
-namespace LBPUnion.ProjectLighthouse.Levels;
+namespace LBPUnion.ProjectLighthouse.Types.Levels;
 
 [XmlType("category")]
 [XmlRoot("category")]

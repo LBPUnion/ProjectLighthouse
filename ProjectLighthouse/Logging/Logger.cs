@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Logging;
 

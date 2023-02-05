@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Moderation.Reports;
+namespace LBPUnion.ProjectLighthouse.Types.Moderation.Reports;
 
 [XmlRoot("visibleBadge")]
 [Serializable]

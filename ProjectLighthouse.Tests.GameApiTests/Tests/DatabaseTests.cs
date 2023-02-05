@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;

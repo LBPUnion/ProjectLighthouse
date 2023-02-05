@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace LBPUnion.ProjectLighthouse.Levels;
+namespace LBPUnion.ProjectLighthouse.Types.Levels;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]

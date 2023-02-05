@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Token;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Token;
 
 public class EmailSetToken
 {

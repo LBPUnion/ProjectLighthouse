@@ -1,11 +1,11 @@
-namespace LBPUnion.ProjectLighthouse.Misc;
+namespace LBPUnion.ProjectLighthouse.Tickets;
 
-public struct Version
+public struct TicketVersion
 {
     public byte Major { get; set; }
     public byte Minor { get; set; }
 
-    public Version(byte major, byte minor)
+    public TicketVersion(byte major, byte minor)
     {
         this.Major = major;
         this.Minor = minor;
@@ -13,5 +13,5 @@ public struct Version
 
     public override string ToString() => $"{this.Major}.{this.Minor}";
 
-    public static implicit operator string(Version v) => v.ToString();
+    public static implicit operator string(TicketVersion v) => v.ToString();
 }

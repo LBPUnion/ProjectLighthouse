@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Entities.Token;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Tests;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using OpenQA.Selenium;
 using Xunit;
 

@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Misc;
+using LBPUnion.ProjectLighthouse.Types.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Tickets;
 
@@ -40,7 +40,7 @@ public class TicketReader : BinaryReader
     public TicketReader([NotNull] Stream input) : base(input)
     {}
 
-    public Version ReadTicketVersion() => new((byte)(this.ReadByte() >> 4), this.ReadByte());
+    public TicketVersion ReadTicketVersion() => new((byte)(this.ReadByte() >> 4), this.ReadByte());
 
     public SectionHeader ReadSectionHeader()
     {

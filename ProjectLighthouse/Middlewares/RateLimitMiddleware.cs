@@ -10,6 +10,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Http;
 
 namespace LBPUnion.ProjectLighthouse.Middlewares;

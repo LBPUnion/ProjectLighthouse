@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Redis.OM.Modeling;
 
-namespace LBPUnion.ProjectLighthouse.Users;
+namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 [Document(StorageType = StorageType.Json, Prefixes = new[] {"UserFriendData",})]
 public class UserFriendData

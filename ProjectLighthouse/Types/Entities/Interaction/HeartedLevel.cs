@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using LBPUnion.ProjectLighthouse.Entities.Level;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Interaction;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 
 public class HeartedLevel
 {

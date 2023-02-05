@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using AspLogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;

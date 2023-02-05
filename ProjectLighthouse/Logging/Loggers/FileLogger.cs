@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Files;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers;
 

@@ -1,7 +1,7 @@
 ﻿#nullable enable
-using LBPUnion.ProjectLighthouse.Entities.Moderation;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Files;
+using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

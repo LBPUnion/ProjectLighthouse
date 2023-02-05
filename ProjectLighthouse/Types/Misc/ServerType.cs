@@ -1,4 +1,4 @@
-namespace LBPUnion.ProjectLighthouse.Misc;
+namespace LBPUnion.ProjectLighthouse.Types.Misc;
 
 public enum ServerType
 {

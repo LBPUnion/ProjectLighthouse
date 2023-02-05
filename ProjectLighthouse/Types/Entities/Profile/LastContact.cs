@@ -1,9 +1,9 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Profile;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 public class LastContact
 {

@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
+/// <summary>
+/// Used to differentiate between LBP Vita and 3 specific labels
+/// Also translates labels that have different display names in-game
+/// </summary>
 public static class LabelHelper
 {
 

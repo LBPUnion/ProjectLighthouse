@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text.Encodings.Web;
-using LBPUnion.ProjectLighthouse.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;

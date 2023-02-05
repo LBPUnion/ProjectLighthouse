@@ -1,4 +1,4 @@
-namespace LBPUnion.ProjectLighthouse.Logging;
+namespace LBPUnion.ProjectLighthouse.Types.Logging;
 
 public enum LogLevel
 {

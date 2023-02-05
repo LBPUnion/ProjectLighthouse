@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Http;
 
 namespace LBPUnion.ProjectLighthouse.Middlewares;

@@ -1,7 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.StorableLists.Stores;
 

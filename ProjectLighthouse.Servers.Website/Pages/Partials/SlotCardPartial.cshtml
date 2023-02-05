@@ -1,12 +1,12 @@
 @using System.Web
 @using LBPUnion.ProjectLighthouse
 @using LBPUnion.ProjectLighthouse.Configuration
-@using LBPUnion.ProjectLighthouse.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
-@using LBPUnion.ProjectLighthouse.Users
+@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
+@using LBPUnion.ProjectLighthouse.Types.Users
 @using Microsoft.EntityFrameworkCore
-@model LBPUnion.ProjectLighthouse.Entities.Level.Slot
+@model LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot
 
 @{
     User? user = (User?)ViewData["User"];

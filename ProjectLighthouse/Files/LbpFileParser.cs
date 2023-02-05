@@ -4,8 +4,8 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using LBPUnion.ProjectLighthouse.Resources;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Resources;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Files;
 
@@ -50,11 +50,11 @@ public partial class FileHelper
             "ADSb" => LbpFileType.Adventure,
             "PLNb" => LbpFileType.Plan,
             "QSTb" => LbpFileType.Quest,
-            _ => readAlternateHeader(data, reader),
+            _ => readAlternateHeader(reader),
         };
     }
 
-    private static LbpFileType readAlternateHeader(byte[] data, BinaryReader reader)
+    private static LbpFileType readAlternateHeader(BinaryReader reader)
     {
         reader.BaseStream.Position = 0;
 
@@ -62,11 +62,7 @@ public partial class FileHelper
         byte[] header = reader.ReadBytes(9);
 
         if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF && header[3] == 0xE0) return LbpFileType.Jpeg;
-        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
-        {
-            // only animated PNG files have acTL headers
-            return data.AsSpan().IndexOf("acTL"u8) == -1 ? LbpFileType.Png : LbpFileType.Unknown;
-        }
+        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47) return LbpFileType.Png;
 
         return LbpFileType.Unknown; // Still unknown.
     }

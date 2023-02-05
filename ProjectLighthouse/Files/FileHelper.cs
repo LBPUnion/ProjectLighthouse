@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Resources;
+using LBPUnion.ProjectLighthouse.Types.Resources;
 
 namespace LBPUnion.ProjectLighthouse.Files;
 

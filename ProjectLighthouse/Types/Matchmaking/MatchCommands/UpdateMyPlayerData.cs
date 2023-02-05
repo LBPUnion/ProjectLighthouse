@@ -1,7 +1,7 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
-namespace LBPUnion.ProjectLighthouse.Matchmaking.MatchCommands;
+namespace LBPUnion.ProjectLighthouse.Types.Matchmaking.MatchCommands;
 
 public class UpdateMyPlayerData : IMatchCommand
 {

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Redis.OM.Modeling;
 
-namespace LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+namespace LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
 [Document(StorageType = StorageType.Json, Prefixes = new[]{"Room",})]
 public class Room

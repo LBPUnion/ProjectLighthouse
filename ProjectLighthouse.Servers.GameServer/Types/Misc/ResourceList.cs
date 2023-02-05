@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Misc;
 
 /// <summary>
 /// Used by the game to send a list of hashed resources

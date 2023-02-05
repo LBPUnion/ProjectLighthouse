@@ -5,16 +5,18 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.StorableLists;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Matchmaking;
+using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
-namespace LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public class RoomHelper
 {

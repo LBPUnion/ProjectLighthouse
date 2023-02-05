@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Resources;
+using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Resources;
 using Pfim;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -171,7 +172,7 @@ public partial class FileHelper
         Image image = ddsImage.Format switch
         {
             ImageFormat.Rgba32 => Image.LoadPixelData<Bgra32>(ddsImage.Data, ddsImage.Width, ddsImage.Height),
-            _ => throw new ArgumentOutOfRangeException($"ddsImage.Format is not supported: {ddsImage.Format}")
+            _ => throw new ArgumentOutOfRangeException($"ddsImage.Format is not supported: {ddsImage.Format}"),
         };
 
         Directory.CreateDirectory("png");

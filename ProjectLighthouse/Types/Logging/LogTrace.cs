@@ -1,5 +1,5 @@
 #nullable enable
-namespace LBPUnion.ProjectLighthouse.Logging;
+namespace LBPUnion.ProjectLighthouse.Types.Logging;
 
 public struct LogTrace
 {

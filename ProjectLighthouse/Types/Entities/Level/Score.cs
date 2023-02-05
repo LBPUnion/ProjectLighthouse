@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Entities.Level;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
 [XmlRoot("playRecord")]
 [XmlType("playRecord")]

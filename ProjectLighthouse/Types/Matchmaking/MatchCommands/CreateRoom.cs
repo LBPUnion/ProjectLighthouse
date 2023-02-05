@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.Matchmaking.Rooms;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
-namespace LBPUnion.ProjectLighthouse.Matchmaking.MatchCommands;
+namespace LBPUnion.ProjectLighthouse.Types.Matchmaking.MatchCommands;
 
 [SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
 public class CreateRoom : IMatchCommand

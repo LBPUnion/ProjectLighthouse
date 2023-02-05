@@ -1,8 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.Users;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
@@ -31,5 +31,5 @@ public static class StatisticsHelper
     public static async Task<int> DismissedCaseCount(Database database) => await database.Cases.CountAsync(c => c.DismissedAt != null);
     #endregion
 
-    public static async Task<int> APIKeyCount(Database database) => await database.APIKeys.CountAsync();
+    public static async Task<int> ApiKeyCount(Database database) => await database.APIKeys.CountAsync();
 }
