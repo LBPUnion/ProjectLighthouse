@@ -13,10 +13,6 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class CryptoHelper
 {
-    /// <summary>
-    /// An instance of Random. Must be locked when in use.
-    /// </summary>
-    public static readonly Random Random = new();
 
     // private static readonly SHA1 sha1 = SHA1.Create();
     private static readonly SHA256 sha256 = SHA256.Create();
@@ -64,17 +60,15 @@ public static class CryptoHelper
     /// </summary>
     /// <param name="count">The amount of bytes to generate.</param>
     /// <returns>The bytes generated</returns>
-    public static IEnumerable<byte> GenerateRandomBytes(int count)
-    {
-        byte[] b = new byte[count];
+    public static IEnumerable<byte> GenerateRandomBytes(int count) => RandomNumberGenerator.GetBytes(count);
 
-        lock(Random)
-        {
-            Random.NextBytes(b);
-        }
-
-        return b;
-    }
+    /// <summary>
+    ///     Generates a random bounded 32 bit integer
+    /// </summary>
+    /// <param name="fromInclusive">The lowest possible integer than can be generated, inclusive</param>
+    /// <param name="toExclusive">The highest possible integer than can be generated, exclusive</param>
+    /// <returns>The randomly generated integer</returns>
+    public static int GenerateRandomInt32(int fromInclusive, int toExclusive) => RandomNumberGenerator.GetInt32(fromInclusive, toExclusive);
 
     public static string ToBase64(string str)
     {

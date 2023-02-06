@@ -39,30 +39,27 @@ public static class CensorHelper
     {
         StringBuilder sb = new();
 
-        char prevRandomChar = '\0';
-
         sb.Append(message.AsSpan(0, profanityIndex));
 
         switch (CensorConfiguration.Instance.UserInputFilterMode)
         {
             case FilterMode.Random:
-                for(int i = 0; i < profanityLength; i++)
-                    lock(CryptoHelper.Random)
+                char prevRandomChar = '\0';
+                for (int i = 0; i < profanityLength; i++)
+                {
+                    if (message[i] == ' ')
                     {
-                        if (message[i] == ' ')
-                        {
-                            sb.Append(' ');
-                        }
-                        else
-                        {
-                            char randomChar = randomCharacters[CryptoHelper.Random.Next(0, randomCharacters.Length - 1)];
-                            if (randomChar == prevRandomChar) randomChar = randomCharacters[CryptoHelper.Random.Next(0, randomCharacters.Length - 1)];
-
-                            prevRandomChar = randomChar;
-
-                            sb.Append(randomChar);
-                        }
+                        sb.Append(' ');
                     }
+                    else
+                    {
+                        char randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
+                        if (randomChar == prevRandomChar) randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
+
+                        prevRandomChar = randomChar;
+                        sb.Append(randomChar);
+                    }
+                }
 
                 break;
             case FilterMode.Asterisks:
@@ -73,12 +70,8 @@ public static class CensorHelper
 
                 break;
             case FilterMode.Furry:
-                lock(CryptoHelper.Random)
-                {
-                    string randomWord = randomFurry[CryptoHelper.Random.Next(0, randomFurry.Length - 1)];
-                    sb.Append(randomWord);
-                }
-
+                string randomWord = randomFurry[CryptoHelper.GenerateRandomInt32(0, randomFurry.Length)];
+                sb.Append(randomWord);
                 break;
             case FilterMode.None: break;
             default: throw new ArgumentOutOfRangeException(nameof(message));
