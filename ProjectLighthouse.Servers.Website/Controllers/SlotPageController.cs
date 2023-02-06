@@ -65,7 +65,7 @@ public class SlotPageController : ControllerBase
 
         if (msg == null)
         {
-            Logger.Error($"Refusing to post comment from {token.UserId} on user {id}, {nameof(msg)} is null", LogArea.Comments);
+            Logger.Error($"Refusing to post comment from {token.UserId} on level {id}, {nameof(msg)} is null", LogArea.Comments);
             return this.Redirect("~/slot/" + id);
         }
 
@@ -73,8 +73,15 @@ public class SlotPageController : ControllerBase
         msg = SanitizationHelper.SanitizeString(msg);
         msg = CensorHelper.FilterMessage(msg);
 
-        await this.database.PostComment(token.UserId, id, CommentType.Level, msg);
-        Logger.Success($"Posted comment from {token.UserId}: \"{msg}\" on user {id}", LogArea.Comments);
+        bool success = await this.database.PostComment(token.UserId, id, CommentType.Level, msg);
+        if (success)
+        {
+            Logger.Success($"Posted comment from {token.UserId}: \"{msg}\" on level {id}", LogArea.Comments);
+        }
+        else
+        {
+            Logger.Error($"Failed to post comment from {token.UserId}: \"{msg}\" on level {id}", LogArea.Comments);
+        }
 
         return this.Redirect("~/slot/" + id);
     }

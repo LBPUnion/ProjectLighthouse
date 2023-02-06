@@ -47,8 +47,15 @@ public class UserPageController : ControllerBase
         msg = SanitizationHelper.SanitizeString(msg);
         msg = CensorHelper.FilterMessage(msg);
 
-        await this.database.PostComment(token.UserId, id, CommentType.Profile, msg);
-        Logger.Success($"Posted comment from {token.UserId}: \"{msg}\" on user {id}", LogArea.Comments);
+        bool success = await this.database.PostComment(token.UserId, id, CommentType.Profile, msg);
+        if (success)
+        {
+            Logger.Success($"Posted comment from {token.UserId}: \"{msg}\" on user {id}", LogArea.Comments);
+        }
+        else
+        {
+            Logger.Error($"Failed to post comment from {token.UserId}: \"{msg}\" on user {id}", LogArea.Comments);
+        }
 
         return this.Redirect("~/user/" + id);
     }
