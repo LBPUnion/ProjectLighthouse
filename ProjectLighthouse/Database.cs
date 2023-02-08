@@ -53,7 +53,7 @@ public class Database : DbContext
     public DbSet<APIKey> APIKeys { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
-
+    public DbSet<BlockedProfile> BlockedProfiles { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
