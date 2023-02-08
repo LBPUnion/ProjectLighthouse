@@ -54,6 +54,7 @@ public class Database : DbContext
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
     public DbSet<BlockedProfile> BlockedProfiles { get; set; }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
@@ -131,7 +132,6 @@ public class Database : DbContext
         Comment? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
 
         if (comment == null) return false;
-        
         if (comment.PosterUserId == userId) return false;
 
         if (await this.IsUserBlockedBy(userId, comment.PosterUserId)) return false;
