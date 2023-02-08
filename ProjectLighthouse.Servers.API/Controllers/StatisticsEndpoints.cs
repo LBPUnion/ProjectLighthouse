@@ -1,6 +1,6 @@
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
-using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
@@ -36,4 +36,38 @@ public class StatisticsEndpoints : ApiEndpointController
                 TeamPicks = await StatisticsHelper.TeamPickCount(this.database),
             }
         );
+
+    /// <summary>
+    /// Get player counts for each individual title
+    /// </summary>
+    /// <returns>An instance of PlayerCountResponse</returns>
+    [HttpGet("playerCount")]
+    [ProducesResponseType(typeof(PlayerCountResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPlayerCounts() =>
+        this.Ok(new PlayerCountResponse
+        {
+            PlayerCounts = 
+            {
+                { 
+                    GameVersion.LittleBigPlanet1,
+                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanet1)
+                },
+                {
+                    GameVersion.LittleBigPlanet2,
+                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanet2)
+                },
+                {
+                    GameVersion.LittleBigPlanet3,
+                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanet3)
+                },
+                {
+                    GameVersion.LittleBigPlanetVita,
+                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanetVita)
+                },
+                {
+                    GameVersion.LittleBigPlanetPSP,
+                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanetPSP)
+                },
+            },
+        });
 }
