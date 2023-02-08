@@ -195,12 +195,13 @@ public class Database : DbContext
         }
         else
         {
-            Slot? targetSlot = await this.Slots.Where(s => s.SlotId == targetId)
+            int creatorId = await this.Slots.Where(s => s.SlotId == targetId)
                 .Where(s => s.CommentsEnabled && !s.Hidden)
+                .Select(s => s.CreatorId)
                 .FirstOrDefaultAsync();
-            if (targetSlot == null) return false;
+            if (creatorId == 0) return false;
             
-            if (await this.IsUserBlockedBy(userId, targetSlot.CreatorId)) return false;
+            if (await this.IsUserBlockedBy(userId, creatorId)) return false;
         }
 
         this.Comments.Add
