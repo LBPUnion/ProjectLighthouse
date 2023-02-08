@@ -60,7 +60,9 @@
                         <img class="cardIcon slotCardIcon" src="@ServerConfiguration.Instance.ExternalUrl/gameAssets/@faceHash" alt="@faceAlt" title="@faceAlt" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
                     </div>
                     <div class="cardStats">
-                        <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                        <a href="/user/@review.Reviewer?.UserId">
+                            <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                        </a>
                         @if (review.Deleted)
                         {
                             if (review.DeletedBy == DeletedBy.LevelAuthor)
@@ -80,10 +82,12 @@
                         {
                             @if (review.Labels.Length > 1)
                             {
-                                @foreach (string reviewLabel in review.Labels)
-                                {
-                                    <div class="ui blue label">@LabelHelper.TranslateTag(reviewLabel)</div>
-                                }
+                                <div style="padding-bottom: 5px;">
+                                    @foreach (string reviewLabel in review.Labels)
+                                    {
+                                        <div class="ui blue label">@LabelHelper.TranslateTag(reviewLabel)</div>
+                                    }
+                                </div>
                             }
                             @if (string.IsNullOrWhiteSpace(review.Text))
                             {
