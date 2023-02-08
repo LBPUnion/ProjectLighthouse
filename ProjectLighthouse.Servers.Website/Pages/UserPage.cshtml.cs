@@ -93,7 +93,7 @@ public class UserPage : BaseLayout
                 (from comment in this.Database.Comments
                 where !(
                     from blockedProfile in this.Database.BlockedProfiles 
-                    where blockedProfile.UserId == this.User.UserId 
+                    where blockedProfile.UserId == this.User?.UserId 
                     select blockedProfile.BlockedUserId
                     ).Contains(comment.PosterUserId)
                 where comment.TargetId == this.ProfileUser.UserId
