@@ -13,7 +13,6 @@ public enum LogArea
     Database,
     Filter,
     HTTP,
-    InfluxDB,
     Match,
     Photos,
     Resources,
