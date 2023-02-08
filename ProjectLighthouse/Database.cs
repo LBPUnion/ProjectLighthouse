@@ -312,6 +312,35 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
+    public async Task BlockUser(int blockedUserId, int userId)
+    {
+        if (userId == blockedUserId) return;
+        
+        User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+        
+        User? blockedUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == blockedUserId);
+
+        BlockedProfile blockedProfile = new BlockedProfile();
+        blockedProfile.User = user;
+        blockedProfile.BlockedUser = blockedUser;
+
+        await this.BlockedProfiles.AddAsync(blockedProfile);
+    }
+
+    public void UnBlockUser(int blockedUserId, int userId)
+    {
+        if (userId == blockedUserId) return;
+
+        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUserId && bp.UserId == userId);
+    }
+
+    public async Task<bool> IsBlocked(int blockedUserId, int userId)
+    {
+        if (userId == blockedUserId) return false;
+
+        return await this.BlockedProfiles.Has(bp => bp.BlockedUserId == blockedUserId && bp.UserId == userId);
+    }
+    
     #endregion
 
     #region User Helper Methods
