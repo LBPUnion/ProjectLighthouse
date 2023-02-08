@@ -131,9 +131,11 @@ public class Database : DbContext
         Comment? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
 
         if (comment == null) return false;
-
+        
         if (comment.PosterUserId == userId) return false;
 
+        if (await this.IsBlocked(userId, comment.PosterUserId)) return false;
+        
         Reaction? reaction = await this.Reactions.FirstOrDefaultAsync(r => r.UserId == userId && r.TargetId == commentId);
         if (reaction == null)
         {
@@ -189,14 +191,16 @@ public class Database : DbContext
                 .Select(u => u.UserId)
                 .FirstOrDefaultAsync();
             if (targetUserId == 0) return false;
+            if (await this.IsBlocked(userId, targetUserId)) return false;
         }
         else
         {
-            int targetSlotId = await this.Slots.Where(s => s.SlotId == targetId)
+            Slot? targetSlot = await this.Slots.Where(s => s.SlotId == targetId)
                 .Where(s => s.CommentsEnabled && !s.Hidden)
-                .Select(s => s.SlotId)
                 .FirstOrDefaultAsync();
-            if (targetSlotId == 0) return false;
+            if (targetSlot == null) return false;
+            
+            if (await this.IsBlocked(userId, targetSlot.CreatorId)) return false;
         }
 
         this.Comments.Add
@@ -312,26 +316,26 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
-    public async Task BlockUser(int blockedUserId, int userId)
+    public async Task BlockUser(int userId, User blockedUser)
     {
-        if (userId == blockedUserId) return;
+        if (userId == blockedUser.UserId) return;
         
         User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         
-        User? blockedUser = await this.Users.FirstOrDefaultAsync(u => u.UserId == blockedUserId);
-
-        BlockedProfile blockedProfile = new BlockedProfile();
-        blockedProfile.User = user;
-        blockedProfile.BlockedUser = blockedUser;
+        BlockedProfile blockedProfile = new()
+        {
+            User = user,
+            BlockedUser = blockedUser,
+        };
 
         await this.BlockedProfiles.AddAsync(blockedProfile);
     }
 
-    public void UnBlockUser(int blockedUserId, int userId)
+    public void UnblockUser(int userId, User blockedUser)
     {
-        if (userId == blockedUserId) return;
+        if (userId == blockedUser.UserId) return;
 
-        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUserId && bp.UserId == userId);
+        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUser == blockedUser && bp.UserId == userId);
     }
 
     public async Task<bool> IsBlocked(int blockedUserId, int userId)
