@@ -1,14 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using LBPUnion.ProjectLighthouse;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ProjectLighthouse.Migrations
 {
-    /// <inheritdoc />
+
+    [DbContext(typeof(Database))]
+    [Migration("20230208165011_AddedUserBlocking")]
     public partial class AddedUserBlocking : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -48,8 +52,7 @@ namespace ProjectLighthouse.Migrations
                 table: "BlockedProfiles",
                 column: "UserId");
         }
-
-        /// <inheritdoc />
+        
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
