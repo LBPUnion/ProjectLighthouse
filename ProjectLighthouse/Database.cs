@@ -134,7 +134,7 @@ public class Database : DbContext
         
         if (comment.PosterUserId == userId) return false;
 
-        if (await this.IsBlocked(userId, comment.PosterUserId)) return false;
+        if (await this.IsUserBlockedBy(userId, comment.PosterUserId)) return false;
         
         Reaction? reaction = await this.Reactions.FirstOrDefaultAsync(r => r.UserId == userId && r.TargetId == commentId);
         if (reaction == null)
@@ -191,7 +191,7 @@ public class Database : DbContext
                 .Select(u => u.UserId)
                 .FirstOrDefaultAsync();
             if (targetUserId == 0) return false;
-            if (await this.IsBlocked(userId, targetUserId)) return false;
+            if (await this.IsUserBlockedBy(userId, targetUserId)) return false;
         }
         else
         {
@@ -200,7 +200,7 @@ public class Database : DbContext
                 .FirstOrDefaultAsync();
             if (targetSlot == null) return false;
             
-            if (await this.IsBlocked(userId, targetSlot.CreatorId)) return false;
+            if (await this.IsUserBlockedBy(userId, targetSlot.CreatorId)) return false;
         }
 
         this.Comments.Add
@@ -343,11 +343,11 @@ public class Database : DbContext
         this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUser == blockedUser && bp.UserId == userId);
     }
 
-    public async Task<bool> IsBlocked(int blockedUserId, int userId)
+    public async Task<bool> IsUserBlockedBy(int userId, int targetId)
     {
-        if (userId == blockedUserId) return false;
+        if (targetId == userId) return false;
 
-        return await this.BlockedProfiles.Has(bp => bp.BlockedUserId == blockedUserId && bp.UserId == userId);
+        return await this.BlockedProfiles.Has(bp => bp.BlockedUserId == userId && bp.UserId == targetId);
     }
     
     #endregion
