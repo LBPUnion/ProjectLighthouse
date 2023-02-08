@@ -118,11 +118,8 @@ public class UserPage : BaseLayout
             .Where(h => h.HeartedUserId == this.ProfileUser.UserId)
             .Where(h => h.UserId == this.User.UserId)
             .AnyAsync();
-        
-        this.IsProfileUserBlocked = await this.Database.BlockedProfiles
-            .Where(b => b.BlockedUserId == this.ProfileUser.UserId)
-            .Where(b => b.UserId == this.User.UserId)
-            .AnyAsync();
+
+        this.IsProfileUserBlocked = await this.Database.IsUserBlockedBy(this.ProfileUser.UserId, this.User.UserId);
         
         return this.Page();
     }
