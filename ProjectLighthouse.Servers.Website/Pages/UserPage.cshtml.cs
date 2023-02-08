@@ -4,6 +4,7 @@ using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -89,15 +90,11 @@ public class UserPage : BaseLayout
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.ProfileUser.CommentsEnabled;
         if (this.CommentsEnabled)
         {
-            this.Comments = await
-                (from comment in this.Database.Comments
-                where !(
-                    from blockedProfile in this.Database.BlockedProfiles 
-                    where blockedProfile.UserId == this.User.UserId 
-                    select blockedProfile.BlockedUserId
-                    ).Contains(comment.PosterUserId)
-                where comment.TargetId == this.ProfileUser.UserId
-                select comment).ToListAsync();
+            this.Comments = await this.Database.Comments.Include(p => p.Poster)
+                .OrderByDescending(p => p.Timestamp)
+                .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
+                .Take(50)
+                .ToListAsync();
         }
         else
         {
@@ -106,8 +103,16 @@ public class UserPage : BaseLayout
 
         if (this.User == null) return this.Page();
 
+        var blockedUsers = await (
+            from blockedProfile in this.Database.BlockedProfiles
+            where blockedProfile.UserId == this.User.UserId
+            select blockedProfile.BlockedUserId).ToListAsync();
+
+        
         foreach (Comment c in this.Comments)
         {
+            if (blockedUsers.Contains(c.PosterUserId)) this.Comments.Remove(c);
+            
             Reaction? reaction = await this.Database.Reactions.Where(r => r.TargetId == c.TargetId)
                 .Where(r => r.UserId == this.User.UserId)
                 .FirstOrDefaultAsync();
