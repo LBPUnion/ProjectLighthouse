@@ -10,6 +10,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Levels;
 using LBPUnion.ProjectLighthouse.Levels.Categories;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.PlayerData.Profiles.Email;
@@ -318,7 +319,10 @@ public class Database : DbContext
 
     public async Task BlockUser(int userId, User blockedUser)
     {
-        if (userId == blockedUser.UserId) return;
+        if (userId == blockedUser.UserId)
+        {
+            return;
+        }
         
         User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         
@@ -329,6 +333,8 @@ public class Database : DbContext
         };
 
         await this.BlockedProfiles.AddAsync(blockedProfile);
+
+        await this.SaveChangesAsync();
     }
 
     public void UnblockUser(int userId, User blockedUser)
