@@ -61,6 +61,20 @@
         <br>
         @if (Model.ProfileUser != Model.User && Model.User != null)
         {
+            if (!Model.IsProfileUserBlocked)
+            {
+                <a class="ui red button" href="/user/@Model.ProfileUser.UserId/block">
+                    <i class="ban icon"></i>
+                    <span>Block</span>
+                </a>
+            }
+            else
+            {
+                <a class="ui black button" href="/user/@Model.ProfileUser.UserId/unblock">
+                    <i class="ban icon"></i>
+                    <span>Block</span>
+                </a>
+            }
             if (!Model.IsProfileUserHearted)
             {
                 <a class="ui pink button" href="/user/@Model.ProfileUser.UserId/heart">
