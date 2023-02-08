@@ -132,7 +132,6 @@ public class Database : DbContext
         Comment? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
 
         if (comment == null) return false;
-        
         if (comment.PosterUserId == userId) return false;
 
         if (await this.IsBlocked(userId, comment.PosterUserId)) return false;
