@@ -1,8 +1,13 @@
-﻿using LBPUnion.ProjectLighthouse.PlayerData;
+﻿namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 
-namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
+public class PlayerCountObject
+{
+    public string Game { get; set; } = "";
+    public int PlayerCount { get; set; }
+}
 
 public class PlayerCountResponse
 {
-    public Dictionary<GameVersion, int> PlayerCounts { get; set; } = new();
+    public int TotalPlayerCount { get; set; }
+    public List<PlayerCountObject> Games { get; set; } = new();
 }

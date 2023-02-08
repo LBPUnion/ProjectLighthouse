@@ -37,37 +37,38 @@ public class StatisticsEndpoints : ApiEndpointController
             }
         );
 
+    private static readonly List<GameVersion> gameVersions = new()
+    {
+        GameVersion.LittleBigPlanet1,
+        GameVersion.LittleBigPlanet2,
+        GameVersion.LittleBigPlanet3,
+        GameVersion.LittleBigPlanetVita,
+        GameVersion.LittleBigPlanetPSP,
+    };
+
     /// <summary>
     /// Get player counts for each individual title
     /// </summary>
     /// <returns>An instance of PlayerCountResponse</returns>
     [HttpGet("playerCount")]
     [ProducesResponseType(typeof(PlayerCountResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPlayerCounts() =>
-        this.Ok(new PlayerCountResponse
+    public async Task<IActionResult> GetPlayerCounts()
+    {
+        List<PlayerCountObject> gameList = new();
+        foreach (GameVersion version in gameVersions)
         {
-            PlayerCounts = 
+            gameList.Add(new PlayerCountObject
             {
-                { 
-                    GameVersion.LittleBigPlanet1,
-                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanet1)
-                },
-                {
-                    GameVersion.LittleBigPlanet2,
-                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanet2)
-                },
-                {
-                    GameVersion.LittleBigPlanet3,
-                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanet3)
-                },
-                {
-                    GameVersion.LittleBigPlanetVita,
-                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanetVita)
-                },
-                {
-                    GameVersion.LittleBigPlanetPSP,
-                    await StatisticsHelper.RecentMatchesForGame(this.database, GameVersion.LittleBigPlanetPSP)
-                },
-            },
-        });
+                Game = version.ToString(),
+                PlayerCount = await StatisticsHelper.RecentMatchesForGame(this.database, version),
+            });
+        }
+        PlayerCountResponse response = new()
+        {
+            TotalPlayerCount = await StatisticsHelper.RecentMatches(this.database),
+            Games = gameList,
+        };
+
+        return this.Ok(response);
+    }
 }
