@@ -103,12 +103,11 @@ public class UserPage : BaseLayout
 
         if (this.User == null) return this.Page();
 
-        var blockedUsers = await (
+        List<int> blockedUsers = await (
             from blockedProfile in this.Database.BlockedProfiles
             where blockedProfile.UserId == this.User.UserId
             select blockedProfile.BlockedUserId).ToListAsync();
 
-        
         foreach (Comment c in this.Comments)
         {
             if (blockedUsers.Contains(c.PosterUserId)) this.Comments.Remove(c);
