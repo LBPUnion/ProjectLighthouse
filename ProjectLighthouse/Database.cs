@@ -341,7 +341,7 @@ public class Database : DbContext
     {
         if (userId == blockedUser.UserId) return;
 
-        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUser == blockedUser && bp.UserId == userId);
+        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
     }
 
     public async Task<bool> IsUserBlockedBy(int userId, int targetId)
