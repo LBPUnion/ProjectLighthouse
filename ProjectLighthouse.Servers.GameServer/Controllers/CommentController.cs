@@ -71,11 +71,9 @@ public class CommentController : ControllerBase
 
         if (targetId == 0) return this.NotFound();
 
-        User? user = await this.database.UserFromGameToken(token);
-        
-        var blockedUsers = await (
+        List<int> blockedUsers = await (
             from blockedProfile in this.database.BlockedProfiles
-            where blockedProfile.UserId == user.UserId
+            where blockedProfile.UserId == token.UserId
             select blockedProfile.BlockedUserId
         ).ToListAsync();
         

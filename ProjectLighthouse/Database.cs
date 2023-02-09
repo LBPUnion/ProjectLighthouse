@@ -321,7 +321,7 @@ public class Database : DbContext
     {
         if (userId == blockedUser.UserId) return;
         
-        User? user = await this.Users.FindAsync(u => u.UserId == userId);
+        User? user = await this.Users.FindAsync(userId);
         
         BlockedProfile blockedProfile = new()
         {
