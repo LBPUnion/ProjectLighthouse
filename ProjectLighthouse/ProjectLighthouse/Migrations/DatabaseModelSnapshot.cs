@@ -609,6 +609,27 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("PlatformLinkAttempts");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.BlockedProfile", b =>
+                {
+                    b.Property<int>("BlockedProfileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("BlockedUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BlockedProfileId");
+
+                    b.HasIndex("BlockedUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BlockedProfiles");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.Comment", b =>
                 {
                     b.Property<int>("CommentId")
@@ -1221,6 +1242,25 @@ namespace ProjectLighthouse.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.PlayerData.Profiles.BlockedProfile", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "BlockedUser")
+                        .WithMany()
+                        .HasForeignKey("BlockedUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.PlayerData.Profiles.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BlockedUser");
 
                     b.Navigation("User");
                 });

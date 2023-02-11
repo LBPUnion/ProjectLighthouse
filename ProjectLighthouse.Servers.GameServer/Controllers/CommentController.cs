@@ -71,9 +71,15 @@ public class CommentController : ControllerBase
 
         if (targetId == 0) return this.NotFound();
 
-        List<Comment> comments = await this.database.Comments.Include
-                (c => c.Poster)
-            .Where(c => c.TargetId == targetId && c.Type == type)
+        List<int> blockedUsers = await (
+            from blockedProfile in this.database.BlockedProfiles
+            where blockedProfile.UserId == token.UserId
+            select blockedProfile.BlockedUserId
+        ).ToListAsync();
+        
+        List<Comment> comments = await this.database.Comments.Include(c => c.Poster)
+            .Where(c => c.TargetId == targetId && c.Type == type && !c.Poster.IsBanned)
+            .Where(c => !blockedUsers.Contains(c.PosterUserId))
             .OrderByDescending(c => c.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
