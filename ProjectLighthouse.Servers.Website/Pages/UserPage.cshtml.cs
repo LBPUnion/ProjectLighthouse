@@ -88,11 +88,18 @@ public class UserPage : BaseLayout
         }
 
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.ProfileUser.CommentsEnabled;
+
         if (this.CommentsEnabled)
         {
+            List<int> blockedUsers = this.User == null ? new List<int>() : await 
+            (from blockedProfile in this.Database.BlockedProfiles
+                where blockedProfile.UserId == this.User.UserId
+                select blockedProfile.BlockedUserId).ToListAsync();
+            
             this.Comments = await this.Database.Comments.Include(p => p.Poster)
                 .OrderByDescending(p => p.Timestamp)
                 .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
+                .Where(p => !blockedUsers.Contains(p.PosterUserId))
                 .Take(50)
                 .ToListAsync();
         }
@@ -103,15 +110,8 @@ public class UserPage : BaseLayout
 
         if (this.User == null) return this.Page();
 
-        List<int> blockedUsers = await (
-            from blockedProfile in this.Database.BlockedProfiles
-            where blockedProfile.UserId == this.User.UserId
-            select blockedProfile.BlockedUserId).ToListAsync();
-
         foreach (Comment c in this.Comments)
         {
-            if (blockedUsers.Contains(c.PosterUserId)) this.Comments.Remove(c);
-            
             Reaction? reaction = await this.Database.Reactions.Where(r => r.TargetId == c.TargetId)
                 .Where(r => r.UserId == this.User.UserId)
                 .FirstOrDefaultAsync();

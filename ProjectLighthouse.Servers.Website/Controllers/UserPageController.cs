@@ -111,7 +111,7 @@ public class UserPageController : ControllerBase
         User? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (blockedUser == null) return this.NotFound();
 
-        this.database.UnblockUser(token.UserId, blockedUser);
+        await this.database.UnblockUser(token.UserId, blockedUser);
 
         return this.Redirect("~/user/" + id);
     }

@@ -334,11 +334,13 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
-    public void UnblockUser(int userId, User blockedUser)
+    public async Task UnblockUser(int userId, User blockedUser)
     {
         if (userId == blockedUser.UserId) return;
 
         this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
+
+        await this.SaveChangesAsync();
     }
 
     public async Task<bool> IsUserBlockedBy(int userId, int targetId)
