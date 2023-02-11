@@ -53,7 +53,8 @@ public class Database : DbContext
     public DbSet<APIKey> APIKeys { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
-
+    public DbSet<BlockedProfile> BlockedProfiles { get; set; }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 
@@ -131,9 +132,10 @@ public class Database : DbContext
         Comment? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
 
         if (comment == null) return false;
-
         if (comment.PosterUserId == userId) return false;
 
+        if (await this.IsUserBlockedBy(userId, comment.PosterUserId)) return false;
+        
         Reaction? reaction = await this.Reactions.FirstOrDefaultAsync(r => r.UserId == userId && r.TargetId == commentId);
         if (reaction == null)
         {
@@ -189,14 +191,17 @@ public class Database : DbContext
                 .Select(u => u.UserId)
                 .FirstOrDefaultAsync();
             if (targetUserId == 0) return false;
+            if (await this.IsUserBlockedBy(userId, targetUserId)) return false;
         }
         else
         {
-            int targetSlotId = await this.Slots.Where(s => s.SlotId == targetId)
+            int creatorId = await this.Slots.Where(s => s.SlotId == targetId)
                 .Where(s => s.CommentsEnabled && !s.Hidden)
-                .Select(s => s.SlotId)
+                .Select(s => s.CreatorId)
                 .FirstOrDefaultAsync();
-            if (targetSlotId == 0) return false;
+            if (creatorId == 0) return false;
+            
+            if (await this.IsUserBlockedBy(userId, creatorId)) return false;
         }
 
         this.Comments.Add
@@ -312,6 +317,39 @@ public class Database : DbContext
         await this.SaveChangesAsync();
     }
 
+    public async Task BlockUser(int userId, User blockedUser)
+    {
+        if (userId == blockedUser.UserId) return;
+        
+        User? user = await this.Users.FindAsync(userId);
+        
+        BlockedProfile blockedProfile = new()
+        {
+            User = user,
+            BlockedUser = blockedUser,
+        };
+
+        await this.BlockedProfiles.AddAsync(blockedProfile);
+
+        await this.SaveChangesAsync();
+    }
+
+    public async Task UnblockUser(int userId, User blockedUser)
+    {
+        if (userId == blockedUser.UserId) return;
+
+        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
+
+        await this.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsUserBlockedBy(int userId, int targetId)
+    {
+        if (targetId == userId) return false;
+
+        return await this.BlockedProfiles.Has(bp => bp.BlockedUserId == userId && bp.UserId == targetId);
+    }
+    
     #endregion
 
     #region User Helper Methods
