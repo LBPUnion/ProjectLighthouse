@@ -77,8 +77,7 @@ public class ScoreController : ControllerBase
 
         if (!score.PlayerIds.Contains(username))
         {
-            this.Request.Body.Position = 0;
-            string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+            string bodyString = await this.ReadBodyAsync();
             Logger.Warn("Rejecting score upload, requester username is not present in playerIds" +
                         $" (user={username}, playerIds={string.Join(",", score.PlayerIds)}, " +
                         $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={id}, slotType={slotType}, body='{bodyString}')", LogArea.Score);

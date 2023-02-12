@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using LBPUnion.ProjectLighthouse.Match.MatchCommands;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
-public static class MatchHelper
+public static partial class MatchHelper
 {
     public static readonly Dictionary<int, string?> UserLocations = new();
     public static readonly Dictionary<int, List<int>?> UserRecentlyDivedIn = new();
@@ -38,27 +37,23 @@ public static class MatchHelper
 
     public static bool ClearUserRecentDiveIns(int userId) => UserRecentlyDivedIn.Remove(userId);
 
+    [GeneratedRegex("^\\[([^,]*),\\[(.*)\\]\\]")]
+    private static partial Regex MatchJsonRegex();
+
+    [GeneratedRegex(@"0x[a-fA-F0-9]{7,8}")]
+    private static partial Regex LocationHexRegex();
+
     // This is the function used to show people how laughably awful LBP's protocol is. Beware.
     public static IMatchCommand? Deserialize(string data)
     {
-        string matchType = "";
+        System.Text.RegularExpressions.Match match = MatchJsonRegex().Match(data);
 
-        int i = 1;
-        while (true)
-        {
-            if (data[i] == ',') break;
-
-            matchType += data[i];
-            i++;
-        }
-
-        string matchData = $"{{{string.Concat(data.Skip(matchType.Length + 3).SkipLast(2))}}}"; // unfuck formatting so we can parse it as json
+        string matchType = match.Groups[1].Value;
+        // Wraps the actual match data in curly braces to parse it as a json object
+        string matchData = $"{{{match.Groups[2].Value}}}";
 
         // JSON does not like the hex value that location comes in (0x7f000001) so, convert it to int
-        matchData = Regex.Replace(matchData, @"0x[a-fA-F0-9]{8}", m => Convert.ToInt32(m.Value, 16).ToString());
-        // oh, but it gets better than that! LBP also likes to send hex values with an uneven amount of digits (0xa000064, 7 digits). in any case, we handle it here:
-        matchData = Regex.Replace(matchData, @"0x[a-fA-F0-9]{7}", m => Convert.ToInt32(m.Value, 16).ToString());
-        // i'm actually crying about it.
+        matchData = LocationHexRegex().Replace(matchData, m => Convert.ToInt32(m.Value, 16).ToString());
 
         return Deserialize(matchType, matchData);
     }

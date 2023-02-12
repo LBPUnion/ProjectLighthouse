@@ -10,7 +10,7 @@ public class ConsoleLogger : ILogger
         ConsoleColor oldForegroundColor = Console.ForegroundColor;
         ConsoleColor logColor = logLine.Level.ToColor();
 
-        foreach (string line in logLine.Message.Split('\n'))
+        foreach (string line in logLine.Message.Split('\n', StringSplitOptions.RemoveEmptyEntries))
         {
             string time = DateTime.Now.ToString("MM/dd/yyyy-HH:mm:ss.fff");
             string trace = "";

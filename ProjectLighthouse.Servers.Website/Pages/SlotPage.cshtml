@@ -57,9 +57,7 @@
                 }
                 else
                 {
-                    authorLabels = Model.Slot?.AuthorLabels.Split(",") ?? Array.Empty<string>();
-                    // Split() returns an array with an empty character for some reason
-                    if (authorLabels.Length == 1) authorLabels = Array.Empty<string>();
+                    authorLabels = Model.Slot?.AuthorLabels.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
                 }
                 if (authorLabels.Length == 0)
                 {

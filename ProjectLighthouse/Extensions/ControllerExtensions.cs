@@ -1,7 +1,10 @@
 ﻿#nullable enable
 using System;
+using System.Buffers;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -12,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
 
-public static class ControllerExtensions
+public static partial class ControllerExtensions
 {
 
     public static GameToken GetToken(this ControllerBase controller)
@@ -23,15 +26,72 @@ public static class ControllerExtensions
         return token;
     }
 
+    private static void AddStringToBuilder(StringBuilder builder, in ReadOnlySequence<byte> readOnlySequence)
+    {
+        // Separate method because Span/ReadOnlySpan cannot be used in async methods
+        ReadOnlySpan<byte> span = readOnlySequence.IsSingleSegment
+            ? readOnlySequence.First.Span
+            : readOnlySequence.ToArray().AsSpan();
+        builder.Append(Encoding.UTF8.GetString(span));
+    }
+
+    public static async Task<string> ReadBodyAsync(this ControllerBase controller)
+    {
+        StringBuilder builder = new();
+
+        while (true)
+        {
+            ReadResult readResult = await controller.Request.BodyReader.ReadAsync();
+            ReadOnlySequence<byte> buffer = readResult.Buffer;
+
+            SequencePosition? position;
+
+            do
+            {
+                // Look for a EOL in the buffer
+                position = buffer.PositionOf((byte)'\n');
+                if (position == null) continue;
+
+                ReadOnlySequence<byte> readOnlySequence = buffer.Slice(0, position.Value);
+                AddStringToBuilder(builder, in readOnlySequence);
+
+                // Skip the line + the \n character (basically position)
+                buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+            }
+            while (position != null);
+
+
+            if (readResult.IsCompleted && buffer.Length > 0)
+            {
+                AddStringToBuilder(builder, in buffer);
+            }
+
+            controller.Request.BodyReader.AdvanceTo(buffer.Start, buffer.End);
+
+            // At this point, buffer will be updated to point one byte after the last
+            // \n character.
+            if (readResult.IsCompleted)
+            {
+                break;
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    [GeneratedRegex("&(?!(amp|apos|quot|lt|gt);)")]
+    private static partial Regex CharacterEscapeRegex();
+
     public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[] rootElements)
     {
         controller.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(controller.Request.Body).ReadToEndAsync();
+
+        string bodyString = await controller.ReadBodyAsync();
 
         try
         {
             // Prevent unescaped ampersands from causing deserialization to fail
-            bodyString = Regex.Replace(bodyString, "&(?!(amp|apos|quot|lt|gt);)", "&amp;");
+            bodyString = CharacterEscapeRegex().Replace(bodyString, "&amp;");
 
             XmlRootAttribute? root = null;
             if (rootElements.Length > 0)
