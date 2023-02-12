@@ -18,15 +18,45 @@
     <div class="cardStats">
         @if (showLink)
         {
-            <h2 style="margin-bottom: 2px;">
-                <a href="~/user/@Model.UserId">@Model.Username</a>
-            </h2>
+            @if (Model.IsAdmin)
+            {
+                <h2 style="margin-bottom: 2px; color: red;">
+                    <a href="~/user/@Model.UserId">@Model.Username</a>
+                </h2>
+            }
+            else if (Model.IsModerator)
+            {
+                <h2 style="margin-bottom: 2px; color: rgb(200, 130, 0);">
+                    <a href="~/user/@Model.UserId">@Model.Username</a>
+                </h2>
+            }
+            else
+            {
+                <h2 style="margin-bottom: 2px;">
+                    <a href="~/user/@Model.UserId">@Model.Username</a>
+                </h2>
+            }
         }
         else
         {
-            <h1 style="margin-bottom: 2px;">
-                @Model.Username
-            </h1>
+            @if (Model.IsAdmin)
+            {
+                <h1 style="margin-bottom: 2px; color: red;">
+                    @Model.Username
+                </h1>
+            }
+            else if (Model.IsModerator)
+            {
+                <h1 style="margin-bottom: 2px; color: rgb(200, 130, 0);">
+                    @Model.Username
+                </h1>
+            }
+            else
+            {
+                 <h1 style="margin-bottom: 2px;">
+                    @Model.Username
+                </h1>
+            }
         }
         <span>
             <i>@Model.Status.ToTranslatedString(language, timeZone)</i>
