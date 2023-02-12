@@ -23,10 +23,20 @@ public static class ControllerExtensions
         return token;
     }
 
+    public static async Task<string> ReadBodyAsync(this ControllerBase controller)
+    {
+        controller.Request.Body.Position = 0;
+
+        using StreamReader bodyReader = new(controller.Request.Body);
+        return await bodyReader.ReadToEndAsync();
+    }
+
     public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[] rootElements)
     {
         controller.Request.Body.Position = 0;
-        string bodyString = await new StreamReader(controller.Request.Body).ReadToEndAsync();
+
+        using StreamReader bodyReader = new(controller.Request.Body);
+        string bodyString = await bodyReader.ReadToEndAsync();
 
         try
         {
