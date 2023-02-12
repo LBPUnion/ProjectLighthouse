@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
@@ -38,7 +39,7 @@ public class Review
     [NotMapped]
     [XmlIgnore]
     public string[] Labels {
-        get => this.LabelCollection.Split(",");
+        get => this.LabelCollection.Split(",", StringSplitOptions.RemoveEmptyEntries);
         set => this.LabelCollection = string.Join(',', value);
     }
 
