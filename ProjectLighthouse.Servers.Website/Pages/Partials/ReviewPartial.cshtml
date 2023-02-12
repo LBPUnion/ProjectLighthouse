@@ -61,7 +61,18 @@
                     </div>
                     <div class="cardStats">
                         <a href="/user/@review.Reviewer?.UserId">
-                            <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                            @if (review.Reviewer != null && review.Reviewer.IsAdmin)
+                            {
+                                <h3 style="color: red; margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                            }
+                            else if (review.Reviewer != null && review.Reviewer.IsModerator)
+                            {
+                                <h3 style="color: rgb(200, 130, 0); margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                            }
+                            else
+                            {
+                                <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
+                            }
                         </a>
                         @if (review.Deleted)
                         {
