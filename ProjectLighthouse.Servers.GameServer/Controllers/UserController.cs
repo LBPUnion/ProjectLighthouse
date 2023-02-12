@@ -182,8 +182,9 @@ public class UserController : ControllerBase
         User? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.StatusCode(403, "");
 
-        string pinsString = await new StreamReader(this.Request.Body).ReadToEndAsync();
-        Pins? pinJson = JsonSerializer.Deserialize<Pins>(pinsString);
+        string bodyString = await this.ReadBodyAsync();
+
+        Pins? pinJson = JsonSerializer.Deserialize<Pins>(bodyString);
         if (pinJson == null) return this.BadRequest();
 
         // Sometimes the update gets called periodically as pin progress updates via playing,
