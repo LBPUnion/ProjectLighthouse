@@ -48,7 +48,7 @@ public class MatchController : ControllerBase
 
         if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
 
-        Logger.Info("Received match data: " + bodyString, LogArea.Match);
+        Logger.Debug("Received match data: " + bodyString, LogArea.Match);
 
         IMatchCommand? matchData;
         try
