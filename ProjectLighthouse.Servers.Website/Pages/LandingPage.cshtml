@@ -48,8 +48,23 @@
     int i = 0;
     foreach (User user in Model.PlayersOnline)
     {
-        i++; 
-        @await user.ToLink(Html, ViewData, language, timeZone, true)
+        i++;
+        if (user.IsAdmin)
+        {
+            <span style="color: red; font-weight: 600;">
+                @await user.ToLink(Html, ViewData, language, timeZone, true)
+            </span>
+        }
+        else if (user.IsModerator)
+        {
+            <span style="color: rgb(255, 120, 0); font-weight: 600;">
+                @await user.ToLink(Html, ViewData, language, timeZone, true)
+            </span>
+        }
+        else
+        {
+            @await user.ToLink(Html, ViewData, language, timeZone, true)
+        }
         @* whitespace has forced my hand *@
         if (i != Model.PlayersOnline.Count)
         {
