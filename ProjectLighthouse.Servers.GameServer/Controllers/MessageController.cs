@@ -82,7 +82,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameToken token = this.GetToken();
 
-        string message = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        string message = await this.ReadBodyAsync();
 
         if (message.StartsWith("/setemail "))
         {

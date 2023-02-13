@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -70,10 +71,16 @@ public class CommentController : ControllerBase
 
         if (targetId == 0) return this.NotFound();
 
-        List<Comment> comments = await this.database.Comments.Include
-                (c => c.Poster)
-            .Where(c => c.TargetId == targetId && c.Type == type)
-            .OrderByDescending(c => c.Timestamp)
+        List<int> blockedUsers =  await (
+                from blockedProfile in this.database.BlockedProfiles
+                where blockedProfile.UserId == token.UserId
+                select blockedProfile.BlockedUserId).ToListAsync();
+
+        List<Comment> comments = await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
+            .OrderByDescending(p => p.Timestamp)
+            .Where(p => !blockedUsers.Contains(p.PosterUserId))
+            .Include(c => c.Poster)
+            .Where(p => p.Poster.PermissionLevel != PermissionLevel.Banned)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync();

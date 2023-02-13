@@ -45,11 +45,11 @@ public class MatchController : ControllerBase
 
         // Example POST /match: [UpdateMyPlayerData,["Player":"FireGamer9872"]]
 
-        string bodyString = await new StreamReader(this.Request.Body).ReadToEndAsync();
+        string bodyString = await this.ReadBodyAsync();
 
         if (bodyString.Length == 0 || bodyString[0] != '[') return this.BadRequest();
 
-        Logger.Info("Received match data: " + bodyString, LogArea.Match);
+        Logger.Debug("Received match data: " + bodyString, LogArea.Match);
 
         IMatchCommand? matchData;
         try

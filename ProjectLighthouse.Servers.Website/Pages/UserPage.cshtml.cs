@@ -19,6 +19,8 @@ public class UserPage : BaseLayout
 
     public bool IsProfileUserHearted;
 
+    public bool IsProfileUserBlocked;
+
     public List<Photo>? Photos;
     public List<Slot>? Slots;
 
@@ -87,11 +89,18 @@ public class UserPage : BaseLayout
         }
 
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.ProfileUser.CommentsEnabled;
+
         if (this.CommentsEnabled)
         {
+            List<int> blockedUsers = this.User == null ? new List<int>() : await 
+            (from blockedProfile in this.Database.BlockedProfiles
+                where blockedProfile.UserId == this.User.UserId
+                select blockedProfile.BlockedUserId).ToListAsync();
+            
             this.Comments = await this.Database.Comments.Include(p => p.Poster)
                 .OrderByDescending(p => p.Timestamp)
                 .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
+                .Where(p => !blockedUsers.Contains(p.PosterUserId))
                 .Take(50)
                 .ToListAsync();
         }
@@ -115,6 +124,8 @@ public class UserPage : BaseLayout
             .Where(h => h.UserId == this.User.UserId)
             .AnyAsync();
 
+        this.IsProfileUserBlocked = await this.Database.IsUserBlockedBy(this.ProfileUser.UserId, this.User.UserId);
+        
         return this.Page();
     }
 }

@@ -60,12 +60,20 @@ public class SlotPage : BaseLayout
 
         this.Slot = slot;
 
+        List<int> blockedUsers = this.User == null
+            ? new List<int>()
+            : await (
+                from blockedProfile in this.Database.BlockedProfiles
+                where blockedProfile.UserId == this.User.UserId
+                select blockedProfile.BlockedUserId).ToListAsync();
+        
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.Slot.CommentsEnabled;
         if (this.CommentsEnabled)
         {
             this.Comments = await this.Database.Comments.Include(p => p.Poster)
                 .OrderByDescending(p => p.Timestamp)
                 .Where(c => c.TargetId == id && c.Type == CommentType.Level)
+                .Where(c => !blockedUsers.Contains(c.PosterUserId))
                 .Take(50)
                 .ToListAsync();
         }
@@ -80,6 +88,7 @@ public class SlotPage : BaseLayout
                 .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
                 .ThenByDescending(r => r.Timestamp)
                 .Where(r => r.SlotId == id)
+                .Where(r => !blockedUsers.Contains(r.ReviewerId))
                 .Take(50)
                 .ToListAsync();
         }

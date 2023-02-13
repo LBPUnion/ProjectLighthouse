@@ -233,6 +233,9 @@ public class PublishController : ControllerBase
                 slot.MaximumPlayers = 4;
             }
 
+            slot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
+            slot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
+
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
             return this.Ok(oldSlot.Serialize(token.GameVersion));
@@ -262,6 +265,9 @@ public class PublishController : ControllerBase
             slot.MinimumPlayers = 1;
             slot.MaximumPlayers = 4;
         }
+
+        slot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
+        slot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
 
         this.database.Slots.Add(slot);
         await this.database.SaveChangesAsync();
