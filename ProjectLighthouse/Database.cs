@@ -54,7 +54,6 @@ public class Database : DbContext
     public DbSet<VisitedLevel> VisitedLevels { get; set; }
     public DbSet<WebToken> WebTokens { get; set; }
 
-
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 

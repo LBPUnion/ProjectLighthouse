@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 public class BlockedProfile
 {
+    // ReSharper disable once UnusedMember.Global
     [Key]
     public int BlockedProfileId { get; set; }
 
