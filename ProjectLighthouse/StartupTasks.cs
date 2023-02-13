@@ -67,13 +67,6 @@ public static class StartupTasks
         
         migrateDatabase(database).Wait();
 
-        if (ServerConfiguration.Instance.InfluxDB.InfluxEnabled)
-        {
-            Logger.Info("Influx logging is enabled. Starting influx logging...", LogArea.Startup);
-            InfluxHelper.StartLogging().Wait();
-            if (ServerConfiguration.Instance.InfluxDB.LoggingEnabled) Logger.Instance.AddLogger(new InfluxLogger());
-        }
-
         Logger.Debug
         (
             "This is a debug build, so performance may suffer! " +
