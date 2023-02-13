@@ -22,7 +22,7 @@ public static partial class ControllerExtensions
     public static GameToken GetToken(this ControllerBase controller)
     {
         GameToken? token = (GameToken?)(controller.HttpContext.Items["Token"] ?? null);
-        if (token == null) throw new ArgumentNullException(nameof(controller), @$"GameToken was null even though authentication was successful {nameof(controller)}");
+        if (token == null) throw new ArgumentNullException(nameof(controller), @"GameToken was null even though authentication was successful");
 
         return token;
     }
