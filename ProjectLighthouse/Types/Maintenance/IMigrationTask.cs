@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Database;
 
 namespace LBPUnion.ProjectLighthouse.Types.Maintenance;
 
@@ -16,5 +17,5 @@ public interface IMigrationTask
     /// </summary>
     /// <param name="database">The Lighthouse database.</param>
     /// <returns>True if successful, false if not.</returns>
-    internal Task<bool> Run(Database database);
+    internal Task<bool> Run(DatabaseContext database);
 }

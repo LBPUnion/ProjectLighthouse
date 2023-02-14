@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -13,9 +14,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers;
 [Route("user/{id:int}")]
 public class UserPageController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public UserPageController(Database database)
+    public UserPageController(DatabaseContext database)
     {
         this.database = database;
     }

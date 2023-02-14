@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -11,9 +12,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 [Route("/moderation/report/{id:int}")]
 public class AdminReportController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public AdminReportController(Database database)
+    public AdminReportController(DatabaseContext database)
     {
         this.database = database;
     }

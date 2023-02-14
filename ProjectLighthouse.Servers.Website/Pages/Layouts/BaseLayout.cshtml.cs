@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Servers.Website.Types;
@@ -11,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 
 public class BaseLayout : PageModel
 {
-    public readonly Database Database;
+    public readonly DatabaseContext Database;
 
     public readonly List<PageNavigationItem> NavigationItems = new();
 
@@ -25,7 +26,7 @@ public class BaseLayout : PageModel
     public string Title = string.Empty;
 
     private User? user;
-    public BaseLayout(Database database)
+    public BaseLayout(DatabaseContext database)
     {
         this.Database = database;
         

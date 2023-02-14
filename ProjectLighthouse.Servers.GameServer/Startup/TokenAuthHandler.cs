@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text.Encodings.Web;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 
 public class TokenAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
     private const string cookie = "MM_AUTH";
 
     public TokenAuthHandler
@@ -17,7 +18,7 @@ public class TokenAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         UrlEncoder encoder,
         ISystemClock clock,
-        Database database
+        DatabaseContext database
         // I said I don't want any damn vegetables (logs)
     ) : base(options, new NullLoggerFactory(), encoder, clock)
     {

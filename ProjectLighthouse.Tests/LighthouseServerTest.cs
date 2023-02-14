@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Tickets;
@@ -34,7 +35,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
         if (createUser)
         {
-            await using Database database = new();
+            await using DatabaseContext database = new();
             if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
             {
                 User user = await database.CreateUser($"{username}{number}",

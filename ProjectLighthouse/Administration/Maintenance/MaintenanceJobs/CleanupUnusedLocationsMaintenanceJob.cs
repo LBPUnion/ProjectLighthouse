@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
 public class CleanupUnusedLocationsMaintenanceJob : IMaintenanceJob
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
     public string Name() => "Cleanup Unused Locations";
     public string Description() => "Cleanup unused locations in the database.";
 

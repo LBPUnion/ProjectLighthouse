@@ -1,4 +1,5 @@
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -15,7 +16,7 @@ public sealed class DatabaseFactAttribute : FactAttribute
         else
             lock (migrateLock)
             {
-                using Database database = new();
+                using DatabaseContext database = new();
                 database.Database.Migrate();
             }
     }

@@ -1,5 +1,6 @@
 #nullable enable
 
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 #if !DEBUG
@@ -10,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Debug;
 
 public class RoomVisualizerPage : BaseLayout
 {
-    public RoomVisualizerPage(Database database) : base(database)
+    public RoomVisualizerPage(DatabaseContext database) : base(database)
     {}
 
     public IActionResult OnGet()

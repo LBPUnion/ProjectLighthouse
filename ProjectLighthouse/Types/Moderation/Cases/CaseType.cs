@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
@@ -43,7 +44,7 @@ public static class CaseTypeExtensions
         };
     }
 
-    public static async Task<bool> IsIdValid(this CaseType type, int affectedId, Database database)
+    public static async Task<bool> IsIdValid(this CaseType type, int affectedId, DatabaseContext database)
     {
         if (type.AffectsUser()) return await database.Users.Has(u => u.UserId == affectedId);
         if (type.AffectsLevel()) return await database.Slots.Has(u => u.SlotId == affectedId);

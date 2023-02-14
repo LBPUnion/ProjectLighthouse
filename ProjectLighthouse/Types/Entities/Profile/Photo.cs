@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -71,7 +72,7 @@ public class Photo
             if (this._subjects != null) return this._subjects;
 
             List<PhotoSubject> response = new();
-            using Database database = new();
+            using DatabaseContext database = new();
 
             foreach (string idStr in this.PhotoSubjectIds.Where(idStr => !string.IsNullOrEmpty(idStr)))
             {
@@ -111,7 +112,7 @@ public class Photo
 
     public string Serialize()
     {
-        using Database database = new();
+        using DatabaseContext database = new();
         var partialSlot = database.Slots.Where(s => s.SlotId == this.SlotId.GetValueOrDefault())
             .Select(s => new
             {

@@ -1,5 +1,6 @@
 #nullable enable
 using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -12,7 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
 public class LandingPage : BaseLayout
 {
-    public LandingPage(Database database) : base(database)
+    public LandingPage(DatabaseContext database) : base(database)
     {}
 
     public int PendingAuthAttempts;

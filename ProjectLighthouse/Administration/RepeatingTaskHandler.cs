@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
@@ -30,7 +31,7 @@ public static class RepeatingTaskHandler
         Queue<IRepeatingTask> taskQueue = new();
         foreach (IRepeatingTask task in MaintenanceHelper.RepeatingTasks) taskQueue.Enqueue(task);
 
-        Database database = new();
+        DatabaseContext database = new();
 
         while (true)
         {

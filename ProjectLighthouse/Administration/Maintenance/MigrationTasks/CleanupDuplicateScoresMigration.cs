@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -12,7 +13,7 @@ public class CleanupDuplicateScoresMigration : IMigrationTask
 {
     public string Name() => "Cleanup duplicate scores";
 
-    public async Task<bool> Run(Database database)
+    public async Task<bool> Run(DatabaseContext database)
     {
         List<int> duplicateScoreIds = new();
         // The original score should have the lowest score id

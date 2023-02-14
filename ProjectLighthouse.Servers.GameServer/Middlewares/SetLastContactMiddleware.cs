@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -10,7 +11,7 @@ public class SetLastContactMiddleware : MiddlewareDBContext
     public SetLastContactMiddleware(RequestDelegate next) : base(next)
     { }
 
-    public override async Task InvokeAsync(HttpContext context, Database database)
+    public override async Task InvokeAsync(HttpContext context, DatabaseContext database)
     {
         #nullable enable
         // Log LastContact for LBP1. This is done on LBP2/3/V on a Match request.

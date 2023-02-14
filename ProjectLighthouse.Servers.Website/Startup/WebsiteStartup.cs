@@ -1,4 +1,5 @@
 using System.Globalization;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
@@ -40,7 +41,7 @@ public class WebsiteStartup
         services.AddRazorPages().WithRazorPagesAtContentRoot();
         #endif
 
-        services.AddDbContext<Database>();
+        services.AddDbContext<DatabaseContext>();
 
         services.Configure<ForwardedHeadersOptions>
         (

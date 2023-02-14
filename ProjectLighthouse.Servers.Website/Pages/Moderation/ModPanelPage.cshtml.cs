@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Servers.Website.Types;
@@ -8,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class ModPanelPage : BaseLayout
 {
-    public ModPanelPage(Database database) : base(database)
+    public ModPanelPage(DatabaseContext database) : base(database)
     {}
 
     public List<AdminPanelStatistic> Statistics = new();

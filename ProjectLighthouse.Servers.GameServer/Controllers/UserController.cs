@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -23,9 +24,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Produces("text/xml")]
 public class UserController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public UserController(Database database)
+    public UserController(DatabaseContext database)
     {
         this.database = database;
     }

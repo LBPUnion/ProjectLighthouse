@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
@@ -68,9 +69,9 @@ public static class MaintenanceHelper
         await job.Run();
     }
 
-    public static async Task RunMigration(IMigrationTask migrationTask, Database? database = null)
+    public static async Task RunMigration(IMigrationTask migrationTask, DatabaseContext? database = null)
     {
-        database ??= new Database();
+        database ??= new DatabaseContext();
 
         // Migrations should never be run twice.
         Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name));

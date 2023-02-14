@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.OpenApi.Models;
@@ -25,7 +26,7 @@ public class ApiStartup
             }
         );
 
-        services.AddDbContext<Database>();
+        services.AddDbContext<DatabaseContext>();
 
         services.AddSwaggerGen
         (

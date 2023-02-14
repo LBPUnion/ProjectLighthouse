@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -21,9 +22,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Produces("text/xml")]
 public class CollectionController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public CollectionController(Database database)
+    public CollectionController(DatabaseContext database)
     {
         this.database = database;
     }

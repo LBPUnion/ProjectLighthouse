@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
@@ -86,7 +86,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
-        await using Database database = new();
+        await using DatabaseContext database = new();
         User user = await database.Users.FirstAsync(u => u.Username == username);
         user.PermissionLevel = PermissionLevel.Banned;
         await database.SaveChangesAsync();

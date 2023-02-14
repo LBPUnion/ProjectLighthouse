@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -12,9 +13,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Moderator;
 [Route("moderation/slot/{id:int}")]
 public class ModerationSlotController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public ModerationSlotController(Database database)
+    public ModerationSlotController(DatabaseContext database)
     {
         this.database = database;
     }

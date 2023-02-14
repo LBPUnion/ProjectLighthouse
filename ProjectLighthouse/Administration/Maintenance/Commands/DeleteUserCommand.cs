@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -11,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class DeleteUserCommand : ICommand
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
     public string Name() => "Delete User";
     public string[] Aliases()
         => new[]

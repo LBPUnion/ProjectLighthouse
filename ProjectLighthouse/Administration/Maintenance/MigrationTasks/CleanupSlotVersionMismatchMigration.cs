@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
@@ -11,7 +12,7 @@ public class CleanupSlotVersionMismatchMigration : IMigrationTask
 {
     public string Name() => "Cleanup slot versions";
 
-    async Task<bool> IMigrationTask.Run(Database database)
+    async Task<bool> IMigrationTask.Run(DatabaseContext database)
     {
         foreach (Slot slot in database.Slots)
         {

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -63,7 +64,7 @@ public static class StartupTasks
         }
 
         if (!dbConnected) Environment.Exit(1);
-        using Database database = new();
+        using DatabaseContext database = new();
         
         migrateDatabase(database).Wait();
 
@@ -150,7 +151,7 @@ public static class StartupTasks
         return didLoad;
     }
 
-    private static async Task migrateDatabase(Database database)
+    private static async Task migrateDatabase(DatabaseContext database)
     {
         // This mutex is used to synchronize migrations across the GameServer, Website, and Api
         // Without it, each server would try to simultaneously migrate the database resulting in undefined behavior

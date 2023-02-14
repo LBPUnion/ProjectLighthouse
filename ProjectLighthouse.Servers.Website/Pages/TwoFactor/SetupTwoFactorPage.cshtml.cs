@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -19,7 +20,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor;
 
 public class SetupTwoFactorPage : BaseLayout
 {
-    public SetupTwoFactorPage(Database database) : base(database)
+    public SetupTwoFactorPage(DatabaseContext database) : base(database)
     { }
 
     public string QrCode { get; set; } = "";

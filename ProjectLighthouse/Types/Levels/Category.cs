@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
@@ -28,13 +29,13 @@ public abstract class Category
         set => this.Endpoint = value.Replace("/searches/", "");
     }
 
-    public abstract Slot? GetPreviewSlot(Database database);
+    public abstract Slot? GetPreviewSlot(DatabaseContext database);
 
-    public abstract IEnumerable<Slot> GetSlots(Database database, int pageStart, int pageSize);
+    public abstract IEnumerable<Slot> GetSlots(DatabaseContext database, int pageStart, int pageSize);
 
-    public abstract int GetTotalSlots(Database database);
+    public abstract int GetTotalSlots(DatabaseContext database);
 
-    public string Serialize(Database database)
+    public string Serialize(DatabaseContext database)
     {
         Slot? previewSlot = this.GetPreviewSlot(database);
 

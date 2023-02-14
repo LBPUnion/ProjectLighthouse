@@ -2,6 +2,7 @@
 #if DEBUG
 using LBPUnion.ProjectLighthouse.Helpers;
 #endif
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Debug;
 
 public class FilterTestPage : BaseLayout
 {
-    public FilterTestPage(Database database) : base(database)
+    public FilterTestPage(DatabaseContext database) : base(database)
     {}
 
     public string? FilteredText;

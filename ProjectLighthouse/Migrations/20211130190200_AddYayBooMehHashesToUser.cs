@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 #nullable disable
 
 namespace ProjectLighthouse.Migrations
 {
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20211130190200_AddYayBooMehHashesToUser")]
     public partial class AddYayBooMehHashesToUser : Migration
     {
