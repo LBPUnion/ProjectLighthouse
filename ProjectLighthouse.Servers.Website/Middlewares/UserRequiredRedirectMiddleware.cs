@@ -1,7 +1,7 @@
 ﻿using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Middlewares;
-using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;

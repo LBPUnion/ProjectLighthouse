@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -13,7 +14,7 @@ using Newtonsoft.Json.Linq;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
 
-public static class RequestExtensions
+public static partial class RequestExtensions
 {
     static RequestExtensions()
     {
@@ -33,14 +34,12 @@ public static class RequestExtensions
     #region Mobile Checking
 
     // yoinked and adapted from https://stackoverflow.com/a/68641796
+    [GeneratedRegex("Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|PlayStation Vita",
+        RegexOptions.IgnoreCase | RegexOptions.Multiline,
+        "en-US")]
+    private static partial Regex MobileCheckRegex();
 
-    private static readonly Regex mobileCheck = new
-    (
-        "Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|PlayStation Vita",
-        RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled
-    );
-
-    public static bool IsMobile(this HttpRequest request) => mobileCheck.IsMatch(request.Headers[HeaderNames.UserAgent].ToString());
+    public static bool IsMobile(this HttpRequest request) => MobileCheckRegex().IsMatch(request.Headers[HeaderNames.UserAgent].ToString());
 
     #endregion
 
@@ -74,24 +73,20 @@ public static class RequestExtensions
 
     public static async Task<bool> CheckCaptchaValidity(this HttpRequest request)
     {
-        if (ServerConfiguration.Instance.Captcha.CaptchaEnabled)
+        if (!ServerConfiguration.Instance.Captcha.CaptchaEnabled) return true;
+
+        string keyName = ServerConfiguration.Instance.Captcha.Type switch
         {
-            string keyName = ServerConfiguration.Instance.Captcha.Type switch
-            {
-                CaptchaType.HCaptcha => "h-captcha-response",
-                CaptchaType.ReCaptcha => "g-recaptcha-response",
-                _ => throw new ArgumentOutOfRangeException(),
-            };
+            CaptchaType.HCaptcha => "h-captcha-response",
+            CaptchaType.ReCaptcha => "g-recaptcha-response",
+            _ => throw new ArgumentOutOfRangeException(nameof(request), @$"Unknown captcha type: {ServerConfiguration.Instance.Captcha.Type}"),
+        };
             
-            bool gotCaptcha = request.Form.TryGetValue(keyName, out StringValues values);
-            if (!gotCaptcha) return false;
+        bool gotCaptcha = request.Form.TryGetValue(keyName, out StringValues values);
+        if (!gotCaptcha) return false;
 
-            if (!await verifyCaptcha(values[0])) return false;
-        }
-
-        return true;
+        return await verifyCaptcha(values[0]);
     }
-
     #endregion
 
 }

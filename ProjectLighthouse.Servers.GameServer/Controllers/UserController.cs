@@ -3,10 +3,14 @@ using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Misc;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -185,7 +189,7 @@ public class UserController : ControllerBase
         string bodyString = await this.ReadBodyAsync();
 
         Pins? pinJson = JsonSerializer.Deserialize<Pins>(bodyString);
-        if (pinJson == null) return this.BadRequest();
+        if (pinJson?.ProfilePins == null) return this.BadRequest();
 
         // Sometimes the update gets called periodically as pin progress updates via playing,
         // may not affect equipped profile pins however, so check before setting it.

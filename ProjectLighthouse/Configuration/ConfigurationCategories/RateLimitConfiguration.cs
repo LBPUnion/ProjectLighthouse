@@ -2,6 +2,13 @@
 
 namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 
+public class RateLimitOptions
+{
+    public bool Enabled;
+    public int RequestsPerInterval { get; set; } = 5;
+    public int RequestInterval { get; set; } = 15;
+}
+
 public class RateLimitConfiguration
 {
     public RateLimitOptions GlobalOptions { get; set; } = new();

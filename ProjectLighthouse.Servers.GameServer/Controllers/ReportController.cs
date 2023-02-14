@@ -1,11 +1,11 @@
 ﻿#nullable enable
 using System.Text.Json;
-using LBPUnion.ProjectLighthouse.Administration.Reports;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.PlayerData;
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
+using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Moderation.Reports;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +38,7 @@ public class ReportController : ControllerBase
 
         report.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
         report.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));
-        report.Timestamp = TimeHelper.UnixTimeMilliseconds();
+        report.Timestamp = TimeHelper.TimestampMillis;
         report.ReportingPlayerId = token.UserId;
 
         this.database.Reports.Add(report);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers;
 

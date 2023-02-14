@@ -2,10 +2,11 @@ using System;
 using LBPUnion.ProjectLighthouse.Extensions;
 using Microsoft.Extensions.Logging;
 using AspLogLevel = Microsoft.Extensions.Logging.LogLevel;
+using LogLevel = LBPUnion.ProjectLighthouse.Types.Logging.LogLevel;
 
 namespace LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
 
-public class AspNetToLighthouseLogger : Microsoft.Extensions.Logging.ILogger
+public class AspNetToLighthouseLogger : ILogger
 {
     public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
     public bool IsEnabled(AspLogLevel logLevel) => true;

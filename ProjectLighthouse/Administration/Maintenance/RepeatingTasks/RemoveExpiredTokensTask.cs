@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.RepeatingTasks;
 

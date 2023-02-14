@@ -5,7 +5,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Maintenance;
+using LBPUnion.ProjectLighthouse.Types.Resources;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 

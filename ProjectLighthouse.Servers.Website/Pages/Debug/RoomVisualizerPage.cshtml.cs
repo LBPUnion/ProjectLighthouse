@@ -3,8 +3,7 @@
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 #if !DEBUG
-using LBPUnion.ProjectLighthouse.PlayerData.Profiles;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 #endif
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Debug;

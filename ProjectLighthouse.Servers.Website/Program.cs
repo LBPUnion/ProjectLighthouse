@@ -2,7 +2,7 @@
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
 using LBPUnion.ProjectLighthouse.Servers.Website.Startup;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Misc;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website;

@@ -1,7 +1,7 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using Redis.OM;
 using Redis.OM.Contracts;
 

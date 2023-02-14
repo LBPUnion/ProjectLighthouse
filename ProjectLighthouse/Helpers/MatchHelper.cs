@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using LBPUnion.ProjectLighthouse.Match.MatchCommands;
+using LBPUnion.ProjectLighthouse.Types.Matchmaking.MatchCommands;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -46,7 +46,9 @@ public static partial class MatchHelper
     // This is the function used to show people how laughably awful LBP's protocol is. Beware.
     public static IMatchCommand? Deserialize(string data)
     {
-        System.Text.RegularExpressions.Match match = MatchJsonRegex().Match(data);
+        Match match = MatchJsonRegex().Match(data);
+
+        if (!match.Success) return null;
 
         string matchType = match.Groups[1].Value;
         // Wraps the actual match data in curly braces to parse it as a json object
@@ -58,7 +60,7 @@ public static partial class MatchHelper
         return Deserialize(matchType, matchData);
     }
 
-    public static IMatchCommand? Deserialize(string matchType, string matchData)
+    private static IMatchCommand? Deserialize(string matchType, string matchData)
     {
         return matchType switch
         {

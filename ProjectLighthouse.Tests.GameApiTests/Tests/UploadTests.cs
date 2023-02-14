@@ -3,9 +3,9 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.PlayerData;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Tests;

@@ -15,7 +15,7 @@ namespace ProjectLighthouse.Migrations
                 table: "Slots",
                 type: "bigint",
                 nullable: false,
-                defaultValue: TimeHelper.UnixTimeMilliseconds());
+                defaultValue: TimeHelper.TimestampMillis);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

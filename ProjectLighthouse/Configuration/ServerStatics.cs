@@ -2,7 +2,8 @@
 using System;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types;
+using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
 
@@ -38,7 +39,7 @@ public static class ServerStatics
     }
 
     /// <summary>
-    /// The servertype, determined on startup. Shouldn't be null unless very very early in startup.
+    /// The server type, determined on startup. Shouldn't be null unless very very early in startup.
     /// </summary>
     // The way of doing this is kinda weird, but it works.
     public static ServerType ServerType;

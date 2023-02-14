@@ -1,4 +1,4 @@
-﻿using LBPUnion.ProjectLighthouse.Administration;
+﻿using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 

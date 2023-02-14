@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using LBPUnion.ProjectLighthouse.Levels;
-using LBPUnion.ProjectLighthouse.PlayerData;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
+/// <summary>
+/// Used to differentiate between LBP Vita and 3 specific labels
+/// Also translates labels that have different display names in-game
+/// </summary>
 public static class LabelHelper
 {
 
@@ -148,7 +152,7 @@ public static class LabelHelper
         if (tag.Contains("TAG_")) return tag.Replace("TAG_", "").Replace("_", "-");
 
         // ReSharper disable once ConvertIfStatementToReturnStatement
-        if (translationTable.ContainsKey(tag)) return translationTable[tag];
+        if (translationTable.TryGetValue(tag, out string value)) return value;
 
         return tag.Replace("LABEL_", "").Replace("_", " ");
     }
