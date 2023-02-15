@@ -25,21 +25,11 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
         User userA = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
         User userB = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
 
-        Location l = new()
-        {
-            X = 0,
-            Y = 0,
-        };
-        database.Locations.Add(l);
-        await database.SaveChangesAsync();
-
         Slot slotA = new()
         {
             Creator = userA,
             CreatorId = userA.UserId,
             Name = "slotA",
-            Location = l,
-            LocationId = l.Id,
             ResourceCollection = "",
         };
 
@@ -48,8 +38,6 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
             Creator = userB,
             CreatorId = userB.UserId,
             Name = "slotB",
-            Location = l,
-            LocationId = l.Id,
             ResourceCollection = "",
         };
 

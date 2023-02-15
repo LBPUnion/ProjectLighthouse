@@ -13,7 +13,6 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +36,6 @@ public class Database : DbContext
     #region Users
     public DbSet<Comment> Comments { get; set; }
     public DbSet<LastContact> LastContacts { get; set; }
-    public DbSet<Location> Locations { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<PhotoSubject> PhotoSubjects { get; set; }
     public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
@@ -97,15 +95,10 @@ public class Database : DbContext
         User? user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
         if (user != null) return user;
 
-        Location l = new(); // store to get id after submitting
-        this.Locations.Add(l); // add to table
-        await this.SaveChangesAsync(); // saving to the database returns the id and sets it on this entity
-
         user = new User
         {
             Username = username,
             Password = password,
-            LocationId = l.Id,
             Biography = "",
             EmailAddress = emailAddress,
         };
@@ -571,8 +564,6 @@ public class Database : DbContext
         if (user == null) return;
         if (user.Username.Length == 0) return; // don't delete the placeholder user
 
-        if (user.Location != null) this.Locations.Remove(user.Location);
-
         LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
         if (lastContact != null) this.LastContacts.Remove(lastContact);
 
@@ -609,8 +600,6 @@ public class Database : DbContext
 
     public async Task RemoveSlot(Slot slot, bool saveChanges = true)
     {
-        if (slot.Location != null) this.Locations.Remove(slot.Location);
-
         this.Slots.Remove(slot);
 
         if (saveChanges) await this.SaveChangesAsync();

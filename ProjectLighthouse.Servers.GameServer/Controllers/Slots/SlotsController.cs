@@ -74,7 +74,7 @@ public class SlotsController : ControllerBase
         List<string?> serializedSlots = new();
         foreach (int slotId in s)
         {
-            Slot? slot = await this.database.Slots.Include(t => t.Creator).Include(t => t.Location).Where(t => t.SlotId == slotId && t.Type == SlotType.User).FirstOrDefaultAsync();
+            Slot? slot = await this.database.Slots.Include(t => t.Creator).Where(t => t.SlotId == slotId && t.Type == SlotType.User).FirstOrDefaultAsync();
             if (slot == null)
             {
                 slot = await this.database.Slots.Where(t => t.InternalSlotId == slotId && t.Type == SlotType.Developer).FirstOrDefaultAsync();
@@ -510,6 +510,6 @@ public class SlotsController : ControllerBase
             // Get game versions exactly equal to gamefiltertype
             whereSlots = this.database.Slots.Where(s => s.Type == SlotType.User && !s.Hidden && s.GameVersion == gameVersion && s.FirstUploaded >= oldestTime);
 
-        return whereSlots.Include(s => s.Creator).Include(s => s.Location);
+        return whereSlots.Include(s => s.Creator);
     }
 }

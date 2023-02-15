@@ -9,7 +9,6 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Resources;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -79,7 +78,7 @@ public class PublishController : ControllerBase
 
         slot.ResourceCollection += "," + slot.IconHash; // tells LBP to upload icon after we process resources here
 
-        string resources = slot.Resources.Where
+        string resources = slot.Resources!.Where
                 (hash => !FileHelper.ResourceExists(hash))
             .Aggregate("", (current, hash) => current + LbpSerializer.StringElement("resource", hash));
 
@@ -105,12 +104,6 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.Location == null)
-        {
-            Logger.Warn("Rejecting level upload, slot location is null", LogArea.Publish);
-            return this.BadRequest();
-        }
-
         slot.Description = CensorHelper.FilterMessage(slot.Description);
 
         if (slot.Description.Length > 512)
@@ -127,7 +120,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
+        if (slot.Resources!.Any(resource => !FileHelper.ResourceExists(resource)))
         {
             Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
             return this.BadRequest();
@@ -168,14 +161,12 @@ public class PublishController : ControllerBase
         // Republish logic
         if (slot.SlotId != 0)
         {
-            Slot? oldSlot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+            Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
             if (oldSlot == null)
             {
                 Logger.Warn("Rejecting level republish, wasn't able to find old slot", LogArea.Publish);
                 return this.NotFound();
             }
-
-            if (oldSlot.Location == null) throw new ArgumentNullException();
 
             if (oldSlot.CreatorId != user.UserId)
             {
@@ -199,11 +190,7 @@ public class PublishController : ControllerBase
                 }
             }
 
-            oldSlot.Location.X = slot.Location.X;
-            oldSlot.Location.Y = slot.Location.Y;
-
             slot.CreatorId = oldSlot.CreatorId;
-            slot.LocationId = oldSlot.LocationId;
             slot.SlotId = oldSlot.SlotId;
 
             #region Set plays
@@ -247,15 +234,6 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        //TODO: parse location in body
-        Location l = new()
-        {
-            X = slot.Location.X,
-            Y = slot.Location.Y,
-        };
-        this.database.Locations.Add(l);
-        await this.database.SaveChangesAsync();
-        slot.LocationId = l.Id;
         slot.CreatorId = user.UserId;
         slot.FirstUploaded = TimeHelper.TimestampMillis;
         slot.LastUpdated = TimeHelper.TimestampMillis;
@@ -288,14 +266,11 @@ public class PublishController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
+        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
-
-        if (slot.Location == null) throw new ArgumentNullException(nameof(id));
 
         if (slot.CreatorId != token.UserId) return this.StatusCode(403, "");
 
-        this.database.Locations.Remove(slot.Location);
         this.database.Slots.Remove(slot);
 
         await this.database.SaveChangesAsync();

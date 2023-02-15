@@ -12,17 +12,17 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 public static class DatabaseExtensions
 {
     public static IQueryable<Slot> ByGameVersion
-        (this DbSet<Slot> set, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false)
-        => set.AsQueryable().ByGameVersion(gameVersion, includeSublevels, includeCreatorAndLocation);
+        (this DbSet<Slot> set, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false)
+        => set.AsQueryable().ByGameVersion(gameVersion, includeSublevels, includeCreator);
 
     public static IQueryable<Slot> ByGameVersion
-        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreatorAndLocation = false, bool includeDeveloperLevels = false)
+        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false, bool includeDeveloperLevels = false)
     {
-        query = query.Where(s => (s.Type == SlotType.User) || (s.Type == SlotType.Developer && includeDeveloperLevels));
+        query = query.Where(s => s.Type == SlotType.User || (s.Type == SlotType.Developer && includeDeveloperLevels));
 
-        if (includeCreatorAndLocation)
+        if (includeCreator)
         {
-            query = query.Include(s => s.Creator).Include(s => s.Location);
+            query = query.Include(s => s.Creator);
         }
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
@@ -41,7 +41,7 @@ public static class DatabaseExtensions
 
     public static IQueryable<Review> ByGameVersion(this IQueryable<Review> queryable, GameVersion gameVersion, bool includeSublevels = false)
     {
-        IQueryable<Review> query = queryable.Include(r => r.Slot).Include(r => r.Slot.Creator).Include(r => r.Slot.Location);
+        IQueryable<Review> query = queryable.Include(r => r.Slot).Include(r => r.Slot.Creator);
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {

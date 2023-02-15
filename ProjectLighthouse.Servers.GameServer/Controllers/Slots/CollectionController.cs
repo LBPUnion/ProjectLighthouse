@@ -35,7 +35,6 @@ public class CollectionController : ControllerBase
         if (targetPlaylist == null) return this.BadRequest();
 
         IQueryable<Slot> slots = this.database.Slots.Include(s => s.Creator)
-            .Include(s => s.Location)
             .Where(s => targetPlaylist.SlotIds.Contains(s.SlotId));
 
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());

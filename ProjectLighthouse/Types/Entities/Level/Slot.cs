@@ -72,16 +72,33 @@ public class Slot
     public string ResourceCollection { get; set; } = "";
 
     [NotMapped]
-    [XmlElement("resource")]
     [JsonIgnore]
-    public string[] Resources {
+    [XmlElement("resource")]
+    public string[]? Resources {
         get => this.ResourceCollection.Split(",");
-        set => this.ResourceCollection = string.Join(',', value);
+        set => this.ResourceCollection = string.Join(',', value ?? Array.Empty<string>());
     }
 
-    [XmlIgnore]
+    /// <summary>
+    ///     The location of the profile card on the user's earth
+    ///     Stored as a single 64 bit unsigned integer but split into
+    ///     2 unsigned 32 bit integers
+    /// </summary>
     [JsonIgnore]
-    public int LocationId { get; set; }
+    public ulong LocationPacked { get; set; }
+
+    [NotMapped]
+    [XmlElement("location")]
+    public Location Location
+    {
+        get =>
+            new()
+            {
+                X = (int)(this.LocationPacked >> 32),
+                Y = (int)this.LocationPacked,
+            };
+        set => this.LocationPacked = (ulong)value.X << 32 | (uint)value.Y;
+    }
 
     [XmlIgnore]
     public int CreatorId { get; set; }
@@ -89,14 +106,6 @@ public class Slot
     [ForeignKey(nameof(CreatorId))]
     [JsonIgnore]
     public User? Creator { get; set; }
-
-    /// <summary>
-    ///     The location of the level on the creator's earth
-    /// </summary>
-    [XmlElement("location")]
-    [ForeignKey(nameof(LocationId))]
-    [JsonIgnore]
-    public Location? Location { get; set; }
 
     [XmlElement("initiallyLocked")]
     public bool InitiallyLocked { get; set; }
@@ -296,7 +305,7 @@ public class Slot
 
         string slotData = LbpSerializer.StringElement("id", this.SlotId) +
                           LbpSerializer.StringElement("npHandle", this.Creator?.Username) +
-                          LbpSerializer.StringElement("location", this.Location?.Serialize()) +
+                          LbpSerializer.StringElement("location", this.Location.Serialize()) +
                           LbpSerializer.StringElement("game", (int)this.GameVersion) +
                           LbpSerializer.StringElement("name", this.Name) +
                           LbpSerializer.StringElement("description", this.Description) +
@@ -355,7 +364,7 @@ public class Slot
                           LbpSerializer.StringElement("lbp3CompletionCount", this.PlaysLBP3Complete) +
                           LbpSerializer.StringElement("lbp3UniquePlayCount", this.PlaysLBP3Unique) +
                           (gameVersion == GameVersion.LittleBigPlanetVita ?
-                              LbpSerializer.StringElement("sizeOfResources", this.Resources.Sum(FileHelper.ResourceSize))
+                              LbpSerializer.StringElement("sizeOfResources", this.Resources!.Sum(FileHelper.ResourceSize))
                               : "");
 
 

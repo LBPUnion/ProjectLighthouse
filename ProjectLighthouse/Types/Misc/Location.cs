@@ -10,9 +10,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Misc;
 [XmlType("location")]
 public class Location
 {
-    [XmlIgnore]
-    public int Id { get; set; }
-
     [XmlElement("x")]
     public int X { get; set; }
 

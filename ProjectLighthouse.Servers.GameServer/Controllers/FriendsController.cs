@@ -78,7 +78,7 @@ public class FriendsController : ControllerBase
         string friends = "";
         foreach (int friendId in friendStore.FriendIds)
         {
-            User? friend = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == friendId);
+            User? friend = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == friendId);
             if (friend == null) continue;
 
             friends += friend.Serialize(token.GameVersion);

@@ -266,7 +266,7 @@ public class ListController : ControllerBase
                 (q => q.HeartedUser)
             .OrderBy(q => q.HeartedProfileId)
             .Where(q => q.UserId == targetUser.UserId)
-            .Include(q => q.HeartedUser.Location)
+            .Include(q => q.HeartedUser)
             .Select(q => q.HeartedUser)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
@@ -368,7 +368,7 @@ public class ListController : ControllerBase
                 whereQueuedLevels = this.database.QueuedLevels.Where(q => q.User.Username == username)
                 .Where(q => q.Slot.Type == SlotType.User && !q.Slot.Hidden && q.Slot.GameVersion == gameVersion && q.Slot.FirstUploaded >= oldestTime);
 
-            return whereQueuedLevels.OrderByDescending(q => q.QueuedLevelId).Include(q => q.Slot.Creator).Include(q => q.Slot.Location).Select(q => q.Slot).ByGameVersion(gameVersion, false, false, true);
+            return whereQueuedLevels.OrderByDescending(q => q.QueuedLevelId).Include(q => q.Slot.Creator).Select(q => q.Slot).ByGameVersion(gameVersion, false, false, true);
         } else
         {
             IQueryable<HeartedLevel> whereHeartedLevels;
@@ -384,7 +384,7 @@ public class ListController : ControllerBase
                 whereHeartedLevels = this.database.HeartedLevels.Where(h => h.User.Username == username)
                 .Where(h => (h.Slot.Type == SlotType.User || h.Slot.Type == SlotType.Developer) && !h.Slot.Hidden && h.Slot.GameVersion == gameVersion && h.Slot.FirstUploaded >= oldestTime);
 
-            return whereHeartedLevels.OrderByDescending(h => h.HeartedLevelId).Include(h => h.Slot.Creator).Include(h => h.Slot.Location).Select(h => h.Slot).ByGameVersion(gameVersion, false, false, true);
+            return whereHeartedLevels.OrderByDescending(h => h.HeartedLevelId).Include(h => h.Slot.Creator).Select(h => h.Slot).ByGameVersion(gameVersion, false, false, true);
         }
     }
     #endregion Filtering

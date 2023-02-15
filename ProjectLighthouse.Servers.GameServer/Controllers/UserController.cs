@@ -32,7 +32,7 @@ public class UserController : ControllerBase
 
     private async Task<string?> getSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
-        User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
+        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         return user?.Serialize(gameVersion);
     }
 
@@ -126,12 +126,7 @@ public class UserController : ControllerBase
 
                 if (slot.CreatorId != token.UserId) continue;
 
-                Location? loc = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == slot.LocationId);
-
-                if (loc == null) throw new ArgumentNullException();
-
-                loc.X = updateSlot.Location.X;
-                loc.Y = updateSlot.Location.Y;
+                slot.Location = updateSlot.Location;
             }
         }
 
@@ -169,11 +164,7 @@ public class UserController : ControllerBase
 
         if (update.Location != null)
         {
-            Location? loc = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == user.LocationId);
-            if (loc == null) throw new Exception("User loc is null, this should never happen.");
-
-            loc.X = update.Location.X;
-            loc.Y = update.Location.Y;
+            user.Location = update.Location;
         }
 
         if (this.database.ChangeTracker.HasChanges()) await this.database.SaveChangesAsync();
