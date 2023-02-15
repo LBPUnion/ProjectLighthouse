@@ -80,7 +80,7 @@ public class Slot
     }
 
     /// <summary>
-    ///     The location of the profile card on the user's earth
+    ///     The location of the level on the user's earth
     ///     Stored as a single 64 bit unsigned integer but split into
     ///     2 unsigned 32 bit integers
     /// </summary>

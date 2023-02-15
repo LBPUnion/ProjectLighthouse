@@ -266,7 +266,6 @@ public class ListController : ControllerBase
                 (q => q.HeartedUser)
             .OrderBy(q => q.HeartedProfileId)
             .Where(q => q.UserId == targetUser.UserId)
-            .Include(q => q.HeartedUser)
             .Select(q => q.HeartedUser)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
