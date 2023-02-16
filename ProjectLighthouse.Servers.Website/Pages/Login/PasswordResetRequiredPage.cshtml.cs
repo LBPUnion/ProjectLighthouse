@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class PasswordResetRequiredPage : BaseLayout
 {
-    public PasswordResetRequiredPage(Database database) : base(database)
+    public PasswordResetRequiredPage(DatabaseContext database) : base(database)
     {}
 
     public bool WasResetRequest { get; private set; }

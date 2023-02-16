@@ -1,12 +1,12 @@
 @using System.Diagnostics
-@using LBPUnion.ProjectLighthouse
+@using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Types.Entities.Level
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @model LBPUnion.ProjectLighthouse.Types.Entities.Moderation.ModerationCase
 
 @{
-    Database database = new();
+    DatabaseContext database = new();
     string color = "blue";
 
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;

@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -24,9 +25,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Produces("text/xml")]
 public class PublishController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public PublishController(Database database)
+    public PublishController(DatabaseContext database)
     {
         this.database = database;
     }

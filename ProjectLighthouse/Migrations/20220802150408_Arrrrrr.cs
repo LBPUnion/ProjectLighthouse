@@ -1,5 +1,6 @@
 ﻿using System;
 using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectLighthouse.Migrations
 {
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20220802150408_Arrrrrr")]
     public partial class Arrrrrr : Migration
     {

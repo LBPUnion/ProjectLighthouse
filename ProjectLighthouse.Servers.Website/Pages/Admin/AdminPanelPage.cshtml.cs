@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -14,7 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
 public class AdminPanelPage : BaseLayout
 {
     public List<ICommand> Commands = MaintenanceHelper.Commands;
-    public AdminPanelPage(Database database) : base(database)
+    public AdminPanelPage(DatabaseContext database) : base(database)
     { }
 
     public List<AdminPanelStatistic> Statistics = new();

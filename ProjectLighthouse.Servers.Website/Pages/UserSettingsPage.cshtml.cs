@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization;
@@ -15,7 +16,7 @@ public class UserSettingsPage : BaseLayout
 {
 
     public User? ProfileUser;
-    public UserSettingsPage(Database database) : base(database)
+    public UserSettingsPage(DatabaseContext database) : base(database)
     {}
 
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]

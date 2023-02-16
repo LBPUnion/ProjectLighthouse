@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -13,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
 public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
     public string Name() => "Cleanup Broken Photos";
     public string Description() => "Deletes all photos that have missing assets or invalid photo subjects.";
 

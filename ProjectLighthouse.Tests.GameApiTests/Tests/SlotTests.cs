@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
@@ -18,7 +18,7 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
     [DatabaseFact]
     public async Task ShouldOnlyShowUsersLevels()
     {
-        await using Database database = new();
+        await using DatabaseContext database = new();
 
         Random r = new();
 

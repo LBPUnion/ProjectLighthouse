@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -21,9 +22,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 [Produces("text/xml")]
 public class MatchController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public MatchController(Database database)
+    public MatchController(DatabaseContext database)
     {
         this.database = database;
     }

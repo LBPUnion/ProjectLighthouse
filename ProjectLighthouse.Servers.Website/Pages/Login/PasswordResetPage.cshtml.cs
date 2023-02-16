@@ -1,6 +1,7 @@
 #nullable enable
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -10,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class PasswordResetPage : BaseLayout
 {
-    public PasswordResetPage(Database database) : base(database)
+    public PasswordResetPage(DatabaseContext database) : base(database)
     {}
 
     public string? Error { get; private set; }

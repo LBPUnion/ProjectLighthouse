@@ -1,4 +1,5 @@
-﻿using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
+﻿using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ public class AdminApiKeyPageModel : BaseLayout
         public List<ApiKey> ApiKeys = new();
         public int KeyCount;
 
-        public AdminApiKeyPageModel(Database database) : base(database)
+        public AdminApiKeyPageModel(DatabaseContext database) : base(database)
         { }
 
         public async Task<IActionResult> OnGet()

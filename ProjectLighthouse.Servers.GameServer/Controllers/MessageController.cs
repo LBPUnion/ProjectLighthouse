@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -18,7 +19,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Produces("text/plain")]
 public class MessageController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
     private const string license = @"
 This program is free software: you can redistribute it and/or modify
@@ -34,7 +35,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
-    public MessageController(Database database)
+    public MessageController(DatabaseContext database)
     {
         this.database = database;
     }

@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -15,9 +16,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 [Route("moderation/user/{id:int}")]
 public class AdminUserController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public AdminUserController(Database database)
+    public AdminUserController(DatabaseContext database)
     {
         this.database = database;
     }

@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -19,9 +20,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers;
 [Route("slot/{id:int}")]
 public class SlotPageController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public SlotPageController(Database database)
+    public SlotPageController(DatabaseContext database)
     {
         this.database = database;
     }

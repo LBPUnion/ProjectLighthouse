@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
@@ -8,7 +9,7 @@ public class FixBrokenVersusScores : IMigrationTask
 {
     public string Name() => "Cleanup versus scores";
 
-    async Task<bool> IMigrationTask.Run(Database database)
+    async Task<bool> IMigrationTask.Run(DatabaseContext database)
     {
         foreach (Score score in database.Scores)
         {

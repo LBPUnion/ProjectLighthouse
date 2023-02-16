@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -24,7 +25,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands
             }
             key.Key = CryptoHelper.GenerateAuthToken();
             key.Created = DateTime.Now;
-            Database database = new();
+            DatabaseContext database = new();
             await database.APIKeys.AddAsync(key);
             await database.SaveChangesAsync();
             logger.LogSuccess($"The API key has been created (id: {key.Id}), however for security the token will only be shown once.", LogArea.Command);

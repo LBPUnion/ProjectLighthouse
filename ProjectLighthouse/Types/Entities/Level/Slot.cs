@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -28,16 +29,16 @@ public class Slot
     [NotMapped]
     [JsonIgnore]
     [XmlIgnore]
-    private Database? _database;
+    private DatabaseContext? _database;
 
     [NotMapped]
     [JsonIgnore]
     [XmlIgnore]
-    private Database database {
+    private DatabaseContext database {
         get {
             if (this._database != null) return this._database;
 
-            return this._database = new Database();
+            return this._database = new DatabaseContext();
         }
         set => this._database = value;
     }

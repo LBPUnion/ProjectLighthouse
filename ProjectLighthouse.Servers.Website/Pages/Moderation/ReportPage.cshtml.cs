@@ -1,4 +1,5 @@
 using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -10,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class ReportPage : BaseLayout
 {
-    public ReportPage(Database database) : base(database)
+    public ReportPage(DatabaseContext database) : base(database)
     {}
 
     public GriefReport Report = null!; // Report is not used if it's null in OnGet

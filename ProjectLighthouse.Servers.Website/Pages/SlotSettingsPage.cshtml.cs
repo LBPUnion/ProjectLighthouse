@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -12,7 +13,7 @@ public class SlotSettingsPage : BaseLayout
 {
 
     public Slot? Slot;
-    public SlotSettingsPage(Database database) : base(database)
+    public SlotSettingsPage(DatabaseContext database) : base(database)
     {}
 
     public async Task<IActionResult> OnPost([FromRoute] int slotId, [FromForm] string? avatar, [FromForm] string? name, [FromForm] string? description, string? labels)

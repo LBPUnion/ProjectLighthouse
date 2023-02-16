@@ -1,5 +1,6 @@
 ﻿using System;
 using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectLighthouse.Migrations
 {
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20220624210701_AddedPasswordResetTokens")]
     public partial class AddedPasswordResetTokens : Migration
     {

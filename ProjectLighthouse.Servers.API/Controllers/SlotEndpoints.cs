@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 /// </summary>
 public class SlotEndpoints : ApiEndpointController
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public SlotEndpoints(Database database)
+    public SlotEndpoints(DatabaseContext database)
     {
         this.database = database;
     }

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -16,7 +16,7 @@ public class RegisterTests : LighthouseWebTest
     [DatabaseFact]
     public async Task ShouldRegister()
     {
-        await using Database database = new();
+        await using DatabaseContext database = new();
 
         string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
@@ -41,7 +41,7 @@ public class RegisterTests : LighthouseWebTest
     [DatabaseFact]
     public async Task ShouldNotRegisterWithMismatchingPasswords()
     {
-        await using Database database = new();
+        await using DatabaseContext database = new();
 
         string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
@@ -64,7 +64,7 @@ public class RegisterTests : LighthouseWebTest
     [DatabaseFact]
     public async Task ShouldNotRegisterWithTakenUsername()
     {
-        await using Database database = new();
+        await using DatabaseContext database = new();
 
         string username = ("unitTestUser" + new Random().Next())[..16];
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());

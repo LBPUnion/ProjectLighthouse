@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
 
 public class AdminSetGrantedSlotsPage : BaseLayout
 {
-    public AdminSetGrantedSlotsPage(Database database) : base(database)
+    public AdminSetGrantedSlotsPage(DatabaseContext database) : base(database)
     {}
 
     public User? TargetedUser;

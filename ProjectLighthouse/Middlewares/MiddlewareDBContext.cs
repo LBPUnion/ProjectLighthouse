@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.AspNetCore.Http;
 
 namespace LBPUnion.ProjectLighthouse.Middlewares;
@@ -17,5 +18,5 @@ public abstract class MiddlewareDBContext
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
-    public abstract Task InvokeAsync(HttpContext ctx, Database db);
+    public abstract Task InvokeAsync(HttpContext ctx, DatabaseContext db);
 }

@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -13,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Email;
 
 public class SetEmailForm : BaseLayout
 {
-    public SetEmailForm(Database database) : base(database)
+    public SetEmailForm(DatabaseContext database) : base(database)
     {}
 
     public string? Error { get; private set; }

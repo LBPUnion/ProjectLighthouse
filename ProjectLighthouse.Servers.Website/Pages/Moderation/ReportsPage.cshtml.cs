@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -22,7 +23,7 @@ public class ReportsPage : BaseLayout
 
     public string SearchValue = "";
 
-    public ReportsPage(Database database) : base(database)
+    public ReportsPage(DatabaseContext database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)

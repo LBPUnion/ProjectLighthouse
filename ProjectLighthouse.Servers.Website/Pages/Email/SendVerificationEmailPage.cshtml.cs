@@ -1,5 +1,6 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Email;
 
 public class SendVerificationEmailPage : BaseLayout
 {
-    public SendVerificationEmailPage(Database database) : base(database)
+    public SendVerificationEmailPage(DatabaseContext database) : base(database)
     {}
 
     public bool Success { get; set; }

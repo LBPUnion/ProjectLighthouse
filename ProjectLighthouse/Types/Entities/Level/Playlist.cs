@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
@@ -27,7 +28,7 @@ public class Playlist
     [JsonIgnore]
     public User? Creator { get; set; }
 
-    public int Hearts(Database database) => database.HeartedPlaylists.Count(p => p.HeartedPlaylistId == this.PlaylistId);
+    public int Hearts(DatabaseContext database) => database.HeartedPlaylists.Count(p => p.HeartedPlaylistId == this.PlaylistId);
 
     public string SlotCollection { get; set; } = "";
 
@@ -45,7 +46,7 @@ public class Playlist
 
     public string Serialize()
     {
-        using Database database = new();
+        using DatabaseContext database = new();
         string playlist = LbpSerializer.StringElement("id", this.PlaylistId) +
                           LbpSerializer.StringElement("author",
                           LbpSerializer.StringElement("npHandle", this.Creator?.Username)) +
@@ -59,7 +60,7 @@ public class Playlist
         return LbpSerializer.StringElement("playlist", playlist);
     }
 
-    private string SerializeIcons(Database database)
+    private string SerializeIcons(DatabaseContext database)
     {
         string iconList = this.SlotIds.Select(id => database.Slots.FirstOrDefault(s => s.SlotId == id))
             .Where(slot => slot != null && slot.IconHash.Length > 0)

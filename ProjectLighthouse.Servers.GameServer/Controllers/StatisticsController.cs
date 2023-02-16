@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class StatisticsController : ControllerBase
 {
 
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public StatisticsController(Database database)
+    public StatisticsController(DatabaseContext database)
     {
         this.database = database;
     }

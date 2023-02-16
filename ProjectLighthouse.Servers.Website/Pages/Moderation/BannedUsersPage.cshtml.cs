@@ -1,4 +1,5 @@
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class BannedUsersPage : BaseLayout
 {
-    public BannedUsersPage(Database database) : base(database)
+    public BannedUsersPage(DatabaseContext database) : base(database)
     {}
 
     public List<User> Users = new();

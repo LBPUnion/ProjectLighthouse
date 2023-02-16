@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -8,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class NewCasePage : BaseLayout
 {
-    public NewCasePage(Database database) : base(database)
+    public NewCasePage(DatabaseContext database) : base(database)
     {}
 
     public CaseType Type { get; set; }

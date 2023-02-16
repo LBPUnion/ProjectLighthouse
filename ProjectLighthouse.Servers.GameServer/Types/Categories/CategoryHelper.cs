@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
@@ -18,7 +19,7 @@ public static class CategoryHelper
         Categories.Add(new HeartedCategory());
         Categories.Add(new LuckyDipCategory());
 
-        using Database database = new();
+        using DatabaseContext database = new();
         foreach (DatabaseCategory category in database.CustomCategories) Categories.Add(new CustomCategory(category));
     }
 }

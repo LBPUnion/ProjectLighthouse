@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Misc;
@@ -15,7 +16,7 @@ public static class ServerStatics
         get {
             try
             {
-                using Database db = new();
+                using DatabaseContext db = new();
                 return db.Database.CanConnect();
             }
             catch(Exception e)

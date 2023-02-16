@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Tickets;
 

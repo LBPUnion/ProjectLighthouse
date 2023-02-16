@@ -1,6 +1,7 @@
 #nullable enable
 using System.Net;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -19,9 +20,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Produces("text/xml")]
 public class LoginController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public LoginController(Database database)
+    public LoginController(DatabaseContext database)
     {
         this.database = database;
     }

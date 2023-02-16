@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
@@ -14,7 +14,7 @@ public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
     [DatabaseFact]
     public async Task CanCreateUserTwice()
     {
-        await using Database database = new();
+        await using DatabaseContext database = new();
         int rand = new Random().Next();
 
         User userA = await database.CreateUser("unitTestUser" + rand, CryptoHelper.GenerateAuthToken());

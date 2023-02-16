@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
@@ -47,13 +48,13 @@ public class ModerationCase
     public int AffectedId { get; set; }
 
     #region Get affected id result
-    public Task<User?> GetUserAsync(Database database)
+    public Task<User?> GetUserAsync(DatabaseContext database)
     {
         Debug.Assert(this.Type.AffectsUser());
         return database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId);
     }
     
-    public Task<Slot?> GetSlotAsync(Database database)
+    public Task<Slot?> GetSlotAsync(DatabaseContext database)
     {
         Debug.Assert(this.Type.AffectsLevel());
         return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId);

@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -11,9 +12,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.ExternalAuth;
 [Route("/authentication")]
 public class AuthenticationController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public AuthenticationController(Database database)
+    public AuthenticationController(DatabaseContext database)
     {
         this.database = database;
     }
