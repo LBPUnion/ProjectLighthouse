@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -17,15 +18,15 @@ public class User
     #nullable enable
     [NotMapped]
     [JsonIgnore]
-    private Database? _database;
+    private DatabaseContext? _database;
 
     [NotMapped]
     [JsonIgnore]
-    private Database database {
+    private DatabaseContext database {
         get {
             if (this._database != null) return this._database;
 
-            return this._database = new Database();
+            return this._database = new DatabaseContext();
         }
         set => this._database = value;
     }

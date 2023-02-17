@@ -17,7 +17,6 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 #if DEBUG
-using System.Text;
 using System.Text.Json;
 #endif
 

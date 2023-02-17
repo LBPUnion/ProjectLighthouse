@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
@@ -47,7 +47,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
 
         await semaphore.WaitAsync();
 
-        await using Database database = new();
+        await using DatabaseContext database = new();
 
         int oldPlayerCount = await StatisticsHelper.RecentMatches(database);
 

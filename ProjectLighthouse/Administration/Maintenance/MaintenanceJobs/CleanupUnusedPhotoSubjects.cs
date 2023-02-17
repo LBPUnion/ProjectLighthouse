@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
 public class CleanupUnusedPhotoSubjects : IMaintenanceJob
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
     public string Name() => "Cleanup Unused PhotoSubjects";
     public string Description() => "Cleanup unused photo subjects in the database.";
 

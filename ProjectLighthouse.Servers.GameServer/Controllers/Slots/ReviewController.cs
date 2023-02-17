@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -18,9 +19,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Produces("text/xml")]
 public class ReviewController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public ReviewController(Database database)
+    public ReviewController(DatabaseContext database)
     {
         this.database = database;
     }

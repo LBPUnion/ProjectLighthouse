@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
@@ -10,7 +11,7 @@ public class CleanupXmlInjectionMigration : IMigrationTask
     public string Name() => "Cleanup XML injections";
 
     // Weird, but required. Thanks, hejlsberg.
-    async Task<bool> IMigrationTask.Run(Database database)
+    async Task<bool> IMigrationTask.Run(DatabaseContext database)
     {
         List<object> objsToBeSanitized = new();
         

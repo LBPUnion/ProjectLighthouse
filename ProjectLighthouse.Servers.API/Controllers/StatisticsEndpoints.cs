@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -11,9 +12,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 public class StatisticsEndpoints : ApiEndpointController
 {
 
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public StatisticsEndpoints(Database database)
+    public StatisticsEndpoints(DatabaseContext database)
     {
         this.database = database;
     }

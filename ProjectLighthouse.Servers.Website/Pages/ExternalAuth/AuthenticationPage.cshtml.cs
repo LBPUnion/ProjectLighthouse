@@ -1,5 +1,6 @@
 #nullable enable
 using System.Net;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ public class AuthenticationPage : BaseLayout
     public List<PlatformLinkAttempt> LinkAttempts = new();
 
     public IPAddress? IpAddress;
-    public AuthenticationPage(Database database) : base(database)
+    public AuthenticationPage(DatabaseContext database) : base(database)
     {}
 
     public IActionResult OnGet()

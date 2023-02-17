@@ -1,4 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -11,7 +12,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
     public UserRequiredRedirectMiddleware(RequestDelegate next) : base(next)
     { }
 
-    public override async Task InvokeAsync(HttpContext ctx, Database database)
+    public override async Task InvokeAsync(HttpContext ctx, DatabaseContext database)
     {
         WebToken? token = database.WebTokenFromRequest(ctx.Request);
         if (token == null || pathContains(ctx, "/logout"))

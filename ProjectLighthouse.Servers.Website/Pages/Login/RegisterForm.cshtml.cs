@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
@@ -14,7 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class RegisterForm : BaseLayout
 {
-    public RegisterForm(Database database) : base(database)
+    public RegisterForm(DatabaseContext database) : base(database)
     { }
 
     public string? Error { get; private set; }

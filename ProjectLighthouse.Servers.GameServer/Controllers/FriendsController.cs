@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -18,9 +19,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Route("LITTLEBIGPLANETPS3_XML/")]
 public class FriendsController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public FriendsController(Database database)
+    public FriendsController(DatabaseContext database)
     {
         this.database = database;
     }

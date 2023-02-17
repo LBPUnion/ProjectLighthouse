@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -26,7 +27,7 @@ public class UserStatus
     public UserStatus()
     {}
 
-    public UserStatus(Database database, int userId)
+    public UserStatus(DatabaseContext database, int userId)
     {
         LastContact? lastContact = database.LastContacts.Where(l => l.UserId == userId).FirstOrDefault(l => TimeHelper.Timestamp - l.Timestamp < 300);
 

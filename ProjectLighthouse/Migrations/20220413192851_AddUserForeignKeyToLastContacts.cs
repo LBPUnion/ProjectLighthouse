@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ProjectLighthouse.Migrations
 {
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20220413192851_AddUserForeignKeyToLastContacts")]
     public partial class AddUserForeignKeyToLastContacts : Migration
     {

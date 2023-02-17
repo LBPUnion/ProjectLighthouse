@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -17,7 +18,7 @@ public partial class SMTPHelper
     // (User id, timestamp of last request + 30 seconds)
     private static readonly ConcurrentDictionary<int, long> recentlySentEmail = new();
 
-    public static async Task<bool> SendVerificationEmail(Database database, User user)
+    public static async Task<bool> SendVerificationEmail(DatabaseContext database, User user)
     {
         // Remove expired entries
         for (int i = recentlySentEmail.Count - 1; i >= 0; i--)

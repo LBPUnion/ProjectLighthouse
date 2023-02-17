@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -22,9 +23,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Produces("text/xml")]
 public class ScoreController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public ScoreController(Database database)
+    public ScoreController(DatabaseContext database)
     {
         this.database = database;
     }

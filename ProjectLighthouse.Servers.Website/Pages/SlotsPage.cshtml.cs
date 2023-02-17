@@ -1,6 +1,7 @@
 #nullable enable
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -23,7 +24,7 @@ public class SlotsPage : BaseLayout
 
     public string? SearchValue;
 
-    public SlotsPage(Database database) : base(database)
+    public SlotsPage(DatabaseContext database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)

@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -18,8 +19,8 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Produces("text/xml")]
 public class CommentController : ControllerBase
 {
-    private readonly Database database;
-    public CommentController(Database database)
+    private readonly DatabaseContext database;
+    public CommentController(DatabaseContext database)
     {
         this.database = database;
     }

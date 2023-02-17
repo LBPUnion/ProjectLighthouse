@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -59,7 +60,7 @@ public class Comment
             return "This comment has been deleted by the author.";
         }
 
-        using Database database = new();
+        using DatabaseContext database = new();
         User deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
 
         if (deletedBy != null && deletedBy.UserId == this.TargetId)

@@ -1,4 +1,5 @@
-﻿using LBPUnion.ProjectLighthouse.Extensions;
+﻿using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -14,9 +15,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class LogoutController : ControllerBase
 {
 
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public LogoutController(Database database)
+    public LogoutController(DatabaseContext database)
     {
         this.database = database;
     }

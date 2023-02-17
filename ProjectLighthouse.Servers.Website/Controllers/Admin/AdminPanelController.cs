@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
@@ -7,9 +8,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 [Route("/admin")]
 public class AdminPanelController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public AdminPanelController(Database database)
+    public AdminPanelController(DatabaseContext database)
     {
         this.database = database;
     }

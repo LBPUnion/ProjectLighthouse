@@ -1,4 +1,4 @@
-using LBPUnion.ProjectLighthouse.Administration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Moderator;
 [Route("moderation/case/{id:int}")]
 public class ModerationCaseController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public ModerationCaseController(Database database)
+    public ModerationCaseController(DatabaseContext database)
     {
         this.database = database;
     }

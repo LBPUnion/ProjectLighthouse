@@ -1,4 +1,5 @@
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
 public class HiddenLevelsPage : BaseLayout
 {
-    public HiddenLevelsPage(Database database) : base(database)
+    public HiddenLevelsPage(DatabaseContext database) : base(database)
     {}
 
     public int PageAmount;

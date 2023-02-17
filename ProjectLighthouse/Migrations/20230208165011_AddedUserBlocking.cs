@@ -1,4 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
 
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20230208165011_AddedUserBlocking")]
     public partial class AddedUserBlocking : Migration
     {

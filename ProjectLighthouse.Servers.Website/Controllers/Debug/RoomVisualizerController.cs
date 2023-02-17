@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +10,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Debug;
 [Route("debug/roomVisualizer")]
 public class RoomVisualizerController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public RoomVisualizerController(Database database)
+    public RoomVisualizerController(DatabaseContext database)
     {
         this.database = database;
     }

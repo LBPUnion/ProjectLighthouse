@@ -1,4 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
@@ -11,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.TwoFactor;
 
 public class TwoFactorLoginPage : BaseLayout
 {
-    public TwoFactorLoginPage(Database database) : base(database)
+    public TwoFactorLoginPage(DatabaseContext database) : base(database)
     { }
 
     public string Error { get; set; } = "";

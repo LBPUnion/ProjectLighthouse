@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
@@ -17,9 +18,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Produces("text/xml")]
 public class ReportController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public ReportController(Database database)
+    public ReportController(DatabaseContext database)
     {
         this.database = database;
     }

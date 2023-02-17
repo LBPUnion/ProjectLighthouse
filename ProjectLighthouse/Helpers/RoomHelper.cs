@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.StorableLists;
@@ -84,7 +85,7 @@ public class RoomHelper
 
             response.Players = new List<Player>();
             response.Locations = new List<string>();
-            foreach (User player in room.GetPlayers(new Database()))
+            foreach (User player in room.GetPlayers(new DatabaseContext()))
             {
                 response.Players.Add
                 (
@@ -186,7 +187,7 @@ public class RoomHelper
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    public static Task CleanupRooms(int? hostId = null, Room? newRoom = null, Database? database = null)
+    public static Task CleanupRooms(int? hostId = null, Room? newRoom = null, DatabaseContext? database = null)
     {
         #if DEBUG
         Stopwatch stopwatch = new();
@@ -205,7 +206,7 @@ public class RoomHelper
             // Remove offline players from rooms
             foreach (Room room in rooms)
             {
-                List<User> players = room.GetPlayers(database ?? new Database());
+                List<User> players = room.GetPlayers(database ?? new DatabaseContext());
                 List<int> playersToRemove = players.Where(player => player.Status.StatusType == StatusType.Offline).Select(player => player.UserId).ToList();
 
                 foreach (int player in playersToRemove) room.PlayerIds.Remove(player);

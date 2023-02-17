@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
@@ -17,9 +18,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Produces("text/plain")]
 public class LevelTagsController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public LevelTagsController(Database database)
+    public LevelTagsController(DatabaseContext database)
     {
         this.database = database;
     }

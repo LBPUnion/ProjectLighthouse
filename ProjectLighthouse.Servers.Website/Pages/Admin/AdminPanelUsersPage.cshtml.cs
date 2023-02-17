@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ public class AdminPanelUsersPage : BaseLayout
     public int UserCount;
 
     public List<User> Users = new();
-    public AdminPanelUsersPage(Database database) : base(database)
+    public AdminPanelUsersPage(DatabaseContext database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet()

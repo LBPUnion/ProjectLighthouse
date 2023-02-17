@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -16,8 +17,8 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Produces("text/xml")]
 public class SearchController : ControllerBase
 {
-    private readonly Database database;
-    public SearchController(Database database)
+    private readonly DatabaseContext database;
+    public SearchController(DatabaseContext database)
     {
         this.database = database;
     }

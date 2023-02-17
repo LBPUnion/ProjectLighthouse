@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using LBPUnion.ProjectLighthouse;
+using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ProjectLighthouse.Migrations
 {
-    [DbContext(typeof(Database))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20211105205010_UpdatePhotoAndPhotoSubjectToDoStuffWeirdName")]
     public partial class UpdatePhotoAndPhotoSubjectToDoStuffWeirdName : Migration
     {

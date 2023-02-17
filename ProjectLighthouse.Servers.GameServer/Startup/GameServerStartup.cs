@@ -1,4 +1,5 @@
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -45,7 +46,7 @@ public class GameServerStartup
             }
         );
 
-        services.AddDbContext<Database>();
+        services.AddDbContext<DatabaseContext>();
 
         services.Configure<ForwardedHeadersOptions>
         (

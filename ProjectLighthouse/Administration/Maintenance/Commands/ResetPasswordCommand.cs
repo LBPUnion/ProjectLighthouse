@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -12,7 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class ResetPasswordCommand : ICommand
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
     public string Name() => "Reset Password";
     public string[] Aliases()
         => new[]

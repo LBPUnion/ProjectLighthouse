@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
@@ -19,7 +20,7 @@ public class PerformCaseActionsTask : IRepeatingTask
     public string Name => "Perform actions on moderation cases";
     public TimeSpan RepeatInterval => TimeSpan.FromSeconds(10);
     public DateTime LastRan { get; set; }
-    public async Task Run(Database database)
+    public async Task Run(DatabaseContext database)
     {
         foreach (ModerationCase @case in await database.Cases.Where(c => !c.Processed).ToListAsync())
         {

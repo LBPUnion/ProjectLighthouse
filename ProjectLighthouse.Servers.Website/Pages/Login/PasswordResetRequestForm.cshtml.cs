@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -16,7 +17,7 @@ public class PasswordResetRequestForm : BaseLayout
 
     public string? Status { get; private set; }
 
-    public PasswordResetRequestForm(Database database) : base(database)
+    public PasswordResetRequestForm(DatabaseContext database) : base(database)
     { }
 
     [UsedImplicitly]

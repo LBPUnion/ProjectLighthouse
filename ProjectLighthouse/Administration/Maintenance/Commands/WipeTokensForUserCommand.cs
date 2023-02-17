@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
@@ -11,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class WipeTokensForUserCommand : ICommand
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
 
     public string Name() => "Wipe tokens for user";
     public string[] Aliases()

@@ -1,4 +1,5 @@
-﻿using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+﻿using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +10,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Moderator;
 [Route("moderation")]
 public class ModerationRemovalController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public ModerationRemovalController(Database database)
+    public ModerationRemovalController(DatabaseContext database)
     {
         this.database = database;
     }

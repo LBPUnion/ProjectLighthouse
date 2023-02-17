@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class RoomExtensions
 {
-    public static List<User> GetPlayers(this Room room, Database database)
+    public static List<User> GetPlayers(this Room room, DatabaseContext database)
     {
         List<User> players = new();
         foreach (int playerId in room.PlayerIds)

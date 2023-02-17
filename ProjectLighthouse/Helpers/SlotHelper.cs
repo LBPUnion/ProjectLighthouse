@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -42,7 +43,7 @@ public static class SlotHelper
 
     private static readonly SemaphoreSlim semaphore = new(1, 1);
 
-    public static async Task<int> GetPlaceholderUserId(Database database)
+    public static async Task<int> GetPlaceholderUserId(DatabaseContext database)
     {
         int devCreatorId = await database.Users.Where(u => u.Username.Length == 0)
             .Select(u => u.UserId)
@@ -69,7 +70,7 @@ public static class SlotHelper
         }
     }
 
-    public static async Task<int> GetPlaceholderSlotId(Database database, int guid, SlotType slotType)
+    public static async Task<int> GetPlaceholderSlotId(DatabaseContext database, int guid, SlotType slotType)
     {
         int slotId = await database.Slots.Where(s => s.Type == slotType && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
         if (slotId != 0) return slotId;

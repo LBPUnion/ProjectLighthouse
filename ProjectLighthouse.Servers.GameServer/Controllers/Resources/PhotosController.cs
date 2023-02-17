@@ -1,6 +1,7 @@
 #nullable enable
 using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -23,9 +24,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Resources;
 [Produces("text/xml")]
 public class PhotosController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public PhotosController(Database database)
+    public PhotosController(DatabaseContext database)
     {
         this.database = database;
     }

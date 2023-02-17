@@ -1,12 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
 public class DeleteAllTokensMaintenanceJob : IMaintenanceJob
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
 
     public string Name() => "Delete ALL Tokens";
     public string Description() => "Deletes ALL game tokens and web tokens.";

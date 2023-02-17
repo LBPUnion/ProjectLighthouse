@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -13,9 +14,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 /// </summary>
 public class UserEndpoints : ApiEndpointController
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public UserEndpoints(Database database)
+    public UserEndpoints(DatabaseContext database)
     {
         this.database = database;
     }

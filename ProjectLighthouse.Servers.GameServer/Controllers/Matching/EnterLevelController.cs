@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
@@ -17,9 +18,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 [Produces("text/xml")]
 public class EnterLevelController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public EnterLevelController(Database database)
+    public EnterLevelController(DatabaseContext database)
     {
         this.database = database;
     }

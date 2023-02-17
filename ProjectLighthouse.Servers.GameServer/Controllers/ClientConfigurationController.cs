@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -17,9 +18,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Produces("text/plain")]
 public class ClientConfigurationController : ControllerBase
 {
-    private readonly Database database;
+    private readonly DatabaseContext database;
 
-    public ClientConfigurationController(Database database)
+    public ClientConfigurationController(DatabaseContext database)
     {
         this.database = database;
     }

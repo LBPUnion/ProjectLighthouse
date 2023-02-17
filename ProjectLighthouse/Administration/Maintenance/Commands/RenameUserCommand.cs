@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -11,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class RenameUserCommand : ICommand
 {
-    private readonly Database database = new();
+    private readonly DatabaseContext database = new();
     public async Task Run(string[] args, Logger logger)
     {
         User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
