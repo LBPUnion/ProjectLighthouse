@@ -39,15 +39,10 @@ public partial class DatabaseContext
         User? user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
         if (user != null) return user;
 
-        Location l = new(); // store to get id after submitting
-        this.Locations.Add(l); // add to table
-        await this.SaveChangesAsync(); // saving to the database returns the id and sets it on this entity
-
         user = new User
         {
             Username = username,
             Password = password,
-            LocationId = l.Id,
             Biography = "",
             EmailAddress = emailAddress,
         };
@@ -98,8 +93,6 @@ public partial class DatabaseContext
     {
         if (user == null) return;
         if (user.Username.Length == 0) return; // don't delete the placeholder user
-
-        if (user.Location != null) this.Locations.Remove(user.Location);
 
         LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
         if (lastContact != null) this.LastContacts.Remove(lastContact);

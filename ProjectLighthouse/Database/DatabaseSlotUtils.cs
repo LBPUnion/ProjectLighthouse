@@ -10,8 +10,6 @@ public partial class DatabaseContext
 {
     public async Task RemoveSlot(Slot slot, bool saveChanges = true)
     {
-        if (slot.Location != null) this.Locations.Remove(slot.Location);
-
         this.Slots.Remove(slot);
 
         if (saveChanges) await this.SaveChangesAsync();
@@ -22,7 +20,7 @@ public partial class DatabaseContext
         HeartedPlaylist? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
         if (heartedList != null) return;
 
-        this.HeartedPlaylists.Add(new HeartedPlaylist()
+        this.HeartedPlaylists.Add(new HeartedPlaylist
         {
             PlaylistId = heartedPlaylist.PlaylistId,
             UserId = userId,

@@ -28,7 +28,6 @@ public partial class DatabaseContext : DbContext
     #region Users
     public DbSet<Comment> Comments { get; set; }
     public DbSet<LastContact> LastContacts { get; set; }
-    public DbSet<Location> Locations { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<PhotoSubject> PhotoSubjects { get; set; }
     public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
