@@ -3,6 +3,7 @@ using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -36,6 +37,14 @@ public class ReportController : ControllerBase
         if (report == null) return this.BadRequest();
 
         SanitizationHelper.SanitizeStringsInClass(report);
+
+        if (string.IsNullOrWhiteSpace(report.JpegHash)) return this.BadRequest();
+
+        if (!FileHelper.ResourceExists(report.JpegHash)) return this.BadRequest();
+
+        if (report.XmlPlayers.Length > 4) return this.BadRequest();
+
+        if (report.XmlPlayers.Any(p => !this.database.IsUsernameValid(p.Name))) return this.BadRequest();
 
         report.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
         report.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));
