@@ -192,8 +192,8 @@ public static class GameVersionHelper
         LittleBigPlanet1TitleIds.ToList().ForEach(x => titleMap.Add(x, GameVersion.LittleBigPlanet1));
         LittleBigPlanet2TitleIds.ToList().ForEach(x => titleMap.Add(x, GameVersion.LittleBigPlanet2));
         LittleBigPlanet3TitleIds.ToList().ForEach(x => titleMap.Add(x, GameVersion.LittleBigPlanet3));
-        LittleBigPlanetVitaTitleIds.ToList().ForEach(x => titleMap.Add(x, GameVersion.LittleBigPlanetPSP));
-        LittleBigPlanetPSPTitleIds.ToList().ForEach(x => titleMap.Add(x, GameVersion.LittleBigPlanetVita));
+        LittleBigPlanetVitaTitleIds.ToList().ForEach(x => titleMap.Add(x, GameVersion.LittleBigPlanetVita));
+        LittleBigPlanetPSPTitleIds.ToList().ForEach(x => titleMap.Add(x, GameVersion.LittleBigPlanetPSP));
 
         return titleMap;
     }
