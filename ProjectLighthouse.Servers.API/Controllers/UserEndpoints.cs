@@ -51,6 +51,31 @@ public class UserEndpoints : ApiEndpointController
     }
 
     /// <summary>
+    /// Searches for the user based on the query
+    /// </summary>
+    /// <param name="query">The search query</param>
+    /// <returns>A list of users</returns>
+    /// <response code="200">The list of users, if any were found</response>
+    /// <response code="404">No users matched the query</response>
+    [HttpGet("user_search")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SearchUsers(string query)
+    {
+        List<User> users = await this.database.Users
+            .Where(u => u.PermissionLevel != PermissionLevel.Banned && u.Username.Contains(query))
+            .Where(u => u.ProfileVisibility == PrivacyType.All) // TODO: change check for when user is logged in
+            .OrderByDescending(b => b.UserId)
+            .ToListAsync();
+        if (users.Count == 0)
+        {
+            return this.NotFound();
+        }
+
+        return this.Ok(users);
+    }
+
+    /// <summary>
     /// Gets a user and their information from the database.
     /// </summary>
     /// <param name="id">The ID of the user</param>
