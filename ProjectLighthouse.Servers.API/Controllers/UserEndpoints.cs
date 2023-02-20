@@ -65,13 +65,10 @@ public class UserEndpoints : ApiEndpointController
         List<User> users = await this.database.Users
             .Where(u => u.PermissionLevel != PermissionLevel.Banned && u.Username.Contains(query))
             .Where(u => u.ProfileVisibility == PrivacyType.All) // TODO: change check for when user is logged in
-            .Take(20)
             .OrderByDescending(b => b.UserId)
+            .Take(20)
             .ToListAsync();
-        if (users.Count == 0)
-        {
-            return this.NotFound();
-        }
+        if (!users.Any()) return this.NotFound();
 
         return this.Ok(users);
     }
