@@ -57,7 +57,7 @@ public class UserEndpoints : ApiEndpointController
     /// <returns>A list of users</returns>
     /// <response code="200">The list of users, if any were found</response>
     /// <response code="404">No users matched the query</response>
-    [HttpGet("user_search")]
+    [HttpGet("search/user")]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SearchUsers(string query)
