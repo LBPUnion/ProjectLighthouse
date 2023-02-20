@@ -80,8 +80,8 @@ public class WebsiteStartup
         app.UseForwardedHeaders();
 
         app.UseMiddleware<RequestLogMiddleware>();
-        app.UseMiddleware<UserRequiredRedirectMiddleware>();
         app.UseMiddleware<RateLimitMiddleware>();
+        app.UseMiddleware<UserRequiredRedirectMiddleware>();
 
         app.UseRouting();
 

@@ -21,6 +21,8 @@ public partial class DatabaseContext
     [GeneratedRegex("^[a-zA-Z0-9_.-]{3,16}$")]
     private static partial Regex UsernameRegex();
 
+    public bool IsUsernameValid(string username) => UsernameRegex().IsMatch(username);
+
     #nullable enable
     public async Task<User> CreateUser(string username, string password, string? emailAddress = null)
     {
@@ -31,9 +33,7 @@ public partial class DatabaseContext
         {
             if (username.Length is > 16 or < 3) throw new ArgumentException(nameof(username) + " is either too long or too short");
 
-            Regex regex = UsernameRegex();
-
-            if (!regex.IsMatch(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
+            if (!this.IsUsernameValid(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
         }
 
         User? user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
