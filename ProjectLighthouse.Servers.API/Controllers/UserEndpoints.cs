@@ -68,10 +68,7 @@ public class UserEndpoints : ApiEndpointController
             .Take(20)
             .OrderByDescending(b => b.UserId)
             .ToListAsync();
-        if (users.Count == 0)
-        {
-            return this.NotFound();
-        }
+        if (!users.Any()) return this.NotFound();
 
         return this.Ok(users);
     }
