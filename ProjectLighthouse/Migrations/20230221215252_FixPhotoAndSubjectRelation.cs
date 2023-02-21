@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230215195324_ChangeLocationStorage")]
+    [Migration("20230221215252_FixPhotoAndSubjectRelation")]
     public partial class FixPhotoAndSubjectRelation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
