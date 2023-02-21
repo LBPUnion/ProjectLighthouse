@@ -22,6 +22,9 @@ namespace ProjectLighthouse.Migrations
             migrationBuilder.Sql(
                 "UPDATE PhotoSubjects as ps inner join Photos as p on find_in_set(ps.PhotoSubjectId, p.PhotoSubjectCollection) SET ps.PhotoId = p.PhotoId");
 
+            // Delete unused PhotoSubjects otherwise foreign key constraint will fail
+            migrationBuilder.Sql("DELETE from PhotoSubjects where PhotoId = 0");
+
             migrationBuilder.CreateIndex(
                 name: "IX_PhotoSubjects_PhotoId",
                 table: "PhotoSubjects",
