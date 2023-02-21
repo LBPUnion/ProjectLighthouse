@@ -20,9 +20,16 @@ public class PhotoSubject
     public int UserId { get; set; }
 
     [XmlIgnore]
-    [ForeignKey(nameof(UserId))]
     [JsonIgnore]
+    [ForeignKey(nameof(UserId))]
     public User User { get; set; }
+
+    public int PhotoId { get; set; }
+
+    [XmlIgnore]
+    [JsonIgnore]
+    [ForeignKey(nameof(PhotoId))]
+    public Photo Photo { get; set; }
 
     [NotMapped]
     [XmlElement("npHandle")]

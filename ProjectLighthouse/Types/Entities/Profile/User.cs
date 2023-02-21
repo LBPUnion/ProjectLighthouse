@@ -7,9 +7,11 @@ using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
@@ -224,6 +226,37 @@ public class User
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
+        long start = TimeHelper.TimestampMillis;
+        var stats = this.database.Users.AsNoTracking().DefaultIfEmpty().Select(_ => new
+            {
+                ReviewCount = this.database.Reviews.Count(r => r.ReviewerId == this.UserId),
+                CommentCount = this.database.Comments.Count(c => c.PosterUserId == this.UserId),
+                PhotoCount = this.database.Photos.Count(p => p.CreatorId == this.UserId),
+                PlaylistCount = this.database.Playlists.Count(p => p.CreatorId == this.UserId),
+                HeartedLevelCount = this.database.HeartedLevels.Count(p => p.UserId == this.UserId),
+                HeartedUserCount = this.database.HeartedProfiles.Count(p => p.UserId == this.UserId),
+                HeartedPlaylistCount = this.database.HeartedPlaylists.Count(p => p.UserId == this.UserId),
+                QueuedLevelCount = this.database.QueuedLevels.Count(p => p.UserId == this.UserId),
+            })
+            .FirstOrDefault();
+        Console.WriteLine(@$"Fetching stats in single query took {TimeHelper.TimestampMillis - start}");
+        start = TimeHelper.TimestampMillis;
+        var stats2 = new
+        {
+            ReviewCount = this.Reviews,
+            CommentCount = this.Comments,
+            PhotoCount = this.PhotosByMe,
+            PlaylistCount = this.Lists,
+            HeartedLevelCount = this.HeartedLevels,
+            HeartedUserCount = this.HeartedUsers,
+            HeartedPlaylistCount = this.HeartedPlaylists,
+            QueuedLevelCount = this.QueuedLevels,
+        };
+        Console.WriteLine(@$"Fetching stats in multiple queries took {TimeHelper.TimestampMillis - start}");
+
+        start = TimeHelper.TimestampMillis;
+        int photosWithMe = this.PhotosWithMe();
+        Console.WriteLine(@$"Fetching photos with me took {TimeHelper.TimestampMillis - start}");
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                       LbpSerializer.StringElement("game", (int)gameVersion) +
                       this.serializeSlots(gameVersion) +

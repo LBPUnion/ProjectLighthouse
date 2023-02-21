@@ -95,20 +95,20 @@ public class PhotosController : ControllerBase
             if (validLevel) photo.SlotId = photo.XmlLevelInfo.SlotId;
         }
 
-        if (photo.Subjects.Count > 4) return this.BadRequest();
+        if (photo.PhotoSubjects.Count > 4) return this.BadRequest();
 
         if (photo.Timestamp > TimeHelper.Timestamp) photo.Timestamp = TimeHelper.Timestamp;
 
         // Check for duplicate photo subjects
         List<string> subjectUserIds = new(4);
-        foreach (PhotoSubject subject in photo.Subjects)
+        foreach (PhotoSubject subject in photo.PhotoSubjects)
         {
             if (subjectUserIds.Contains(subject.Username) && !string.IsNullOrEmpty(subject.Username)) return this.BadRequest();
 
             subjectUserIds.Add(subject.Username);
         }
 
-        foreach (PhotoSubject subject in photo.Subjects.Where(subject => !string.IsNullOrEmpty(subject.Username)))
+        foreach (PhotoSubject subject in photo.PhotoSubjects.Where(subject => !string.IsNullOrEmpty(subject.Username)))
         {
             subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
 
@@ -122,7 +122,7 @@ public class PhotosController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        photo.PhotoSubjectIds = photo.Subjects.Where(s => s.UserId != 0).Select(subject => subject.PhotoSubjectId.ToString()).ToArray();
+        photo.PhotoSubjectIds = photo.PhotoSubjects.Where(s => s.UserId != 0).Select(subject => subject.PhotoSubjectId.ToString()).ToArray();
 
         Logger.Debug($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LogArea.Photos);
 

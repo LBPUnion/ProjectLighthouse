@@ -32,7 +32,7 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
 
             // Checks should generally be ordered in least computationally expensive to most.
 
-            if (photo.Subjects.Count > 4)
+            if (photo.PhotoSubjects.Count > 4)
             {
                 tooManyPhotoSubjects = true;
                 goto removePhoto;
@@ -60,7 +60,7 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
             };
 
             List<int> subjectUserIds = new(4);
-            foreach (PhotoSubject subject in photo.Subjects)
+            foreach (PhotoSubject subject in photo.PhotoSubjects)
             {
                 if (subjectUserIds.Contains(subject.UserId))
                 {

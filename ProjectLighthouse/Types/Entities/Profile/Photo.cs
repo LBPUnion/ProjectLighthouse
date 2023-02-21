@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +8,6 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Levels;
-using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
@@ -65,31 +63,7 @@ public class Photo
     [XmlElement("plan")]
     public string PlanHash { get; set; } = "";
 
-    [NotMapped]
-    public List<PhotoSubject> Subjects {
-        get {
-            if (this.SubjectsXmlDontUseLiterallyEver != null) return this.SubjectsXmlDontUseLiterallyEver;
-            if (this._subjects != null) return this._subjects;
-
-            List<PhotoSubject> response = new();
-            using DatabaseContext database = new();
-
-            foreach (string idStr in this.PhotoSubjectIds.Where(idStr => !string.IsNullOrEmpty(idStr)))
-            {
-                if (!int.TryParse(idStr, out int id)) throw new InvalidCastException(idStr + " is not a valid number.");
-
-                PhotoSubject? photoSubject = database.PhotoSubjects
-                    .Include(p => p.User)
-                    .FirstOrDefault(p => p.PhotoSubjectId == id);
-                if (photoSubject == null) continue;
-
-                response.Add(photoSubject);
-            }
-
-            return response;
-        }
-        set => this._subjects = value;
-    }
+    public virtual ICollection<PhotoSubject> PhotoSubjects { get; set; } = new HashSet<PhotoSubject>();
 
     [NotMapped]
     [XmlIgnore]
@@ -134,7 +108,7 @@ public class Photo
         string slot = LbpSerializer.TaggedStringElement("slot", LbpSerializer.StringElement("id", slotId), "type", slotType.ToString().ToLower());
         if (slotId == 0) slot = "";
 
-        string subjectsAggregate = this.Subjects.Aggregate(string.Empty, (s, subject) => s + subject.Serialize());
+        string subjectsAggregate = this.PhotoSubjects.Aggregate(string.Empty, (s, subject) => s + subject.Serialize());
 
         string photo = LbpSerializer.StringElement("id", this.PhotoId) +
                        LbpSerializer.StringElement("small", this.SmallHash) +
