@@ -18,17 +18,15 @@ on our forum.
 ## DISCLAIMERS (Please read!)
 
 ### This is not a final product.
-This is **beta software**, and thus is **not stable nor is it secure**.
+This is **beta software**, and thus is potentially **unstable or insecure**.
 
 While Project Lighthouse is in a mostly working state, **we ask that our software not be used in a production
-environment until release**.
+environment without prioritizing security.**
 
-This is because we have not entirely nailed security down yet, and **your instance WILL get attacked** as a result. It's
-happened before, and it'll happen again.
+This is because we have not entirely nailed that down yet, and **your instance WILL get attacked, as they have in the past,** as a result. It's
+happened before, and it **will** happen again.
 
-Simply put, **Project Lighthouse is not ready for the public yet**.
-
-In addition, we're not responsible if someone hacks your machine and wipes your database, so make frequent backups, and
+We're not responsible if someone hacks your machine and compromises your database, so make frequent backups, and
 be sure to report any vulnerabilities. Thank you in advance.
 
 ### We are not obligated to provide support.
@@ -67,12 +65,12 @@ information.
 
 ## Compatibility across games and platforms
 
-| Game     | Console (PS3/Vita/PSP) | Emulator (RPCS3/Vita3k/PPSSPP)            | Next-Gen (PS4/PS5/Adrenaline) |
-|----------|------------------------|-------------------------------------------|-------------------------------|
-| LBP1     | Compatible             | Compatible                                | No next-gen equivalent        |
-| LBP2     | Compatible             | Compatible                                | No next-gen equivalent        |
-| LBP3     | Compatible             | Compatible                                | Incompatible                  |
-| LBP Vita | Compatible             | Incompatible, PSN not supported on Vita3k | No next-gen equivalent        |
-| LBP PSP  | Potentially compatible | Incompatible, PSN not supported on PPSSPP | Potentially Compatible        |
+| Game     | Console (PS3/Vita/PSP)             | Emulator (RPCS3/Vita3k/PPSSPP)            | Next-Gen (PS4/PS5/Adrenaline)      |
+|----------|------------------------------------|-------------------------------------------|------------------------------------|
+| LBP1     | Compatible                         | Compatible                                | No next-gen equivalent             |
+| LBP2     | Compatible                         | Compatible                                | No next-gen equivalent             |
+| LBP3     | Compatible                         | Compatible                                | Incompatible                       |
+| LBP Vita | Compatible                         | Incompatible, PSN not supported on Vita3k | No next-gen equivalent             |
+| LBP PSP  | Incompatible, PSN missing endpoint | Incompatible, PSN not supported on PPSSPP | Incompatible, PSN missing endpoint |
 
 Project Lighthouse is mostly a work in progress, so this chart is subject to change at any point.
