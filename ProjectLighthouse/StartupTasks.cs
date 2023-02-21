@@ -159,7 +159,7 @@ public static class StartupTasks
         Stopwatch totalStopwatch = Stopwatch.StartNew();
         Stopwatch stopwatch = Stopwatch.StartNew();
         Logger.Info("Migrating database...", LogArea.Database);
-        MySqlDistributedLock mutex = new("LighthouseMigration", ServerConfiguration.Instance.DbConnectionString);
+        MySqlDistributedLock mutex = new("LighthouseMigration", ServerConfiguration.Instance.DbConnectionString, exactName: true);
         await using (await mutex.AcquireAsync())
         {
             stopwatch.Stop();
