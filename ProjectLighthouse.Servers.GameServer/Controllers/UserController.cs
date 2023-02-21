@@ -5,12 +5,11 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -96,6 +95,8 @@ public class UserController : ControllerBase
             user.Biography = update.Biography;
         }
 
+        if (update.Location != null) user.Location = update.Location;
+
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
         {
@@ -163,12 +164,8 @@ public class UserController : ControllerBase
             }
         }
 
-        if (update.Location != null)
-        {
-            user.Location = update.Location;
-        }
+        await this.database.SaveChangesAsync();
 
-        if (this.database.ChangeTracker.HasChanges()) await this.database.SaveChangesAsync();
         return this.Ok();
     }
 

@@ -76,7 +76,7 @@ public class Slot
     [JsonIgnore]
     [XmlElement("resource")]
     public string[]? Resources {
-        get => this.ResourceCollection.Split(",");
+        get => this.ResourceCollection.Split(",", StringSplitOptions.RemoveEmptyEntries);
         set => this.ResourceCollection = string.Join(',', value ?? Array.Empty<string>());
     }
 

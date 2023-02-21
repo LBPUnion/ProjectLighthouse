@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 
 /// <summary>
 /// Sent by the game client to inform the server

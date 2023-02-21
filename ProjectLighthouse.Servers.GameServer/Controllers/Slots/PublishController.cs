@@ -57,6 +57,12 @@ public class PublishController : ControllerBase
 
         if (string.IsNullOrEmpty(slot.ResourceCollection)) slot.ResourceCollection = slot.RootLevel;
 
+        if (slot.Resources == null)
+        {
+            Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
+            return this.BadRequest();
+        }
+
         // Republish logic
         if (slot.SlotId != 0)
         {
@@ -79,7 +85,7 @@ public class PublishController : ControllerBase
 
         slot.ResourceCollection += "," + slot.IconHash; // tells LBP to upload icon after we process resources here
 
-        string resources = slot.Resources!.Where
+        string resources = slot.Resources.Where
                 (hash => !FileHelper.ResourceExists(hash))
             .Aggregate("", (current, hash) => current + LbpSerializer.StringElement("resource", hash));
 
@@ -121,7 +127,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.Resources!.Any(resource => !FileHelper.ResourceExists(resource)))
+        if (slot.Resources != null && slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
         {
             Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
             return this.BadRequest();
