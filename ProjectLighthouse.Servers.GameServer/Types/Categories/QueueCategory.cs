@@ -20,7 +20,6 @@ public class QueueCategory : CategoryWithUser
             .Where(q => q.Slot.Type == SlotType.User && !q.Slot.Hidden && q.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
             .OrderByDescending(q => q.QueuedLevelId)
             .Include(q => q.Slot.Creator)
-            .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
             .FirstOrDefault();
@@ -30,7 +29,6 @@ public class QueueCategory : CategoryWithUser
             .Where(q => q.Slot.Type == SlotType.User && !q.Slot.Hidden && q.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
             .OrderByDescending(q => q.QueuedLevelId)
             .Include(q => q.Slot.Creator)
-            .Include(q => q.Slot.Location)
             .Select(q => q.Slot)
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
             .Skip(Math.Max(0, pageStart - 1))

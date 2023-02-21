@@ -98,15 +98,26 @@ public class User
             select id).Count();
     }
 
-    [JsonIgnore]
-    public int LocationId { get; set; }
-
     /// <summary>
     ///     The location of the profile card on the user's earth
+    ///     Stored as a single 64 bit unsigned integer but split into
+    ///     2 unsigned 32 bit integers
     /// </summary>
-    [ForeignKey("LocationId")]
     [JsonIgnore]
-    public Location Location { get; set; }
+    public ulong LocationPacked { get; set; }
+
+    [NotMapped]
+    [XmlElement("location")]
+    public Location Location
+    {
+        get =>
+            new()
+            {
+                X = (int)(this.LocationPacked >> 32),
+                Y = (int)this.LocationPacked,
+            };
+        set => this.LocationPacked = (ulong)value.X << 32 | (uint)value.Y;
+    }
 
     [NotMapped]
     [JsonIgnore]

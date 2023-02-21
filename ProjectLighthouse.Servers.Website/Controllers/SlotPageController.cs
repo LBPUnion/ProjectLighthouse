@@ -33,14 +33,11 @@ public class SlotPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        Slot? targetSlot = await this.database.Slots.Include(s => s.Location).FirstOrDefaultAsync(s => s.SlotId == id);
+        Slot? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (targetSlot == null) return this.Redirect("~/slots/0");
-
-        if (targetSlot.Location == null) throw new ArgumentNullException(nameof(id));
 
         if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
 
-        this.database.Locations.Remove(targetSlot.Location);
         this.database.Slots.Remove(targetSlot);
 
         await this.database.SaveChangesAsync();

@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;

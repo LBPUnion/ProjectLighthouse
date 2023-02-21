@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,28 +43,6 @@ public static class SlotHelper
 
     private static readonly SemaphoreSlim semaphore = new(1, 1);
 
-    private static async Task<int> GetPlaceholderLocationId(DatabaseContext database)
-    {
-        Location? devLocation = await database.Locations.FirstOrDefaultAsync(l => l.Id == 1);
-
-        if (devLocation != null) return devLocation.Id;
-
-        await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
-        try
-        {
-            devLocation = new Location
-            {
-                Id = 1,
-            };
-            database.Locations.Add(devLocation);
-            return devLocation.Id;
-        }
-        finally
-        {
-            semaphore.Release();
-        }
-    }
-
     public static async Task<int> GetPlaceholderUserId(DatabaseContext database)
     {
         int devCreatorId = await database.Users.Where(u => u.Username.Length == 0)
@@ -82,7 +59,6 @@ public static class SlotHelper
                 PermissionLevel = PermissionLevel.Banned,
                 Biography = "Placeholder author of story levels",
                 BannedReason = "Banned to not show in users list",
-                LocationId = await GetPlaceholderLocationId(database),
             };
             database.Users.Add(devCreator);
             await database.SaveChangesAsync();
@@ -119,7 +95,6 @@ public static class SlotHelper
                 Description = $"Placeholder for {slotType} type level",
                 CreatorId = devCreatorId,
                 InternalSlotId = guid,
-                LocationId = await GetPlaceholderLocationId(database),
                 Type = slotType,
             };
 

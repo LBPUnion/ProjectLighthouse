@@ -3,7 +3,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -79,7 +79,7 @@ public class FriendsController : ControllerBase
         string friends = "";
         foreach (int friendId in friendStore.FriendIds)
         {
-            User? friend = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.UserId == friendId);
+            User? friend = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == friendId);
             if (friend == null) continue;
 
             friends += friend.Serialize(token.GameVersion);

@@ -1,7 +1,7 @@
 using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 
 [Keyless]
 public class ClientsConnected

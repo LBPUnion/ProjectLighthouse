@@ -5,12 +5,11 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +32,7 @@ public class UserController : ControllerBase
 
     private async Task<string?> getSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
-        User? user = await this.database.Users.Include(u => u.Location).FirstOrDefaultAsync(u => u.Username == username);
+        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         return user?.Serialize(gameVersion);
     }
 
@@ -96,6 +95,8 @@ public class UserController : ControllerBase
             user.Biography = update.Biography;
         }
 
+        if (update.Location != null) user.Location = update.Location;
+
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
         {
@@ -127,12 +128,7 @@ public class UserController : ControllerBase
 
                 if (slot.CreatorId != token.UserId) continue;
 
-                Location? loc = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == slot.LocationId);
-
-                if (loc == null) throw new ArgumentNullException();
-
-                loc.X = updateSlot.Location.X;
-                loc.Y = updateSlot.Location.Y;
+                slot.Location = updateSlot.Location;
             }
         }
 
@@ -168,16 +164,8 @@ public class UserController : ControllerBase
             }
         }
 
-        if (update.Location != null)
-        {
-            Location? loc = await this.database.Locations.FirstOrDefaultAsync(l => l.Id == user.LocationId);
-            if (loc == null) throw new Exception("User loc is null, this should never happen.");
+        await this.database.SaveChangesAsync();
 
-            loc.X = update.Location.X;
-            loc.Y = update.Location.Y;
-        }
-
-        if (this.database.ChangeTracker.HasChanges()) await this.database.SaveChangesAsync();
         return this.Ok();
     }
 

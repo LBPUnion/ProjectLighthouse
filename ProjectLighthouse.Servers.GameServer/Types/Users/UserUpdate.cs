@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 /// <summary>
 /// Used by the games to update details about a user's profile
 /// LBP1 only uses Location and IconHash
