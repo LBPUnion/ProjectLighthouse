@@ -99,6 +99,8 @@ public class SlotPage : BaseLayout
         }
 
         this.Photos = await this.Database.Photos.Include(p => p.Creator)
+            .Include(p => p.PhotoSubjects)
+            .ThenInclude(ps => ps.User)
             .OrderByDescending(p => p.Timestamp)
             .Where(r => r.SlotId == id)
             .Take(10)

@@ -33,16 +33,13 @@ public class Photo
 {
 
     [NotMapped]
-    private List<PhotoSubject>? _subjects;
-
-    [NotMapped]
     [XmlElement("slot")]
     public PhotoSlot? XmlLevelInfo;
 
     [NotMapped]
     [XmlArray("subjects")]
     [XmlArrayItem("subject")]
-    public List<PhotoSubject>? SubjectsXmlDontUseLiterallyEver;
+    public List<PhotoSubject>? XmlSubjects;
 
     [Key]
     public int PhotoId { get; set; }
@@ -64,15 +61,6 @@ public class Photo
     public string PlanHash { get; set; } = "";
 
     public virtual ICollection<PhotoSubject> PhotoSubjects { get; set; } = new HashSet<PhotoSubject>();
-
-    [NotMapped]
-    [XmlIgnore]
-    public string[] PhotoSubjectIds {
-        get => this.PhotoSubjectCollection.Split(",");
-        set => this.PhotoSubjectCollection = string.Join(',', value);
-    }
-
-    public string PhotoSubjectCollection { get; set; } = "";
 
     public int CreatorId { get; set; }
 

@@ -7,7 +7,6 @@ using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -87,18 +86,9 @@ public class User
     [JsonIgnore]
     public int PhotosByMe => this.database.Photos.Count(p => p.CreatorId == this.UserId);
 
-    private int PhotosWithMe()
-    {
-        List<int> photoSubjectIds = new();
-        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == this.UserId)
-            .Select(p => p.PhotoSubjectId));
-
-        return (
-            from id in photoSubjectIds
-            from photo in this.database.Photos.Where(p => p.PhotoSubjectCollection.Contains(id.ToString())).ToList()
-            where photo.PhotoSubjectCollection.Split(",").Contains(id.ToString()) && photo.CreatorId != this.UserId
-            select id).Count();
-    }
+    [NotMapped]
+    [JsonIgnore]
+    public int PhotosWithMe => this.database.Photos.Include(p => p.PhotoSubjects).Count(p => p.PhotoSubjects.Any(ps => ps.UserId == this.UserId));
 
     /// <summary>
     ///     The location of the profile card on the user's earth
@@ -226,37 +216,6 @@ public class User
 
     public string Serialize(GameVersion gameVersion = GameVersion.LittleBigPlanet1)
     {
-        long start = TimeHelper.TimestampMillis;
-        var stats = this.database.Users.AsNoTracking().DefaultIfEmpty().Select(_ => new
-            {
-                ReviewCount = this.database.Reviews.Count(r => r.ReviewerId == this.UserId),
-                CommentCount = this.database.Comments.Count(c => c.PosterUserId == this.UserId),
-                PhotoCount = this.database.Photos.Count(p => p.CreatorId == this.UserId),
-                PlaylistCount = this.database.Playlists.Count(p => p.CreatorId == this.UserId),
-                HeartedLevelCount = this.database.HeartedLevels.Count(p => p.UserId == this.UserId),
-                HeartedUserCount = this.database.HeartedProfiles.Count(p => p.UserId == this.UserId),
-                HeartedPlaylistCount = this.database.HeartedPlaylists.Count(p => p.UserId == this.UserId),
-                QueuedLevelCount = this.database.QueuedLevels.Count(p => p.UserId == this.UserId),
-            })
-            .FirstOrDefault();
-        Console.WriteLine(@$"Fetching stats in single query took {TimeHelper.TimestampMillis - start}");
-        start = TimeHelper.TimestampMillis;
-        var stats2 = new
-        {
-            ReviewCount = this.Reviews,
-            CommentCount = this.Comments,
-            PhotoCount = this.PhotosByMe,
-            PlaylistCount = this.Lists,
-            HeartedLevelCount = this.HeartedLevels,
-            HeartedUserCount = this.HeartedUsers,
-            HeartedPlaylistCount = this.HeartedPlaylists,
-            QueuedLevelCount = this.QueuedLevels,
-        };
-        Console.WriteLine(@$"Fetching stats in multiple queries took {TimeHelper.TimestampMillis - start}");
-
-        start = TimeHelper.TimestampMillis;
-        int photosWithMe = this.PhotosWithMe();
-        Console.WriteLine(@$"Fetching photos with me took {TimeHelper.TimestampMillis - start}");
         string user = LbpSerializer.TaggedStringElement("npHandle", this.Username, "icon", this.IconHash) +
                       LbpSerializer.StringElement("game", (int)gameVersion) +
                       this.serializeSlots(gameVersion) +
@@ -276,7 +235,7 @@ public class User
                       LbpSerializer.StringElement<int>("reviewCount", this.Reviews, true) +
                       LbpSerializer.StringElement<int>("commentCount", this.Comments, true) +
                       LbpSerializer.StringElement<int>("photosByMeCount", this.PhotosByMe, true) +
-                      LbpSerializer.StringElement<int>("photosWithMeCount", this.PhotosWithMe(), true) +
+                      LbpSerializer.StringElement<int>("photosWithMeCount", this.PhotosWithMe, true) +
                       LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled && this.CommentsEnabled) +
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
                       LbpSerializer.StringElement<int>("favouriteSlotCount", this.HeartedLevels, true) +
@@ -317,12 +276,10 @@ public class User
     [JsonIgnore]
     public int UsedSlots => this.database.Slots.Count(s => s.CreatorId == this.UserId);
 
-    #nullable enable
     public int GetUsedSlotsForGame(GameVersion version)
     {
         return this.database.Slots.Count(s => s.CreatorId == this.UserId && s.GameVersion == version);
     }
-    #nullable disable
 
     [JsonIgnore]
     [XmlIgnore]
