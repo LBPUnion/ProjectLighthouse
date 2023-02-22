@@ -682,10 +682,6 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("PhotoSubjectCollection")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("PlanHash")
                         .IsRequired()
                         .HasColumnType("longtext");
