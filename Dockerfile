@@ -21,6 +21,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS final
 # Add non-root user
 RUN addgroup -S lighthouse --gid 1001 && \
 adduser -S lighthouse -G lighthouse -h /lighthouse --uid 1001 && \
+mkdir -p /lighthouse/data && \
 mkdir -p /lighthouse/app && \
 mkdir -p /lighthouse/temp && \
 apk add --no-cache icu-libs su-exec tzdata
