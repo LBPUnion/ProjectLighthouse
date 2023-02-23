@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 volumes:
   database:
   redis:
@@ -16,6 +16,7 @@ services:
       test: wget --spider -t1 -nv http://localhost:10061/LITTLEBIGPLANETPS3_XML/status || exit 1
       timeout: 10s
       retries: 5
+      start_period: 60s
     depends_on:
       db:
         condition: service_healthy
@@ -36,6 +37,7 @@ services:
       test: wget --spider -t1 -nv http://localhost:10060/status || exit 1
       timeout: 10s
       retries: 5
+      start_period: 60s
     depends_on:
       db:
         condition: service_healthy
@@ -56,6 +58,7 @@ services:
       test: wget --spider -t1 -nv http://localhost:10062/api/v1/status || exit 1
       timeout: 10s
       retries: 5
+      start_period: 60s
     depends_on:
       db:
         condition: service_healthy
@@ -68,8 +71,6 @@ services:
     image: mariadb
     container_name: db
     restart: unless-stopped
-    ports:
-      - "3306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: lighthouse
       MARIADB_DATABASE: lighthouse
@@ -84,7 +85,5 @@ services:
     image: redis/redis-stack-server
     container_name: redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
     volumes:
       - "redis:/var/lib/redis"
