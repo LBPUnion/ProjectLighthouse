@@ -1,3 +1,4 @@
+using System.Net;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -53,6 +54,11 @@ public class GameServerStartup
             options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                foreach (KeyValuePair<string, string?> proxy in this.Configuration.GetSection("KnownProxies").AsEnumerable())
+                {
+                    if (proxy.Value == null) continue;
+                    options.KnownProxies.Add(IPAddress.Parse(proxy.Value));
+                }
             }
         );
     }

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Middlewares;
@@ -48,6 +49,11 @@ public class WebsiteStartup
             options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                foreach (KeyValuePair<string, string?> proxy in this.Configuration.GetSection("KnownProxies").AsEnumerable())
+                {
+                    if (proxy.Value == null) continue;
+                    options.KnownProxies.Add(IPAddress.Parse(proxy.Value));
+                }
             }
         );
 
