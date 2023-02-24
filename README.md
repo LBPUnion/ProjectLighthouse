@@ -37,7 +37,7 @@ meaning that Project Lighthouse is provided to you as-is, with **absolutely no w
 
 Please understand that while this license gives you freedom to do pretty much anything you would want to do, including
 allowing you to run your instance,
-**this doesn't mean we are obligated to support you or your instance**. When you set up an instance of Project
+**this does not mean we are obligated to provide support to you or your instance**. When you set up an instance of Project
 Lighthouse, you are entirely on your own.
 
 ### Sony is not related nor liable.
@@ -54,13 +54,13 @@ corporate, or personal loss caused to you or others by the use of Project Lighth
 
 ## Building
 
-This will be written when we're out of beta. Consider this your barrier to entry ;).
+See [`BUILDING.md`](BUILDING.md) on build instructions for your platform.
 
 It is recommended to build with `Release` if you plan to use Lighthouse in a production environment.
 
 ## Contributing
 
-Please see [`CONTRIBUTING.md`](https://github.com/LBPUnion/ProjectLighthouse/blob/main/CONTRIBUTING.md) for more
+Please see [`CONTRIBUTING.md`](CONTRIBUTING.md) for more
 information.
 
 ## Compatibility across games and platforms
@@ -73,4 +73,4 @@ information.
 | LBP Vita | Compatible                         | Incompatible, PSN not supported on Vita3k | No next-gen equivalent             |
 | LBP PSP  | Incompatible, PSN missing endpoint | Incompatible, PSN not supported on PPSSPP | Incompatible, PSN missing endpoint |
 
-Project Lighthouse is mostly a work in progress, so this chart is subject to change at any point.
+Project Lighthouse is a work-in-progress beta software, this chart is subject to change at any point.
