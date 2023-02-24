@@ -10,6 +10,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
@@ -85,18 +86,9 @@ public class User
     [JsonIgnore]
     public int PhotosByMe => this.database.Photos.Count(p => p.CreatorId == this.UserId);
 
-    private int PhotosWithMe()
-    {
-        List<int> photoSubjectIds = new();
-        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == this.UserId)
-            .Select(p => p.PhotoSubjectId));
-
-        return (
-            from id in photoSubjectIds
-            from photo in this.database.Photos.Where(p => p.PhotoSubjectCollection.Contains(id.ToString())).ToList()
-            where photo.PhotoSubjectCollection.Split(",").Contains(id.ToString()) && photo.CreatorId != this.UserId
-            select id).Count();
-    }
+    [NotMapped]
+    [JsonIgnore]
+    public int PhotosWithMe => this.database.Photos.Include(p => p.PhotoSubjects).Count(p => p.PhotoSubjects.Any(ps => ps.UserId == this.UserId));
 
     /// <summary>
     ///     The location of the profile card on the user's earth
@@ -243,7 +235,7 @@ public class User
                       LbpSerializer.StringElement<int>("reviewCount", this.Reviews, true) +
                       LbpSerializer.StringElement<int>("commentCount", this.Comments, true) +
                       LbpSerializer.StringElement<int>("photosByMeCount", this.PhotosByMe, true) +
-                      LbpSerializer.StringElement<int>("photosWithMeCount", this.PhotosWithMe(), true) +
+                      LbpSerializer.StringElement<int>("photosWithMeCount", this.PhotosWithMe, true) +
                       LbpSerializer.StringElement("commentsEnabled", ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled && this.CommentsEnabled) +
                       LbpSerializer.StringElement("location", this.Location.Serialize()) +
                       LbpSerializer.StringElement<int>("favouriteSlotCount", this.HeartedLevels, true) +
@@ -284,12 +276,10 @@ public class User
     [JsonIgnore]
     public int UsedSlots => this.database.Slots.Count(s => s.CreatorId == this.UserId);
 
-    #nullable enable
     public int GetUsedSlotsForGame(GameVersion version)
     {
         return this.database.Slots.Count(s => s.CreatorId == this.UserId && s.GameVersion == version);
     }
-    #nullable disable
 
     [JsonIgnore]
     [XmlIgnore]

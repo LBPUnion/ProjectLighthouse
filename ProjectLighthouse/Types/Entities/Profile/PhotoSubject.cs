@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
-//    [XmlRoot("subject")]
 [XmlType("subject")]
 [Serializable]
 public class PhotoSubject
@@ -20,9 +19,17 @@ public class PhotoSubject
     public int UserId { get; set; }
 
     [XmlIgnore]
-    [ForeignKey(nameof(UserId))]
     [JsonIgnore]
+    [ForeignKey(nameof(UserId))]
     public User User { get; set; }
+
+    [XmlIgnore]
+    public int PhotoId { get; set; }
+
+    [XmlIgnore]
+    [JsonIgnore]
+    [ForeignKey(nameof(PhotoId))]
+    public Photo Photo { get; set; }
 
     [NotMapped]
     [XmlElement("npHandle")]

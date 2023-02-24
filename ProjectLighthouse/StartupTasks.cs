@@ -153,6 +153,8 @@ public static class StartupTasks
 
     private static async Task migrateDatabase(DatabaseContext database)
     {
+        int? originalTimeout = database.Database.GetCommandTimeout();
+        database.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
         // This mutex is used to synchronize migrations across the GameServer, Website, and Api
         // Without it, each server would try to simultaneously migrate the database resulting in undefined behavior
         // It is only used for startup and immediately disposed after migrating
@@ -189,5 +191,6 @@ public static class StartupTasks
             Logger.Success($"Extra migration tasks took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
             Logger.Success($"Total migration took {totalStopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
         }
+        database.Database.SetCommandTimeout(originalTimeout);
     }
 }

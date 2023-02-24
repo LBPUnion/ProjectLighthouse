@@ -60,6 +60,8 @@ public class UserPage : BaseLayout
         }
 
         this.Photos = await this.Database.Photos.Include(p => p.Slot)
+            .Include(p => p.PhotoSubjects)
+            .ThenInclude(ps => ps.User)
             .OrderByDescending(p => p.Timestamp)
             .Where(p => p.CreatorId == userId)
             .Take(6)
