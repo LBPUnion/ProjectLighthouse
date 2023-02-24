@@ -20,7 +20,6 @@ public class HeartedCategory : CategoryWithUser
             .Where(h => h.Slot.Type == SlotType.User && !h.Slot.Hidden && h.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
             .OrderByDescending(h => h.HeartedLevelId)
             .Include(h => h.Slot.Creator)
-            .Include(h => h.Slot.Location)
             .Select(h => h.Slot)
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
             .FirstOrDefault();
@@ -30,7 +29,6 @@ public class HeartedCategory : CategoryWithUser
             .Where(h => h.Slot.Type == SlotType.User && !h.Slot.Hidden && h.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
             .OrderByDescending(h => h.HeartedLevelId)
             .Include(h => h.Slot.Creator)
-            .Include(h => h.Slot.Location)
             .Select(h => h.Slot)
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
             .Skip(Math.Max(0, pageStart))

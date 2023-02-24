@@ -2,7 +2,7 @@
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 
 [XmlRoot("privacySettings")]
 [XmlType("privacySettings")]

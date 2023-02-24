@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 
 public class Pins
 {
