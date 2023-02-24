@@ -26,8 +26,8 @@ environment without prioritizing security.**
 This is because we have not entirely nailed that down yet, and **your instance WILL get attacked, as they have in the past,** as a result. It's
 happened before, and it **will** happen again.
 
-We're not responsible if someone hacks your machine and compromises your database, so make frequent backups, and
-be sure to report any vulnerabilities. Thank you in advance.
+We're not responsible if someone compromises your host and accesses your database, so make frequent backups and
+be sure to report any vulnerabilities!
 
 ### We are not obligated to provide support.
 
