@@ -60,6 +60,7 @@ public class Photo
     [XmlElement("plan")]
     public string PlanHash { get; set; } = "";
 
+    [XmlIgnore]
     public virtual ICollection<PhotoSubject> PhotoSubjects { get; set; } = new HashSet<PhotoSubject>();
 
     public int CreatorId { get; set; }
