@@ -70,7 +70,7 @@ public class RoomHelper
                 {
                     bool gotValue = MatchHelper.UserLocations.TryGetValue(p, out string? value);
 
-                    if (gotValue && value != null) relevantUserLocations.Add(p, value);
+                    if (gotValue && value != null) relevantUserLocations.TryAdd(p, value);
                     return gotValue;
                 }
             );
@@ -80,11 +80,13 @@ public class RoomHelper
 
             // If we got here then it should be a valid room.
 
-            FindBestRoomResponse response = new();
-            response.RoomId = room.RoomId;
+            FindBestRoomResponse response = new()
+            {
+                RoomId = room.RoomId,
+                Players = new List<Player>(),
+                Locations = new List<string>(),
+            };
 
-            response.Players = new List<Player>();
-            response.Locations = new List<string>();
             foreach (User player in room.GetPlayers(new DatabaseContext()))
             {
                 response.Players.Add
@@ -125,11 +127,10 @@ public class RoomHelper
             return response;
         }
 
-        if (user != null)
-        {
-            MatchHelper.ClearUserRecentDiveIns(user.UserId);
-            Logger.Info($"Cleared {user.Username} (id: {user.UserId})'s recent dive-ins", LogArea.Match);
-        }
+        if (user == null) return null;
+
+        MatchHelper.ClearUserRecentDiveIns(user.UserId);
+        Logger.Info($"Cleared {user.Username} (id: {user.UserId})'s recent dive-ins", LogArea.Match);
 
         return null;
     }
