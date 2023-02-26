@@ -169,7 +169,6 @@ public abstract class ConfigurationBase<T> where T : class, new()
             if (propertyInfo.PropertyType == typeof(string)) value = Environment.ExpandEnvironmentVariables((string)value);
 
             local.SetValue(this, value);
-
         }
     }
 
