@@ -143,20 +143,21 @@
         </noscript>
         @if (!ServerStatics.IsDebug() && VersionHelper.IsDirty)
         {
-            <div class="ui bottom attached red message large">
+            <div class="ui bottom attached red message large" style="margin-bottom: 1em;">
                 <div class="ui container">
                     <i class="warning icon"></i>
-                    <span style="font-size: 1.2rem;">@Model.Translate(BaseLayoutStrings.LicenseWarnTitle)</span>
+                    <span style="font-size: 1.2rem; font-weight: 600;">@Model.Translate(BaseLayoutStrings.LicenseWarnTitle)</span>
                     <p>
                         @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn1, 
                             "<a href=\"https://github.com/LBPUnion/project-lighthouse/blob/main/LICENSE\">GNU Affero General Public License v3.0</a>"))
                     </p>
                     <p>
                         @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn2, 
-                            "<code>git status</code>", "<a href=\"https://github.com/LBPUnion/project-lighthouse/issues\">", "</a>"))
+                            "<code>git status</code>", "<a href=\"https://github.com/LBPUnion/ProjectLighthouse/issues\">", "</a>"))
                     </p>
                     <p>
-                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn3))
+                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn3,
+                        "<a href=\"https://github.com/LBPUnion/project-lighthouse/blob/main/LICENSE\">GNU Affero General Public License v3.0</a>"))
                     </p>
                 </div>
             </div>
