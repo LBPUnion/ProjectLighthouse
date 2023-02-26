@@ -165,7 +165,11 @@ public abstract class ConfigurationBase<T> where T : class, new()
                 continue;
             }
 
+            // Expand environment variables in strings. Format is windows-like (%ENV_NAME%)
+            if (propertyInfo.PropertyType == typeof(string)) value = Environment.ExpandEnvironmentVariables((string)value);
+
             local.SetValue(this, value);
+
         }
     }
 
