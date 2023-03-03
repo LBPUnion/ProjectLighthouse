@@ -15,7 +15,7 @@ public partial class DatabaseContext
         if (saveChanges) await this.SaveChangesAsync();
     }
 
-    public async Task HeartPlaylist(int userId, Playlist heartedPlaylist)
+    public async Task HeartPlaylist(int userId, PlaylistEntity heartedPlaylist)
     {
         HeartedPlaylist? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
         if (heartedList != null) return;
@@ -29,7 +29,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task UnheartPlaylist(int userId, Playlist heartedPlaylist)
+    public async Task UnheartPlaylist(int userId, PlaylistEntity heartedPlaylist)
     {
         HeartedPlaylist? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
         if (heartedList != null) this.HeartedPlaylists.Remove(heartedList);

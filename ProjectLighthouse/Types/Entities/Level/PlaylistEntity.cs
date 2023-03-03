@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
-public class Playlist
+public class PlaylistEntity
 {
     [Key]
     public int PlaylistId { get; set; }

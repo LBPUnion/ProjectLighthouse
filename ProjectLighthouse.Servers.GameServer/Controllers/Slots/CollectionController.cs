@@ -33,7 +33,7 @@ public class CollectionController : ControllerBase
     [HttpGet("playlists/{playlistId:int}/slots")]
     public async Task<IActionResult> GetPlaylistSlots(int playlistId)
     {
-        Playlist? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
+        PlaylistEntity? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         if (targetPlaylist == null) return this.BadRequest();
 
         IQueryable<Slot> slots = this.database.Slots.Include(s => s.Creator)
@@ -53,7 +53,7 @@ public class CollectionController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Playlist? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
+        PlaylistEntity? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         if (targetPlaylist == null) return this.BadRequest();
 
         if (token.UserId != targetPlaylist.CreatorId) return this.BadRequest();
@@ -66,7 +66,7 @@ public class CollectionController : ControllerBase
             return this.Ok(this.GetUserPlaylists(token.UserId));
         }
 
-        PlaylistObject? newPlaylist = await this.DeserializeBody<PlaylistObject>("playlist", "levels");
+        Playlist? newPlaylist = await this.DeserializeBody<Playlist>("playlist", "levels");
 
         if (newPlaylist == null) return this.BadRequest();
 
@@ -100,9 +100,9 @@ public class CollectionController : ControllerBase
 
     private async Task<PlaylistResponse> GetUserPlaylists(int userId)
     {
-        List<PlaylistObject> playlists = await this.database.Playlists.Include(p => p.Creator)
+        List<Playlist> playlists = await this.database.Playlists.Include(p => p.Creator)
             .Where(p => p.CreatorId == userId)
-            .Select(p => PlaylistObject.CreateFromPlaylist(p))
+            .Select(p => Playlist.CreateFromEntity(p))
             .ToListAsync();
         int total = this.database.Playlists.Count(p => p.CreatorId == userId);
 
@@ -123,11 +123,11 @@ public class CollectionController : ControllerBase
 
         if (playlistCount > ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota) return this.BadRequest();
 
-        PlaylistObject? playlist = await this.DeserializeBody<PlaylistObject>("playlist");
+        Playlist? playlist = await this.DeserializeBody<Playlist>("playlist");
 
         if (playlist == null) return this.BadRequest();
 
-        Playlist playlistEntity = new()
+        PlaylistEntity playlistEntity = new()
         {
             CreatorId = token.UserId,
             Description = playlist.Description,

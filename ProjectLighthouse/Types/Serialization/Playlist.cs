@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("playlist")]
-public class PlaylistObject : ILbpSerializable, INeedsPreparationForSerialization
+public class Playlist : ILbpSerializable, INeedsPreparationForSerialization
 {
     [XmlIgnore]
     public int CreatorId { get; set; }
@@ -75,7 +75,7 @@ public class PlaylistObject : ILbpSerializable, INeedsPreparationForSerializatio
         this.LevelIcons = new IconList(iconList);
     }
 
-    public static PlaylistObject CreateFromPlaylist(Playlist playlist) =>
+    public static Playlist CreateFromEntity(PlaylistEntity playlist) =>
         new()
         {
             Name = playlist.Name,

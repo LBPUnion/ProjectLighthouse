@@ -5,7 +5,6 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Database;
@@ -36,7 +35,7 @@ public partial class DatabaseContext : DbContext
 
     #region Levels
     public DbSet<DatabaseCategory> CustomCategories { get; set; }
-    public DbSet<Playlist> Playlists { get; set; }
+    public DbSet<PlaylistEntity> Playlists { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Score> Scores { get; set; }
     public DbSet<Slot> Slots { get; set; }

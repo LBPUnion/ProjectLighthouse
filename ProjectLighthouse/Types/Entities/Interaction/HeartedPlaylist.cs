@@ -18,5 +18,5 @@ public class HeartedPlaylist
     public int PlaylistId { get; set; }
 
     [ForeignKey(nameof(PlaylistId))]
-    public Playlist Playlist { get; set; }
+    public PlaylistEntity Playlist { get; set; }
 }

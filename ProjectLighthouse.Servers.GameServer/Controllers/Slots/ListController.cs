@@ -207,12 +207,12 @@ public class ListController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(username);
         if (targetUserId == 0) return this.StatusCode(403, "");
 
-        List<PlaylistObject> heartedPlaylists = await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
+        List<Playlist> heartedPlaylists = await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
             .Include(p => p.Playlist)
             .Include(p => p.Playlist.Creator)
             .OrderByDescending(p => p.HeartedPlaylistId)
             .Select(p => p.Playlist)
-            .Select(p => PlaylistObject.CreateFromPlaylist(p))
+            .Select(p => Playlist.CreateFromEntity(p))
             .ToListAsync();
 
         int total = await this.database.HeartedPlaylists.CountAsync(p => p.UserId == targetUserId);
@@ -230,7 +230,7 @@ public class ListController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Playlist? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
+        PlaylistEntity? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
         if (playlist == null) return this.NotFound();
 
         await this.database.HeartPlaylist(token.UserId, playlist);
@@ -243,7 +243,7 @@ public class ListController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Playlist? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
+        PlaylistEntity? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
         if (playlist == null) return this.NotFound();
 
         await this.database.UnheartPlaylist(token.UserId, playlist);

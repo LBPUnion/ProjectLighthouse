@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 public class HeartedPlaylistResponse : ILbpSerializable
 {
     [XmlElement("playlist")]
-    public required List<PlaylistObject> Playlists { get; set; }
+    public required List<Playlist> Playlists { get; set; }
 
     [XmlAttribute("total")]
     public required int Total { get; set; }
