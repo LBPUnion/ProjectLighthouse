@@ -115,8 +115,11 @@ public class ScoreController : ControllerBase
                 break;
             case GameVersion.LittleBigPlanetPSP:
             case GameVersion.Unknown:
-            default: throw new ArgumentOutOfRangeException();
+            default:
+                return this.BadRequest();
         }
+
+        await this.database.SaveChangesAsync();
 
         Score playerScore = new()
         {

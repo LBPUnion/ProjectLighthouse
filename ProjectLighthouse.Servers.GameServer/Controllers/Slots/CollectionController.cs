@@ -10,6 +10,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -65,7 +66,7 @@ public class CollectionController : ControllerBase
             return this.Ok(this.GetUserPlaylists(token.UserId));
         }
 
-        Playlist? newPlaylist = await this.DeserializeBody<Playlist>("playlist", "levels");
+        PlaylistObject? newPlaylist = await this.DeserializeBody<PlaylistObject>("playlist", "levels");
 
         if (newPlaylist == null) return this.BadRequest();
 
@@ -97,19 +98,20 @@ public class CollectionController : ControllerBase
         return this.Ok(this.GetUserPlaylists(token.UserId));
     }
 
-    private string GetUserPlaylists(int userId)
+    private async Task<PlaylistResponse> GetUserPlaylists(int userId)
     {
-        string response = Enumerable.Aggregate(
-            this.database.Playlists.Include(p => p.Creator).Where(p => p.CreatorId == userId),
-            string.Empty,
-            (current, slot) => current + slot.Serialize());
+        List<PlaylistObject> playlists = await this.database.Playlists.Include(p => p.Creator)
+            .Where(p => p.CreatorId == userId)
+            .Select(p => PlaylistObject.CreateFromPlaylist(p))
+            .ToListAsync();
         int total = this.database.Playlists.Count(p => p.CreatorId == userId);
 
-        return LbpSerializer.TaggedStringElement("playlists", response, new Dictionary<string, object>
+        return new PlaylistResponse
         {
-            {"total", total},
-            {"hint_start", total+1},
-        });
+            Playlists = playlists,
+            Total = total,
+            HintStart = total+1,
+        };
     }
 
     [HttpPost("playlists")]
@@ -121,17 +123,23 @@ public class CollectionController : ControllerBase
 
         if (playlistCount > ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota) return this.BadRequest();
 
-        Playlist? playlist = await this.DeserializeBody<Playlist>("playlist");
+        PlaylistObject? playlist = await this.DeserializeBody<PlaylistObject>("playlist");
 
         if (playlist == null) return this.BadRequest();
 
-        playlist.CreatorId = token.UserId;
+        Playlist playlistEntity = new()
+        {
+            CreatorId = token.UserId,
+            Description = playlist.Description,
+            Name = playlist.Name,
+            SlotIds = playlist.SlotIds,
+        };
 
-        this.database.Playlists.Add(playlist);
+        this.database.Playlists.Add(playlistEntity);
 
         await this.database.SaveChangesAsync();
 
-        return this.Ok(this.GetUserPlaylists(token.UserId));
+        return this.Ok(await this.GetUserPlaylists(token.UserId));
     }
 
     [HttpGet("user/{username}/playlists")]
@@ -140,7 +148,7 @@ public class CollectionController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(username);
         if (targetUserId == 0) return this.BadRequest();
 
-        return this.Ok(this.GetUserPlaylists(targetUserId));
+        return this.Ok(await this.GetUserPlaylists(targetUserId));
     }
 
     [HttpGet("searches")]

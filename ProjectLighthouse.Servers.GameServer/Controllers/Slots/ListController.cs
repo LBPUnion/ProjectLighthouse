@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -206,19 +207,22 @@ public class ListController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(username);
         if (targetUserId == 0) return this.StatusCode(403, "");
 
-        IEnumerable<Playlist> heartedPlaylists = this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
-            .Include(p => p.Playlist).Include(p => p.Playlist.Creator).OrderByDescending(p => p.HeartedPlaylistId).Select(p => p.Playlist);
+        List<PlaylistObject> heartedPlaylists = await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
+            .Include(p => p.Playlist)
+            .Include(p => p.Playlist.Creator)
+            .OrderByDescending(p => p.HeartedPlaylistId)
+            .Select(p => p.Playlist)
+            .Select(p => PlaylistObject.CreateFromPlaylist(p))
+            .ToListAsync();
 
-        string response = heartedPlaylists.Aggregate(string.Empty, (current, p) => current + p.Serialize());
+        int total = await this.database.HeartedPlaylists.CountAsync(p => p.UserId == targetUserId);
 
-        return this.Ok
-        (
-            LbpSerializer.TaggedStringElement("favouritePlaylists", response, new Dictionary<string, object>
-            {
-                { "total", this.database.HeartedPlaylists.Count(p => p.UserId == targetUserId) },
-                { "hint_start", pageStart + Math.Min(pageSize, 30) },
-            })
-        );
+        return this.Ok(new HeartedPlaylistResponse
+        {
+            Playlists = heartedPlaylists,
+            Total = total,
+            HintStart = pageStart + Math.Min(pageSize, 30),
+        });
     }
 
     [HttpPost("favourite/playlist/{playlistId:int}")]

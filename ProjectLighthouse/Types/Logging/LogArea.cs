@@ -26,4 +26,5 @@ public enum LogArea
     RateLimit,
     Deserialization,
     Email,
+    Serialization,
 }

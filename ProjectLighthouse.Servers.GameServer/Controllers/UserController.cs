@@ -4,12 +4,14 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -159,7 +161,11 @@ public class UserController : ControllerBase
                 case GameVersion.Unknown:
                 default: // The rest do not support custom earths.
                 {
-                    throw new ArgumentException($"invalid gameVersion {token.GameVersion} for setting earth");
+                    string bodyString = await this.ReadBodyAsync();
+                    Logger.Warn($"User with invalid gameVersion '{token.GameVersion}' tried to set earth hash: \n" +
+                                $"body: '{bodyString}'",
+                        LogArea.Resources);
+                    break;
                 }
             }
         }
