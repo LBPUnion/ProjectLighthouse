@@ -23,12 +23,12 @@ public class UserPage : BaseLayout
     public bool IsProfileUserBlocked;
 
     public List<Photo>? Photos;
-    public List<Slot>? Slots;
+    public List<SlotEntity>? Slots;
 
-    public List<Slot>? HeartedSlots;
-    public List<Slot>? QueuedSlots;
+    public List<SlotEntity>? HeartedSlots;
+    public List<SlotEntity>? QueuedSlots;
 
-    public User? ProfileUser;
+    public UserEntity? ProfileUser;
     public UserPage(DatabaseContext database) : base(database)
     {}
 

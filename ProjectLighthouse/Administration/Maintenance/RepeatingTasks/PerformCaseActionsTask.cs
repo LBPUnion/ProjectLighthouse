@@ -24,8 +24,8 @@ public class PerformCaseActionsTask : IRepeatingTask
     {
         foreach (ModerationCase @case in await database.Cases.Where(c => !c.Processed).ToListAsync())
         {
-            User? user = null;
-            Slot? slot = null;
+            UserEntity? user = null;
+            SlotEntity? slot = null;
 
             if (@case.Type.AffectsUser())
             {

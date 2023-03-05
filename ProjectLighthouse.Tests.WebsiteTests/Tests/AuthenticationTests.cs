@@ -21,7 +21,7 @@ public class AuthenticationTests : LighthouseWebTest
         Random random = new();
 
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
+        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -41,7 +41,7 @@ public class AuthenticationTests : LighthouseWebTest
     {
         await using DatabaseContext database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("just like the hindenberg,"));
+        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("just like the hindenberg,"));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -60,7 +60,7 @@ public class AuthenticationTests : LighthouseWebTest
     {
         await using DatabaseContext database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -82,7 +82,7 @@ public class AuthenticationTests : LighthouseWebTest
 
         await using DatabaseContext database = new();
         Random random = new();
-        User user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         WebToken webToken = new()
         {

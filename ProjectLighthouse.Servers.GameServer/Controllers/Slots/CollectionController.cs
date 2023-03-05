@@ -36,13 +36,12 @@ public class CollectionController : ControllerBase
         PlaylistEntity? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         if (targetPlaylist == null) return this.BadRequest();
 
-        IQueryable<Slot> slots = this.database.Slots.Include(s => s.Creator)
-            .Where(s => targetPlaylist.SlotIds.Contains(s.SlotId));
+        List<SlotBase> slots = await this.database.Slots
+            .Where(s => targetPlaylist.SlotIds.Contains(s.SlotId)).Select(s => SlotBase.CreateFromEntity(s, this.GetToken())).ToListAsync();
 
-        string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize());
         int total = targetPlaylist.SlotIds.Length;
 
-        return this.Ok(LbpSerializer.TaggedStringElement("slots", response, "total", total));
+        return this.Ok(new GenericSlotResponse(slots, total, 0));
     }
 
     [HttpPost("playlists/{playlistId:int}")]
@@ -157,7 +156,7 @@ public class CollectionController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? user = await this.database.UserFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
         string categoriesSerialized = CategoryHelper.Categories.Aggregate
@@ -203,7 +202,7 @@ public class CollectionController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? user = await this.database.UserFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
         Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
@@ -211,38 +210,24 @@ public class CollectionController : ControllerBase
 
         Logger.Debug("Found category " + category, LogArea.Category);
 
-        List<Slot> slots;
+        List<SlotBase> slots;
         int totalSlots;
 
         if (category is CategoryWithUser categoryWithUser)
         {
-            slots = categoryWithUser.GetSlots(this.database, user, pageStart, pageSize).ToList();
+            slots = categoryWithUser.GetSlots(this.database, user, pageStart, pageSize)
+                .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+                .ToList();
             totalSlots = categoryWithUser.GetTotalSlots(this.database, user);
         }
         else
         {
-            slots = category.GetSlots(this.database, pageStart, pageSize).ToList();
+            slots = category.GetSlots(this.database, pageStart, pageSize)
+                .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+                .ToList();
             totalSlots = category.GetTotalSlots(this.database);
         }
 
-        string slotsSerialized = slots.Aggregate(string.Empty, (current, slot) => current + slot.Serialize(token.GameVersion));
-
-        return this.Ok
-        (
-            LbpSerializer.TaggedStringElement
-            (
-                "results",
-                slotsSerialized,
-                new Dictionary<string, object>
-                {
-                    {
-                        "total", totalSlots
-                    },
-                    {
-                        "hint_start", pageStart + pageSize
-                    },
-                }
-            )
-        );
+        return this.Ok(new GenericSlotResponse("results", slots, totalSlots, pageStart + pageSize));
     }
 }

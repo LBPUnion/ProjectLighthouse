@@ -21,7 +21,7 @@ public class PhotoSubject
     [XmlIgnore]
     [JsonIgnore]
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; }
+    public UserEntity User { get; set; }
 
     [XmlIgnore]
     public int PhotoId { get; set; }

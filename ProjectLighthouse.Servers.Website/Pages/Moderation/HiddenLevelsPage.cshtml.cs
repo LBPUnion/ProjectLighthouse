@@ -19,7 +19,7 @@ public class HiddenLevelsPage : BaseLayout
 
     public int SlotCount;
 
-    public List<Slot> Slots = new();
+    public List<SlotEntity> Slots = new();
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
     {

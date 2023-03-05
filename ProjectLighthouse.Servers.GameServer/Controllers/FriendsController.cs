@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,10 +37,10 @@ public class FriendsController : ControllerBase
 
         SanitizationHelper.SanitizeStringsInClass(npData);
 
-        List<User> friends = new();
+        List<UserEntity> friends = new();
         foreach (string friendName in npData.Friends ?? new List<string>())
         {
-            User? friend = await this.database.Users.FirstOrDefaultAsync(u => u.Username == friendName);
+            UserEntity? friend = await this.database.Users.FirstOrDefaultAsync(u => u.Username == friendName);
             if (friend == null) continue;
 
             friends.Add(friend);
@@ -48,7 +49,7 @@ public class FriendsController : ControllerBase
         List<int> blockedUsers = new();
         foreach (string blockedUserName in npData.BlockedUsers ?? new List<string>())
         {
-            User? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == blockedUserName);
+            UserEntity? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == blockedUserName);
             if (blockedUser == null) continue;
 
             blockedUsers.Add(blockedUser.UserId);
@@ -73,18 +74,19 @@ public class FriendsController : ControllerBase
 
         UserFriendData? friendStore = UserFriendStore.GetUserFriendData(token.UserId);
 
-        if (friendStore == null)
-            return this.Ok(LbpSerializer.BlankElement("myFriends"));
+        UserListResponse response = new("myFriends", new List<UserProfile>());
 
-        string friends = "";
+        if (friendStore == null)
+            return this.Ok(response);
+
         foreach (int friendId in friendStore.FriendIds)
         {
-            User? friend = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == friendId);
+            UserEntity? friend = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == friendId);
             if (friend == null) continue;
 
-            friends += friend.Serialize(token.GameVersion);
+            response.Users.Add(UserProfile.CreateFromEntity(friend));
         }
 
-        return this.Ok(LbpSerializer.StringElement("myFriends", friends));
+        return this.Ok(response);
     }
 }

@@ -30,7 +30,7 @@ public partial class DatabaseContext : DbContext
     public DbSet<Photo> Photos { get; set; }
     public DbSet<PhotoSubject> PhotoSubjects { get; set; }
     public DbSet<PlatformLinkAttempt> PlatformLinkAttempts { get; set; }
-    public DbSet<User> Users { get; set; }
+    public DbSet<UserEntity> Users { get; set; }
     #endregion
 
     #region Levels
@@ -38,7 +38,7 @@ public partial class DatabaseContext : DbContext
     public DbSet<PlaylistEntity> Playlists { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Score> Scores { get; set; }
-    public DbSet<Slot> Slots { get; set; }
+    public DbSet<SlotEntity> Slots { get; set; }
     #endregion
 
     #region Interactions

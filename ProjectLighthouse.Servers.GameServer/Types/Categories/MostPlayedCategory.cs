@@ -13,12 +13,12 @@ public class MostPlayedCategory : Category
     public override string Description { get; set; } = "The most played content";
     public override string IconHash { get; set; } = "g820608";
     public override string Endpoint { get; set; } = "mostUniquePlays";
-    public override Slot? GetPreviewSlot(DatabaseContext database) => database.Slots
+    public override SlotEntity? GetPreviewSlot(DatabaseContext database) => database.Slots
         .Where(s => s.Type == SlotType.User)
         .OrderByDescending(s => s.PlaysLBP1Unique + s.PlaysLBP2Unique + s.PlaysLBP3Unique)
         .ThenByDescending(s => s.PlaysLBP1 + s.PlaysLBP2 + s.PlaysLBP3)
         .FirstOrDefault();
-    public override IEnumerable<Slot> GetSlots
+    public override IEnumerable<SlotEntity> GetSlots
         (DatabaseContext database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3, false, true)
             .OrderByDescending(s => s.PlaysLBP1Unique + s.PlaysLBP2Unique + s.PlaysLBP3Unique)

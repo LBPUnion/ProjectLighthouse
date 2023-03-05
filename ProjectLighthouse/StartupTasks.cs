@@ -102,7 +102,7 @@ public static class StartupTasks
             const string passwordClear = "lighthouse";
             string password = CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(passwordClear));
             
-            User admin = database.CreateUser("admin", password).Result;
+            UserEntity admin = database.CreateUser("admin", password).Result;
             admin.PermissionLevel = PermissionLevel.Administrator;
             admin.PasswordResetRequired = true;
 

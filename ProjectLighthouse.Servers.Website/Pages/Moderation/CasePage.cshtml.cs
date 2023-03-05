@@ -23,7 +23,7 @@ public class CasePage : BaseLayout
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.NotFound();
         if (!user.IsModerator) return this.NotFound();
 

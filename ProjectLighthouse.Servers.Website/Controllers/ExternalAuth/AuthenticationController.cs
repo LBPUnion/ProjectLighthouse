@@ -22,7 +22,7 @@ public class AuthenticationController : ControllerBase
     [HttpGet("unlink/{platform}")]
     public async Task<IActionResult> UnlinkPlatform(string platform)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         Platform[] invalidTokens;
@@ -48,7 +48,7 @@ public class AuthenticationController : ControllerBase
     [HttpGet("approve/{id:int}")]
     public async Task<IActionResult> Approve(int id)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
         PlatformLinkAttempt? linkAttempt = await this.database.PlatformLinkAttempts
@@ -76,7 +76,7 @@ public class AuthenticationController : ControllerBase
     [HttpGet("deny/{id:int}")]
     public async Task<IActionResult> Deny(int id)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
         PlatformLinkAttempt? linkAttempt = await this.database.PlatformLinkAttempts

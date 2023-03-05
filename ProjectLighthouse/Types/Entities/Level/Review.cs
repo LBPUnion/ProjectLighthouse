@@ -34,14 +34,16 @@ public class Review
     [XmlIgnore]
     public int ReviewerId { get; set; }
 
+    [XmlIgnore]
     [ForeignKey(nameof(ReviewerId))]
-    public User? Reviewer { get; set; }
+    public UserEntity? Reviewer { get; set; }
 
     [XmlElement("slot_id")]
     public int SlotId { get; set; }
 
+    [XmlIgnore]
     [ForeignKey(nameof(SlotId))]
-    public Slot? Slot { get; set; }
+    public SlotEntity? Slot { get; set; }
 
     [XmlElement("timestamp")]
     public long Timestamp { get; set; }

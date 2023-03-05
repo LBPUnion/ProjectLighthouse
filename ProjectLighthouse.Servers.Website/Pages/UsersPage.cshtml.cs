@@ -17,7 +17,7 @@ public class UsersPage : BaseLayout
 
     public int UserCount;
 
-    public List<User> Users = new();
+    public List<UserEntity> Users = new();
 
     public string? SearchValue;
 

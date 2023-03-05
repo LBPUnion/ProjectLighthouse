@@ -29,22 +29,22 @@ public class UserEndpoints : ApiEndpointController
     /// <response code="200">The user, if successful.</response>
     /// <response code="404">The user could not be found.</response>
     [HttpGet("user/{id:int}")]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUser(int id)
     {
-        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (user == null) return this.NotFound();
 
         return this.Ok(user);
     }
 
     [HttpGet("username/{username}")]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUser(string username)
     {
-        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return this.NotFound();
 
         return this.Ok(user);
@@ -58,11 +58,11 @@ public class UserEndpoints : ApiEndpointController
     /// <response code="200">The list of users, if any were found</response>
     /// <response code="404">No users matched the query</response>
     [HttpGet("search/user")]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SearchUsers(string query)
     {
-        List<User> users = await this.database.Users
+        List<UserEntity> users = await this.database.Users
             .Where(u => u.PermissionLevel != PermissionLevel.Banned && u.Username.Contains(query))
             .Where(u => u.ProfileVisibility == PrivacyType.All) // TODO: change check for when user is logged in
             .OrderByDescending(b => b.UserId)

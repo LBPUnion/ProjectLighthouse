@@ -6,10 +6,10 @@
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Users
 @using Microsoft.EntityFrameworkCore
-@model LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot
+@model LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity
 
 @{
-    User? user = (User?)ViewData["User"];
+    UserEntity? user = (UserEntity?)ViewData["User"];
 
     await using DatabaseContext database = new();
 

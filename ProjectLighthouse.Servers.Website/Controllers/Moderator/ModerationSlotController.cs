@@ -23,10 +23,10 @@ public class ModerationSlotController : ControllerBase
     [HttpGet("teamPick")]
     public async Task<IActionResult> TeamPick([FromRoute] int id)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
         slot.TeamPick = true;
@@ -42,10 +42,10 @@ public class ModerationSlotController : ControllerBase
     [HttpGet("removeTeamPick")]
     public async Task<IActionResult> RemoveTeamPick([FromRoute] int id)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
         slot.TeamPick = false;
@@ -58,10 +58,10 @@ public class ModerationSlotController : ControllerBase
     [HttpGet("delete")]
     public async Task<IActionResult> DeleteLevel([FromRoute] int id)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.StatusCode(403, "");
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.Ok();
 
         await this.database.RemoveSlot(slot);

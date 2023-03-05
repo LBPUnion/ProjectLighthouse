@@ -66,12 +66,12 @@ public class Photo
     public int CreatorId { get; set; }
 
     [ForeignKey(nameof(CreatorId))]
-    public User? Creator { get; set; }
+    public UserEntity? Creator { get; set; }
 
     public int? SlotId { get; set; }
 
     [ForeignKey(nameof(SlotId))]
-    public Slot? Slot { get; set; }
+    public SlotEntity? Slot { get; set; }
 
     public string Serialize()
     {

@@ -221,7 +221,7 @@
                 {
                     <p>This user hasn't published any levels</p>
                 }
-                @foreach (Slot slot in Model.Slots ?? new List<Slot>())
+                @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
                 {
                     <div class="ui segment">
                         @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
@@ -246,7 +246,7 @@
                     {
                         <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
                     }
-                    @foreach (Slot slot in Model.HeartedSlots ?? new List<Slot>())
+                    @foreach (SlotEntity slot in Model.HeartedSlots ?? new List<SlotEntity>())
                     {
                         <div class="ui segment">
                             @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#hearted", language, timeZone, isMobile, true)
@@ -264,7 +264,7 @@
                     {
                         <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
                     }
-                    @foreach (Slot slot in Model.QueuedSlots ?? new List<Slot>())
+                    @foreach (SlotEntity slot in Model.QueuedSlots ?? new List<SlotEntity>())
                     {
                         <div class="ui segment">
                             @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#queued", language, timeZone, isMobile, true)

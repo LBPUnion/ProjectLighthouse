@@ -19,7 +19,7 @@ public partial class DatabaseContext
         return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
     }
 
-    public async Task<User?> UserFromGameToken(GameToken? token)
+    public async Task<UserEntity?> UserFromGameToken(GameToken? token)
     {
         if (token == null) return null;
 

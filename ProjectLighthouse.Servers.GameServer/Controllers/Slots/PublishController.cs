@@ -11,6 +11,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Resources;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,10 +40,10 @@ public class PublishController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? user = await this.database.UserFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
-        Slot? slot = await this.DeserializeBody<Slot>();
+        SlotEntity? slot = await this.DeserializeBody<SlotEntity>();
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
@@ -63,10 +64,12 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
+        int usedSlots = await this.database.Slots.CountAsync(s => s.CreatorId == token.UserId && s.GameVersion == token.GameVersion);
+
         // Republish logic
         if (slot.SlotId != 0)
         {
-            Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+            SlotEntity? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
             if (oldSlot == null)
             {
                 Logger.Warn("Rejecting level republish, could not find old slot", LogArea.Publish);
@@ -78,7 +81,7 @@ public class PublishController : ControllerBase
                 return this.BadRequest();
             }
         }
-        else if (user.GetUsedSlotsForGame(token.GameVersion) > user.EntitledSlots)
+        else if (usedSlots > user.EntitledSlots)
         {
             return this.StatusCode(403, "");
         }
@@ -100,10 +103,10 @@ public class PublishController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? user = await this.database.UserFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
-        Slot? slot = await this.DeserializeBody<Slot>();
+        SlotEntity? slot = await this.DeserializeBody<SlotEntity>();
 
         if (slot == null)
         {
@@ -168,7 +171,7 @@ public class PublishController : ControllerBase
         // Republish logic
         if (slot.SlotId != 0)
         {
-            Slot? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+            SlotEntity? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
             if (oldSlot == null)
             {
                 Logger.Warn("Rejecting level republish, wasn't able to find old slot", LogArea.Publish);
@@ -232,10 +235,12 @@ public class PublishController : ControllerBase
 
             this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
-            return this.Ok(oldSlot.Serialize(token.GameVersion));
+            return this.Ok(SlotBase.CreateFromEntity(oldSlot, this.GetToken()));
         }
 
-        if (user.GetUsedSlotsForGame(slotVersion) > user.EntitledSlots)
+        int usedSlots = await this.database.Slots.CountAsync(s => s.CreatorId == token.UserId && s.GameVersion == slotVersion);
+
+        if (usedSlots > user.EntitledSlots)
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
             return this.BadRequest();
@@ -265,7 +270,7 @@ public class PublishController : ControllerBase
 
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
-        return this.Ok(slot.Serialize(token.GameVersion));
+        return this.Ok(SlotBase.CreateFromEntity(slot, this.GetToken()));
     }
 
     [HttpPost("unpublish/{id:int}")]
@@ -273,7 +278,7 @@ public class PublishController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
         if (slot.CreatorId != token.UserId) return this.StatusCode(403, "");

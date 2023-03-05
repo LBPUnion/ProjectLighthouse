@@ -17,7 +17,7 @@ public class AdminApiKeyPageModel : BaseLayout
 
         public async Task<IActionResult> OnGet()
         {
-            User? user = this.Database.UserFromWebRequest(this.Request);
+            UserEntity? user = this.Database.UserFromWebRequest(this.Request);
             if (user == null) return this.Redirect("~/login");
             if (!user.IsAdmin) return this.NotFound();
 
@@ -29,7 +29,7 @@ public class AdminApiKeyPageModel : BaseLayout
 
         public async Task<IActionResult> OnPost(string keyId)
         {
-            User? user = this.Database.UserFromWebRequest(this.Request);
+            UserEntity? user = this.Database.UserFromWebRequest(this.Request);
             if (user == null || !user.IsAdmin) return this.NotFound();
 
             ApiKey? apiKey = await this.Database.APIKeys.FirstOrDefaultAsync(k => k.Id == int.Parse(keyId));

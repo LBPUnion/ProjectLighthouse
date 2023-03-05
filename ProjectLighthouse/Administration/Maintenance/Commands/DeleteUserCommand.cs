@@ -23,7 +23,7 @@ public class DeleteUserCommand : ICommand
     public int RequiredArgs() => 1;
     public async Task Run(string[] args, Logger logger)
     {
-        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username.Length > 0 && u.Username == args[0]);
+        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username.Length > 0 && u.Username == args[0]);
         if (user == null)
             try
             {

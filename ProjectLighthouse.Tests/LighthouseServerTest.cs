@@ -38,7 +38,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
             await using DatabaseContext database = new();
             if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
             {
-                User user = await database.CreateUser($"{username}{number}",
+                UserEntity user = await database.CreateUser($"{username}{number}",
                     CryptoHelper.BCryptHash($"unitTestPassword{number}"));
                 user.LinkedPsnId = (ulong)number;
                 await database.SaveChangesAsync();

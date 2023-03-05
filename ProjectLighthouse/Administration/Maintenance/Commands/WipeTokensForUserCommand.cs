@@ -24,7 +24,7 @@ public class WipeTokensForUserCommand : ICommand
     public int RequiredArgs() => 1;
     public async Task Run(string[] args, Logger logger)
     {
-        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
+        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
         if (user == null)
             try
             {
@@ -33,7 +33,7 @@ public class WipeTokensForUserCommand : ICommand
             }
             catch
             {
-                Console.WriteLine($"Could not find user by parameter '{args[0]}'");
+                Console.WriteLine(@$"Could not find user by parameter '{args[0]}'");
                 return;
             }
 
@@ -42,6 +42,6 @@ public class WipeTokensForUserCommand : ICommand
 
         await this.database.SaveChangesAsync();
 
-        Console.WriteLine($"Deleted all tokens for {user.Username} (id: {user.UserId}).");
+        Console.WriteLine(@$"Deleted all tokens for {user.Username} (id: {user.UserId}).");
     }
 }

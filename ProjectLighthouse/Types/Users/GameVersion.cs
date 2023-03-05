@@ -1,14 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 public enum GameVersion
 {
+    [XmlEnum("0")]
     LittleBigPlanet1 = 0,
+    [XmlEnum("1")]
     LittleBigPlanet2 = 1,
+    [XmlEnum("2")]
     LittleBigPlanet3 = 2,
+    [XmlEnum("3")]
     LittleBigPlanetVita = 3,
+    [XmlEnum("4")]
     LittleBigPlanetPSP = 4,
     Unknown = -1,
 }

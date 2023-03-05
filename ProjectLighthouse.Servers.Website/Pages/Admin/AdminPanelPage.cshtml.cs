@@ -24,7 +24,7 @@ public class AdminPanelPage : BaseLayout
 
     public async Task<IActionResult> OnGet([FromQuery] string? args, [FromQuery] string? command, [FromQuery] string? maintenanceJob, [FromQuery] string? log)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
 

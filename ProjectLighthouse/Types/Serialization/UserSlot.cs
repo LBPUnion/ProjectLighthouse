@@ -1,0 +1,278 @@
+﻿using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Files;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Misc;
+using LBPUnion.ProjectLighthouse.Types.Users;
+using Microsoft.EntityFrameworkCore;
+
+namespace LBPUnion.ProjectLighthouse.Types.Serialization;
+
+[XmlRoot("slot")]
+public class UserSlot : SlotBase, INeedsPreparationForSerialization
+{
+
+    [XmlIgnore]
+    public int CreatorId { get; set; }
+
+    [XmlIgnore]
+    public GameVersion TargetGame { get; set; }
+
+    [XmlIgnore]
+    public int TargetUserId { get; set; }
+
+    [XmlIgnore]
+    public SerializationMode SerializationMode { get; set; }
+
+    [XmlIgnore]
+    public string[] Resources { get; set; }
+
+    [XmlElement("id")]
+    public int SlotId { get; set; }
+
+    [XmlAttribute("type")]
+    public string Type { get; set; } = "user";
+
+    [XmlElement("npHandle")]
+    public NpHandle AuthorHandle { get; set; } = new();
+
+    [XmlElement("location")]
+    public Location Location { get; set; }
+
+    [XmlElement("game")]
+    public GameVersion GameVersion { get; set; }
+
+    [XmlElement("name")]
+    public string Name { get; set; }
+
+    [XmlElement("description")]
+    public string Description { get; set; }
+
+    [XmlElement("rootLevel")]
+    public string RootLevel { get; set; }
+
+    [XmlElement("icon")]
+    public string IconHash { get; set; }
+
+    [XmlElement("initiallyLocked")]
+    public bool InitiallyLocked { get; set; }
+
+    [XmlElement("isSubLevel")]
+    public bool IsSubLevel { get; set; }
+
+    [XmlElement("isLBP1Only")]
+    public bool IsLbp1Only { get; set; }
+
+    [XmlElement("isAdventurePlanet")]
+    public bool IsAdventurePlanet { get; set; }
+
+    [DefaultValue("")]
+    [XmlElement("background")]
+    public string BackgroundHash { get; set; }
+
+    [XmlElement("shareable")]
+    public int IsShareable { get; set; }
+
+    [XmlElement("authorLabels")]
+    public string AuthorLabels { get; set; }
+
+    [XmlElement("leveltype")]
+    public string LevelType { get; set; } = "";
+
+    [XmlElement("minPlayers")]
+    public int MinimumPlayers { get; set; }
+
+    [XmlElement("maxPlayers")]
+    public int MaximumPlayers { get; set; }
+
+    [XmlElement("heartCount")]
+    public int HeartCount { get; set; }
+
+    [XmlElement("thumbsup")]
+    public int ThumbsUp { get; set; }
+
+    [XmlElement("thumbsdown")]
+    public int ThumbsDown { get; set; }
+
+    [XmlElement("averageRating")]
+    public double AverageRating { get; set; }
+    public bool ShouldSerializeAverageRating() => this.GameVersion == GameVersion.LittleBigPlanet1;
+
+    [XmlElement("playerCount")]
+    public int PlayerCount { get; set; }
+
+    [XmlElement("mmpick")]
+    public bool IsTeamPicked { get; set; }
+
+    [XmlElement("moveRequired")]
+    public bool IsMoveRequired { get; set; }
+    public bool ShouldSerializeIsMoveRequired() => this.SerializationMode == SerializationMode.Full;
+
+    [XmlElement("crossControlRequired")]
+    public bool IsCrossControlRequired { get; set; }
+    public bool ShouldSerializeIsCrossControlRequired() => this.SerializationMode == SerializationMode.Full;
+
+    [DefaultValue(0.0)]
+    [XmlElement("yourRating")]
+    public double YourRating { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("yourDPadRating")]
+    public double YourDPadRating { get; set; }
+
+    [XmlElement("yourlbp1PlayCount")]
+    public int YourPlaysLBP1 { get; set; }
+
+    [XmlElement("yourlbp2PlayCount")]
+    public int YourPlaysLBP2 { get; set; }
+
+    [XmlElement("yourlbp3PlayCount")]
+    public int YourPlaysLBP3 { get; set; }
+
+    [XmlElement("reviewCount")]
+    public int ReviewCount { get; set; }
+
+    [XmlElement("commentCount")]
+    public int CommentCount { get; set; }
+
+    [XmlElement("photoCount")]
+    public int PhotoCount { get; set; }
+
+    [XmlElement("authorPhotoCount")]
+    public int AuthorPhotoCount { get; set; }
+
+    [DefaultValue("")]
+    [XmlElement("tags")]
+    public string Tags { get; set; }
+    public bool ShouldSerializeTags() => this.SerializationMode == SerializationMode.Full;
+
+    [DefaultValue("")]
+    [XmlElement("labels")]
+    public string Labels => this.AuthorLabels;
+    public bool ShouldSerializeLabels() => this.SerializationMode == SerializationMode.Full;
+
+    [XmlElement("firstPublished")]
+    public long FirstUploaded { get; set; }
+
+    [XmlElement("lastUpdated")]
+    public long LastUpdated { get; set; }
+
+    [DefaultValue(null)]
+    [XmlElement("yourReview")]
+    public Review YourReview { get; set; }
+    public bool ShouldSerializeYourReview() => this.SerializationMode == SerializationMode.Full; 
+
+    [XmlElement("reviewsEnabled")]
+    public bool ReviewsEnabled => ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
+    public bool ShouldSerializeReviewsEnabled() => this.SerializationMode == SerializationMode.Full;
+
+    [XmlElement("commentsEnabled")]
+    public bool CommentsEnabled => ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
+    public bool ShouldSerializeCommentsEnabled() => this.SerializationMode == SerializationMode.Full;
+
+    [XmlElement("playCount")]
+    public int PlayCount { get; set; }
+
+    [XmlElement("completionCount")]
+    public int CompletePlayCount { get; set; }
+
+    [XmlElement("lbp1PlayCount")]
+    public int LBP1PlayCount { get; set; }
+
+    [XmlElement("lbp1CompletePlayCount")]
+    public int LBP1CompletePlayCount { get; set; }
+
+    [XmlElement("lbp1UniquePlayCount")]
+    public int LBP1UniquePlayCount { get; set; }
+
+    [XmlElement("lbp2PlayCount")]
+    public int LBP2PlayCount { get; set; }
+
+    [XmlElement("lbp2CompletePlayCount")]
+    public int LBP2CompletePlayCount { get; set; }
+
+    [XmlElement("uniquePlayCount")]
+    public int LBP2UniquePlayCount { get; set; }
+
+    [XmlElement("lbp3PlayCount")]
+    public int LBP3PlayCount { get; set; }
+
+    [XmlElement("lbp3CompletePlayCount")]
+    public int LBP3CompletePlayCount { get; set; }
+
+    [XmlElement("lbp3UniquePlayCount")]
+    public int LBP3UniquePlayCount { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("sizeOfResources")]
+    public int ResourcesSize { get; set; }
+    public bool ShouldSerializeResourcesSize() => this.TargetGame == GameVersion.LittleBigPlanetVita;
+
+    public async Task PrepareSerialization(DatabaseContext database)
+    {
+        var stats = await database.Slots.DefaultIfEmpty()
+            .Select(_ => new
+            {
+                ThumbsUp = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1),
+                ThumbsDown = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1),
+                ReviewCount = database.Reviews.Count(r => r.SlotId == this.SlotId),
+                CommentCount = database.Comments.Count(c => c.TargetId == this.SlotId && c.Type == CommentType.Level),
+                PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
+                AuthorPhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId),
+                HeartCount = database.HeartedLevels.Count(h => h.SlotId == this.SlotId),
+                UsernameAndIcon = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => new
+                {
+                    u.IconHash,
+                    u.Username, 
+                }).First(),
+            })
+            .FirstAsync();
+        ReflectionHelper.CopyAllFields(stats, this);
+        this.AuthorHandle = new NpHandle(stats.UsernameAndIcon.Username, stats.UsernameAndIcon.IconHash);
+        // ReSharper disable once ConvertIfStatementToSwitchStatement
+        if (this.GameVersion == GameVersion.LittleBigPlanet1)
+        {
+            this.AverageRating = database.RatedLevels.Where(r => r.SlotId == this.SlotId)
+                .Average(r => (double?)r.RatingLBP1) ?? 0;
+        }
+        else if (this.GameVersion == GameVersion.LittleBigPlanetVita)
+        {
+            this.ResourcesSize = this.Resources.Sum(FileHelper.ResourceSize);
+        }
+
+        if (this.SerializationMode == SerializationMode.Minimal) return;
+
+        #nullable enable
+        RatedLevel? yourRating = await database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == this.TargetUserId && r.SlotId == this.SlotId);
+        Review? yourReview = await database.Reviews.Include(r => r.Slot).FirstOrDefaultAsync(r => r.ReviewerId == this.TargetUserId && r.SlotId == this.SlotId);
+        VisitedLevel? yourVisitedStats = await database.VisitedLevels.FirstOrDefaultAsync(v => v.UserId == this.TargetUserId && v.SlotId == this.SlotId);
+        if (yourRating != null)
+        {
+            this.YourRating = yourRating.RatingLBP1;
+            this.YourDPadRating = yourRating.Rating;
+        }
+        if (yourVisitedStats != null)
+        {
+            this.YourPlaysLBP1 = yourVisitedStats.PlaysLBP1;
+            this.YourPlaysLBP2 = yourVisitedStats.PlaysLBP2;
+            this.YourPlaysLBP3 = yourVisitedStats.PlaysLBP3;
+        }
+        if (yourReview != null)
+        {
+            this.YourReview = yourReview;
+        }
+        #nullable disable
+
+        this.PlayerCount = RoomHelper.Rooms.Count(r => r.Slot.SlotType == SlotType.User && r.Slot.SlotId == this.SlotId);
+    }
+
+}

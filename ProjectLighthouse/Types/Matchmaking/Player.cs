@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Matchmaking;
 public class Player
 {
     [JsonIgnore]
-    public User User { get; set; }
+    public UserEntity User { get; set; }
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public string PlayerId => this.User.Username;

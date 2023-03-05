@@ -15,7 +15,7 @@ public class PasswordResetRequiredPage : BaseLayout
 
     public IActionResult OnGet()
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
         if (!user.PasswordResetRequired) return this.Redirect("~/passwordReset");
 

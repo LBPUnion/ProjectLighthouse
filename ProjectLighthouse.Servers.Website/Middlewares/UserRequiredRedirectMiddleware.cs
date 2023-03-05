@@ -21,7 +21,7 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
-        User? user = await database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
         if (user == null)
         {
             await this.next(ctx);

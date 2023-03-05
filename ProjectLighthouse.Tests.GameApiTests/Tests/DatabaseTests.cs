@@ -17,8 +17,8 @@ public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
         await using DatabaseContext database = new();
         int rand = new Random().Next();
 
-        User userA = await database.CreateUser("unitTestUser" + rand, CryptoHelper.GenerateAuthToken());
-        User userB = await database.CreateUser("unitTestUser" + rand, CryptoHelper.GenerateAuthToken());
+        UserEntity userA = await database.CreateUser("unitTestUser" + rand, CryptoHelper.GenerateAuthToken());
+        UserEntity userB = await database.CreateUser("unitTestUser" + rand, CryptoHelper.GenerateAuthToken());
 
         Assert.NotNull(userA);
         Assert.NotNull(userB);

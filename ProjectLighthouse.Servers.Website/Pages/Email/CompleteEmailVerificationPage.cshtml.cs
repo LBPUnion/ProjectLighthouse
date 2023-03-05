@@ -28,7 +28,7 @@ public class CompleteEmailVerificationPage : BaseLayout
             return this.Page();
         }
 
-        User user = await this.Database.Users.FirstAsync(u => u.UserId == emailVerifyToken.UserId);
+        UserEntity user = await this.Database.Users.FirstAsync(u => u.UserId == emailVerifyToken.UserId);
 
         if (DateTime.Now > emailVerifyToken.ExpiresAt)
         {

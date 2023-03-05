@@ -18,7 +18,7 @@ public partial class SMTPHelper
     // (User id, timestamp of last request + 30 seconds)
     private static readonly ConcurrentDictionary<int, long> recentlySentEmail = new();
 
-    public static async Task<bool> SendVerificationEmail(DatabaseContext database, User user)
+    public static async Task<bool> SendVerificationEmail(DatabaseContext database, UserEntity user)
     {
         // Remove expired entries
         for (int i = recentlySentEmail.Count - 1; i >= 0; i--)

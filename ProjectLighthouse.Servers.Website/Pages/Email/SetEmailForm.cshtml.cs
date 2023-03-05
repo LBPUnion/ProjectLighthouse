@@ -36,7 +36,7 @@ public class SetEmailForm : BaseLayout
         WebToken? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        UserEntity? user = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
         if (user == null) return this.Redirect("~/login");
 
         if (!SanitizationHelper.IsValidEmail(emailAddress))

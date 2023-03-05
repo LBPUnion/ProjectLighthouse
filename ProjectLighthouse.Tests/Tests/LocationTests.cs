@@ -17,7 +17,7 @@ public class LocationTests
             X = 1000,
             Y = 5000,
         };
-        User user = new()
+        UserEntity user = new()
         {
             Location = new Location
             {
@@ -38,7 +38,7 @@ public class LocationTests
             X = 1000,
             Y = 5000,
         };
-        Slot slot = new()
+        SlotEntity slot = new()
         {
             Location = new Location
             {
@@ -54,10 +54,10 @@ public class LocationTests
     [Fact]
     public void ShouldReadLocationAfterDeserialization()
     {
-        XmlSerializer deserializer = new(typeof(Slot));
+        XmlSerializer deserializer = new(typeof(SlotEntity));
         const string slotData = "<slot><name>test</name><resource>test</resource><location><x>4000</x><y>9000</y></location></slot>";
 
-        Slot? deserialized = (Slot?)deserializer.Deserialize(new StringReader(slotData));
+        SlotEntity? deserialized = (SlotEntity?)deserializer.Deserialize(new StringReader(slotData));
         Assert.True(deserialized != null);
         Assert.True(deserialized.Name == "test");
         Assert.True(deserialized.Location.X == 4000);
@@ -68,10 +68,10 @@ public class LocationTests
     [Fact]
     public void ShouldDeserializeEmptyLocation()
     {
-        XmlSerializer deserializer = new(typeof(Slot));
+        XmlSerializer deserializer = new(typeof(SlotEntity));
         const string slotData = "<slot><name>test</name></slot>";
 
-        Slot? deserialized = (Slot?)deserializer.Deserialize(new StringReader(slotData));
+        SlotEntity? deserialized = (SlotEntity?)deserializer.Deserialize(new StringReader(slotData));
         Assert.True(deserialized != null);
         Assert.True(deserialized.Name == "test");
         Assert.True(deserialized.Location.X == 0);

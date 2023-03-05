@@ -20,7 +20,7 @@ public class GriefReport
     public int ReportingPlayerId { get; set; }
 
     [ForeignKey(nameof(ReportingPlayerId))]
-    public User ReportingPlayer { get; set; }
+    public UserEntity ReportingPlayer { get; set; }
 
     [NotMapped]
     [XmlElement("player")]

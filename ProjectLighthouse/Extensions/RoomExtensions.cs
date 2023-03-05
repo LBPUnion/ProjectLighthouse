@@ -10,12 +10,12 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class RoomExtensions
 {
-    public static List<User> GetPlayers(this Room room, DatabaseContext database)
+    public static List<UserEntity> GetPlayers(this Room room, DatabaseContext database)
     {
-        List<User> players = new();
+        List<UserEntity> players = new();
         foreach (int playerId in room.PlayerIds)
         {
-            User? player = database.Users.FirstOrDefault(p => p.UserId == playerId);
+            UserEntity? player = database.Users.FirstOrDefault(p => p.UserId == playerId);
             Debug.Assert(player != null);
 
             players.Add(player);

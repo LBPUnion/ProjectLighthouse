@@ -16,7 +16,7 @@ public class ModPanelPage : BaseLayout
     
     public async Task<IActionResult> OnGet()
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
         if (!user.IsModerator) return this.NotFound();
         

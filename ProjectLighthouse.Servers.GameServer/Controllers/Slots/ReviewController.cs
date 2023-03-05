@@ -32,7 +32,7 @@ public class ReviewController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == slotId);
+        SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
 
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
@@ -61,7 +61,7 @@ public class ReviewController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
 
         RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
@@ -150,7 +150,7 @@ public class ReviewController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.BadRequest();
 
         IQueryable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)

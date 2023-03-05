@@ -44,7 +44,7 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        User? user;
+        UserEntity? user;
 
         if (!ServerConfiguration.Instance.Mail.MailEnabled)
         {
@@ -55,7 +55,7 @@ public class LoginForm : BaseLayout
             user = await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress == username);
             if (user == null)
             {
-                User? noEmailUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
+                UserEntity? noEmailUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username == username);
                 if (noEmailUser != null && noEmailUser.EmailAddress == null) user = noEmailUser;
 
             }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +18,15 @@ public static class LighthouseSerializer
 {
     public static string Serialize(IServiceProvider serviceProvider, ILbpSerializable serializableObject)
     {
-        CustomXmlSerializer serializer = new(serializableObject.GetType(), serviceProvider);
+        XmlRootAttribute? rootAttribute = null;
+        if (serializableObject is IHasCustomRoot customRoot) rootAttribute = new XmlRootAttribute(customRoot.GetRoot());
+        
         // Required to omit the xml namespace
         XmlSerializerNamespaces namespaces = new();
-        namespaces.Add("", "");
+        namespaces.Add(string.Empty, string.Empty);
         StringWriter stringWriter = new();
-        XmlWriter xmlWriter = XmlWriter.Create(stringWriter,
+        CustomXmlSerializer serializer = new(serializableObject.GetType(), serviceProvider, rootAttribute);
+        ExcludeNamespaceXmlWriter xmlWriter = new(stringWriter,
             new XmlWriterSettings
             {
                 OmitXmlDeclaration = true,
@@ -65,7 +67,7 @@ public static class LighthouseSerializer
         }
         catch (Exception e)
         {
-            Logger.Error($@"Failed to prepare '{serializableObject.GetType().Name}' for serialization: {e.ToDetailedException()}", LogArea.Serialization);
+            Logger.Error(@$"Failed to prepare '{serializableObject.GetType().Name}' for serialization: {e.ToDetailedException()}", LogArea.Serialization);
         }
     }
 }

@@ -39,7 +39,7 @@ public class MatchController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? user = await this.database.UserFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
         #region Parse match data
@@ -113,7 +113,7 @@ public class MatchController : ControllerBase
                 List<int> users = new();
                 foreach (string playerUsername in createRoom.Players)
                 {
-                    User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
+                    UserEntity? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (player != null) users.Add(player.UserId);
                     else return this.BadRequest();
@@ -129,10 +129,10 @@ public class MatchController : ControllerBase
 
                 if (room != null)
                 {
-                    List<User> users = new();
+                    List<UserEntity> users = new();
                     foreach (string playerUsername in updatePlayersInRoom.Players)
                     {
-                        User? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
+                        UserEntity? player = await this.database.Users.FirstOrDefaultAsync(u => u.Username == playerUsername);
                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                         if (player != null) users.Add(player);
                         else return this.BadRequest();

@@ -20,7 +20,7 @@ public partial class DatabaseContext
         return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.Username).FirstAsync();
     }
 
-    private User? UserFromLighthouseToken(string lighthouseToken)
+    private UserEntity? UserFromLighthouseToken(string lighthouseToken)
     {
         WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
@@ -33,7 +33,7 @@ public partial class DatabaseContext
         return null;
     }
 
-    public User? UserFromWebRequest(HttpRequest request)
+    public UserEntity? UserFromWebRequest(HttpRequest request)
     {
         if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken)) return null;
 
@@ -56,7 +56,7 @@ public partial class DatabaseContext
 
     }
 
-    public async Task<User?> UserFromPasswordResetToken(string? resetToken)
+    public async Task<UserEntity?> UserFromPasswordResetToken(string? resetToken)
     {
         if (string.IsNullOrWhiteSpace(resetToken)) return null;
 
@@ -93,7 +93,7 @@ public partial class DatabaseContext
     {
         foreach (GameToken token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
         {
-            User? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+            UserEntity? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
             if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
             this.GameTokens.Remove(token);
         }

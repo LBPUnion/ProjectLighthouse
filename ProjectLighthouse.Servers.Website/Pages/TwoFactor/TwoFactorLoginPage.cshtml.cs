@@ -29,7 +29,7 @@ public class TwoFactorLoginPage : BaseLayout
 
         if (token.Verified) return this.Redirect(this.RedirectUrl);
 
-        User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
+        UserEntity? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
         if (user == null) return this.Redirect("~/login");
 
         if (user.IsTwoFactorSetup) return this.Page();
@@ -50,7 +50,7 @@ public class TwoFactorLoginPage : BaseLayout
 
         if (token.Verified) return this.Redirect(this.RedirectUrl);
 
-        User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
+        UserEntity? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
         if (user == null) return this.Redirect("~/login");
 
         if (!user.IsTwoFactorSetup)

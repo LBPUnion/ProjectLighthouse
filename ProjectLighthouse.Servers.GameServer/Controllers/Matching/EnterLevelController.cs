@@ -35,7 +35,7 @@ public class EnterLevelController : ControllerBase
         // don't count plays for developer slots
         if (slotType == "developer") return this.Ok();
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
 
         IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);
@@ -104,7 +104,7 @@ public class EnterLevelController : ControllerBase
 
         if (slotType == "developer") return this.Ok();
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.NotFound();
 
         IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);

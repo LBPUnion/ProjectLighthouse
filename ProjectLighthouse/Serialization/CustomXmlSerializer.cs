@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Xml;
@@ -8,11 +9,20 @@ using System.Xml.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Serialization;
 
+/// <summary>
+/// This class is used in lieu of the regular XmlSerializer so we can add a custom function trigger 
+/// such that before a class is about to be serialized a custom function will be called for that object.
+/// </summary>
 public class CustomXmlSerializer : XmlSerializer
 {
     private readonly IServiceProvider provider;
 
     public CustomXmlSerializer(Type type, IServiceProvider provider) : base(type)
+    {
+        this.provider = provider;
+    }
+
+    public CustomXmlSerializer(Type type, IServiceProvider provider, XmlRootAttribute rootAttribute) : base(type, rootAttribute)
     {
         this.provider = provider;
     }
@@ -71,7 +81,7 @@ public class CustomXmlSerializer : XmlSerializer
             // If the property isn't a list or a ILbpSerializable
             if (typeof(IList).IsAssignableFrom(info.PropertyType) && info.PropertyType.GetGenericArguments().Length > 0)
             {
-                if (!typeof(INeedsPreparationForSerialization).IsAssignableFrom(info.PropertyType.GetGenericArguments()[0])) continue;
+                if (!typeof(ILbpSerializable).IsAssignableFrom(info.PropertyType.GetGenericArguments()[0])) continue;
             }
             else
             {

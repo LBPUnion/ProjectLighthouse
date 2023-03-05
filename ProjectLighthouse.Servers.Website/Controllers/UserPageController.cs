@@ -67,7 +67,7 @@ public class UserPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (heartedUser == null) return this.NotFound();
 
         await this.database.HeartUser(token.UserId, heartedUser);
@@ -81,7 +81,7 @@ public class UserPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (heartedUser == null) return this.NotFound();
 
         await this.database.UnheartUser(token.UserId, heartedUser);
@@ -95,7 +95,7 @@ public class UserPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        User? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        UserEntity? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (blockedUser == null) return this.NotFound();
 
         await this.database.BlockUser(token.UserId, blockedUser);
@@ -109,7 +109,7 @@ public class UserPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        User? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        UserEntity? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (blockedUser == null) return this.NotFound();
 
         await this.database.UnblockUser(token.UserId, blockedUser);

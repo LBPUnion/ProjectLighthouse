@@ -11,7 +11,7 @@ public class LastContact
     public int UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public User? User { get; set; }
+    public UserEntity? User { get; set; }
 
     public long Timestamp { get; set; }
 

@@ -37,24 +37,24 @@ public class ModerationCase
     public string? DismisserUsername { get; set; }
 
     [ForeignKey(nameof(DismisserId))]
-    public virtual User? Dismisser { get; set; }
+    public virtual UserEntity? Dismisser { get; set; }
     
     public int CreatorId { get; set; }
     public required string CreatorUsername { get; set; }
 
     [ForeignKey(nameof(CreatorId))]
-    public virtual User? Creator { get; set; }
+    public virtual UserEntity? Creator { get; set; }
     
     public int AffectedId { get; set; }
 
     #region Get affected id result
-    public Task<User?> GetUserAsync(DatabaseContext database)
+    public Task<UserEntity?> GetUserAsync(DatabaseContext database)
     {
         Debug.Assert(this.Type.AffectsUser());
         return database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId);
     }
     
-    public Task<Slot?> GetSlotAsync(DatabaseContext database)
+    public Task<SlotEntity?> GetSlotAsync(DatabaseContext database)
     {
         Debug.Assert(this.Type.AffectsLevel());
         return database.Slots.FirstOrDefaultAsync(u => u.SlotId == this.AffectedId);

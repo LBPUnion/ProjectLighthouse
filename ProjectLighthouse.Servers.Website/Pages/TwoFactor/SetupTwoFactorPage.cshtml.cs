@@ -31,7 +31,7 @@ public class SetupTwoFactorPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         if (user.IsTwoFactorSetup) return this.Redirect("~/");
@@ -87,7 +87,7 @@ public class SetupTwoFactorPage : BaseLayout
         return image.ToBase64String(PngFormat.Instance);
     }
 
-    private static string getQrCode(User user)
+    private static string getQrCode(UserEntity user)
     {
         string instanceName = ServerConfiguration.Instance.Customization.ServerName;
         string totpLink = CryptoHelper.GenerateTotpLink(user.TwoFactorSecret, HttpUtility.HtmlEncode(instanceName), user.Username);
@@ -101,7 +101,7 @@ public class SetupTwoFactorPage : BaseLayout
         WebToken? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         if (user.IsTwoFactorSetup) return this.Redirect("~/");

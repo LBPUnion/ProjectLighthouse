@@ -48,23 +48,15 @@ public class ListController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        GameVersion gameVersion = token.GameVersion;
-
-        IEnumerable<Slot> queuedLevels = this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.Queue)
+        List<SlotBase> queuedLevels = await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.Queue)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .AsEnumerable();
+            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken())).ToListAsync();
 
-        string response = queuedLevels.Aggregate(string.Empty, (current, q) => current + q.Serialize(gameVersion));
+        int total = await this.database.QueuedLevels.CountAsync(q => q.UserId == token.UserId);
+        int start = pageStart + Math.Min(pageSize, 30);
 
-        return this.Ok
-        (
-            LbpSerializer.TaggedStringElement("slots", response, new Dictionary<string, object>
-            {
-                { "total", await this.database.QueuedLevels.CountAsync(q => q.UserId == token.UserId) },
-                { "hint_start", pageStart + Math.Min(pageSize, 30) },
-            })
-        );
+        return this.Ok(new GenericSlotResponse(queuedLevels, total, start));
     }
 
     [HttpPost("lolcatftw/add/user/{id:int}")]
@@ -72,7 +64,7 @@ public class ListController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
         await this.database.QueueLevel(token.UserId, slot);
@@ -85,7 +77,7 @@ public class ListController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
         await this.database.UnqueueLevel(token.UserId, slot);
@@ -125,26 +117,19 @@ public class ListController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        GameVersion gameVersion = token.GameVersion;
-
-        User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (targetUser == null) return this.StatusCode(403, "");
 
-        IEnumerable<Slot> heartedLevels = this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.FavouriteSlots)
+        List<SlotBase> heartedLevels = await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.FavouriteSlots)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .AsEnumerable();
+            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .ToListAsync();
 
-        string response = heartedLevels.Aggregate(string.Empty, (current, q) => current + q.Serialize(gameVersion));
+        int total = await this.database.HeartedLevels.CountAsync(q => q.UserId == targetUser.UserId);
+        int start = pageStart + Math.Min(pageSize, 30);
 
-        return this.Ok
-        (
-            LbpSerializer.TaggedStringElement("favouriteSlots", response, new Dictionary<string, object>
-            {
-                { "total", await this.database.HeartedLevels.CountAsync(q => q.UserId == targetUser.UserId) },
-                { "hint_start", pageStart + Math.Min(pageSize, 30) },
-            })
-        );
+        return this.Ok(new GenericSlotResponse("favouriteSlots", heartedLevels, total, start));
     }
 
     private const int FirstLbp2DeveloperSlotId = 124806; // This is the first known level slot GUID in LBP2. Feel free to change it if a lower one is found.
@@ -158,7 +143,7 @@ public class ListController : ControllerBase
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
         if (slotType == "developer")
@@ -181,7 +166,7 @@ public class ListController : ControllerBase
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
         if (slotType == "developer")
@@ -217,9 +202,8 @@ public class ListController : ControllerBase
 
         int total = await this.database.HeartedPlaylists.CountAsync(p => p.UserId == targetUserId);
 
-        return this.Ok(new HeartedPlaylistResponse
+        return this.Ok(new GenericPlaylistResponse<Playlist>("favouritePlaylists", heartedPlaylists)
         {
-            Playlists = heartedPlaylists,
             Total = total,
             HintStart = pageStart + Math.Min(pageSize, 30),
         });
@@ -260,32 +244,24 @@ public class ListController : ControllerBase
     [HttpGet("favouriteUsers/{username}")]
     public async Task<IActionResult> GetFavouriteUsers(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
     {
-        GameToken token = this.GetToken();
-
-        User? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (targetUser == null) return this.StatusCode(403, "");
 
         if (pageSize <= 0) return this.BadRequest();
 
-        IEnumerable<User> heartedProfiles = this.database.HeartedProfiles.Include
-                (q => q.HeartedUser)
-            .OrderBy(q => q.HeartedProfileId)
-            .Where(q => q.UserId == targetUser.UserId)
-            .Select(q => q.HeartedUser)
+        List<UserProfile> heartedProfiles = await this.database.HeartedProfiles.Include
+                (h => h.HeartedUser)
+            .OrderBy(h => h.HeartedProfileId)
+            .Where(h => h.UserId == targetUser.UserId)
+            .Select(h => h.HeartedUser)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .AsEnumerable();
+            .Select(h => UserProfile.CreateFromEntity(h, this.GetToken().GameVersion))
+            .ToListAsync();
 
-        string response = heartedProfiles.Aggregate(string.Empty, (current, u) => current + u.Serialize(token.GameVersion));
+        int total = await this.database.HeartedProfiles.CountAsync(h => h.UserId == targetUser.UserId);
 
-        return this.Ok
-        (
-            LbpSerializer.TaggedStringElement("favouriteUsers", response, new Dictionary<string, object>
-            {
-                { "total", await this.database.HeartedProfiles.CountAsync(q => q.UserId == targetUser.UserId) },
-                { "hint_start", pageStart + Math.Min(pageSize, 30) },
-            })
-        );
+        return this.Ok(new GenericUserResponse<UserProfile>("favouriteUsers", heartedProfiles, total, pageStart + Math.Min(pageSize, 30)));
     }
 
     [HttpPost("favourite/user/{username}")]
@@ -293,7 +269,7 @@ public class ListController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (heartedUser == null) return this.NotFound();
 
         await this.database.HeartUser(token.UserId, heartedUser);
@@ -306,7 +282,7 @@ public class ListController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (heartedUser == null) return this.NotFound();
 
         await this.database.UnheartUser(token.UserId, heartedUser);
@@ -317,7 +293,7 @@ public class ListController : ControllerBase
     #endregion
 
     #region Filtering
-    enum ListFilterType // used to collapse code that would otherwise be two separate functions
+    internal enum ListFilterType // used to collapse code that would otherwise be two separate functions
     {
         Queue,
         FavouriteSlots,
@@ -325,21 +301,23 @@ public class ListController : ControllerBase
 
     private GameVersion getGameFilter(string? gameFilterType, GameVersion version)
     {
-        if (version == GameVersion.LittleBigPlanetVita) return GameVersion.LittleBigPlanetVita;
-        if (version == GameVersion.LittleBigPlanetPSP) return GameVersion.LittleBigPlanetPSP;
-
-        return gameFilterType switch
+        return version switch
         {
-            "lbp1" => GameVersion.LittleBigPlanet1,
-            "lbp2" => GameVersion.LittleBigPlanet2,
-            "lbp3" => GameVersion.LittleBigPlanet3,
-            "both" => GameVersion.LittleBigPlanet2, // LBP2 default option
-            null => GameVersion.LittleBigPlanet1,
-            _ => GameVersion.Unknown,
+            GameVersion.LittleBigPlanetVita => GameVersion.LittleBigPlanetVita,
+            GameVersion.LittleBigPlanetPSP => GameVersion.LittleBigPlanetPSP,
+            _ => gameFilterType switch
+            {
+                "lbp1" => GameVersion.LittleBigPlanet1,
+                "lbp2" => GameVersion.LittleBigPlanet2,
+                "lbp3" => GameVersion.LittleBigPlanet3,
+                "both" => GameVersion.LittleBigPlanet2, // LBP2 default option
+                null => GameVersion.LittleBigPlanet1,
+                _ => GameVersion.Unknown,
+            }
         };
     }
 
-    private IQueryable<Slot> filterListByRequest(string? gameFilterType, string? dateFilterType, GameVersion version, string username, ListFilterType filterType)
+    private IQueryable<SlotEntity> filterListByRequest(string? gameFilterType, string? dateFilterType, GameVersion version, string username, ListFilterType filterType)
     {
         if (version == GameVersion.LittleBigPlanetVita || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown)
         {

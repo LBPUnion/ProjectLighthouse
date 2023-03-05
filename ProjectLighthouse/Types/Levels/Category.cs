@@ -29,41 +29,42 @@ public abstract class Category
         set => this.Endpoint = value.Replace("/searches/", "");
     }
 
-    public abstract Slot? GetPreviewSlot(DatabaseContext database);
+    public abstract SlotEntity? GetPreviewSlot(DatabaseContext database);
 
-    public abstract IEnumerable<Slot> GetSlots(DatabaseContext database, int pageStart, int pageSize);
+    public abstract IEnumerable<SlotEntity> GetSlots(DatabaseContext database, int pageStart, int pageSize);
 
     public abstract int GetTotalSlots(DatabaseContext database);
 
     public string Serialize(DatabaseContext database)
     {
-        Slot? previewSlot = this.GetPreviewSlot(database);
 
-        string previewResults = "";
-        if (previewSlot != null)
-            previewResults = LbpSerializer.TaggedStringElement
-            (
-                "results",
-                previewSlot.Serialize(),
-                new Dictionary<string, object>
-                {
-                    {
-                        "total", this.GetTotalSlots(database)
-                    },
-                    {
-                        "hint_start", "2"
-                    },
-                }
-            );
-
-        return LbpSerializer.StringElement
-        (
-            "category",
-            LbpSerializer.StringElement("name", this.Name) +
-            LbpSerializer.StringElement("description", this.Description) +
-            LbpSerializer.StringElement("url", this.IngameEndpoint) +
-            (previewSlot == null ? "" : previewResults) +
-            LbpSerializer.StringElement("icon", this.IconHash)
-        );
+        //TODO fixme
+        return "";
+        // string previewResults = "";
+        // if (previewSlot != null)
+        //     previewResults = LbpSerializer.TaggedStringElement
+        //     (
+        //         "results",
+        //         previewSlot.Serialize(),
+        //         new Dictionary<string, object>
+        //         {
+        //             {
+        //                 "total", this.GetTotalSlots(database)
+        //             },
+        //             {
+        //                 "hint_start", "2"
+        //             },
+        //         }
+        //     );
+        //
+        // return LbpSerializer.StringElement
+        // (
+        //     "category",
+        //     LbpSerializer.StringElement("name", this.Name) +
+        //     LbpSerializer.StringElement("description", this.Description) +
+        //     LbpSerializer.StringElement("url", this.IngameEndpoint) +
+        //     (previewSlot == null ? "" : previewResults) +
+        //     LbpSerializer.StringElement("icon", this.IconHash)
+        // );
     }
 }

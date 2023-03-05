@@ -14,7 +14,7 @@ public class RatedReview
     public int UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; }
+    public UserEntity User { get; set; }
 
     public int ReviewId { get; set; }
 

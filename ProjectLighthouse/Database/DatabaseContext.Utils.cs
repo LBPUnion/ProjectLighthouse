@@ -23,7 +23,7 @@ public partial class DatabaseContext
     public bool IsUsernameValid(string username) => UsernameRegex().IsMatch(username);
 
     #nullable enable
-    public async Task<User> CreateUser(string username, string password, string? emailAddress = null)
+    public async Task<UserEntity> CreateUser(string username, string password, string? emailAddress = null)
     {
         if (!password.StartsWith('$')) throw new ArgumentException(nameof(password) + " is not a BCrypt hash");
 
@@ -35,10 +35,10 @@ public partial class DatabaseContext
             if (!this.IsUsernameValid(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
         }
 
-        User? user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
+        UserEntity? user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
         if (user != null) return user;
 
-        user = new User
+        user = new UserEntity
         {
             Username = username,
             Password = password,
@@ -65,7 +65,7 @@ public partial class DatabaseContext
         return await this.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
     }
 
-    public async Task<GameToken?> AuthenticateUser(User? user, NPTicket npTicket, string userLocation)
+    public async Task<GameToken?> AuthenticateUser(UserEntity? user, NPTicket npTicket, string userLocation)
     {
         if (user == null) return null;
 
@@ -88,7 +88,7 @@ public partial class DatabaseContext
         return gameToken;
     }
 
-    public async Task RemoveUser(User? user)
+    public async Task RemoveUser(UserEntity? user)
     {
         if (user == null) return;
         if (user.Username.Length == 0) return; // don't delete the placeholder user
@@ -106,7 +106,7 @@ public partial class DatabaseContext
                 modCase.CreatorId = await SlotHelper.GetPlaceholderUserId(this);
         }
 
-        foreach (Slot slot in this.Slots.Where(s => s.CreatorId == user.UserId)) await this.RemoveSlot(slot, false);
+        foreach (SlotEntity slot in this.Slots.Where(s => s.CreatorId == user.UserId)) await this.RemoveSlot(slot, false);
 
         this.HeartedProfiles.RemoveRange(this.HeartedProfiles.Where(h => h.UserId == user.UserId));
         this.PhotoSubjects.RemoveRange(this.PhotoSubjects.Where(s => s.UserId == user.UserId));
@@ -127,7 +127,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task HeartUser(int userId, User heartedUser)
+    public async Task HeartUser(int userId, UserEntity heartedUser)
     {
         HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) return;
@@ -141,7 +141,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task UnheartUser(int userId, User heartedUser)
+    public async Task UnheartUser(int userId, UserEntity heartedUser)
     {
         HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
@@ -149,11 +149,11 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task BlockUser(int userId, User blockedUser)
+    public async Task BlockUser(int userId, UserEntity blockedUser)
     {
         if (userId == blockedUser.UserId) return;
 
-        User? user = await this.Users.FindAsync(userId);
+        UserEntity? user = await this.Users.FindAsync(userId);
 
         BlockedProfile blockedProfile = new()
         {
@@ -166,7 +166,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task UnblockUser(int userId, User blockedUser)
+    public async Task UnblockUser(int userId, UserEntity blockedUser)
     {
         if (userId == blockedUser.UserId) return;
 

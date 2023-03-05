@@ -1,9 +1,10 @@
 ﻿using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("author")]
-public class Author
+public class Author : ILbpSerializable
 {
     public Author() { }
 

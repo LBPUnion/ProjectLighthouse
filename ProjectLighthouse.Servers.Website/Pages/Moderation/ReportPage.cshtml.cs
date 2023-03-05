@@ -18,7 +18,7 @@ public class ReportPage : BaseLayout
     
     public async Task<IActionResult> OnGet([FromRoute] int reportId)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
 

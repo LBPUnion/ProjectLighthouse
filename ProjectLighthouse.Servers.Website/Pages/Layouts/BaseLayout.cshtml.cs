@@ -25,7 +25,7 @@ public class BaseLayout : PageModel
 
     public string Title = string.Empty;
 
-    private User? user;
+    private UserEntity? user;
     public BaseLayout(DatabaseContext database)
     {
         this.Database = database;
@@ -35,7 +35,7 @@ public class BaseLayout : PageModel
         this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderSlots, "/slots/0", "globe americas"));
     }
 
-    public new User? User {
+    public new UserEntity? User {
         get {
             if (this.user != null) return this.user;
 

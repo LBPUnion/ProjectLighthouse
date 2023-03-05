@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 public static class LastContactHelper
 {
 
-    public static async Task SetLastContact(DatabaseContext database, User user, GameVersion gameVersion, Platform platform)
+    public static async Task SetLastContact(DatabaseContext database, UserEntity user, GameVersion gameVersion, Platform platform)
     {
         LastContact? lastContact = await database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
 

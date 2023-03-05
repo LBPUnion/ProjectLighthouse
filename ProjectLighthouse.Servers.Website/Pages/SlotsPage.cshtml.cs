@@ -20,7 +20,7 @@ public class SlotsPage : BaseLayout
 
     public int SlotCount;
 
-    public List<Slot> Slots = new();
+    public List<SlotEntity> Slots = new();
 
     public string? SearchValue;
 
@@ -57,7 +57,7 @@ public class SlotsPage : BaseLayout
         
         string trimmedSearch = finalSearch.ToString().Trim();
 
-        IQueryable<Slot> slots = this.Database.Slots.Include(p => p.Creator)
+        IQueryable<SlotEntity> slots = this.Database.Slots.Include(p => p.Creator)
             .Where(p => p.Type == SlotType.User && !p.Hidden)
             .Where(p => p.Name.Contains(trimmedSearch))
             .Where(p => p.Creator != null && (targetAuthor == null || string.Equals(p.Creator.Username.ToLower(), targetAuthor.ToLower())))

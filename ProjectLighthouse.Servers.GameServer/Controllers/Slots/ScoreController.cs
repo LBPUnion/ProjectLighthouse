@@ -94,7 +94,7 @@ public class ScoreController : ControllerBase
         score.SlotId = id;
         score.ChildSlotId = childId;
 
-        Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
+        SlotEntity? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
         if (slot == null)
         {
             Logger.Warn($"Rejecting score upload, slot is null (slotId={score.SlotId}, slotType={slotType}, reqId={id}, user={username})", LogArea.Score);

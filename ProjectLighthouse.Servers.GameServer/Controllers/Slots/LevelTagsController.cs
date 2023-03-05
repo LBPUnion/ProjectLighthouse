@@ -45,7 +45,7 @@ public class LevelTagsController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.Where(s => s.SlotId == id).FirstOrDefaultAsync();
+        SlotEntity? slot = await this.database.Slots.Where(s => s.SlotId == id).FirstOrDefaultAsync();
         if (slot == null) return this.BadRequest();
 
         if (!LabelHelper.IsValidTag(tagName)) return this.BadRequest();

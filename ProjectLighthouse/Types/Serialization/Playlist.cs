@@ -31,16 +31,16 @@ public class Playlist : ILbpSerializable, INeedsPreparationForSerialization
     [XmlElement("name")]
     public string Name { get; set; } = "";
 
-    [XmlElement("description")]
     [DefaultValue("")]
+    [XmlElement("description")]
     public string Description { get; set; } = "";
 
-    [XmlElement("levels")]
     [DefaultValue(0)]
+    [XmlElement("levels")]
     public int LevelCount { get; set; }
 
-    [XmlElement("hearts")]
     [DefaultValue(0)]
+    [XmlElement("hearts")]
     public int Hearts { get; set; }
 
     [XmlElement("levels_quota")]
@@ -48,11 +48,10 @@ public class Playlist : ILbpSerializable, INeedsPreparationForSerialization
 
     [XmlElement("level_id")]
     public int[]? LevelIds { get; set; }
+    public bool ShouldSerializeLevelIds() => false;
 
     [XmlElement("icons")]
     public IconList LevelIcons { get; set; } = new();
-
-    public bool ShouldSerializeLevelIds() => false;
 
     public async Task PrepareSerialization(DatabaseContext database)
     {

@@ -5,13 +5,13 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,48 +32,32 @@ public class UserController : ControllerBase
         this.database = database;
     }
 
-    private async Task<string?> getSerializedUser(string username, GameVersion gameVersion = GameVersion.LittleBigPlanet1)
-    {
-        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-        return user?.Serialize(gameVersion);
-    }
-
-    private async Task<string?> getSerializedUserPicture(string username)
-    {
-        // use an anonymous type to only fetch certain columns
-        var partialUser = await this.database.Users.Where(u => u.Username == username)
-            .Select(u => new
-            {
-                u.Username,
-                u.IconHash,
-            })
-            .FirstOrDefaultAsync();
-        if (partialUser == null) return null;
-
-        string user = LbpSerializer.TaggedStringElement("npHandle", partialUser.Username, "icon", partialUser.IconHash);
-        return LbpSerializer.TaggedStringElement("user", user, "type", "user");
-    }
-
     [HttpGet("user/{username}")]
     public async Task<IActionResult> GetUser(string username)
     {
-        GameToken token = this.GetToken();
-
-        string? user = await this.getSerializedUser(username, token.GameVersion);
+        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return this.NotFound();
 
-        return this.Ok(user);
+        return this.Ok(UserProfile.CreateFromEntity(user));
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetUserAlt([FromQuery] string[] u)
+    public async Task<IActionResult> GetUserAlt([FromQuery(Name = "u")] string[] userList)
     {
-        List<string?> serializedUsers = new();
-        foreach (string userId in u) serializedUsers.Add(await this.getSerializedUserPicture(userId));
+        List<MinimalUserProfile> minimalUserList = new();
+        foreach (string username in userList)
+        {
+            MinimalUserProfile? profile = await this.database.Users.Where(u => u.Username == username)
+                .Select(u => new MinimalUserProfile
+                {
+                    UserHandle = new NpHandle(u.Username, u.IconHash),
+                })
+                .FirstOrDefaultAsync();
+            if (profile == null) continue;
+            minimalUserList.Add(profile);
+        }
 
-        string serialized = serializedUsers.Aggregate(string.Empty, (current, user) => user == null ? current : current + user);
-
-        return this.Ok(LbpSerializer.StringElement("users", serialized));
+        return this.Ok(new MinimalUserListResponse(minimalUserList));
     }
 
     [HttpPost("updateUser")]
@@ -81,7 +65,7 @@ public class UserController : ControllerBase
     {
         GameToken token = this.GetToken();
 
-        User? user = await this.database.UserFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
         UserUpdate? update = await this.DeserializeBody<UserUpdate>("updateUser", "user");
@@ -120,17 +104,17 @@ public class UserController : ControllerBase
 
         if (update.Slots != null)
         {
+            update.Slots = update.Slots.Where(s => s.Type == SlotType.User)
+                .Where(s => s.Location != null)
+                .Where(s => s.SlotId != 0).ToList();
             foreach (UserUpdateSlot? updateSlot in update.Slots)
             {
-                // ReSharper disable once MergeIntoNegatedPattern
-                if (updateSlot.Type != SlotType.User || updateSlot.Location == null || updateSlot.SlotId == 0) continue;
-
-                Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == updateSlot.SlotId);
+                SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == updateSlot.SlotId);
                 if (slot == null) continue;
 
                 if (slot.CreatorId != token.UserId) continue;
 
-                slot.Location = updateSlot.Location;
+                slot.Location = updateSlot.Location!;
             }
         }
 
@@ -178,7 +162,7 @@ public class UserController : ControllerBase
     [HttpPost("update_my_pins")]
     public async Task<IActionResult> UpdateMyPins()
     {
-        User? user = await this.database.UserFromGameToken(this.GetToken());
+        UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.StatusCode(403, "");
 
         string bodyString = await this.ReadBodyAsync();

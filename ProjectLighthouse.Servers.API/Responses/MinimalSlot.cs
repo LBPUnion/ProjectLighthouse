@@ -15,7 +15,7 @@ public struct MinimalSlot
     public long FirstUploaded { get; set; }
     #endif
 
-    public static MinimalSlot FromSlot(Slot slot)
+    public static MinimalSlot FromSlot(SlotEntity slot)
         => new()
         {
             SlotId = slot.SlotId,

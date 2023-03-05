@@ -12,10 +12,10 @@ public class HeartedProfile
     public int UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; }
+    public UserEntity User { get; set; }
 
     public int HeartedUserId { get; set; }
 
     [ForeignKey(nameof(HeartedUserId))]
-    public User HeartedUser { get; set; }
+    public UserEntity HeartedUser { get; set; }
 }

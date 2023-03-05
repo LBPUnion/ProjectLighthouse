@@ -14,12 +14,12 @@ public class RatedLevel
     public int UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; }
+    public UserEntity User { get; set; }
 
     public int SlotId { get; set; }
 
     [ForeignKey(nameof(SlotId))]
-    public Slot Slot { get; set; }
+    public SlotEntity Slot { get; set; }
 
     public int Rating { get; set; }
 

@@ -15,7 +15,7 @@ public class GameToken
     public int UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; }
+    public UserEntity User { get; set; }
 
     public string UserToken { get; set; }
 

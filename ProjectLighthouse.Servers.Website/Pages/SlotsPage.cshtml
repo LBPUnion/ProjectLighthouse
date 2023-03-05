@@ -24,7 +24,7 @@
 </form>
 <div class="ui divider"></div>
 
-@foreach (Slot slot in Model.Slots)
+@foreach (SlotEntity slot in Model.Slots)
 {
     <div class="ui segment">
         @await slot.ToHtml(Html, ViewData, Model.User, $"~/slots/{Model.PageNumber}", language, timeZone, isMobile, true)

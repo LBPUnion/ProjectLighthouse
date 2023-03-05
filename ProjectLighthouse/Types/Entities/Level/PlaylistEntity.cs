@@ -18,7 +18,7 @@ public class PlaylistEntity
     public int CreatorId { get; set; }
 
     [ForeignKey(nameof(CreatorId))]
-    public User? Creator { get; set; }
+    public UserEntity? Creator { get; set; }
 
     public string SlotCollection { get; set; } = "";
 

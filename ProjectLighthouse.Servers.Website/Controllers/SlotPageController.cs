@@ -33,7 +33,7 @@ public class SlotPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        Slot? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (targetSlot == null) return this.Redirect("~/slots/0");
 
         if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
@@ -93,7 +93,7 @@ public class SlotPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        Slot? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (heartedSlot == null) return this.NotFound();
 
         await this.database.HeartLevel(token.UserId, heartedSlot);
@@ -109,7 +109,7 @@ public class SlotPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        Slot? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (heartedSlot == null) return this.NotFound();
 
         await this.database.UnheartLevel(token.UserId, heartedSlot);
@@ -125,7 +125,7 @@ public class SlotPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        Slot? queuedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? queuedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (queuedSlot == null) return this.NotFound();
 
         await this.database.QueueLevel(token.UserId, queuedSlot);
@@ -141,7 +141,7 @@ public class SlotPageController : ControllerBase
         WebToken? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        Slot? queuedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? queuedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (queuedSlot == null) return this.NotFound();
 
         await this.database.UnqueueLevel(token.UserId, queuedSlot);

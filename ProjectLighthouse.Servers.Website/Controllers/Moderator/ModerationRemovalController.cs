@@ -17,9 +17,9 @@ public class ModerationRemovalController : ControllerBase
         this.database = database;
     }
 
-    private async Task<IActionResult> Delete<T>(DbSet<T> dbSet, int id, string? callbackUrl, Func<User, int, Task<T?>> getHandler) where T: class
+    private async Task<IActionResult> Delete<T>(DbSet<T> dbSet, int id, string? callbackUrl, Func<UserEntity, int, Task<T?>> getHandler) where T: class
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         T? item = await getHandler(user, id);
@@ -46,7 +46,7 @@ public class ModerationRemovalController : ControllerBase
     [HttpGet("deleteComment/{commentId:int}")]
     public async Task<IActionResult> DeleteComment(int commentId, [FromQuery] string? callbackUrl)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
@@ -82,7 +82,7 @@ public class ModerationRemovalController : ControllerBase
     [HttpGet("deleteReview/{reviewId:int}")]
     public async Task<IActionResult> DeleteReview(int reviewId, [FromQuery] string? callbackUrl)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         Review? review = await this.database.Reviews.Include(r => r.Slot).FirstOrDefaultAsync(c => c.ReviewId == reviewId);

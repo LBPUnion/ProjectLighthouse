@@ -26,7 +26,7 @@ public class Comment
     public int TargetId { get; set; }
 
     [ForeignKey(nameof(PosterUserId))]
-    public User Poster { get; set; }
+    public UserEntity Poster { get; set; }
 
     public bool Deleted { get; set; }
 
@@ -61,7 +61,7 @@ public class Comment
         }
 
         using DatabaseContext database = new();
-        User deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
+        UserEntity deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
 
         if (deletedBy != null && deletedBy.UserId == this.TargetId)
         {

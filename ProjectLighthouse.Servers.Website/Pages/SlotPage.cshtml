@@ -1,5 +1,6 @@
 @page "/slot/{id:int}"
 @using System.Web
+@using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
@@ -54,7 +55,7 @@
                 string[] authorLabels;
                 if (Model.Slot?.GameVersion == GameVersion.LittleBigPlanet1)
                 {
-                    authorLabels = Model.Slot?.LevelTags ?? Array.Empty<string>();
+                    authorLabels = Model.Slot.LevelTags(new DatabaseContext());
                 }
                 else
                 {

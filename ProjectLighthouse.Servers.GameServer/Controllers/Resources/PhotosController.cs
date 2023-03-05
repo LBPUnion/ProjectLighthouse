@@ -34,10 +34,12 @@ public class PhotosController : ControllerBase
     [HttpPost("uploadPhoto")]
     public async Task<IActionResult> UploadPhoto()
     {
-        User? user = await this.database.UserFromGameToken(this.GetToken());
+        UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.StatusCode(403, "");
 
-        if (user.PhotosByMe >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
+        int photoCount = await this.database.Photos.CountAsync(p => p.CreatorId == user.UserId);
+
+        if (photoCount >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
 
         Photo? photo = await this.DeserializeBody<Photo>();
         if (photo == null) return this.BadRequest();
@@ -65,7 +67,7 @@ public class PhotosController : ControllerBase
                 case SlotType.User:
                 {
                     // We'll grab the slot by the RootLevel and see what happens from here.
-                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.ResourceCollection.Contains(photoSlot.RootLevel));
+                    SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == SlotType.User && s.ResourceCollection.Contains(photoSlot.RootLevel));
                     if (slot == null) break;
 
                     if (!string.IsNullOrEmpty(slot.RootLevel)) validLevel = true;
@@ -76,7 +78,7 @@ public class PhotosController : ControllerBase
                 case SlotType.Local:
                 case SlotType.Developer:
                 {
-                    Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == photoSlot.SlotType && s.InternalSlotId == photoSlot.SlotId);
+                    SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == photoSlot.SlotType && s.InternalSlotId == photoSlot.SlotId);
                     if (slot != null) 
                         photoSlot.SlotId = slot.SlotId;
                     else
@@ -219,7 +221,7 @@ public class PhotosController : ControllerBase
         // If user isn't photo creator then check if they own the level
         if (photo.CreatorId != token.UserId)
         {
-            Slot? photoSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId && s.Type == SlotType.User);
+            SlotEntity? photoSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId && s.Type == SlotType.User);
             if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.StatusCode(401, "");
         }
 

@@ -92,7 +92,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
             if (await this.database.Users.AnyAsync(u => u.EmailAddress == email)) return this.Ok();
 
-            User? user = await this.database.UserFromGameToken(token);
+            UserEntity? user = await this.database.UserFromGameToken(token);
             if (user == null || user.EmailAddress != null) return this.Ok();
 
             PasswordResetToken resetToken = new()

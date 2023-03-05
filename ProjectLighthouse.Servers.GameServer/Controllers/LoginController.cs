@@ -69,7 +69,7 @@ public class LoginController : ControllerBase
 
         await this.database.RemoveExpiredTokens();
 
-        User? user;
+        UserEntity? user;
 
         switch (npTicket.Platform)
         {
@@ -91,7 +91,7 @@ public class LoginController : ControllerBase
         if (user == null)
         {
             // Check if there is an account with that username already 
-            User? targetUsername = await this.database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
+            UserEntity? targetUsername = await this.database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
             if (targetUsername != null)
             {
                 ulong targetPlatform = npTicket.Platform == Platform.RPCS3

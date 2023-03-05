@@ -8,7 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Database;
 
 public partial class DatabaseContext
 {
-    public async Task RemoveSlot(Slot slot, bool saveChanges = true)
+    public async Task RemoveSlot(SlotEntity slot, bool saveChanges = true)
     {
         this.Slots.Remove(slot);
 
@@ -37,7 +37,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task HeartLevel(int userId, Slot heartedSlot)
+    public async Task HeartLevel(int userId, SlotEntity heartedSlot)
     {
         HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) return;
@@ -54,7 +54,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task UnheartLevel(int userId, Slot heartedSlot)
+    public async Task UnheartLevel(int userId, SlotEntity heartedSlot)
     {
         HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
@@ -62,7 +62,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task QueueLevel(int userId, Slot queuedSlot)
+    public async Task QueueLevel(int userId, SlotEntity queuedSlot)
     {
         QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
         if (queuedLevel != null) return;
@@ -79,7 +79,7 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
-    public async Task UnqueueLevel(int userId, Slot queuedSlot)
+    public async Task UnqueueLevel(int userId, SlotEntity queuedSlot)
     {
         QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
         if (queuedLevel != null) this.QueuedLevels.Remove(queuedLevel);

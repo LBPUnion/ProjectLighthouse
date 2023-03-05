@@ -27,7 +27,7 @@ public class RoomHelper
     private static int roomIdIncrement;
     internal static int RoomIdIncrement => roomIdIncrement++;
 
-    public static FindBestRoomResponse? FindBestRoom(User? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform, string? location)
+    public static FindBestRoomResponse? FindBestRoom(UserEntity? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform, string? location)
     {
         if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
         {
@@ -87,7 +87,7 @@ public class RoomHelper
                 Locations = new List<string>(),
             };
 
-            foreach (User player in room.GetPlayers(new DatabaseContext()))
+            foreach (UserEntity player in room.GetPlayers(new DatabaseContext()))
             {
                 response.Players.Add
                 (
@@ -207,8 +207,10 @@ public class RoomHelper
             // Remove offline players from rooms
             foreach (Room room in rooms)
             {
-                List<User> players = room.GetPlayers(database ?? new DatabaseContext());
-                List<int> playersToRemove = players.Where(player => player.Status.StatusType == StatusType.Offline).Select(player => player.UserId).ToList();
+                List<UserEntity> players = room.GetPlayers(database ?? new DatabaseContext());
+                //TODO fixme
+                List<int> playersToRemove = new(); 
+                    // players.Where(player => player.Status.StatusType == StatusType.Offline).Select(player => player.UserId).ToList();
 
                 foreach (int player in playersToRemove) room.PlayerIds.Remove(player);
                 

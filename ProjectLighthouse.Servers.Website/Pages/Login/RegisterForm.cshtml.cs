@@ -54,7 +54,7 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        User? existingUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+        UserEntity? existingUser = await this.Database.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
         if (existingUser != null)
         {
             this.Error = this.Translate(ErrorStrings.UsernameTaken);
@@ -74,7 +74,7 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        User user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
+        UserEntity user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
 
         WebToken webToken = new()
         {

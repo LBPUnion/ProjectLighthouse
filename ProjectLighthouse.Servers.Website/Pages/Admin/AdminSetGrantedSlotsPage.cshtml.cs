@@ -12,11 +12,11 @@ public class AdminSetGrantedSlotsPage : BaseLayout
     public AdminSetGrantedSlotsPage(DatabaseContext database) : base(database)
     {}
 
-    public User? TargetedUser;
+    public UserEntity? TargetedUser;
 
     public async Task<IActionResult> OnGet([FromRoute] int id)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsAdmin) return this.NotFound();
 
         this.TargetedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == id);
@@ -27,7 +27,7 @@ public class AdminSetGrantedSlotsPage : BaseLayout
 
     public async Task<IActionResult> OnPost([FromRoute] int id, int grantedSlotCount)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsAdmin) return this.NotFound();
 
         this.TargetedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == id);

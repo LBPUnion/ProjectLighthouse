@@ -13,7 +13,7 @@ public class BannedUsersPage : BaseLayout
     public BannedUsersPage(DatabaseContext database) : base(database)
     {}
 
-    public List<User> Users = new();
+    public List<UserEntity> Users = new();
 
     public int PageAmount;
 

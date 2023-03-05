@@ -22,13 +22,13 @@ public class SlotPage : BaseLayout
     public bool CommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
 
-    public Slot? Slot;
+    public SlotEntity? Slot;
     public SlotPage(DatabaseContext database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet([FromRoute] int id)
     {
-        Slot? slot = await this.Database.Slots.Include(s => s.Creator)
+        SlotEntity? slot = await this.Database.Slots.Include(s => s.Creator)
             .Where(s => s.Type == SlotType.User)
             .FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();

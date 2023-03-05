@@ -14,7 +14,7 @@ public class EmailSetToken
     public int UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; }
+    public UserEntity User { get; set; }
 
     public string EmailToken { get; set; }
 
