@@ -17,7 +17,7 @@ public class RoomVisualizerPage : BaseLayout
     public IActionResult OnGet()
     {
         #if !DEBUG
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsAdmin) return this.NotFound();
         #endif
 
