@@ -53,7 +53,7 @@ public partial class SMTPHelper
             .FirstOrDefaultAsync();
         if (existingToken != null) database.EmailVerificationTokens.RemoveWhere(t => t.EmailToken == existingToken);
 
-        EmailVerificationToken verifyToken = new()
+        EmailVerificationTokenEntity verifyToken = new()
         {
             UserId = user.UserId,
             User = user,

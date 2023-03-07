@@ -55,6 +55,6 @@ public static class PartialExtensions
                 .WithKeyValue("IsMini", isMini)
                 .WithKeyValue("IsMobile", isMobile));
 
-    public static Task<IHtmlContent> ToHtml<T>(this Photo photo, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, string timeZone, bool canDelete = false)
+    public static Task<IHtmlContent> ToHtml<T>(this PhotoEntity photo, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, string timeZone, bool canDelete = false)
         => helper.PartialAsync("Partials/PhotoPartial", photo, viewData.WithLang(language).WithTime(timeZone).CanDelete(canDelete));
 }

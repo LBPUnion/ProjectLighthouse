@@ -6,25 +6,25 @@ using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-[XmlInclude(typeof(UserSlot))]
-[XmlInclude(typeof(DeveloperSlot))]
+[XmlInclude(typeof(GameUserSlot))]
+[XmlInclude(typeof(GameDeveloperSlot))]
 // The C# XML serializer doesn't recognize children of interfaces, only abstract classes. Therefore, this has to be abstract
 public abstract class SlotBase : ILbpSerializable
 {
 
-    public static SlotBase CreateFromEntity(SlotEntity slot, GameToken token, SerializationMode serializationMode)
+    public static SlotBase CreateFromEntity(SlotEntity slot, GameTokenEntity token, SerializationMode serializationMode)
     {
         SlotBase retSlot = CreateFromEntity(slot, token);
-        if (retSlot is UserSlot userSlot) userSlot.SerializationMode = serializationMode;
+        if (retSlot is GameUserSlot userSlot) userSlot.SerializationMode = serializationMode;
 
         return retSlot;
     }
 
-    public static SlotBase CreateFromEntity(SlotEntity slot, GameToken token)
+    public static SlotBase CreateFromEntity(SlotEntity slot, GameTokenEntity token)
     {
         if (slot.Type == SlotType.Developer)
         {
-            DeveloperSlot devSlot = new()
+            GameDeveloperSlot devSlot = new()
             {
                 SlotId = slot.SlotId,
                 InternalSlotId = slot.InternalSlotId,
@@ -32,7 +32,7 @@ public abstract class SlotBase : ILbpSerializable
             return devSlot;
         }
 
-        UserSlot userSlot = new()
+        GameUserSlot userSlot = new()
         {
             TargetGame = token.GameVersion,
             TargetUserId = token.UserId,

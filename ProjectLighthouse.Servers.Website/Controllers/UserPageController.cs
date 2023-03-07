@@ -24,7 +24,7 @@ public class UserPageController : ControllerBase
     [HttpGet("rateComment")]
     public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int? commentId, [FromQuery] int? rating)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         await this.database.RateComment(token.UserId, commentId.GetValueOrDefault(), rating.GetValueOrDefault());
@@ -35,7 +35,7 @@ public class UserPageController : ControllerBase
     [HttpPost("postComment")]
     public async Task<IActionResult> PostComment([FromRoute] int id, [FromForm] string? msg)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         if (msg == null)
@@ -64,7 +64,7 @@ public class UserPageController : ControllerBase
     [HttpGet("heart")]
     public async Task<IActionResult> HeartUser([FromRoute] int id)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
@@ -78,7 +78,7 @@ public class UserPageController : ControllerBase
     [HttpGet("unheart")]
     public async Task<IActionResult> UnheartUser([FromRoute] int id)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
@@ -92,7 +92,7 @@ public class UserPageController : ControllerBase
     [HttpGet("block")]
     public async Task<IActionResult> BlockUser([FromRoute] int id)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         UserEntity? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
@@ -106,7 +106,7 @@ public class UserPageController : ControllerBase
     [HttpGet("unblock")]
     public async Task<IActionResult> UnblockUser([FromRoute] int id)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         UserEntity? blockedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);

@@ -38,7 +38,7 @@ public class UserController : ControllerBase
         UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return this.NotFound();
 
-        return this.Ok(UserProfile.CreateFromEntity(user));
+        return this.Ok(GameUser.CreateFromEntity(user));
     }
 
     [HttpGet("users")]
@@ -63,7 +63,7 @@ public class UserController : ControllerBase
     [HttpPost("updateUser")]
     public async Task<IActionResult> UpdateUser()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");

@@ -30,7 +30,7 @@ public class AuthenticationTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
-        WebToken? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
+        WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.NotNull(webToken);
 
         await database.RemoveUser(user);
@@ -49,7 +49,7 @@ public class AuthenticationTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
-        WebToken? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
+        WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.Null(webToken);
 
         await database.RemoveUser(user);
@@ -69,7 +69,7 @@ public class AuthenticationTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
-        WebToken? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
+        WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.Null(webToken);
 
         await database.RemoveUser(user);
@@ -84,7 +84,7 @@ public class AuthenticationTests : LighthouseWebTest
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
-        WebToken webToken = new()
+        WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),

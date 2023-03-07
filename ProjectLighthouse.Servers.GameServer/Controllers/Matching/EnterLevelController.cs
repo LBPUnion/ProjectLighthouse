@@ -28,7 +28,7 @@ public class EnterLevelController : ControllerBase
     [HttpPost("play/{slotType}/{slotId:int}")]
     public async Task<IActionResult> PlayLevel(string slotType, int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
@@ -38,8 +38,8 @@ public class EnterLevelController : ControllerBase
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.StatusCode(403, "");
 
-        IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);
-        VisitedLevel? v;
+        IQueryable<VisitedLevelEntity> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);
+        VisitedLevelEntity? v;
         if (!visited.Any())
         {
             switch (token.GameVersion)
@@ -57,7 +57,7 @@ public class EnterLevelController : ControllerBase
                 default: return this.BadRequest();
             }
 
-            v = new VisitedLevel
+            v = new VisitedLevelEntity
             {
                 SlotId = slotId,
                 UserId = token.UserId,
@@ -98,7 +98,7 @@ public class EnterLevelController : ControllerBase
     [HttpPost("enterLevel/{slotType}/{slotId:int}")]
     public async Task<IActionResult> EnterLevel(string slotType, int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
@@ -107,13 +107,13 @@ public class EnterLevelController : ControllerBase
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.NotFound();
 
-        IQueryable<VisitedLevel> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);
-        VisitedLevel? v;
+        IQueryable<VisitedLevelEntity> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);
+        VisitedLevelEntity? v;
         if (!visited.Any())
         {
             slot.PlaysLBP1Unique++;
 
-            v = new VisitedLevel
+            v = new VisitedLevelEntity
             {
                 SlotId = slotId,
                 UserId = token.UserId,

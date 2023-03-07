@@ -85,7 +85,7 @@ public class SlotEntity
 
         // Sort tags by most popular
         SortedDictionary<string, int> occurrences = new();
-        foreach (RatedLevel r in database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0))
+        foreach (RatedLevelEntity r in database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0))
         {
             if (!occurrences.ContainsKey(r.TagLBP1))
                 occurrences.Add(r.TagLBP1, 1);

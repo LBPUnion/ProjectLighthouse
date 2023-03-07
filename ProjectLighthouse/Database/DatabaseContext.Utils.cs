@@ -65,11 +65,11 @@ public partial class DatabaseContext
         return await this.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
     }
 
-    public async Task<GameToken?> AuthenticateUser(UserEntity? user, NPTicket npTicket, string userLocation)
+    public async Task<GameTokenEntity?> AuthenticateUser(UserEntity? user, NPTicket npTicket, string userLocation)
     {
         if (user == null) return null;
 
-        GameToken gameToken = new()
+        GameTokenEntity gameToken = new()
         {
             UserToken = CryptoHelper.GenerateAuthToken(),
             User = user,
@@ -93,10 +93,10 @@ public partial class DatabaseContext
         if (user == null) return;
         if (user.Username.Length == 0) return; // don't delete the placeholder user
 
-        LastContact? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
+        LastContactEntity? lastContact = await this.LastContacts.FirstOrDefaultAsync(l => l.UserId == user.UserId);
         if (lastContact != null) this.LastContacts.Remove(lastContact);
 
-        foreach (ModerationCase modCase in await this.Cases
+        foreach (ModerationCaseEntity modCase in await this.Cases
                      .Where(c => c.CreatorId == user.UserId || c.DismisserId == user.UserId)
                      .ToListAsync())
         {
@@ -129,10 +129,10 @@ public partial class DatabaseContext
 
     public async Task HeartUser(int userId, UserEntity heartedUser)
     {
-        HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
+        HeartedProfileEntity? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) return;
 
-        this.HeartedProfiles.Add(new HeartedProfile
+        this.HeartedProfiles.Add(new HeartedProfileEntity
         {
             HeartedUserId = heartedUser.UserId,
             UserId = userId,
@@ -143,7 +143,7 @@ public partial class DatabaseContext
 
     public async Task UnheartUser(int userId, UserEntity heartedUser)
     {
-        HeartedProfile? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
+        HeartedProfileEntity? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
 
         await this.SaveChangesAsync();
@@ -155,7 +155,7 @@ public partial class DatabaseContext
 
         UserEntity? user = await this.Users.FindAsync(userId);
 
-        BlockedProfile blockedProfile = new()
+        BlockedProfileEntity blockedProfile = new()
         {
             User = user,
             BlockedUser = blockedUser,

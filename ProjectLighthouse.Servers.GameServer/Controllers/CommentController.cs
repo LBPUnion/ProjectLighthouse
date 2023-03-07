@@ -29,7 +29,7 @@ public class CommentController : ControllerBase
     [HttpPost("rateComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         // Return bad request if both are true or both are false
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
@@ -44,7 +44,7 @@ public class CommentController : ControllerBase
     [HttpGet("userComments/{username}")]
     public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, string? slotType, int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0 || pageStart < 0) return this.BadRequest();
 
@@ -103,7 +103,7 @@ public class CommentController : ControllerBase
     [HttpPost("postComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> PostComment(string? username, string? slotType, int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         Comment? comment = await this.DeserializeBody<Comment>();
         if (comment == null) return this.BadRequest();
@@ -138,7 +138,7 @@ public class CommentController : ControllerBase
     [HttpPost("deleteComment/{slotType}/{slotId:int}")]
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 

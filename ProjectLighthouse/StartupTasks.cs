@@ -174,7 +174,7 @@ public static class StartupTasks
 
             stopwatch.Restart();
 
-            List<CompletedMigration> completedMigrations = database.CompletedMigrations.ToList();
+            List<CompletedMigrationEntity> completedMigrations = database.CompletedMigrations.ToList();
             List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
                 .Where(migrationTask => !completedMigrations
                     .Select(m => m.MigrationName)

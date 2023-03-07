@@ -8,7 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 public class PlaylistResponse : ILbpSerializable
 {
     [XmlElement("playlist")]
-    public required List<Playlist> Playlists { get; set; }
+    public required List<GamePlaylist> Playlists { get; set; }
 
     [XmlAttribute("total")]
     public required int Total { get; set; }

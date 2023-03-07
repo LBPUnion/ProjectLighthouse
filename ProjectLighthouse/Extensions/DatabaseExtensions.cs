@@ -39,9 +39,9 @@ public static class DatabaseExtensions
         return query;
     }
 
-    public static IQueryable<Review> ByGameVersion(this IQueryable<Review> queryable, GameVersion gameVersion, bool includeSublevels = false)
+    public static IQueryable<ReviewEntity> ByGameVersion(this IQueryable<ReviewEntity> queryable, GameVersion gameVersion, bool includeSublevels = false)
     {
-        IQueryable<Review> query = queryable.Include(r => r.Slot).Include(r => r.Slot.Creator);
+        IQueryable<ReviewEntity> query = queryable.Include(r => r.Slot).Include(r => r.Slot.Creator);
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {

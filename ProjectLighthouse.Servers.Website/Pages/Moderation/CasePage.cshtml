@@ -21,7 +21,7 @@
 
 <div class="ui divider"></div>
 
-@foreach (ModerationCase @case in Model.Cases)
+@foreach (ModerationCaseEntity @case in Model.Cases)
 {
     @(await Html.PartialAsync("Partials/ModerationCasePartial", @case, ViewData.WithTime(timeZone)))
 }

@@ -43,7 +43,7 @@ public class NewCasePage : BaseLayout
         // if id is invalid then return bad request
         if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
         
-        ModerationCase @case = new()
+        ModerationCaseEntity @case = new()
         {
             Type = type.Value,
             Reason = reason,

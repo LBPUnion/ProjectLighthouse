@@ -10,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.ExternalAuth;
 public class AuthenticationPage : BaseLayout
 {
 
-    public List<PlatformLinkAttempt> LinkAttempts = new();
+    public List<PlatformLinkAttemptEntity> LinkAttempts = new();
 
     public IPAddress? IpAddress;
     public AuthenticationPage(DatabaseContext database) : base(database)

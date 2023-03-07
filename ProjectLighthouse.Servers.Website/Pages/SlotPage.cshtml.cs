@@ -15,9 +15,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 public class SlotPage : BaseLayout
 {
     public List<Comment> Comments = new();
-    public List<Review> Reviews = new();
-    public List<Photo> Photos = new();
-    public List<Score> Scores = new();
+    public List<ReviewEntity> Reviews = new();
+    public List<PhotoEntity> Photos = new();
+    public List<ScoreEntity> Scores = new();
 
     public bool CommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
@@ -95,7 +95,7 @@ public class SlotPage : BaseLayout
         }
         else
         {
-            this.Reviews = new List<Review>();
+            this.Reviews = new List<ReviewEntity>();
         }
 
         this.Photos = await this.Database.Photos.Include(p => p.Creator)
@@ -116,7 +116,7 @@ public class SlotPage : BaseLayout
 
         foreach (Comment c in this.Comments)
         {
-            Reaction? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.TargetId == c.CommentId);
+            ReactionEntity? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.TargetId == c.CommentId);
             if (reaction != null) c.YourThumb = reaction.Rating;
         }
 

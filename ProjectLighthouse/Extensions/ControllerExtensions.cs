@@ -19,9 +19,9 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 public static partial class ControllerExtensions
 {
 
-    public static GameToken GetToken(this ControllerBase controller)
+    public static GameTokenEntity GetToken(this ControllerBase controller)
     {
-        GameToken? token = (GameToken?)(controller.HttpContext.Items["Token"] ?? null);
+        GameTokenEntity? token = (GameTokenEntity?)(controller.HttpContext.Items["Token"] ?? null);
         if (token == null) throw new ArgumentNullException(nameof(controller), @"GameToken was null even though authentication was successful");
 
         return token;

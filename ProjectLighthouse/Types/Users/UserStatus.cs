@@ -29,7 +29,7 @@ public class UserStatus
 
     public UserStatus(DatabaseContext database, int userId)
     {
-        LastContact? lastContact = database.LastContacts.Where(l => l.UserId == userId).FirstOrDefault(l => TimeHelper.Timestamp - l.Timestamp < 300);
+        LastContactEntity? lastContact = database.LastContacts.Where(l => l.UserId == userId).FirstOrDefault(l => TimeHelper.Timestamp - l.Timestamp < 300);
 
         if (lastContact == null)
         {

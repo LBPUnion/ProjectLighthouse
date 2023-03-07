@@ -13,11 +13,11 @@ public static class LastContactHelper
 
     public static async Task SetLastContact(DatabaseContext database, UserEntity user, GameVersion gameVersion, Platform platform)
     {
-        LastContact? lastContact = await database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
+        LastContactEntity? lastContact = await database.LastContacts.Where(l => l.UserId == user.UserId).FirstOrDefaultAsync();
 
         if (lastContact == null)
         {
-            lastContact = new LastContact
+            lastContact = new LastContactEntity
             {
                 UserId = user.UserId,
             };

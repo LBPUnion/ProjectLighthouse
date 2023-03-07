@@ -11,7 +11,7 @@ public class UserListResponse : ILbpSerializable, IHasCustomRoot
     public UserListResponse()
     { }
 
-    public UserListResponse(string rootElement, List<UserProfile> users, int total, int hintStart)
+    public UserListResponse(string rootElement, List<GameUser> users, int total, int hintStart)
     {
         this.RootTag = rootElement;
         this.Users = users;
@@ -19,7 +19,7 @@ public class UserListResponse : ILbpSerializable, IHasCustomRoot
         this.HintStart = hintStart;
     }
 
-    public UserListResponse(string rootElement, List<UserProfile> users)
+    public UserListResponse(string rootElement, List<GameUser> users)
     {
         this.RootTag = rootElement;
         this.Users = users;
@@ -29,7 +29,7 @@ public class UserListResponse : ILbpSerializable, IHasCustomRoot
     public string RootTag { get; set; }
 
     [XmlElement("user")]
-    public List<UserProfile> Users { get; set; }
+    public List<GameUser> Users { get; set; }
 
     [DefaultValue(0)]
     [XmlAttribute("total")]

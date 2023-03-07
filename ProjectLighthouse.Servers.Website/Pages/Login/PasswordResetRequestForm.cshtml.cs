@@ -51,7 +51,7 @@ public class PasswordResetRequestForm : BaseLayout
             return this.Page();
         }
 
-        PasswordResetToken token = new()
+        PasswordResetTokenEntity token = new()
         {
             Created = DateTime.Now,
             UserId = user.UserId,

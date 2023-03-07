@@ -13,7 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Database;
 
 public partial class DatabaseContext
 {
-    public async Task<string> UsernameFromWebToken(WebToken? token)
+    public async Task<string> UsernameFromWebToken(WebTokenEntity? token)
     {
         if (token == null) return "";
 
@@ -22,7 +22,7 @@ public partial class DatabaseContext
 
     private UserEntity? UserFromLighthouseToken(string lighthouseToken)
     {
-        WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
+        WebTokenEntity? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
 
         if (DateTime.Now <= token.ExpiresAt) return this.Users.FirstOrDefault(u => u.UserId == token.UserId);
@@ -40,11 +40,11 @@ public partial class DatabaseContext
         return this.UserFromLighthouseToken(lighthouseToken);
     }
 
-    public WebToken? WebTokenFromRequest(HttpRequest request)
+    public WebTokenEntity? WebTokenFromRequest(HttpRequest request)
     {
         if (!request.Cookies.TryGetValue("LighthouseToken", out string? lighthouseToken)) return null;
 
-        WebToken? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
+        WebTokenEntity? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
 
         if (DateTime.Now <= token.ExpiresAt) return token;
@@ -60,7 +60,7 @@ public partial class DatabaseContext
     {
         if (string.IsNullOrWhiteSpace(resetToken)) return null;
 
-        PasswordResetToken? token =
+        PasswordResetTokenEntity? token =
             await this.PasswordResetTokens.FirstOrDefaultAsync(token => token.ResetToken == resetToken);
         if (token == null) return null;
 
@@ -77,7 +77,7 @@ public partial class DatabaseContext
     {
         if (string.IsNullOrWhiteSpace(tokenString)) return false;
 
-        RegistrationToken? token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
+        RegistrationTokenEntity? token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
         if (token == null) return false;
 
         if (token.Created >= DateTime.Now.AddDays(-7)) return true;
@@ -91,7 +91,7 @@ public partial class DatabaseContext
 
     public async Task RemoveExpiredTokens()
     {
-        foreach (GameToken token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
+        foreach (GameTokenEntity token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
         {
             UserEntity? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
             if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
@@ -109,7 +109,7 @@ public partial class DatabaseContext
     {
         if (string.IsNullOrWhiteSpace(tokenString)) return;
 
-        RegistrationToken? token = await this.RegistrationTokens.FirstOrDefaultAsync(t => t.Token == tokenString);
+        RegistrationTokenEntity? token = await this.RegistrationTokens.FirstOrDefaultAsync(t => t.Token == tokenString);
         if (token == null) return;
 
         this.RegistrationTokens.Remove(token);

@@ -86,7 +86,7 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        WebToken webToken = new()
+        WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),

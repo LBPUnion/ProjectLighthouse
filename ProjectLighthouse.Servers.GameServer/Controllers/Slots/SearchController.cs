@@ -35,7 +35,7 @@ public class SearchController : ControllerBase
         string? keyName = "slots"
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 

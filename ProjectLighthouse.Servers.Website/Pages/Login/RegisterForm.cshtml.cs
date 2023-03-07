@@ -76,7 +76,7 @@ public class RegisterForm : BaseLayout
 
         UserEntity user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
 
-        WebToken webToken = new()
+        WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),

@@ -22,7 +22,7 @@ else
     }
 }
 
-@foreach (PlatformLinkAttempt authAttempt in Model.LinkAttempts)
+@foreach (PlatformLinkAttemptEntity authAttempt in Model.LinkAttempts)
 {
     DateTimeOffset timestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(authAttempt.Timestamp), timeZoneInfo);
     <div class="ui red segment">

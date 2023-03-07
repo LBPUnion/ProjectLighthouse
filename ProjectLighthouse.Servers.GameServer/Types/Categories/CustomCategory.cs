@@ -21,7 +21,7 @@ public class CustomCategory : Category
         this.SlotIds = slotIds.ToList();
     }
 
-    public CustomCategory(DatabaseCategory category)
+    public CustomCategory(DatabaseCategoryEntity category)
     {
         this.Name = category.Name;
         this.Description = category.Description;

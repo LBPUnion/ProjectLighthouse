@@ -120,7 +120,7 @@
                 @if (Model.Photos.Count != 0)
                 {
                     <div class="ui center aligned grid">
-                        @foreach (Photo photo in Model.Photos)
+                        @foreach (PhotoEntity photo in Model.Photos)
                         {
                             string width = isMobile ? "sixteen" : "eight";
                             bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);

@@ -5,7 +5,6 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -38,12 +37,12 @@ public class PublishController : ControllerBase
     [HttpPost("startPublish")]
     public async Task<IActionResult> StartPublish()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
-        SlotEntity? slot = await this.DeserializeBody<SlotEntity>();
+        GameUserSlot? slot = await this.DeserializeBody<GameUserSlot>();
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
@@ -56,7 +55,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (string.IsNullOrEmpty(slot.ResourceCollection)) slot.ResourceCollection = slot.RootLevel;
+        if (slot.Resources?.Length == 0) slot.Resources = new[]{slot.RootLevel,};
 
         if (slot.Resources == null)
         {
@@ -86,13 +85,13 @@ public class PublishController : ControllerBase
             return this.StatusCode(403, "");
         }
 
-        slot.ResourceCollection += "," + slot.IconHash; // tells LBP to upload icon after we process resources here
+        HashSet<string> resources = new(slot.Resources)
+        {
+            slot.IconHash,
+        };
+        resources = resources.Where(hash => !FileHelper.ResourceExists(hash)).ToHashSet();
 
-        string resources = slot.Resources.Where
-                (hash => !FileHelper.ResourceExists(hash))
-            .Aggregate("", (current, hash) => current + LbpSerializer.StringElement("resource", hash));
-
-        return this.Ok(LbpSerializer.TaggedStringElement("slot", resources, "type", "user"));
+        return this.Ok(new SlotResourceResponse(resources.ToList()));
     }
 
     /// <summary>
@@ -101,16 +100,22 @@ public class PublishController : ControllerBase
     [HttpPost("publish")]
     public async Task<IActionResult> Publish([FromQuery] string? game)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
-        SlotEntity? slot = await this.DeserializeBody<SlotEntity>();
+        GameUserSlot? slot = await this.DeserializeBody<GameUserSlot>();
 
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
+            return this.BadRequest();
+        }
+
+        if (slot.Resources == null)
+        {
+            Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
             return this.BadRequest();
         }
 
@@ -167,6 +172,7 @@ public class PublishController : ControllerBase
         if (slotVersion == GameVersion.Unknown) slot.GameVersion = token.GameVersion;
 
         slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(slot.AuthorLabels);
+        //TODO implement serializable to entity here
 
         // Republish logic
         if (slot.SlotId != 0)
@@ -193,36 +199,30 @@ public class PublishController : ControllerBase
                     // Delete the useless rootLevel that lbp3 just uploaded
                     if (slotVersion == GameVersion.LittleBigPlanet3)
                         FileHelper.DeleteResource(slot.RootLevel);
-
-                    slot.GameVersion = oldSlot.GameVersion;
-                    slot.RootLevel = oldSlot.RootLevel;
-                    slot.ResourceCollection = oldSlot.ResourceCollection;
+                    else
+                    {
+                        oldSlot.GameVersion = slot.GameVersion;
+                        oldSlot.RootLevel = slot.RootLevel;
+                        oldSlot.ResourceCollection = string.Join(",", slot.Resources ?? Array.Empty<string>());
+                    }
                 }
             }
 
-            slot.CreatorId = oldSlot.CreatorId;
-            slot.SlotId = oldSlot.SlotId;
+            oldSlot.Name = slot.Name;
+            oldSlot.Description = slot.Description;
+            oldSlot.Location = slot.Location;
+            oldSlot.Shareable = slot.IsShareable;
+            oldSlot.IsAdventurePlanet = slot.IsAdventurePlanet;
+            oldSlot.IconHash = slot.IconHash;
+            oldSlot.IsAdventurePlanet = slot.IsAdventurePlanet;
+            oldSlot.AuthorLabels = slot.AuthorLabels;
+            oldSlot.BackgroundHash = slot.BackgroundHash;
+            oldSlot.MoveRequired = slot.IsMoveRequired;
+            oldSlot.Lbp1Only = slot.IsLbp1Only;
+            oldSlot.SubLevel = slot.IsSubLevel;
+            oldSlot.CrossControllerRequired = slot.IsCrossControlRequired;
 
-            #region Set plays
-
-            slot.PlaysLBP1 = oldSlot.PlaysLBP1;
-            slot.PlaysLBP1Complete = oldSlot.PlaysLBP1Complete;
-            slot.PlaysLBP1Unique = oldSlot.PlaysLBP1Unique;
-
-            slot.PlaysLBP2 = oldSlot.PlaysLBP2;
-            slot.PlaysLBP2Complete = oldSlot.PlaysLBP2Complete;
-            slot.PlaysLBP2Unique = oldSlot.PlaysLBP2Unique;
-
-            slot.PlaysLBP3 = oldSlot.PlaysLBP3;
-            slot.PlaysLBP3Complete = oldSlot.PlaysLBP3Complete;
-            slot.PlaysLBP3Unique = oldSlot.PlaysLBP3Unique;
-
-            #endregion
-
-            slot.FirstUploaded = oldSlot.FirstUploaded;
-            slot.LastUpdated = TimeHelper.TimestampMillis;
-
-            slot.TeamPick = oldSlot.TeamPick;
+            oldSlot.LastUpdated = TimeHelper.TimestampMillis;
 
             if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
             {
@@ -230,10 +230,9 @@ public class PublishController : ControllerBase
                 slot.MaximumPlayers = 4;
             }
 
-            slot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
-            slot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
+            oldSlot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
+            oldSlot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
 
-            this.database.Entry(oldSlot).CurrentValues.SetValues(slot);
             await this.database.SaveChangesAsync();
             return this.Ok(SlotBase.CreateFromEntity(oldSlot, this.GetToken()));
         }
@@ -245,6 +244,9 @@ public class PublishController : ControllerBase
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
             return this.BadRequest();
         }
+
+        SlotEntity slotEntity = new()
+            { };
 
         slot.CreatorId = user.UserId;
         slot.FirstUploaded = TimeHelper.TimestampMillis;
@@ -259,7 +261,7 @@ public class PublishController : ControllerBase
         slot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
         slot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
 
-        this.database.Slots.Add(slot);
+        this.database.Slots.Add(slotEntity);
         await this.database.SaveChangesAsync();
 
         if (user.LevelVisibility == PrivacyType.All)
@@ -270,13 +272,13 @@ public class PublishController : ControllerBase
 
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
-        return this.Ok(SlotBase.CreateFromEntity(slot, this.GetToken()));
+        return this.Ok(SlotBase.CreateFromEntity(slotEntity, this.GetToken()));
     }
 
     [HttpPost("unpublish/{id:int}")]
     public async Task<IActionResult> Unpublish(int id)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();

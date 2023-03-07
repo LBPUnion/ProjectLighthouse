@@ -17,10 +17,10 @@ public partial class DatabaseContext
 
     public async Task HeartPlaylist(int userId, PlaylistEntity heartedPlaylist)
     {
-        HeartedPlaylist? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
+        HeartedPlaylistEntity? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
         if (heartedList != null) return;
 
-        this.HeartedPlaylists.Add(new HeartedPlaylist
+        this.HeartedPlaylists.Add(new HeartedPlaylistEntity
         {
             PlaylistId = heartedPlaylist.PlaylistId,
             UserId = userId,
@@ -31,7 +31,7 @@ public partial class DatabaseContext
 
     public async Task UnheartPlaylist(int userId, PlaylistEntity heartedPlaylist)
     {
-        HeartedPlaylist? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
+        HeartedPlaylistEntity? heartedList = await this.HeartedPlaylists.FirstOrDefaultAsync(p => p.UserId == userId && p.PlaylistId == heartedPlaylist.PlaylistId);
         if (heartedList != null) this.HeartedPlaylists.Remove(heartedList);
 
         await this.SaveChangesAsync();
@@ -39,12 +39,12 @@ public partial class DatabaseContext
 
     public async Task HeartLevel(int userId, SlotEntity heartedSlot)
     {
-        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
+        HeartedLevelEntity? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) return;
 
         this.HeartedLevels.Add
         (
-            new HeartedLevel
+            new HeartedLevelEntity
             {
                 SlotId = heartedSlot.SlotId,
                 UserId = userId,
@@ -56,7 +56,7 @@ public partial class DatabaseContext
 
     public async Task UnheartLevel(int userId, SlotEntity heartedSlot)
     {
-        HeartedLevel? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
+        HeartedLevelEntity? heartedLevel = await this.HeartedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == heartedSlot.SlotId);
         if (heartedLevel != null) this.HeartedLevels.Remove(heartedLevel);
 
         await this.SaveChangesAsync();
@@ -64,12 +64,12 @@ public partial class DatabaseContext
 
     public async Task QueueLevel(int userId, SlotEntity queuedSlot)
     {
-        QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
+        QueuedLevelEntity? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
         if (queuedLevel != null) return;
 
         this.QueuedLevels.Add
         (
-            new QueuedLevel
+            new QueuedLevelEntity
             {
                 SlotId = queuedSlot.SlotId,
                 UserId = userId,
@@ -81,7 +81,7 @@ public partial class DatabaseContext
 
     public async Task UnqueueLevel(int userId, SlotEntity queuedSlot)
     {
-        QueuedLevel? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
+        QueuedLevelEntity? queuedLevel = await this.QueuedLevels.FirstOrDefaultAsync(q => q.UserId == userId && q.SlotId == queuedSlot.SlotId);
         if (queuedLevel != null) this.QueuedLevels.Remove(queuedLevel);
 
         await this.SaveChangesAsync();

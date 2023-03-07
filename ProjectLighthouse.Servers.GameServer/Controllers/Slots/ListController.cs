@@ -44,7 +44,7 @@ public class ListController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -62,7 +62,7 @@ public class ListController : ControllerBase
     [HttpPost("lolcatftw/add/user/{id:int}")]
     public async Task<IActionResult> AddQueuedLevel(int id)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -75,7 +75,7 @@ public class ListController : ControllerBase
     [HttpPost("lolcatftw/remove/user/{id:int}")]
     public async Task<IActionResult> RemoveQueuedLevel(int id)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -88,7 +88,7 @@ public class ListController : ControllerBase
     [HttpPost("lolcatftw/clear")]
     public async Task<IActionResult> ClearQueuedLevels()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         this.database.QueuedLevels.RemoveRange(this.database.QueuedLevels.Where(q => q.UserId == token.UserId));
 
@@ -113,7 +113,7 @@ public class ListController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -137,7 +137,7 @@ public class ListController : ControllerBase
     [HttpPost("favourite/slot/{slotType}/{id:int}")]
     public async Task<IActionResult> AddFavouriteSlot(string slotType, int id)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
@@ -160,7 +160,7 @@ public class ListController : ControllerBase
     [HttpPost("unfavourite/slot/{slotType}/{id:int}")]
     public async Task<IActionResult> RemoveFavouriteSlot(string slotType, int id)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
@@ -192,17 +192,17 @@ public class ListController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(username);
         if (targetUserId == 0) return this.StatusCode(403, "");
 
-        List<Playlist> heartedPlaylists = await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
+        List<GamePlaylist> heartedPlaylists = await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
             .Include(p => p.Playlist)
             .Include(p => p.Playlist.Creator)
             .OrderByDescending(p => p.HeartedPlaylistId)
             .Select(p => p.Playlist)
-            .Select(p => Playlist.CreateFromEntity(p))
+            .Select(p => GamePlaylist.CreateFromEntity(p))
             .ToListAsync();
 
         int total = await this.database.HeartedPlaylists.CountAsync(p => p.UserId == targetUserId);
 
-        return this.Ok(new GenericPlaylistResponse<Playlist>("favouritePlaylists", heartedPlaylists)
+        return this.Ok(new GenericPlaylistResponse<GamePlaylist>("favouritePlaylists", heartedPlaylists)
         {
             Total = total,
             HintStart = pageStart + Math.Min(pageSize, 30),
@@ -212,7 +212,7 @@ public class ListController : ControllerBase
     [HttpPost("favourite/playlist/{playlistId:int}")]
     public async Task<IActionResult> AddFavouritePlaylist(int playlistId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         PlaylistEntity? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
         if (playlist == null) return this.NotFound();
@@ -225,7 +225,7 @@ public class ListController : ControllerBase
     [HttpPost("unfavourite/playlist/{playlistId:int}")]
     public async Task<IActionResult> RemoveFavouritePlaylist(int playlistId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         PlaylistEntity? playlist = await this.database.Playlists.FirstOrDefaultAsync(s => s.PlaylistId == playlistId);
         if (playlist == null) return this.NotFound();
@@ -249,25 +249,25 @@ public class ListController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        List<UserProfile> heartedProfiles = await this.database.HeartedProfiles.Include
+        List<GameUser> heartedProfiles = await this.database.HeartedProfiles.Include
                 (h => h.HeartedUser)
             .OrderBy(h => h.HeartedProfileId)
             .Where(h => h.UserId == targetUser.UserId)
             .Select(h => h.HeartedUser)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(h => UserProfile.CreateFromEntity(h, this.GetToken().GameVersion))
+            .Select(h => GameUser.CreateFromEntity(h, this.GetToken().GameVersion))
             .ToListAsync();
 
         int total = await this.database.HeartedProfiles.CountAsync(h => h.UserId == targetUser.UserId);
 
-        return this.Ok(new GenericUserResponse<UserProfile>("favouriteUsers", heartedProfiles, total, pageStart + Math.Min(pageSize, 30)));
+        return this.Ok(new GenericUserResponse<GameUser>("favouriteUsers", heartedProfiles, total, pageStart + Math.Min(pageSize, 30)));
     }
 
     [HttpPost("favourite/user/{username}")]
     public async Task<IActionResult> AddFavouriteUser(string username)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (heartedUser == null) return this.NotFound();
@@ -280,7 +280,7 @@ public class ListController : ControllerBase
     [HttpPost("unfavourite/user/{username}")]
     public async Task<IActionResult> RemoveFavouriteUser(string username)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? heartedUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (heartedUser == null) return this.NotFound();
@@ -338,7 +338,7 @@ public class ListController : ControllerBase
 
         if (filterType == ListFilterType.Queue)
         {
-            IQueryable<QueuedLevel> whereQueuedLevels;
+            IQueryable<QueuedLevelEntity> whereQueuedLevels;
 
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (gameFilterType == "both")
@@ -354,7 +354,7 @@ public class ListController : ControllerBase
             return whereQueuedLevels.OrderByDescending(q => q.QueuedLevelId).Include(q => q.Slot.Creator).Select(q => q.Slot).ByGameVersion(gameVersion, false, false, true);
         }
 
-        IQueryable<HeartedLevel> whereHeartedLevels;
+        IQueryable<HeartedLevelEntity> whereHeartedLevels;
 
         // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
         if (gameFilterType == "both")

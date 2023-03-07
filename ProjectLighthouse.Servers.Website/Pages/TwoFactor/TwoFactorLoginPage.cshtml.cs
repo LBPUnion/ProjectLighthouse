@@ -22,7 +22,7 @@ public class TwoFactorLoginPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         this.RedirectUrl = redirect ?? "~/";
@@ -43,7 +43,7 @@ public class TwoFactorLoginPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         this.RedirectUrl = redirect ?? "~/";

@@ -3,6 +3,7 @@
 @using LBPUnion.ProjectLighthouse.Files
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Types.Entities.Level
+@using LBPUnion.ProjectLighthouse.Types.Serialization
 
 @{
     bool isMobile = (bool?)ViewData["IsMobile"] ?? false;
@@ -30,7 +31,7 @@
 
             @for(int i = 0; i < Model.Reviews.Count; i++)
             {
-                Review review = Model.Reviews[i];
+                ReviewEntity review = Model.Reviews[i];
                 string faceHash = (review.Thumb switch {
                     -1 => review.Reviewer?.BooHash,
                     0 => review.Reviewer?.MehHash,

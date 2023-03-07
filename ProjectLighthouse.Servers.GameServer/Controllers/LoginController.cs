@@ -113,7 +113,7 @@ public class LoginController : ControllerBase
 
                 if (linkAttemptExists) return this.StatusCode(403, "");
 
-                PlatformLinkAttempt linkAttempt = new()
+                PlatformLinkAttemptEntity linkAttempt = new()
                 {
                     Platform = npTicket.Platform,
                     UserId = targetUsername.UserId,
@@ -163,7 +163,7 @@ public class LoginController : ControllerBase
             await this.database.SaveChangesAsync();
         }
 
-        GameToken? token = await this.database.GameTokens.Include(t => t.User)
+        GameTokenEntity? token = await this.database.GameTokens.Include(t => t.User)
             .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == npTicket.Username && t.TicketHash == npTicket.TicketHash);
 
         if (token != null)

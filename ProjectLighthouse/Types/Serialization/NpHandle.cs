@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.ComponentModel;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -16,6 +17,7 @@ public class NpHandle : ILbpSerializable
     [XmlText]
     public string Username { get; set; }
 
+    [DefaultValue("")]
     [XmlAttribute("icon")]
     public string IconHash { get; set; }
 }

@@ -37,7 +37,7 @@ public class MatchController : ControllerBase
     [Produces("text/plain")]
     public async Task<IActionResult> Match()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");

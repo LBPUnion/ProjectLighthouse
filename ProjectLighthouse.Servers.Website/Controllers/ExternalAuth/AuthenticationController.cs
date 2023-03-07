@@ -51,7 +51,7 @@ public class AuthenticationController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
-        PlatformLinkAttempt? linkAttempt = await this.database.PlatformLinkAttempts
+        PlatformLinkAttemptEntity? linkAttempt = await this.database.PlatformLinkAttempts
             .FirstOrDefaultAsync(l => l.PlatformLinkAttemptId == id);
         if (linkAttempt == null) return this.NotFound();
 
@@ -79,7 +79,7 @@ public class AuthenticationController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
-        PlatformLinkAttempt? linkAttempt = await this.database.PlatformLinkAttempts
+        PlatformLinkAttemptEntity? linkAttempt = await this.database.PlatformLinkAttempts
             .FirstOrDefaultAsync(l => l.PlatformLinkAttemptId == id);
         if (linkAttempt == null) return this.NotFound();
 

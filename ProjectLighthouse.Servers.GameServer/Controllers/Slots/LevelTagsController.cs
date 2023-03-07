@@ -43,7 +43,7 @@ public class LevelTagsController : ControllerBase
     [HttpPost("tag/{slotType}/{id:int}")]
     public async Task<IActionResult> PostTag([FromForm(Name = "t")] string tagName, [FromRoute] string slotType, [FromRoute] int id)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         SlotEntity? slot = await this.database.Slots.Where(s => s.SlotId == id).FirstOrDefaultAsync();
         if (slot == null) return this.BadRequest();
@@ -56,7 +56,7 @@ public class LevelTagsController : ControllerBase
 
         if (slotType != "user") return this.BadRequest();
 
-        RatedLevel? rating = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == token.UserId && r.SlotId == slot.SlotId);
+        RatedLevelEntity? rating = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == token.UserId && r.SlotId == slot.SlotId);
         if (rating == null) return this.BadRequest();
 
         rating.TagLBP1 = tagName;

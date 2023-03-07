@@ -1,0 +1,18 @@
+﻿using System.Collections.Generic;
+using System.Xml.Serialization;
+
+namespace LBPUnion.ProjectLighthouse.Types.Serialization;
+
+[XmlRoot("photos")]
+public class PhotoListResponse
+{
+
+    public PhotoListResponse(List<GamePhoto> photos)
+    {
+        this.Photos = photos;
+    }
+
+    [XmlElement("photo")]
+    public List<GamePhoto> Photos { get; set; }
+    
+}

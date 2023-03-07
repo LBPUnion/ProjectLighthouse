@@ -13,7 +13,7 @@ public class CasePage : BaseLayout
     public CasePage(DatabaseContext database) : base(database)
     {}
 
-    public List<ModerationCase> Cases = new();
+    public List<ModerationCaseEntity> Cases = new();
     public int CaseCount;
     public int DismissedCaseCount;
 

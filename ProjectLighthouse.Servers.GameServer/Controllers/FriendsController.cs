@@ -30,7 +30,7 @@ public class FriendsController : ControllerBase
     [HttpPost("npdata")]
     public async Task<IActionResult> NPData()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         NPData? npData = await this.DeserializeBody<NPData>();
         if (npData == null) return this.BadRequest();
@@ -62,19 +62,23 @@ public class FriendsController : ControllerBase
 
         UserFriendStore.UpdateFriendData(friendStore);
 
-        string friendsSerialized = friends.Aggregate(string.Empty, (current, user1) => current + LbpSerializer.StringElement("npHandle", user1.Username));
+        List<MinimalUserProfile> minimalFriends =
+            friends.Select(u => new MinimalUserProfile
+            {
+                UserHandle = new NpHandle(u.Username, ""),
+            }).ToList();
 
-        return this.Ok(LbpSerializer.StringElement("npdata", LbpSerializer.StringElement("friends", friendsSerialized)));
+        return this.Ok(new FriendResponse(minimalFriends));
     }
 
     [HttpGet("myFriends")]
     public async Task<IActionResult> MyFriends()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserFriendData? friendStore = UserFriendStore.GetUserFriendData(token.UserId);
 
-        UserListResponse response = new("myFriends", new List<UserProfile>());
+        GenericUserResponse<GameUser> response = new("myFriends", new List<GameUser>());
 
         if (friendStore == null)
             return this.Ok(response);
@@ -84,7 +88,7 @@ public class FriendsController : ControllerBase
             UserEntity? friend = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == friendId);
             if (friend == null) continue;
 
-            response.Users.Add(UserProfile.CreateFromEntity(friend));
+            response.Users.Add(GameUser.CreateFromEntity(friend));
         }
 
         return this.Ok(response);

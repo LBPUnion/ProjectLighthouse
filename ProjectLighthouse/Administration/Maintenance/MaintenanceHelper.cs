@@ -101,7 +101,7 @@ public static class MaintenanceHelper
         
         Logger.Success($"Successfully completed migration {migrationTask.Name()}", LogArea.Database);
 
-        CompletedMigration completedMigration = new()
+        CompletedMigrationEntity completedMigration = new()
         {
             MigrationName = migrationTask.GetType().Name,
             RanAt = DateTime.Now,

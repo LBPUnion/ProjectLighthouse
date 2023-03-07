@@ -50,7 +50,7 @@ public class CollectionController : ControllerBase
     [HttpPost("playlists/{playlistId:int}/order_slots")]
     public async Task<IActionResult> UpdatePlaylist(int playlistId, int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         PlaylistEntity? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         if (targetPlaylist == null) return this.BadRequest();
@@ -65,7 +65,7 @@ public class CollectionController : ControllerBase
             return this.Ok(this.GetUserPlaylists(token.UserId));
         }
 
-        Playlist? newPlaylist = await this.DeserializeBody<Playlist>("playlist", "levels");
+        GamePlaylist? newPlaylist = await this.DeserializeBody<GamePlaylist>("playlist", "levels");
 
         if (newPlaylist == null) return this.BadRequest();
 
@@ -99,9 +99,9 @@ public class CollectionController : ControllerBase
 
     private async Task<PlaylistResponse> GetUserPlaylists(int userId)
     {
-        List<Playlist> playlists = await this.database.Playlists.Include(p => p.Creator)
+        List<GamePlaylist> playlists = await this.database.Playlists.Include(p => p.Creator)
             .Where(p => p.CreatorId == userId)
-            .Select(p => Playlist.CreateFromEntity(p))
+            .Select(p => GamePlaylist.CreateFromEntity(p))
             .ToListAsync();
         int total = this.database.Playlists.Count(p => p.CreatorId == userId);
 
@@ -116,13 +116,13 @@ public class CollectionController : ControllerBase
     [HttpPost("playlists")]
     public async Task<IActionResult> CreatePlaylist()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         int playlistCount = await this.database.Playlists.CountAsync(p => p.CreatorId == token.UserId);
 
         if (playlistCount > ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota) return this.BadRequest();
 
-        Playlist? playlist = await this.DeserializeBody<Playlist>("playlist");
+        GamePlaylist? playlist = await this.DeserializeBody<GamePlaylist>("playlist");
 
         if (playlist == null) return this.BadRequest();
 
@@ -154,7 +154,7 @@ public class CollectionController : ControllerBase
     [HttpGet("genres")]
     public async Task<IActionResult> GenresAndSearches()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
@@ -200,7 +200,7 @@ public class CollectionController : ControllerBase
     [HttpGet("searches/{endpointName}")]
     public async Task<IActionResult> GetCategorySlots(string endpointName, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");

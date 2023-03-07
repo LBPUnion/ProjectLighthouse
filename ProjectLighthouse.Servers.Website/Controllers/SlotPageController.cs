@@ -30,7 +30,7 @@ public class SlotPageController : ControllerBase
     [HttpGet("unpublish")]
     public async Task<IActionResult> UnpublishSlot([FromRoute] int id)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
@@ -48,7 +48,7 @@ public class SlotPageController : ControllerBase
     [HttpGet("rateComment")]
     public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int commentId, [FromQuery] int rating)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         await this.database.RateComment(token.UserId, commentId, rating);
@@ -59,7 +59,7 @@ public class SlotPageController : ControllerBase
     [HttpPost("postComment")]
     public async Task<IActionResult> PostComment([FromRoute] int id, [FromForm] string? msg)
     {
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         if (msg == null)
@@ -90,7 +90,7 @@ public class SlotPageController : ControllerBase
     {
         if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         SlotEntity? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
@@ -106,7 +106,7 @@ public class SlotPageController : ControllerBase
     {
         if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         SlotEntity? heartedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
@@ -122,7 +122,7 @@ public class SlotPageController : ControllerBase
     {
         if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         SlotEntity? queuedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
@@ -138,7 +138,7 @@ public class SlotPageController : ControllerBase
     {
         if (string.IsNullOrEmpty(callbackUrl)) callbackUrl = "~/slot/" + id;
 
-        WebToken? token = this.database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         SlotEntity? queuedSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);

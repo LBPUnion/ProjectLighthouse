@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
 
 public class AdminApiKeyPageModel : BaseLayout
     {
-        public List<ApiKey> ApiKeys = new();
+        public List<ApiKeyEntity> ApiKeys = new();
         public int KeyCount;
 
         public AdminApiKeyPageModel(DatabaseContext database) : base(database)
@@ -32,7 +32,7 @@ public class AdminApiKeyPageModel : BaseLayout
             UserEntity? user = this.Database.UserFromWebRequest(this.Request);
             if (user == null || !user.IsAdmin) return this.NotFound();
 
-            ApiKey? apiKey = await this.Database.APIKeys.FirstOrDefaultAsync(k => k.Id == int.Parse(keyId));
+            ApiKeyEntity? apiKey = await this.Database.APIKeys.FirstOrDefaultAsync(k => k.Id == int.Parse(keyId));
             if (apiKey == null) return this.NotFound();
             this.Database.APIKeys.Remove(apiKey);
             await this.Database.SaveChangesAsync();

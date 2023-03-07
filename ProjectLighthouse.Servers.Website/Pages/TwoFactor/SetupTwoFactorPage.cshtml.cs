@@ -98,7 +98,7 @@ public class SetupTwoFactorPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         UserEntity? user = this.Database.UserFromWebRequest(this.Request);

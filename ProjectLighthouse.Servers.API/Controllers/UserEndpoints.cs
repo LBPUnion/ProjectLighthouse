@@ -102,7 +102,7 @@ public class UserEndpoints : ApiEndpointController
 
         string authToken = authHeader[(authHeader.IndexOf(' ') + 1)..];
 
-        ApiKey? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
+        ApiKeyEntity? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
         if (apiKey == null) return this.StatusCode(403, null);
 
         if (!string.IsNullOrWhiteSpace(username))
@@ -111,7 +111,7 @@ public class UserEndpoints : ApiEndpointController
             if (userExists) return this.BadRequest();
         }
 
-        RegistrationToken token = new()
+        RegistrationTokenEntity token = new()
         {
             Created = DateTime.Now,
             Token = CryptoHelper.GenerateAuthToken(),

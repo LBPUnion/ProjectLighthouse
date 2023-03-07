@@ -25,7 +25,7 @@ public class LogoutController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> OnPost()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");

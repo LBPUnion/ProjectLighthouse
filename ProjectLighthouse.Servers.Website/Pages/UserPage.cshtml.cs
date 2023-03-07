@@ -22,7 +22,7 @@ public class UserPage : BaseLayout
 
     public bool IsProfileUserBlocked;
 
-    public List<Photo>? Photos;
+    public List<PhotoEntity>? Photos;
     public List<SlotEntity>? Slots;
 
     public List<SlotEntity>? HeartedSlots;
@@ -116,7 +116,7 @@ public class UserPage : BaseLayout
 
         foreach (Comment c in this.Comments)
         {
-            Reaction? reaction = await this.Database.Reactions.Where(r => r.TargetId == c.TargetId)
+            ReactionEntity? reaction = await this.Database.Reactions.Where(r => r.TargetId == c.TargetId)
                 .Where(r => r.UserId == this.User.UserId)
                 .FirstOrDefaultAsync();
             if (reaction != null) c.YourThumb = reaction.Rating;

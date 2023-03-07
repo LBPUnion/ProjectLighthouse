@@ -20,6 +20,6 @@ public static class CategoryHelper
         Categories.Add(new LuckyDipCategory());
 
         using DatabaseContext database = new();
-        foreach (DatabaseCategory category in database.CustomCategories) Categories.Add(new CustomCategory(category));
+        foreach (DatabaseCategoryEntity category in database.CustomCategories) Categories.Add(new CustomCategory(category));
     }
 }

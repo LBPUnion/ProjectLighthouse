@@ -22,7 +22,7 @@ public class AdminTests : LighthouseWebTest
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
-        WebToken webToken = new()
+        WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
@@ -48,7 +48,7 @@ public class AdminTests : LighthouseWebTest
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
-        WebToken webToken = new()
+        WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),

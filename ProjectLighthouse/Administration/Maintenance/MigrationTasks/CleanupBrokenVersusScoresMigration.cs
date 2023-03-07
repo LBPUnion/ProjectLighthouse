@@ -11,7 +11,7 @@ public class FixBrokenVersusScores : IMigrationTask
 
     async Task<bool> IMigrationTask.Run(DatabaseContext database)
     {
-        foreach (Score score in database.Scores)
+        foreach (ScoreEntity score in database.Scores)
         {
             if (!score.PlayerIdCollection.Contains(':')) continue;
 

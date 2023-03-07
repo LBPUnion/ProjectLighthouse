@@ -31,7 +31,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/by")]
     public async Task<IActionResult> SlotsBy([FromQuery(Name = "u")] string username, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -65,7 +65,7 @@ public class SlotsController : ControllerBase
                 slot = await this.database.Slots.Where(t => t.InternalSlotId == slotId && t.Type == SlotType.Developer).FirstOrDefaultAsync();
                 if (slot == null)
                 {
-                    slots.Add(new DeveloperSlot
+                    slots.Add(new GameDeveloperSlot
                     {
                         SlotId = slotId,
                     });
@@ -109,7 +109,7 @@ public class SlotsController : ControllerBase
     [HttpGet("s/user/{id:int}")]
     public async Task<IActionResult> SUser(int id)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         GameVersion gameVersion = token.GameVersion;
 
@@ -146,7 +146,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots")]
     public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -167,7 +167,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/like/{slotType}/{slotId:int}")]
     public async Task<IActionResult> SimilarSlots([FromRoute] string slotType, [FromRoute] int slotId, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -203,7 +203,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/highestRated")]
     public async Task<IActionResult> HighestRatedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -226,7 +226,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/tag")]
     public async Task<IActionResult> SimilarSlots([FromQuery] string tag, [FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -252,7 +252,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/mmpicks")]
     public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -272,7 +272,7 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/lbp2luckydip")]
     public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -301,7 +301,7 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -333,7 +333,7 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -377,7 +377,7 @@ public class SlotsController : ControllerBase
         [FromQuery] string? dateFilterType = null
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -407,7 +407,7 @@ public class SlotsController : ControllerBase
         [FromQuery] bool? move = null
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 

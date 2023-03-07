@@ -46,7 +46,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     [HttpGet("announce")]
     public async Task<IActionResult> Announce()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         string username = await this.database.UsernameFromGameToken(token);
 
@@ -81,7 +81,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     [HttpPost("filter")]
     public async Task<IActionResult> Filter()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         string message = await this.ReadBodyAsync();
 
@@ -95,7 +95,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             UserEntity? user = await this.database.UserFromGameToken(token);
             if (user == null || user.EmailAddress != null) return this.Ok();
 
-            PasswordResetToken resetToken = new()
+            PasswordResetTokenEntity resetToken = new()
             {
                 Created = DateTime.Now,
                 UserId = user.UserId,

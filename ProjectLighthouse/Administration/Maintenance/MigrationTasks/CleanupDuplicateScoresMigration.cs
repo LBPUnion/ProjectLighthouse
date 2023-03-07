@@ -17,11 +17,11 @@ public class CleanupDuplicateScoresMigration : IMigrationTask
     {
         List<int> duplicateScoreIds = new();
         // The original score should have the lowest score id
-        foreach (Score score in database.Scores.OrderBy(s => s.ScoreId)
+        foreach (ScoreEntity score in database.Scores.OrderBy(s => s.ScoreId)
                      .ToList()
                      .Where(score => !duplicateScoreIds.Contains(score.ScoreId)))
         {
-            foreach (Score other in database.Scores.Where(s =>
+            foreach (ScoreEntity other in database.Scores.Where(s =>
                          s.Points == score.Points &&
                          s.Type == score.Type &&
                          s.SlotId == score.SlotId &&

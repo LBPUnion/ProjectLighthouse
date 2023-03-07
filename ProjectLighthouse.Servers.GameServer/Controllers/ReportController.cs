@@ -29,7 +29,7 @@ public class ReportController : ControllerBase
     [HttpPost("grief")]
     public async Task<IActionResult> Report()
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         string username = await this.database.UsernameFromGameToken(token);
 

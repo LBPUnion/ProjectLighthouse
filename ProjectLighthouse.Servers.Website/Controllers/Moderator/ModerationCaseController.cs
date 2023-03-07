@@ -23,7 +23,7 @@ public class ModerationCaseController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.StatusCode(403, "");
 
-        ModerationCase? @case = await this.database.Cases.FirstOrDefaultAsync(c => c.CaseId == id);
+        ModerationCaseEntity? @case = await this.database.Cases.FirstOrDefaultAsync(c => c.CaseId == id);
         if (@case == null) return this.NotFound();
         
         @case.DismissedAt = DateTime.Now;

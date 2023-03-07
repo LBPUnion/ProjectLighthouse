@@ -19,7 +19,7 @@ public class RatedReview
     public int ReviewId { get; set; }
 
     [ForeignKey(nameof(ReviewId))]
-    public Review Review { get; set; }
+    public ReviewEntity Review { get; set; }
 
     public int Thumb { get; set; }
 }

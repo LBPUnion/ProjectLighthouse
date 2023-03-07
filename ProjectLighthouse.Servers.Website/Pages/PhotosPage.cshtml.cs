@@ -18,7 +18,7 @@ public class PhotosPage : BaseLayout
 
     public int PhotoCount;
 
-    public List<Photo> Photos = new();
+    public List<PhotoEntity> Photos = new();
 
     public string? SearchValue;
     public PhotosPage(DatabaseContext database) : base(database)
@@ -28,7 +28,7 @@ public class PhotosPage : BaseLayout
     {
         if (string.IsNullOrWhiteSpace(name)) name = "";
 
-        IQueryable<Photo> photos = this.Database.Photos.Include(p => p.Creator)
+        IQueryable<PhotoEntity> photos = this.Database.Photos.Include(p => p.Creator)
             .Include(p => p.PhotoSubjects)
             .ThenInclude(ps => ps.User);
 
