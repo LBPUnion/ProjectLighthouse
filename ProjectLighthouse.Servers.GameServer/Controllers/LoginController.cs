@@ -138,6 +138,11 @@ public class LoginController : ControllerBase
             user.LinkedRpcnId = npTicket.Platform == Platform.RPCS3 ? npTicket.UserId : 0;
             user.LinkedPsnId = npTicket.Platform != Platform.RPCS3 ? npTicket.UserId : 0;
             await this.database.SaveChangesAsync();
+
+            await WebhookHelper.SendWebhook(
+                title: "New user",
+                description: $"{username} just connected to {ServerConfiguration.Instance.Customization.ServerName} for the first time!",
+                dest: WebhookHelper.WebhookDestination.Registration);
                 
             Logger.Success($"Created new user for {username}, platform={npTicket.Platform}", LogArea.Login);
         }
