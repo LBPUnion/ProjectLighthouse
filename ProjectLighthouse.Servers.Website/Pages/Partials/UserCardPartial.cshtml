@@ -19,12 +19,36 @@
         {
             <h2 style="margin-bottom: 2px;">
                 <a href="~/user/@Model.UserId">@Model.Username</a>
+                @if (Model.IsAdmin)
+                {
+                    <span style="width:auto;height:auto;color:white;background-color:red;border:0px solid black;border-radius:50px;font-weight:200;font-size:10pt;padding:1px;padding-left:6px;padding-right:6px;vertical-align:middle;">
+                        Administrator
+                    </span>
+                }
+                else if (Model.IsModerator)
+                {
+                    <span style="width:auto;height:auto;color:white;background-color:rgb(200, 130, 0);border:0px solid black;border-radius:50px;font-weight:200;font-size:10pt;padding:1px;padding-left:6px;padding-right:6px;vertical-align:middle;">
+                        Moderator
+                    </span>
+                }
             </h2>
         }
         else
         {
             <h1 style="margin-bottom: 2px;">
                 @Model.Username
+                @if (Model.IsAdmin)
+                {
+                    <span style="width:auto;height:auto;color:white;background-color:red;border:0px solid black;border-radius:50px;font-weight:200;font-size:10pt;padding:1px;padding-left:6px;padding-right:6px;vertical-align:middle;">
+                        Administrator
+                    </span>
+                }
+                else if (Model.IsModerator)
+                {
+                    <span style="width:auto;height:auto;color:white;background-color:rgb(200, 130, 0);border:0px solid black;border-radius:50px;font-weight:200;font-size:10pt;padding:1px;padding-left:6px;padding-right:6px;vertical-align:middle;">
+                        Moderator
+                    </span>
+                }
             </h1>
         }
         <span>
