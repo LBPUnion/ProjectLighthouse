@@ -66,7 +66,7 @@ public static class WebhookHelper
         );
     }
 
-    private static DiscordColor GetEmbedColor()
+    public static DiscordColor GetEmbedColor()
     {
         Color embedColor = Color.ParseHex(DiscordConfiguration.Instance.EmbedColor);
         Rgb24 pixel = embedColor.ToPixel<Rgb24>();
