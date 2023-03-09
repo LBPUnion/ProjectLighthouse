@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ public class ClientConfigurationController : ControllerBase
 
     [HttpGet("t_conf")]
     [Produces("text/xml")]
-    public IActionResult Conf() => this.Ok("<t_enable>false</t_enable>");
+    public IActionResult Conf() => this.Ok(new TelemetryConfigResponse());
 
     [HttpGet("ChallengeConfig.xml")]
     [Produces("text/xml")]
@@ -63,7 +64,7 @@ public class ClientConfigurationController : ControllerBase
             ProfileVisibility = user.ProfileVisibility.ToSerializedString(),
         };
 
-        return this.Ok(ps.Serialize());
+        return this.Ok(ps);
     }
 
     [HttpPost("privacySettings")]
@@ -100,6 +101,6 @@ public class ClientConfigurationController : ControllerBase
             ProfileVisibility = user.ProfileVisibility.ToSerializedString(),
         };
 
-        return this.Ok(ps.Serialize());
+        return this.Ok(ps);
     }
 }

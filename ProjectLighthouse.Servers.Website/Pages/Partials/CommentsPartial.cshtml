@@ -2,6 +2,7 @@
 @using System.IO
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using LBPUnion.ProjectLighthouse.Types.Entities.Interaction
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 
 @{
@@ -45,7 +46,9 @@
 
     @for(int i = 0; i < Model.Comments.Count; i++)
     {
-        Comment comment = Model.Comments[i];
+        KeyValuePair<CommentEntity, ReactionEntity?> commentAndReaction = Model.Comments[i];
+        CommentEntity comment = commentAndReaction.Key;
+        int yourThumb = commentAndReaction.Value?.Rating ?? 0;
         DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000).ToLocalTime();
         StringWriter messageWriter = new();
         HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
@@ -65,12 +68,12 @@
                 }
             }
             <div class="voting" style="@(style)">
-                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == 1 ? 0 : 1)">
-                    <i class="fitted @(comment.YourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
+                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == 1 ? 0 : 1)">
+                    <i class="fitted @(yourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
                 </a>
                 <span style="text-align: center; margin: auto; @(rating < 0 ? "margin-left: -5px" : "")">@(rating)</span>
-                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(comment.YourThumb == -1 ? 0 : -1)">
-                    <i class="fitted @(comment.YourThumb == -1 ? "red" : "grey") arrow down link icon" style="display: block"></i>
+                <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == -1 ? 0 : -1)">
+                    <i class="fitted @(yourThumb == -1 ? "red" : "grey") arrow down link icon" style="display: block"></i>
                 </a>
             </div>
 

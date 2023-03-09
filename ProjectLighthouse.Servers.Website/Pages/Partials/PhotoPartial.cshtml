@@ -3,6 +3,7 @@
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Levels
+@using LBPUnion.ProjectLighthouse.Types.Serialization
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity
 
 @{
@@ -88,10 +89,12 @@
         @await subject.User.ToLink(Html, ViewData, language, timeZone)
     }
 </div>
-
 @{
-    PhotoSubjectEntity[] subjects = Model.PhotoSubjects.ToArray();
-    foreach (PhotoSubjectEntity subject in subjects) subject.Username = subject.User.Username;
+    GamePhotoSubject[] subjects = Model.PhotoSubjects.Select(GamePhotoSubject.CreateFromEntity).ToArray();
+    foreach (GamePhotoSubject subject in subjects)
+    {
+        subject.Username = Model.PhotoSubjects.Where(ps => ps.UserId == subject.UserId).Select(ps => ps.User.Username).First();
+    }
 }
 
 <script>

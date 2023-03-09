@@ -14,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
 public class UserPage : BaseLayout
 {
-    public List<Comment>? Comments;
+    public Dictionary<CommentEntity, ReactionEntity?> Comments = new();
 
     public bool CommentsEnabled;
 
@@ -105,21 +105,21 @@ public class UserPage : BaseLayout
                 .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
                 .Where(p => !blockedUsers.Contains(p.PosterUserId))
                 .Take(50)
-                .ToListAsync();
+                .ToDictionaryAsync(c => c, _ => (ReactionEntity?) null);
         }
         else
         {
-            this.Comments = new List<Comment>();
+            this.Comments = new Dictionary<CommentEntity, ReactionEntity?>();
         }
 
         if (this.User == null) return this.Page();
 
-        foreach (Comment c in this.Comments)
+        foreach (KeyValuePair<CommentEntity, ReactionEntity?> kvp in this.Comments)
         {
-            ReactionEntity? reaction = await this.Database.Reactions.Where(r => r.TargetId == c.TargetId)
+            ReactionEntity? reaction = await this.Database.Reactions.Where(r => r.TargetId == kvp.Key.TargetId)
                 .Where(r => r.UserId == this.User.UserId)
                 .FirstOrDefaultAsync();
-            if (reaction != null) c.YourThumb = reaction.Rating;
+            this.Comments[kvp.Key] = reaction;
         }
 
         this.IsProfileUserHearted = await this.Database.HeartedProfiles

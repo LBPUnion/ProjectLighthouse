@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-public class GenericPlaylistResponse<T> : ILbpSerializable, IHasCustomRoot where T : ILbpSerializable
+public struct GenericPlaylistResponse<T> : ILbpSerializable, IHasCustomRoot where T : ILbpSerializable
 {
     public GenericPlaylistResponse()
     { }

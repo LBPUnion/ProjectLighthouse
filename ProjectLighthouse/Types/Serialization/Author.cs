@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("author")]
-public class Author : ILbpSerializable
+public struct Author : ILbpSerializable
 {
     public Author() { }
 

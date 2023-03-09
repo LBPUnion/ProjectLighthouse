@@ -172,7 +172,6 @@ public class PublishController : ControllerBase
         if (slotVersion == GameVersion.Unknown) slot.GameVersion = token.GameVersion;
 
         slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(slot.AuthorLabels);
-        //TODO implement serializable to entity here
 
         // Republish logic
         if (slot.SlotId != 0)
@@ -203,7 +202,7 @@ public class PublishController : ControllerBase
                     {
                         oldSlot.GameVersion = slot.GameVersion;
                         oldSlot.RootLevel = slot.RootLevel;
-                        oldSlot.ResourceCollection = string.Join(",", slot.Resources ?? Array.Empty<string>());
+                        oldSlot.Resources = slot.Resources;
                     }
                 }
             }
@@ -211,15 +210,17 @@ public class PublishController : ControllerBase
             oldSlot.Name = slot.Name;
             oldSlot.Description = slot.Description;
             oldSlot.Location = slot.Location;
-            oldSlot.Shareable = slot.IsShareable;
-            oldSlot.IsAdventurePlanet = slot.IsAdventurePlanet;
             oldSlot.IconHash = slot.IconHash;
-            oldSlot.IsAdventurePlanet = slot.IsAdventurePlanet;
-            oldSlot.AuthorLabels = slot.AuthorLabels;
             oldSlot.BackgroundHash = slot.BackgroundHash;
-            oldSlot.MoveRequired = slot.IsMoveRequired;
+            oldSlot.AuthorLabels = slot.AuthorLabels;
+            oldSlot.Shareable = slot.IsShareable;
+            oldSlot.Resources = slot.Resources;
+            oldSlot.InitiallyLocked = slot.InitiallyLocked;
             oldSlot.Lbp1Only = slot.IsLbp1Only;
+            oldSlot.IsAdventurePlanet = slot.IsAdventurePlanet;
+            oldSlot.LevelType = slot.LevelType;
             oldSlot.SubLevel = slot.IsSubLevel;
+            oldSlot.MoveRequired = slot.IsMoveRequired;
             oldSlot.CrossControllerRequired = slot.IsCrossControlRequired;
 
             oldSlot.LastUpdated = TimeHelper.TimestampMillis;
@@ -245,8 +246,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        SlotEntity slotEntity = new()
-            { };
+        SlotEntity slotEntity = SlotBase.ConvertToEntity(slot, token);
 
         slot.CreatorId = user.UserId;
         slot.FirstUploaded = TimeHelper.TimestampMillis;

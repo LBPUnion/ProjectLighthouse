@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-public class UserListResponse : ILbpSerializable, IHasCustomRoot
+public struct UserListResponse : ILbpSerializable, IHasCustomRoot
 {
 
     public UserListResponse()

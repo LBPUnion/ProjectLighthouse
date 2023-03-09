@@ -36,8 +36,11 @@ public class CollectionController : ControllerBase
         PlaylistEntity? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         if (targetPlaylist == null) return this.BadRequest();
 
-        List<SlotBase> slots = await this.database.Slots
-            .Where(s => targetPlaylist.SlotIds.Contains(s.SlotId)).Select(s => SlotBase.CreateFromEntity(s, this.GetToken())).ToListAsync();
+        GameTokenEntity token = this.GetToken();
+
+        List<SlotBase> slots = await this.database.Slots.Where(s => targetPlaylist.SlotIds.Contains(s.SlotId))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
+            .ToListAsync();
 
         int total = targetPlaylist.SlotIds.Length;
 
@@ -216,14 +219,14 @@ public class CollectionController : ControllerBase
         if (category is CategoryWithUser categoryWithUser)
         {
             slots = categoryWithUser.GetSlots(this.database, user, pageStart, pageSize)
-                .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+                .Select(s => SlotBase.CreateFromEntity(s, token))
                 .ToList();
             totalSlots = categoryWithUser.GetTotalSlots(this.database, user);
         }
         else
         {
             slots = category.GetSlots(this.database, pageStart, pageSize)
-                .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+                .Select(s => SlotBase.CreateFromEntity(s, token))
                 .ToList();
             totalSlots = category.GetTotalSlots(this.database);
         }

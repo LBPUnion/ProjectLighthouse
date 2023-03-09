@@ -2,10 +2,10 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -77,26 +77,17 @@ public class CommentController : ControllerBase
                 where blockedProfile.UserId == token.UserId
                 select blockedProfile.BlockedUserId).ToListAsync();
 
-        List<Comment> comments = await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
+        List<GameComment> comments = await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
             .OrderByDescending(p => p.Timestamp)
             .Where(p => !blockedUsers.Contains(p.PosterUserId))
             .Include(c => c.Poster)
             .Where(p => p.Poster.PermissionLevel != PermissionLevel.Banned)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
+            .Select(c => GameComment.CreateFromEntity(c))
             .ToListAsync();
 
-        string outputXml = comments.Aggregate
-            (string.Empty, (current, comment) => current + comment.Serialize(this.getReaction(token.UserId, comment.CommentId).Result));
-        return this.Ok(LbpSerializer.StringElement("comments", outputXml));
-    }
-
-    private async Task<int> getReaction(int userId, int commentId)
-    {
-        return await this.database.Reactions.Where(r => r.UserId == userId)
-            .Where(r => r.TargetId == commentId)
-            .Select(r => r.Rating)
-            .FirstOrDefaultAsync();
+        return this.Ok(new CommentListResponse(comments));
     }
 
     [HttpPost("postUserComment/{username}")]
@@ -105,7 +96,7 @@ public class CommentController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
-        Comment? comment = await this.DeserializeBody<Comment>();
+        GameComment? comment = await this.DeserializeBody<GameComment>();
         if (comment == null) return this.BadRequest();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
@@ -142,7 +133,7 @@ public class CommentController : ControllerBase
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 
-        Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+        CommentEntity? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.NotFound();
 
         if (comment.Deleted) return this.Ok();

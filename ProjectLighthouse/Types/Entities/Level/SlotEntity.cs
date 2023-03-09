@@ -18,7 +18,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Entities.Level;
 /// </summary>
 public class SlotEntity
 {
-
     [Key]
     public int SlotId { get; set; }
 
@@ -162,15 +161,11 @@ public class SlotEntity
     [NotMapped]
     public int PlaysComplete => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete;
 
-    public double RatingLBP1 => new DatabaseContext().RatedLevels.Where(r => r.SlotId == this.SlotId)
-            .Select(r => r.RatingLBP1)
-            .DefaultIfEmpty(3.0)
-            .Average();
+    public double RatingLBP1 => new DatabaseContext().RatedLevels.Where(r => r.SlotId == this.SlotId).Average(r => (double?)r.RatingLBP1) ?? 3.0;
 
     [NotMapped]
     public int Thumbsup => new DatabaseContext().RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
 
     [NotMapped]
     public int Thumbsdown => new DatabaseContext().RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
-
 }

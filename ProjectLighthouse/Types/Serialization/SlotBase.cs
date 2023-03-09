@@ -20,6 +20,30 @@ public abstract class SlotBase : ILbpSerializable
         return retSlot;
     }
 
+    public static SlotEntity ConvertToEntity(GameUserSlot slot, GameTokenEntity token) =>
+        new()
+        {
+            Name = slot.Name,
+            Description = slot.Description,
+            Location = slot.Location,
+            IconHash = slot.IconHash,
+            BackgroundHash = slot.BackgroundHash,
+            AuthorLabels = slot.AuthorLabels,
+            Shareable = slot.IsShareable,
+            Resources = slot.Resources,
+            InitiallyLocked = slot.InitiallyLocked,
+            MinimumPlayers = slot.MinimumPlayers,
+            MaximumPlayers = slot.MaximumPlayers,
+            CreatorId = token.UserId,
+            Lbp1Only = slot.IsLbp1Only,
+            IsAdventurePlanet = slot.IsAdventurePlanet,
+            LevelType = slot.LevelType,
+            SubLevel = slot.IsSubLevel,
+            RootLevel = slot.RootLevel,
+            MoveRequired = slot.IsMoveRequired,
+            CrossControllerRequired = slot.IsCrossControlRequired,
+        };
+
     public static SlotBase CreateFromEntity(SlotEntity slot, GameTokenEntity token)
     {
         if (slot.Type == SlotType.Developer)

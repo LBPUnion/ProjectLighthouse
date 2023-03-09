@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("photos")]
-public class PhotoListResponse
+public struct PhotoListResponse
 {
 
     public PhotoListResponse(List<GamePhoto> photos)

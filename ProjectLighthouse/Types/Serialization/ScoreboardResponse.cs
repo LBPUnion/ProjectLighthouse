@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-public class ScoreboardResponse: ILbpSerializable, IHasCustomRoot
+public struct ScoreboardResponse: ILbpSerializable, IHasCustomRoot
 {
     public ScoreboardResponse()
     { }

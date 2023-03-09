@@ -14,7 +14,7 @@ public partial class DatabaseContext
 {
     public async Task<bool> RateComment(int userId, int commentId, int rating)
     {
-        Comment? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
+        CommentEntity? comment = await this.Comments.FirstOrDefaultAsync(c => commentId == c.CommentId);
 
         if (comment == null) return false;
         if (comment.PosterUserId == userId) return false;
@@ -91,7 +91,7 @@ public partial class DatabaseContext
 
         this.Comments.Add
         (
-            new Comment
+            new CommentEntity
             {
                 PosterUserId = userId,
                 TargetId = targetId,

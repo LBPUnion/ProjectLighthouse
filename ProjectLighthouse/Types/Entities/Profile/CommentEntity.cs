@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
@@ -13,12 +11,9 @@ public enum CommentType
     Level = 1,
 }
 
-[XmlRoot("comment")]
-[XmlType("comment")]
-public class Comment
+public class CommentEntity
 {
     [Key]
-    [XmlAttribute("id")]
     public int CommentId { get; set; }
 
     public int PosterUserId { get; set; }
@@ -36,17 +31,12 @@ public class Comment
 
     public long Timestamp { get; set; }
 
-    [XmlElement("message")]
     public string Message { get; set; }
 
     public CommentType Type { get; set; }
 
     public int ThumbsUp { get; set; }
     public int ThumbsDown { get; set; }
-
-    [NotMapped]
-    [XmlIgnore]
-    public int YourThumb;
 
     public string getComment()
     {
@@ -70,19 +60,4 @@ public class Comment
 
         return "This comment has been deleted.";
     }
-
-    private string serialize()
-        => LbpSerializer.StringElement("id", this.CommentId) +
-           LbpSerializer.StringElement("npHandle", this.Poster.Username) +
-           LbpSerializer.StringElement("timestamp", this.Timestamp) +
-           LbpSerializer.StringElement("message", this.Message) +
-           (this.Deleted ? LbpSerializer.StringElement("deleted", true) +
-           LbpSerializer.StringElement("deletedBy", this.DeletedBy) +
-           LbpSerializer.StringElement("deletedType", this.DeletedBy) : "") +
-           LbpSerializer.StringElement("thumbsup", this.ThumbsUp) +
-           LbpSerializer.StringElement("thumbsdown", this.ThumbsDown);
-
-    public string Serialize(int yourThumb) => LbpSerializer.StringElement("comment", this.serialize() + LbpSerializer.StringElement("yourthumb", yourThumb));
-
-    public string Serialize() => LbpSerializer.StringElement("comment", this.serialize());
 }

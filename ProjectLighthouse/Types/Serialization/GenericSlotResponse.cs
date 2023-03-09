@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-public class GenericSlotResponse : ILbpSerializable, IHasCustomRoot
+public struct GenericSlotResponse : ILbpSerializable, IHasCustomRoot
 {
 
     public GenericSlotResponse() { }

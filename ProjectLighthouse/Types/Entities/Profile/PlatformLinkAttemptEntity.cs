@@ -21,5 +21,4 @@ public class PlatformLinkAttemptEntity
     public long Timestamp { get; set; }
 
     public string IPAddress { get; set; } = "";
-
 }

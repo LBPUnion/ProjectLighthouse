@@ -51,7 +51,7 @@ public class ListController : ControllerBase
         List<SlotBase> queuedLevels = await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.Queue)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken())).ToListAsync();
+            .Select(s => SlotBase.CreateFromEntity(s, token)).ToListAsync();
 
         int total = await this.database.QueuedLevels.CountAsync(q => q.UserId == token.UserId);
         int start = pageStart + Math.Min(pageSize, 30);
@@ -123,7 +123,7 @@ public class ListController : ControllerBase
         List<SlotBase> heartedLevels = await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.FavouriteSlots)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int total = await this.database.HeartedLevels.CountAsync(q => q.UserId == targetUser.UserId);
@@ -244,6 +244,8 @@ public class ListController : ControllerBase
     [HttpGet("favouriteUsers/{username}")]
     public async Task<IActionResult> GetFavouriteUsers(string username, [FromQuery] int pageSize, [FromQuery] int pageStart)
     {
+        GameTokenEntity token = this.GetToken();
+
         UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (targetUser == null) return this.StatusCode(403, "");
 
@@ -256,7 +258,7 @@ public class ListController : ControllerBase
             .Select(h => h.HeartedUser)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(h => GameUser.CreateFromEntity(h, this.GetToken().GameVersion))
+            .Select(h => GameUser.CreateFromEntity(h, token.GameVersion))
             .ToListAsync();
 
         int total = await this.database.HeartedProfiles.CountAsync(h => h.UserId == targetUser.UserId);

@@ -1,6 +1,5 @@
 #nullable enable
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 
@@ -13,12 +12,4 @@ public class PrivacySettings
 
     [XmlElement("profileVisiblity")]
     public string? ProfileVisibility { get; set; }
-
-    public string Serialize()
-        => LbpSerializer.StringElement
-        (
-            "privacySettings",
-            LbpSerializer.StringElement("levelVisibility", this.LevelVisibility) +
-            LbpSerializer.StringElement("profileVisibility", this.ProfileVisibility)
-        );
 }

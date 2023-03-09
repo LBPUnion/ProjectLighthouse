@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -29,14 +30,14 @@ public class UserEndpoints : ApiEndpointController
     /// <response code="200">The user, if successful.</response>
     /// <response code="404">The user could not be found.</response>
     [HttpGet("user/{id:int}")]
-    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiUser), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUser(int id)
     {
         UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (user == null) return this.NotFound();
 
-        return this.Ok(user);
+        return this.Ok(ApiUser.CreateFromEntity(user));
     }
 
     [HttpGet("username/{username}")]
@@ -47,7 +48,7 @@ public class UserEndpoints : ApiEndpointController
         UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return this.NotFound();
 
-        return this.Ok(user);
+        return this.Ok(ApiUser.CreateFromEntity(user));
     }
 
     /// <summary>
@@ -62,11 +63,12 @@ public class UserEndpoints : ApiEndpointController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SearchUsers(string query)
     {
-        List<UserEntity> users = await this.database.Users
+        List<ApiUser> users = await this.database.Users
             .Where(u => u.PermissionLevel != PermissionLevel.Banned && u.Username.Contains(query))
             .Where(u => u.ProfileVisibility == PrivacyType.All) // TODO: change check for when user is logged in
             .OrderByDescending(b => b.UserId)
             .Take(20)
+            .Select(u => ApiUser.CreateFromEntity(u))
             .ToListAsync();
         if (!users.Any()) return this.NotFound();
 

@@ -56,6 +56,8 @@ public class SlotsController : ControllerBase
     [HttpGet("slotList")]
     public async Task<IActionResult> GetSlotListAlt([FromQuery(Name = "s")] int[] slotIds)
     {
+        GameTokenEntity token = this.GetToken();
+
         List<SlotBase> slots = new();
         foreach (int slotId in slotIds)
         {
@@ -73,7 +75,7 @@ public class SlotsController : ControllerBase
                 }
             }
             
-            slots.Add(SlotBase.CreateFromEntity(slot, this.GetToken()));
+            slots.Add(SlotBase.CreateFromEntity(slot, token));
         }
 
         return this.Ok(new GenericSlotResponse(slots, slots.Count, 0));
@@ -82,6 +84,8 @@ public class SlotsController : ControllerBase
     [HttpGet("slots/developer")]
     public async Task<IActionResult> StoryPlayers()
     {
+        GameTokenEntity token = this.GetToken();
+
         List<int> activeSlotIds = RoomHelper.Rooms.Where(r => r.Slot.SlotType == SlotType.Developer).Select(r => r.Slot.SlotId).ToList();
 
         List<SlotBase> slots = new();
@@ -91,7 +95,7 @@ public class SlotsController : ControllerBase
             int placeholderSlotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
             SlotEntity slot = await this.database.Slots.FirstAsync(s => s.SlotId == placeholderSlotId);
 
-            slots.Add(SlotBase.CreateFromEntity(slot, this.GetToken()));
+            slots.Add(SlotBase.CreateFromEntity(slot, token));
         }
 
         return this.Ok(new GenericSlotResponse(slots));
@@ -100,10 +104,12 @@ public class SlotsController : ControllerBase
     [HttpGet("s/developer/{id:int}")]
     public async Task<IActionResult> SDev(int id)
     {
+        GameTokenEntity token = this.GetToken();
+
         int slotId = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
         SlotEntity slot = await this.database.Slots.FirstAsync(s => s.SlotId == slotId);
 
-        return this.Ok(SlotBase.CreateFromEntity(slot, this.GetToken()));
+        return this.Ok(SlotBase.CreateFromEntity(slot, token));
     } 
 
     [HttpGet("s/user/{id:int}")]
@@ -117,7 +123,7 @@ public class SlotsController : ControllerBase
 
         if (slot == null) return this.NotFound();
 
-        return this.Ok(SlotBase.CreateFromEntity(slot, this.GetToken(), SerializationMode.Full));
+        return this.Ok(SlotBase.CreateFromEntity(slot, token, SerializationMode.Full));
     }
 
     [HttpGet("slots/cool")]
@@ -156,7 +162,7 @@ public class SlotsController : ControllerBase
             .OrderByDescending(s => s.FirstUploaded)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -191,7 +197,7 @@ public class SlotsController : ControllerBase
             .OrderByDescending(s => s.PlaysLBP1)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -214,7 +220,7 @@ public class SlotsController : ControllerBase
             .OrderByDescending(s => s.RatingLBP1)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -240,7 +246,7 @@ public class SlotsController : ControllerBase
             .OrderByDescending(s => s.PlaysLBP1)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -261,7 +267,7 @@ public class SlotsController : ControllerBase
             .OrderByDescending(s => s.LastUpdated)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.TeamPickCount(this.database);
@@ -281,7 +287,7 @@ public class SlotsController : ControllerBase
         List<SlotBase> slots = await this.database.Slots.ByGameVersion(gameVersion, false, true)
             .OrderBy(_ => EF.Functions.Random())
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -313,7 +319,7 @@ public class SlotsController : ControllerBase
             .ThenBy(_ => rand.Next())
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -357,7 +363,7 @@ public class SlotsController : ControllerBase
             .ThenBy(_ => rand.Next())
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -387,7 +393,7 @@ public class SlotsController : ControllerBase
             .ThenBy(_ => RandomNumberGenerator.GetInt32(int.MaxValue))
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
@@ -439,7 +445,7 @@ public class SlotsController : ControllerBase
         {
             SlotBase? slot = await this.database.Slots.ByGameVersion(token.GameVersion, false, true)
                 .Where(s => s.SlotId == slotId)
-                .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+                .Select(s => SlotBase.CreateFromEntity(s, token))
                 .FirstOrDefaultAsync();
             if (slot == null) continue; // shouldn't happen ever unless the room is borked
             

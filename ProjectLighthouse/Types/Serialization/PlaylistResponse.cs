@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("playlists")]
-public class PlaylistResponse : ILbpSerializable
+public struct PlaylistResponse : ILbpSerializable
 {
     [XmlElement("playlist")]
     public required List<GamePlaylist> Playlists { get; set; }

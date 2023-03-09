@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("slot")]
-public class SlotResourceResponse : ILbpSerializable
+public struct SlotResourceResponse : ILbpSerializable
 {
 
     public SlotResourceResponse(List<string> resources)

@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -34,9 +35,6 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
 
     [XmlElement("npHandle")]
     public NpHandle UserHandle { get; set; } = new();
-
-    [XmlElement("type")]
-    public string Type { get; set; } = "user";
 
     [XmlElement("game")]
     public int Game { get; set; }
@@ -124,7 +122,37 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
 
     #region Used Slots
 
-    public int UsedSlots { get; set; }
+    [DefaultValue(0)]
+    [XmlElement("lbp1UsedSlots")]
+    public int Lbp1UsedSlots { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("entitledSlots")]
+    public int Lbp1EntitledSlots { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("lbp2UsedSlots")]
+    public int Lbp2UsedSlots { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("lbp2EntitledSlots")]
+    public int Lbp2EntitledSlots { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("crossControlEntitledSlots")]
+    public int CrossControlEntitledSlots { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("crossControlUsedSlots")]
+    public int CrossControlUsedSlots { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("lbp3UsedSlots")]
+    public int Lbp3UsedSlots { get; set; }
+
+    [DefaultValue(0)]
+    [XmlElement("lbp3EntitledSlots")]
+    public int Lbp3EntitledSlots { get; set; }
 
     #endregion
 
@@ -133,7 +161,11 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         var stats = await database.Users.DefaultIfEmpty()
             .Select(_ => new
             {
-                Username = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.Username).First(),
+                UsernameAndSlots = database.Users.Where(u => u.UserId == this.UserId).Select(u => new
+                {
+                    u.Username,
+                    u.AdminGrantedSlots,
+                }).First(),
                 PlaylistCount = database.Playlists.Count(p => p.CreatorId == this.UserId),
                 ReviewCount = database.Reviews.Count(r => r.ReviewerId == this.UserId),
                 CommentCount = database.Comments.Count(c => c.TargetId == this.UserId && c.Type == CommentType.Profile),
@@ -147,9 +179,34 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
             })
             .FirstOrDefaultAsync();
 
-        this.UserHandle.Username = stats.Username;
-        this.CommentsEnabled = this.CommentsEnabled &&
-                               ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
+        this.UserHandle.Username = stats.UsernameAndSlots.Username;
+        this.CommentsEnabled = this.CommentsEnabled && ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
+
+        int entitledSlots = ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + stats.UsernameAndSlots.AdminGrantedSlots;
+
+        IQueryable<SlotEntity> SlotCount(GameVersion version)
+        {
+            return database.Slots.Where(s => s.CreatorId == this.UserId && s.GameVersion == version);
+        }
+
+        if (this.TargetGame == GameVersion.LittleBigPlanetVita)
+        {
+            this.Lbp2EntitledSlots = entitledSlots;
+            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync();
+        }
+        else
+        {
+            this.Lbp1EntitledSlots = entitledSlots;
+            this.Lbp2EntitledSlots = entitledSlots;
+            this.CrossControlEntitledSlots = entitledSlots;
+            this.Lbp3EntitledSlots = entitledSlots;
+            this.Lbp1UsedSlots = await SlotCount(GameVersion.LittleBigPlanet1).CountAsync();
+            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync();
+            this.Lbp3UsedSlots = await SlotCount(GameVersion.LittleBigPlanet3).CountAsync();
+            this.CrossControlUsedSlots = await database.Slots.CountAsync(s => s.CreatorId == this.UserId && s.CrossControllerRequired);
+        }
+
+        this.Game = (int)this.TargetGame;
 
         this.PlanetHash = this.TargetGame switch
         {

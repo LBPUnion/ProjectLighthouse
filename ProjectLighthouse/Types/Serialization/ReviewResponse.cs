@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-public class ReviewResponse : ILbpSerializable
+public struct ReviewResponse : ILbpSerializable
 {
 
     public ReviewResponse(List<GameReview> reviews, long hint, int hintStart)

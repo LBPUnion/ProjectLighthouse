@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-public class IconList : ILbpSerializable
+public struct IconList : ILbpSerializable
 {
     public IconList() { }
 

@@ -12,7 +12,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 public class UserEntity
 {
-
     [Key]
     public int UserId { get; set; }
 

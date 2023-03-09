@@ -160,6 +160,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("update_my_pins")]
+    [Produces("text/json")]
     public async Task<IActionResult> UpdateMyPins()
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());

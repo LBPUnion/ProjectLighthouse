@@ -50,7 +50,7 @@ public class ModerationRemovalController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+        CommentEntity? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.Redirect("~/404");
 
         if (comment.Deleted) return this.Redirect(callbackUrl ?? "~/");

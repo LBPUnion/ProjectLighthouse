@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("users")]
-public class MinimalUserListResponse : ILbpSerializable
+public struct MinimalUserListResponse : ILbpSerializable
 {
     public MinimalUserListResponse() { }
 

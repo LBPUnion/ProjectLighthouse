@@ -83,7 +83,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     public int IsShareable { get; set; }
 
     [XmlElement("authorLabels")]
-    public string AuthorLabels { get; set; }
+    public string AuthorLabels { get; set; } = "";
 
     [XmlElement("leveltype")]
     public string LevelType { get; set; } = "";
@@ -242,7 +242,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
         if (this.GameVersion == GameVersion.LittleBigPlanet1)
         {
             this.AverageRating = database.RatedLevels.Where(r => r.SlotId == this.SlotId)
-                .Average(r => (double?)r.RatingLBP1) ?? 0;
+                .Average(r => (double?)r.RatingLBP1) ?? 3.0;
         }
         else if (this.GameVersion == GameVersion.LittleBigPlanetVita)
         {
@@ -257,7 +257,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
         VisitedLevelEntity? yourVisitedStats = await database.VisitedLevels.FirstOrDefaultAsync(v => v.UserId == this.TargetUserId && v.SlotId == this.SlotId);
         if (yourRating != null)
         {
-            this.YourRating = yourRating.RatingLBP1;
+            this.YourRating = (this.GameVersion == GameVersion.LittleBigPlanet1 ? yourRating.Rating : yourRating.RatingLBP1);
             this.YourDPadRating = yourRating.Rating;
         }
         if (yourVisitedStats != null)

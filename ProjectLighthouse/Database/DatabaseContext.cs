@@ -25,7 +25,7 @@ public partial class DatabaseContext : DbContext
     #endregion
 
     #region Users
-    public DbSet<Comment> Comments { get; set; }
+    public DbSet<CommentEntity> Comments { get; set; }
     public DbSet<LastContactEntity> LastContacts { get; set; }
     public DbSet<PhotoEntity> Photos { get; set; }
     public DbSet<PhotoSubjectEntity> PhotoSubjects { get; set; }

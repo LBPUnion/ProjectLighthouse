@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml;
 
 namespace LBPUnion.ProjectLighthouse.Serialization;
@@ -13,6 +14,8 @@ namespace LBPUnion.ProjectLighthouse.Serialization;
 public class ExcludeNamespaceXmlWriter : XmlWriterWrapper
 {
     public ExcludeNamespaceXmlWriter(TextWriter stringWriter, XmlWriterSettings settings) : base(Create(stringWriter, settings)) { }
+
+    private bool skipAttribute;
 
     public override void WriteEndAttribute()
     {
@@ -29,16 +32,17 @@ public class ExcludeNamespaceXmlWriter : XmlWriterWrapper
     // Therefore it shouldn't be necessary to overwrite every WriteX method
     public override void WriteString(string text)
     {
-        if (this.skipAttribute) return;
+        if (this.skipAttribute)
+        {
+            return;
+        }
         base.WriteString(text);
     }
-
-    private bool skipAttribute;
 
     public override void WriteStartAttribute(string prefix, string localName, string ns)
     {
         // If serializer tries to write a namespace, then skip the next attribute
-        if (ns != "" || prefix != "")
+        if (ns != "" && prefix != "")
         {
             this.skipAttribute = true;
             return;
