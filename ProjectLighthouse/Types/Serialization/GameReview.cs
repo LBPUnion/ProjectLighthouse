@@ -39,11 +39,11 @@ public class GameReview : ILbpSerializable, INeedsPreparationForSerialization
     [XmlAttribute("id")]
     public string ReviewTag { get; set; }
 
+    [XmlElement("slot_id")]
+    public ReviewSlot Slot { get; set; }
+
     [XmlElement("reviewer")]
     public string ReviewerUsername { get; set; }
-
-    [XmlElement("slot_id")]
-    public PhotoSlot Slot { get; set; }
 
     [XmlElement("timestamp")]
     public long Timestamp { get; set; }
@@ -90,7 +90,6 @@ public class GameReview : ILbpSerializable, INeedsPreparationForSerialization
             .FirstOrDefaultAsync();
 
         this.ReviewTag = $"{this.Slot.SlotId}.{this.ReviewerUsername}";
-        Console.WriteLine(this.ReviewTag);
     }
 
     public static GameReview CreateFromEntity(ReviewEntity entity, GameTokenEntity token) 
@@ -101,7 +100,7 @@ public class GameReview : ILbpSerializable, INeedsPreparationForSerialization
         {
             ReviewerId = entity.ReviewerId,
             ReviewId = entity.ReviewId,
-            Slot = new PhotoSlot
+            Slot = new ReviewSlot
             {
                 SlotId = entity.SlotId,
                 SlotType = SlotType.User,
