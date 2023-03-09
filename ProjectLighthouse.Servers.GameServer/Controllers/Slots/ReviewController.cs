@@ -162,7 +162,8 @@ public class ReviewController : ControllerBase
             .Select(r => GameReview.CreateFromEntity(r, token))
             .ToListAsync();
 
-        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart + pageSize));
+
+        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart + Math.Min(pageSize, 30)));
     }
 
     [HttpGet("reviewsBy/{username}")]
@@ -179,8 +180,6 @@ public class ReviewController : ControllerBase
         if (targetUserId == 0) return this.BadRequest();
 
         List<GameReview> reviews = await this.database.Reviews.ByGameVersion(gameVersion, true)
-            .Include(r => r.Reviewer)
-            .Include(r => r.Slot)
             .Where(r => r.ReviewerId == targetUserId)
             .OrderByDescending(r => r.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))

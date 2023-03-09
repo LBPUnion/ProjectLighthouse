@@ -38,7 +38,7 @@ public class UserController : ControllerBase
         UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return this.NotFound();
 
-        return this.Ok(GameUser.CreateFromEntity(user));
+        return this.Ok(GameUser.CreateFromEntity(user, this.GetToken().GameVersion));
     }
 
     [HttpGet("users")]

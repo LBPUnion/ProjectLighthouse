@@ -84,7 +84,7 @@ public class CommentController : ControllerBase
             .Where(p => p.Poster.PermissionLevel != PermissionLevel.Banned)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(c => GameComment.CreateFromEntity(c))
+            .Select(c => GameComment.CreateFromEntity(c, token.UserId))
             .ToListAsync();
 
         return this.Ok(new CommentListResponse(comments));

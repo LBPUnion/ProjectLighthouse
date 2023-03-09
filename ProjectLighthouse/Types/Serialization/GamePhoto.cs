@@ -16,7 +16,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 [XmlType("photo")]
 public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
 {
-
     [XmlIgnore]
     public int CreatorId { get; set; }
 
@@ -28,11 +27,6 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
 
     [XmlElement("slot")]
     public PhotoSlot? LevelInfo;
-    public bool ShouldSerializeLevelInfo() => false;
-
-    [DefaultValue(null)]
-    [XmlElement("slot")]
-    public SlotAndType? SlotInfo { get; set; } = new(0, "user");
 
     [XmlArray("subjects")]
     [XmlArrayItem("subject")]
@@ -56,12 +50,12 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        if (this.SlotInfo?.SlotId == 0) this.SlotInfo = null;
+        if (this.LevelInfo?.SlotId == 0) this.LevelInfo = null;
 
         // Fetch slot data
-        if (this.SlotInfo != null)
+        if (this.LevelInfo != null)
         {
-            var partialSlot = await database.Slots.Where(s => s.SlotId == this.SlotInfo.SlotId)
+            var partialSlot = await database.Slots.Where(s => s.SlotId == this.LevelInfo.SlotId)
                 .Select(s => new
                 {
                     s.InternalSlotId,
@@ -71,10 +65,10 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
 
             if (partialSlot != null)
             {
-                this.SlotInfo.Type = partialSlot.Type.ToString().ToLower();
+                this.LevelInfo.SlotType = partialSlot.Type;
 
                 if (partialSlot.Type == SlotType.Developer)
-                    this.SlotInfo.SlotId = partialSlot.InternalSlotId;
+                    this.LevelInfo.SlotId = partialSlot.InternalSlotId;
             }
 
             // Fetch creator username
@@ -99,7 +93,10 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
         {
             PhotoId = entity.PhotoId,
             CreatorId = entity.CreatorId,
-            SlotInfo = new SlotAndType(entity.SlotId.GetValueOrDefault(), ""),
+            LevelInfo = new PhotoSlot
+            {
+                SlotId = entity.SlotId.GetValueOrDefault(),
+            },
             Timestamp = entity.Timestamp,
             SmallHash = entity.SmallHash,
             MediumHash = entity.MediumHash,

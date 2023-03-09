@@ -58,6 +58,7 @@ public abstract class SlotBase : ILbpSerializable
 
         GameUserSlot userSlot = new()
         {
+            SerializationMode = SerializationMode.Minimal,
             TargetGame = token.GameVersion,
             TargetUserId = token.UserId,
             CreatorId = slot.CreatorId,

@@ -7,9 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 public struct GenericUserResponse<T> : ILbpSerializable, IHasCustomRoot where T : ILbpSerializable
 {
-
-    public GenericUserResponse()
-    { }
+    public GenericUserResponse() { }
 
     public GenericUserResponse(string rootElement, List<T> users, int total, int hintStart)
     {

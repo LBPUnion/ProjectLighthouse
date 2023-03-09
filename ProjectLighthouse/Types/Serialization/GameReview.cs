@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -6,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -15,22 +17,21 @@ public enum DeletedBy
 {
     [XmlEnum(Name = "none")]
     None,
-
     [XmlEnum(Name = "moderator")]
     Moderator,
-
     [XmlEnum(Name = "level_author")]
     LevelAuthor,
-    // TODO: deletion types for comments (profile etc) 
 }
 
 [XmlRoot("review")]
 [XmlType("review")]
-public class GameReview : ILbpSerializable
+public class GameReview : ILbpSerializable, INeedsPreparationForSerialization
 {
-
     [XmlIgnore]
     public int TargetUserId { get; set; }
+
+    [XmlIgnore]
+    public int ReviewerId { get; set; }
 
     [XmlIgnore]
     public int ReviewId { get; set; }
@@ -38,8 +39,11 @@ public class GameReview : ILbpSerializable
     [XmlAttribute("id")]
     public string ReviewTag { get; set; }
 
+    [XmlElement("reviewer")]
+    public string ReviewerUsername { get; set; }
+
     [XmlElement("slot_id")]
-    public SlotAndType Slot { get; set; }
+    public PhotoSlot Slot { get; set; }
 
     [XmlElement("timestamp")]
     public long Timestamp { get; set; }
@@ -70,24 +74,38 @@ public class GameReview : ILbpSerializable
     [XmlElement("yourthumb")]
     public int YourThumb { get; set; }
 
-    public async Task PrepareForSerialization(DatabaseContext database)
+    public async Task PrepareSerialization(DatabaseContext database)
     {
         this.YourThumb = await database.RatedReviews.Where(r => r.UserId == this.TargetUserId && r.ReviewId == this.ReviewId)
             .Select(r => r.Thumb)
             .FirstOrDefaultAsync();
 
-        string username = await database.Users.Where(u => u.UserId == this.TargetUserId)
+        this.ReviewerUsername = await database.Users.Where(u => u.UserId == this.ReviewerId)
             .Select(u => u.Username)
             .FirstOrDefaultAsync();
 
-        this.ReviewTag = $"{this.Slot.SlotId}.{username}";
+        // Slot could be a developer level so check here
+        this.Slot.SlotType = await database.Slots.Where(s => s.SlotId == this.Slot.SlotId)
+            .Select(s => s.Type)
+            .FirstOrDefaultAsync();
+
+        this.ReviewTag = $"{this.Slot.SlotId}.{this.ReviewerUsername}";
+        Console.WriteLine(this.ReviewTag);
     }
 
-    public static GameReview CreateFromEntity(ReviewEntity entity, GameTokenEntity token) =>
+    public static GameReview CreateFromEntity(ReviewEntity entity, GameTokenEntity token) 
+        => CreateFromEntity(entity, token.UserId);
+
+    public static GameReview CreateFromEntity(ReviewEntity entity, int targetUserId) =>
         new()
         {
+            ReviewerId = entity.ReviewerId,
             ReviewId = entity.ReviewId,
-            Slot = new SlotAndType(entity.SlotId, "user"),
+            Slot = new PhotoSlot
+            {
+                SlotId = entity.SlotId,
+                SlotType = SlotType.User,
+            },
             Text = entity.Text,
             Deleted = entity.Deleted,
             DeletedBy = entity.DeletedBy,
@@ -96,7 +114,7 @@ public class GameReview : ILbpSerializable
             ThumbsUp = entity.ThumbsUp,
             ThumbsDown = entity.ThumbsDown,
             Timestamp = entity.Timestamp,
-            TargetUserId = token.UserId,
+            TargetUserId = targetUserId,
         };
 
 }

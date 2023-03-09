@@ -7,7 +7,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 [XmlRoot("t_enable")]
 public class TelemetryConfigResponse : ILbpSerializable
 {
-
     [XmlText]
     public bool TelemetryEnabled { get; set; }
     

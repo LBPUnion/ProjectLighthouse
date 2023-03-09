@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -20,7 +22,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 [XmlRoot("slot")]
 public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 {
-
     [XmlIgnore]
     public int CreatorId { get; set; }
 
@@ -157,7 +158,13 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [DefaultValue("")]
     [XmlElement("labels")]
-    public string Labels => this.AuthorLabels;
+    // The C# XML serializer doesn't serialize fields that don't have public getters and setters
+    // even though it doesn't use the setter, these fields were originally meant to be expression bodies to another variable
+    // but unfortunately that's not supported.
+    public string Labels {
+        get => this.AuthorLabels;
+        set => throw new NotSupportedException();
+    }
     public bool ShouldSerializeLabels() => this.SerializationMode == SerializationMode.Full;
 
     [XmlElement("firstPublished")]
@@ -168,15 +175,23 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [DefaultValue(null)]
     [XmlElement("yourReview")]
-    public ReviewEntity YourReview { get; set; }
+    public GameReview YourReview { get; set; }
     public bool ShouldSerializeYourReview() => this.SerializationMode == SerializationMode.Full; 
 
     [XmlElement("reviewsEnabled")]
-    public bool ReviewsEnabled => ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
+    public bool ReviewsEnabled
+    {
+        get => ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
+        set => throw new NotSupportedException();
+    }
     public bool ShouldSerializeReviewsEnabled() => this.SerializationMode == SerializationMode.Full;
 
     [XmlElement("commentsEnabled")]
-    public bool CommentsEnabled => ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
+    public bool CommentsEnabled
+    {
+        get => ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
+        set => throw new NotSupportedException();
+    }
     public bool ShouldSerializeCommentsEnabled() => this.SerializationMode == SerializationMode.Full;
 
     [XmlElement("playCount")]
@@ -238,26 +253,34 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
             .FirstAsync();
         ReflectionHelper.CopyAllFields(stats, this);
         this.AuthorHandle = new NpHandle(stats.UsernameAndIcon.Username, stats.UsernameAndIcon.IconHash);
-        // ReSharper disable once ConvertIfStatementToSwitchStatement
+
         if (this.GameVersion == GameVersion.LittleBigPlanet1)
         {
             this.AverageRating = database.RatedLevels.Where(r => r.SlotId == this.SlotId)
                 .Average(r => (double?)r.RatingLBP1) ?? 3.0;
-        }
-        else if (this.GameVersion == GameVersion.LittleBigPlanetVita)
-        {
-            this.ResourcesSize = this.Resources.Sum(FileHelper.ResourceSize);
+            SortedDictionary<string, int> tagOccurrences = new();
+            foreach (RatedLevelEntity r in await database.RatedLevels
+                         .Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0)
+                         .ToListAsync())
+            {
+                if(tagOccurrences.TryGetValue(r.TagLBP1, out int _)) tagOccurrences[r.TagLBP1]++;
+
+                tagOccurrences.Add(r.TagLBP1, 1);
+            }
+            this.Tags = string.Join(",", tagOccurrences.OrderBy(r => r.Value).Select(r => r.Key).ToList());
         }
 
         if (this.SerializationMode == SerializationMode.Minimal) return;
 
+        if (this.GameVersion == GameVersion.LittleBigPlanetVita) this.ResourcesSize = this.Resources.Sum(FileHelper.ResourceSize);
+
         #nullable enable
         RatedLevelEntity? yourRating = await database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == this.TargetUserId && r.SlotId == this.SlotId);
-        ReviewEntity? yourReview = await database.Reviews.Include(r => r.Slot).FirstOrDefaultAsync(r => r.ReviewerId == this.TargetUserId && r.SlotId == this.SlotId);
+        ReviewEntity? yourReview = await database.Reviews.FirstOrDefaultAsync(r => r.ReviewerId == this.TargetUserId && r.SlotId == this.SlotId);
         VisitedLevelEntity? yourVisitedStats = await database.VisitedLevels.FirstOrDefaultAsync(v => v.UserId == this.TargetUserId && v.SlotId == this.SlotId);
         if (yourRating != null)
         {
-            this.YourRating = (this.GameVersion == GameVersion.LittleBigPlanet1 ? yourRating.Rating : yourRating.RatingLBP1);
+            this.YourRating = this.GameVersion == GameVersion.LittleBigPlanet1 ? yourRating.Rating : yourRating.RatingLBP1;
             this.YourDPadRating = yourRating.Rating;
         }
         if (yourVisitedStats != null)
@@ -268,7 +291,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
         }
         if (yourReview != null)
         {
-            this.YourReview = yourReview;
+            this.YourReview = GameReview.CreateFromEntity(yourReview, this.TargetUserId);
         }
         #nullable disable
 

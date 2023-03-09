@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -17,7 +18,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 [XmlRoot("user")]
 public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
 {
-
     [XmlIgnore]
     public int UserId { get; set; }
 

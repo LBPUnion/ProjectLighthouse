@@ -88,7 +88,7 @@ public class FriendsController : ControllerBase
             UserEntity? friend = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == friendId);
             if (friend == null) continue;
 
-            response.Users.Add(GameUser.CreateFromEntity(friend));
+            response.Users.Add(GameUser.CreateFromEntity(friend, token.GameVersion));
         }
 
         return this.Ok(response);

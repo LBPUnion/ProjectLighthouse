@@ -13,7 +13,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 [XmlRoot("slot")]
 public class GameDeveloperSlot : SlotBase, INeedsPreparationForSerialization
 {
-
     [XmlIgnore]
     public int SlotId { get; set; }
 
@@ -44,5 +43,4 @@ public class GameDeveloperSlot : SlotBase, INeedsPreparationForSerialization
             .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)
             .Sum(r => r.PlayerIds.Count);
     }
-
 }

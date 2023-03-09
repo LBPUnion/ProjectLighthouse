@@ -20,11 +20,6 @@ public static class DatabaseExtensions
     {
         query = query.Where(s => s.Type == SlotType.User || (s.Type == SlotType.Developer && includeDeveloperLevels));
 
-        if (includeCreator)
-        {
-            query = query.Include(s => s.Creator);
-        }
-
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {
             query = query.Where(s => s.GameVersion == gameVersion);
@@ -41,7 +36,7 @@ public static class DatabaseExtensions
 
     public static IQueryable<ReviewEntity> ByGameVersion(this IQueryable<ReviewEntity> queryable, GameVersion gameVersion, bool includeSublevels = false)
     {
-        IQueryable<ReviewEntity> query = queryable.Include(r => r.Slot).Include(r => r.Slot.Creator);
+        IQueryable<ReviewEntity> query = queryable;
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {

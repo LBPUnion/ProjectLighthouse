@@ -7,7 +7,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 public struct GenericSlotResponse : ILbpSerializable, IHasCustomRoot
 {
-
     public GenericSlotResponse() { }
 
     public GenericSlotResponse(string rootElement, List<SlotBase> slots, int total, int hintStart)

@@ -49,7 +49,7 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
     [XmlElement("yourthumb")]
     public int YourThumb { get; set; }
 
-    public async Task PrepareForSerialization(DatabaseContext database)
+    public async Task PrepareSerialization(DatabaseContext database)
     {
         this.AuthorUsername = await database.Users.Where(u => u.UserId == this.TargetUserId)
             .Select(u => u.Username)
@@ -61,7 +61,7 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
             .FirstOrDefaultAsync();
     }
 
-    public static GameComment CreateFromEntity(CommentEntity comment) =>
+    public static GameComment CreateFromEntity(CommentEntity comment, int targetUserId) =>
         new()
         {
             CommentId = comment.CommentId,
@@ -72,6 +72,7 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
             Deleted = comment.Deleted,
             DeletedBy = comment.DeletedBy,
             DeletedType = comment.DeletedType,
+            TargetUserId = targetUserId,
         };
 
     public static CommentEntity ConvertToEntity(GameComment comment) => new()

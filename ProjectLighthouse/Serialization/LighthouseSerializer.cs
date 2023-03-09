@@ -26,11 +26,13 @@ public static class LighthouseSerializer
         namespaces.Add(string.Empty, string.Empty);
         StringWriter stringWriter = new();
         CustomXmlSerializer serializer = new(serializableObject.GetType(), serviceProvider, rootAttribute);
-        ExcludeNamespaceXmlWriter xmlWriter = new(stringWriter,
+        WriteFullClosingTagXmlWriter xmlWriter = new(stringWriter,
             new XmlWriterSettings
             {
                 OmitXmlDeclaration = true,
                 CheckCharacters = false,
+                ConformanceLevel = ConformanceLevel.Auto,
+                WriteEndDocumentOnClose = true,
             });
         serializer.Serialize(xmlWriter, serializableObject, namespaces);
         return stringWriter.ToString();

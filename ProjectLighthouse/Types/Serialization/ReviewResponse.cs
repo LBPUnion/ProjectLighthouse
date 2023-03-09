@@ -5,9 +5,9 @@ using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
+[XmlRoot("reviews")]
 public struct ReviewResponse : ILbpSerializable
 {
-
     public ReviewResponse(List<GameReview> reviews, long hint, int hintStart)
     {
         this.Reviews = reviews;

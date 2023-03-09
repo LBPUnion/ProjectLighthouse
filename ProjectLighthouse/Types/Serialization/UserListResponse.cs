@@ -7,9 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 public struct UserListResponse : ILbpSerializable, IHasCustomRoot
 {
-
-    public UserListResponse()
-    { }
+    public UserListResponse() { }
 
     public UserListResponse(string rootElement, List<GameUser> users, int total, int hintStart)
     {

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("photos")]
-public struct PhotoListResponse
+public struct PhotoListResponse : ILbpSerializable
 {
-
     public PhotoListResponse(List<GamePhoto> photos)
     {
         this.Photos = photos;

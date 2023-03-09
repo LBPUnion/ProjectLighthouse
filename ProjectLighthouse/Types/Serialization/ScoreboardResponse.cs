@@ -7,8 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 public struct ScoreboardResponse: ILbpSerializable, IHasCustomRoot
 {
-    public ScoreboardResponse()
-    { }
+    public ScoreboardResponse() { }
 
     public ScoreboardResponse(string rootElement, List<GameScore> scores, int total, int yourScore, int yourRank)
     {

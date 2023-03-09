@@ -12,5 +12,6 @@ public struct CommentListResponse : ILbpSerializable
         this.Comments = comments;
     }
 
+    [XmlElement("comment")]
     public List<GameComment> Comments { get; set; }
 }
