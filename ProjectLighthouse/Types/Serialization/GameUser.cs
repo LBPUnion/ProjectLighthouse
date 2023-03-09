@@ -158,7 +158,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        var stats = await database.Users.DefaultIfEmpty()
+        var stats = await database.Users.Where(u => u.UserId == this.UserId)
             .Select(_ => new
             {
                 Username = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.Username).First(),
