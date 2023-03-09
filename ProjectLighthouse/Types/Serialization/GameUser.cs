@@ -161,11 +161,8 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         var stats = await database.Users.DefaultIfEmpty()
             .Select(_ => new
             {
-                UsernameAndSlots = database.Users.Where(u => u.UserId == this.UserId).Select(u => new
-                {
-                    u.Username,
-                    u.AdminGrantedSlots,
-                }).First(),
+                Username = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.Username).First(),
+                BonusSlots = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.AdminGrantedSlots).First(),
                 PlaylistCount = database.Playlists.Count(p => p.CreatorId == this.UserId),
                 ReviewCount = database.Reviews.Count(r => r.ReviewerId == this.UserId),
                 CommentCount = database.Comments.Count(c => c.TargetId == this.UserId && c.Type == CommentType.Profile),
@@ -179,10 +176,10 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
             })
             .FirstOrDefaultAsync();
 
-        this.UserHandle.Username = stats.UsernameAndSlots.Username;
+        this.UserHandle.Username = stats.Username;
         this.CommentsEnabled = this.CommentsEnabled && ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
 
-        int entitledSlots = ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + stats.UsernameAndSlots.AdminGrantedSlots;
+        int entitledSlots = ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + stats.BonusSlots;
 
         IQueryable<SlotEntity> SlotCount(GameVersion version)
         {
