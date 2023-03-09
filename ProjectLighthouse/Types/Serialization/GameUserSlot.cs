@@ -259,9 +259,10 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
                          .Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0)
                          .ToListAsync())
             {
-                if(tagOccurrences.TryGetValue(r.TagLBP1, out int _)) tagOccurrences[r.TagLBP1]++;
-
-                tagOccurrences.Add(r.TagLBP1, 1);
+                if (tagOccurrences.TryGetValue(r.TagLBP1, out _))
+                    tagOccurrences[r.TagLBP1]++;
+                else
+                    tagOccurrences.Add(r.TagLBP1, 1);
             }
             this.Tags = string.Join(",", tagOccurrences.OrderBy(r => r.Value).Select(r => r.Key).ToList());
         }
