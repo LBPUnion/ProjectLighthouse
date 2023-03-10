@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Xml;
 
 namespace LBPUnion.ProjectLighthouse.Serialization;
@@ -37,6 +36,12 @@ public class ExcludeNamespaceXmlWriter : XmlWriterWrapper
             return;
         }
         base.WriteString(text);
+    }
+
+    // Ignores namespaces (xmlns attributes)
+    public override void WriteStartElement(string prefix, string localName, string ns)
+    {
+        base.WriteStartElement(prefix, localName, "");
     }
 
     public override void WriteStartAttribute(string prefix, string localName, string ns)

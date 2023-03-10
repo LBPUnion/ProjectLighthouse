@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
@@ -58,60 +58,94 @@ public class CustomXmlSerializer : XmlSerializer
         base.Serialize(xmlWriter, o, namespaces);
     }
 
+    private static readonly ConcurrentDictionary<PropertyInfo, Func<object, object>> propertyCache = new ();
+
+    // https://stackoverflow.com/a/35759009
+    // TLDR: Reflection is pretty slow, so we compile an expression tree to fetch the field we want then cache it
+    // so we incur less expense next time we try and access this property.
+    private static object GetFromCache(object owner, PropertyInfo propertyInfo)
+    {
+        if (propertyCache.TryGetValue(propertyInfo, out Func<object,object> getter))
+        {
+            return getter.Invoke(owner);
+        }
+
+        if (!propertyInfo.CanRead) throw new Exception("Tried to get from object that has no getter");
+
+        ParameterExpression param = Expression.Parameter(typeof(object), "param");
+        Expression propExpression =
+            Expression.Convert(Expression.Property(Expression.Convert(param, owner.GetType()), propertyInfo),
+                typeof(object));
+        LambdaExpression lambda = Expression.Lambda(propExpression,
+            param);
+        if (lambda.Compile() is not Func<object, object> compiled)
+            throw new Exception("Failed to compile lambda getter expression");
+        
+        propertyCache.TryAdd(propertyInfo, compiled);
+        return compiled.Invoke(owner);
+
+    }
+
     /// <summary>
     /// Recursively finds all properties of an object
     /// </summary>
     /// <param name="obj">The object to recursively find all properties of</param>
-    /// <param name="alreadyChecked">A list of type references that have already been checked to prevent infinite loops</param>
+    /// <param name="alreadyPrepared">A list of type references that have already been prepared to prevent duplicate preparing</param>
+    /// <param name="recursionDepth">A number tracking how deep into the recursion call stack we are to prevent recursive loops</param>
     /// <returns>A list of object references of all properties of the object</returns>
-    public void RecursivelyPrepare(object obj, List<INeedsPreparationForSerialization> alreadyChecked)
+    public void RecursivelyPrepare2(object obj, List<INeedsPreparationForSerialization> alreadyPrepared, int recursionDepth = 0)
     {
-        List<INeedsPreparationForSerialization> list = new();
+        if (recursionDepth > 5) return;
         switch (obj)
         {
-            case null: return;
-            case INeedsPreparationForSerialization cb when alreadyChecked.Contains(cb): return;
-            case INeedsPreparationForSerialization cb:
-            {
-                this.PrepareForSerialization(cb);
-                list.Add(cb);
+            case INeedsPreparationForSerialization needsPreparation:
+                if (alreadyPrepared.Contains(needsPreparation)) break;
+
+                this.PrepareForSerialization(needsPreparation);
+                alreadyPrepared.Add(needsPreparation);
                 break;
-            }
+            case null: return;
         }
 
-        foreach (PropertyInfo info in obj.GetType().GetProperties())
+        foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties())
         {
-            if (info.PropertyType.IsPrimitive) continue;
+            if (propertyInfo.PropertyType.IsPrimitive || propertyInfo.PropertyType == typeof(string)) continue;
 
-
-            // If the property isn't a list or a ILbpSerializable
-            if (typeof(IList).IsAssignableFrom(info.PropertyType) && info.PropertyType.GetGenericArguments().Length > 0)
+            // If the property isn't the T value of a generic
+            if (typeof(IList).IsAssignableFrom(propertyInfo.PropertyType) && propertyInfo.PropertyType.GetGenericArguments().Length > 0 &&
+                !typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType.GetGenericArguments()[0]))
             {
-                if (!typeof(ILbpSerializable).IsAssignableFrom(info.PropertyType.GetGenericArguments()[0])) continue;
-            }
-            else
-            {
-                if (!typeof(INeedsPreparationForSerialization).IsAssignableFrom(info.PropertyType)) continue;
+                continue;
             }
 
-            object val = info.GetValue(obj, null);
+            // If the property type doesn't extend ILbpSerializable
+            if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType))
+            {
+                continue;
+            }
+
+            object val = GetFromCache(obj, propertyInfo);
             switch (val)
             {
-                // Recursively find items in list
-                case IList elems:
-                {
-                    foreach (object item in elems)
+                case ICollection collection:
+                    foreach (object o in collection)
                     {
-                        this.RecursivelyPrepare(item, list);
+                        this.RecursivelyPrepare2(o, alreadyPrepared, recursionDepth+1);
                     }
                     break;
-                }
-                // Otherwise we already checked that it is serializable so add it to the list  
-                case INeedsPreparationForSerialization prep:
-                    if (list.Contains(prep)) continue;
+                case INeedsPreparationForSerialization nP:
+                    if (alreadyPrepared.Contains(nP)) break;
 
-                    this.PrepareForSerialization(prep);
-                    list.Add(prep);
+                    // Prepare object
+                    this.PrepareForSerialization(nP);
+                    alreadyPrepared.Add(nP);
+
+                    // Recursively find objects in this INeedsPreparationForSerialization object
+                    this.RecursivelyPrepare2(nP, alreadyPrepared, recursionDepth+1);
+                    break;
+                case ILbpSerializable serializable:
+                    // Recursively find objects in this ILbpSerializable object
+                    this.RecursivelyPrepare2(serializable, alreadyPrepared, recursionDepth+1);
                     break;
             }
         }
@@ -122,6 +156,6 @@ public class CustomXmlSerializer : XmlSerializer
 
     public void TriggerCallback(object o)
     {
-        this.RecursivelyPrepare(o, new List<INeedsPreparationForSerialization>());
+        this.RecursivelyPrepare2(o, new List<INeedsPreparationForSerialization>());
     }
 }

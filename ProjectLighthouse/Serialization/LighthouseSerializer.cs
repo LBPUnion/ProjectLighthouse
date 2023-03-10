@@ -16,26 +16,28 @@ namespace LBPUnion.ProjectLighthouse.Serialization;
 
 public static class LighthouseSerializer
 {
-    public static string Serialize(IServiceProvider serviceProvider, ILbpSerializable serializableObject)
+    public static string Serialize(IServiceProvider serviceProvider, ILbpSerializable? serializableObject)
     {
+        if (serializableObject == null) return "";
+
         XmlRootAttribute? rootAttribute = null;
         if (serializableObject is IHasCustomRoot customRoot) rootAttribute = new XmlRootAttribute(customRoot.GetRoot());
-        
+
         // Required to omit the xml namespace
         XmlSerializerNamespaces namespaces = new();
         namespaces.Add(string.Empty, string.Empty);
-        StringWriter stringWriter = new();
+        using StringWriter stringWriter = new();
         CustomXmlSerializer serializer = new(serializableObject.GetType(), serviceProvider, rootAttribute);
         WriteFullClosingTagXmlWriter xmlWriter = new(stringWriter,
             new XmlWriterSettings
             {
                 OmitXmlDeclaration = true,
                 CheckCharacters = false,
-                ConformanceLevel = ConformanceLevel.Auto,
-                WriteEndDocumentOnClose = true,
             });
         serializer.Serialize(xmlWriter, serializableObject, namespaces);
-        return stringWriter.ToString();
+        string finalResult = stringWriter.ToString();
+        stringWriter.Dispose();
+        return finalResult;
     }
 
     public static string Serialize(this ControllerBase controllerBase, ILbpSerializable serializableObject) 
@@ -55,11 +57,20 @@ public static class LighthouseSerializer
             }
             catch (Exception e)
             {
-                Logger.Error($"Failed to resolve dependency '{info.Name}': {e.ToDetailedException()}", LogArea.Serialization);
+                Logger.Error(
+                    $"Failed to resolve dependency '{info.Name}' during serialization of {serializableObject.GetType().FullName}: {e.ToDetailedException()}",
+                    LogArea.Serialization);
+                return;
             }
         }
 
-        if (parameterInfos.Length != parameters.Count) return;
+        if (parameterInfos.Length != parameters.Count)
+        {
+            Logger.Error(
+                $"Failed to fetch one or more dependencies during serialization of {serializableObject.GetType().FullName}",
+                LogArea.Serialization);
+            return;
+        }
 
         try
         {
@@ -69,7 +80,9 @@ public static class LighthouseSerializer
         }
         catch (Exception e)
         {
-            Logger.Error(@$"Failed to prepare '{serializableObject.GetType().Name}' for serialization: {e.ToDetailedException()}", LogArea.Serialization);
+            Logger.Error(
+                @$"Failed to prepare '{serializableObject.GetType().FullName}' for serialization: {e.ToDetailedException()}",
+                LogArea.Serialization);
         }
     }
 }

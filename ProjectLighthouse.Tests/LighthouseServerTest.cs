@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -66,7 +65,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
     {
         HttpResponseMessage response = await this.AuthenticateResponse(number);
 
-        string responseContent = LbpSerializer.StringElement("loginResult", await response.Content.ReadAsStringAsync());
+        string responseContent = await response.Content.ReadAsStringAsync();
 
         XmlSerializer serializer = new(typeof(LoginResult));
         return (LoginResult)serializer.Deserialize(new StringReader(responseContent))!;

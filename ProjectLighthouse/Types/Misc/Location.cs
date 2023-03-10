@@ -1,5 +1,4 @@
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Misc;
 
@@ -15,6 +14,4 @@ public class Location
 
     [XmlElement("y")]
     public int Y { get; set; }
-
-    public string Serialize() => LbpSerializer.StringElement("x", this.X) + LbpSerializer.StringElement("y", this.Y);
 }
