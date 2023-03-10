@@ -13,7 +13,9 @@ public class DiscordConfiguration : ConfigurationBase<DiscordConfiguration>
     public override int ConfigVersion { get; set; } = 1;
 
     public override string ConfigName { get; set; } = "discord.yml";
-    
+
+    public override bool NeedsConfiguration { get; set; } = false;
+
     // TODO integrations should be more modular
 
     public bool DiscordIntegrationEnabled { get; set; } = false;
