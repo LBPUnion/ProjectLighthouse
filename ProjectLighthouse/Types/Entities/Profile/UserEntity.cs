@@ -48,6 +48,12 @@ public class UserEntity
         }
     }
 
+    public UserStatus GetStatus(DatabaseContext database) => new(database, this.UserId);
+    public int GetHeartCount(DatabaseContext database) => database.HeartedProfiles.Count(hp => hp.HeartedProfileId == this.UserId);
+    public int GetCommentCount(DatabaseContext database) => database.Comments.Count(c => c.TargetId == this.UserId && c.Type == CommentType.Profile);
+    public int GetUsedSlotCount(DatabaseContext database) => database.Slots.Count(s => s.CreatorId == this.UserId);
+    public int GetUploadedPhotoCount(DatabaseContext database) => database.Photos.Count(p => p.CreatorId == this.UserId);
+
     /// <summary>
     ///     The location of the profile card on the user's earth
     ///     Stored as a single 64 bit unsigned integer but split into
@@ -76,8 +82,6 @@ public class UserEntity
     public string PlanetHashLBP3 { get; set; } = "";
 
     public string PlanetHashLBPVita { get; set; } = "";
-
-    public int Hearts(DatabaseContext database) => database.HeartedProfiles.Count(s => s.HeartedUserId == this.UserId);
 
     public bool PasswordResetRequired { get; set; }
 

@@ -1,3 +1,4 @@
+@using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
 
@@ -5,11 +6,11 @@
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     bool includeStatus = (bool?)ViewData["IncludeStatus"] ?? false;
-    // string userStatus = includeStatus ? Model.Status.ToTranslatedString(language, timeZone) : "";
-    //TODO userStatus
+    await using DatabaseContext database = new(); 
+    string userStatus = includeStatus ? Model.GetStatus(database).ToTranslatedString(language, timeZone) : "";
 }
 
-<a href="/user/@Model.UserId" title="TODO: UserStatus" class="user-link">
+<a href="/user/@Model.UserId" title="@userStatus" class="user-link">
     <img src="/gameAssets/@Model.WebsiteAvatarHash" alt=""/>
 
     @if (Model.IsAdmin)

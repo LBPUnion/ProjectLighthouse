@@ -204,13 +204,16 @@ public class RoomHelper
             #endif
             int roomCountBeforeCleanup = rooms.Count();
 
+            database ??= new DatabaseContext();
+
             // Remove offline players from rooms
             foreach (Room room in rooms)
             {
-                List<UserEntity> players = room.GetPlayers(database ?? new DatabaseContext());
-                //TODO fixme
-                List<int> playersToRemove = new(); 
-                    // players.Where(player => player.Status.StatusType == StatusType.Offline).Select(player => player.UserId).ToList();
+                List<UserEntity> players = room.GetPlayers(database);
+                List<int> playersToRemove = players
+                    .Where(player => player.GetStatus(database).StatusType == StatusType.Offline)
+                    .Select(player => player.UserId)
+                    .ToList();
 
                 foreach (int player in playersToRemove) room.PlayerIds.Remove(player);
                 

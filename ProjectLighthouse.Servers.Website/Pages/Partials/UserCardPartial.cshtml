@@ -1,3 +1,4 @@
+@using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
 
@@ -27,14 +28,22 @@
                 @Model.Username
             </h1>
         }
+        @{
+            await using DatabaseContext context = new();
+
+            int hearts = Model.GetHeartCount(context);
+            int comments = Model.GetCommentCount(context);
+            int levels = Model.GetUsedSlotCount(context);
+            int photos = Model.GetUploadedPhotoCount(context);
+        }
         <span>
-            <i>TODO: status</i>
+            <i>@Model.GetStatus(context).ToTranslatedString(language, timeZone)</i>
         </span>
         <div class="cardStatsUnderTitle">
-            <i class="pink heart icon" title="Hearts"></i> <span>TODO: hearts</span>
-            <i class="blue comment icon" title="Comments"></i> <span>TODO: comments</span>
-            <i class="green upload icon" title="Uploaded Levels"></i><span>TODO: UsedSlots</span>
-            <i class="purple camera icon" title="Uploaded Photos"></i><span>TODO: PhotosByMe</span>
+            <i class="pink heart icon" title="Hearts"></i> <span>@hearts</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@comments</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@levels</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@photos</span>
         </div>
     </div>
 </div>
