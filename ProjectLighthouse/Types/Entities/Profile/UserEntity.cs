@@ -12,10 +12,12 @@ namespace LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 public class UserEntity
 {
+
+    #nullable enable
     [Key]
     public int UserId { get; set; }
 
-    public string Username { get; set; } = "";
+    public required string Username { get; set; }
 
     #nullable enable
     public string? EmailAddress { get; set; }
