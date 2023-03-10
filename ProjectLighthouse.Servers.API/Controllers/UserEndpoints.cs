@@ -41,7 +41,7 @@ public class UserEndpoints : ApiEndpointController
     }
 
     [HttpGet("username/{username}")]
-    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiUser), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUser(string username)
     {
@@ -59,7 +59,7 @@ public class UserEndpoints : ApiEndpointController
     /// <response code="200">The list of users, if any were found</response>
     /// <response code="404">No users matched the query</response>
     [HttpGet("search/user")]
-    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiUser), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SearchUsers(string query)
     {
@@ -83,7 +83,7 @@ public class UserEndpoints : ApiEndpointController
     /// <response code="200">The user's status, if successful.</response>
     /// <response code="404">The user could not be found.</response>
     [HttpGet("user/{id:int}/status")]
-    [ProducesResponseType(typeof(UserStatus), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiUser), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetUserStatus(int id)
     {

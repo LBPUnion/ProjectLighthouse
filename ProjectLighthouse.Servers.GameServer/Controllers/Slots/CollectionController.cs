@@ -162,42 +162,15 @@ public class CollectionController : ControllerBase
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.StatusCode(403, "");
 
-        string categoriesSerialized = CategoryHelper.Categories.Aggregate
-        (
-            string.Empty,
-            (current, category) =>
-            {
-                string serialized;
+        List<GameCategory> categories = new();
 
-                if (category is CategoryWithUser categoryWithUser) serialized = categoryWithUser.Serialize(this.database, user);
-                else serialized = category.Serialize(this.database);
+        foreach (Category category in CategoryHelper.Categories.ToList())
+        {
+            if(category is CategoryWithUser categoryWithUser) categories.Add(categoryWithUser.Serialize(this.database, user));
+            else categories.Add(category.Serialize(this.database));
+        }
 
-                return current + serialized;
-            }
-        );
-
-        categoriesSerialized += LbpSerializer.StringElement("text_search", LbpSerializer.StringElement("url", "/slots/searchLBP3"));
-
-        return this.Ok
-        (
-            LbpSerializer.TaggedStringElement
-            (
-                "categories",
-                categoriesSerialized,
-                new Dictionary<string, object>
-                {
-                    {
-                        "hint", ""
-                    },
-                    {
-                        "hint_start", 1
-                    },
-                    {
-                        "total", CategoryHelper.Categories.Count
-                    },
-                }
-            )
-        );
+        return this.Ok(new CategoryListResponse(categories, CategoryHelper.Categories.Count, 0, 1));
     }
 
     [HttpGet("searches/{endpointName}")]

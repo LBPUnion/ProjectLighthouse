@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
@@ -44,7 +45,10 @@ public abstract class SlotBase : ILbpSerializable
             CrossControllerRequired = slot.IsCrossControlRequired,
         };
 
-    public static SlotBase CreateFromEntity(SlotEntity slot, GameTokenEntity token)
+    public static SlotBase CreateFromEntity(SlotEntity slot, GameTokenEntity token) 
+        => CreateFromEntity(slot, token.GameVersion, token.UserId);
+
+    public static SlotBase CreateFromEntity(SlotEntity slot, GameVersion targetGame, int targetUserId)
     {
         if (slot.Type == SlotType.Developer)
         {
@@ -59,8 +63,8 @@ public abstract class SlotBase : ILbpSerializable
         GameUserSlot userSlot = new()
         {
             SerializationMode = SerializationMode.Minimal,
-            TargetGame = token.GameVersion,
-            TargetUserId = token.UserId,
+            TargetGame = targetGame,
+            TargetUserId = targetUserId,
             CreatorId = slot.CreatorId,
             SlotId = slot.SlotId,
             // this gets set in PrepareSerialization

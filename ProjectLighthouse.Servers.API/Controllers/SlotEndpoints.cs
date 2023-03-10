@@ -52,9 +52,8 @@ public class SlotEndpoints : ApiEndpointController
     /// <response code="200">The slot, if successful.</response>
     /// <response code="404">The slot could not be found.</response>
     [HttpGet("slot/{id:int}")]
-    [ProducesResponseType(typeof(SlotEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiSlot), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    //TODO implement json serializable slot
     public async Task<IActionResult> GetSlot(int id)
     {
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(u => u.SlotId == id);

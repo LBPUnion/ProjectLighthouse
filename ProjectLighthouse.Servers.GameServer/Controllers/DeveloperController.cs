@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LBPUnion.ProjectLighthouse.Types.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
@@ -10,5 +11,5 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class DeveloperController : Controller
 {
     [HttpGet("developer_videos")]
-    public IActionResult DeveloperVideos() => this.Ok("<videos></videos>");
+    public IActionResult DeveloperVideos() => this.Ok(new GameDeveloperVideos());
 }
