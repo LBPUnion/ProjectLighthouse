@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -106,6 +107,52 @@ public class SerializationDependencyTests
                     "<dependency><secret>bruh</secret></dependency>" +
                     "<nestedDependency><dependency><secret>bruh</secret></dependency><prepared>test</prepared></nestedDependency>" +
                     "</xmlRoot>");
+    }
+
+    public class CounterDependency
+    {
+        private int counter;
+        public int Counter => this.counter++;
+
+        public CounterDependency()
+        {
+            this.counter = 0;
+        }
+
+    }
+
+    public class ListDependencyItem : ILbpSerializable, INeedsPreparationForSerialization
+    {
+        [XmlElement("counter")]
+        public int Counter { get; set; } = -1;
+
+        public void PrepareSerialization(CounterDependency counter)
+        {
+            this.Counter = counter.Counter;
+        }
+    }
+
+    public class ListDependencyTest : TestSerializable
+    {
+        [XmlElement("item")]
+        public List<ListDependencyItem> Items { get; set; } = new();
+    }
+
+    [Fact]
+    public void ShouldPrepareItemsInList()
+    {
+        ListDependencyTest serializable = new()
+        {
+            Items = new List<ListDependencyItem>
+            {
+                new(),
+                new(),
+                new(),
+            },
+        };
+        CounterDependency counterDependency = new();
+        string serialized = LighthouseSerializer.Serialize(GetTestServiceProvider(counterDependency), serializable);
+        Assert.True(serialized == "<xmlRoot><item><counter>0</counter></item><item><counter>1</counter></item><item><counter>2</counter></item></xmlRoot>");
     }
 
 }

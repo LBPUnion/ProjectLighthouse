@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml;
@@ -93,7 +94,7 @@ public class CustomXmlSerializer : XmlSerializer
     /// <param name="alreadyPrepared">A list of type references that have already been prepared to prevent duplicate preparing</param>
     /// <param name="recursionDepth">A number tracking how deep into the recursion call stack we are to prevent recursive loops</param>
     /// <returns>A list of object references of all properties of the object</returns>
-    public void RecursivelyPrepare2(object obj, List<INeedsPreparationForSerialization> alreadyPrepared, int recursionDepth = 0)
+    public void RecursivelyPrepare(object obj, List<INeedsPreparationForSerialization> alreadyPrepared, int recursionDepth = 0)
     {
         if (recursionDepth > 5) return;
         switch (obj)
@@ -111,15 +112,19 @@ public class CustomXmlSerializer : XmlSerializer
         {
             if (propertyInfo.PropertyType.IsPrimitive || propertyInfo.PropertyType == typeof(string)) continue;
 
-            // If the property isn't the T value of a generic
-            if (typeof(IList).IsAssignableFrom(propertyInfo.PropertyType) && propertyInfo.PropertyType.GetGenericArguments().Length > 0 &&
-                !typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType.GetGenericArguments()[0]))
+            // If the property is a list
+            if (typeof(IList).IsAssignableFrom(propertyInfo.PropertyType))
             {
-                continue;
+                // If the list doesn't contain objects of ILbpSerializable, skip
+                if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType.GetGenericArguments()
+                        .ElementAtOrDefault(0)))
+                {
+                    continue;
+                }
+                
             }
-
-            // If the property type doesn't extend ILbpSerializable
-            if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType))
+            // Otherwise if the object isn't a ILbpSerializable, skip
+            else if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType))
             {
                 continue;
             }
@@ -127,10 +132,10 @@ public class CustomXmlSerializer : XmlSerializer
             object val = GetFromCache(obj, propertyInfo);
             switch (val)
             {
-                case ICollection collection:
-                    foreach (object o in collection)
+                case IList list:
+                    foreach (object o in list)
                     {
-                        this.RecursivelyPrepare2(o, alreadyPrepared, recursionDepth+1);
+                        this.RecursivelyPrepare(o, alreadyPrepared, recursionDepth+1);
                     }
                     break;
                 case INeedsPreparationForSerialization nP:
@@ -141,11 +146,11 @@ public class CustomXmlSerializer : XmlSerializer
                     alreadyPrepared.Add(nP);
 
                     // Recursively find objects in this INeedsPreparationForSerialization object
-                    this.RecursivelyPrepare2(nP, alreadyPrepared, recursionDepth+1);
+                    this.RecursivelyPrepare(nP, alreadyPrepared, recursionDepth+1);
                     break;
                 case ILbpSerializable serializable:
                     // Recursively find objects in this ILbpSerializable object
-                    this.RecursivelyPrepare2(serializable, alreadyPrepared, recursionDepth+1);
+                    this.RecursivelyPrepare(serializable, alreadyPrepared, recursionDepth+1);
                     break;
             }
         }
@@ -156,6 +161,6 @@ public class CustomXmlSerializer : XmlSerializer
 
     public void TriggerCallback(object o)
     {
-        this.RecursivelyPrepare2(o, new List<INeedsPreparationForSerialization>());
+        this.RecursivelyPrepare(o, new List<INeedsPreparationForSerialization>());
     }
 }
