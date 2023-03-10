@@ -28,5 +28,7 @@ public class DiscordConfiguration : ConfigurationBase<DiscordConfiguration>
 
     public string RegistrationUrl { get; set; } = "";
 
+    public string RegistrationAnnouncement { get; set; } = "%user just connected to %instance for the first time using %platform!";
+
     public override ConfigurationBase<DiscordConfiguration> Deserialize(IDeserializer deserializer, string text) => deserializer.Deserialize<DiscordConfiguration>(text);
 }

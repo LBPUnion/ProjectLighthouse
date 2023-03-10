@@ -139,11 +139,17 @@ public class LoginController : ControllerBase
             user.LinkedPsnId = npTicket.Platform != Platform.RPCS3 ? npTicket.UserId : 0;
             await this.database.SaveChangesAsync();
 
-            await WebhookHelper.SendWebhook(
-                title: "New user",
-                description: $"{username} just connected to {ServerConfiguration.Instance.Customization.ServerName} for the first time!",
-                dest: WebhookHelper.WebhookDestination.Registration);
-                
+            if (DiscordConfiguration.Instance.DiscordIntegrationEnabled)
+            {
+                string announceMsg = DiscordConfiguration.Instance.RegistrationAnnouncement;
+                announceMsg = announceMsg.Replace("%user", username);
+                announceMsg = announceMsg.Replace("%instance", ServerConfiguration.Instance.Customization.ServerName);
+                announceMsg = announceMsg.Replace("%platform", npTicket.Platform.ToString());
+                await WebhookHelper.SendWebhook(title: "New user",
+                    description: announceMsg,
+                    dest: WebhookHelper.WebhookDestination.Registration);
+            }
+
             Logger.Success($"Created new user for {username}, platform={npTicket.Platform}", LogArea.Login);
         }
         // automatically change username if it doesn't match
