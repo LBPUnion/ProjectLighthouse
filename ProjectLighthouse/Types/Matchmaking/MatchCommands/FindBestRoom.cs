@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
+using System.Linq;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
@@ -24,13 +24,10 @@ public class FindBestRoom : IMatchCommand
     public List<string> Reservations { get; set; }
     public List<List<int>> Slots { get; set; }
 
-    [JsonIgnore]
-    public IEnumerable<int> FirstSlot => this.Slots[0];
-
     public RoomSlot RoomSlot
         => new()
         {
-            SlotType = (SlotType)this.Slots[0][0],
-            SlotId = this.Slots[0][1],
+            SlotType = (SlotType)(this.Slots.ElementAtOrDefault(0)?.ElementAtOrDefault(0) ?? (int)SlotType.Pod),
+            SlotId = this.Slots.ElementAtOrDefault(0)?.ElementAtOrDefault(1) ?? 0,
         };
 }
