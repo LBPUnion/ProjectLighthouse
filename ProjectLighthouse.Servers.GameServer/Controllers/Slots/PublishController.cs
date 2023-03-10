@@ -246,7 +246,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        SlotEntity slotEntity = SlotBase.ConvertToEntity(slot, token);
+        SlotEntity slotEntity = SlotBase.ConvertToEntity(slot);
 
         slot.CreatorId = user.UserId;
         slot.FirstUploaded = TimeHelper.TimestampMillis;
