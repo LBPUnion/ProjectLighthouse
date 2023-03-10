@@ -118,7 +118,7 @@ public class ListController : ControllerBase
         if (pageSize <= 0) return this.BadRequest();
 
         UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-        if (targetUser == null) return this.StatusCode(403, "");
+        if (targetUser == null) return this.Forbid();
 
         List<SlotBase> heartedLevels = await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.FavouriteSlots)
             .Skip(Math.Max(0, pageStart - 1))
@@ -190,7 +190,7 @@ public class ListController : ControllerBase
         if (pageSize <= 0) return this.BadRequest();
 
         int targetUserId = await this.database.UserIdFromUsername(username);
-        if (targetUserId == 0) return this.StatusCode(403, "");
+        if (targetUserId == 0) return this.Forbid();
 
         List<GamePlaylist> heartedPlaylists = await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
             .Include(p => p.Playlist)
@@ -247,7 +247,7 @@ public class ListController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-        if (targetUser == null) return this.StatusCode(403, "");
+        if (targetUser == null) return this.Forbid();
 
         if (pageSize <= 0) return this.BadRequest();
 

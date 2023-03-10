@@ -40,7 +40,7 @@ public class MatchController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         #region Parse match data
 

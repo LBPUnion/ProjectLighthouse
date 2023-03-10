@@ -66,7 +66,7 @@ public class UserController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         UserUpdate? update = await this.DeserializeBody<UserUpdate>("updateUser", "user");
 
@@ -164,7 +164,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> UpdateMyPins()
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         string bodyString = await this.ReadBodyAsync();
 

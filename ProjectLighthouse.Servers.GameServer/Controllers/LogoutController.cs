@@ -28,7 +28,7 @@ public class LogoutController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         user.LastLogout = TimeHelper.TimestampMillis;
 

@@ -160,7 +160,7 @@ public class CommentController : ControllerBase
             canDelete = comment.PosterUserId == token.UserId || slotCreator == token.UserId;
         }
 
-        if (!canDelete) return this.StatusCode(403, "");
+        if (!canDelete) return this.Forbid();
 
         comment.Deleted = true;
         comment.DeletedBy = await this.database.UsernameFromGameToken(token);

@@ -18,7 +18,7 @@ public class AuthenticationPage : BaseLayout
 
     public IActionResult OnGet()
     {
-        if (this.User == null) return this.StatusCode(403, "");
+        if (this.User == null) return this.Forbid();
 
         this.IpAddress = this.HttpContext.Connection.RemoteIpAddress;
 

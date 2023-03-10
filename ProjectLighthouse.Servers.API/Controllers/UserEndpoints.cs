@@ -105,7 +105,7 @@ public class UserEndpoints : ApiEndpointController
         string authToken = authHeader[(authHeader.IndexOf(' ') + 1)..];
 
         ApiKeyEntity? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
-        if (apiKey == null) return this.StatusCode(403, null);
+        if (apiKey == null) return this.Forbid();
 
         if (!string.IsNullOrWhiteSpace(username))
         {

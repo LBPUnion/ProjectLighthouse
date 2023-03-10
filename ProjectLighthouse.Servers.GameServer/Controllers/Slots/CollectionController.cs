@@ -160,7 +160,7 @@ public class CollectionController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         List<GameCategory> categories = new();
 
@@ -179,7 +179,7 @@ public class CollectionController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();

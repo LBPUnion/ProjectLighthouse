@@ -64,7 +64,7 @@ public class LoginController : ControllerBase
         if (username == null)
         {
             Logger.Warn("Unable to determine username, rejecting login", LogArea.Login);
-            return this.StatusCode(403, "");
+            return this.Forbid();
         }
 
         await this.database.RemoveExpiredTokens();
@@ -102,7 +102,7 @@ public class LoginController : ControllerBase
                 if (targetPlatform != 0)
                 {
                     Logger.Warn($"New user tried to login but their name is already taken, username={username}", LogArea.Login);
-                    return this.StatusCode(403, "");
+                    return this.Forbid();
                 }
 
                 // if there is already a pending link request don't create another
@@ -111,7 +111,7 @@ public class LoginController : ControllerBase
                     p.PlatformId == npTicket.UserId &&
                     p.UserId == targetUsername.UserId);
 
-                if (linkAttemptExists) return this.StatusCode(403, "");
+                if (linkAttemptExists) return this.Forbid();
 
                 PlatformLinkAttemptEntity linkAttempt = new()
                 {
@@ -124,13 +124,13 @@ public class LoginController : ControllerBase
                 this.database.PlatformLinkAttempts.Add(linkAttempt);
                 await this.database.SaveChangesAsync();
                 Logger.Success($"User '{npTicket.Username}' tried to login but platform isn't linked, platform={npTicket.Platform}", LogArea.Login);
-                return this.StatusCode(403, "");
+                return this.Forbid();
             }
 
             if (!ServerConfiguration.Instance.Authentication.AutomaticAccountCreation)
             {
                 Logger.Warn($"Unknown user tried to connect username={username}", LogArea.Login);
-                return this.StatusCode(403, "");
+                return this.Forbid();
             }
             // create account for user if they don't exist
             user = await this.database.CreateUser(username, "$");
@@ -149,7 +149,7 @@ public class LoginController : ControllerBase
             {
                 Logger.Warn($"{npTicket.Platform} user changed their name to a name that is already taken," +
                             $" oldName='{user.Username}', newName='{npTicket.Username}'", LogArea.Login);
-                return this.StatusCode(403, "");
+                return this.Forbid();
             }
             Logger.Info($"User's username has changed, old='{user.Username}', new='{npTicket.Username}', platform={npTicket.Platform}", LogArea.Login);
             user.Username = username;
@@ -169,20 +169,20 @@ public class LoginController : ControllerBase
         if (token != null)
         {
             Logger.Warn($"Rejecting duplicate ticket from {username}", LogArea.Login);
-            return this.StatusCode(403, "");
+            return this.Forbid();
         }
 
         token = await this.database.AuthenticateUser(user, npTicket, ipAddress);
         if (token == null)
         {
             Logger.Warn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
-            return this.StatusCode(403, "");
+            return this.Forbid();
         }
 
         if (user.IsBanned)
         {
             Logger.Error($"User {npTicket.Username} tried to login but is banned", LogArea.Login);
-            return this.StatusCode(403, "");
+            return this.Forbid();
         }
 
         Logger.Success($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);

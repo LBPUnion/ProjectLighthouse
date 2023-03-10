@@ -33,7 +33,7 @@ public class ReviewController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == slotId);
-        if (slot == null) return this.StatusCode(403, "");
+        if (slot == null) return this.Forbid();
 
         RatedLevelEntity? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
         if (ratedLevel == null)
@@ -62,7 +62,7 @@ public class ReviewController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
-        if (slot == null) return this.StatusCode(403, "");
+        if (slot == null) return this.Forbid();
 
         RatedLevelEntity? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
         if (ratedLevel == null)
@@ -196,10 +196,10 @@ public class ReviewController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         int reviewerId = await this.database.UserIdFromUsername(username);
-        if (reviewerId == 0) return this.StatusCode(400, "");
+        if (reviewerId == 0) return this.BadRequest();
 
         ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
-        if (review == null) return this.StatusCode(400, "");
+        if (review == null) return this.BadRequest();
 
         RatedReview? ratedReview = await this.database.RatedReviews.FirstOrDefaultAsync(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
         if (ratedReview == null)
@@ -249,15 +249,15 @@ public class ReviewController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         int creatorId = await this.database.Slots.Where(s => s.SlotId == slotId).Select(s => s.CreatorId).FirstOrDefaultAsync();
-        if (creatorId == 0) return this.StatusCode(400, "");
+        if (creatorId == 0) return this.BadRequest();
 
-        if (token.UserId != creatorId) return this.StatusCode(403, "");
+        if (token.UserId != creatorId) return this.Unauthorized();
 
         int reviewerId = await this.database.UserIdFromUsername(username);
-        if (reviewerId == 0) return this.StatusCode(400, "");
+        if (reviewerId == 0) return this.BadRequest();
 
         ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
-        if (review == null) return this.StatusCode(400, "");
+        if (review == null) return this.BadRequest();
 
         review.Deleted = true;
         review.DeletedBy = DeletedBy.LevelAuthor;

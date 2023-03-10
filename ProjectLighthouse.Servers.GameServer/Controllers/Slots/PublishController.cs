@@ -40,7 +40,7 @@ public class PublishController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         GameUserSlot? slot = await this.DeserializeBody<GameUserSlot>();
         if (slot == null)
@@ -82,7 +82,7 @@ public class PublishController : ControllerBase
         }
         else if (usedSlots > user.EntitledSlots)
         {
-            return this.StatusCode(403, "");
+            return this.Forbid();
         }
 
         HashSet<string> resources = new(slot.Resources)
@@ -103,7 +103,7 @@ public class PublishController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         GameUserSlot? slot = await this.DeserializeBody<GameUserSlot>();
 
@@ -283,7 +283,7 @@ public class PublishController : ControllerBase
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        if (slot.CreatorId != token.UserId) return this.StatusCode(403, "");
+        if (slot.CreatorId != token.UserId) return this.Forbid();
 
         this.database.Slots.Remove(slot);
 

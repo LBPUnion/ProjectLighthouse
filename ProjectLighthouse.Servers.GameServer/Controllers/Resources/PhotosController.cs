@@ -36,7 +36,7 @@ public class PhotosController : ControllerBase
     public async Task<IActionResult> UploadPhoto()
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         int photoCount = await this.database.Photos.CountAsync(p => p.CreatorId == user.UserId);
 
@@ -232,7 +232,7 @@ public class PhotosController : ControllerBase
         if (photo.CreatorId != token.UserId)
         {
             SlotEntity? photoSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId && s.Type == SlotType.User);
-            if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.StatusCode(401, "");
+            if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.Unauthorized();
         }
 
         HashSet<string> photoResources = new(){photo.LargeHash, photo.SmallHash, photo.MediumHash, photo.PlanHash,};

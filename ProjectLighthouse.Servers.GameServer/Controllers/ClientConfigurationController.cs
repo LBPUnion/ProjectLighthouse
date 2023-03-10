@@ -56,7 +56,7 @@ public class ClientConfigurationController : ControllerBase
     public async Task<IActionResult> GetPrivacySettings()
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         PrivacySettings ps = new()
         {
@@ -72,7 +72,7 @@ public class ClientConfigurationController : ControllerBase
     public async Task<IActionResult> SetPrivacySetting()
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
-        if (user == null) return this.StatusCode(403, "");
+        if (user == null) return this.Forbid();
 
         PrivacySettings? settings = await this.DeserializeBody<PrivacySettings>();
         if (settings == null) return this.BadRequest();

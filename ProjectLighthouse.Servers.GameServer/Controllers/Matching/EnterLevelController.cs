@@ -36,7 +36,7 @@ public class EnterLevelController : ControllerBase
         if (slotType == "developer") return this.Ok();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
-        if (slot == null) return this.StatusCode(403, "");
+        if (slot == null) return this.BadRequest();
 
         IQueryable<VisitedLevelEntity> visited = this.database.VisitedLevels.Where(s => s.SlotId == slotId && s.UserId == token.UserId);
         VisitedLevelEntity? v;
