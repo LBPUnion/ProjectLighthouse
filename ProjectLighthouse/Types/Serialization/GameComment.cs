@@ -16,6 +16,9 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
     [XmlIgnore]
     public int TargetUserId { get; set; }
 
+    [XmlIgnore]
+    public int PosterUserId { get; set; }
+
     [XmlElement("id")]
     public int CommentId { get; set; }
 
@@ -51,7 +54,7 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        this.AuthorUsername = await database.Users.Where(u => u.UserId == this.TargetUserId)
+        this.AuthorUsername = await database.Users.Where(u => u.UserId == this.PosterUserId)
             .Select(u => u.Username)
             .FirstOrDefaultAsync();
 
@@ -65,6 +68,7 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
         new()
         {
             CommentId = comment.CommentId,
+            PosterUserId = comment.PosterUserId,
             Message = comment.Message,
             Timestamp = comment.Timestamp,
             ThumbsUp = comment.ThumbsUp,
