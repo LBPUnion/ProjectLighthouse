@@ -1,4 +1,5 @@
 @using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.User
 
 @{
@@ -19,34 +20,22 @@
         {
             <h2 style="margin-bottom: 2px;">
                 <a href="~/user/@Model.UserId">@Model.Username</a>
-                @if (Model.IsAdmin)
-                {
-                    <span class="permissionBadge" style="color: red;">
-                        Administrator
-                    </span>
-                }
-                else if (Model.IsModerator)
-                {
-                    <span class="permissionBadge" style="color: rgb(200, 130, 0);">
-                        Moderator
-                    </span>
-                }
+                    @if (Model.IsModerator)
+                    {
+                        <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                            @Model.PermissionLevel.ToString()
+                        </span>
+                    }
             </h2>
         }
         else
         {
             <h1 style="margin-bottom: 2px;">
                 @Model.Username
-                @if (Model.IsAdmin)
+                @if (Model.IsModerator)
                 {
-                    <span class="permissionBadge" style="color: red;">
-                        Administrator
-                    </span>
-                }
-                else if (Model.IsModerator)
-                {
-                    <span class="permissionBadge" style="color: rgb(200, 130, 0);">
-                        Moderator
+                    <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                        @Model.PermissionLevel.ToString()
                     </span>
                 }
             </h1>
