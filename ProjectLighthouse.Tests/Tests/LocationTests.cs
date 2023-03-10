@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Misc;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests;
@@ -54,28 +55,30 @@ public class LocationTests
     [Fact]
     public void ShouldReadLocationAfterDeserialization()
     {
-        XmlSerializer deserializer = new(typeof(SlotEntity));
+        XmlSerializer deserializer = new(typeof(GameUserSlot));
         const string slotData = "<slot><name>test</name><resource>test</resource><location><x>4000</x><y>9000</y></location></slot>";
 
-        SlotEntity? deserialized = (SlotEntity?)deserializer.Deserialize(new StringReader(slotData));
+        GameUserSlot? deserialized = (GameUserSlot?)deserializer.Deserialize(new StringReader(slotData));
         Assert.True(deserialized != null);
         Assert.True(deserialized.Name == "test");
         Assert.True(deserialized.Location.X == 4000);
         Assert.True(deserialized.Location.Y == 9000);
-        Assert.True(deserialized.LocationPacked == 17_179_869_193_000);
+        SlotEntity entity = SlotBase.ConvertToEntity(deserialized, null);
+        Assert.True(entity.LocationPacked == 17_179_869_193_000);
     }
 
     [Fact]
     public void ShouldDeserializeEmptyLocation()
     {
-        XmlSerializer deserializer = new(typeof(SlotEntity));
+        XmlSerializer deserializer = new(typeof(GameUserSlot));
         const string slotData = "<slot><name>test</name></slot>";
 
-        SlotEntity? deserialized = (SlotEntity?)deserializer.Deserialize(new StringReader(slotData));
+        GameUserSlot? deserialized = (GameUserSlot?)deserializer.Deserialize(new StringReader(slotData));
         Assert.True(deserialized != null);
         Assert.True(deserialized.Name == "test");
         Assert.True(deserialized.Location.X == 0);
         Assert.True(deserialized.Location.Y == 0);
-        Assert.True(deserialized.LocationPacked == 0);
+        SlotEntity entity = SlotBase.ConvertToEntity(deserialized, null);
+        Assert.True(entity.LocationPacked == 0);
     }
 }
