@@ -86,7 +86,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
     public bool CommentsEnabled { get; set; }
 
     [XmlElement("location")]
-    public Location Location { get; set; }
+    public Location Location { get; set; } = new();
 
     [DefaultValue(0)]
     [XmlElement("favouriteSlotCount")]

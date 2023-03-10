@@ -47,7 +47,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     public NpHandle AuthorHandle { get; set; } = new();
 
     [XmlElement("location")]
-    public Location Location { get; set; }
+    public Location Location { get; set; } = new();
 
     [XmlElement("game")]
     public GameVersion GameVersion { get; set; }
