@@ -21,7 +21,7 @@ public abstract class SlotBase : ILbpSerializable
         return retSlot;
     }
 
-    public static SlotEntity ConvertToEntity(GameUserSlot slot, GameTokenEntity token) =>
+    public static SlotEntity ConvertToEntity(GameUserSlot slot) =>
         new()
         {
             Name = slot.Name,
@@ -35,7 +35,7 @@ public abstract class SlotBase : ILbpSerializable
             InitiallyLocked = slot.InitiallyLocked,
             MinimumPlayers = slot.MinimumPlayers,
             MaximumPlayers = slot.MaximumPlayers,
-            CreatorId = token.UserId,
+            CreatorId = slot.CreatorId,
             Lbp1Only = slot.IsLbp1Only,
             IsAdventurePlanet = slot.IsAdventurePlanet,
             LevelType = slot.LevelType,

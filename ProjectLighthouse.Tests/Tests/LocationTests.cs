@@ -2,6 +2,7 @@ using System.IO;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Xunit;
@@ -63,7 +64,7 @@ public class LocationTests
         Assert.True(deserialized.Name == "test");
         Assert.True(deserialized.Location.X == 4000);
         Assert.True(deserialized.Location.Y == 9000);
-        SlotEntity entity = SlotBase.ConvertToEntity(deserialized, null);
+        SlotEntity entity = SlotBase.ConvertToEntity(deserialized);
         Assert.True(entity.LocationPacked == 17_179_869_193_000);
     }
 
@@ -78,7 +79,7 @@ public class LocationTests
         Assert.True(deserialized.Name == "test");
         Assert.True(deserialized.Location.X == 0);
         Assert.True(deserialized.Location.Y == 0);
-        SlotEntity entity = SlotBase.ConvertToEntity(deserialized, null);
+        SlotEntity entity = SlotBase.ConvertToEntity(deserialized);
         Assert.True(entity.LocationPacked == 0);
     }
 }
