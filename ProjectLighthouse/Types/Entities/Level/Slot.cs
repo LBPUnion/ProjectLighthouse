@@ -163,6 +163,9 @@ public class Slot
 
     [XmlIgnore]
     public bool TeamPick { get; set; }
+    
+    [XmlIgnore]
+    public bool TeamPickForGame { get; set; }
 
     [XmlIgnore]
     public GameVersion GameVersion { get; set; }
