@@ -1,5 +1,6 @@
 @using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
 
 @{
@@ -13,15 +14,9 @@
 <a href="/user/@Model.UserId" title="@userStatus" class="user-link">
     <img src="/gameAssets/@Model.WebsiteAvatarHash" alt=""/>
 
-    @if (Model.IsAdmin)
+    @if (Model.IsModerator)
     {
-        <span style="color: red; font-weight: 600;">
-            @Model.Username
-        </span>
-    }
-    else if (Model.IsModerator)
-    {
-        <span style="color: rgb(200, 130, 0); font-weight: 600;">
+        <span style="color: @Model.PermissionLevel.ToHtmlColor(); font-weight: 600;">
             @Model.Username
         </span>
     }

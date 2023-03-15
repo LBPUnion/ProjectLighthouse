@@ -1,5 +1,6 @@
 @using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
 
 @{
@@ -20,12 +21,24 @@
         {
             <h2 style="margin-bottom: 2px;">
                 <a href="~/user/@Model.UserId">@Model.Username</a>
+                    @if (Model.IsModerator)
+                    {
+                        <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                            @Model.PermissionLevel.ToString()
+                        </span>
+                    }
             </h2>
         }
         else
         {
             <h1 style="margin-bottom: 2px;">
                 @Model.Username
+                @if (Model.IsModerator)
+                {
+                    <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                        @Model.PermissionLevel.ToString()
+                    </span>
+                }
             </h1>
         }
         @{
