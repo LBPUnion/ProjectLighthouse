@@ -9,3 +9,16 @@ public enum PermissionLevel
     Moderator = 1,
     Administrator = 2,
 }
+
+public static class PermissionLevelExtensions
+{
+    public static string ToHtmlColor(this PermissionLevel permissionLevel)
+    {
+        return permissionLevel switch
+        {
+            PermissionLevel.Administrator => "red",
+            PermissionLevel.Moderator => "rgb(200, 130, 0)",
+            _ => "",
+        };
+    }
+}
