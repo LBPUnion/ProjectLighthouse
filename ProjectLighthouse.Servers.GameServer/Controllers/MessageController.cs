@@ -93,27 +93,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             if (await this.database.Users.AnyAsync(u => u.EmailAddress == email)) return this.Ok();
 
             User? user = await this.database.UserFromGameToken(token);
-            if (user == null || user.EmailAddress != null) return this.Ok();
-
-            PasswordResetToken resetToken = new()
-            {
-                Created = DateTime.Now,
-                UserId = user.UserId,
-                ResetToken = CryptoHelper.GenerateAuthToken(),
-            };
-
-            string messageBody = $"Hello, {user.Username}.\n\n" +
-                                 "A request to set your account's password was issued. If this wasn't you, this can probably be ignored.\n\n" +
-                                 $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be set at the following link:\n" +
-                                 $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={resetToken.ResetToken}";
-
-            SMTPHelper.SendEmail(email, $"Project Lighthouse Password Setup Request for {user.Username}", messageBody);
-
-            this.database.PasswordResetTokens.Add(resetToken);
+            if (user == null || user.EmailAddressVerified) return this.Ok();
 
             user.EmailAddress = email;
-            user.EmailAddressVerified = true;
-            await this.database.SaveChangesAsync();
+            await SMTPHelper.SendVerificationEmail(this.database, user);
 
             return this.Ok();
         }
