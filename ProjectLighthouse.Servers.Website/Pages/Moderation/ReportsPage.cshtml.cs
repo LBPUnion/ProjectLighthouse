@@ -19,7 +19,7 @@ public class ReportsPage : BaseLayout
 
     public int ReportCount;
 
-    public List<GriefReport> Reports = new();
+    public List<GriefReportEntity> Reports = new();
 
     public string SearchValue = "";
 
@@ -51,7 +51,7 @@ public class ReportsPage : BaseLayout
             .Take(ServerStatics.PageSize)
             .ToListAsync();
 
-        foreach (GriefReport r in this.Reports)
+        foreach (GriefReportEntity r in this.Reports)
         {
             r.XmlPlayers = (ReportPlayer[]?)JsonSerializer.Deserialize(r.Players, typeof(ReportPlayer[])) ?? Array.Empty<ReportPlayer>();
 

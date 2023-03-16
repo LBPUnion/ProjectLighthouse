@@ -201,10 +201,10 @@ public class ReviewController : ControllerBase
         ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
         if (review == null) return this.BadRequest();
 
-        RatedReview? ratedReview = await this.database.RatedReviews.FirstOrDefaultAsync(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
+        RatedReviewEntity? ratedReview = await this.database.RatedReviews.FirstOrDefaultAsync(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
         if (ratedReview == null)
         {
-            ratedReview = new RatedReview
+            ratedReview = new RatedReviewEntity
             {
                 ReviewId = review.ReviewId,
                 UserId = token.UserId,

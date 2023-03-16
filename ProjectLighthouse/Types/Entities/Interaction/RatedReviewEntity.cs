@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 
-public class RatedReview
+public class RatedReviewEntity
 {
     // ReSharper disable once UnusedMember.Global
     [Key]

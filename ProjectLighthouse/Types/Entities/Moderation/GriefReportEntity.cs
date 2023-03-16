@@ -1,18 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Moderation.Reports;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 
-[XmlRoot("griefReport")]
-public class GriefReport
+public class GriefReportEntity
 {
     [Key]
     public int ReportId { get; set; }
 
-    [XmlElement("griefTypeId")]
     public GriefType Type { get; set; }
 
     public long Timestamp { get; set; }
@@ -22,34 +19,26 @@ public class GriefReport
     [ForeignKey(nameof(ReportingPlayerId))]
     public UserEntity ReportingPlayer { get; set; }
 
-    [NotMapped]
-    [XmlElement("player")]
-    public ReportPlayer[] XmlPlayers { get; set; }
-
     public string Players { get; set; }
 
-    [XmlElement("griefStateHash")]
     public string GriefStateHash { get; set; }
 
-    [XmlElement("levelOwner")]
     public string LevelOwner { get; set; }
 
-    [XmlElement("initialStateHash")]
     public string InitialStateHash { get; set; }
 
-    [XmlElement("jpegHash")]
     public string JpegHash { get; set; }
 
-    [XmlElement("levelId")]
     public int LevelId { get; set; }
 
-    [XmlElement("levelType")]
     public string LevelType { get; set; }
 
+    public string Bounds { get; set; }
+
     [NotMapped]
-    [XmlElement("marqee")]
     public Marqee XmlBounds { get; set; }
 
-    public string Bounds { get; set; }
+    [NotMapped]
+    public ReportPlayer[] XmlPlayers { get; set; }
 
 }

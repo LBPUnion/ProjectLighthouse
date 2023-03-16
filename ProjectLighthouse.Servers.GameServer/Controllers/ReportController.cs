@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Moderation.Reports;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +34,7 @@ public class ReportController : ControllerBase
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        GriefReport? report = await this.DeserializeBody<GriefReport>();
+        GameGriefReport? report = await this.DeserializeBody<GameGriefReport>();
         if (report == null) return this.BadRequest();
 
         SanitizationHelper.SanitizeStringsInClass(report);
@@ -46,18 +47,20 @@ public class ReportController : ControllerBase
 
         if (report.XmlPlayers.Any(p => !this.database.IsUsernameValid(p.Name))) return this.BadRequest();
 
-        report.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
-        report.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));
-        report.Timestamp = TimeHelper.TimestampMillis;
-        report.ReportingPlayerId = token.UserId;
+        GriefReportEntity reportEntity = GameGriefReport.ConvertToEntity(report);
 
-        this.database.Reports.Add(report);
+        reportEntity.Bounds = JsonSerializer.Serialize(report.XmlBounds.Rect, typeof(Rectangle));
+        reportEntity.Players = JsonSerializer.Serialize(report.XmlPlayers, typeof(ReportPlayer[]));
+        reportEntity.Timestamp = TimeHelper.TimestampMillis;
+        reportEntity.ReportingPlayerId = token.UserId;
+
+        this.database.Reports.Add(reportEntity);
         await this.database.SaveChangesAsync();
 
         await WebhookHelper.SendWebhook(
             title: "New grief report",
             description: $"Submitted by {username}\n" +
-                         $"To view it, click [here]({ServerConfiguration.Instance.ExternalUrl}/moderation/report/{report.ReportId}).",
+                         $"To view it, click [here]({ServerConfiguration.Instance.ExternalUrl}/moderation/report/{reportEntity.ReportId}).",
             dest: WebhookHelper.WebhookDestination.Moderation
         );
 

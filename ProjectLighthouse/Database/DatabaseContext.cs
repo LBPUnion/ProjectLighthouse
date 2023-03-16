@@ -48,14 +48,14 @@ public partial class DatabaseContext : DbContext
     public DbSet<HeartedProfileEntity> HeartedProfiles { get; set; }
     public DbSet<QueuedLevelEntity> QueuedLevels { get; set; }
     public DbSet<RatedLevelEntity> RatedLevels { get; set; }
-    public DbSet<RatedReview> RatedReviews { get; set; }
+    public DbSet<RatedReviewEntity> RatedReviews { get; set; }
     public DbSet<ReactionEntity> Reactions { get; set; }
     public DbSet<VisitedLevelEntity> VisitedLevels { get; set; }
     #endregion
 
     #region Moderation
     public DbSet<ModerationCaseEntity> Cases { get; set; }
-    public DbSet<GriefReport> Reports { get; set; }
+    public DbSet<GriefReportEntity> Reports { get; set; }
     #endregion
 
     #region Misc
