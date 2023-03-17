@@ -280,7 +280,7 @@ public class SlotsController : ControllerBase
             .Take(Math.Min(pageSize, 30));
         string response = Enumerable.Aggregate(slots, string.Empty, (current, slot) => current + slot.Serialize(gameVersion));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.TeamPickCountForGame(this.database, token);
+        int total = await StatisticsHelper.TeamPickCountForGame(this.database, token.GameVersion);
 
         return this.Ok(generateSlotsResponse(response, start, total));
     }
