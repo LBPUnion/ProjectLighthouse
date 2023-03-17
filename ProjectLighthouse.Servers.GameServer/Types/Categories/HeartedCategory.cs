@@ -24,7 +24,7 @@ public class HeartedCategory : CategoryWithUser
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
             .FirstOrDefault();
 
-    public override IEnumerable<Slot> GetSlots(DatabaseContext database, User user, int pageStart, int pageSize)
+    public override IQueryable<Slot> GetSlots(DatabaseContext database, User user, int pageStart, int pageSize)
         => database.HeartedLevels.Where(h => h.UserId == user.UserId)
             .Where(h => h.Slot.Type == SlotType.User && !h.Slot.Hidden && h.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
             .OrderByDescending(h => h.HeartedLevelId)
