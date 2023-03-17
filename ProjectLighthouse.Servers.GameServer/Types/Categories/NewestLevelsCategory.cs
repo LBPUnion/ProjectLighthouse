@@ -14,7 +14,7 @@ public class NewestLevelsCategory : Category
     public override string IconHash { get; set; } = "g820623";
     public override string Endpoint { get; set; } = "newest";
     public override Slot? GetPreviewSlot(DatabaseContext database) => database.Slots.Where(s => s.Type == SlotType.User).OrderByDescending(s => s.FirstUploaded).FirstOrDefault();
-    public override IEnumerable<Slot> GetSlots
+    public override IQueryable<Slot> GetSlots
         (DatabaseContext database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3, false, true)
             .OrderByDescending(s => s.FirstUploaded)
