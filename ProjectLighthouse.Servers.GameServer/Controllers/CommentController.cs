@@ -101,12 +101,13 @@ public class CommentController : ControllerBase
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 
+        if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
+
         CommentType type = username == null ? CommentType.Level : CommentType.Profile;
 
         int targetId;
         if (type == CommentType.Level)
         {
-            slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
             targetId = await this.database.Slots.Where(s => s.SlotId == slotId)
                 .Where(s => s.CommentsEnabled && !s.Hidden)
                 .Select(s => s.SlotId)
