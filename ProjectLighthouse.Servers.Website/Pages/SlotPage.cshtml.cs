@@ -75,6 +75,8 @@ public class SlotPage : BaseLayout
                 .OrderByDescending(p => p.Timestamp)
                 .Where(c => c.TargetId == id && c.Type == CommentType.Level)
                 .Where(c => !blockedUsers.Contains(c.PosterUserId))
+                .Include(c => c.Poster)
+                .Where(c => c.Poster.PermissionLevel != PermissionLevel.Banned)
                 .Take(50)
                 .ToDictionaryAsync(c => c,  _ => (RatedCommentEntity?)null);
         }
