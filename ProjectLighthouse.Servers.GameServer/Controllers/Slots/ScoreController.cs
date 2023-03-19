@@ -118,28 +118,27 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        ScoreEntity playerScore = new()
-        {
-            PlayerIdCollection = string.Join(',', score.PlayerIds),
-            Type = score.Type,
-            Points = score.Points,
-            SlotId = slotId,
-            ChildSlotId = childId,
-        };
+        string playerIdCollection = string.Join(',', score.PlayerIds);
 
-        IQueryable<ScoreEntity> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
+        ScoreEntity? existingScore = await this.database.Scores.Where(s => s.SlotId == slot.SlotId)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
-            .Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
-            .Where(s => s.Type == playerScore.Type);
-        if (await existingScore.AnyAsync())
+            .Where(s => s.PlayerIdCollection == playerIdCollection)
+            .Where(s => s.Type == score.Type)
+            .FirstOrDefaultAsync();
+        if (existingScore != null)
         {
-            ScoreEntity first = await existingScore.FirstAsync(s => s.SlotId == playerScore.SlotId);
-            playerScore.ScoreId = first.ScoreId;
-            playerScore.Points = Math.Max(first.Points, playerScore.Points);
-            this.database.Entry(first).CurrentValues.SetValues(playerScore);
+            existingScore.Points = Math.Max(existingScore.Points, score.Points);
         }
         else
         {
+            ScoreEntity playerScore = new()
+            {
+                PlayerIdCollection = playerIdCollection,
+                Type = score.Type,
+                Points = score.Points,
+                SlotId = slotId,
+                ChildSlotId = childId,
+            };
             this.database.Scores.Add(playerScore);
         }
 
@@ -229,7 +228,7 @@ public class ScoreController : ControllerBase
         }));
     }
 
-    internal class LeaderboardOptions
+    private class LeaderboardOptions
     {
         public int SlotId { get; set; }
         public int ScoreType { get; set; }
