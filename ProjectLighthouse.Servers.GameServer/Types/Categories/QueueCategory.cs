@@ -24,7 +24,7 @@ public class QueueCategory : CategoryWithUser
             .ByGameVersion(GameVersion.LittleBigPlanet3, false, false, true)
             .FirstOrDefault();
 
-    public override IEnumerable<SlotEntity> GetSlots(DatabaseContext database, UserEntity user, int pageStart, int pageSize)
+    public override IQueryable<SlotEntity> GetSlots(DatabaseContext database, UserEntity user, int pageStart, int pageSize)
         => database.QueuedLevels.Where(q => q.UserId == user.UserId)
             .Where(q => q.Slot.Type == SlotType.User && !q.Slot.Hidden && q.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
             .OrderByDescending(q => q.QueuedLevelId)

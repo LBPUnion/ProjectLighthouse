@@ -15,7 +15,7 @@ public class LuckyDipCategory : Category
     public override string IconHash { get; set; } = "g820605";
     public override string Endpoint { get; set; } = "lbp2luckydip";
     public override SlotEntity? GetPreviewSlot(DatabaseContext database) => database.Slots.Where(s => s.Type == SlotType.User).OrderByDescending(_ => EF.Functions.Random()).FirstOrDefault();
-    public override IEnumerable<SlotEntity> GetSlots
+    public override IQueryable<SlotEntity> GetSlots
         (DatabaseContext database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3, false, true)
             .OrderByDescending(_ => EF.Functions.Random())

@@ -270,7 +270,7 @@ public class SlotsController : ControllerBase
             .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.TeamPickCount(this.database);
+        int total = await StatisticsHelper.TeamPickCountForGame(this.database, token.GameVersion);
 
         return this.Ok(new GenericSlotResponse(slots, total, start));
     }

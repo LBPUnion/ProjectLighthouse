@@ -33,8 +33,8 @@ public abstract class CategoryWithUser : Category
         return -1;
     }
 
-    public abstract IEnumerable<SlotEntity> GetSlots(DatabaseContext database, UserEntity user, int pageStart, int pageSize);
-    public override IEnumerable<SlotEntity> GetSlots(DatabaseContext database, int pageStart, int pageSize)
+    public abstract IQueryable<SlotEntity> GetSlots(DatabaseContext database, User user, int pageStart, int pageSize);
+    public override IList<SlotEntity> GetSlots(DatabaseContext database, int pageStart, int pageSize)
     {
         #if DEBUG
         Logger.Error("tried to get slots without user on CategoryWithUser", LogArea.Category);
