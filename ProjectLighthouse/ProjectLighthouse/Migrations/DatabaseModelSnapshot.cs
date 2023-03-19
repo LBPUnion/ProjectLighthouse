@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
@@ -133,7 +133,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("RatedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReview", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReviewEntity", b =>
                 {
                     b.Property<int>("RatedReviewId")
                         .ValueGeneratedOnAdd()
@@ -482,7 +482,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("CompletedMigrations");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReport", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReportEntity", b =>
                 {
                     b.Property<int>("ReportId")
                         .ValueGeneratedOnAdd()
@@ -1115,7 +1115,7 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReview", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReviewEntity", b =>
                 {
                     b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.ReviewEntity", "Review")
                         .WithMany()
@@ -1205,7 +1205,7 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReport", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReportEntity", b =>
                 {
                     b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "ReportingPlayer")
                         .WithMany()
