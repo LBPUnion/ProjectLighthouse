@@ -117,7 +117,7 @@ public partial class DatabaseContext
         this.RatedLevels.RemoveRange(this.RatedLevels.Where(r => r.UserId == user.UserId));
         this.GameTokens.RemoveRange(this.GameTokens.Where(t => t.UserId == user.UserId));
         this.WebTokens.RemoveRange(this.WebTokens.Where(t => t.UserId == user.UserId));
-        this.Reactions.RemoveRange(this.Reactions.Where(p => p.UserId == user.UserId));
+        this.RatedComments.RemoveRange(this.RatedComments.Where(p => p.UserId == user.UserId));
         this.Comments.RemoveRange(this.Comments.Where(c => c.PosterUserId == user.UserId));
         this.Reviews.RemoveRange(this.Reviews.Where(r => r.ReviewerId == user.UserId));
         this.Photos.RemoveRange(this.Photos.Where(p => p.CreatorId == user.UserId));

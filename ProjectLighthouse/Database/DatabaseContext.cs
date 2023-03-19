@@ -47,9 +47,9 @@ public partial class DatabaseContext : DbContext
     public DbSet<HeartedPlaylistEntity> HeartedPlaylists { get; set; }
     public DbSet<HeartedProfileEntity> HeartedProfiles { get; set; }
     public DbSet<QueuedLevelEntity> QueuedLevels { get; set; }
+    public DbSet<RatedCommentEntity> RatedComments { get; set; }
     public DbSet<RatedLevelEntity> RatedLevels { get; set; }
     public DbSet<RatedReviewEntity> RatedReviews { get; set; }
-    public DbSet<ReactionEntity> Reactions { get; set; }
     public DbSet<VisitedLevelEntity> VisitedLevels { get; set; }
     #endregion
 

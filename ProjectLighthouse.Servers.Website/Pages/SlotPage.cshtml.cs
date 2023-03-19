@@ -14,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
 public class SlotPage : BaseLayout
 {
-    public Dictionary<CommentEntity, ReactionEntity?> Comments = new();
+    public Dictionary<CommentEntity, RatedCommentEntity?> Comments = new();
     public List<ReviewEntity> Reviews = new();
     public List<PhotoEntity> Photos = new();
     public List<ScoreEntity> Scores = new();
@@ -76,11 +76,11 @@ public class SlotPage : BaseLayout
                 .Where(c => c.TargetId == id && c.Type == CommentType.Level)
                 .Where(c => !blockedUsers.Contains(c.PosterUserId))
                 .Take(50)
-                .ToDictionaryAsync(c => c,  _ => (ReactionEntity?)null);
+                .ToDictionaryAsync(c => c,  _ => (RatedCommentEntity?)null);
         }
         else
         {
-            this.Comments = new Dictionary<CommentEntity, ReactionEntity?>();
+            this.Comments = new Dictionary<CommentEntity, RatedCommentEntity?>();
         }
 
         if (this.ReviewsEnabled)
@@ -114,9 +114,9 @@ public class SlotPage : BaseLayout
 
         if (this.User == null) return this.Page();
 
-        foreach (KeyValuePair<CommentEntity, ReactionEntity?> kvp in this.Comments)
+        foreach (KeyValuePair<CommentEntity, RatedCommentEntity?> kvp in this.Comments)
         {
-            ReactionEntity? reaction = await this.Database.Reactions.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.TargetId == kvp.Key.CommentId);
+            RatedCommentEntity? reaction = await this.Database.RatedComments.FirstOrDefaultAsync(r => r.UserId == this.User.UserId && r.CommentId == kvp.Key.CommentId);
             this.Comments[kvp.Key] = reaction;
         }
 

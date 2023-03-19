@@ -21,16 +21,16 @@ public partial class DatabaseContext
 
         if (await this.IsUserBlockedBy(userId, comment.PosterUserId)) return false;
         
-        ReactionEntity? reaction = await this.Reactions.FirstOrDefaultAsync(r => r.UserId == userId && r.TargetId == commentId);
+        RatedCommentEntity? reaction = await this.RatedComments.FirstOrDefaultAsync(r => r.UserId == userId && r.CommentId == commentId);
         if (reaction == null)
         {
-            ReactionEntity newReaction = new()
+            RatedCommentEntity newReaction = new()
             {
                 UserId = userId,
-                TargetId = commentId,
+                CommentId = commentId,
                 Rating = 0,
             };
-            this.Reactions.Add(newReaction);
+            this.RatedComments.Add(newReaction);
             await this.SaveChangesAsync();
             reaction = newReaction;
         }
@@ -42,10 +42,10 @@ public partial class DatabaseContext
 
         reaction.Rating = rating;
         // if rating changed then we count the number of reactions to ensure accuracy
-        List<ReactionEntity> reactions = await this.Reactions.Where(c => c.TargetId == commentId).ToListAsync();
+        List<RatedCommentEntity> reactions = await this.RatedComments.Where(c => c.CommentId == commentId).ToListAsync();
         int yay = 0;
         int boo = 0;
-        foreach (ReactionEntity r in reactions)
+        foreach (RatedCommentEntity r in reactions)
         {
             switch (r.Rating)
             {

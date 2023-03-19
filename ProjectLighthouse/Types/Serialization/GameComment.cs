@@ -58,8 +58,8 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
             .Select(u => u.Username)
             .FirstOrDefaultAsync();
 
-        this.YourThumb = await database.Reactions.Where(r => r.UserId == this.TargetUserId)
-            .Where(r => r.TargetId == this.CommentId)
+        this.YourThumb = await database.RatedComments.Where(r => r.UserId == this.TargetUserId)
+            .Where(r => r.CommentId == this.CommentId)
             .Select(r => r.Rating)
             .FirstOrDefaultAsync();
     }
