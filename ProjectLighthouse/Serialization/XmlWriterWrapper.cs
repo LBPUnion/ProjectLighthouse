@@ -6,7 +6,7 @@ public class XmlWriterWrapper : XmlWriter
 {
     private readonly XmlWriter writer;
 
-    public XmlWriterWrapper(XmlWriter baseWriter)
+    protected XmlWriterWrapper(XmlWriter baseWriter)
     {
         this.writer = baseWriter;
     }

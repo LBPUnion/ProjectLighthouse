@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Serialization;
 
@@ -18,11 +19,6 @@ namespace LBPUnion.ProjectLighthouse.Serialization;
 public class CustomXmlSerializer : XmlSerializer
 {
     private readonly IServiceProvider provider;
-
-    public CustomXmlSerializer(Type type, IServiceProvider provider) : base(type)
-    {
-        this.provider = provider;
-    }
 
     public CustomXmlSerializer(Type type, IServiceProvider provider, XmlRootAttribute rootAttribute) : base(type, rootAttribute)
     {

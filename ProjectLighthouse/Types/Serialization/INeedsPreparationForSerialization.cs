@@ -1,4 +1,4 @@
-﻿namespace LBPUnion.ProjectLighthouse.Serialization;
+﻿namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 /// <summary>
 /// Allows serializable classes to fetch other data using DI services

@@ -1,6 +1,6 @@
 #nullable enable
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 
