@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public class QueueCategory : CategoryWithUser
 {
-    public override string Name { get; set; } = "My Queue";
+    public override string Name { get; set; } = "2170169607";
     public override string Description { get; set; } = "Your queued content";
     public override string IconHash { get; set; } = "g820614";
     public override string Endpoint { get; set; } = "queue";

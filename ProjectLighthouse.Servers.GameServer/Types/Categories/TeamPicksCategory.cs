@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public class TeamPicksCategory : Category
 {
-    public override string Name { get; set; } = "Team Picks";
+    public override string Name { get; set; } = "1369597325";
     public override string Description { get; set; } = "Community Team Picks";
     public override string IconHash { get; set; } = "g820626";
     public override string Endpoint { get; set; } = "team_picks";

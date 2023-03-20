@@ -10,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public class LuckyDipCategory : Category
 {
-    public override string Name { get; set; } = "Lucky Dip";
+    public override string Name { get; set; } = "966139835";
     public override string Description { get; set; } = "Randomized uploaded content";
     public override string IconHash { get; set; } = "g820605";
     public override string Endpoint { get; set; } = "lbp2luckydip";

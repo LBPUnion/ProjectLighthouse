@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public class HeartedCategory : CategoryWithUser
 {
-    public override string Name { get; set; } = "My Hearted Content";
+    public override string Name { get; set; } = "1092830675";
     public override string Description { get; set; } = "Content you've hearted";
     public override string IconHash { get; set; } = "g820611";
     public override string Endpoint { get; set; } = "hearted";

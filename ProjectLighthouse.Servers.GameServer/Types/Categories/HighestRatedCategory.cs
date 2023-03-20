@@ -10,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public class HighestRatedCategory : Category
 {
-    public override string Name { get; set; } = "Highest Rated";
+    public override string Name { get; set; } = "3411227110";
     public override string Description { get; set; } = "Community Highest Rated content";
     public override string IconHash { get; set; } = "g820603";
     public override string Endpoint { get; set; } = "thumbs";

@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public class NewestLevelsCategory : Category
 {
-    public override string Name { get; set; } = "Newest Levels";
+    public override string Name { get; set; } = "877177920";
     public override string Description { get; set; } = "The most recently published content";
     public override string IconHash { get; set; } = "g820623";
     public override string Endpoint { get; set; } = "newest";

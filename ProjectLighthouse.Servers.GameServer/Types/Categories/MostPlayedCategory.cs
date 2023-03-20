@@ -9,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
 public class MostPlayedCategory : Category
 {
-    public override string Name { get; set; } = "Most Played";
+    public override string Name { get; set; } = "1290380954";
     public override string Description { get; set; } = "The most played content";
     public override string IconHash { get; set; } = "g820608";
     public override string Endpoint { get; set; } = "mostUniquePlays";
