@@ -117,7 +117,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
                 {
                     int newVersion = GetVersion();
                     Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {newVersion}", LogArea.Config);
-                    storedConfig.writeConfig(this.ConfigName + ".bak");
+                    File.Copy(this.ConfigName, this.ConfigName + "." + GetVersion());
                     this.loadConfig(storedConfig);
                     this.ConfigVersion = newVersion;
                     this.writeConfig(this.ConfigName);
@@ -164,6 +164,9 @@ public abstract class ConfigurationBase<T> where T : class, new()
             {
                 continue;
             }
+
+            // Expand environment variables in strings. Format is windows-like (%ENV_NAME%)
+            if (propertyInfo.PropertyType == typeof(string)) value = Environment.ExpandEnvironmentVariables((string)value);
 
             local.SetValue(this, value);
         }

@@ -48,7 +48,7 @@ public class ReviewController : ControllerBase
             this.database.RatedLevels.Add(ratedLevel);
         }
 
-        ratedLevel.RatingLBP1 = Math.Max(Math.Min(5, rating), 0);
+        ratedLevel.RatingLBP1 = Math.Clamp(rating, 0, 5);
 
         await this.database.SaveChangesAsync();
 

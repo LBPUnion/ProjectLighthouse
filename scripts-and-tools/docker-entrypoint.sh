@@ -1,15 +1,33 @@
 #!/bin/sh
 
-chown -R lighthouse:lighthouse /lighthouse/data
+log() {
+    type="$1"; shift
+    printf '%s [%s] [Entrypoint]: %s\n' "$(date -Iseconds)" "$type" "$*"
+}
 
-if [ -d "/lighthouse/temp" ]; then
-  cp -rf /lighthouse/temp/* /lighthouse/data
-  rm -rf /lighthouse/temp
+log Note "Entrypoint script for Lighthouse $SERVER started"
+
+if [ ! -d "/lighthouse/data" ]; then
+    log Note "Creating data directory"
+    mkdir -p "/lighthouse/data"
 fi
 
-# run from cmd
+owner=$(stat -c "%U %G" /lighthouse/data)
+if [ "$owner" != "lighthouse lighthouse" ]; then
+    log Note "Changing ownership of data directory"
+    chown -R lighthouse:lighthouse /lighthouse/data
+fi
 
-cd /lighthouse/data
+if [ -d "/lighthouse/temp" ]; then
+    log Note "Copying temp directory to data"
+    cp -rn /lighthouse/temp/* /lighthouse/data
+    rm -rf /lighthouse/temp
+fi
+
+# Start server
+
+log Note "Startup tasks finished, starting $SERVER..."
+cd /lighthouse/data || exit
 exec su-exec lighthouse:lighthouse dotnet /lighthouse/app/LBPUnion.ProjectLighthouse.Servers."$SERVER".dll
 
 exit $? # Expose error code from dotnet command

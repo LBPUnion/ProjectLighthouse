@@ -95,38 +95,40 @@ public class PhotosController : ControllerBase
             if (validLevel) photo.SlotId = photo.XmlLevelInfo.SlotId;
         }
 
-        if (photo.Subjects.Count > 4) return this.BadRequest();
+        if (photo.XmlSubjects?.Count > 4) return this.BadRequest();
 
         if (photo.Timestamp > TimeHelper.Timestamp) photo.Timestamp = TimeHelper.Timestamp;
 
-        // Check for duplicate photo subjects
-        List<string> subjectUserIds = new(4);
-        foreach (PhotoSubject subject in photo.Subjects)
-        {
-            if (subjectUserIds.Contains(subject.Username) && !string.IsNullOrEmpty(subject.Username)) return this.BadRequest();
+        this.database.Photos.Add(photo);
 
-            subjectUserIds.Add(subject.Username);
-        }
-
-        foreach (PhotoSubject subject in photo.Subjects.Where(subject => !string.IsNullOrEmpty(subject.Username)))
-        {
-            subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
-
-            if (subject.User == null) continue;
-
-            subject.UserId = subject.User.UserId;
-            Logger.Debug($"Adding PhotoSubject (userid {subject.UserId}) to db", LogArea.Photos);
-
-            this.database.PhotoSubjects.Add(subject);
-        }
-
+        // Save to get photo ID for the PhotoSubject foreign keys
         await this.database.SaveChangesAsync();
 
-        photo.PhotoSubjectIds = photo.Subjects.Where(s => s.UserId != 0).Select(subject => subject.PhotoSubjectId.ToString()).ToArray();
+        if (photo.XmlSubjects != null)
+        {
+            // Check for duplicate photo subjects
+            List<string> subjectUserIds = new(4);
+            foreach (PhotoSubject subject in photo.PhotoSubjects)
+            {
+                if (subjectUserIds.Contains(subject.Username) && !string.IsNullOrEmpty(subject.Username))
+                    return this.BadRequest();
 
-        Logger.Debug($"Adding PhotoSubjectCollection ({photo.PhotoSubjectCollection}) to photo", LogArea.Photos);
+                subjectUserIds.Add(subject.Username);
+            }
 
-        this.database.Photos.Add(photo);
+            foreach (PhotoSubject subject in photo.XmlSubjects.Where(subject => !string.IsNullOrEmpty(subject.Username)))
+            {
+                subject.User = await this.database.Users.FirstOrDefaultAsync(u => u.Username == subject.Username);
+
+                if (subject.User == null) continue;
+
+                subject.UserId = subject.User.UserId;
+                subject.PhotoId = photo.PhotoId;
+                Logger.Debug($"Adding PhotoSubject (userid {subject.UserId}) to db", LogArea.Photos);
+
+                this.database.PhotoSubjects.Add(subject);
+            }
+        }
 
         await this.database.SaveChangesAsync();
 
@@ -154,6 +156,8 @@ public class PhotosController : ControllerBase
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
         List<Photo> photos = await this.database.Photos.Include(p => p.Creator)
+            .Include(p => p.PhotoSubjects)
+            .ThenInclude(ps => ps.User)
             .Where(p => p.SlotId == id)
             .OrderByDescending(s => s.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
@@ -171,8 +175,9 @@ public class PhotosController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
-        List<Photo> photos = await this.database.Photos.Include
-                (p => p.Creator)
+        List<Photo> photos = await this.database.Photos.Include(p => p.Creator)
+            .Include(p => p.PhotoSubjects)
+            .ThenInclude(ps => ps.User)
             .Where(p => p.CreatorId == targetUserId)
             .OrderByDescending(s => s.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
@@ -190,17 +195,15 @@ public class PhotosController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
-        List<int> photoSubjectIds = new();
-        photoSubjectIds.AddRange(this.database.PhotoSubjects.Where(p => p.UserId == targetUserId).Select(p => p.PhotoSubjectId));
-        List<Photo> photos = (from id in photoSubjectIds from p in 
-            this.database.Photos.Include(p => p.Creator).Where(p => p.PhotoSubjectCollection.Contains(id.ToString()))
-            where p.PhotoSubjectCollection.Split(",").Contains(id.ToString()) && p.CreatorId != targetUserId select p).ToList();
-
-        string response = photos
+        List<Photo> photos = await this.database.Photos.Include(p => p.Creator)
+            .Include(p => p.PhotoSubjects)
+            .ThenInclude(ps => ps.User)
+            .Where(p => p.PhotoSubjects.Any(ps => ps.UserId == targetUserId))
             .OrderByDescending(s => s.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30)).Aggregate(string.Empty,
-            (current, photo) => current + photo.Serialize());
+            .Take(Math.Min(pageSize, 30))
+            .ToListAsync();
+        string response = photos.Aggregate(string.Empty, (current, photo) => current + photo.Serialize());
 
         return this.Ok(LbpSerializer.StringElement("photos", response));
     }
@@ -218,14 +221,6 @@ public class PhotosController : ControllerBase
         {
             Slot? photoSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId && s.Type == SlotType.User);
             if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.StatusCode(401, "");
-        }
-        foreach (string idStr in photo.PhotoSubjectIds)
-        {
-            if (string.IsNullOrWhiteSpace(idStr)) continue;
-
-            if (!int.TryParse(idStr, out int subjectId)) continue;
-
-            this.database.PhotoSubjects.RemoveWhere(p => p.PhotoSubjectId == subjectId);
         }
 
         HashSet<string> photoResources = new(){photo.LargeHash, photo.SmallHash, photo.MediumHash, photo.PlanHash,};

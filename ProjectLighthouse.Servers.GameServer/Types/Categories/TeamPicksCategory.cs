@@ -14,7 +14,7 @@ public class TeamPicksCategory : Category
     public override string IconHash { get; set; } = "g820626";
     public override string Endpoint { get; set; } = "team_picks";
     public override Slot? GetPreviewSlot(DatabaseContext database) => database.Slots.OrderByDescending(s => s.FirstUploaded).FirstOrDefault(s => s.TeamPick);
-    public override IEnumerable<Slot> GetSlots
+    public override IQueryable<Slot> GetSlots
         (DatabaseContext database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3, false, true)
             .OrderByDescending(s => s.FirstUploaded)

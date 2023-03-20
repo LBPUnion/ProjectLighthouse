@@ -76,21 +76,21 @@
     </i>
 </p>
 
-@if (Model.Subjects.Count > 0)
+@if (Model.PhotoSubjects.Count > 0)
 {
     <p>
-        <b>Photo contains @Model.Subjects.Count @(Model.Subjects.Count == 1 ? "person" : "people"):</b>
+        <b>Photo contains @Model.PhotoSubjects.Count @(Model.PhotoSubjects.Count == 1 ? "person" : "people"):</b>
     </p>
 }
 <div id="hover-subjects-@Model.PhotoId">
-    @foreach (PhotoSubject subject in Model.Subjects)
+    @foreach (PhotoSubject subject in Model.PhotoSubjects)
     {
         @await subject.User.ToLink(Html, ViewData, language, timeZone)
     }
 </div>
 
 @{
-    PhotoSubject[] subjects = Model.Subjects.ToArray();
+    PhotoSubject[] subjects = Model.PhotoSubjects.ToArray();
     foreach (PhotoSubject subject in subjects) subject.Username = subject.User.Username;
 }
 

@@ -22,14 +22,16 @@ public class StatisticsController : ControllerBase
     }
 
     [HttpGet("playersInPodCount")]
+    public IActionResult PlayersInPodCount() => this.Ok((StatisticsHelper.UserCountInPod(this.database)).ToString());
+
     [HttpGet("totalPlayerCount")]
-    public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatches(this.database)).ToString());
+    public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatchesForGame(this.database, this.GetToken().GameVersion)).ToString());
 
     [HttpGet("planetStats")]
     public async Task<IActionResult> PlanetStats()
     {
         int totalSlotCount = await StatisticsHelper.SlotCountForGame(this.database, this.GetToken().GameVersion);
-        int mmPicksCount = await StatisticsHelper.TeamPickCount(this.database);
+        int mmPicksCount = await StatisticsHelper.TeamPickCountForGame(this.database, this.GetToken().GameVersion);
 
         return this.Ok
         (

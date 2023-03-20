@@ -102,8 +102,9 @@ public static partial class ControllerExtensions
                 if (matchedRoot == null)
                 {
                     Logger.Error($"[{controller.ControllerContext.ActionDescriptor.ActionName}] " +
-                                 $"Failed to deserialize {typeof(T).Name}: Unable to match root element", LogArea.Deserialization);
-                    Logger.Error($"{bodyString}", LogArea.Deserialization);
+                                 $"Failed to deserialize {typeof(T).Name}: Unable to match root element\n" +
+                                 $"xmlData: '{bodyString}'",
+                        LogArea.Deserialization);
                     return default;
                 }
                 root = new XmlRootAttribute(matchedRoot);
@@ -116,8 +117,10 @@ public static partial class ControllerExtensions
         catch (Exception e)
         {
             Logger.Error($"[{controller.ControllerContext.ActionDescriptor.ActionName}] " +
-                         $"Failed to deserialize {typeof(T).Name}: {e.Message}", LogArea.Deserialization);
-            Logger.Error($"{bodyString}", LogArea.Deserialization);
+                         $"Failed to deserialize {typeof(T).Name}:\n" +
+                         $"xmlData: '{bodyString}'\n" +
+                         $"detailedException: '{e.ToDetailedException()}",
+                LogArea.Deserialization);
         }
         return default;
     }

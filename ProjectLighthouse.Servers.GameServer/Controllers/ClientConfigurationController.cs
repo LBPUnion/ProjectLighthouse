@@ -54,9 +54,7 @@ public class ClientConfigurationController : ControllerBase
     [Produces("text/xml")]
     public async Task<IActionResult> GetPrivacySettings()
     {
-        GameToken token = this.GetToken();
-
-        User? user = await this.database.UserFromGameToken(token);
+        User? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.StatusCode(403, "");
 
         PrivacySettings ps = new()
@@ -72,7 +70,7 @@ public class ClientConfigurationController : ControllerBase
     [Produces("text/xml")]
     public async Task<IActionResult> SetPrivacySetting()
     {
-        User? user = await this.database.UserFromGameRequest(this.Request);
+        User? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.StatusCode(403, "");
 
         PrivacySettings? settings = await this.DeserializeBody<PrivacySettings>();
