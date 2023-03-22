@@ -141,12 +141,13 @@ public class LoginController : ControllerBase
 
             if (DiscordConfiguration.Instance.DiscordIntegrationEnabled)
             {
-                string announceMsg = DiscordConfiguration.Instance.RegistrationAnnouncement;
-                announceMsg = announceMsg.Replace("%user", username);
-                announceMsg = announceMsg.Replace("%instance", ServerConfiguration.Instance.Customization.ServerName);
-                announceMsg = announceMsg.Replace("%platform", npTicket.Platform.ToString());
-                await WebhookHelper.SendWebhook(title: "New user",
-                    description: announceMsg,
+                string registrationAnnouncementMsg = DiscordConfiguration.Instance.RegistrationAnnouncement
+                    .Replace("%user", username)
+                    .Replace("%userid", user.UserId.ToString())
+                    .Replace("%instance", ServerConfiguration.Instance.Customization.ServerName)
+                    .Replace("%platform", npTicket.Platform.ToString());
+                await WebhookHelper.SendWebhook(title: "A new user has registered!",
+                    description: registrationAnnouncementMsg,
                     dest: WebhookHelper.WebhookDestination.Registration);
             }
 
