@@ -117,7 +117,7 @@ public abstract class ConfigurationBase<T> where T : class, new()
                 {
                     int newVersion = GetVersion();
                     Logger.Info($"Upgrading config file from version {storedConfig.ConfigVersion} to version {newVersion}", LogArea.Config);
-                    File.Copy(this.ConfigName, this.ConfigName + "." + GetVersion());
+                    File.Copy(this.ConfigName, this.ConfigName + ".v" + storedConfig.ConfigVersion);
                     this.loadConfig(storedConfig);
                     this.ConfigVersion = newVersion;
                     this.writeConfig(this.ConfigName);

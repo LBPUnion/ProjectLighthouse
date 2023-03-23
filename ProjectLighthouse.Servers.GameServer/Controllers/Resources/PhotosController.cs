@@ -139,7 +139,7 @@ public class PhotosController : ControllerBase
                 Title = "New photo uploaded!",
                 Description = $"{user.Username} uploaded a new photo.",
                 ImageUrl = $"{ServerConfiguration.Instance.ExternalUrl}/gameAssets/{photo.LargeHash}",
-                Color = WebhookHelper.UnionColor,
+                Color = WebhookHelper.GetEmbedColor(),
             }
         );
 
