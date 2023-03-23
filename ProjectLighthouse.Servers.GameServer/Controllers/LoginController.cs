@@ -143,9 +143,10 @@ public class LoginController : ControllerBase
             {
                 string registrationAnnouncementMsg = DiscordConfiguration.Instance.RegistrationAnnouncement
                     .Replace("%user", username)
-                    .Replace("%userid", user.UserId.ToString())
+                    .Replace("%id", user.UserId.ToString())
                     .Replace("%instance", ServerConfiguration.Instance.Customization.ServerName)
-                    .Replace("%platform", npTicket.Platform.ToString());
+                    .Replace("%platform", npTicket.Platform.ToString())
+                    .Replace(@"\n", "\n");
                 await WebhookHelper.SendWebhook(title: "A new user has registered!",
                     description: registrationAnnouncementMsg,
                     dest: WebhookHelper.WebhookDestination.Registration);

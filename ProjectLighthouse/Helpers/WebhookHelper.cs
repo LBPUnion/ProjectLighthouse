@@ -30,15 +30,28 @@ public static class WebhookHelper
         Registration,
     }
 
-    private static readonly DiscordWebhookClient publicClient = DiscordConfiguration.Instance.DiscordIntegrationEnabled
+    private static bool isDestinationValid(WebhookDestination dest)
+    {
+        if (!DiscordConfiguration.Instance.DiscordIntegrationEnabled) return false;
+        string url = dest switch
+        {
+            WebhookDestination.Public => DiscordConfiguration.Instance.PublicUrl,
+            WebhookDestination.Moderation => DiscordConfiguration.Instance.ModerationUrl,
+            WebhookDestination.Registration => DiscordConfiguration.Instance.RegistrationUrl,
+            _ => throw new ArgumentOutOfRangeException(nameof(dest), dest, null),
+        };
+        return !string.IsNullOrWhiteSpace(url);
+    }
+
+    private static readonly DiscordWebhookClient publicClient = isDestinationValid(WebhookDestination.Public)
         ? new DiscordWebhookClient(DiscordConfiguration.Instance.PublicUrl)
         : null;
 
-    private static readonly DiscordWebhookClient moderationClient = DiscordConfiguration.Instance.DiscordIntegrationEnabled
+    private static readonly DiscordWebhookClient moderationClient = isDestinationValid(WebhookDestination.Moderation)
         ? new DiscordWebhookClient(DiscordConfiguration.Instance.ModerationUrl)
         : null;
 
-    private static readonly DiscordWebhookClient registrationClient = DiscordConfiguration.Instance.DiscordIntegrationEnabled
+    private static readonly DiscordWebhookClient registrationClient = isDestinationValid(WebhookDestination.Registration)
         ? new DiscordWebhookClient(DiscordConfiguration.Instance.RegistrationUrl)
         : null;
 
@@ -56,6 +69,7 @@ public static class WebhookHelper
             WebhookDestination.Registration => registrationClient,
             _ => throw new ArgumentOutOfRangeException(nameof(dest), dest, null),
         };
+        if (client == null) return;
 
         await client.SendMessageAsync
         (
