@@ -7,6 +7,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers;
 [Produces("application/json")]
 public class StatusController : ControllerBase
 {
-    [HttpGet("status")]
+    [AcceptVerbs("GET", "HEAD", Route = "status")]
     public IActionResult GetStatus() => this.Ok();
 }
