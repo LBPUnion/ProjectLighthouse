@@ -4,6 +4,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 
 public class StatusController : ApiEndpointController
 {
-    [HttpGet("status")]
+    [AcceptVerbs("GET", "HEAD", Route = "status")]
     public IActionResult GetStatus() => this.Ok();
 }
