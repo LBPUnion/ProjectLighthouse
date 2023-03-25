@@ -51,7 +51,8 @@ public class ScoreController : ControllerBase
             return this.BadRequest();
         }
 
-        //TODO versus levels having a ':' instead of ',' in score submit?
+        // Workaround for parsing player ids of versus levels
+        if (score.PlayerIds.Length == 1 && score.PlayerIds[0].Contains(':')) score.PlayerIds = score.PlayerIds[0].Split(":");
 
         if (score.PlayerIds.Length == 0)
         {
