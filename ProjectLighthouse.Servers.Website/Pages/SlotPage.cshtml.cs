@@ -109,7 +109,7 @@ public class SlotPage : BaseLayout
             .ToListAsync();
 
         this.Scores = await this.Database.Scores.OrderByDescending(s => s.Points)
-            .ThenByDescending(s => s.ScoreId)
+            .ThenBy(s => s.ScoreId)
             .Where(s => s.SlotId == id)
             .Take(10)
             .ToListAsync();
