@@ -96,6 +96,7 @@ public abstract class SlotBase : ILbpSerializable
             IsAdventurePlanet = slot.IsAdventurePlanet,
             Resources = slot.Resources,
             IsLbp1Only = slot.Lbp1Only,
+            PlayCount = slot.Plays,
             CompletePlayCount = slot.PlaysComplete,
             LBP1PlayCount = slot.PlaysLBP1,
             LBP1UniquePlayCount = slot.PlaysLBP1Unique,
