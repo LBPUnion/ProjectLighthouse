@@ -63,7 +63,7 @@ public class SearchController : ControllerBase
 
         List<SlotBase> slots = await dbQuery.Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .Select(s => SlotBase.CreateFromEntity(s, token))
             .ToListAsync();
 
         return this.Ok(new GenericSlotResponse(keyName, slots, await dbQuery.CountAsync(), 0));

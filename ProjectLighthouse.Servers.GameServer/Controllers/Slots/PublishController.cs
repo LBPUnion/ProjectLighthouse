@@ -235,7 +235,7 @@ public class PublishController : ControllerBase
             oldSlot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
 
             await this.database.SaveChangesAsync();
-            return this.Ok(SlotBase.CreateFromEntity(oldSlot, this.GetToken()));
+            return this.Ok(SlotBase.CreateFromEntity(oldSlot, token));
         }
 
         int usedSlots = await this.database.Slots.CountAsync(s => s.CreatorId == token.UserId && s.GameVersion == slotVersion);
@@ -272,7 +272,7 @@ public class PublishController : ControllerBase
 
         Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
-        return this.Ok(SlotBase.CreateFromEntity(slotEntity, this.GetToken()));
+        return this.Ok(SlotBase.CreateFromEntity(slotEntity, token));
     }
 
     [HttpPost("unpublish/{id:int}")]

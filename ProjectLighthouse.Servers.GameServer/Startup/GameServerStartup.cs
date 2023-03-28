@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 
@@ -44,6 +45,7 @@ public class GameServerStartup
             {
                 options.OutputFormatters.Add(new LbpOutputFormatter());
                 options.OutputFormatters.Add(new JsonOutputFormatter());
+                options.OutputFormatters.Add(new StringOutputFormatter());
             }
         );
 
