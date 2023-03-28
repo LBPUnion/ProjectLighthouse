@@ -15,11 +15,11 @@
 <div class="ui yellow segment" id="comments">
     @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
     {
-        <p>There are no comments.</p>
+        <p><i>There are no comments.</i></p>
     }
     else if (!Model.CommentsEnabled)
     {
-        <p>Comments are disabled.</p>
+        <p><i>Comments are disabled.</i></p>
     }
     else
     {
