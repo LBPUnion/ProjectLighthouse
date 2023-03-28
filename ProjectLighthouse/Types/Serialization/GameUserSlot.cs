@@ -34,9 +34,6 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     [XmlIgnore]
     public SerializationMode SerializationMode { get; set; }
 
-    [XmlIgnore]
-    public string[]? Resources { get; set; }
-
     [XmlElement("id")]
     public int SlotId { get; set; }
 
@@ -62,7 +59,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     public string? RootLevel { get; set; }
 
     [XmlElement("resource")]
-    public string[]? ResourceList { get; set; }
+    public string[]? Resources { get; set; }
 
     [XmlElement("icon")]
     public string IconHash { get; set; } = "";

@@ -56,9 +56,9 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.ResourceList?.Length == 0) slot.ResourceList = new[]{slot.RootLevel,};
+        if (slot.Resources?.Length == 0) slot.Resources = new[]{slot.RootLevel,};
 
-        if (slot.ResourceList == null)
+        if (slot.Resources == null)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
             return this.BadRequest();
@@ -86,7 +86,7 @@ public class PublishController : ControllerBase
             return this.Forbid();
         }
 
-        HashSet<string> resources = new(slot.ResourceList)
+        HashSet<string> resources = new(slot.Resources)
         {
             slot.IconHash,
         };
@@ -114,13 +114,13 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.ResourceList?.Length == 0)
+        if (slot.Resources?.Length == 0)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
             return this.BadRequest();
         }
         // Yes Rider, this isn't null
-        Debug.Assert(slot.ResourceList != null, "slot.ResourceList != null");
+        Debug.Assert(slot.Resources != null, "slot.ResourceList != null");
 
         if (string.IsNullOrWhiteSpace(slot.BackgroundHash))
         {
@@ -144,7 +144,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.ResourceList.Any(resource => !FileHelper.ResourceExists(resource)))
+        if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
         {
             Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
             return this.BadRequest();
@@ -182,10 +182,10 @@ public class PublishController : ControllerBase
 
         slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(slot.AuthorLabels);
 
-        if (!slot.ResourceList.Contains(slot.RootLevel))
-            slot.ResourceList = slot.ResourceList.Append(rootLevel.Hash).ToArray();
+        if (!slot.Resources.Contains(slot.RootLevel))
+            slot.Resources = slot.Resources.Append(rootLevel.Hash).ToArray();
 
-        string resourceCollection = string.Join(",", slot.ResourceList); 
+        string resourceCollection = string.Join(",", slot.Resources); 
 
         // Republish logic
         if (slot.SlotId != 0)
