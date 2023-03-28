@@ -6,13 +6,14 @@ using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests.Serialization;
+namespace LBPUnion.ProjectLighthouse.Tests.Integration.Serialization;
 
 public class TestSerializable : ILbpSerializable, IHasCustomRoot
 {
     public virtual string GetRoot() => "xmlRoot";
 }
 
+[Trait("Category", "Integration")]
 public class SerializationTests
 {
     private static IServiceProvider GetEmptyServiceProvider() => new DefaultServiceProviderFactory().CreateServiceProvider(new ServiceCollection());

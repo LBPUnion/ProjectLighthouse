@@ -3,14 +3,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.EntityFrameworkCore;
 using OpenQA.Selenium;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.WebsiteTests.Tests;
+namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 
+[Trait("Category", "Integration")]
 public class RegisterTests : LighthouseWebTest
 {
     [DatabaseFact]

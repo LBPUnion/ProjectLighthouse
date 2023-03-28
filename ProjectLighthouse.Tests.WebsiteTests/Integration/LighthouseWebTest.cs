@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.WebsiteTests.Tests;
+namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 
 [Collection(nameof(LighthouseWebTest))]
 public class LighthouseWebTest : IDisposable

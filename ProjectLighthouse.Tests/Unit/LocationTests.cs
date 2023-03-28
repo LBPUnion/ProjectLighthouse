@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests;
+namespace LBPUnion.ProjectLighthouse.Tests.Unit;
 
 public class LocationTests
 {

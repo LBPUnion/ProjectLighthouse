@@ -2,18 +2,19 @@ using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using OpenQA.Selenium;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.WebsiteTests.Tests;
+namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 
+[Trait("Category", "Integration")]
 public class AdminTests : LighthouseWebTest
 {
-    public const string AdminPanelButtonXPath = "/html/body/div/header/div/div/div/a[1]";
+    private const string adminPanelButtonXPath = "/html/body/div/header/div/div/div/a[1]";
 
     [DatabaseFact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
@@ -38,7 +39,7 @@ public class AdminTests : LighthouseWebTest
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.Contains("Admin", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
+        Assert.Contains("Admin", this.Driver.FindElement(By.XPath(adminPanelButtonXPath)).Text);
     }
 
     [DatabaseFact]
@@ -64,6 +65,6 @@ public class AdminTests : LighthouseWebTest
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.DoesNotContain("Admin", this.Driver.FindElement(By.XPath(AdminPanelButtonXPath)).Text);
+        Assert.DoesNotContain("Admin", this.Driver.FindElement(By.XPath(adminPanelButtonXPath)).Text);
     }
 }

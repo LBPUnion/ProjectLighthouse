@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Tests;
+namespace LBPUnion.ProjectLighthouse.Tests.Integration;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class LighthouseServerTest<TStartup> where TStartup : class

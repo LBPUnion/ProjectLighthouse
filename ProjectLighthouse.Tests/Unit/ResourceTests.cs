@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Types.Resources;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests;
+namespace LBPUnion.ProjectLighthouse.Tests.Unit;
 
 public class ResourceTests
 {

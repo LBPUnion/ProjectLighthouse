@@ -4,12 +4,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
-using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Tests;
+namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 
+[Trait("Category", "Integration")]
 public class UploadTests : LighthouseServerTest<GameServerTestStartup>
 {
     public UploadTests()
