@@ -28,6 +28,7 @@ public class StatisticsController : ControllerBase
     public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatchesForGame(this.database, this.GetToken().GameVersion)).ToString());
 
     [HttpGet("planetStats")]
+    [Produces("text/xml")]
     public async Task<IActionResult> PlanetStats()
     {
         int totalSlotCount = await StatisticsHelper.SlotCountForGame(this.database, this.GetToken().GameVersion);
