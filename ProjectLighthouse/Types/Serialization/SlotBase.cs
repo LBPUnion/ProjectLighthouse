@@ -1,5 +1,4 @@
 ﻿using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -28,8 +27,9 @@ public abstract class SlotBase : ILbpSerializable
             Description = slot.Description,
             Location = slot.Location,
             IconHash = slot.IconHash,
-            BackgroundHash = slot.BackgroundHash,
+            BackgroundHash = slot.BackgroundHash ?? "",
             AuthorLabels = slot.AuthorLabels,
+            GameVersion = slot.GameVersion,
             Shareable = slot.IsShareable,
             Resources = slot.Resources,
             InitiallyLocked = slot.InitiallyLocked,
@@ -40,7 +40,7 @@ public abstract class SlotBase : ILbpSerializable
             IsAdventurePlanet = slot.IsAdventurePlanet,
             LevelType = slot.LevelType,
             SubLevel = slot.IsSubLevel,
-            RootLevel = slot.RootLevel,
+            RootLevel = slot.RootLevel ?? "",
             MoveRequired = slot.IsMoveRequired,
             CrossControllerRequired = slot.IsCrossControlRequired,
         };

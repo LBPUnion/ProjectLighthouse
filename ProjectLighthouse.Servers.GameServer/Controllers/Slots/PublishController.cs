@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -55,9 +56,9 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.Resources?.Length == 0) slot.Resources = new[]{slot.RootLevel,};
+        if (slot.ResourceList?.Length == 0) slot.ResourceList = new[]{slot.RootLevel,};
 
-        if (slot.Resources == null)
+        if (slot.ResourceList == null)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
             return this.BadRequest();
@@ -85,7 +86,7 @@ public class PublishController : ControllerBase
             return this.Forbid();
         }
 
-        HashSet<string> resources = new(slot.Resources)
+        HashSet<string> resources = new(slot.ResourceList)
         {
             slot.IconHash,
         };
@@ -113,9 +114,17 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.Resources == null)
+        if (slot.ResourceList?.Length == 0)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
+            return this.BadRequest();
+        }
+        // Yes Rider, this isn't null
+        Debug.Assert(slot.ResourceList != null, "slot.ResourceList != null");
+
+        if (string.IsNullOrWhiteSpace(slot.BackgroundHash))
+        {
+            Logger.Warn("Rejecting level upload, background is null", LogArea.Publish);
             return this.BadRequest();
         }
 
@@ -135,7 +144,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        if (slot.Resources != null && slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
+        if (slot.ResourceList.Any(resource => !FileHelper.ResourceExists(resource)))
         {
             Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
             return this.BadRequest();
@@ -173,6 +182,11 @@ public class PublishController : ControllerBase
 
         slot.AuthorLabels = LabelHelper.RemoveInvalidLabels(slot.AuthorLabels);
 
+        if (!slot.ResourceList.Contains(slot.RootLevel))
+            slot.ResourceList = slot.ResourceList.Append(rootLevel.Hash).ToArray();
+
+        string resourceCollection = string.Join(",", slot.ResourceList); 
+
         // Republish logic
         if (slot.SlotId != 0)
         {
@@ -197,12 +211,13 @@ public class PublishController : ControllerBase
                 {
                     // Delete the useless rootLevel that lbp3 just uploaded
                     if (slotVersion == GameVersion.LittleBigPlanet3)
-                        FileHelper.DeleteResource(slot.RootLevel);
+                        FileHelper.DeleteResource(rootLevel.Hash);
                     else
+                    // Only change the rootLevel and gameversion if it's not lbp3
                     {
                         oldSlot.GameVersion = slot.GameVersion;
-                        oldSlot.RootLevel = slot.RootLevel;
-                        oldSlot.Resources = slot.Resources;
+                        oldSlot.RootLevel = rootLevel.Hash;
+                        oldSlot.ResourceCollection = resourceCollection;
                     }
                 }
             }
@@ -247,19 +262,19 @@ public class PublishController : ControllerBase
         }
 
         SlotEntity slotEntity = SlotBase.ConvertToEntity(slot);
+        slotEntity.CreatorId = user.UserId;
+        slotEntity.FirstUploaded = TimeHelper.TimestampMillis;
+        slotEntity.LastUpdated = TimeHelper.TimestampMillis;
+        slotEntity.ResourceCollection = resourceCollection;
 
-        slot.CreatorId = user.UserId;
-        slot.FirstUploaded = TimeHelper.TimestampMillis;
-        slot.LastUpdated = TimeHelper.TimestampMillis;
-
-        if (slot.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
+        if (slotEntity.MinimumPlayers == 0 || slot.MaximumPlayers == 0)
         {
-            slot.MinimumPlayers = 1;
-            slot.MaximumPlayers = 4;
+            slotEntity.MinimumPlayers = 1;
+            slotEntity.MaximumPlayers = 4;
         }
 
-        slot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
-        slot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
+        slotEntity.MinimumPlayers = Math.Clamp(slotEntity.MinimumPlayers, 1, 4);
+        slotEntity.MaximumPlayers = Math.Clamp(slotEntity.MaximumPlayers, 1, 4);
 
         this.database.Slots.Add(slotEntity);
         await this.database.SaveChangesAsync();
@@ -267,10 +282,10 @@ public class PublishController : ControllerBase
         if (user.LevelVisibility == PrivacyType.All)
         {
             await WebhookHelper.SendWebhook("New level published!",
-                $"**{user.Username}** just published a new level: [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId})\n{slot.Description}");
+                $"**{user.Username}** just published a new level: [**{slotEntity.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slotEntity.SlotId})\n{slotEntity.Description}");
         }
 
-        Logger.Success($"Successfully published level {slot.Name} (id: {slot.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
+        Logger.Success($"Successfully published level {slotEntity.Name} (id: {slotEntity.SlotId}) by {user.Username} (id: {user.UserId})", LogArea.Publish);
 
         return this.Ok(SlotBase.CreateFromEntity(slotEntity, token));
     }
