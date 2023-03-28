@@ -270,6 +270,6 @@ public class ScoreController : ControllerBase
 
         List<GameScore> gameScores = pagedScores.Select(ps => GameScore.CreateFromEntity(ps.Score, ps.Rank)).ToList();
 
-        return new ScoreboardResponse(options.RootName, gameScores, myScore?.Score.Points ?? 0, myScore?.Rank ?? 0, rankedScores.Count);
+        return new ScoreboardResponse(options.RootName, gameScores, rankedScores.Count, myScore?.Score.Points ?? 0, myScore?.Rank ?? 0);
     }
 }
