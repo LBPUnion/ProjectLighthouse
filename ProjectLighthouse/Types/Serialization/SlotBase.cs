@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -50,6 +51,10 @@ public abstract class SlotBase : ILbpSerializable
 
     public static SlotBase CreateFromEntity(SlotEntity slot, GameVersion targetGame, int targetUserId)
     {
+        if (slot == null)
+        {
+            throw new Exception($"Tried to create GameSlot from null slot, targetGame={targetGame}, targetUserId={targetUserId}");
+        }
         if (slot.Type == SlotType.Developer)
         {
             GameDeveloperSlot devSlot = new()
