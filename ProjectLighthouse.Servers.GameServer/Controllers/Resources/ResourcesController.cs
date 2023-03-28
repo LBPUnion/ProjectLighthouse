@@ -4,7 +4,6 @@ using System.IO.Pipelines;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Resources;
@@ -22,7 +21,7 @@ public class ResourcesController : ControllerBase
 {
 
     [HttpPost("showModerated")]
-    public IActionResult ShowModerated() => this.Ok(LbpSerializer.BlankElement("resources"));
+    public IActionResult ShowModerated() => this.Ok(new ResourceList());
 
     [HttpPost("filterResources")]
     [HttpPost("showNotUploaded")]
@@ -31,11 +30,9 @@ public class ResourcesController : ControllerBase
         ResourceList? resourceList = await this.DeserializeBody<ResourceList>();
         if (resourceList?.Resources == null) return this.BadRequest();
 
-        string resources = resourceList.Resources.Where
-                (s => !FileHelper.ResourceExists(s))
-            .Aggregate("", (current, hash) => current + LbpSerializer.StringElement("resource", hash));
+        resourceList.Resources = resourceList.Resources.Where(r => !FileHelper.ResourceExists(r)).ToArray();
 
-        return this.Ok(LbpSerializer.StringElement("resources", resources));
+        return this.Ok(resourceList);
     }
 
     [HttpGet("r/{hash}")]

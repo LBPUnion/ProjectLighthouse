@@ -22,10 +22,10 @@ public class PerformCaseActionsTask : IRepeatingTask
     public DateTime LastRan { get; set; }
     public async Task Run(DatabaseContext database)
     {
-        foreach (ModerationCase @case in await database.Cases.Where(c => !c.Processed).ToListAsync())
+        foreach (ModerationCaseEntity @case in await database.Cases.Where(c => !c.Processed).ToListAsync())
         {
-            User? user = null;
-            Slot? slot = null;
+            UserEntity? user = null;
+            SlotEntity? slot = null;
 
             if (@case.Type.AffectsUser())
             {

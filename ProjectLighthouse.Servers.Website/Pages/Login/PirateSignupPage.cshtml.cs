@@ -12,7 +12,7 @@ public class PirateSignupPage : BaseLayout
     
     public IActionResult OnGet()
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
         
         return this.Page();
@@ -20,7 +20,7 @@ public class PirateSignupPage : BaseLayout
 
     public async Task<IActionResult> OnPost()
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("/login");
 
         user.Language = user.Language == "en-PT" ? "en" : "en-PT";

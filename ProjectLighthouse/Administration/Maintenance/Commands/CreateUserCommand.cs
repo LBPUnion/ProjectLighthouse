@@ -21,7 +21,7 @@ public class CreateUserCommand : ICommand
 
         password = CryptoHelper.Sha256Hash(password);
 
-        User? user = await this._database.Users.FirstOrDefaultAsync(u => u.Username == onlineId);
+        UserEntity? user = await this._database.Users.FirstOrDefaultAsync(u => u.Username == onlineId);
         if (user == null)
         {
             user = await this._database.CreateUser(onlineId, CryptoHelper.BCryptHash(password));

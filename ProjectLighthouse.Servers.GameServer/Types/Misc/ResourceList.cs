@@ -1,4 +1,5 @@
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Misc;
 
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Misc;
 /// </summary>
 [XmlRoot("resources")]
 [XmlType("resources")]
-public class ResourceList
+public class ResourceList : ILbpSerializable
 {
     [XmlElement("resource")]
     public string[]? Resources;

@@ -11,13 +11,13 @@ public class AdminPanelUsersPage : BaseLayout
 {
     public int UserCount;
 
-    public List<User> Users = new();
+    public List<UserEntity> Users = new();
     public AdminPanelUsersPage(DatabaseContext database) : base(database)
     {}
 
     public async Task<IActionResult> OnGet()
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
 

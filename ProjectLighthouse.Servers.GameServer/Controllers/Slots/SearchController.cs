@@ -1,10 +1,10 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +35,7 @@ public class SearchController : ControllerBase
         string? keyName = "slots"
     )
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -45,7 +45,7 @@ public class SearchController : ControllerBase
 
         string[] keywords = query.Split(" ");
 
-        IQueryable<Slot> dbQuery = this.database.Slots.ByGameVersion(token.GameVersion, false, true)
+        IQueryable<SlotEntity> dbQuery = this.database.Slots.ByGameVersion(token.GameVersion, false, true)
             .Where(s => s.Type == SlotType.User)
             .OrderBy(s => !s.TeamPick)
             .ThenByDescending(s => s.FirstUploaded)
@@ -61,11 +61,12 @@ public class SearchController : ControllerBase
                      s.SlotId.ToString().Equals(keyword)
             );
 
-        List<Slot> slots = await dbQuery.Skip(Math.Max(0, pageStart - 1)).Take(Math.Min(pageSize, 30)).ToListAsync();
+        List<SlotBase> slots = await dbQuery.Skip(Math.Max(0, pageStart - 1))
+            .Take(Math.Min(pageSize, 30))
+            .Select(s => SlotBase.CreateFromEntity(s, this.GetToken()))
+            .ToListAsync();
 
-        string response = slots.Aggregate("", (current, slot) => current + slot.Serialize(token.GameVersion));
-
-        return this.Ok(LbpSerializer.TaggedStringElement(keyName, response, "total", dbQuery.Count()));
+        return this.Ok(new GenericSlotResponse(keyName, slots, await dbQuery.CountAsync(), 0));
     }
     
     // /LITTLEBIGPLANETPS3_XML?pageStart=1&pageSize=10&resultTypes[]=slot&resultTypes[]=playlist&resultTypes[]=user&adventure=dontCare&textFilter=qwer

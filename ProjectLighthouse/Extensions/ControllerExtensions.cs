@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -19,9 +20,9 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 public static partial class ControllerExtensions
 {
 
-    public static GameToken GetToken(this ControllerBase controller)
+    public static GameTokenEntity GetToken(this ControllerBase controller)
     {
-        GameToken? token = (GameToken?)(controller.HttpContext.Items["Token"] ?? null);
+        GameTokenEntity? token = (GameTokenEntity?)(controller.HttpContext.Items["Token"] ?? null);
         if (token == null) throw new ArgumentNullException(nameof(controller), @"GameToken was null even though authentication was successful");
 
         return token;
@@ -86,9 +87,7 @@ public static partial class ControllerExtensions
     public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[] rootElements)
     {
         controller.Request.Body.Position = 0;
-
         string bodyString = await controller.ReadBodyAsync();
-
         try
         {
             // Prevent unescaped ampersands from causing deserialization to fail
@@ -97,17 +96,19 @@ public static partial class ControllerExtensions
             XmlRootAttribute? root = null;
             if (rootElements.Length > 0)
             {
-                //TODO: This doesn't support root tags with attributes, but it's only used in scenarios where there shouldn't any (UpdateUser and Playlists)
-                string? matchedRoot = rootElements.FirstOrDefault(e => bodyString.StartsWith(@$"<{e}>"));
-                if (matchedRoot == null)
+                XmlDocument doc = new();
+                doc.LoadXml(bodyString);
+                string? rootElement = doc.DocumentElement?.Name;
+                if (rootElement == null || !rootElements.Contains(rootElement))
                 {
                     Logger.Error($"[{controller.ControllerContext.ActionDescriptor.ActionName}] " +
                                  $"Failed to deserialize {typeof(T).Name}: Unable to match root element\n" +
+                                 $"rootElement: '{rootElement ?? "null"}'" +
                                  $"xmlData: '{bodyString}'",
                         LogArea.Deserialization);
                     return default;
                 }
-                root = new XmlRootAttribute(matchedRoot);
+                root = new XmlRootAttribute(rootElement);
             }
             XmlSerializer serializer = new(typeof(T), root);
             T? obj = (T?)serializer.Deserialize(new StringReader(bodyString));

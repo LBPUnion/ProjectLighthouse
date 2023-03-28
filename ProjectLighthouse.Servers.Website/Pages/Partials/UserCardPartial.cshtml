@@ -1,6 +1,7 @@
+@using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Types.Users
-@model LBPUnion.ProjectLighthouse.Types.Entities.Profile.User
+@model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
 
 @{
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
@@ -40,14 +41,22 @@
                 }
             </h1>
         }
+        @{
+            await using DatabaseContext context = new();
+
+            int hearts = Model.GetHeartCount(context);
+            int comments = Model.GetCommentCount(context);
+            int levels = Model.GetUsedSlotCount(context);
+            int photos = Model.GetUploadedPhotoCount(context);
+        }
         <span>
-            <i>@Model.Status.ToTranslatedString(language, timeZone)</i>
+            <i>@Model.GetStatus(context).ToTranslatedString(language, timeZone)</i>
         </span>
         <div class="cardStatsUnderTitle">
-            <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
-            <i class="blue comment icon" title="Comments"></i> <span>@Model.Comments</span>
-            <i class="green upload icon" title="Uploaded Levels"></i><span>@Model.UsedSlots</span>
-            <i class="purple camera icon" title="Uploaded Photos"></i><span>@Model.PhotosByMe</span>
+            <i class="pink heart icon" title="Hearts"></i> <span>@hearts</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@comments</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@levels</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@photos</span>
         </div>
     </div>
 </div>

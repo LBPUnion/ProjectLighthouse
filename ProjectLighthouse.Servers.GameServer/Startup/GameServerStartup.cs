@@ -42,7 +42,7 @@ public class GameServerStartup
         (
             options =>
             {
-                options.OutputFormatters.Add(new XmlOutputFormatter());
+                options.OutputFormatters.Add(new LbpOutputFormatter());
                 options.OutputFormatters.Add(new JsonOutputFormatter());
             }
         );

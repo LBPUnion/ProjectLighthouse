@@ -15,7 +15,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 public class UserSettingsPage : BaseLayout
 {
 
-    public User? ProfileUser;
+    public UserEntity? ProfileUser;
     public UserSettingsPage(DatabaseContext database) : base(database)
     {}
 

@@ -12,7 +12,7 @@ public class LogoutPage : BaseLayout
     {}
     public async Task<IActionResult> OnGet()
     {
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/");
 
         this.Database.WebTokens.Remove(token);

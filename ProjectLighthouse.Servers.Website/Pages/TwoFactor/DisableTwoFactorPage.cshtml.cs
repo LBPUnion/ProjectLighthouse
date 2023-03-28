@@ -18,7 +18,7 @@ public class DisableTwoFactorPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         if (!user.IsTwoFactorSetup) return this.Redirect("~/user/" + user.UserId + "/settings");
@@ -30,7 +30,7 @@ public class DisableTwoFactorPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         if (!user.IsTwoFactorSetup) return this.Redirect("~/user/" + user.UserId + "/settings");

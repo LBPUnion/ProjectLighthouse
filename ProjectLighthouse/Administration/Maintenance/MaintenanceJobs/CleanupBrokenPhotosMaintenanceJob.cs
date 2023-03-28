@@ -21,7 +21,7 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
     [SuppressMessage("ReSharper", "LoopCanBePartlyConvertedToQuery")]
     public async Task Run()
     {
-        foreach (Photo photo in this.database.Photos)
+        foreach (PhotoEntity photo in this.database.Photos)
         {
             bool hashNullOrEmpty = false;
             bool noHashesExist = false;
@@ -60,7 +60,7 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
             };
 
             List<int> subjectUserIds = new(4);
-            foreach (PhotoSubject subject in photo.PhotoSubjects)
+            foreach (PhotoSubjectEntity subject in photo.PhotoSubjects)
             {
                 if (subjectUserIds.Contains(subject.UserId))
                 {

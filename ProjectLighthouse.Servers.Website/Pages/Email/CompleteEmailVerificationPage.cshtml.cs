@@ -21,14 +21,14 @@ public class CompleteEmailVerificationPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled) return this.NotFound();
 
-        EmailVerificationToken? emailVerifyToken = await this.Database.EmailVerificationTokens.FirstOrDefaultAsync(e => e.EmailToken == token);
+        EmailVerificationTokenEntity? emailVerifyToken = await this.Database.EmailVerificationTokens.FirstOrDefaultAsync(e => e.EmailToken == token);
         if (emailVerifyToken == null)
         {
             this.Error = "Invalid verification token";
             return this.Page();
         }
 
-        User user = await this.Database.Users.FirstAsync(u => u.UserId == emailVerifyToken.UserId);
+        UserEntity user = await this.Database.Users.FirstAsync(u => u.UserId == emailVerifyToken.UserId);
 
         if (DateTime.Now > emailVerifyToken.ExpiresAt)
         {
@@ -50,7 +50,7 @@ public class CompleteEmailVerificationPage : BaseLayout
         if (user.Password != null) return this.Page();
 
         // if user's account was created automatically
-        WebToken webToken = new()
+        WebTokenEntity webToken = new()
         {
             ExpiresAt = DateTime.Now.AddDays(7),
             Verified = true,

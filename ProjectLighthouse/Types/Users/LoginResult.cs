@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Users;
 
@@ -9,7 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Users;
 /// </summary>
 [XmlRoot("loginResult")]
 [XmlType("loginResult")]
-public class LoginResult
+public class LoginResult : ILbpSerializable
 {
     [XmlElement("authTicket")]
     public string AuthTicket { get; set; }
@@ -19,12 +18,4 @@ public class LoginResult
 
     [XmlElement("titleStorageURL")]
     public string TitleStorageUrl { get; set; }
-
-    public string Serialize()
-        => LbpSerializer.Elements
-            (
-                new KeyValuePair<string, object>("authTicket", this.AuthTicket), 
-                new KeyValuePair<string, object>("lbpEnvVer", this.ServerBrand),
-                new KeyValuePair<string, object>("titleStorageURL", this.TitleStorageUrl)
-            );
 }

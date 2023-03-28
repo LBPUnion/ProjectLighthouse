@@ -20,7 +20,7 @@
 </form>
 <div class="ui divider"></div>
 
-@foreach (User user in Model.Users)
+@foreach (UserEntity user in Model.Users)
 {
     <div class="ui segment">
         @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)

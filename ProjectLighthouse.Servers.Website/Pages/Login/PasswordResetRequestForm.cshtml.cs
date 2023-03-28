@@ -42,7 +42,7 @@ public class PasswordResetRequestForm : BaseLayout
             return this.Page();
         }
 
-        User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress == email && u.EmailAddressVerified);
+        UserEntity? user = await this.Database.Users.FirstOrDefaultAsync(u => u.EmailAddress == email && u.EmailAddressVerified);
 
         if (user == null)
         {
@@ -51,7 +51,7 @@ public class PasswordResetRequestForm : BaseLayout
             return this.Page();
         }
 
-        PasswordResetToken token = new()
+        PasswordResetTokenEntity token = new()
         {
             Created = DateTime.Now,
             UserId = user.UserId,

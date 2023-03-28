@@ -1,9 +1,9 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
@@ -33,11 +33,7 @@ public class StatisticsController : ControllerBase
         int totalSlotCount = await StatisticsHelper.SlotCountForGame(this.database, this.GetToken().GameVersion);
         int mmPicksCount = await StatisticsHelper.TeamPickCountForGame(this.database, this.GetToken().GameVersion);
 
-        return this.Ok
-        (
-            LbpSerializer.StringElement
-                ("planetStats", LbpSerializer.StringElement("totalSlotCount", totalSlotCount) + LbpSerializer.StringElement("mmPicksCount", mmPicksCount))
-        );
+        return this.Ok(new PlanetStatsResponse(totalSlotCount, mmPicksCount));
     }
 
     [HttpGet("planetStats/totalLevelCount")]

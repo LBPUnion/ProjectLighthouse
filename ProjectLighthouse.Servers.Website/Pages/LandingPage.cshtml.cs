@@ -17,15 +17,15 @@ public class LandingPage : BaseLayout
     {}
 
     public int PendingAuthAttempts;
-    public List<User> PlayersOnline = new();
+    public List<UserEntity> PlayersOnline = new();
 
-    public List<Slot>? LatestTeamPicks;
-    public List<Slot>? NewestLevels;
+    public List<SlotEntity>? LatestTeamPicks;
+    public List<SlotEntity>? NewestLevels;
 
     [UsedImplicitly]
     public async Task<IActionResult> OnGet()
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user != null && user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 
         if (user != null)

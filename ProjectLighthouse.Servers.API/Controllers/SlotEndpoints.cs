@@ -28,15 +28,18 @@ public class SlotEndpoints : ApiEndpointController
     /// <returns>The slot</returns>
     /// <response code="200">The slot list, if successful.</response>
     [HttpGet("slots")]
-    [ProducesResponseType(typeof(List<MinimalSlot>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<ApiSlot>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSlots([FromQuery] int limit = 20, [FromQuery] int skip = 0)
     {
         if (skip < 0) skip = 0;
         if (limit < 0) limit = 0;
         limit = Math.Min(ServerStatics.PageSize, limit);
 
-        IEnumerable<MinimalSlot> minimalSlots = (await this.database.Slots.OrderByDescending(s => s.FirstUploaded).Skip(skip).Take(limit).ToListAsync()).Select
-            (MinimalSlot.FromSlot);
+        IEnumerable<ApiSlot> minimalSlots = await this.database.Slots.OrderByDescending(s => s.FirstUploaded)
+            .Skip(skip)
+            .Take(limit)
+            .Select(s => ApiSlot.CreateFromEntity(s))
+            .ToListAsync();
 
         return this.Ok(minimalSlots);
     }
@@ -49,13 +52,13 @@ public class SlotEndpoints : ApiEndpointController
     /// <response code="200">The slot, if successful.</response>
     /// <response code="404">The slot could not be found.</response>
     [HttpGet("slot/{id:int}")]
-    [ProducesResponseType(typeof(Slot), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiSlot), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSlot(int id)
     {
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(u => u.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(u => u.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        return this.Ok(slot);
+        return this.Ok(ApiSlot.CreateFromEntity(slot));
     }
 }

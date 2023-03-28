@@ -7,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
 
@@ -22,10 +21,10 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
 
         Random r = new();
 
-        User userA = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
-        User userB = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
+        UserEntity userA = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
+        UserEntity userB = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
 
-        Slot slotA = new()
+        SlotEntity slotA = new()
         {
             Creator = userA,
             CreatorId = userA.UserId,
@@ -33,7 +32,7 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
             ResourceCollection = "",
         };
 
-        Slot slotB = new()
+        SlotEntity slotB = new()
         {
             Creator = userB,
             CreatorId = userB.UserId,

@@ -14,7 +14,7 @@ public class CleanupSlotVersionMismatchMigration : IMigrationTask
 
     async Task<bool> IMigrationTask.Run(DatabaseContext database)
     {
-        foreach (Slot slot in database.Slots)
+        foreach (SlotEntity slot in database.Slots)
         {
             LbpFile rootLevel = LbpFile.FromHash(slot.RootLevel);
             if (rootLevel == null) continue;

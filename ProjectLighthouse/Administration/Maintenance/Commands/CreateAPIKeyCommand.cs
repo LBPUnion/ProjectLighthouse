@@ -18,7 +18,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands
 
         public async Task Run(string[] args, Logger logger)
         {
-            ApiKey key = new() { Description = args[0], };
+            ApiKeyEntity key = new() { Description = args[0], };
             if (string.IsNullOrWhiteSpace(key.Description))
             {
                 key.Description = "<no description specified>";

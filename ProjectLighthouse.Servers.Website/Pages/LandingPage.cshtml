@@ -46,7 +46,7 @@
 
 @{
     int i = 0;
-    foreach (User user in Model.PlayersOnline)
+    foreach (UserEntity user in Model.PlayersOnline)
     {
         i++; 
         @await user.ToLink(Html, ViewData, language, timeZone, true)
@@ -66,7 +66,7 @@
             <h1><i class="star icon"></i>@Model.Translate(LandingPageStrings.LatestTeamPicks)</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
-                @foreach (Slot slot in Model.LatestTeamPicks!) @* Can't reach a point where this is null *@
+                @foreach (SlotEntity slot in Model.LatestTeamPicks!) @* Can't reach a point where this is null *@
                 {
                     @await slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{slot.SlotId}", language, timeZone, isMobile, true, true)
                     <br>
@@ -83,7 +83,7 @@
             <h1><i class="globe americas icon"></i>@Model.Translate(LandingPageStrings.NewestLevels)</h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
-                @foreach (Slot slot in Model.NewestLevels!) @* Can't reach a point where this is null *@
+                @foreach (SlotEntity slot in Model.NewestLevels!) @* Can't reach a point where this is null *@
                 {
                     @await slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{slot.SlotId}", language, timeZone, isMobile, true, true)
                     <br>

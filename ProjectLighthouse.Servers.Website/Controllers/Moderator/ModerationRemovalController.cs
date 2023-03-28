@@ -1,6 +1,7 @@
 ﻿using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,9 +18,9 @@ public class ModerationRemovalController : ControllerBase
         this.database = database;
     }
 
-    private async Task<IActionResult> Delete<T>(DbSet<T> dbSet, int id, string? callbackUrl, Func<User, int, Task<T?>> getHandler) where T: class
+    private async Task<IActionResult> Delete<T>(DbSet<T> dbSet, int id, string? callbackUrl, Func<UserEntity, int, Task<T?>> getHandler) where T: class
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         T? item = await getHandler(user, id);
@@ -34,9 +35,9 @@ public class ModerationRemovalController : ControllerBase
     [HttpGet("deleteScore/{scoreId:int}")]
     public async Task<IActionResult> DeleteScore(int scoreId, [FromQuery] string? callbackUrl)
     {
-        return await this.Delete<Score>(this.database.Scores, scoreId, callbackUrl, async (user, id) =>
+        return await this.Delete<ScoreEntity>(this.database.Scores, scoreId, callbackUrl, async (user, id) =>
         {
-            Score? score = await this.database.Scores.Include(s => s.Slot).FirstOrDefaultAsync(s => s.ScoreId == id);
+            ScoreEntity? score = await this.database.Scores.Include(s => s.Slot).FirstOrDefaultAsync(s => s.ScoreId == id);
             if (score == null) return null;
 
             return user.IsModerator ? score : null;
@@ -46,10 +47,10 @@ public class ModerationRemovalController : ControllerBase
     [HttpGet("deleteComment/{commentId:int}")]
     public async Task<IActionResult> DeleteComment(int commentId, [FromQuery] string? callbackUrl)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        Comment? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+        CommentEntity? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.Redirect("~/404");
 
         if (comment.Deleted) return this.Redirect(callbackUrl ?? "~/");
@@ -82,10 +83,10 @@ public class ModerationRemovalController : ControllerBase
     [HttpGet("deleteReview/{reviewId:int}")]
     public async Task<IActionResult> DeleteReview(int reviewId, [FromQuery] string? callbackUrl)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        Review? review = await this.database.Reviews.Include(r => r.Slot).FirstOrDefaultAsync(c => c.ReviewId == reviewId);
+        ReviewEntity? review = await this.database.Reviews.Include(r => r.Slot).FirstOrDefaultAsync(c => c.ReviewId == reviewId);
         if (review == null) return this.Redirect("~/404");
 
         if (review.Deleted) return this.Redirect(callbackUrl ?? "~/");
@@ -103,9 +104,9 @@ public class ModerationRemovalController : ControllerBase
     [HttpGet("deletePhoto/{photoId:int}")]
     public async Task<IActionResult> DeletePhoto(int photoId, [FromQuery] string? callbackUrl)
     {
-        return await this.Delete<Photo>(this.database.Photos, photoId, callbackUrl, async (user, id) =>
+        return await this.Delete<PhotoEntity>(this.database.Photos, photoId, callbackUrl, async (user, id) =>
         {
-            Photo? photo = await this.database.Photos.Include(p => p.Slot).FirstOrDefaultAsync(p => p.PhotoId == id);
+            PhotoEntity? photo = await this.database.Photos.Include(p => p.Slot).FirstOrDefaultAsync(p => p.PhotoId == id);
             if (photo == null) return null;
 
             if (!user.IsModerator && photo.CreatorId != user.UserId) return null;

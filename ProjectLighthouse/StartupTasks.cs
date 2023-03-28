@@ -102,7 +102,7 @@ public static class StartupTasks
             const string passwordClear = "lighthouse";
             string password = CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(passwordClear));
             
-            User admin = database.CreateUser("admin", password).Result;
+            UserEntity admin = database.CreateUser("admin", password).Result;
             admin.PermissionLevel = PermissionLevel.Administrator;
             admin.PasswordResetRequired = true;
 
@@ -174,7 +174,7 @@ public static class StartupTasks
 
             stopwatch.Restart();
 
-            List<CompletedMigration> completedMigrations = database.CompletedMigrations.ToList();
+            List<CompletedMigrationEntity> completedMigrations = database.CompletedMigrations.ToList();
             List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
                 .Where(migrationTask => !completedMigrations
                     .Select(m => m.MigrationName)

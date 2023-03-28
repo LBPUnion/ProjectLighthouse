@@ -13,7 +13,7 @@ public class CasePage : BaseLayout
     public CasePage(DatabaseContext database) : base(database)
     {}
 
-    public List<ModerationCase> Cases = new();
+    public List<ModerationCaseEntity> Cases = new();
     public int CaseCount;
     public int DismissedCaseCount;
 
@@ -23,7 +23,7 @@ public class CasePage : BaseLayout
 
     public async Task<IActionResult> OnGet([FromRoute] int pageNumber, [FromQuery] string? name)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.NotFound();
         if (!user.IsModerator) return this.NotFound();
 

@@ -28,7 +28,7 @@
     let images = [];
 </script>
 
-@foreach (GriefReport report in Model.Reports)
+@foreach (GriefReportEntity report in Model.Reports)
 {
     @await Html.PartialAsync("Partials/ReportPartial", report, ViewData.WithTime(timeZone))
 }

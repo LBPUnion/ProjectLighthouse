@@ -11,19 +11,14 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class DatabaseExtensions
 {
-    public static IQueryable<Slot> ByGameVersion
-        (this DbSet<Slot> set, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false)
+    public static IQueryable<SlotEntity> ByGameVersion
+        (this DbSet<SlotEntity> set, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false)
         => set.AsQueryable().ByGameVersion(gameVersion, includeSublevels, includeCreator);
 
-    public static IQueryable<Slot> ByGameVersion
-        (this IQueryable<Slot> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false, bool includeDeveloperLevels = false)
+    public static IQueryable<SlotEntity> ByGameVersion
+        (this IQueryable<SlotEntity> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false, bool includeDeveloperLevels = false)
     {
         query = query.Where(s => s.Type == SlotType.User || (s.Type == SlotType.Developer && includeDeveloperLevels));
-
-        if (includeCreator)
-        {
-            query = query.Include(s => s.Creator);
-        }
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {
@@ -39,9 +34,9 @@ public static class DatabaseExtensions
         return query;
     }
 
-    public static IQueryable<Review> ByGameVersion(this IQueryable<Review> queryable, GameVersion gameVersion, bool includeSublevels = false)
+    public static IQueryable<ReviewEntity> ByGameVersion(this IQueryable<ReviewEntity> queryable, GameVersion gameVersion, bool includeSublevels = false)
     {
-        IQueryable<Review> query = queryable.Include(r => r.Slot).Include(r => r.Slot.Creator);
+        IQueryable<ReviewEntity> query = queryable;
 
         if (gameVersion == GameVersion.LittleBigPlanetVita || gameVersion == GameVersion.LittleBigPlanetPSP || gameVersion == GameVersion.Unknown)
         {

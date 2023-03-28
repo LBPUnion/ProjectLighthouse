@@ -14,15 +14,15 @@ public class ReportPage : BaseLayout
     public ReportPage(DatabaseContext database) : base(database)
     {}
 
-    public GriefReport Report = null!; // Report is not used if it's null in OnGet
+    public GriefReportEntity Report = null!; // Report is not used if it's null in OnGet
     
     public async Task<IActionResult> OnGet([FromRoute] int reportId)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
 
-        GriefReport? report = await this.Database.Reports
+        GriefReportEntity? report = await this.Database.Reports
             .Include(r => r.ReportingPlayer)
             .FirstOrDefaultAsync(r => r.ReportId == reportId);
         if (report == null) return this.NotFound();

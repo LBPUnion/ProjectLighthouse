@@ -22,10 +22,10 @@ public class AdminReportController : ControllerBase
     [HttpGet("remove")]
     public async Task<IActionResult> DeleteReport([FromRoute] int id)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsAdmin) return this.StatusCode(403, "");
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsAdmin) return this.Forbid();
 
-        GriefReport? report = await this.database.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
+        GriefReportEntity? report = await this.database.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
         if (report == null) return this.NotFound();
 
         List<string> hashes = new()
@@ -49,10 +49,10 @@ public class AdminReportController : ControllerBase
     [HttpGet("dismiss")]
     public async Task<IActionResult> DismissReport([FromRoute] int id)
     {
-        User? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsModerator) return this.StatusCode(403, "");
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsModerator) return this.Forbid();
 
-        GriefReport? report = await this.database.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
+        GriefReportEntity? report = await this.database.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
         if (report == null) return this.NotFound();
 
         FileHelper.DeleteResource(report.JpegHash);

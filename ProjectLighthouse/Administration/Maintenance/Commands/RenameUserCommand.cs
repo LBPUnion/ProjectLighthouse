@@ -15,7 +15,7 @@ public class RenameUserCommand : ICommand
     private readonly DatabaseContext database = new();
     public async Task Run(string[] args, Logger logger)
     {
-        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
+        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
         if (user == null)
             try
             {

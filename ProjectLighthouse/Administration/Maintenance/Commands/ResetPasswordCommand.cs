@@ -25,7 +25,7 @@ public class ResetPasswordCommand : ICommand
 
     public async Task Run(string[] args, Logger logger)
     {
-        User? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
+        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);
         if (user == null)
             try
             {

@@ -81,7 +81,7 @@
         }
         <p>@room.PlayerIds.Count players, state is @room.State, version is @room.RoomVersion.ToPrettyString() on platform @room.RoomPlatform</p>
         <p>Slot type: @room.Slot.SlotType, slot id: @room.Slot.SlotId</p>
-        @foreach (User player in room.GetPlayers(Model.Database))
+        @foreach (UserEntity player in room.GetPlayers(Model.Database))
         {
             <div class="ui segment">@player.Username</div>
         }

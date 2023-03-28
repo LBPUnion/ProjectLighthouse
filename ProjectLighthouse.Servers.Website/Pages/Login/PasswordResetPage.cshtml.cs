@@ -19,7 +19,7 @@ public class PasswordResetPage : BaseLayout
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string password, string confirmPassword)
     {
-        User? user;
+        UserEntity? user;
         if (this.Request.Query.ContainsKey("token"))
         {
             user = await this.Database.UserFromPasswordResetToken(this.Request.Query["token"][0]);
@@ -63,7 +63,7 @@ public class PasswordResetPage : BaseLayout
     {
         if (this.Request.Query.ContainsKey("token")) return this.Page();
         
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
         return this.Page();

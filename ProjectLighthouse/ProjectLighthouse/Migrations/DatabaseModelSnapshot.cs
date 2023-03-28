@@ -16,10 +16,10 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
                 {
                     b.Property<int>("HeartedLevelId")
                         .ValueGeneratedOnAdd()
@@ -40,7 +40,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("HeartedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedPlaylist", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedPlaylistEntity", b =>
                 {
                     b.Property<int>("HeartedPlaylistId")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("HeartedPlaylists");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedProfile", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedProfileEntity", b =>
                 {
                     b.Property<int>("HeartedProfileId")
                         .ValueGeneratedOnAdd()
@@ -82,7 +82,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("HeartedProfiles");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.QueuedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.QueuedLevelEntity", b =>
                 {
                     b.Property<int>("QueuedLevelId")
                         .ValueGeneratedOnAdd()
@@ -103,7 +103,31 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("QueuedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedCommentEntity", b =>
+                {
+                    b.Property<int>("RatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RatingId");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RatedComments");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedLevelEntity", b =>
                 {
                     b.Property<int>("RatedLevelId")
                         .ValueGeneratedOnAdd()
@@ -133,7 +157,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("RatedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReview", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReviewEntity", b =>
                 {
                     b.Property<int>("RatedReviewId")
                         .ValueGeneratedOnAdd()
@@ -157,27 +181,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("RatedReviews");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.Reaction", b =>
-                {
-                    b.Property<int>("RatingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TargetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RatingId");
-
-                    b.ToTable("Reactions");
-                });
-
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.VisitedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.VisitedLevelEntity", b =>
                 {
                     b.Property<int>("VisitedLevelId")
                         .ValueGeneratedOnAdd()
@@ -207,7 +211,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("VisitedLevels");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.DatabaseCategory", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.DatabaseCategoryEntity", b =>
                 {
                     b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
@@ -233,7 +237,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("CustomCategories");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Playlist", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.PlaylistEntity", b =>
                 {
                     b.Property<int>("PlaylistId")
                         .ValueGeneratedOnAdd()
@@ -261,7 +265,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Playlists");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Review", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.ReviewEntity", b =>
                 {
                     b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
@@ -308,7 +312,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Score", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.ScoreEntity", b =>
                 {
                     b.Property<int>("ScoreId")
                         .ValueGeneratedOnAdd()
@@ -336,7 +340,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Scores");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", b =>
                 {
                     b.Property<int>("SlotId")
                         .ValueGeneratedOnAdd()
@@ -469,7 +473,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Slots");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Maintenance.CompletedMigration", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Maintenance.CompletedMigrationEntity", b =>
                 {
                     b.Property<string>("MigrationName")
                         .HasColumnType("varchar(255)");
@@ -482,7 +486,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("CompletedMigrations");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReport", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReportEntity", b =>
                 {
                     b.Property<int>("ReportId")
                         .ValueGeneratedOnAdd()
@@ -528,7 +532,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Reports");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.ModerationCase", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.ModerationCaseEntity", b =>
                 {
                     b.Property<int>("CaseId")
                         .ValueGeneratedOnAdd()
@@ -582,7 +586,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Cases");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.BlockedProfile", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.BlockedProfileEntity", b =>
                 {
                     b.Property<int>("BlockedProfileId")
                         .ValueGeneratedOnAdd()
@@ -603,7 +607,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("BlockedProfiles");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.Comment", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.CommentEntity", b =>
                 {
                     b.Property<int>("CommentId")
                         .ValueGeneratedOnAdd()
@@ -646,7 +650,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.LastContact", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.LastContactEntity", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -665,7 +669,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("LastContacts");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.Photo", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", b =>
                 {
                     b.Property<int>("PhotoId")
                         .ValueGeneratedOnAdd()
@@ -705,7 +709,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Photos");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoSubject", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoSubjectEntity", b =>
                 {
                     b.Property<int>("PhotoSubjectId")
                         .ValueGeneratedOnAdd()
@@ -729,7 +733,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("PhotoSubjects");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PlatformLinkAttempt", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PlatformLinkAttemptEntity", b =>
                 {
                     b.Property<int>("PlatformLinkAttemptId")
                         .ValueGeneratedOnAdd()
@@ -757,7 +761,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("PlatformLinkAttempts");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -783,9 +787,6 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<bool>("EmailAddressVerified")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("Game")
-                        .HasColumnType("int");
 
                     b.Property<string>("IconHash")
                         .HasColumnType("longtext");
@@ -862,7 +863,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.ApiKey", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.ApiKeyEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -882,7 +883,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("APIKeys");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailSetToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailSetTokenEntity", b =>
                 {
                     b.Property<int>("EmailSetTokenId")
                         .ValueGeneratedOnAdd()
@@ -904,7 +905,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("EmailSetTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailVerificationToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailVerificationTokenEntity", b =>
                 {
                     b.Property<int>("EmailVerificationTokenId")
                         .ValueGeneratedOnAdd()
@@ -926,7 +927,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("EmailVerificationTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.GameToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.GameTokenEntity", b =>
                 {
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
@@ -960,7 +961,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("GameTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.PasswordResetToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.PasswordResetTokenEntity", b =>
                 {
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
@@ -980,7 +981,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("PasswordResetTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.RegistrationToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.RegistrationTokenEntity", b =>
                 {
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
@@ -1000,7 +1001,7 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("RegistrationTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.WebToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.WebTokenEntity", b =>
                 {
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
@@ -1023,15 +1024,15 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("WebTokens");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1042,15 +1043,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedPlaylist", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedPlaylistEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Playlist", "Playlist")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.PlaylistEntity", "Playlist")
                         .WithMany()
                         .HasForeignKey("PlaylistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1061,15 +1062,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedProfile", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedProfileEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "HeartedUser")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "HeartedUser")
                         .WithMany()
                         .HasForeignKey("HeartedUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1080,15 +1081,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.QueuedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.QueuedLevelEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1099,15 +1100,34 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedCommentEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.CommentEntity", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedLevelEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1118,15 +1138,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReview", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RatedReviewEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Review", "Review")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.ReviewEntity", "Review")
                         .WithMany()
                         .HasForeignKey("ReviewId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1137,15 +1157,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.VisitedLevel", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.VisitedLevelEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1156,9 +1176,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Playlist", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.PlaylistEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "Creator")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1167,15 +1187,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Review", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.ReviewEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "Reviewer")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Reviewer")
                         .WithMany()
                         .HasForeignKey("ReviewerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1186,9 +1206,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Slot");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Score", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.ScoreEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1197,9 +1217,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Slot");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "Creator")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1208,9 +1228,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReport", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.GriefReportEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "ReportingPlayer")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "ReportingPlayer")
                         .WithMany()
                         .HasForeignKey("ReportingPlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1219,15 +1239,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("ReportingPlayer");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.ModerationCase", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Moderation.ModerationCaseEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "Creator")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "Dismisser")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Dismisser")
                         .WithMany()
                         .HasForeignKey("DismisserId");
 
@@ -1236,15 +1256,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Dismisser");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.BlockedProfile", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.BlockedProfileEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "BlockedUser")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "BlockedUser")
                         .WithMany()
                         .HasForeignKey("BlockedUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1255,9 +1275,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.Comment", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.CommentEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "Poster")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Poster")
                         .WithMany()
                         .HasForeignKey("PosterUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1266,9 +1286,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Poster");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.LastContact", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.LastContactEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1277,15 +1297,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.Photo", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "Creator")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.Slot", "Slot")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId");
 
@@ -1294,15 +1314,15 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("Slot");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoSubject", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoSubjectEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.Photo", "Photo")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", "Photo")
                         .WithMany("PhotoSubjects")
                         .HasForeignKey("PhotoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1313,9 +1333,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PlatformLinkAttempt", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PlatformLinkAttemptEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1324,9 +1344,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailSetToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailSetTokenEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1335,9 +1355,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailVerificationToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.EmailVerificationTokenEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1346,9 +1366,9 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.GameToken", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Token.GameTokenEntity", b =>
                 {
-                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.User", "User")
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1357,7 +1377,7 @@ namespace ProjectLighthouse.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.Photo", b =>
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", b =>
                 {
                     b.Navigation("PhotoSubjects");
                 });

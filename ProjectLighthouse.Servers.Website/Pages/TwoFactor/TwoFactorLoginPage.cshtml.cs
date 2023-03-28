@@ -22,14 +22,14 @@ public class TwoFactorLoginPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         this.RedirectUrl = redirect ?? "~/";
 
         if (token.Verified) return this.Redirect(this.RedirectUrl);
 
-        User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
+        UserEntity? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
         if (user == null) return this.Redirect("~/login");
 
         if (user.IsTwoFactorSetup) return this.Page();
@@ -43,14 +43,14 @@ public class TwoFactorLoginPage : BaseLayout
     {
         if (!ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled) return this.Redirect("~/login");
 
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
         this.RedirectUrl = redirect ?? "~/";
 
         if (token.Verified) return this.Redirect(this.RedirectUrl);
 
-        User? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
+        UserEntity? user = await this.Database.Users.Where(u => u.UserId == token.UserId).FirstOrDefaultAsync();
         if (user == null) return this.Redirect("~/login");
 
         if (!user.IsTwoFactorSetup)

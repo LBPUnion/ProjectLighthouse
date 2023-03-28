@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Types.Levels;
 
@@ -29,41 +30,19 @@ public abstract class Category
         set => this.Endpoint = value.Replace("/searches/", "");
     }
 
-    public abstract Slot? GetPreviewSlot(DatabaseContext database);
+    public abstract SlotEntity? GetPreviewSlot(DatabaseContext database);
 
-    public abstract IEnumerable<Slot> GetSlots(DatabaseContext database, int pageStart, int pageSize);
+    public abstract IEnumerable<SlotEntity> GetSlots(DatabaseContext database, int pageStart, int pageSize);
 
     public abstract int GetTotalSlots(DatabaseContext database);
 
-    public string Serialize(DatabaseContext database)
+    public GameCategory Serialize(DatabaseContext database)
     {
-        Slot? previewSlot = this.GetPreviewSlot(database);
-
-        string previewResults = "";
-        if (previewSlot != null)
-            previewResults = LbpSerializer.TaggedStringElement
-            (
-                "results",
-                previewSlot.Serialize(),
-                new Dictionary<string, object>
-                {
-                    {
-                        "total", this.GetTotalSlots(database)
-                    },
-                    {
-                        "hint_start", "2"
-                    },
-                }
-            );
-
-        return LbpSerializer.StringElement
-        (
-            "category",
-            LbpSerializer.StringElement("name", this.Name) +
-            LbpSerializer.StringElement("description", this.Description) +
-            LbpSerializer.StringElement("url", this.IngameEndpoint) +
-            (previewSlot == null ? "" : previewResults) +
-            LbpSerializer.StringElement("icon", this.IconHash)
-        );
+        List<SlotBase> slots = new()
+        {
+            SlotBase.CreateFromEntity(this.GetPreviewSlot(database), GameVersion.LittleBigPlanet3, -1),
+        };
+        int totalSlots = this.GetTotalSlots(database);
+        return GameCategory.CreateFromEntity(this, new GenericSlotResponse(slots, totalSlots, 2));
     }
 }

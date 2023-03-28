@@ -15,7 +15,7 @@
 
 <p>There are @Model.SlotCount hidden levels.</p>
 
-@foreach (Slot slot in Model.Slots)
+@foreach (SlotEntity slot in Model.Slots)
 {
     <div class="ui segment">
         @await slot.ToHtml(Html, ViewData, Model.User, $"~/moderation/hiddenLevels/{Model.PageNumber}", language, timeZone, isMobile, true)

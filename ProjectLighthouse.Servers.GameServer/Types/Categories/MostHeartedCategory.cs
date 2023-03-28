@@ -14,8 +14,8 @@ public class MostHeartedCategory : Category
     public override string Description { get; set; } = "The Most Hearted Content";
     public override string IconHash { get; set; } = "g820607";
     public override string Endpoint { get; set; } = "mostHearted";
-    public override Slot? GetPreviewSlot(DatabaseContext database) => database.Slots.Where(s => s.Type == SlotType.User).AsEnumerable().MaxBy(s => s.Hearts);
-    public override IEnumerable<Slot> GetSlots
+    public override SlotEntity? GetPreviewSlot(DatabaseContext database) => database.Slots.Where(s => s.Type == SlotType.User).AsEnumerable().MaxBy(s => s.Hearts);
+    public override IEnumerable<SlotEntity> GetSlots
         (DatabaseContext database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3, false, true)
             .AsEnumerable()

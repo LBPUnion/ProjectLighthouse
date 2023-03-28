@@ -17,7 +17,7 @@ public class NewCasePage : BaseLayout
 
     public IActionResult OnGet([FromQuery] CaseType? type, [FromQuery] int? affectedId)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.Redirect("/login");
 
         if (type == null) return this.BadRequest();
@@ -31,7 +31,7 @@ public class NewCasePage : BaseLayout
 
     public async Task<IActionResult> OnPost(CaseType? type, string? reason, string? modNotes, DateTime expires, int? affectedId)
     {
-        User? user = this.Database.UserFromWebRequest(this.Request);
+        UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.Redirect("/login");
 
         if (type == null) return this.BadRequest();
@@ -43,7 +43,7 @@ public class NewCasePage : BaseLayout
         // if id is invalid then return bad request
         if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
         
-        ModerationCase @case = new()
+        ModerationCaseEntity @case = new()
         {
             Type = type.Value,
             Reason = reason,

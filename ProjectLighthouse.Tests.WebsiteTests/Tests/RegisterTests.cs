@@ -32,7 +32,7 @@ public class RegisterTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
-        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
         Assert.NotNull(user);
 
         await database.RemoveUser(user);
@@ -57,7 +57,7 @@ public class RegisterTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
-        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
         Assert.Null(user);
     }
 
@@ -70,7 +70,7 @@ public class RegisterTests : LighthouseWebTest
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
 
         await database.CreateUser(username, CryptoHelper.BCryptHash(password));
-        User? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
         Assert.NotNull(user);
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");

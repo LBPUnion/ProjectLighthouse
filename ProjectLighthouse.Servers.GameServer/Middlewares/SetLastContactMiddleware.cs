@@ -18,7 +18,7 @@ public class SetLastContactMiddleware : MiddlewareDBContext
         if (context.Request.Path.ToString().StartsWith("/LITTLEBIGPLANETPS3_XML"))
         {
             // We begin by grabbing a token from the request, if this is a LBPPS3_XML request of course.
-            GameToken? gameToken = await database.GameTokenFromRequest(context.Request);
+            GameTokenEntity? gameToken = await database.GameTokenFromRequest(context.Request);
 
             if (gameToken?.GameVersion == GameVersion.LittleBigPlanet1)
                 // Ignore UserFromGameToken null because user must exist for a token to exist

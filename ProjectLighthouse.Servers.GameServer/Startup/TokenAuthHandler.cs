@@ -35,7 +35,7 @@ public class TokenAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
     {
         if (!this.Context.Request.Cookies.ContainsKey(cookie)) return AuthenticateResult.Fail("No auth cookie");
 
-        GameToken? gameToken = await this.database.GameTokenFromRequest(this.Request);
+        GameTokenEntity? gameToken = await this.database.GameTokenFromRequest(this.Request);
         if (gameToken == null) return AuthenticateResult.Fail("No game token");
 
         this.Context.Items["Token"] = gameToken;

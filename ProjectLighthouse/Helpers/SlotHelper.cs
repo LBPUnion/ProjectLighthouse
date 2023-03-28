@@ -53,7 +53,7 @@ public static class SlotHelper
         await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
         try
         {
-            User devCreator = new()
+            UserEntity devCreator = new()
             {
                 Username = "",
                 PermissionLevel = PermissionLevel.Banned,
@@ -89,7 +89,7 @@ public static class SlotHelper
 
             int devCreatorId = await GetPlaceholderUserId(database);
 
-            Slot slot = new()
+            SlotEntity slot = new()
             {
                 Name = $"{slotType} slot {guid}",
                 Description = $"Placeholder for {slotType} type level",

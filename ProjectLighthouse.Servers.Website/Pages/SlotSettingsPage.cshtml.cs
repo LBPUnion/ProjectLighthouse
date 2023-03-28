@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 public class SlotSettingsPage : BaseLayout
 {
 
-    public Slot? Slot;
+    public SlotEntity? Slot;
     public SlotSettingsPage(DatabaseContext database) : base(database)
     {}
 

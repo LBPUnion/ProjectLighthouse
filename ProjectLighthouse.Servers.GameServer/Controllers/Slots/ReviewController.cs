@@ -2,10 +2,10 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,15 +30,15 @@ public class ReviewController : ControllerBase
     [HttpPost("rate/user/{slotId:int}")]
     public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == slotId);
-        if (slot == null) return this.StatusCode(403, "");
+        SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == slotId);
+        if (slot == null) return this.Forbid();
 
-        RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
+        RatedLevelEntity? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
         if (ratedLevel == null)
         {
-            ratedLevel = new RatedLevel
+            ratedLevel = new RatedLevelEntity
             {
                 SlotId = slotId,
                 UserId = token.UserId,
@@ -59,15 +59,15 @@ public class ReviewController : ControllerBase
     [HttpPost("dpadrate/user/{slotId:int}")]
     public async Task<IActionResult> DPadRate(int slotId, [FromQuery] int rating)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
-        if (slot == null) return this.StatusCode(403, "");
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        if (slot == null) return this.Forbid();
 
-        RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
+        RatedLevelEntity? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
         if (ratedLevel == null)
         {
-            ratedLevel = new RatedLevel
+            ratedLevel = new RatedLevelEntity
             {
                 SlotId = slotId,
                 UserId = token.UserId,
@@ -79,7 +79,7 @@ public class ReviewController : ControllerBase
 
         ratedLevel.Rating = Math.Clamp(rating, -1, 1);
 
-        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == token.UserId);
+        ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == token.UserId);
         if (review != null) review.Thumb = ratedLevel.Rating;
 
         await this.database.SaveChangesAsync();
@@ -90,20 +90,20 @@ public class ReviewController : ControllerBase
     [HttpPost("postReview/user/{slotId:int}")]
     public async Task<IActionResult> PostReview(int slotId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
-        Review? newReview = await this.DeserializeBody<Review>();
+        GameReview? newReview = await this.DeserializeBody<GameReview>();
         if (newReview == null) return this.BadRequest();
 
         newReview.Text = CensorHelper.FilterMessage(newReview.Text);
 
         if (newReview.Text.Length > 512) return this.BadRequest();
 
-        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == token.UserId);
+        ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == token.UserId);
 
         if (review == null)
         {
-            review = new Review
+            review = new ReviewEntity
             {
                 SlotId = slotId,
                 ReviewerId = token.UserId,
@@ -121,10 +121,10 @@ public class ReviewController : ControllerBase
         review.Timestamp = TimeHelper.TimestampMillis;
 
         // sometimes the game posts/updates a review rating without also calling dpadrate/user/etc (why??)
-        RatedLevel? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
+        RatedLevelEntity? ratedLevel = await this.database.RatedLevels.FirstOrDefaultAsync(r => r.SlotId == slotId && r.UserId == token.UserId);
         if (ratedLevel == null)
         {
-            ratedLevel = new RatedLevel
+            ratedLevel = new RatedLevelEntity
             {
                 SlotId = slotId,
                 UserId = token.UserId,
@@ -144,58 +144,32 @@ public class ReviewController : ControllerBase
     [HttpGet("reviewsFor/user/{slotId:int}")]
     public async Task<IActionResult> ReviewsFor(int slotId, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
         GameVersion gameVersion = token.GameVersion;
 
-        Slot? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.BadRequest();
 
-        IQueryable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)
+        List<GameReview> reviews = await this.database.Reviews.ByGameVersion(gameVersion, true)
             .Where(r => r.SlotId == slotId)
-            .Include(r => r.Reviewer)
-            .Include(r => r.Slot)
             .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
             .ThenByDescending(r => r.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
-            .Take(pageSize);
+            .Take(Math.Min(pageSize, 30))
+            .Select(r => GameReview.CreateFromEntity(r, token))
+            .ToListAsync();
 
-        List<Review?> reviewList = reviews.ToList();
 
-        string inner = reviewList.Aggregate
-        (
-            string.Empty,
-            (current, review) =>
-            {
-                if (review == null) return current;
-
-                RatedReview? yourThumb = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
-                return current + review.Serialize(yourThumb);
-            }
-        );
-        string response = LbpSerializer.TaggedStringElement
-        (
-            "reviews",
-            inner,
-            new Dictionary<string, object>
-            {
-                {
-                    "hint_start", pageStart + pageSize
-                },
-                {
-                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0
-                },
-            }
-        );
-        return this.Ok(response);
+        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart + Math.Min(pageSize, 30)));
     }
 
     [HttpGet("reviewsBy/{username}")]
     public async Task<IActionResult> ReviewsBy(string username, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -205,61 +179,32 @@ public class ReviewController : ControllerBase
 
         if (targetUserId == 0) return this.BadRequest();
 
-        IEnumerable<Review?> reviews = this.database.Reviews.ByGameVersion(gameVersion, true)
-            .Include(r => r.Reviewer)
-            .Include(r => r.Slot)
+        List<GameReview> reviews = await this.database.Reviews.ByGameVersion(gameVersion, true)
             .Where(r => r.ReviewerId == targetUserId)
             .OrderByDescending(r => r.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
-            .Take(pageSize);
+            .Take(Math.Min(pageSize, 30))
+            .Select(r => GameReview.CreateFromEntity(r, token))
+            .ToListAsync();
 
-        List<Review?> reviewList = reviews.ToList();
-
-        string inner = reviewList.Aggregate
-        (
-            string.Empty,
-            (current, review) =>
-            {
-                if (review == null) return current;
-
-                RatedReview? ratedReview = this.database.RatedReviews.FirstOrDefault(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
-                return current + review.Serialize(ratedReview);
-            }
-        );
-
-        string response = LbpSerializer.TaggedStringElement
-        (
-            "reviews",
-            inner,
-            new Dictionary<string, object>
-            {
-                {
-                    "hint_start", pageStart
-                },
-                {
-                    "hint", reviewList.LastOrDefault()?.Timestamp ?? 0 // Seems to be the timestamp of oldest
-                },
-            }
-        );
-
-        return this.Ok(response);
+        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart));
     }
 
     [HttpPost("rateReview/user/{slotId:int}/{username}")]
     public async Task<IActionResult> RateReview(int slotId, string username, [FromQuery] int rating = 0)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         int reviewerId = await this.database.UserIdFromUsername(username);
-        if (reviewerId == 0) return this.StatusCode(400, "");
+        if (reviewerId == 0) return this.BadRequest();
 
-        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
-        if (review == null) return this.StatusCode(400, "");
+        ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
+        if (review == null) return this.BadRequest();
 
-        RatedReview? ratedReview = await this.database.RatedReviews.FirstOrDefaultAsync(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
+        RatedReviewEntity? ratedReview = await this.database.RatedReviews.FirstOrDefaultAsync(r => r.ReviewId == review.ReviewId && r.UserId == token.UserId);
         if (ratedReview == null)
         {
-            ratedReview = new RatedReview
+            ratedReview = new RatedReviewEntity
             {
                 ReviewId = review.ReviewId,
                 UserId = token.UserId,
@@ -301,18 +246,18 @@ public class ReviewController : ControllerBase
     [HttpPost("deleteReview/user/{slotId:int}/{username}")]
     public async Task<IActionResult> DeleteReview(int slotId, string username)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         int creatorId = await this.database.Slots.Where(s => s.SlotId == slotId).Select(s => s.CreatorId).FirstOrDefaultAsync();
-        if (creatorId == 0) return this.StatusCode(400, "");
+        if (creatorId == 0) return this.BadRequest();
 
-        if (token.UserId != creatorId) return this.StatusCode(403, "");
+        if (token.UserId != creatorId) return this.Unauthorized();
 
         int reviewerId = await this.database.UserIdFromUsername(username);
-        if (reviewerId == 0) return this.StatusCode(400, "");
+        if (reviewerId == 0) return this.BadRequest();
 
-        Review? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
-        if (review == null) return this.StatusCode(400, "");
+        ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.SlotId == slotId && r.ReviewerId == reviewerId);
+        if (review == null) return this.BadRequest();
 
         review.Deleted = true;
         review.DeletedBy = DeletedBy.LevelAuthor;

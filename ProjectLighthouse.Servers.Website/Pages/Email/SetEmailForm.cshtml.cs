@@ -22,7 +22,7 @@ public class SetEmailForm : BaseLayout
     public IActionResult OnGet()
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled) return this.NotFound();
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("/login");
 
         return this.Page();
@@ -33,10 +33,10 @@ public class SetEmailForm : BaseLayout
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled) return this.NotFound();
 
-        WebToken? token = this.Database.WebTokenFromRequest(this.Request);
+        WebTokenEntity? token = this.Database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-        User? user = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
+        UserEntity? user = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
         if (user == null) return this.Redirect("~/login");
 
         if (!SanitizationHelper.IsValidEmail(emailAddress))

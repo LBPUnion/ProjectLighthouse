@@ -4,12 +4,12 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +34,7 @@ public class ScoreController : ControllerBase
     [HttpPost("scoreboard/{slotType}/{id:int}/{childId:int}")]
     public async Task<IActionResult> SubmitScore(string slotType, int id, int childId)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         string username = await this.database.UsernameFromGameToken(token);
 
@@ -44,16 +44,15 @@ public class ScoreController : ControllerBase
             return this.BadRequest();
         }
 
-        Score? score = await this.DeserializeBody<Score>();
+        GameScore? score = await this.DeserializeBody<GameScore>();
         if (score == null)
         {
             Logger.Warn($"Rejecting score upload, score is null (slotType={slotType}, slotId={id}, user={username})", LogArea.Score);
             return this.BadRequest();
         }
 
-        // This only seems to happens on lbp2 versus levels, not sure why
-        if (score.PlayerIdCollection.Contains(':')) 
-            score.PlayerIdCollection = score.PlayerIdCollection.Replace(':', ',');
+        // Workaround for parsing player ids of versus levels
+        if (score.PlayerIds.Length == 1 && score.PlayerIds[0].Contains(':')) score.PlayerIds = score.PlayerIds[0].Split(":");
 
         if (score.PlayerIds.Length == 0)
         {
@@ -89,15 +88,14 @@ public class ScoreController : ControllerBase
 
         SanitizationHelper.SanitizeStringsInClass(score);
 
-        if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
+        int slotId = id;
 
-        score.SlotId = id;
-        score.ChildSlotId = childId;
+        if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        Slot? slot = this.database.Slots.FirstOrDefault(s => s.SlotId == score.SlotId);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null)
         {
-            Logger.Warn($"Rejecting score upload, slot is null (slotId={score.SlotId}, slotType={slotType}, reqId={id}, user={username})", LogArea.Score);
+            Logger.Warn($"Rejecting score upload, slot is null (slotId={slotId}, slotType={slotType}, reqId={id}, user={username})", LogArea.Score);
             return this.BadRequest();
         }
 
@@ -115,46 +113,56 @@ public class ScoreController : ControllerBase
                 break;
             case GameVersion.LittleBigPlanetPSP:
             case GameVersion.Unknown:
-            default: throw new ArgumentOutOfRangeException();
+            default:
+                return this.BadRequest();
         }
 
-        Score playerScore = new()
-        {
-            PlayerIdCollection = string.Join(',', score.PlayerIds),
-            Type = score.Type,
-            Points = score.Points,
-            SlotId = score.SlotId,
-            ChildSlotId = score.ChildSlotId,
-        };
+        await this.database.SaveChangesAsync();
 
-        IQueryable<Score> existingScore = this.database.Scores.Where(s => s.SlotId == playerScore.SlotId)
+        string playerIdCollection = string.Join(',', score.PlayerIds);
+
+        ScoreEntity? existingScore = await this.database.Scores.Where(s => s.SlotId == slot.SlotId)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
-            .Where(s => s.PlayerIdCollection == playerScore.PlayerIdCollection)
-            .Where(s => s.Type == playerScore.Type);
-        if (existingScore.Any())
+            .Where(s => s.PlayerIdCollection == playerIdCollection)
+            .Where(s => s.Type == score.Type)
+            .FirstOrDefaultAsync();
+        if (existingScore != null)
         {
-            Score first = existingScore.First(s => s.SlotId == playerScore.SlotId);
-            playerScore.ScoreId = first.ScoreId;
-            playerScore.Points = Math.Max(first.Points, playerScore.Points);
-            this.database.Entry(first).CurrentValues.SetValues(playerScore);
+            existingScore.Points = Math.Max(existingScore.Points, score.Points);
         }
         else
         {
+            ScoreEntity playerScore = new()
+            {
+                PlayerIdCollection = playerIdCollection,
+                Type = score.Type,
+                Points = score.Points,
+                SlotId = slotId,
+                ChildSlotId = childId,
+            };
             this.database.Scores.Add(playerScore);
         }
 
         await this.database.SaveChangesAsync();
 
-        string myRanking = this.getScores(score.SlotId, score.Type, username, -1, 5, "scoreboardSegment", childId: score.ChildSlotId);
-
-        return this.Ok(myRanking);
+        return this.Ok(this.getScores(new LeaderboardOptions
+        {
+            RootName = "scoreboardSegment",
+            PageSize = 5,
+            PageStart = -1,
+            SlotId = slotId,
+            ChildSlotId = childId,
+            ScoreType = score.Type,
+            TargetUsername = username,
+            TargetPlayerIds = null,
+        })); 
     }
 
     [HttpGet("friendscores/{slotType}/{slotId:int}/{type:int}")]
     [HttpGet("friendscores/{slotType}/{slotId:int}/{childId:int}/{type:int}")]
     public async Task<IActionResult> FriendScores(string slotType, int slotId, int? childId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -180,7 +188,17 @@ public class ScoreController : ControllerBase
             if (friendUsername != null) friendNames.Add(friendUsername);
         }
 
-        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, "scores", friendNames.ToArray(), childId)); 
+        return this.Ok(this.getScores(new LeaderboardOptions
+        {
+            RootName = "scores",
+            PageSize = pageSize,
+            PageStart = pageStart,
+            SlotId = slotId,
+            ChildSlotId = childId,
+            ScoreType = type,
+            TargetUsername = username,
+            TargetPlayerIds = friendNames.ToArray(),
+        })); 
     }
 
     [HttpGet("topscores/{slotType}/{slotId:int}/{type:int}")]
@@ -188,7 +206,7 @@ public class ScoreController : ControllerBase
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
     public async Task<IActionResult> TopScores(string slotType, int slotId, int? childId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
     {
-        GameToken token = this.GetToken();
+        GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
@@ -198,79 +216,60 @@ public class ScoreController : ControllerBase
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        return this.Ok(this.getScores(slotId, type, username, pageStart, pageSize, childId: childId));
+        return this.Ok(this.getScores(new LeaderboardOptions
+        {
+            RootName = "scores",
+            PageSize = pageSize,
+            PageStart = pageStart,
+            SlotId = slotId,
+            ChildSlotId = childId,
+            ScoreType = type,
+            TargetUsername = username,
+            TargetPlayerIds = null,
+        }));
     }
 
-    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-    private string getScores
-    (
-        int slotId,
-        int type,
-        string username,
-        int pageStart = -1,
-        int pageSize = 5,
-        string rootName = "scores",
-        string[]? playerIds = null,
-        int? childId = 0
-    )
+    private class LeaderboardOptions
+    {
+        public int SlotId { get; set; }
+        public int ScoreType { get; set; }
+        public string TargetUsername { get; set; } = "";
+        public int PageStart { get; set; } = -1;
+        public int PageSize { get; set; } = 5;
+        public string RootName { get; set; } = "scores";
+        public string[]? TargetPlayerIds;
+        public int? ChildSlotId;
+    }
+
+    private ScoreboardResponse getScores(LeaderboardOptions options)
     {
 
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
-        var rankedScores = this.database.Scores
-            .Where(s => s.SlotId == slotId && s.Type == type)
-            .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
+        var rankedScores = this.database.Scores.Where(s => s.SlotId == options.SlotId && s.Type == options.ScoreType)
+            .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == options.ChildSlotId)
             .AsEnumerable()
-            .Where(s => playerIds == null || playerIds.Any(id => s.PlayerIdCollection.Split(",").Contains(id)))
+            .Where(s => options.TargetPlayerIds == null ||
+                        options.TargetPlayerIds.Any(id => s.PlayerIdCollection.Split(",").Contains(id)))
             .OrderByDescending(s => s.Points)
             .ThenBy(s => s.ScoreId)
             .ToList()
-            .Select
-            (
-                (s, rank) => new
-                {
-                    Score = s,
-                    Rank = rank + 1,
-                }
-            );
+            .Select((s, rank) => new
+            {
+                Score = s,
+                Rank = rank + 1,
+            })
+            .ToList();
+
 
         // Find your score, since even if you aren't in the top list your score is pinned
-        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Split(",").Contains(username)).MaxBy(rs => rs.Score.Points);
+        var myScore = rankedScores.Where(rs => rs.Score.PlayerIdCollection.Split(",").Contains(options.TargetUsername)).MaxBy(rs => rs.Score.Points);
 
         // Paginated viewing: if not requesting pageStart, get results around user
-        var pagedScores = rankedScores.Skip(pageStart != -1 || myScore == null ? pageStart - 1 : myScore.Rank - 3).Take(Math.Min(pageSize, 30));
+        var pagedScores = rankedScores.Skip(options.PageStart != -1 || myScore == null ? options.PageStart - 1 : myScore.Rank - 3).Take(Math.Min(options.PageSize, 30));
 
-        string serializedScores = pagedScores.Aggregate
-        (
-            string.Empty,
-            (current, rs) =>
-            {
-                rs.Score.Rank = rs.Rank;
-                return current + rs.Score.Serialize();
-            }
-        );
+        List<GameScore> gameScores = pagedScores.Select(ps => GameScore.CreateFromEntity(ps.Score, ps.Rank)).ToList();
 
-        string res;
-        if (myScore == null) res = LbpSerializer.StringElement(rootName, serializedScores);
-        else
-            res = LbpSerializer.TaggedStringElement
-            (
-                rootName,
-                serializedScores,
-                new Dictionary<string, object>
-                {
-                    {
-                        "yourScore", myScore.Score.Points
-                    },
-                    {
-                        "yourRank", myScore.Rank
-                    }, //This is the numerator of your position globally in the side menu.
-                    {
-                        "totalNumScores", rankedScores.Count()
-                    }, // This is the denominator of your position globally in the side menu.
-                }
-            );
-
-        return res;
+        return new ScoreboardResponse(options.RootName, gameScores, myScore?.Score.Points ?? 0, myScore?.Rank ?? 0, rankedScores.Count);
     }
 }
