@@ -1,11 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Misc;
@@ -121,9 +121,15 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
 
     #region Used Slots
 
+    // Used to identify LBP1 used slots in LBP2 and beyond
     [DefaultValue(0)]
     [XmlElement("lbp1UsedSlots")]
     public int Lbp1UsedSlots { get; set; }
+
+    // Used to calculate the number of slots the user has used in LBP1 only
+    [DefaultValue(0)]
+    [XmlElement("freeSlots")]
+    public int Lbp1FreeSlots { get; set; }
 
     [DefaultValue(0)]
     [XmlElement("entitledSlots")]
@@ -199,6 +205,9 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
             this.Lbp1UsedSlots = await SlotCount(GameVersion.LittleBigPlanet1).CountAsync();
             this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync();
             this.Lbp3UsedSlots = await SlotCount(GameVersion.LittleBigPlanet3).CountAsync();
+            
+            this.Lbp1FreeSlots = this.Lbp1EntitledSlots - this.Lbp1UsedSlots;
+
             this.CrossControlUsedSlots = await database.Slots.CountAsync(s => s.CreatorId == this.UserId && s.CrossControllerRequired);
         }
 
