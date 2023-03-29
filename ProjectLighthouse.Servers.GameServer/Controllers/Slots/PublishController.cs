@@ -122,12 +122,6 @@ public class PublishController : ControllerBase
         // Yes Rider, this isn't null
         Debug.Assert(slot.Resources != null, "slot.ResourceList != null");
 
-        if (string.IsNullOrWhiteSpace(slot.BackgroundHash))
-        {
-            Logger.Warn("Rejecting level upload, background is null", LogArea.Publish);
-            return this.BadRequest();
-        }
-
         slot.Description = CensorHelper.FilterMessage(slot.Description);
 
         if (slot.Description.Length > 512)

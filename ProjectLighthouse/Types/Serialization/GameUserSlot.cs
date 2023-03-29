@@ -78,7 +78,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [DefaultValue("")]
     [XmlElement("background")]
-    public string? BackgroundHash { get; set; }
+    public string BackgroundHash { get; set; } = "";
 
     [XmlElement("shareable")]
     public int IsShareable { get; set; }
