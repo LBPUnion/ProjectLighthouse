@@ -171,6 +171,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
                 PlaylistCount = database.Playlists.Count(p => p.CreatorId == this.UserId),
                 ReviewCount = database.Reviews.Count(r => r.ReviewerId == this.UserId),
                 CommentCount = database.Comments.Count(c => c.TargetId == this.UserId && c.Type == CommentType.Profile),
+                HeartCount = database.HeartedProfiles.Count(h => h.HeartedUserId == this.UserId),
                 PhotosByMeCount = database.Photos.Count(p => p.CreatorId == this.UserId),
                 PhotosWithMeCount = database.Photos.Include(p => p.PhotoSubjects)
                     .Count(p => p.PhotoSubjects.Any(ps => ps.UserId == this.UserId)),
