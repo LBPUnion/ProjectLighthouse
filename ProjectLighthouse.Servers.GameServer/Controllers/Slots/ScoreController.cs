@@ -52,7 +52,8 @@ public class ScoreController : ControllerBase
         }
 
         // Workaround for parsing player ids of versus levels
-        if (score.PlayerIds.Length == 1 && score.PlayerIds[0].Contains(':')) score.PlayerIds = score.PlayerIds[0].Split(":");
+        if (score.PlayerIds.Length == 1 && score.PlayerIds[0].Contains(':'))
+            score.PlayerIds = score.PlayerIds[0].Split(":", StringSplitOptions.RemoveEmptyEntries);
 
         if (score.PlayerIds.Length == 0)
         {
@@ -81,7 +82,7 @@ public class ScoreController : ControllerBase
         {
             string bodyString = await this.ReadBodyAsync();
             Logger.Warn("Rejecting score upload, requester username is not present in playerIds" +
-                        $" (user={username}, playerIds={string.Join(",", score.PlayerIds)}, " +
+                        $" (user='{username}', playerIds='{string.Join(",", score.PlayerIds)}', " +
                         $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={id}, slotType={slotType}, body='{bodyString}')", LogArea.Score);
             return this.BadRequest();
         }
@@ -92,7 +93,7 @@ public class ScoreController : ControllerBase
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null)
         {
             Logger.Warn($"Rejecting score upload, slot is null (slotId={slotId}, slotType={slotType}, reqId={id}, user={username})", LogArea.Score);
