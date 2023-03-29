@@ -51,10 +51,11 @@ public abstract class CategoryWithUser : Category
 
     public GameCategory Serialize(DatabaseContext database, UserEntity user)
     {
-        List<SlotBase> slots = new()
-        {
-            SlotBase.CreateFromEntity(this.GetPreviewSlot(database, user), GameVersion.LittleBigPlanet3, user.UserId),
-        };
+        List<SlotBase> slots = new();
+        SlotEntity? previewSlot = this.GetPreviewSlot(database, user);
+        if (previewSlot != null)
+            slots.Add(SlotBase.CreateFromEntity(previewSlot, GameVersion.LittleBigPlanet3, user.UserId));
+        
         int totalSlots = this.GetTotalSlots(database, user);
         return GameCategory.CreateFromEntity(this, new GenericSlotResponse(slots, totalSlots, 2));
     }
