@@ -52,8 +52,15 @@ public class ScoreController : ControllerBase
         }
 
         // Workaround for parsing player ids of versus levels
-        if (score.PlayerIds.Length == 1 && score.PlayerIds[0].Contains(':'))
-            score.PlayerIds = score.PlayerIds[0].Split(":", StringSplitOptions.RemoveEmptyEntries);
+        if (score.PlayerIds.Length == 1)
+        {
+            char[] delimiters = { ':', ',', };
+            foreach (char delimiter in delimiters)
+            {
+                score.PlayerIds = score.PlayerIds[0].Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+            }
+                
+        }
 
         if (score.PlayerIds.Length == 0)
         {
@@ -82,8 +89,9 @@ public class ScoreController : ControllerBase
         {
             string bodyString = await this.ReadBodyAsync();
             Logger.Warn("Rejecting score upload, requester username is not present in playerIds" +
-                        $" (user='{username}', playerIds='{string.Join(",", score.PlayerIds)}', " +
-                        $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={id}, slotType={slotType}, body='{bodyString}')", LogArea.Score);
+                        $" (user='{username}', playerIds='{string.Join(",", score.PlayerIds)}' playerIds.Length={score.PlayerIds.Length}, " +
+                        $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={id}, slotType={slotType}, body='{bodyString}')",
+                LogArea.Score);
             return this.BadRequest();
         }
 
