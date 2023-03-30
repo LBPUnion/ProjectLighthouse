@@ -37,8 +37,6 @@ public class ReportController : ControllerBase
         GameGriefReport? report = await this.DeserializeBody<GameGriefReport>();
         if (report == null) return this.BadRequest();
 
-        SanitizationHelper.SanitizeStringsInClass(report);
-
         if (string.IsNullOrWhiteSpace(report.JpegHash)) return this.BadRequest();
 
         if (!FileHelper.ResourceExists(report.JpegHash)) return this.BadRequest();

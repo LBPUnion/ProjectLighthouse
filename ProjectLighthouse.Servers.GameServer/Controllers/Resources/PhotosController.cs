@@ -42,8 +42,6 @@ public class PhotosController : ControllerBase
         GamePhoto? photo = await this.DeserializeBody<GamePhoto>();
         if (photo == null) return this.BadRequest();
 
-        SanitizationHelper.SanitizeStringsInClass(photo);
-
         foreach (PhotoEntity p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
         {
             if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uplaoded

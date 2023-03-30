@@ -1,20 +1,21 @@
+#nullable enable
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Web;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MigrationTasks;
 
-public class CleanupXmlInjectionMigration : IMigrationTask
+public class CleanupSanitizedStrings : IMigrationTask
 {
-    public string Name() => "Cleanup XML injections";
+    public string Name() => "Cleanup Sanitized strings";
 
-    // Weird, but required. Thanks, hejlsberg.
     async Task<bool> IMigrationTask.Run(DatabaseContext database)
     {
         List<object> objsToBeSanitized = new();
-        
+
         // Store all the objects we need to sanitize in a list.
         // The alternative here is to loop through every table, but thats a ton of code...
         objsToBeSanitized.AddRange(database.Slots);
@@ -24,8 +25,25 @@ public class CleanupXmlInjectionMigration : IMigrationTask
         objsToBeSanitized.AddRange(database.Users);
         objsToBeSanitized.AddRange(database.Photos);
         objsToBeSanitized.AddRange(database.Reports);
-        
-        foreach (object obj in objsToBeSanitized) SanitizationHelper.SanitizeStringsInClass(obj);
+
+        foreach (object obj in objsToBeSanitized)
+        {
+            PropertyInfo[] properties = obj.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.PropertyType != typeof(string)) continue;
+
+                string? before = (string?)property.GetValue(obj);
+
+                if (before == null) continue;
+
+                string after = HttpUtility.HtmlDecode(before);
+                if (before != after)
+                {
+                    property.SetValue(obj, after);
+                }
+            }
+        }
 
         await database.SaveChangesAsync();
         return true;
