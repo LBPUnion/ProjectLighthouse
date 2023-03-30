@@ -64,7 +64,7 @@ public class CollectionController : ControllerBase
         {
             targetPlaylist.SlotIds = targetPlaylist.SlotIds.Where(s => s != slotId).ToArray();
             await this.database.SaveChangesAsync();
-            return this.Ok(this.GetUserPlaylists(token.UserId));
+            return this.Ok(await this.GetUserPlaylists(token.UserId));
         }
 
         GamePlaylist? newPlaylist = await this.DeserializeBody<GamePlaylist>("playlist", "levels");
@@ -96,13 +96,12 @@ public class CollectionController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Ok(this.GetUserPlaylists(token.UserId));
+        return this.Ok(await this.GetUserPlaylists(token.UserId));
     }
 
     private async Task<PlaylistResponse> GetUserPlaylists(int userId)
     {
-        List<GamePlaylist> playlists = await this.database.Playlists.Include(p => p.Creator)
-            .Where(p => p.CreatorId == userId)
+        List<GamePlaylist> playlists = await this.database.Playlists.Where(p => p.CreatorId == userId)
             .Select(p => GamePlaylist.CreateFromEntity(p))
             .ToListAsync();
         int total = this.database.Playlists.Count(p => p.CreatorId == userId);
@@ -140,7 +139,7 @@ public class CollectionController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Ok(await this.GetUserPlaylists(token.UserId));
+        return this.Ok(GamePlaylist.CreateFromEntity(playlistEntity));
     }
 
     [HttpGet("user/{username}/playlists")]
