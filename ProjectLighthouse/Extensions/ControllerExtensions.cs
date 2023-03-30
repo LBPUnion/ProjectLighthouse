@@ -120,7 +120,6 @@ public static partial class ControllerExtensions
             }
             XmlSerializer serializer = new(typeof(T), root);
             T? obj = (T?)serializer.Deserialize(new StringReader(bodyString));
-            SanitizationHelper.SanitizeStringsInClass(obj);
             return obj;
         }
         catch (Exception e)

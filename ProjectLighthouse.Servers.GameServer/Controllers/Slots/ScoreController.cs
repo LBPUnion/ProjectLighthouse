@@ -95,8 +95,6 @@ public class ScoreController : ControllerBase
             return this.BadRequest();
         }
 
-        SanitizationHelper.SanitizeStringsInClass(score);
-
         int slotId = id;
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
