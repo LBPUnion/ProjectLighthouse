@@ -68,7 +68,6 @@ public class SlotPageController : ControllerBase
             return this.Redirect("~/slot/" + id);
         }
 
-        // Prevent potential xml injection and censor content 
         msg = CensorHelper.FilterMessage(msg);
 
         bool success = await this.database.PostComment(token.UserId, id, CommentType.Level, msg);
