@@ -52,7 +52,15 @@ public class ScoreController : ControllerBase
         }
 
         // Workaround for parsing player ids of versus levels
-        if (score.PlayerIds.Length == 1 && score.PlayerIds[0].Contains(':')) score.PlayerIds = score.PlayerIds[0].Split(":");
+        if (score.PlayerIds.Length == 1)
+        {
+            char[] delimiters = { ':', ',', };
+            foreach (char delimiter in delimiters)
+            {
+                score.PlayerIds = score.PlayerIds[0].Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+            }
+                
+        }
 
         if (score.PlayerIds.Length == 0)
         {
@@ -81,8 +89,9 @@ public class ScoreController : ControllerBase
         {
             string bodyString = await this.ReadBodyAsync();
             Logger.Warn("Rejecting score upload, requester username is not present in playerIds" +
-                        $" (user={username}, playerIds={string.Join(",", score.PlayerIds)}, " +
-                        $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={id}, slotType={slotType}, body='{bodyString}')", LogArea.Score);
+                        $" (user='{username}', playerIds='{string.Join(",", score.PlayerIds)}' playerIds.Length={score.PlayerIds.Length}, " +
+                        $"gameVersion={token.GameVersion.ToPrettyString()}, type={score.Type}, id={id}, slotType={slotType}, body='{bodyString}')",
+                LogArea.Score);
             return this.BadRequest();
         }
 
@@ -92,7 +101,7 @@ public class ScoreController : ControllerBase
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null)
         {
             Logger.Warn($"Rejecting score upload, slot is null (slotId={slotId}, slotType={slotType}, reqId={id}, user={username})", LogArea.Score);
@@ -270,6 +279,6 @@ public class ScoreController : ControllerBase
 
         List<GameScore> gameScores = pagedScores.Select(ps => GameScore.CreateFromEntity(ps.Score, ps.Rank)).ToList();
 
-        return new ScoreboardResponse(options.RootName, gameScores, myScore?.Score.Points ?? 0, myScore?.Rank ?? 0, rankedScores.Count);
+        return new ScoreboardResponse(options.RootName, gameScores, rankedScores.Count, myScore?.Score.Points ?? 0, myScore?.Rank ?? 0);
     }
 }

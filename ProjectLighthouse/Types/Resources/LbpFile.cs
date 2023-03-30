@@ -28,8 +28,9 @@ public class LbpFile
         this.Hash = CryptoHelper.Sha1Hash(this.Data).ToLower();
     }
 
-    public static LbpFile? FromHash(string hash)
+    public static LbpFile? FromHash(string? hash)
     {
+        if (hash == null) return null;
         string path = FileHelper.GetResourcePath(hash);
         if (!File.Exists(path)) return null;
 

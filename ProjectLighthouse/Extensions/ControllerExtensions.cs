@@ -39,6 +39,7 @@ public static partial class ControllerExtensions
 
     public static async Task<string> ReadBodyAsync(this ControllerBase controller)
     {
+        controller.Request.Body.Position = 0;
         StringBuilder builder = new();
 
         while (true)
@@ -78,6 +79,14 @@ public static partial class ControllerExtensions
             }
         }
 
+        string finalString = builder.ToString();
+        if (finalString.Length != controller.Request.ContentLength)
+        {
+            Logger.Warn($"Failed to read entire body, contentType={controller.Request.ContentType}, " +
+                        $"contentLen={controller.Request.ContentLength}, readLen={finalString.Length}",
+                LogArea.HTTP);
+        }
+
         return builder.ToString();
     }
 
@@ -86,7 +95,6 @@ public static partial class ControllerExtensions
 
     public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[] rootElements)
     {
-        controller.Request.Body.Position = 0;
         string bodyString = await controller.ReadBodyAsync();
         try
         {

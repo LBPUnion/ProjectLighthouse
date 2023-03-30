@@ -1,5 +1,5 @@
-﻿using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
@@ -28,8 +28,9 @@ public abstract class SlotBase : ILbpSerializable
             Description = slot.Description,
             Location = slot.Location,
             IconHash = slot.IconHash,
-            BackgroundHash = slot.BackgroundHash,
+            BackgroundHash = slot.BackgroundHash ?? "",
             AuthorLabels = slot.AuthorLabels,
+            GameVersion = slot.GameVersion,
             Shareable = slot.IsShareable,
             Resources = slot.Resources,
             InitiallyLocked = slot.InitiallyLocked,
@@ -40,7 +41,7 @@ public abstract class SlotBase : ILbpSerializable
             IsAdventurePlanet = slot.IsAdventurePlanet,
             LevelType = slot.LevelType,
             SubLevel = slot.IsSubLevel,
-            RootLevel = slot.RootLevel,
+            RootLevel = slot.RootLevel ?? "",
             MoveRequired = slot.IsMoveRequired,
             CrossControllerRequired = slot.IsCrossControlRequired,
         };
@@ -50,6 +51,10 @@ public abstract class SlotBase : ILbpSerializable
 
     public static SlotBase CreateFromEntity(SlotEntity slot, GameVersion targetGame, int targetUserId)
     {
+        if (slot == null)
+        {
+            throw new Exception($"Tried to create GameSlot from null slot, targetGame={targetGame}, targetUserId={targetUserId}");
+        }
         if (slot.Type == SlotType.Developer)
         {
             GameDeveloperSlot devSlot = new()
@@ -91,6 +96,7 @@ public abstract class SlotBase : ILbpSerializable
             IsAdventurePlanet = slot.IsAdventurePlanet,
             Resources = slot.Resources,
             IsLbp1Only = slot.Lbp1Only,
+            PlayCount = slot.Plays,
             CompletePlayCount = slot.PlaysComplete,
             LBP1PlayCount = slot.PlaysLBP1,
             LBP1UniquePlayCount = slot.PlaysLBP1Unique,

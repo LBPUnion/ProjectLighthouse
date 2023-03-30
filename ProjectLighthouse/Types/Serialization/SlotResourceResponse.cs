@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
@@ -15,8 +14,7 @@ public struct SlotResourceResponse : ILbpSerializable
     [XmlAttribute("type")]
     public string Type { get; set; } = "user";
 
-    [XmlArray("resources")]
-    [XmlArrayItem("resource")]
+    [XmlElement("resource")]
     public List<string> Resources { get; set; }
 
 }

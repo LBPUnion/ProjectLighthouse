@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 public class LuckyDipCategory : Category
 {
     public override string Name { get; set; } = "Lucky Dip";
-    public override string Description { get; set; } = "Randomized uploaded content";
+    public override string Description { get; set; } = "A random selection of content";
     public override string IconHash { get; set; } = "g820605";
     public override string Endpoint { get; set; } = "lbp2luckydip";
     public override SlotEntity? GetPreviewSlot(DatabaseContext database) => database.Slots.Where(s => s.Type == SlotType.User).OrderByDescending(_ => EF.Functions.Random()).FirstOrDefault();

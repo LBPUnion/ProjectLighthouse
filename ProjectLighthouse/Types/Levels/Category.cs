@@ -38,10 +38,11 @@ public abstract class Category
 
     public GameCategory Serialize(DatabaseContext database)
     {
-        List<SlotBase> slots = new()
-        {
-            SlotBase.CreateFromEntity(this.GetPreviewSlot(database), GameVersion.LittleBigPlanet3, -1),
-        };
+        List<SlotBase> slots = new();
+        SlotEntity? previewSlot = this.GetPreviewSlot(database);
+        if (previewSlot != null)
+            slots.Add(SlotBase.CreateFromEntity(this.GetPreviewSlot(database), GameVersion.LittleBigPlanet3, -1));
+        
         int totalSlots = this.GetTotalSlots(database);
         return GameCategory.CreateFromEntity(this, new GenericSlotResponse(slots, totalSlots, 2));
     }

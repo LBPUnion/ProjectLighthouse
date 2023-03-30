@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -8,7 +9,6 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -34,9 +34,6 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     [XmlIgnore]
     public SerializationMode SerializationMode { get; set; }
 
-    [XmlIgnore]
-    public string[] Resources { get; set; }
-
     [XmlElement("id")]
     public int SlotId { get; set; }
 
@@ -53,16 +50,19 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     public GameVersion GameVersion { get; set; }
 
     [XmlElement("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 
     [XmlElement("description")]
-    public string Description { get; set; }
+    public string Description { get; set; } = "";
 
     [XmlElement("rootLevel")]
-    public string RootLevel { get; set; }
+    public string? RootLevel { get; set; }
+
+    [XmlElement("resource")]
+    public string[]? Resources { get; set; }
 
     [XmlElement("icon")]
-    public string IconHash { get; set; }
+    public string IconHash { get; set; } = "";
 
     [XmlElement("initiallyLocked")]
     public bool InitiallyLocked { get; set; }
@@ -78,7 +78,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [DefaultValue("")]
     [XmlElement("background")]
-    public string BackgroundHash { get; set; }
+    public string BackgroundHash { get; set; } = "";
 
     [XmlElement("shareable")]
     public int IsShareable { get; set; }
@@ -153,7 +153,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [DefaultValue("")]
     [XmlElement("tags")]
-    public string Tags { get; set; }
+    public string? Tags { get; set; }
     public bool ShouldSerializeTags() => this.SerializationMode == SerializationMode.Full;
 
     [DefaultValue("")]
@@ -175,7 +175,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [DefaultValue(null)]
     [XmlElement("yourReview")]
-    public GameReview YourReview { get; set; }
+    public GameReview? YourReview { get; set; }
     public bool ShouldSerializeYourReview() => this.SerializationMode == SerializationMode.Full; 
 
     [XmlElement("reviewsEnabled")]
@@ -237,8 +237,8 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
         var stats = await database.Slots
             .Select(_ => new
             {
-                ThumbsUp = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1),
-                ThumbsDown = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1),
+                ThumbsUp = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1),
+                ThumbsDown = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1),
                 ReviewCount = database.Reviews.Count(r => r.SlotId == this.SlotId),
                 CommentCount = database.Comments.Count(c => c.TargetId == this.SlotId && c.Type == CommentType.Level),
                 PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
@@ -269,7 +269,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
         if (this.SerializationMode == SerializationMode.Minimal) return;
 
-        if (this.GameVersion == GameVersion.LittleBigPlanetVita) this.ResourcesSize = this.Resources.Sum(FileHelper.ResourceSize);
+        if (this.GameVersion == GameVersion.LittleBigPlanetVita && this.Resources != null) this.ResourcesSize = this.Resources.Sum(FileHelper.ResourceSize);
 
         #nullable enable
         RatedLevelEntity? yourRating = await database.RatedLevels.FirstOrDefaultAsync(r => r.UserId == this.TargetUserId && r.SlotId == this.SlotId);

@@ -24,7 +24,7 @@ public class ModerationSlotController : ControllerBase
     public async Task<IActionResult> TeamPick([FromRoute] int id)
     {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsModerator) return this.Forbid();
+        if (user == null || !user.IsModerator) return this.Unauthorized();
 
         SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -43,7 +43,7 @@ public class ModerationSlotController : ControllerBase
     public async Task<IActionResult> RemoveTeamPick([FromRoute] int id)
     {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsModerator) return this.Forbid();
+        if (user == null || !user.IsModerator) return this.Unauthorized();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
@@ -59,7 +59,7 @@ public class ModerationSlotController : ControllerBase
     public async Task<IActionResult> DeleteLevel([FromRoute] int id)
     {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsModerator) return this.Forbid();
+        if (user == null || !user.IsModerator) return this.Unauthorized();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.Ok();

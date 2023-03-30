@@ -96,7 +96,8 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
             {
                 SlotId = entity.SlotId.GetValueOrDefault(),
             },
-            Timestamp = entity.Timestamp,
+            // Timestamps are uploaded and stored in seconds but game expects milliseconds
+            Timestamp = entity.Timestamp * 1000,
             SmallHash = entity.SmallHash,
             MediumHash = entity.MediumHash,
             LargeHash = entity.MediumHash,
