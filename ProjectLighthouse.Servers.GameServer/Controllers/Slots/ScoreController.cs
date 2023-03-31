@@ -200,10 +200,11 @@ public class ScoreController : ControllerBase
         LeaderboardOptions options = new()
         {
             PageSize = 10,
-            PageStart = -1,
+            PageStart = 1,
             ScoreType = -1,
-            TargetUsername = username,
             SlotId = id,
+            TargetPlayerIds = null,
+            TargetUsername = username,
             RootName = "scoreboardSegment",
         };
         if (!HttpMethods.IsPost(this.Request.Method)) return this.Ok(this.getScores(options));
