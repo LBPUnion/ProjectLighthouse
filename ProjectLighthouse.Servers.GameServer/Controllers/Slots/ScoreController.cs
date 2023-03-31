@@ -206,7 +206,17 @@ public class ScoreController : ControllerBase
             TargetUsername = username,
             RootName = "scoreboardSegment",
         };
-        if (!HttpMethods.IsPost(this.Request.Method)) return this.Ok(this.getScores(options));
+        if (!HttpMethods.IsPost(this.Request.Method))
+        {
+            List<PlayerScoreboardResponse> scoreboardResponses = new();
+            for (int i = 1; i <= 4; i++)
+            {
+                options.ScoreType = i;
+                ScoreboardResponse response = this.getScores(options);
+                scoreboardResponses.Add(new PlayerScoreboardResponse(response.Scores, i));
+            } 
+            return this.Ok(new MultiScoreboardResponse(scoreboardResponses));
+        }
 
         GameScore? score = await this.DeserializeBody<GameScore>();
         if (score == null) return this.BadRequest();
