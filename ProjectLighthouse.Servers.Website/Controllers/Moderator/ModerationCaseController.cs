@@ -21,7 +21,7 @@ public class ModerationCaseController : ControllerBase
     public async Task<IActionResult> DismissCase([FromRoute] int id)
     {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
-        if (user == null || !user.IsModerator) return this.Forbid();
+        if (user == null || !user.IsModerator) return this.StatusCode(403);
 
         ModerationCaseEntity? @case = await this.database.Cases.FirstOrDefaultAsync(c => c.CaseId == id);
         if (@case == null) return this.NotFound();
