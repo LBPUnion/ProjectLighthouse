@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -13,12 +14,16 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 public class PasswordResetRequestForm : BaseLayout
 {
 
+    public MailQueueService Mail;
+
     public string? Error { get; private set; }
 
     public string? Status { get; private set; }
 
-    public PasswordResetRequestForm(DatabaseContext database) : base(database)
-    { }
+    public PasswordResetRequestForm(DatabaseContext database, MailQueueService mail) : base(database)
+    {
+        this.Mail = mail;
+    }
 
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string email)
@@ -63,7 +68,8 @@ public class PasswordResetRequestForm : BaseLayout
             $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be reset at the following link:\n" +
             $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={token.ResetToken}";
 
-        SMTPHelper.SendEmail(user.EmailAddress, $"Project Lighthouse Password Reset Request for {user.Username}", messageBody);
+        //TODO refactor to use EmailHelper to have cooldown
+        this.Mail.SendEmail(user.EmailAddress, $"Project Lighthouse Password Reset Request for {user.Username}", messageBody);
 
         this.Database.PasswordResetTokens.Add(token);
         await this.Database.SaveChangesAsync();

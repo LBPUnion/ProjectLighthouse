@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class MessageController : ControllerBase
 {
     private readonly DatabaseContext database;
+    private readonly IMailService mail;
 
     private const string license = @"
 This program is free software: you can redistribute it and/or modify
@@ -35,9 +37,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
-    public MessageController(DatabaseContext database)
+    public MessageController(DatabaseContext database, IMailService mail)
     {
         this.database = database;
+        this.mail = mail;
     }
 
     [HttpGet("eula")]
@@ -85,7 +88,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string message = await this.ReadBodyAsync();
 
-        if (message.StartsWith("/setemail "))
+        if (message.StartsWith("/setemail ") && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
             if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
@@ -96,7 +99,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             if (user == null || user.EmailAddressVerified) return this.Ok();
 
             user.EmailAddress = email;
-            await SMTPHelper.SendVerificationEmail(this.database, user);
+            await SMTPHelper.SendVerificationEmail(this.database, this.mail, user);
 
             return this.Ok();
         }

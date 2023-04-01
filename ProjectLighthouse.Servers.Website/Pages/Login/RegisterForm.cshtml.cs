@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -15,8 +16,12 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class RegisterForm : BaseLayout
 {
-    public RegisterForm(DatabaseContext database) : base(database)
-    { }
+    public readonly MailQueueService Mail;
+
+    public RegisterForm(DatabaseContext database, MailQueueService mail) : base(database)
+    {
+        this.Mail = mail;
+    }
 
     public string? Error { get; private set; }
 
@@ -75,6 +80,8 @@ public class RegisterForm : BaseLayout
         }
 
         UserEntity user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
+
+        if(ServerConfiguration.Instance.Mail.MailEnabled) SMTPHelper.SendRegistrationEmail(this.Mail, user);
 
         WebTokenEntity webToken = new()
         {

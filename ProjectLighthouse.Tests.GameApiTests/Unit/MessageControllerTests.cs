@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -37,14 +40,23 @@ public class MessageControllerTests
             UserToken = "unittest",
         };
 
-    private static Mock<DatabaseContext> getDatabaseMock()
+    private static Mock<DatabaseContext> getDatabaseMock(List<UserEntity>? users = null, List<GameTokenEntity>? tokens = null)
     {
-        List<UserEntity> users = new()
+        users ??= new List<UserEntity>
         {
             getUnitTestUser(),
         };
+
+        tokens ??= new List<GameTokenEntity>
+        {
+            getUnitTestToken(),
+        };
         Mock<DatabaseContext> mock = new();
         mock.SetupGet(x => x.Users).ReturnsDbSet(users);
+        mock.SetupGet(x => x.GameTokens).ReturnsDbSet(tokens);
+        mock.Setup(x => x.Users.FindAsync(It.IsAny<object[]>()))
+            .Returns<object[]>(async objects =>
+                await Task.FromResult(users.FirstOrDefault(u => u.UserId == (int)objects[0])));
         return mock;
     }
 
@@ -52,7 +64,7 @@ public class MessageControllerTests
     public void Eula_ShouldReturnLicense_WhenConfigEmpty()
     {
         Mock<DatabaseContext> dbMock = getDatabaseMock();
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, null!)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
         };
@@ -88,7 +100,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     public void Eula_ShouldReturnLicenseAndConfigString_WhenConfigNotEmpty()
     {
         Mock<DatabaseContext> dbMock = getDatabaseMock();
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, null!)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
         };
@@ -124,7 +136,7 @@ unit test eula text";
     public async void Announcement_WithVariables_ShouldBeResolved()
     {
         Mock<DatabaseContext> dbMock = getDatabaseMock();
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, null!)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
         };
@@ -147,7 +159,7 @@ unit test eula text";
     public async void Announcement_WithEmptyString_ShouldBeEmpty()
     {
         Mock<DatabaseContext> dbMock = getDatabaseMock();
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, null!)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
         };
@@ -170,7 +182,7 @@ unit test eula text";
     public void Notification_ShouldReturn_Empty()
     {
         Mock<DatabaseContext> dbMock = getDatabaseMock();
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, null!)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
         };
@@ -190,7 +202,7 @@ unit test eula text";
         Mock<DatabaseContext> dbMock = getDatabaseMock();
         const string request = "unit test message";
         byte[] requestBytes = Encoding.ASCII.GetBytes(request);
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, null!)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
             Request = { Body = new MemoryStream(requestBytes), ContentLength = requestBytes.Length,},
@@ -211,12 +223,12 @@ unit test eula text";
     }
 
     [Fact]
-    public async void Filter_ShouldCensor_WhenEnabled()
+    public async void Filter_ShouldCensor_WhenCensorEnabled()
     {
         Mock<DatabaseContext> dbMock = getDatabaseMock();
         const string request = "unit test message bruh";
         byte[] requestBytes = Encoding.ASCII.GetBytes(request);
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, null!)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
             Request =
@@ -244,13 +256,22 @@ unit test eula text";
         Assert.Equal(expectedBody, (string)okObjectResult.Value);
     }
 
+    private static Mock<IMailService> getMailServiceMock()
+    {
+        Mock<IMailService> mailMock = new();
+        mailMock.Setup(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(Task.FromResult(true));
+        return mailMock;
+    }
+
     [Fact]
     public async void Filter_ShouldNotSendEmail_WhenMailDisabled()
     {
         Mock<DatabaseContext> dbMock = getDatabaseMock();
+        Mock<IMailService> mailMock = getMailServiceMock();
         const string request = "/setemail unittest@unittest.com";
         byte[] requestBytes = Encoding.ASCII.GetBytes(request);
-        MessageController messageController = new(dbMock.Object)
+        MessageController messageController = new(dbMock.Object, mailMock.Object)
         {
             ControllerContext = MockHelper.GetMockControllerContext(),
             Request =
@@ -261,16 +282,164 @@ unit test eula text";
         };
         MockHelper.SetupTestGameToken(messageController, getUnitTestToken());
 
-        //TODO: mock smtphelper
-
         ServerConfiguration.Instance.Mail.MailEnabled = false;
+        CensorConfiguration.Instance.FilteredWordList = new List<string>();
+
+        const int expectedStatus = 200;
+        const string expected = "/setemail unittest@unittest.com";
+
+        IActionResult result = await messageController.Filter();
+        OkObjectResult? okObjectResult = result as OkObjectResult;
+        Assert.NotNull(okObjectResult);
+        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
+        Assert.Equal(expected, okObjectResult.Value);
+    }
+
+    [Fact]
+    public async void Filter_ShouldSendEmail_WhenMailEnabled_AndEmailNotTaken()
+    {
+        Mock<DatabaseContext> dbMock = getDatabaseMock();
+        
+        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
+        Mock<IMailService> mailMock = getMailServiceMock();
+
+        const string request = "/setemail unittest@unittest.com";
+        byte[] requestBytes = Encoding.ASCII.GetBytes(request);
+
+        MessageController messageController = new(dbMock.Object, mailMock.Object)
+        {
+            ControllerContext = MockHelper.GetMockControllerContext(),
+            Request =
+            {
+                Body = new MemoryStream(requestBytes),
+                ContentLength = requestBytes.Length,
+            },
+        };
+        MockHelper.SetupTestGameToken(messageController, getUnitTestToken());
+
+        ServerConfiguration.Instance.Mail.MailEnabled = true;
+
+        const int expectedStatus = 200;
+        const string expectedEmail = "unittest@unittest.com";
+
+        IActionResult result = await messageController.Filter();
+        OkResult? okResult = result as OkResult;
+        Assert.NotNull(okResult);
+        Assert.Equal(expectedStatus, okResult.StatusCode);
+        Assert.Equal(expectedEmail, dbMock.Object.Users.First().EmailAddress);
+        mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async void Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailTaken()
+    {
+        Mock<DatabaseContext> dbMock = getDatabaseMock();
+        List<UserEntity> users = new()
+        {
+            new UserEntity
+            {
+                UserId = 2,
+                EmailAddress = "unittest@unittest.com",
+                EmailAddressVerified = false,
+            }
+        };
+        dbMock.Setup(x => x.Users).ReturnsDbSet(users);
+        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
+        Mock<IMailService> mailMock = getMailServiceMock();
+
+        const string request = "/setemail unittest@unittest.com";
+        byte[] requestBytes = Encoding.ASCII.GetBytes(request);
+        MessageController messageController = new(dbMock.Object, mailMock.Object)
+        {
+            ControllerContext = MockHelper.GetMockControllerContext(),
+            Request =
+            {
+                Body = new MemoryStream(requestBytes),
+                ContentLength = requestBytes.Length,
+            },
+        };
+        MockHelper.SetupTestGameToken(messageController, getUnitTestToken());
+
+        ServerConfiguration.Instance.Mail.MailEnabled = true;
 
         const int expectedStatus = 200;
 
         IActionResult result = await messageController.Filter();
-        OkResult? okObjectResult = result as OkResult;
-        Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
+        OkResult? okResult = result as OkResult;
+        Assert.NotNull(okResult);
+        Assert.Equal(expectedStatus, okResult.StatusCode);
+        mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async void Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailAlreadyVerified()
+    {
+        UserEntity unitTestUser = getUnitTestUser();
+        unitTestUser.EmailAddressVerified = true;
+        Mock<DatabaseContext> dbMock = getDatabaseMock(new List<UserEntity>{unitTestUser,});
+        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
+
+        Mock<IMailService> mailMock = getMailServiceMock();
+
+        const string request = "/setemail unittest@unittest.com";
+        byte[] requestBytes = Encoding.ASCII.GetBytes(request);
+        MessageController messageController = new(dbMock.Object, mailMock.Object)
+        {
+            ControllerContext = MockHelper.GetMockControllerContext(),
+            Request =
+            {
+                Body = new MemoryStream(requestBytes),
+                ContentLength = requestBytes.Length,
+            },
+        };
+        MockHelper.SetupTestGameToken(messageController, getUnitTestToken());
+
+        ServerConfiguration.Instance.Mail.MailEnabled = true;
+
+        const int expectedStatus = 200;
+
+        IActionResult result = await messageController.Filter();
+        OkResult? okResult = result as OkResult;
+        Assert.NotNull(okResult);
+        Assert.Equal(expectedStatus, okResult.StatusCode);
+        mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async void Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailFormatInvalid()
+    {
+        UserEntity unitTestUser = getUnitTestUser();
+        unitTestUser.EmailAddressVerified = true;
+        Mock<DatabaseContext> dbMock = getDatabaseMock(new List<UserEntity>
+        {
+            unitTestUser,
+        });
+        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
+
+        Mock<IMailService> mailMock = getMailServiceMock();
+
+        const string request = "/setemail unittestinvalidemail@@@";
+        byte[] requestBytes = Encoding.ASCII.GetBytes(request);
+        MessageController messageController = new(dbMock.Object, mailMock.Object)
+        {
+            ControllerContext = MockHelper.GetMockControllerContext(),
+            Request =
+            {
+                Body = new MemoryStream(requestBytes),
+                ContentLength = requestBytes.Length,
+            },
+        };
+        MockHelper.SetupTestGameToken(messageController, getUnitTestToken());
+
+        ServerConfiguration.Instance.Mail.MailEnabled = true;
+
+        const int expectedStatus = 200;
+
+        IActionResult result = await messageController.Filter();
+        OkResult? okResult = result as OkResult;
+        Assert.NotNull(okResult);
+        Assert.Equal(expectedStatus, okResult.StatusCode);
+        mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
     
 }

@@ -2,10 +2,12 @@ using System.Net;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -19,7 +21,7 @@ public class GameServerStartup
         this.Configuration = configuration;
     }
 
-    public IConfiguration Configuration { get; }
+    private IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -50,6 +52,9 @@ public class GameServerStartup
         );
 
         services.AddDbContext<DatabaseContext>();
+
+        services.AddSingleton<IMailService>(x =>
+            ActivatorUtilities.CreateInstance<MailQueueService>(x, new SmtpMailSender()));
 
         services.Configure<ForwardedHeadersOptions>
         (

@@ -2,11 +2,12 @@ using System.Globalization;
 using System.Net;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
 using Microsoft.Extensions.Hosting.Internal;
@@ -23,7 +24,7 @@ public class WebsiteStartup
         this.Configuration = configuration;
     }
 
-    public IConfiguration Configuration { get; }
+    private IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -43,6 +44,9 @@ public class WebsiteStartup
         #endif
 
         services.AddDbContext<DatabaseContext>();
+
+        services.AddSingleton<IMailService>(x =>
+            ActivatorUtilities.CreateInstance<MailQueueService>(x, new SmtpMailSender()));
 
         services.Configure<ForwardedHeadersOptions>
         (

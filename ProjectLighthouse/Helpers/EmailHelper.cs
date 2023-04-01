@@ -9,16 +9,25 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
-public partial class SMTPHelper
+public static class SMTPHelper
 {
     // (User id, timestamp of last request + 30 seconds)
     private static readonly ConcurrentDictionary<int, long> recentlySentEmail = new();
 
-    public static async Task<bool> SendVerificationEmail(DatabaseContext database, UserEntity user)
+    public static void SendRegistrationEmail(IMailService mail, UserEntity user)
+    {
+        string body = "An account for Project Lighthouse has been registered with this email address.\n\n" +
+                      $"You can login at {ServerConfiguration.Instance.ExternalUrl}.";
+
+        mail.SendEmail(user.EmailAddress, "Project Lighthouse Account Created: " + user.Username, body);
+    }
+
+    public static async Task<bool> SendVerificationEmail(DatabaseContext database, IMailService mail, UserEntity user)
     {
         // Remove expired entries
         for (int i = recentlySentEmail.Count - 1; i >= 0; i--)
@@ -69,7 +78,7 @@ public partial class SMTPHelper
                       $"To verify your account, click the following link: {ServerConfiguration.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}\n\n\n" +
                       "If this wasn't you, feel free to ignore this email.";
 
-        bool success = await SendEmailAsync(user.EmailAddress, "Project Lighthouse Email Verification", body);
+        bool success = await mail.SendEmailAsync(user.EmailAddress, "Project Lighthouse Email Verification", body);
 
         // Don't send another email for 30 seconds
         recentlySentEmail.TryAdd(user.UserId, TimeHelper.TimestampMillis + 30 * 1000);
