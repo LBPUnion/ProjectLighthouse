@@ -45,7 +45,7 @@ public class WebsiteStartup
 
         services.AddDbContext<DatabaseContext>();
 
-        services.AddSingleton<IMailService>(x =>
+        services.AddSingleton<MailQueueService>(x =>
             ActivatorUtilities.CreateInstance<MailQueueService>(x, new SmtpMailSender()));
 
         services.Configure<ForwardedHeadersOptions>

@@ -57,8 +57,11 @@ public class MailQueueService : IMailService, IDisposable
     public void Dispose()
     {
         this.stopSignal = true;
-        this.emailThread.Wait();
-        this.emailThread.Dispose();
+        if (this.emailThread != null)
+        {
+            this.emailThread.Wait();
+            this.emailThread.Dispose();
+        }
         GC.SuppressFinalize(this);
     }
 
