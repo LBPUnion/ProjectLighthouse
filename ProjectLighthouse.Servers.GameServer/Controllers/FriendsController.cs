@@ -34,8 +34,6 @@ public class FriendsController : ControllerBase
         NPData? npData = await this.DeserializeBody<NPData>();
         if (npData == null) return this.BadRequest();
 
-        SanitizationHelper.SanitizeStringsInClass(npData);
-
         List<UserEntity> friends = new();
         foreach (string friendName in npData.Friends ?? new List<string>())
         {

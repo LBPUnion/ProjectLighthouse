@@ -30,6 +30,28 @@ public class ScoreController : ControllerBase
         this.database = database;
     }
 
+    private string[] getFriendUsernames(int userId, string username)
+    {
+        UserFriendData? store = UserFriendStore.GetUserFriendData(userId);
+        if (store == null) return new[] { username, };
+
+        List<string> friendNames = new()
+        {
+            username,
+        };
+
+        // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+        foreach (int friendId in store.FriendIds)
+        {
+            string? friendUsername = this.database.Users.Where(u => u.UserId == friendId)
+                .Select(u => u.Username)
+                .FirstOrDefault();
+            if (friendUsername != null) friendNames.Add(friendUsername);
+        }
+
+        return friendNames.ToArray();
+    }
+
     [HttpPost("scoreboard/{slotType}/{id:int}")]
     [HttpPost("scoreboard/{slotType}/{id:int}/{childId:int}")]
     public async Task<IActionResult> SubmitScore(string slotType, int id, int childId)
@@ -94,8 +116,6 @@ public class ScoreController : ControllerBase
                 LogArea.Score);
             return this.BadRequest();
         }
-
-        SanitizationHelper.SanitizeStringsInClass(score);
 
         int slotId = id;
 
@@ -167,6 +187,45 @@ public class ScoreController : ControllerBase
         })); 
     }
 
+    [HttpGet("scoreboard/{slotType}/{id:int}")]
+    [HttpPost("scoreboard/friends/{slotType}/{id:int}")]
+    public async Task<IActionResult> Lbp1Leaderboards(string slotType, int id)
+    {
+        GameTokenEntity token = this.GetToken();
+
+        string username = await this.database.UsernameFromGameToken(token);
+
+        if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
+
+        LeaderboardOptions options = new()
+        {
+            PageSize = 10,
+            PageStart = 1,
+            ScoreType = -1,
+            SlotId = id,
+            TargetUsername = username,
+            RootName = "scoreboardSegment",
+        };
+        if (!HttpMethods.IsPost(this.Request.Method))
+        {
+            List<PlayerScoreboardResponse> scoreboardResponses = new();
+            for (int i = 1; i <= 4; i++)
+            {
+                options.ScoreType = i;
+                ScoreboardResponse response = this.getScores(options);
+                scoreboardResponses.Add(new PlayerScoreboardResponse(response.Scores, i));
+            } 
+            return this.Ok(new MultiScoreboardResponse(scoreboardResponses));
+        }
+
+        GameScore? score = await this.DeserializeBody<GameScore>();
+        if (score == null) return this.BadRequest();
+        options.ScoreType = score.Type;
+        options.TargetPlayerIds = this.getFriendUsernames(token.UserId, username);
+
+        return this.Ok(this.getScores(options));
+    }
+
     [HttpGet("friendscores/{slotType}/{slotId:int}/{type:int}")]
     [HttpGet("friendscores/{slotType}/{slotId:int}/{childId:int}/{type:int}")]
     public async Task<IActionResult> FriendScores(string slotType, int slotId, int? childId, int type, [FromQuery] int pageStart = -1, [FromQuery] int pageSize = 5)
@@ -181,21 +240,7 @@ public class ScoreController : ControllerBase
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        UserFriendData? store = UserFriendStore.GetUserFriendData(token.UserId);
-        if (store == null) return this.Ok();
-
-        List<string> friendNames = new()
-        {
-            username,
-        };
-
-        foreach (int friendId in store.FriendIds)
-        {
-            string? friendUsername = await this.database.Users.Where(u => u.UserId == friendId)
-                .Select(u => u.Username)
-                .FirstOrDefaultAsync();
-            if (friendUsername != null) friendNames.Add(friendUsername);
-        }
+        string[] friendIds = this.getFriendUsernames(token.UserId, username);
 
         return this.Ok(this.getScores(new LeaderboardOptions
         {
@@ -206,7 +251,7 @@ public class ScoreController : ControllerBase
             ChildSlotId = childId,
             ScoreType = type,
             TargetUsername = username,
-            TargetPlayerIds = friendNames.ToArray(),
+            TargetPlayerIds = friendIds,
         })); 
     }
 
@@ -252,10 +297,10 @@ public class ScoreController : ControllerBase
 
     private ScoreboardResponse getScores(LeaderboardOptions options)
     {
-
         // This is hella ugly but it technically assigns the proper rank to a score
         // var needed for Anonymous type returned from SELECT
-        var rankedScores = this.database.Scores.Where(s => s.SlotId == options.SlotId && s.Type == options.ScoreType)
+        var rankedScores = this.database.Scores.Where(s => s.SlotId == options.SlotId)
+            .Where(s => options.ScoreType == -1 || s.Type == options.ScoreType)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == options.ChildSlotId)
             .AsEnumerable()
             .Where(s => options.TargetPlayerIds == null ||

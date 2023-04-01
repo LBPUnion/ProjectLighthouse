@@ -18,7 +18,7 @@ public class AuthenticationPage : BaseLayout
 
     public IActionResult OnGet()
     {
-        if (this.User == null) return this.Forbid();
+        if (this.User == null) return this.Redirect("~/login");
 
         this.IpAddress = this.HttpContext.Connection.RemoteIpAddress;
 

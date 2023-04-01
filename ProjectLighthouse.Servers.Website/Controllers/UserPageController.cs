@@ -44,8 +44,6 @@ public class UserPageController : ControllerBase
             return this.Redirect("~/user/" + id);
         }
 
-        // Prevent potential xml injection and censor content
-        msg = SanitizationHelper.SanitizeString(msg);
         msg = CensorHelper.FilterMessage(msg);
 
         bool success = await this.database.PostComment(token.UserId, id, CommentType.Profile, msg);

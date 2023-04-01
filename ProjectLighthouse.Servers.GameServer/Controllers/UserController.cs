@@ -72,8 +72,6 @@ public class UserController : ControllerBase
 
         if (update == null) return this.BadRequest();
 
-        SanitizationHelper.SanitizeStringsInClass(update);
-
         if (update.Biography != null)
         {
             if (update.Biography.Length > 512) return this.BadRequest();

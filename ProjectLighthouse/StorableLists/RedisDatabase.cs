@@ -11,6 +11,7 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Redis.OM;
 using Redis.OM.Contracts;
 using Redis.OM.Searching;
+using StackExchange.Redis;
 
 namespace LBPUnion.ProjectLighthouse.StorableLists;
 
@@ -20,6 +21,7 @@ public static class RedisDatabase
 
     static RedisDatabase()
     {
+        ConnectionMultiplexer.SetFeatureFlag("preventthreadtheft", true);
         provider = new RedisConnectionProvider(ServerConfiguration.Instance.RedisConnectionString);
     }
 
