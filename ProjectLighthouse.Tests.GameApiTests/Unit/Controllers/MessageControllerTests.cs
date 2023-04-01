@@ -248,6 +248,7 @@ unit test eula text";
         Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
         List<UserEntity> users = new()
         {
+            MockHelper.GetUnitTestUser(),
             new UserEntity
             {
                 UserId = 2,
