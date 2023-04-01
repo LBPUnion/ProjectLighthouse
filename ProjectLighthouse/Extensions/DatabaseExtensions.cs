@@ -11,9 +11,11 @@ namespace LBPUnion.ProjectLighthouse.Extensions;
 
 public static class DatabaseExtensions
 {
+    // This converts a DbSet to IQueryable without using AsQueryable which causes problems with testing
+    // It doesn't generate any extra SQL so it shouldn't be an issue
     public static IQueryable<SlotEntity> ByGameVersion
         (this DbSet<SlotEntity> set, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false)
-        => set.AsQueryable().ByGameVersion(gameVersion, includeSublevels, includeCreator);
+        => set.Where(_ => true).ByGameVersion(gameVersion, includeSublevels, includeCreator);
 
     public static IQueryable<SlotEntity> ByGameVersion
         (this IQueryable<SlotEntity> query, GameVersion gameVersion, bool includeSublevels = false, bool includeCreator = false, bool includeDeveloperLevels = false)

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Unit;
+namespace ProjectLighthouse.Tests.GameApiTests.Unit.Middlewares;
 
 [Trait("Category", "Unit")]
 public class DigestMiddlewareTests

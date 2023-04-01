@@ -8,6 +8,7 @@ using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests.Unit;
 
+[Trait("Category", "Unit")]
 public class LocationTests
 {
     [Fact]
