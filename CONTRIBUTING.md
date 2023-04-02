@@ -21,7 +21,7 @@ If you are not using a PS3, see [the RPCS3 section](#connecting-rpcs3).
 ## Connecting (RPCS3)
 
 Start by getting a copy of LittleBigPlanet 1/2/3 installed. (Check the LittleBigPlanet 1 section, since you'll need to do
-extra steps for your game to not crash upon entering pod computer). 
+extra steps for your game to not crash upon entering the pod computer). 
 
 The game can be a digital copy (NPUA80472/NPUA80662/NPUA81116) or a disc copy (BCUS98148/BCUS98245/BCUS98362).
 
@@ -29,15 +29,15 @@ Next, download [UnionPatcher](https://github.com/LBPUnion/UnionPatcher/). Binari
 file.
 
 You should have everything you need now, so open up RPCS3 and go to Utilities -> Decrypt PS3 Binaries. Point this
-to `rpcs3/dev_hdd0/game/(title id)/USRDIR/EBOOT.BIN`. You can grab your title id by right clicking the game in RPCS3 and
+to `rpcs3/dev_hdd0/game/(title id)/USRDIR/EBOOT.BIN`. You can grab your title ID by right clicking the game in RPCS3 and
 clicking Copy Info -> Copy Serial.
 
 
-This should give you a file named `EBOOT.elf` in the same folder. This is your decrypted eboot.
+This should give you a file named `EBOOT.elf` in the same folder. This is your decrypted EBOOT.
 
-Now that you have your decrypted eboot, open UnionPatcher and select the `EBOOT.elf` you got earlier in the top box,
+Now that you have your decrypted EBOOT, open UnionPatcher and select the `EBOOT.elf` you got earlier in the top box,
 enter `http://localhost:10060/LITTLEBIGPLANETPS3_XML` in the second, and the output filename in the third. For this
-guide I'll use `EBOOTlocalhost.elf`.
+guide we'll use `EBOOTlocalhost.elf`.
 
 Now, copy the `EBOOTlocalhost.elf` file to where you got your `EBOOT.elf` file from, and you're now good to go.
 
