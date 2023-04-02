@@ -32,7 +32,7 @@
         <div class="ui divider"></div>
         <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment" method="post">
             <div class="field">
-                <textarea style="min-height: 70px; height: 70px; max-height:120px" maxlength="100" name="msg"></textarea>
+                <textarea style="min-height: 70px; height: 70px; max-height:120px" maxlength="256" name="msg"></textarea>
             </div>
             <input type="submit" class="ui blue button">
         </form>
