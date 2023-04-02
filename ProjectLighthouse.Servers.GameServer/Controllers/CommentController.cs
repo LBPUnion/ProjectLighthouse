@@ -77,15 +77,14 @@ public class CommentController : ControllerBase
                 where blockedProfile.UserId == token.UserId
                 select blockedProfile.BlockedUserId).ToListAsync();
 
-        List<GameComment> comments = await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
+        List<GameComment> comments = (await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
             .OrderByDescending(p => p.Timestamp)
             .Where(p => !blockedUsers.Contains(p.PosterUserId))
             .Include(c => c.Poster)
             .Where(p => p.Poster.PermissionLevel != PermissionLevel.Banned)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(c => GameComment.CreateFromEntity(c, token.UserId))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(c => GameComment.CreateFromEntity(c, token.UserId));
 
         return this.Ok(new CommentListResponse(comments));
     }

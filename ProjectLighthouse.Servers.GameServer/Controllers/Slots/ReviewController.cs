@@ -153,14 +153,13 @@ public class ReviewController : ControllerBase
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.BadRequest();
 
-        List<GameReview> reviews = await this.database.Reviews.ByGameVersion(gameVersion, true)
+        List<GameReview> reviews = (await this.database.Reviews.ByGameVersion(gameVersion, true)
             .Where(r => r.SlotId == slotId)
             .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
             .ThenByDescending(r => r.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(r => GameReview.CreateFromEntity(r, token))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(r => GameReview.CreateFromEntity(r, token));
 
 
         return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart + Math.Min(pageSize, 30)));
@@ -179,13 +178,12 @@ public class ReviewController : ControllerBase
 
         if (targetUserId == 0) return this.BadRequest();
 
-        List<GameReview> reviews = await this.database.Reviews.ByGameVersion(gameVersion, true)
+        List<GameReview> reviews = (await this.database.Reviews.ByGameVersion(gameVersion, true)
             .Where(r => r.ReviewerId == targetUserId)
             .OrderByDescending(r => r.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(r => GameReview.CreateFromEntity(r, token))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(r => GameReview.CreateFromEntity(r, token));
 
         return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart));
     }

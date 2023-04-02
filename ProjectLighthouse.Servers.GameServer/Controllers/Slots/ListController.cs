@@ -47,10 +47,11 @@ public class ListController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        List<SlotBase> queuedLevels = await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.Queue)
+        List<SlotBase> queuedLevels = (await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.Queue)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, token)).ToListAsync();
+            .ToListAsync())
+            .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         int total = await this.database.QueuedLevels.CountAsync(q => q.UserId == token.UserId);
         int start = pageStart + Math.Min(pageSize, 30);
@@ -119,11 +120,11 @@ public class ListController : ControllerBase
         UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (targetUser == null) return this.Forbid();
 
-        List<SlotBase> heartedLevels = await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.FavouriteSlots)
+        List<SlotBase> heartedLevels = (await this.filterListByRequest(gameFilterType, dateFilterType, token.GameVersion, username, ListFilterType.FavouriteSlots)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, token))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            
 
         int total = await this.database.HeartedLevels.CountAsync(q => q.UserId == targetUser.UserId);
         int start = pageStart + Math.Min(pageSize, 30);
@@ -191,13 +192,12 @@ public class ListController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(username);
         if (targetUserId == 0) return this.Forbid();
 
-        List<GamePlaylist> heartedPlaylists = await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
+        List<GamePlaylist> heartedPlaylists = (await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
             .Include(p => p.Playlist)
             .Include(p => p.Playlist.Creator)
             .OrderByDescending(p => p.HeartedPlaylistId)
             .Select(p => p.Playlist)
-            .Select(p => GamePlaylist.CreateFromEntity(p))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(GamePlaylist.CreateFromEntity);
 
         int total = await this.database.HeartedPlaylists.CountAsync(p => p.UserId == targetUserId);
 
@@ -250,15 +250,13 @@ public class ListController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        List<GameUser> heartedProfiles = await this.database.HeartedProfiles.Include
-                (h => h.HeartedUser)
+        List<GameUser> heartedProfiles = (await this.database.HeartedProfiles.Include(h => h.HeartedUser)
             .OrderBy(h => h.HeartedProfileId)
             .Where(h => h.UserId == targetUser.UserId)
             .Select(h => h.HeartedUser)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(h => GameUser.CreateFromEntity(h, token.GameVersion))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(u => GameUser.CreateFromEntity(u, token.GameVersion));
 
         int total = await this.database.HeartedProfiles.CountAsync(h => h.UserId == targetUser.UserId);
 
