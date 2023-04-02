@@ -37,9 +37,8 @@ public class CollectionController : ControllerBase
 
         GameTokenEntity token = this.GetToken();
 
-        List<SlotBase> slots = await this.database.Slots.Where(s => targetPlaylist.SlotIds.Contains(s.SlotId))
-            .Select(s => SlotBase.CreateFromEntity(s, token))
-            .ToListAsync();
+        List<SlotBase> slots = (await this.database.Slots.Where(s => targetPlaylist.SlotIds.Contains(s.SlotId)).ToListAsync())
+            .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         int total = targetPlaylist.SlotIds.Length;
 
@@ -101,9 +100,8 @@ public class CollectionController : ControllerBase
 
     private async Task<PlaylistResponse> GetUserPlaylists(int userId)
     {
-        List<GamePlaylist> playlists = await this.database.Playlists.Where(p => p.CreatorId == userId)
-            .Select(p => GamePlaylist.CreateFromEntity(p))
-            .ToListAsync();
+        List<GamePlaylist> playlists = (await this.database.Playlists.Where(p => p.CreatorId == userId)
+            .ToListAsync()).ToSerializableList(GamePlaylist.CreateFromEntity);
         int total = this.database.Playlists.Count(p => p.CreatorId == userId);
 
         return new PlaylistResponse
@@ -189,16 +187,16 @@ public class CollectionController : ControllerBase
 
         if (category is CategoryWithUser categoryWithUser)
         {
-            slots = categoryWithUser.GetSlots(this.database, user, pageStart, pageSize)
-                .Select(s => SlotBase.CreateFromEntity(s, token))
-                .ToList();
+            slots = (await categoryWithUser.GetSlots(this.database, user, pageStart, pageSize)
+                .ToListAsync())
+                .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
             totalSlots = categoryWithUser.GetTotalSlots(this.database, user);
         }
         else
         {
             slots = category.GetSlots(this.database, pageStart, pageSize)
-                .Select(s => SlotBase.CreateFromEntity(s, token))
-                .ToList();
+                .ToList()
+                .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
             totalSlots = category.GetTotalSlots(this.database);
         }
 

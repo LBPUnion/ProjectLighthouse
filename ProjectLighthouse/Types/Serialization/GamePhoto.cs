@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.EntityFrameworkCore;
@@ -102,7 +102,7 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
             MediumHash = entity.MediumHash,
             LargeHash = entity.MediumHash,
             PlanHash = entity.PlanHash,
-            Subjects = entity.PhotoSubjects.Select(GamePhotoSubject.CreateFromEntity).ToList(),
+            Subjects = entity.PhotoSubjects.ToSerializableList(GamePhotoSubject.CreateFromEntity),
         };
 
 }

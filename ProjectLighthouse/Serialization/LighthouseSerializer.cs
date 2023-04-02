@@ -10,39 +10,55 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LBPUnion.ProjectLighthouse.Serialization;
 
 public static class LighthouseSerializer
 {
+
+    private static readonly Dictionary<Type, CustomXmlSerializer> serializerCache = new();
+
+    private static readonly XmlSerializerNamespaces emptyNamespace = new(new[]
+    {
+        XmlQualifiedName.Empty,
+    });
+
+    private static readonly XmlWriterSettings defaultWriterSettings = new()
+    {
+        OmitXmlDeclaration = true,
+        CheckCharacters = false,
+    };
+
+    public static CustomXmlSerializer GetSerializer(Type type, XmlRootAttribute? rootAttribute = null)
+    {
+        if (serializerCache.TryGetValue(type, out CustomXmlSerializer? value)) return value;
+
+        CustomXmlSerializer serializer = new(type, rootAttribute);
+
+        serializerCache.Add(type, serializer);
+        return serializer;
+    }
+
     public static string Serialize(IServiceProvider serviceProvider, ILbpSerializable? serializableObject)
     {
         if (serializableObject == null) return "";
 
         XmlRootAttribute? rootAttribute = null;
+
         if (serializableObject is IHasCustomRoot customRoot) rootAttribute = new XmlRootAttribute(customRoot.GetRoot());
 
-        // Required to omit the xml namespace
-        XmlSerializerNamespaces namespaces = new();
-        namespaces.Add(string.Empty, string.Empty);
+        CustomXmlSerializer serializer = GetSerializer(serializableObject.GetType(), rootAttribute);
+
         using StringWriter stringWriter = new();
-        CustomXmlSerializer serializer = new(serializableObject.GetType(), serviceProvider, rootAttribute);
-        WriteFullClosingTagXmlWriter xmlWriter = new(stringWriter,
-            new XmlWriterSettings
-            {
-                OmitXmlDeclaration = true,
-                CheckCharacters = false,
-            });
-        serializer.Serialize(xmlWriter, serializableObject, namespaces);
+
+        WriteFullClosingTagXmlWriter xmlWriter = new(stringWriter, defaultWriterSettings);
+            
+        serializer.Serialize(serviceProvider, xmlWriter, serializableObject, emptyNamespace);
         string finalResult = stringWriter.ToString();
         stringWriter.Dispose();
         return finalResult;
     }
-
-    public static string Serialize(this ControllerBase controllerBase, ILbpSerializable serializableObject) 
-        => Serialize(controllerBase.Request.HttpContext.RequestServices, serializableObject);
 
     public static void PrepareForSerialization(IServiceProvider serviceProvider, INeedsPreparationForSerialization serializableObject)
     {

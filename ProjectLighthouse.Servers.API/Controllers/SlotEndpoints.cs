@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using Microsoft.AspNetCore.Mvc;
@@ -35,11 +36,10 @@ public class SlotEndpoints : ApiEndpointController
         if (limit < 0) limit = 0;
         limit = Math.Min(ServerStatics.PageSize, limit);
 
-        IEnumerable<ApiSlot> minimalSlots = await this.database.Slots.OrderByDescending(s => s.FirstUploaded)
+        List<ApiSlot> minimalSlots = (await this.database.Slots.OrderByDescending(s => s.FirstUploaded)
             .Skip(skip)
             .Take(limit)
-            .Select(s => ApiSlot.CreateFromEntity(s))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(ApiSlot.CreateFromEntity);
 
         return this.Ok(minimalSlots);
     }

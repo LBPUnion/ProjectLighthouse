@@ -41,7 +41,7 @@ public abstract class Category
         List<SlotBase> slots = new();
         SlotEntity? previewSlot = this.GetPreviewSlot(database);
         if (previewSlot != null)
-            slots.Add(SlotBase.CreateFromEntity(this.GetPreviewSlot(database), GameVersion.LittleBigPlanet3, -1));
+            slots.Add(SlotBase.CreateFromEntity(previewSlot, GameVersion.LittleBigPlanet3, -1));
         
         int totalSlots = this.GetTotalSlots(database);
         return GameCategory.CreateFromEntity(this, new GenericSlotResponse(slots, totalSlots, 2));
