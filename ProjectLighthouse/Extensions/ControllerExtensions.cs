@@ -9,8 +9,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -118,7 +118,7 @@ public static partial class ControllerExtensions
                 }
                 root = new XmlRootAttribute(rootElement);
             }
-            XmlSerializer serializer = new(typeof(T), root);
+            XmlSerializer serializer = LighthouseSerializer.GetSerializer(typeof(T), root);
             T? obj = (T?)serializer.Deserialize(new StringReader(bodyString));
             return obj;
         }

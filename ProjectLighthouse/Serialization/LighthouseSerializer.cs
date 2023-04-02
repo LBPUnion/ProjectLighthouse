@@ -30,17 +30,13 @@ public static class LighthouseSerializer
         CheckCharacters = false,
     };
 
-    private static CustomXmlSerializer GetSerializer(IServiceProvider serviceProvider, ILbpSerializable serializableObject, XmlRootAttribute? rootAttribute = null)
+    public static CustomXmlSerializer GetSerializer(Type type, XmlRootAttribute? rootAttribute = null)
     {
-        Type objType = serializableObject.GetType();
-        if (serializerCache.TryGetValue(objType, out CustomXmlSerializer? value)) return value;
+        if (serializerCache.TryGetValue(type, out CustomXmlSerializer? value)) return value;
 
-        if (serializableObject is IHasCustomRoot customRoot) rootAttribute = new XmlRootAttribute(customRoot.GetRoot());
+        CustomXmlSerializer serializer = new(type, rootAttribute);
 
-        // Required to omit the xml namespace
-        CustomXmlSerializer serializer = new(objType, serviceProvider, rootAttribute);
-
-        serializerCache.Add(objType, serializer);
+        serializerCache.Add(type, serializer);
         return serializer;
     }
 
@@ -48,13 +44,17 @@ public static class LighthouseSerializer
     {
         if (serializableObject == null) return "";
 
-        CustomXmlSerializer serializer = GetSerializer(serviceProvider, serializableObject);
+        XmlRootAttribute? rootAttribute = null;
+
+        if (serializableObject is IHasCustomRoot customRoot) rootAttribute = new XmlRootAttribute(customRoot.GetRoot());
+
+        CustomXmlSerializer serializer = GetSerializer(serializableObject.GetType(), rootAttribute);
 
         using StringWriter stringWriter = new();
 
         WriteFullClosingTagXmlWriter xmlWriter = new(stringWriter, defaultWriterSettings);
             
-        serializer.Serialize(xmlWriter, serializableObject, emptyNamespace);
+        serializer.Serialize(serviceProvider, xmlWriter, serializableObject, emptyNamespace);
         string finalResult = stringWriter.ToString();
         stringWriter.Dispose();
         return finalResult;
