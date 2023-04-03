@@ -17,7 +17,7 @@ namespace LBPUnion.ProjectLighthouse.Serialization;
 public static class LighthouseSerializer
 {
 
-    private static readonly Dictionary<Type, CustomXmlSerializer> serializerCache = new();
+    private static readonly Dictionary<(Type, XmlRootAttribute?), CustomXmlSerializer> serializerCache = new();
 
     private static readonly XmlSerializerNamespaces emptyNamespace = new(new[]
     {
@@ -32,11 +32,11 @@ public static class LighthouseSerializer
 
     public static CustomXmlSerializer GetSerializer(Type type, XmlRootAttribute? rootAttribute = null)
     {
-        if (serializerCache.TryGetValue(type, out CustomXmlSerializer? value)) return value;
+        if (serializerCache.TryGetValue((type, rootAttribute), out CustomXmlSerializer? value)) return value; 
 
         CustomXmlSerializer serializer = new(type, rootAttribute);
 
-        serializerCache.Add(type, serializer);
+        serializerCache.Add((type, rootAttribute), serializer);
         return serializer;
     }
 
