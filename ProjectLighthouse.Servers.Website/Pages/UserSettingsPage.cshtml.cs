@@ -33,9 +33,12 @@ public class UserSettingsPage : BaseLayout
 
         if (avatarHash != null) this.ProfileUser.IconHash = avatarHash;
 
-        biography = CensorHelper.FilterMessage(biography);
-
-        if (this.ProfileUser.Biography != biography && biography.Length <= 512) this.ProfileUser.Biography = biography;
+        if (biography != null)
+        {
+            biography = CensorHelper.FilterMessage(biography);
+            if (this.ProfileUser.Biography != biography && biography.Length <= 512)
+                this.ProfileUser.Biography = biography;
+        }
 
         if (ServerConfiguration.Instance.Mail.MailEnabled &&
             SanitizationHelper.IsValidEmail(email) &&

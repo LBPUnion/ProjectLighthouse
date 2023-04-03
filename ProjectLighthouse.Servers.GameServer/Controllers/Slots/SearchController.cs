@@ -61,10 +61,10 @@ public class SearchController : ControllerBase
                      s.SlotId.ToString().Equals(keyword)
             );
 
-        List<SlotBase> slots = await dbQuery.Skip(Math.Max(0, pageStart - 1))
+        List<SlotBase> slots = (await dbQuery.Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(s => SlotBase.CreateFromEntity(s, token))
-            .ToListAsync();
+            .ToListAsync())
+            .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         return this.Ok(new GenericSlotResponse(keyName, slots, await dbQuery.CountAsync(), 0));
     }

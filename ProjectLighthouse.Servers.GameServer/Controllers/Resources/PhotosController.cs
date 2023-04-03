@@ -167,13 +167,12 @@ public class PhotosController : ControllerBase
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
-        List<GamePhoto> photos = await this.database.Photos.Include(p => p.PhotoSubjects)
+        List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.SlotId == id)
             .OrderByDescending(s => s.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(p => GamePhoto.CreateFromEntity(p))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
 
         return this.Ok(new PhotoListResponse(photos));
     }
@@ -186,13 +185,12 @@ public class PhotosController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
-        List<GamePhoto> photos = await this.database.Photos.Include(p => p.PhotoSubjects)
+        List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.CreatorId == targetUserId)
             .OrderByDescending(s => s.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(p => GamePhoto.CreateFromEntity(p))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
         return this.Ok(new PhotoListResponse(photos));
     }
 
@@ -204,13 +202,12 @@ public class PhotosController : ControllerBase
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
-        List<GamePhoto> photos = await this.database.Photos.Include(p => p.PhotoSubjects)
+        List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.PhotoSubjects.Any(ps => ps.UserId == targetUserId))
             .OrderByDescending(s => s.Timestamp)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .Select(p => GamePhoto.CreateFromEntity(p))
-            .ToListAsync();
+            .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
 
         return this.Ok(new PhotoListResponse(photos));
     }

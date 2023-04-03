@@ -29,14 +29,26 @@ public class SlotSettingsPage : BaseLayout
 
         if (avatarHash != null) this.Slot.IconHash = avatarHash;
 
-        name = CensorHelper.FilterMessage(name);
-        if (this.Slot.Name != name && name.Length <= 64) this.Slot.Name = name;
+        if (name != null)
+        {
+            name = CensorHelper.FilterMessage(name);
+            if (this.Slot.Name != name && name.Length <= 64)
+                this.Slot.Name = name;
+        }
 
-        description = CensorHelper.FilterMessage(description);
-        if (this.Slot.Description != description && description.Length <= 512) this.Slot.Description = description;
+        if (description != null)
+        {
+            description = CensorHelper.FilterMessage(description);
+            if (this.Slot.Description != description && description?.Length <= 512)
+                this.Slot.Description = description;
+        }
 
-        labels = LabelHelper.RemoveInvalidLabels(labels);
-        if (this.Slot.AuthorLabels != labels) this.Slot.AuthorLabels = labels;
+        if (labels != null)
+        {
+            labels = LabelHelper.RemoveInvalidLabels(labels);
+            if (this.Slot.AuthorLabels != labels) 
+                this.Slot.AuthorLabels = labels;
+        }
 
         // ReSharper disable once InvertIf
         if (this.Database.ChangeTracker.HasChanges())

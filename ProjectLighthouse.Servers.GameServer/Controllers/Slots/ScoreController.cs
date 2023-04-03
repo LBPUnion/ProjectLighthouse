@@ -322,7 +322,7 @@ public class ScoreController : ControllerBase
         // Paginated viewing: if not requesting pageStart, get results around user
         var pagedScores = rankedScores.Skip(options.PageStart != -1 || myScore == null ? options.PageStart - 1 : myScore.Rank - 3).Take(Math.Min(options.PageSize, 30));
 
-        List<GameScore> gameScores = pagedScores.Select(ps => GameScore.CreateFromEntity(ps.Score, ps.Rank)).ToList();
+        List<GameScore> gameScores = pagedScores.ToSerializableList(ps => GameScore.CreateFromEntity(ps.Score, ps.Rank));
 
         return new ScoreboardResponse(options.RootName, gameScores, rankedScores.Count, myScore?.Score.Points ?? 0, myScore?.Rank ?? 0);
     }

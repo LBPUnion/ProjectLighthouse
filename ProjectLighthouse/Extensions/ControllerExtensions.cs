@@ -9,8 +9,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +33,7 @@ public static partial class ControllerExtensions
         // Separate method because Span/ReadOnlySpan cannot be used in async methods
         ReadOnlySpan<byte> span = readOnlySequence.IsSingleSegment
             ? readOnlySequence.First.Span
-            : readOnlySequence.ToArray().AsSpan();
+            : readOnlySequence.ToArray();
         builder.Append(Encoding.UTF8.GetString(span));
     }
 
@@ -47,32 +47,13 @@ public static partial class ControllerExtensions
             ReadResult readResult = await controller.Request.BodyReader.ReadAsync();
             ReadOnlySequence<byte> buffer = readResult.Buffer;
 
-            SequencePosition? position;
-
-            do
+            if (buffer.Length > 0)
             {
-                // Look for a EOL in the buffer
-                position = buffer.PositionOf((byte)'\n');
-                if (position == null) continue;
-
-                ReadOnlySequence<byte> readOnlySequence = buffer.Slice(0, position.Value);
-                AddStringToBuilder(builder, in readOnlySequence);
-
-                // Skip the line + the \n character (basically position)
-                buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
-            }
-            while (position != null);
-
-
-            if (readResult.IsCompleted && buffer.Length > 0)
-            {
-                AddStringToBuilder(builder, in buffer);
+                AddStringToBuilder(builder, buffer);
             }
 
-            controller.Request.BodyReader.AdvanceTo(buffer.Start, buffer.End);
+            controller.Request.BodyReader.AdvanceTo(buffer.End);
 
-            // At this point, buffer will be updated to point one byte after the last
-            // \n character.
             if (readResult.IsCompleted)
             {
                 break;
@@ -118,7 +99,7 @@ public static partial class ControllerExtensions
                 }
                 root = new XmlRootAttribute(rootElement);
             }
-            XmlSerializer serializer = new(typeof(T), root);
+            XmlSerializer serializer = LighthouseSerializer.GetSerializer(typeof(T), root);
             T? obj = (T?)serializer.Deserialize(new StringReader(bodyString));
             return obj;
         }
