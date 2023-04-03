@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
@@ -9,7 +8,7 @@ public struct GenericSlotResponse : ILbpSerializable, IHasCustomRoot
 {
     public GenericSlotResponse() { }
 
-    public GenericSlotResponse(string rootElement, List<SlotBase> slots, int total, int hintStart)
+    public GenericSlotResponse(string rootElement, List<SlotBase> slots, int total = 0, int hintStart = 0)
     {
         this.RootTag = rootElement;
         this.Slots = slots;
@@ -17,14 +16,12 @@ public struct GenericSlotResponse : ILbpSerializable, IHasCustomRoot
         this.HintStart = hintStart;
     }
 
-    public GenericSlotResponse(string rootElement, List<SlotBase> slots) : this(rootElement, slots, 0, 0) { }
-
     public GenericSlotResponse(List<SlotBase> slots) : this("slots", slots) { }
 
     public GenericSlotResponse(List<SlotBase> slots, int total, int hintStart) : this("slots", slots, total, hintStart) { }
 
     [XmlIgnore]
-    public string RootTag { get; set; }
+    private string RootTag { get; }
 
     [XmlElement("slot")]
     public List<SlotBase> Slots { get; set; }

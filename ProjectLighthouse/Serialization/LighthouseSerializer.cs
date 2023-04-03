@@ -32,7 +32,7 @@ public static class LighthouseSerializer
 
     public static CustomXmlSerializer GetSerializer(Type type, XmlRootAttribute? rootAttribute = null)
     {
-        if (serializerCache.TryGetValue((type, rootAttribute), out CustomXmlSerializer? value)) return value; 
+        if (serializerCache.TryGetValue((type, rootAttribute), out CustomXmlSerializer? value)) return value;
 
         CustomXmlSerializer serializer = new(type, rootAttribute);
 
