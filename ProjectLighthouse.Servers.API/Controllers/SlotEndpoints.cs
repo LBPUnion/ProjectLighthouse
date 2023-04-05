@@ -39,7 +39,7 @@ public class SlotEndpoints : ApiEndpointController
         List<ApiSlot> minimalSlots = (await this.database.Slots.OrderByDescending(s => s.FirstUploaded)
             .Skip(skip)
             .Take(limit)
-            .ToListAsync()).ToSerializableList(ApiSlot.CreateFromEntity);
+            .ToListAsync()).ToSerializableList(MinimalApiSlot.CreateFromEntity);
 
         return this.Ok(minimalSlots);
     }
@@ -59,6 +59,6 @@ public class SlotEndpoints : ApiEndpointController
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(u => u.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        return this.Ok(ApiSlot.CreateFromEntity(slot));
+        return this.Ok(ApiSlot.CreateFromEntity(slot, this.database));
     }
 }
