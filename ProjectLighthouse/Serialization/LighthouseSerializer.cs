@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -16,8 +17,7 @@ namespace LBPUnion.ProjectLighthouse.Serialization;
 
 public static class LighthouseSerializer
 {
-
-    private static readonly Dictionary<(Type, XmlRootAttribute?), CustomXmlSerializer> serializerCache = new();
+    private static readonly ConcurrentDictionary<(Type, XmlRootAttribute?), CustomXmlSerializer> serializerCache = new();
 
     private static readonly XmlSerializerNamespaces emptyNamespace = new(new[]
     {
@@ -36,7 +36,7 @@ public static class LighthouseSerializer
 
         CustomXmlSerializer serializer = new(type, rootAttribute);
 
-        serializerCache.Add((type, rootAttribute), serializer);
+        serializerCache.TryAdd((type, rootAttribute), serializer);
         return serializer;
     }
 
