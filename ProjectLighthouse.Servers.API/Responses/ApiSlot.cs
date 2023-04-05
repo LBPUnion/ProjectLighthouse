@@ -10,6 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 public struct ApiSlot
 {
     public int SlotId { get; set; }
+    public int InternalSlotId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public string IconHash { get; set; }
@@ -40,6 +41,7 @@ public struct ApiSlot
         new()
         {
             SlotId = slot.SlotId,
+            InternalSlotId = slot.InternalSlotId,
             Name = slot.Name,
             Description = slot.Description,
             IconHash = slot.IconHash,
