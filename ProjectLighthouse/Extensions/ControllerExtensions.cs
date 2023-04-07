@@ -1,8 +1,6 @@
 ﻿#nullable enable
 using System;
-using System.Buffers;
 using System.IO;
-using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -28,47 +26,16 @@ public static partial class ControllerExtensions
         return token;
     }
 
-    private static void AddStringToBuilder(StringBuilder builder, in ReadOnlySequence<byte> readOnlySequence)
-    {
-        // Separate method because Span/ReadOnlySpan cannot be used in async methods
-        ReadOnlySpan<byte> span = readOnlySequence.IsSingleSegment
-            ? readOnlySequence.First.Span
-            : readOnlySequence.ToArray();
-        builder.Append(Encoding.UTF8.GetString(span));
-    }
-
     public static async Task<string> ReadBodyAsync(this ControllerBase controller)
     {
-        controller.Request.Body.Position = 0;
-        StringBuilder builder = new();
-
-        while (true)
-        {
-            ReadResult readResult = await controller.Request.BodyReader.ReadAsync();
-            ReadOnlySequence<byte> buffer = readResult.Buffer;
-
-            if (buffer.Length > 0)
-            {
-                AddStringToBuilder(builder, buffer);
-            }
-
-            controller.Request.BodyReader.AdvanceTo(buffer.End);
-
-            if (readResult.IsCompleted)
-            {
-                break;
-            }
-        }
-
-        string finalString = builder.ToString();
-        if (finalString.Length != controller.Request.ContentLength)
+        byte[] bodyBytes = await controller.Request.BodyReader.ReadAllAsync();
+        if (bodyBytes.Length != controller.Request.ContentLength)
         {
             Logger.Warn($"Failed to read entire body, contentType={controller.Request.ContentType}, " +
-                        $"contentLen={controller.Request.ContentLength}, readLen={finalString.Length}",
+                        $"contentLen={controller.Request.ContentLength}, readLen={bodyBytes.Length}",
                 LogArea.HTTP);
         }
-
-        return builder.ToString();
+        return Encoding.ASCII.GetString(bodyBytes);
     }
 
     [GeneratedRegex("&(?!(amp|apos|quot|lt|gt);)")]

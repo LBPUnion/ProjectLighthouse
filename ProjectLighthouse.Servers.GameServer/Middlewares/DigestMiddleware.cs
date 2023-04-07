@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using Microsoft.Extensions.Primitives;
@@ -39,7 +40,7 @@ public class DigestMiddleware : Middleware
         const string url = "/LITTLEBIGPLANETPS3_XML";
         string strippedPath = digestPath.Contains(url) ? digestPath[url.Length..] : "";
         #endif
-        Stream body = context.Request.Body;
+        byte[] bodyBytes = await context.Request.BodyReader.ReadAllAsync();
 
         bool usedAlternateDigestKey = false;
 
@@ -54,8 +55,8 @@ public class DigestMiddleware : Middleware
                 excludeBodyFromDigest = true;
             }
 
-            string clientRequestDigest = await CryptoHelper.ComputeDigest
-                (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey, excludeBodyFromDigest);
+            string clientRequestDigest = CryptoHelper.ComputeDigest
+                (digestPath, authCookie, bodyBytes, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey, excludeBodyFromDigest);
 
             // Check the digest we've just calculated against the digest header if the game set the header. They should match.
             if (context.Request.Headers.TryGetValue(digestHeaderKey, out StringValues sentDigest))
@@ -65,11 +66,8 @@ public class DigestMiddleware : Middleware
                     // If we got here, the normal ServerDigestKey failed to validate. Lets try again with the alternate digest key.
                     usedAlternateDigestKey = true;
 
-                    // Reset the body stream
-                    body.Position = 0;
-
-                    clientRequestDigest = await CryptoHelper.ComputeDigest
-                        (digestPath, authCookie, body, ServerConfiguration.Instance.DigestKey.AlternateDigestKey, excludeBodyFromDigest);
+                    clientRequestDigest = CryptoHelper.ComputeDigest
+                        (digestPath, authCookie, bodyBytes, ServerConfiguration.Instance.DigestKey.AlternateDigestKey, excludeBodyFromDigest);
                     if (clientRequestDigest != sentDigest)
                     {
                         #if DEBUG
@@ -116,7 +114,7 @@ public class DigestMiddleware : Middleware
                 : ServerConfiguration.Instance.DigestKey.PrimaryDigestKey;
 
             // Compute the digest for the response.
-            string serverDigest = await CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer, digestKey);
+            string serverDigest = CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer.ToArray(), digestKey);
             context.Response.Headers.Add("X-Digest-A", serverDigest);
         }
 
