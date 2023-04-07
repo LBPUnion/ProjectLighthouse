@@ -1,9 +1,9 @@
-using System.IO.Compression;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using Microsoft.Extensions.Primitives;
+using Org.BouncyCastle.Utilities.Zlib;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 
@@ -104,28 +104,15 @@ public class DigestMiddleware : Middleware
         await this.next(context); // Handle the request so we can get the server digest hash
         responseBuffer.Position = 0;
 
-        // Compute the server digest hash.
-        if (this.computeDigests)
-        {
-            responseBuffer.Position = 0;
-
-            string digestKey = usedAlternateDigestKey
-                ? ServerConfiguration.Instance.DigestKey.AlternateDigestKey
-                : ServerConfiguration.Instance.DigestKey.PrimaryDigestKey;
-
-            // Compute the digest for the response.
-            string serverDigest = CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer.ToArray(), digestKey);
-            context.Response.Headers.Add("X-Digest-A", serverDigest);
-        }
-
         if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate") && (context.Response.ContentType ?? string.Empty).Contains("text/xml"))
         {
             context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
             context.Response.Headers.Add("Vary", "Accept-Encoding");
             MemoryStream resultStream = new();
-            await using ZLibStream stream = new(resultStream, CompressionMode.Compress, true);
+            const int defaultCompressionLevel = 6;
+            await using ZOutputStreamLeaveOpen stream = new(resultStream, defaultCompressionLevel);
             await stream.WriteAsync(responseBuffer.ToArray());
-            stream.Close();
+            stream.Finish();
         
             resultStream.Position = 0;
             context.Response.Headers.Add("Content-Length", resultStream.Length.ToString());
@@ -139,6 +126,20 @@ public class DigestMiddleware : Middleware
                 ? "Content-Length"
                 : "X-Original-Content-Length";
             context.Response.Headers.Add(headerName, responseBuffer.Length.ToString());
+        }
+
+        // Compute the server digest hash.
+        if (this.computeDigests)
+        {
+            responseBuffer.Position = 0;
+
+            string digestKey = usedAlternateDigestKey
+                ? ServerConfiguration.Instance.DigestKey.AlternateDigestKey
+                : ServerConfiguration.Instance.DigestKey.PrimaryDigestKey;
+
+            // Compute the digest for the response.
+            string serverDigest = CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer.ToArray(), digestKey);
+            context.Response.Headers.Add("X-Digest-A", serverDigest);
         }
 
         // Copy the buffered response to the actual response stream.
