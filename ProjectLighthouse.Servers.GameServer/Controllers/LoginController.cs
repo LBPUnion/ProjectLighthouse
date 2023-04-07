@@ -30,9 +30,7 @@ public class LoginController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Login()
     {
-        MemoryStream ms = new();
-        await this.Request.Body.CopyToAsync(ms);
-        byte[] loginData = ms.ToArray();
+        byte[] loginData = await this.Request.BodyReader.ReadAllAsync();
 
         NPTicket? npTicket;
         try
