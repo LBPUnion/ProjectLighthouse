@@ -29,7 +29,7 @@ public static partial class ControllerExtensions
     public static async Task<string> ReadBodyAsync(this ControllerBase controller)
     {
         byte[] bodyBytes = await controller.Request.BodyReader.ReadAllAsync();
-        if (bodyBytes.Length != controller.Request.ContentLength)
+        if (controller.Request.ContentLength != null && bodyBytes.Length != controller.Request.ContentLength)
         {
             Logger.Warn($"Failed to read entire body, contentType={controller.Request.ContentType}, " +
                         $"contentLen={controller.Request.ContentLength}, readLen={bodyBytes.Length}",
