@@ -5,6 +5,7 @@
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Users
+@using LBPUnion.ProjectLighthouse.Types.Entities.Level
 @using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity
 
@@ -54,13 +55,13 @@
             @if (showLink)
             {
                 <h2>
-                    <a href="~/slot/@Model.SlotId">@slotName</a>
+                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.InitiallyLocked.LevelLockedIcon();"></i>
                 </h2>
             }
             else
             {
                 <h1>
-                    @slotName
+                    @slotName <i class="@Model.InitiallyLocked.LevelLockedIcon();"></i>
                 </h1>
             }
         }
@@ -69,13 +70,13 @@
             @if (showLink)
             {
                 <h3>
-                    <a href="~/slot/@Model.SlotId">@slotName</a>
+                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.InitiallyLocked.LevelLockedIcon();"></i>
                 </h3>
             }
             else
             {
                 <h3>
-                    @slotName
+                    @slotName <i class="@Model.InitiallyLocked.LevelLockedIcon();"></i>
                 </h3>
             }
         }
