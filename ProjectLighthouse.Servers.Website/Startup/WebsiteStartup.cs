@@ -5,9 +5,9 @@ using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
-using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
 using Microsoft.Extensions.Hosting.Internal;

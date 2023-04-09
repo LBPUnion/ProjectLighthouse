@@ -15,7 +15,7 @@ namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 [Trait("Category", "Integration")]
 public class AuthenticationTests : LighthouseWebTest
 {
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldLoginWithPassword()
     {
         await using DatabaseContext database = new();
@@ -37,7 +37,7 @@ public class AuthenticationTests : LighthouseWebTest
         await database.RemoveUser(user);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldNotLoginWithNoPassword()
     {
         await using DatabaseContext database = new();
@@ -56,7 +56,7 @@ public class AuthenticationTests : LighthouseWebTest
         await database.RemoveUser(user);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldNotLoginWithWrongPassword()
     {
         await using DatabaseContext database = new();
@@ -76,7 +76,7 @@ public class AuthenticationTests : LighthouseWebTest
         await database.RemoveUser(user);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldLoginWithInjectedCookie()
     {
         const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/div/p[1]";

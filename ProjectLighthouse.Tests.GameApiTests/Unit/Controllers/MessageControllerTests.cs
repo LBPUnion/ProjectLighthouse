@@ -21,8 +21,7 @@ public class MessageControllerTests
     [Fact]
     public void Eula_ShouldReturnLicense_WhenConfigEmpty()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        MessageController messageController = new(dbMock.Object, null!);
+        MessageController messageController = new(null!, null!);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.EulaText = "";
@@ -40,8 +39,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-";
+along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\n";
 
         IActionResult result = messageController.Eula();
         OkObjectResult? okObjectResult = result as OkObjectResult;
@@ -54,8 +52,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     [Fact]
     public void Eula_ShouldReturnLicenseAndConfigString_WhenConfigNotEmpty()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        MessageController messageController = new(dbMock.Object, null!);
+        MessageController messageController = new(null!, null!);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.EulaText = "unit test eula text";
@@ -73,8 +70,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-unit test eula text";
+along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nunit test eula text";
 
         IActionResult result = messageController.Eula();
         OkObjectResult? okObjectResult = result as OkObjectResult;
@@ -85,7 +81,7 @@ unit test eula text";
     }
 
     [Fact]
-    public async void Announcement_WithVariables_ShouldBeResolved()
+    public async Task Announcement_WithVariables_ShouldBeResolved()
     {
         Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
         MessageController messageController = new(dbMock.Object, null!);
@@ -105,10 +101,10 @@ unit test eula text";
     }
 
     [Fact]
-    public async void Announcement_WithEmptyString_ShouldBeEmpty()
+    public async Task Announcement_WithEmptyString_ShouldBeEmpty()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        MessageController messageController = new(dbMock.Object, null!);
+        await using DatabaseContext db = await MockHelper.GetTestDatabase();
+        MessageController messageController = new(db, null!);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.AnnounceText = "";
@@ -125,10 +121,10 @@ unit test eula text";
     }
 
     [Fact]
-    public void Notification_ShouldReturn_Empty()
+    public async Task Notification_ShouldReturn_Empty()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        MessageController messageController = new(dbMock.Object, null!);
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
+        MessageController messageController = new(dbMock, null!);
         messageController.SetupTestController();
 
         const int expected = 200;
@@ -140,12 +136,12 @@ unit test eula text";
     }
 
     [Fact]
-    public async void Filter_ShouldNotCensor_WhenCensorDisabled()
+    public async Task Filter_ShouldNotCensor_WhenCensorDisabled()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
         const string request = "unit test message";
-        MessageController messageController = new(dbMock.Object, null!);
+        MessageController messageController = new(dbMock, null!);
         messageController.SetupTestController(request);
 
         CensorConfiguration.Instance.UserInputFilterMode = FilterMode.None;
@@ -162,15 +158,16 @@ unit test eula text";
     }
 
     [Fact]
-    public async void Filter_ShouldCensor_WhenCensorEnabled()
+    public async Task Filter_ShouldCensor_WhenCensorEnabled()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
+
         const string request = "unit test message bruh";
-        MessageController messageController = new(dbMock.Object, null!);
+        MessageController messageController = new(dbMock, null!);
         messageController.SetupTestController(request);
 
         CensorConfiguration.Instance.UserInputFilterMode = FilterMode.Asterisks;
-        CensorConfiguration.Instance.FilteredWordList = new List<string>()
+        CensorConfiguration.Instance.FilteredWordList = new List<string>
         {
             "bruh",
         };
@@ -197,10 +194,10 @@ unit test eula text";
     [Fact]
     public async void Filter_ShouldNotSendEmail_WhenMailDisabled()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
         Mock<IMailService> mailMock = getMailServiceMock();
         const string request = "/setemail unittest@unittest.com";
-        MessageController messageController = new(dbMock.Object, mailMock.Object);
+        MessageController messageController = new(dbMock, mailMock.Object);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = false;
@@ -219,14 +216,13 @@ unit test eula text";
     [Fact]
     public async void Filter_ShouldSendEmail_WhenMailEnabled_AndEmailNotTaken()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
         
-        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
         Mock<IMailService> mailMock = getMailServiceMock();
 
         const string request = "/setemail unittest@unittest.com";
 
-        MessageController messageController = new(dbMock.Object, mailMock.Object);
+        MessageController messageController = new(dbMock, mailMock.Object);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
@@ -238,14 +234,13 @@ unit test eula text";
         OkResult? okResult = result as OkResult;
         Assert.NotNull(okResult);
         Assert.Equal(expectedStatus, okResult.StatusCode);
-        Assert.Equal(expectedEmail, dbMock.Object.Users.First().EmailAddress);
+        Assert.Equal(expectedEmail, dbMock.Users.First().EmailAddress);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
 
     [Fact]
     public async void Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailTaken()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
         List<UserEntity> users = new()
         {
             MockHelper.GetUnitTestUser(),
@@ -254,15 +249,14 @@ unit test eula text";
                 UserId = 2,
                 EmailAddress = "unittest@unittest.com",
                 EmailAddressVerified = false,
-            }
+            },
         };
-        dbMock.Setup(x => x.Users).ReturnsDbSet(users);
-        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(users);
         Mock<IMailService> mailMock = getMailServiceMock();
 
         const string request = "/setemail unittest@unittest.com";
 
-        MessageController messageController = new(dbMock.Object, mailMock.Object);
+        MessageController messageController = new(dbMock, mailMock.Object);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
@@ -281,14 +275,16 @@ unit test eula text";
     {
         UserEntity unitTestUser = MockHelper.GetUnitTestUser();
         unitTestUser.EmailAddressVerified = true;
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock(new List<UserEntity>{unitTestUser,});
-        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new List<UserEntity>
+        {
+            unitTestUser,
+        });
 
         Mock<IMailService> mailMock = getMailServiceMock();
 
         const string request = "/setemail unittest@unittest.com";
 
-        MessageController messageController = new(dbMock.Object, mailMock.Object);
+        MessageController messageController = new(dbMock, mailMock.Object);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
@@ -307,17 +303,16 @@ unit test eula text";
     {
         UserEntity unitTestUser = MockHelper.GetUnitTestUser();
         unitTestUser.EmailAddressVerified = true;
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock(new List<UserEntity>
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new List<UserEntity>
         {
             unitTestUser,
         });
-        dbMock.Setup(x => x.EmailVerificationTokens).ReturnsDbSet(new List<EmailVerificationTokenEntity>());
 
         Mock<IMailService> mailMock = getMailServiceMock();
 
         const string request = "/setemail unittestinvalidemail@@@";
 
-        MessageController messageController = new(dbMock.Object, mailMock.Object);
+        MessageController messageController = new(dbMock, mailMock.Object);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;

@@ -16,7 +16,7 @@ public class AdminTests : LighthouseWebTest
 {
     private const string adminPanelButtonXPath = "/html/body/div/header/div/div/div/a[1]";
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
     {
         await using DatabaseContext database = new();
@@ -42,7 +42,7 @@ public class AdminTests : LighthouseWebTest
         Assert.Contains("Admin", this.Driver.FindElement(By.XPath(adminPanelButtonXPath)).Text);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldNotShowAdminPanelButtonWhenNotAdmin()
     {
         await using DatabaseContext database = new();

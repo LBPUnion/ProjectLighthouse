@@ -20,7 +20,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldReturnWithValidData()
     {
         HttpResponseMessage response = await this.AuthenticateResponse();
@@ -30,7 +30,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         Assert.Contains(VersionHelper.EnvVer, responseContent);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task CanSerializeBack()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -43,7 +43,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         Assert.Equal(VersionHelper.EnvVer, loginResult.ServerBrand);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task CanUseToken()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -54,7 +54,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldReturnForbiddenWhenNotAuthenticated()
     {
         HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/announce");

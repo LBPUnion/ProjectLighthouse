@@ -12,7 +12,7 @@ namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 [Trait("Category", "Integration")]
 public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
 {
-    [DatabaseFact]
+    [Fact]
     public async Task CanCreateUserTwice()
     {
         await using DatabaseContext database = new();

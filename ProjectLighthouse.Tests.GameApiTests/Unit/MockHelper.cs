@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
@@ -10,6 +11,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -35,6 +37,30 @@ public static class MockHelper
             UserLocation = "127.0.0.1",
             UserToken = "unittest",
         };
+
+    public static async Task<DatabaseContext> GetTestDatabase(List<UserEntity>? users = null, List<GameTokenEntity>? tokens = null,
+        [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0
+    )
+    {
+        users ??= new List<UserEntity>
+        {
+            GetUnitTestUser(),
+        };
+
+        tokens ??= new List<GameTokenEntity>
+        {
+            GetUnitTestToken(),
+        };
+        DbContextOptions<DatabaseContext> options = new DbContextOptionsBuilder<DatabaseContext>()
+            .UseInMemoryDatabase($"{caller}_{lineNum}")
+            .Options;
+        await using DatabaseContext context = new(options);
+        context.Users.AddRange(users);
+        context.GameTokens.AddRange(tokens);
+        await context.SaveChangesAsync();
+        await context.DisposeAsync();
+        return new DatabaseContext(options);
+    }
 
     public static Mock<DatabaseContext> GetDatabaseMock(List<UserEntity>? users = null, List<GameTokenEntity>? tokens = null)
     {

@@ -15,7 +15,7 @@ namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 [Trait("Category", "Integration")]
 public class SlotTests : LighthouseServerTest<GameServerTestStartup>
 {
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldOnlyShowUsersLevels()
     {
         await using DatabaseContext database = new();

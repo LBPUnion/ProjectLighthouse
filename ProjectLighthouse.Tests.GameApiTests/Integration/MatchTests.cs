@@ -16,7 +16,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
 {
     private static readonly SemaphoreSlim semaphore = new(1, 1);
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldRejectEmptyData()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -28,7 +28,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
         Assert.False(result.IsSuccessStatusCode);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldReturnOk()
     {
         LoginResult loginResult = await this.Authenticate();
@@ -41,7 +41,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
         Assert.True(result.IsSuccessStatusCode);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldIncrementPlayerCount()
     {
         LoginResult loginResult = await this.Authenticate(new Random().Next());

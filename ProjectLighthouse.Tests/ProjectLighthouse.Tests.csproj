@@ -31,6 +31,7 @@
         </PackageReference>
         <PackageReference Include="Moq" Version="4.18.4"/>
         <PackageReference Include="Moq.EntityFrameworkCore" Version="7.0.0.2"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -38,9 +39,5 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Unit\Serialization" />
     </ItemGroup>
 </Project>

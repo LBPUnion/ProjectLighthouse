@@ -64,6 +64,16 @@ public partial class DatabaseContext : DbContext
 
     #endregion
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
+    public DatabaseContext() : base(new DbContextOptionsBuilder().UseMySql(
+            ServerConfiguration.Instance.DbConnectionString,
+            MySqlServerVersion.LatestSupportedServerVersion)
+        .Options)
+
+    { }
+
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+    { }
+
+    // protected override void OnConfiguring(DbContextOptionsBuilder options)
+    //     => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 }

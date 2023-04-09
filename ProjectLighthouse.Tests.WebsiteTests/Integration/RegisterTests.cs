@@ -14,7 +14,7 @@ namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 [Trait("Category", "Integration")]
 public class RegisterTests : LighthouseWebTest
 {
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldRegister()
     {
         await using DatabaseContext database = new();
@@ -39,7 +39,7 @@ public class RegisterTests : LighthouseWebTest
         await database.RemoveUser(user);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldNotRegisterWithMismatchingPasswords()
     {
         await using DatabaseContext database = new();
@@ -62,7 +62,7 @@ public class RegisterTests : LighthouseWebTest
         Assert.Null(user);
     }
 
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldNotRegisterWithTakenUsername()
     {
         await using DatabaseContext database = new();
