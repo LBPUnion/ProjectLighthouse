@@ -16,11 +16,8 @@ public class StatusControllerTests
             ControllerContext = MockHelper.GetMockControllerContext(),
         };
 
-        const int expectedStatusCode = 200;
-
         IActionResult result = statusController.GetStatus();
-        OkResult? okResult = result as OkResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(expectedStatusCode, okResult.StatusCode);
+
+        Assert.IsType<OkResult>(result);
     }
 }

@@ -22,12 +22,12 @@ public class UserControllerTests
         userController.SetupTestController();
 
         const int expectedId = 1;
-        const int expectedStatus = 200;
 
         IActionResult result = await userController.GetUser("unittest");
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
         GameUser? gameUser = okObject.Value as GameUser;
         Assert.NotNull(gameUser);
         Assert.Equal(expectedId, gameUser.UserId);
@@ -41,12 +41,9 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController();
 
-        const int expectedStatus = 404;
-
         IActionResult result = await userController.GetUser("notfound");
-        NotFoundResult? okObject = result as NotFoundResult;
-        Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
+
+        Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]
@@ -57,12 +54,11 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController();
 
-        const int expectedStatus = 200;
-
         IActionResult result = await userController.GetUserAlt(new[]{"notfound",});
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
         MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
         Assert.NotNull(userList);
         Assert.Empty(userList.Value.Users);
@@ -76,15 +72,14 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController();
 
-        const int expectedStatus = 200;
-
         IActionResult result = await userController.GetUserAlt(new[]
         {
             "notfound", "notfound2", "notfound3",
         });
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
         MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
         Assert.NotNull(userList);
         Assert.Empty(userList.Value.Users);
@@ -98,15 +93,15 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController();
 
-        const int expectedStatus = 200;
 
         IActionResult result = await userController.GetUserAlt(new[]
         {
             "notfound", "unittest", "notfound3",
         });
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
         MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
         Assert.NotNull(userList);
         Assert.Single(userList.Value.Users);
@@ -130,16 +125,16 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController();
 
-        const int expectedStatus = 200;
         const int expectedLength = 2;
 
         IActionResult result = await userController.GetUserAlt(new[]
         {
             "unittest2", "unittest",
         });
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
         MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
         Assert.NotNull(userList);
         Assert.Equal(expectedLength, userList.Value.Users.Count);
@@ -153,12 +148,10 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController("{}");
 
-        const int expectedStatus = 400;
 
         IActionResult result = await userController.UpdateMyPins();
-        BadRequestResult? okObject = result as BadRequestResult;
-        Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
+
+        Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
@@ -169,14 +162,14 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController("{\"profile_pins\": [1234]}");
 
-        const int expectedStatus = 200;
         const string expectedPins = "1234";
         const string expectedResponse = "[{\"StatusCode\":200}]";
 
         IActionResult result = await userController.UpdateMyPins();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
         Assert.Equal(expectedPins, dbMock.Users.First().Pins);
         Assert.Equal(expectedResponse, okObject.Value);
     }
@@ -195,14 +188,14 @@ public class UserControllerTests
         UserController userController = new(dbMock);
         userController.SetupTestController("{\"profile_pins\": [1234]}");
 
-        const int expectedStatus = 200;
         const string expectedPins = "1234";
         const string expectedResponse = "[{\"StatusCode\":200}]";
 
         IActionResult result = await userController.UpdateMyPins();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
-        Assert.Equal(expectedStatus, okObject.StatusCode);
         Assert.Equal(expectedPins, dbMock.Users.First().Pins);
         Assert.Equal(expectedResponse, okObject.Value);
     }

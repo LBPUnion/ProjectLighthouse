@@ -6,11 +6,9 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Moq.EntityFrameworkCore;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Unit.Controllers;
@@ -27,7 +25,6 @@ public class MessageControllerTests
 
         ServerConfiguration.Instance.EulaText = "";
 
-        const int expectedStatus = 200;
         const string expected = @"
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -43,9 +40,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\n";
 
         IActionResult result = messageController.Eula();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
         Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
         Assert.NotNull(okObjectResult.Value);
         Assert.Equal(expected, (string)okObjectResult.Value);
     }
@@ -58,7 +56,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\n";
 
         ServerConfiguration.Instance.EulaText = "unit test eula text";
 
-        const int expectedStatus = 200;
         const string expected = @"
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -74,9 +71,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nunit test eula text";
 
         IActionResult result = messageController.Eula();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
         Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
         Assert.NotNull(okObjectResult.Value);
         Assert.Equal(expected, (string)okObjectResult.Value);
     }
@@ -90,13 +88,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         ServerConfiguration.Instance.AnnounceText = "you are now logged in as %user (id: %id)";
 
-        const int expectedStatus = 200;
         const string expected = "you are now logged in as unittest (id: 1)\n";
 
         IActionResult result = await messageController.Announce();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
         Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
         Assert.NotNull(okObjectResult.Value);
         Assert.Equal(expected, (string)okObjectResult.Value);
     }
@@ -110,13 +108,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         ServerConfiguration.Instance.AnnounceText = "";
 
-        const int expectedStatus = 200;
         const string expected = "";
 
         IActionResult result = await messageController.Announce();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
         Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
         Assert.NotNull(okObjectResult.Value);
         Assert.Equal(expected, (string)okObjectResult.Value);
     }
@@ -129,12 +127,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
         MessageController messageController = new(dbMock, null!);
         messageController.SetupTestController();
 
-        const int expected = 200;
-
         IActionResult result = messageController.Notification();
-        OkResult? okObjectResult = result as OkResult;
-        Assert.NotNull(okObjectResult);
-        Assert.Equal(expected, okObjectResult.StatusCode);
+
+        Assert.IsType<OkResult>(result);
     }
 
     [Fact]
@@ -148,13 +143,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         CensorConfiguration.Instance.UserInputFilterMode = FilterMode.None;
 
-        const int expectedStatus = 200;
         const string expectedBody = "unit test message";
 
         IActionResult result = await messageController.Filter();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
         Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
         Assert.NotNull(okObjectResult.Value);
         Assert.Equal(expectedBody, (string)okObjectResult.Value);
     }
@@ -174,13 +169,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
             "bruh",
         };
 
-        const int expectedStatus = 200;
         const string expectedBody = "unit test message ****";
 
         IActionResult result = await messageController.Filter();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
         Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
         Assert.NotNull(okObjectResult.Value);
         Assert.Equal(expectedBody, (string)okObjectResult.Value);
     }
@@ -209,6 +204,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
         const string expected = "/setemail unittest@unittest.com";
 
         IActionResult result = await messageController.Filter();
+
+        Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
         Assert.NotNull(okObjectResult);
         Assert.Equal(expectedStatus, okObjectResult.StatusCode);
@@ -229,13 +226,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
-        const int expectedStatus = 200;
         const string expectedEmail = "unittest@unittest.com";
 
         IActionResult result = await messageController.Filter();
-        OkResult? okResult = result as OkResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(expectedStatus, okResult.StatusCode);
+
+        Assert.IsType<OkResult>(result);
         Assert.Equal(expectedEmail, dbMock.Users.First().EmailAddress);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
@@ -263,12 +258,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
-        const int expectedStatus = 200;
-
         IActionResult result = await messageController.Filter();
-        OkResult? okResult = result as OkResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(expectedStatus, okResult.StatusCode);
+
+        Assert.IsType<OkResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
@@ -291,12 +283,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
-        const int expectedStatus = 200;
-
         IActionResult result = await messageController.Filter();
-        OkResult? okResult = result as OkResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(expectedStatus, okResult.StatusCode);
+
+        Assert.IsType<OkResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
@@ -319,12 +308,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
-        const int expectedStatus = 200;
-
         IActionResult result = await messageController.Filter();
-        OkResult? okResult = result as OkResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(expectedStatus, okResult.StatusCode);
+
+        Assert.IsType<OkResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
     

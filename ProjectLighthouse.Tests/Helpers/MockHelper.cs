@@ -7,12 +7,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -142,7 +142,7 @@ public static class MockHelper
             HttpContext = new DefaultHttpContext(),
         };
 
-    public static ControllerContext GetMockControllerContext(string? body) =>
+    private static ControllerContext GetMockControllerContext(string? body) =>
         new()
         {
             HttpContext = new DefaultHttpContext
@@ -153,9 +153,13 @@ public static class MockHelper
                     Body = new MemoryStream(Encoding.ASCII.GetBytes(body ?? string.Empty)),
                 },
             },
+            ActionDescriptor = new ControllerActionDescriptor
+            {
+                ActionName = "",
+            },
         };
 
-    public static void SetupTestGameToken(ControllerBase controller, GameTokenEntity token)
+    private static void SetupTestGameToken(ControllerBase controller, GameTokenEntity token)
     {
         controller.HttpContext.Items["Token"] = token;
     }
