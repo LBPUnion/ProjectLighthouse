@@ -178,7 +178,6 @@ public static class SlotEntityExtensions
         {
             { InitiallyLocked: true } => "icon lock",
             _ => ""
-            
         };
     }
 }
