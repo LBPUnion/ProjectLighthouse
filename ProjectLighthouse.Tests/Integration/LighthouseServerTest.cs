@@ -24,7 +24,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
     protected LighthouseServerTest()
     {
-        ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=testing;pwd=lighthouse;database=lighthouse_tests";
+        ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse_tests;database=lighthouse_tests";
         this.server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
         this.Client = this.server.CreateClient();
     }
