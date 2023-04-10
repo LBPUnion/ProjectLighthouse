@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -37,6 +39,52 @@ public static class MockHelper
             UserLocation = "127.0.0.1",
             UserToken = "unittest",
         };
+
+    public static async Task<DatabaseContext> GetTestDatabase(IEnumerable<IList> sets, [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0)
+    {
+        Dictionary<Type, IList> setDict = new();
+        foreach (IList list in sets)
+        {
+            Type? type = list.GetType().GetGenericArguments().ElementAtOrDefault(0);
+            if (type == null) continue;
+            setDict[type] = list;
+        }
+
+        if (!setDict.TryGetValue(typeof(GameTokenEntity), out _))
+        {
+            setDict[typeof(GameTokenEntity)] = new List<GameTokenEntity>
+            {
+                GetUnitTestToken(),
+            };
+        }
+
+        if (!setDict.TryGetValue(typeof(UserEntity), out _))
+        {
+            setDict[typeof(UserEntity)] = new List<UserEntity>
+            {
+                GetUnitTestUser(),
+            };
+        }
+
+
+        DbContextOptions<DatabaseContext> options = new DbContextOptionsBuilder<DatabaseContext>()
+            .UseInMemoryDatabase($"{caller}_{lineNum}")
+            .Options;
+
+        await using DatabaseContext context = new(options);
+        foreach (IList list in setDict.Select(p => p.Value))
+        {
+            foreach (object item in list)
+            {
+                context.Add(item);
+            }
+        }
+
+
+        await context.SaveChangesAsync();
+        await context.DisposeAsync();
+        return new DatabaseContext(options);
+    }
 
     public static async Task<DatabaseContext> GetTestDatabase(List<UserEntity>? users = null, List<GameTokenEntity>? tokens = null,
         [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0

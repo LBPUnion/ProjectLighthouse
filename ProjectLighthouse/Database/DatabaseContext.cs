@@ -74,7 +74,4 @@ public partial class DatabaseContext : DbContext
             MySqlServerVersion.LatestSupportedServerVersion);
         return new DatabaseContext(builder.Options);
     }
-
-    // protected override void OnConfiguring(DbContextOptionsBuilder options)
-    //     => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
 }

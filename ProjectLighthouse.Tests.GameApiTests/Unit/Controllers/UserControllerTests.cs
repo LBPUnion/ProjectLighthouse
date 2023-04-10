@@ -1,14 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
-using Moq.EntityFrameworkCore;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Unit.Controllers;
@@ -19,9 +16,9 @@ public class UserControllerTests
     [Fact]
     public async void GetUser_WithValidUser_ShouldReturnUser()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController();
 
         const int expectedId = 1;
@@ -39,9 +36,9 @@ public class UserControllerTests
     [Fact]
     public async void GetUser_WithInvalidUser_ShouldReturnNotFound()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController();
 
         const int expectedStatus = 404;
@@ -55,9 +52,9 @@ public class UserControllerTests
     [Fact]
     public async void GetUserAlt_WithInvalidUser_ShouldReturnEmptyList()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController();
 
         const int expectedStatus = 200;
@@ -74,9 +71,9 @@ public class UserControllerTests
     [Fact]
     public async void GetUserAlt_WithOnlyInvalidUsers_ShouldReturnEmptyList()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController();
 
         const int expectedStatus = 200;
@@ -96,9 +93,9 @@ public class UserControllerTests
     [Fact]
     public async void GetUserAlt_WithTwoInvalidUsers_AndOneValidUser_ShouldReturnOne()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController();
 
         const int expectedStatus = 200;
@@ -118,19 +115,19 @@ public class UserControllerTests
     [Fact]
     public async void GetUserAlt_WithTwoValidUsers_ShouldReturnTwo()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        dbMock.Setup(x => x.Users)
-            .ReturnsDbSet(new List<UserEntity>
+        List<UserEntity> users = new()
+        {
+            MockHelper.GetUnitTestUser(),
+            new UserEntity
             {
-                MockHelper.GetUnitTestUser(),
-                new()
-                {
-                    UserId = 2,
-                    Username = "unittest2",
-                },
-            });
+                UserId = 2,
+                Username = "unittest2",
+            },
+        };
 
-        UserController userController = new(dbMock.Object);
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(users);
+
+        UserController userController = new(dbMock);
         userController.SetupTestController();
 
         const int expectedStatus = 200;
@@ -151,9 +148,9 @@ public class UserControllerTests
     [Fact]
     public async void UpdateMyPins_ShouldReturnBadRequest_WhenBodyIsInvalid()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController("{}");
 
         const int expectedStatus = 400;
@@ -167,9 +164,9 @@ public class UserControllerTests
     [Fact]
     public async void UpdateMyPins_ShouldUpdatePins()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController("{\"profile_pins\": [1234]}");
 
         const int expectedStatus = 200;
@@ -180,7 +177,7 @@ public class UserControllerTests
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
         Assert.Equal(expectedStatus, okObject.StatusCode);
-        Assert.Equal(expectedPins, dbMock.Object.Users.First().Pins);
+        Assert.Equal(expectedPins, dbMock.Users.First().Pins);
         Assert.Equal(expectedResponse, okObject.Value);
     }
 
@@ -191,11 +188,11 @@ public class UserControllerTests
         entity.Pins = "1234";
         List<UserEntity> users = new()
         {
-            entity
+            entity,
         };
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock(users);
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(users);
 
-        UserController userController = new(dbMock.Object);
+        UserController userController = new(dbMock);
         userController.SetupTestController("{\"profile_pins\": [1234]}");
 
         const int expectedStatus = 200;
@@ -206,8 +203,7 @@ public class UserControllerTests
         OkObjectResult? okObject = result as OkObjectResult;
         Assert.NotNull(okObject);
         Assert.Equal(expectedStatus, okObject.StatusCode);
-        Assert.Equal(expectedPins, dbMock.Object.Users.First().Pins);
+        Assert.Equal(expectedPins, dbMock.Users.First().Pins);
         Assert.Equal(expectedResponse, okObject.Value);
-        dbMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

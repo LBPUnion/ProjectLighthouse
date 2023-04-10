@@ -84,8 +84,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     [Fact]
     public async Task Announcement_WithVariables_ShouldBeResolved()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        MessageController messageController = new(dbMock.Object, null!);
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
+        MessageController messageController = new(dbMock, null!);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.AnnounceText = "you are now logged in as %user (id: %id)";
@@ -104,8 +104,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     [Fact]
     public async Task Announcement_WithEmptyString_ShouldBeEmpty()
     {
-        await using DatabaseContext db = await MockHelper.GetTestDatabase();
-        MessageController messageController = new(db, null!);
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
+        MessageController messageController = new(dbMock, null!);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.AnnounceText = "";
@@ -125,6 +125,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     public async Task Notification_ShouldReturn_Empty()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
+
         MessageController messageController = new(dbMock, null!);
         messageController.SetupTestController();
 

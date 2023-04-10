@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -18,10 +19,9 @@ public class StatisticsControllerTests
     [Fact]
     public async void PlanetStats_ShouldReturnCorrectCounts_WhenEmpty()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        dbMock.Setup(x => x.Slots).ReturnsDbSet(new List<SlotEntity>());
+        await using DatabaseContext db = await MockHelper.GetTestDatabase();
 
-        StatisticsController statsController = new(dbMock.Object);
+        StatisticsController statsController = new(db);
         statsController.SetupTestController();
 
         const int expectedStatusCode = 200;
@@ -41,25 +41,25 @@ public class StatisticsControllerTests
     [Fact]
     public async void PlanetStats_ShouldReturnCorrectCounts_WhenNotEmpty()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        dbMock.Setup(x => x.Slots).ReturnsDbSet(new List<SlotEntity>
+        List<SlotEntity> slots = new()
         {
-            new()
+            new SlotEntity
             {
                 SlotId = 1,
             },
-            new()
+            new SlotEntity
             {
                 SlotId = 2,
             },
-            new()
+            new SlotEntity
             {
                 SlotId = 3,
                 TeamPick = true,
             },
-        });
+        };
+        await using DatabaseContext db = await MockHelper.GetTestDatabase(new []{slots,});
 
-        StatisticsController statsController = new(dbMock.Object);
+        StatisticsController statsController = new(db);
         statsController.SetupTestController();
 
         const int expectedStatusCode = 200;
@@ -79,29 +79,28 @@ public class StatisticsControllerTests
     [Fact]
     public async void PlanetStats_ShouldReturnCorrectCounts_WhenSlotsAreIncompatibleGameVersion()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        dbMock.Setup(x => x.Slots)
-            .ReturnsDbSet(new List<SlotEntity>
+        List<SlotEntity> slots = new()
+        {
+            new SlotEntity
             {
-                new()
-                {
-                    SlotId = 1,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                },
-                new()
-                {
-                    SlotId = 2,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                },
-                new()
-                {
-                    SlotId = 3,
-                    TeamPick = true,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                },
-            });
+                SlotId = 1,
+                GameVersion = GameVersion.LittleBigPlanet2,
+            },
+            new SlotEntity
+            {
+                SlotId = 2,
+                GameVersion = GameVersion.LittleBigPlanet2,
+            },
+            new SlotEntity
+            {
+                SlotId = 3,
+                TeamPick = true,
+                GameVersion = GameVersion.LittleBigPlanet2,
+            },
+        };
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[]{slots,});
 
-        StatisticsController statsController = new(dbMock.Object);
+        StatisticsController statsController = new(dbMock);
         statsController.SetupTestController();
 
         const int expectedStatusCode = 200;
@@ -121,29 +120,28 @@ public class StatisticsControllerTests
     [Fact]
     public async void TotalLevelCount_ShouldReturnCorrectCount_WhenSlotsAreCompatible()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        dbMock.Setup(x => x.Slots)
-            .ReturnsDbSet(new List<SlotEntity>
+        List<SlotEntity> slots = new()
+        {
+            new SlotEntity
             {
-                new()
-                {
-                    SlotId = 1,
-                    GameVersion = GameVersion.LittleBigPlanet1,
-                },
-                new()
-                {
-                    SlotId = 2,
-                    GameVersion = GameVersion.LittleBigPlanet1,
-                },
-                new()
-                {
-                    SlotId = 3,
-                    TeamPick = true,
-                    GameVersion = GameVersion.LittleBigPlanet1,
-                },
-            });
+                SlotId = 1,
+                GameVersion = GameVersion.LittleBigPlanet1,
+            },
+            new SlotEntity
+            {
+                SlotId = 2,
+                GameVersion = GameVersion.LittleBigPlanet1,
+            },
+            new SlotEntity
+            {
+                SlotId = 3,
+                TeamPick = true,
+                GameVersion = GameVersion.LittleBigPlanet1,
+            },
+        };
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[] {slots,});
 
-        StatisticsController statsController = new(dbMock.Object);
+        StatisticsController statsController = new(dbMock);
         statsController.SetupTestController();
 
         const int expectedStatusCode = 200;
@@ -159,29 +157,28 @@ public class StatisticsControllerTests
     [Fact]
     public async void TotalLevelCount_ShouldReturnCorrectCount_WhenSlotsAreNotCompatible()
     {
-        Mock<DatabaseContext> dbMock = MockHelper.GetDatabaseMock();
-        dbMock.Setup(x => x.Slots)
-            .ReturnsDbSet(new List<SlotEntity>
+        List<SlotEntity> slots = new()
+        {
+            new SlotEntity
             {
-                new()
-                {
-                    SlotId = 1,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                },
-                new()
-                {
-                    SlotId = 2,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                },
-                new()
-                {
-                    SlotId = 3,
-                    TeamPick = true,
-                    GameVersion = GameVersion.LittleBigPlanet2,
-                },
-            });
+                SlotId = 1,
+                GameVersion = GameVersion.LittleBigPlanet2,
+            },
+            new SlotEntity
+            {
+                SlotId = 2,
+                GameVersion = GameVersion.LittleBigPlanet2,
+            },
+            new SlotEntity
+            {
+                SlotId = 3,
+                TeamPick = true,
+                GameVersion = GameVersion.LittleBigPlanet2,
+            },
+        }; 
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[] {slots,});
 
-        StatisticsController statsController = new(dbMock.Object);
+        StatisticsController statsController = new(dbMock);
         statsController.SetupTestController();
 
         const int expectedStatusCode = 200;
