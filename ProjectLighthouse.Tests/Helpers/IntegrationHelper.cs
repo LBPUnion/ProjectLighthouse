@@ -16,7 +16,7 @@ public static class IntegrationHelper
     /// <returns>A new fresh instance of DatabaseContext</returns>
     public static async Task<DatabaseContext> GetIntegrationDatabase()
     {
-        if (!dbConnected.Value)
+        if (!ServerStatics.DbConnected)
         {
             throw new Exception($"Database is not connected.\n" +
                                 $"Please ensure that the database is running and that the connection string is correct.\n" +

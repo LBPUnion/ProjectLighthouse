@@ -102,7 +102,6 @@ public class UserControllerTests
         userController.SetupTestController();
 
         const int expectedStatus = 200;
-        const int expectedLength = 1;
 
         IActionResult result = await userController.GetUserAlt(new[]
         {
