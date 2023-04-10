@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -19,7 +20,7 @@ public class AdminTests : LighthouseWebTest
     [Fact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
@@ -45,7 +46,7 @@ public class AdminTests : LighthouseWebTest
     [Fact]
     public async Task ShouldNotShowAdminPanelButtonWhenNotAdmin()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Tickets;
@@ -18,16 +19,19 @@ namespace LBPUnion.ProjectLighthouse.Tests.Integration;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class LighthouseServerTest<TStartup> where TStartup : class
 {
-    public readonly HttpClient Client;
-    public readonly TestServer Server;
+    protected readonly HttpClient Client;
+    private readonly TestServer server;
 
-    public LighthouseServerTest()
+    protected LighthouseServerTest()
     {
-        this.Server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
-        this.Client = this.Server.CreateClient();
+        ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=testing;pwd=lighthouse;database=lighthouse_tests";
+        this.server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
+        this.Client = this.server.CreateClient();
     }
 
-    public async Task<string> CreateRandomUser(int number = -1, bool createUser = true)
+    public TestServer GetTestServer() => this.server;
+
+    protected async Task<string> CreateRandomUser(int number = -1, bool createUser = true)
     {
         if (number == -1) number = new Random().Next();
         const string username = "unitTestUser";
@@ -47,7 +51,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return $"{username}{number}";
     }
 
-    public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
+    protected async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
     {
         string username = await this.CreateRandomUser(number, createUser);
 
@@ -61,7 +65,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return response;
     }
 
-    public async Task<LoginResult> Authenticate(int number = -1)
+    protected async Task<LoginResult> Authenticate(int number = -1)
     {
         HttpResponseMessage response = await this.AuthenticateResponse(number);
 
@@ -71,9 +75,9 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return (LoginResult)serializer.Deserialize(new StringReader(responseContent))!;
     }
 
-    public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
+    protected Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
 
-    public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
+    private Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
     {
         using HttpRequestMessage requestMessage = new(method, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
@@ -89,7 +93,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
     }
 
-    public async Task<HttpResponseMessage> AuthenticatedUploadFileEndpointRequest(string filePath, string mmAuth)
+    protected async Task<HttpResponseMessage> AuthenticatedUploadFileEndpointRequest(string filePath, string mmAuth)
     {
         byte[] bytes = await File.ReadAllBytesAsync(filePath);
         string hash = CryptoHelper.Sha1Hash(bytes).ToLower();
@@ -112,7 +116,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return await this.Client.SendAsync(requestMessage);
     }
 
-    public async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth)
+    protected async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth)
     {
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);

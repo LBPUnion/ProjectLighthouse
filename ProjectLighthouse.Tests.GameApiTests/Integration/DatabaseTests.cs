@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Xunit;
@@ -15,7 +16,8 @@ public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task CanCreateUserTwice()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+
         int rand = new Random().Next();
 
         UserEntity userA = await database.CreateUser("unitTestUser" + rand, CryptoHelper.GenerateAuthToken());

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -18,7 +19,7 @@ public class AuthenticationTests : LighthouseWebTest
     [Fact]
     public async Task ShouldLoginWithPassword()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         Random random = new();
 
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
@@ -40,7 +41,7 @@ public class AuthenticationTests : LighthouseWebTest
     [Fact]
     public async Task ShouldNotLoginWithNoPassword()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("just like the hindenberg,"));
 
@@ -59,7 +60,7 @@ public class AuthenticationTests : LighthouseWebTest
     [Fact]
     public async Task ShouldNotLoginWithWrongPassword()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
@@ -81,7 +82,7 @@ public class AuthenticationTests : LighthouseWebTest
     {
         const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/div/p[1]";
 
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         Random random = new();
         UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 

@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Unit;
+namespace LBPUnion.ProjectLighthouse.Tests.Helpers;
 
 public static class MockHelper
 {

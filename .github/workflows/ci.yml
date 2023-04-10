@@ -16,8 +16,8 @@ jobs:
           - { prettyName: Linux, fullName: ubuntu-latest, database: true, webTest: true }
     timeout-minutes: 5
     env:
-      DB_DATABASE: lighthouse
-      DB_USER: root
+      DB_DATABASE: lighthouse_tests
+      DB_USER: testing
       DB_PASSWORD: lighthouse
     steps:
       - name: Checkout

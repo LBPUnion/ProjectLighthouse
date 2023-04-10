@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public class RegisterTests : LighthouseWebTest
     [Fact]
     public async Task ShouldRegister()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
         string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
@@ -42,7 +43,7 @@ public class RegisterTests : LighthouseWebTest
     [Fact]
     public async Task ShouldNotRegisterWithMismatchingPasswords()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
         string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
@@ -65,7 +66,7 @@ public class RegisterTests : LighthouseWebTest
     [Fact]
     public async Task ShouldNotRegisterWithTakenUsername()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
         string username = ("unitTestUser" + new Random().Next())[..16];
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
@@ -15,6 +16,8 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldReturnErrorOnNoPostData()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", null!);
         Assert.False(response.IsSuccessStatusCode);
         Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
@@ -23,6 +26,8 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldReturnWithValidData()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         HttpResponseMessage response = await this.AuthenticateResponse();
         Assert.True(response.IsSuccessStatusCode);
         string responseContent = await response.Content.ReadAsStringAsync();
@@ -33,6 +38,8 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task CanSerializeBack()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         LoginResult loginResult = await this.Authenticate();
 
         Assert.NotNull(loginResult);
@@ -46,6 +53,8 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task CanUseToken()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/enterLevel/420", loginResult.AuthTicket);
@@ -57,6 +66,8 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldReturnForbiddenWhenNotAuthenticated()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/announce");
         Assert.False(response.IsSuccessStatusCode);
         Assert.True(response.StatusCode == HttpStatusCode.Forbidden);

@@ -1,4 +1,5 @@
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 

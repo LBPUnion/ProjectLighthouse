@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
@@ -19,6 +20,8 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldRejectEmptyData()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         LoginResult loginResult = await this.Authenticate();
         await semaphore.WaitAsync();
 
@@ -31,6 +34,8 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldReturnOk()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         LoginResult loginResult = await this.Authenticate();
         await semaphore.WaitAsync();
 
@@ -44,6 +49,8 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldIncrementPlayerCount()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         LoginResult loginResult = await this.Authenticate(new Random().Next());
 
         await semaphore.WaitAsync();

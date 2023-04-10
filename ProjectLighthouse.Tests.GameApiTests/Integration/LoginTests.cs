@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -20,6 +21,8 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldLoginWithGoodTicket()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder()
@@ -33,6 +36,8 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldNotLoginWithExpiredTicket()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder()
@@ -48,6 +53,8 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldNotLoginWithBadTitleId()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder()
@@ -63,6 +70,8 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldNotLoginWithBadSignature()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         byte[] ticketData = new TicketBuilder()
@@ -85,6 +94,8 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldNotLoginIfBanned()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
         await using DatabaseContext database = new();
