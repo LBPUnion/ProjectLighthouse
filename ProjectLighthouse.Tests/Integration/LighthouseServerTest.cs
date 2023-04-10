@@ -13,10 +13,11 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests.Integration;
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[Collection(nameof(LighthouseServerTest<TStartup>))]
 public class LighthouseServerTest<TStartup> where TStartup : class
 {
     protected readonly HttpClient Client;
