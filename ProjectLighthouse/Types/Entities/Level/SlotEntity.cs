@@ -169,15 +169,3 @@ public class SlotEntity
     [NotMapped]
     public int Thumbsdown => new DatabaseContext().RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
 }
-
-public static class SlotEntityExtensions
-{
-    public static string GetLevelLockIcon(this SlotEntity locked)
-    {
-        return locked switch
-        {
-            { InitiallyLocked: true } => "icon lock",
-            _ => ""
-        };
-    }
-}
