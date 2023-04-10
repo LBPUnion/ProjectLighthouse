@@ -22,11 +22,11 @@ public static class IntegrationHelper
                                 $"Please ensure that the database is running and that the connection string is correct.\n" +
                                 $"Connection string: {ServerConfiguration.Instance.DbConnectionString}");
         }
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
         await database.Database.EnsureDeletedAsync();
         await database.Database.EnsureCreatedAsync();
 
-        return new DatabaseContext();
+        return DatabaseContext.CreateNewInstance();
     } 
 
 }

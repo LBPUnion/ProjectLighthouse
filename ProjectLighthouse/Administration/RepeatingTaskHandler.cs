@@ -31,7 +31,7 @@ public static class RepeatingTaskHandler
         Queue<IRepeatingTask> taskQueue = new();
         foreach (IRepeatingTask task in MaintenanceHelper.RepeatingTasks) taskQueue.Enqueue(task);
 
-        DatabaseContext database = new();
+        DatabaseContext database = DatabaseContext.CreateNewInstance();
 
         while (true)
         {

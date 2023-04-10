@@ -42,7 +42,7 @@
             </h1>
         }
         @{
-            await using DatabaseContext context = new();
+            await using DatabaseContext context = DatabaseContext.CreateNewInstance();
 
             int hearts = Model.GetHeartCount(context);
             int comments = Model.GetCommentCount(context);

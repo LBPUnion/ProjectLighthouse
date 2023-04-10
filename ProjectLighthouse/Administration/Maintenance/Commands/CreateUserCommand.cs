@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class CreateUserCommand : ICommand
 {
-    private readonly DatabaseContext _database = new();
+    private readonly DatabaseContext _database = DatabaseContext.CreateNewInstance();
 
     public async Task Run(string[] args, Logger logger)
     {

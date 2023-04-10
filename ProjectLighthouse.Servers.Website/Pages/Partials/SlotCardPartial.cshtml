@@ -11,7 +11,7 @@
 @{
     UserEntity? user = (UserEntity?)ViewData["User"];
 
-    await using DatabaseContext database = new();
+    await using DatabaseContext database = DatabaseContext.CreateNewInstance();
 
     string slotName = HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model!.Name) ? "Unnamed Level" : Model.Name);
 

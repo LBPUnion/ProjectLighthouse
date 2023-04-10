@@ -55,7 +55,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
 
         await semaphore.WaitAsync();
 
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
 
         int oldPlayerCount = await StatisticsHelper.RecentMatches(database);
 

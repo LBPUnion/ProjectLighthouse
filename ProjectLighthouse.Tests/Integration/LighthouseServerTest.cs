@@ -38,7 +38,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
         if (createUser)
         {
-            await using DatabaseContext database = new();
+            await using DatabaseContext database = DatabaseContext.CreateNewInstance();
             if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
             {
                 UserEntity user = await database.CreateUser($"{username}{number}",

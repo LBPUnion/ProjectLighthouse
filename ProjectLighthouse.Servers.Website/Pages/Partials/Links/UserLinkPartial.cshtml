@@ -7,7 +7,7 @@
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     bool includeStatus = (bool?)ViewData["IncludeStatus"] ?? false;
-    await using DatabaseContext database = new(); 
+    await using DatabaseContext database = DatabaseContext.CreateNewInstance(); 
     string userStatus = includeStatus ? Model.GetStatus(database).ToTranslatedString(language, timeZone) : "";
 }
 

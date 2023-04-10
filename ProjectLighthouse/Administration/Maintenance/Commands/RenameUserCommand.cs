@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class RenameUserCommand : ICommand
 {
-    private readonly DatabaseContext database = new();
+    private readonly DatabaseContext database = DatabaseContext.CreateNewInstance();
     public async Task Run(string[] args, Logger logger)
     {
         UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == args[0]);

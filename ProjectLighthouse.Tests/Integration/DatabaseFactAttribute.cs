@@ -16,7 +16,7 @@ public sealed class DatabaseFactAttribute : FactAttribute
         else
             lock (migrateLock)
             {
-                using DatabaseContext database = new();
+                using DatabaseContext database = DatabaseContext.CreateNewInstance();
                 database.Database.Migrate();
             }
     }

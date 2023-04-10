@@ -98,7 +98,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
 
         string username = await this.CreateRandomUser();
         ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
         UserEntity user = await database.Users.FirstAsync(u => u.Username == username);
         user.PermissionLevel = PermissionLevel.Banned;
         await database.SaveChangesAsync();
