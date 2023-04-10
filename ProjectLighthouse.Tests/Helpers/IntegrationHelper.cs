@@ -18,7 +18,9 @@ public static class IntegrationHelper
     {
         if (!dbConnected.Value)
         {
-            return await MockHelper.GetTestDatabase();
+            throw new Exception($"Database is not connected.\n" +
+                                $"Please ensure that the database is running and that the connection string is correct.\n" +
+                                $"Connection string: {ServerConfiguration.Instance.DbConnectionString}");
         }
         await using DatabaseContext database = new();
         await database.Database.EnsureDeletedAsync();

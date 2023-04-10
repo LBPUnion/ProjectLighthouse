@@ -68,7 +68,6 @@ public partial class DatabaseContext : DbContext
             ServerConfiguration.Instance.DbConnectionString,
             MySqlServerVersion.LatestSupportedServerVersion)
         .Options)
-
     { }
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
