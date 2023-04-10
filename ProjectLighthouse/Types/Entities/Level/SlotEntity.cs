@@ -172,12 +172,13 @@ public class SlotEntity
 
 public static class SlotEntityExtensions
 {
-    public static string LevelLockedIcon(this Boolean locked)
+    public static string GetLevelLockIcon(this SlotEntity locked)
     {
         return locked switch
         {
-            true => "icon lock",
-            false => "",
+            { InitiallyLocked: true } => "icon lock",
+            _ => ""
+            
         };
     }
 }
