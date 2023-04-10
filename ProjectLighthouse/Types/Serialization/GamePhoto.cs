@@ -100,7 +100,7 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
             Timestamp = entity.Timestamp * 1000,
             SmallHash = entity.SmallHash,
             MediumHash = entity.MediumHash,
-            LargeHash = entity.MediumHash,
+            LargeHash = entity.LargeHash,
             PlanHash = entity.PlanHash,
             Subjects = entity.PhotoSubjects.ToSerializableList(GamePhotoSubject.CreateFromEntity),
         };
