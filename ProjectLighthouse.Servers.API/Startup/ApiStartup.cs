@@ -1,6 +1,8 @@
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 namespace LBPUnion.ProjectLighthouse.Servers.API.Startup;
@@ -26,7 +28,9 @@ public class ApiStartup
             }
         );
 
-        services.AddDbContext<DatabaseContext>();
+        services.AddDbContext<DatabaseContext>(builder =>
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion));
 
         services.AddSwaggerGen
         (

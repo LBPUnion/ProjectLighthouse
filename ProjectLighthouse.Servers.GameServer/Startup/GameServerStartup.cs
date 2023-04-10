@@ -11,6 +11,7 @@ using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 
@@ -51,7 +52,9 @@ public class GameServerStartup
             }
         );
 
-        services.AddDbContext<DatabaseContext>();
+        services.AddDbContext<DatabaseContext>(builder =>
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion));
 
         services.AddSingleton<MailQueueService>(x =>
             ActivatorUtilities.CreateInstance<MailQueueService>(x, new SmtpMailSender()));

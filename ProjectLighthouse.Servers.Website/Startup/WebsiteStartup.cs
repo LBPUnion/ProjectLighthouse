@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Mail;
@@ -7,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
@@ -43,7 +45,9 @@ public class WebsiteStartup
         services.AddRazorPages().WithRazorPagesAtContentRoot();
         #endif
 
-        services.AddDbContext<DatabaseContext>();
+        services.AddDbContext<DatabaseContext>(builder =>
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion));
 
         services.AddSingleton<MailQueueService>(x =>
             ActivatorUtilities.CreateInstance<MailQueueService>(x, new SmtpMailSender()));
