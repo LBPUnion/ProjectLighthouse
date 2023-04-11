@@ -78,11 +78,13 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
     protected Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
 
+    private static string GetDigestCookie(string mmAuth) => mmAuth["MM_AUTH=".Length..];
+
     private Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
     {
         using HttpRequestMessage requestMessage = new(method, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
-        string digest = CryptoHelper.ComputeDigest(endpoint, mmAuth, Array.Empty<byte>(), "lighthouse");
+        string digest = CryptoHelper.ComputeDigest(endpoint, GetDigestCookie(mmAuth), Array.Empty<byte>(), "lighthouse");
         requestMessage.Headers.Add("X-Digest-A", digest);
 
         return this.Client.SendAsync(requestMessage);
@@ -103,7 +105,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, $"/LITTLEBIGPLANETPS3_XML/upload/{hash}");
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(bytes);
-        string digest = CryptoHelper.ComputeDigest($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", mmAuth, bytes, "lighthouse");
+        string digest = CryptoHelper.ComputeDigest($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", GetDigestCookie(mmAuth), bytes, "lighthouse");
         requestMessage.Headers.Add("X-Digest-B", digest);
         return await this.Client.SendAsync(requestMessage);
     }
@@ -126,7 +128,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(data);
-        string digest = CryptoHelper.ComputeDigest(endpoint, mmAuth, data, "lighthouse");
+        string digest = CryptoHelper.ComputeDigest(endpoint, GetDigestCookie(mmAuth), data, "lighthouse");
         requestMessage.Headers.Add("X-Digest-A", digest);
         return await this.Client.SendAsync(requestMessage);
     }

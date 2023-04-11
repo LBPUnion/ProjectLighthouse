@@ -50,9 +50,9 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage respMessageA = await this.AuthenticatedRequest
-            ($"LITTLEBIGPLANETPS3_XML/slots/by?u={userA.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
+            ($"/LITTLEBIGPLANETPS3_XML/slots/by?u={userA.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
         HttpResponseMessage respMessageB = await this.AuthenticatedRequest
-            ($"LITTLEBIGPLANETPS3_XML/slots/by?u={userB.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
+            ($"/LITTLEBIGPLANETPS3_XML/slots/by?u={userB.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
 
         Assert.True(respMessageA.IsSuccessStatusCode);
         Assert.True(respMessageB.IsSuccessStatusCode);
