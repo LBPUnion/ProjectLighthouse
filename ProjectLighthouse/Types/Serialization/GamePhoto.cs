@@ -62,12 +62,15 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
                 })
                 .FirstOrDefaultAsync();
 
-            if (partialSlot != null)
+            // Don't send level info if it's not a user or developer slot
+            if (partialSlot?.Type is not (SlotType.Developer or SlotType.User))
+            {
+                this.LevelInfo = null;
+            }
+            else
             {
                 this.LevelInfo.SlotType = partialSlot.Type;
-
-                if (partialSlot.Type == SlotType.Developer)
-                    this.LevelInfo.SlotId = partialSlot.InternalSlotId;
+                if (partialSlot.Type == SlotType.Developer) this.LevelInfo.SlotId = partialSlot.InternalSlotId;
             }
 
             // Fetch creator username
