@@ -5,14 +5,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 
 public static class FormattingExtensions
 {
-    public static string GetLevelLockIcon(this SlotEntity slot)
-    {
-        return slot switch
-        {
-            { InitiallyLocked: true } => "icon lock",
-            _ => ""
-        };
-    }
+    public static string GetLevelLockIcon(this SlotEntity slot) => slot.InitiallyLocked ? "icon lock" : "";
 
     public static string ToHtmlColor(this PermissionLevel permissionLevel)
     {
