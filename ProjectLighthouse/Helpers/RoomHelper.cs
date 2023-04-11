@@ -19,7 +19,7 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
-public class RoomHelper
+public static class RoomHelper
 {
     public static readonly object RoomLock = new();
     public static StorableList<Room> Rooms => RoomStore.GetRooms();
@@ -205,6 +205,8 @@ public class RoomHelper
             int roomCountBeforeCleanup = rooms.Count();
 
             database ??= DatabaseContext.CreateNewInstance();
+
+            int playerCount = database.Users.Count();
 
             // Remove offline players from rooms
             foreach (Room room in rooms)
