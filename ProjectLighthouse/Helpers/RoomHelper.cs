@@ -206,8 +206,6 @@ public static class RoomHelper
 
             database ??= DatabaseContext.CreateNewInstance();
 
-            int playerCount = database.Users.Count();
-
             // Remove offline players from rooms
             foreach (Room room in rooms)
             {

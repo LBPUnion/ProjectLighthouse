@@ -16,7 +16,7 @@ public static class RoomExtensions
         foreach (int playerId in room.PlayerIds)
         {
             UserEntity? player = database.Users.FirstOrDefault(p => p.UserId == playerId);
-            Debug.Assert(player != null);
+            Debug.Assert(player != null, "RoomExtensions: player == null");
 
             players.Add(player);
         }
