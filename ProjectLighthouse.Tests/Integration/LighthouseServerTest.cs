@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -26,6 +25,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
     protected LighthouseServerTest()
     {
         ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse_tests;database=lighthouse_tests";
+        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "lighthouse";
         this.server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
         this.Client = this.server.CreateClient();
     }
@@ -82,10 +82,12 @@ public class LighthouseServerTest<TStartup> where TStartup : class
     {
         using HttpRequestMessage requestMessage = new(method, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
+        string digest = CryptoHelper.ComputeDigest(endpoint, mmAuth, Array.Empty<byte>(), "lighthouse");
+        requestMessage.Headers.Add("X-Digest-A", digest);
 
         return this.Client.SendAsync(requestMessage);
     }
-
+                     
     public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
     {
         byte[] bytes = await File.ReadAllBytesAsync(filePath);
@@ -101,6 +103,8 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, $"/LITTLEBIGPLANETPS3_XML/upload/{hash}");
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(bytes);
+        string digest = CryptoHelper.ComputeDigest($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", mmAuth, bytes, "lighthouse");
+        requestMessage.Headers.Add("X-Digest-B", digest);
         return await this.Client.SendAsync(requestMessage);
     }
 
@@ -122,6 +126,8 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(data);
+        string digest = CryptoHelper.ComputeDigest(endpoint, mmAuth, data, "lighthouse");
+        requestMessage.Headers.Add("X-Digest-A", digest);
         return await this.Client.SendAsync(requestMessage);
     }
 }

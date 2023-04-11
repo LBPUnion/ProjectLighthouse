@@ -24,7 +24,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     }
 
     [Fact]
-    public async Task ShouldReturnWithValidData()
+    public async Task Login_ShouldReturnWithValidData()
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
@@ -36,7 +36,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     }
 
     [Fact]
-    public async Task CanSerializeBack()
+    public async Task Login_CanSerializeBack()
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
@@ -51,7 +51,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     }
 
     [Fact]
-    public async Task CanUseToken()
+    public async Task Login_CanUseToken()
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
@@ -64,7 +64,7 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
     }
 
     [Fact]
-    public async Task ShouldReturnForbiddenWhenNotAuthenticated()
+    public async Task Login_ShouldReturnForbiddenWhenNotAuthenticated()
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
