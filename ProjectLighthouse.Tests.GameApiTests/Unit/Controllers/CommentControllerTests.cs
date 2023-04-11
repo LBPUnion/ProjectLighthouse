@@ -215,6 +215,15 @@ public class CommentControllerTests
 
         Assert.IsType<BadRequestResult>(result);
     }
+    /*
+     * ---------------------------------
+     * | slotType |  slotId  | username
+     * |--------------------------------
+     * |  valid   |  invalid | invalid  | invalid
+     * |
+     * |
+     * |
+     */
 
     [Fact]
     public async Task PostComment_ShouldFail_WhenSlotTypeAndUsernameAreProvided()
@@ -224,7 +233,7 @@ public class CommentControllerTests
         CommentController commentController = new(dbMock);
         commentController.SetupTestController("<comment><message>test</message></comment>");
 
-        IActionResult result = await commentController.PostComment("unittest", "banana", 0);
+        IActionResult result = await commentController.PostComment("unittest", "user", 10);
 
         Assert.IsType<BadRequestResult>(result);
     }
