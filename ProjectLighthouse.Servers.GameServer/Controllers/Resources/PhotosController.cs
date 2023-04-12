@@ -134,6 +134,7 @@ public class PhotosController : ControllerBase
                 {
                     PhotoId = photoEntity.PhotoId,
                     UserId = subject.UserId,
+                    Bounds = subject.Bounds,
                 };
 
                 Logger.Debug($"Adding PhotoSubject (userid {subject.UserId}) to db", LogArea.Photos);
