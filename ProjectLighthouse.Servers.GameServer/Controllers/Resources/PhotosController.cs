@@ -227,12 +227,6 @@ public class PhotosController : ControllerBase
             if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.Unauthorized();
         }
 
-        HashSet<string> photoResources = new(){photo.LargeHash, photo.SmallHash, photo.MediumHash, photo.PlanHash,};
-        foreach (string hash in photoResources)
-        {
-            FileHelper.DeleteResource(hash);
-        }
-
         this.database.Photos.Remove(photo);
         await this.database.SaveChangesAsync();
         return this.Ok();

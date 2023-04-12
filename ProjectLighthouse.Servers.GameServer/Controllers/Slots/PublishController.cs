@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -16,6 +17,7 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Configuration;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
@@ -179,41 +181,39 @@ public class PublishController : ControllerBase
         if (!slot.Resources.Contains(slot.RootLevel))
             slot.Resources = slot.Resources.Append(rootLevel.Hash).ToArray();
 
-        string resourceCollection = string.Join(",", slot.Resources); 
+        string resourceCollection = string.Join(",", slot.Resources);
 
-        // Republish logic
+        SlotEntity? oldSlot = null;
         if (slot.SlotId != 0)
         {
-            SlotEntity? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
-            if (oldSlot == null)
-            {
-                Logger.Warn("Rejecting level republish, wasn't able to find old slot", LogArea.Publish);
-                return this.NotFound();
-            }
+            oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+        }
 
+        // Republish logic
+        if (oldSlot != null)
+        {
             if (oldSlot.CreatorId != user.UserId)
             {
                 Logger.Warn("Rejecting level republish, old level not owned by current user", LogArea.Publish);
                 return this.BadRequest();
             }
 
-            // I hate lbp3
-            if (game != null)
+            // This is a workaround to prevent lbp3 from overwriting the rootLevel of older levels
+            // For some reason when republishing in lbp3 it automatically converts the level to lbp3
+            // so it must be handled here. The game query is only sent by lbp3 so it can be safely assumed
+            // that if it is present, then the level must be be checked for conversion
+            GameVersion intendedVersion = game != null ? FromAbbreviation(game) : slot.GameVersion;
+            if (intendedVersion != GameVersion.Unknown && intendedVersion == slot.GameVersion)
             {
-                GameVersion intendedVersion = FromAbbreviation(game);
-                if (intendedVersion != GameVersion.Unknown && intendedVersion != slotVersion)
-                {
-                    // Delete the useless rootLevel that lbp3 just uploaded
-                    if (slotVersion == GameVersion.LittleBigPlanet3)
-                        FileHelper.DeleteResource(rootLevel.Hash);
-                    else
-                    // Only change the rootLevel and gameversion if it's not lbp3
-                    {
-                        oldSlot.GameVersion = slot.GameVersion;
-                        oldSlot.RootLevel = rootLevel.Hash;
-                        oldSlot.ResourceCollection = resourceCollection;
-                    }
-                }
+                oldSlot.GameVersion = slot.GameVersion;
+                oldSlot.RootLevel = rootLevel.Hash;
+                oldSlot.ResourceCollection = resourceCollection;
+            }
+            else
+            {
+                Logger.Warn(
+                    $"Slot rootLevel divergence: game={game}, slotVersion={slot.GameVersion}, intendedVersion={intendedVersion}, oldVersion={oldSlot.GameVersion}",
+                    LogArea.Publish);
             }
 
             oldSlot.Name = slot.Name;
