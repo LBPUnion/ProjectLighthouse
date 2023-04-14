@@ -35,7 +35,7 @@ public static partial class ControllerExtensions
                         $"contentLen={controller.Request.ContentLength}, readLen={bodyBytes.Length}",
                 LogArea.HTTP);
         }
-        return Encoding.ASCII.GetString(bodyBytes);
+        return Encoding.UTF8.GetString(bodyBytes);
     }
 
     [GeneratedRegex("&(?!(amp|apos|quot|lt|gt);)")]
