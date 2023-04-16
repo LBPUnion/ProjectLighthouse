@@ -1,4 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Newtonsoft.Json;
@@ -9,6 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 public struct MinimalApiSlot
 {
     public int SlotId { get; set; }
+    public SlotType Type { get; set; }
     public string Name { get; set; }
     public string IconHash { get; set; }
     public bool TeamPick { get; set; }
@@ -26,6 +28,7 @@ public struct MinimalApiSlot
         new()
         {
             SlotId = slot.SlotId,
+            Type = slot.Type,
             Name = slot.Name,
             IconHash = slot.IconHash,
             TeamPick = slot.TeamPick,
