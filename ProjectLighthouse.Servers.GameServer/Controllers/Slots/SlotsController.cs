@@ -40,9 +40,7 @@ public class SlotsController : ControllerBase
 
         int usedSlots = this.database.Slots.Count(s => s.CreatorId == targetUserId);
 
-        DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-31);
         List<SlotBase> slots = (await this.database.Slots.Where(s => s.CreatorId == targetUserId)
-            .Where(s => s.FirstUploaded >= cutoff.ToUnixTimeMilliseconds())
             .ByGameVersion(token.GameVersion, token.UserId == targetUserId)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, usedSlots))
