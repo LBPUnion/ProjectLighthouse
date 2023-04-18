@@ -50,6 +50,7 @@ public partial class FileHelper
             "ADSb" => LbpFileType.Adventure,
             "PLNb" => LbpFileType.Plan,
             "QSTb" => LbpFileType.Quest,
+            "CHKb" => LbpFileType.StreamingChunk,
             _ => readAlternateHeader(reader),
         };
     }
