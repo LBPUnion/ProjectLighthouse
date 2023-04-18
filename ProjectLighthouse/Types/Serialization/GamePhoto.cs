@@ -24,13 +24,6 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
     [XmlElement("author")]
     public string AuthorUsername { get; set; } = "";
 
-    [XmlElement("slot")]
-    public PhotoSlot? LevelInfo;
-
-    [XmlArray("subjects")]
-    [XmlArrayItem("subject")]
-    public List<GamePhotoSubject>? Subjects;
-
     // Uses seconds instead of milliseconds for some reason
     [XmlAttribute("timestamp")]
     public long Timestamp { get; set; }
@@ -47,47 +40,44 @@ public class GamePhoto : ILbpSerializable, INeedsPreparationForSerialization
     [XmlElement("plan")]
     public string PlanHash { get; set; } = "";
 
+    [XmlElement("slot")]
+    public PhotoSlot? LevelInfo { get; set; }
+
+    [XmlArray("subjects")]
+    [XmlArrayItem("subject")]
+    public List<GamePhotoSubject>? Subjects { get; set; }
+
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        if (this.LevelInfo?.SlotId == 0) this.LevelInfo = null;
-
         // Fetch slot data
         if (this.LevelInfo != null)
         {
-            var partialSlot = await database.Slots.Where(s => s.SlotId == this.LevelInfo.SlotId)
+            this.LevelInfo = await database.Slots.Where(s => s.SlotId == this.LevelInfo.SlotId)
                 .Select(s => new
                 {
                     s.InternalSlotId,
                     s.Type,
                 })
+                .Select(s => new PhotoSlot
+                {
+                    SlotId = s.Type == SlotType.User ? this.LevelInfo.SlotId : s.InternalSlotId,
+                    SlotType = s.Type,
+                })
                 .FirstOrDefaultAsync();
-
-            // Don't send level info if it's not a user or developer slot
-            if (partialSlot?.Type is not (SlotType.Developer or SlotType.User))
-            {
-                this.LevelInfo = null;
-            }
-            else
-            {
-                this.LevelInfo.SlotType = partialSlot.Type;
-                if (partialSlot.Type == SlotType.Developer) this.LevelInfo.SlotId = partialSlot.InternalSlotId;
-            }
-
-            // Fetch creator username
-            this.AuthorUsername = await database.Users.Where(u => u.UserId == this.CreatorId)
-                .Select(u => u.Username)
-                .FirstOrDefaultAsync() ?? "";
-
-            // Fetch photo subject usernames
-            foreach (GamePhotoSubject photoSubject in this.Subjects ?? Enumerable.Empty<GamePhotoSubject>())
-            {
-                photoSubject.Username = await database.Users.Where(u => u.UserId == photoSubject.UserId)
-                                            .Select(u => u.Username)
-                                            .FirstOrDefaultAsync() ?? "";
-            }
-
         }
 
+        // Fetch creator username
+        this.AuthorUsername = await database.Users.Where(u => u.UserId == this.CreatorId)
+                                  .Select(u => u.Username)
+                                  .FirstOrDefaultAsync() ?? "";
+
+        // Fetch photo subject usernames
+        foreach (GamePhotoSubject photoSubject in this.Subjects ?? Enumerable.Empty<GamePhotoSubject>())
+        {
+            photoSubject.Username = await database.Users.Where(u => u.UserId == photoSubject.UserId)
+                                        .Select(u => u.Username)
+                                        .FirstOrDefaultAsync() ?? "";
+        }
     }
 
     public static GamePhoto CreateFromEntity(PhotoEntity entity) =>
