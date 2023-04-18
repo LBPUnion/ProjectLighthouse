@@ -40,7 +40,9 @@ public class SlotsController : ControllerBase
 
         int usedSlots = this.database.Slots.Count(s => s.CreatorId == targetUserId);
 
+        DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-31);
         List<SlotBase> slots = (await this.database.Slots.Where(s => s.CreatorId == targetUserId)
+            .Where(s => s.FirstUploaded >= cutoff.ToUnixTimeMilliseconds())
             .ByGameVersion(token.GameVersion, token.UserId == targetUserId)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, usedSlots))
@@ -157,7 +159,9 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
+        DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-31);
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
+            .Where(s => s.FirstUploaded >= cutoff.ToUnixTimeMilliseconds())
             .OrderByDescending(s => s.FirstUploaded)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
@@ -270,7 +274,7 @@ public class SlotsController : ControllerBase
     }
 
     [HttpGet("slots/lbp2luckydip")]
-    public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
+    public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed) //here
     {
         GameTokenEntity token = this.GetToken();
 
@@ -278,7 +282,9 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
+        DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-31);
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
+            .Where(s => s.FirstUploaded >= cutoff.ToUnixTimeMilliseconds())
             .OrderBy(_ => EF.Functions.Random())
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
