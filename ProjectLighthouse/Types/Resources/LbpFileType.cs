@@ -15,5 +15,6 @@ public enum LbpFileType
     Jpeg, // JFIF / FIF, used in sticker switches,
     Png, // used in LBP Vita
     Quest, // A LBP3 quest, used in the organizertron
+    StreamingChunk, // used in LBP3 dynamic thermo levels
     Unknown,
 }
