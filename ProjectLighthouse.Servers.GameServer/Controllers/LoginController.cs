@@ -164,7 +164,7 @@ public class LoginController : ControllerBase
             }
             Logger.Info($"User's username has changed, old='{user.Username}', new='{npTicket.Username}', platform={npTicket.Platform}", LogArea.Login);
             user.Username = username;
-            this.database.PlatformLinkAttempts.RemoveWhere(p => p.UserId == user.UserId);
+            await this.database.PlatformLinkAttempts.RemoveWhere(p => p.UserId == user.UserId);
             // unlink other platforms because the names no longer match
             if (npTicket.Platform == Platform.RPCS3)
                 user.LinkedPsnId = 0;

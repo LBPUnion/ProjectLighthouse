@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -91,18 +92,18 @@ public partial class DatabaseContext
 
     public async Task RemoveExpiredTokens()
     {
-        foreach (GameTokenEntity token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
+        List<GameTokenEntity> expiredTokens = await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync(); 
+        foreach (GameTokenEntity token in expiredTokens)
         {
             UserEntity? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
             if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
-            this.GameTokens.Remove(token);
         }
-
-        this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
-        this.EmailVerificationTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
-        this.EmailSetTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
-
         await this.SaveChangesAsync();
+
+        await this.GameTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+        await this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+        await this.EmailVerificationTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
+        await this.EmailSetTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
     }
 
     public async Task RemoveRegistrationToken(string? tokenString)
