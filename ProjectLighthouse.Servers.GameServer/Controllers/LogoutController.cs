@@ -32,9 +32,8 @@ public class LogoutController : ControllerBase
 
         user.LastLogout = TimeHelper.TimestampMillis;
 
-        this.database.GameTokens.RemoveWhere(t => t.TokenId == token.TokenId);
-        this.database.LastContacts.RemoveWhere(c => c.UserId == token.UserId);
-        await this.database.SaveChangesAsync();
+        await this.database.GameTokens.RemoveWhere(t => t.TokenId == token.TokenId);
+        await this.database.LastContacts.RemoveWhere(c => c.UserId == token.UserId);
 
         return this.Ok();
     }
