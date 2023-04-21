@@ -1,6 +1,5 @@
 #nullable enable
-using System.Buffers;
-using System.IO.Pipelines;
+using System.Text;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -67,11 +66,18 @@ public class ResourcesController : ControllerBase
         if (!fullPath.StartsWith(FileHelper.FullResourcePath)) return this.BadRequest();
 
         Logger.Info($"Processing resource upload (hash: {hash})", LogArea.Resources);
-        LbpFile file = new(await readFromPipeReader(this.Request.BodyReader));
+        byte[] data = await this.Request.BodyReader.ReadAllAsync();
+        LbpFile file = new(data);
 
         if (!FileHelper.IsFileSafe(file))
         {
             Logger.Warn($"File is unsafe (hash: {hash}, type: {file.FileType})", LogArea.Resources);
+            if (file.FileType == LbpFileType.Unknown)
+            {
+                Logger.Warn($"({hash}): File header: '{Convert.ToHexString(data[..4])}', " +
+                            $"ascii='{Encoding.ASCII.GetString(data[..4])}'",
+                    LogArea.Resources);
+            }
             return this.Conflict();
         }
 
@@ -92,26 +98,5 @@ public class ResourcesController : ControllerBase
         Logger.Success($"File is OK! (hash: {hash}, type: {file.FileType})", LogArea.Resources);
         await IOFile.WriteAllBytesAsync(path, file.Data);
         return this.Ok();
-    }
-
-    // Written with reference from
-    // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/request-response?view=aspnetcore-5.0
-    // Surprisingly doesn't take seconds. (67ms for a 100kb file)
-    private static async Task<byte[]> readFromPipeReader(PipeReader reader)
-    {
-        List<byte> data = new();
-        while (true)
-        {
-            ReadResult readResult = await reader.ReadAsync();
-            ReadOnlySequence<byte> buffer = readResult.Buffer;
-
-            if (readResult.IsCompleted && buffer.Length > 0) data.AddRange(buffer.ToArray());
-
-            reader.AdvanceTo(buffer.Start, buffer.End);
-
-            if (readResult.IsCompleted) break;
-        }
-
-        return data.ToArray();
     }
 }
