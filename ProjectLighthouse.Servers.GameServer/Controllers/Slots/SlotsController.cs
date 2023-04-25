@@ -272,7 +272,7 @@ public class SlotsController : ControllerBase
     }
 
     [HttpGet("slots/lbp2luckydip")]
-    public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed) //here
+    public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
     {
         GameTokenEntity token = this.GetToken();
 
