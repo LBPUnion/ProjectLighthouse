@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
+using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -203,14 +204,6 @@ public class SlotsController : ControllerBase
         return this.Ok(new GenericSlotResponse(slots, total, start));
     }
 
-    private class SlotCache
-    {
-        public SlotEntity? Slot { get; set; }
-        public double RatingLbp1 { get; set; }
-        public int ThumbsUp { get; set; }
-        public int Hearts { get; set; }
-    }
-
     [HttpGet("slots/highestRated")]
     public async Task<IActionResult> HighestRatedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
     {
@@ -221,7 +214,7 @@ public class SlotsController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .Select(s => new SlotCache
+            .Select(s => new SlotMetadata
             {
                 Slot = s,
                 RatingLbp1 = this.database.RatedLevels.Where(r => r.SlotId == s.SlotId).Average(r => (double?)r.RatingLBP1) ?? 3.0,
@@ -318,7 +311,7 @@ public class SlotsController : ControllerBase
         if (pageSize <= 0) return this.BadRequest();
 
         List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
-            .Select(s => new SlotCache
+            .Select(s => new SlotMetadata
             {
                 Slot = s,
                 ThumbsUp = this.database.RatedLevels.Count(r => r.SlotId == s.SlotId && r.Rating == 1),
@@ -390,7 +383,7 @@ public class SlotsController : ControllerBase
         if (pageSize <= 0) return this.BadRequest();
 
         List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
-            .Select(s => new SlotCache
+            .Select(s => new SlotMetadata
             {
                 Slot = s,
                 Hearts = this.database.HeartedLevels.Count(r => r.SlotId == s.SlotId),
