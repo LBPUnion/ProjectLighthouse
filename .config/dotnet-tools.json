@@ -3,13 +3,13 @@
   "isRoot": true,
   "tools": {
     "dotnet-ef": {
-      "version": "7.0.4",
+      "version": "7.0.5",
       "commands": [
         "dotnet-ef"
       ]
     },
     "dotnet-trace": {
-      "version": "6.0.351802",
+      "version": "7.0.421201",
       "commands": [
         "dotnet-trace"
       ]
