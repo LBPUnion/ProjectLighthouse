@@ -80,10 +80,11 @@ public class ModerationSlotController : ControllerBase
         if (slot.CreatorId == user.UserId) return this.Redirect($"~/slot/{slot.SlotId}");
 
         await WebhookHelper.SendWebhook(title: "New duplicate level flag",
-            description: @$"Level **{slot.Name}** (#{slot.SlotId}) has been flagged as a duplicate level.
+            description: @$"Level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/${slot.SlotId}) has been flagged as a duplicate level.
                             
-                            **Reporter:** {user.Username}
-                            **Offender:** {slot.Creator!.Username}",
+                            > **Reporter:** [{user.Username}]({ServerConfiguration.Instance.ExternalUrl}/user/${user.UserId})
+                            > **Offender:** [{slot.Creator!.Username}]({ServerConfiguration.Instance.ExternalUrl}/slot/${slot.Creator!.UserId})
+                            > **Level Hash:** {slot.RootLevel}",
             dest: WebhookHelper.WebhookDestination.Moderation);
 
         return this.Redirect($"~/slot/{slot.SlotId}");
