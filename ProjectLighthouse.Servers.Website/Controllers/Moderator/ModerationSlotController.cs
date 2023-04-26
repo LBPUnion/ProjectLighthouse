@@ -75,7 +75,7 @@ public class ModerationSlotController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.StatusCode(403);
 
-        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.BadRequest();
 
         await WebhookHelper.SendWebhook(title: "New duplicate level flag",
