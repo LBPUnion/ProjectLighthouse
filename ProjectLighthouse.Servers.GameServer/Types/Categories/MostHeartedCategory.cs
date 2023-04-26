@@ -33,7 +33,7 @@ public class MostHeartedCategory : Category
                 Slot = s,
                 Hearts = database.HeartedLevels.Count(r => r.SlotId == s.SlotId),
             })
-            .OrderByDescending(s => s.ThumbsUp)
+            .OrderByDescending(s => s.Hearts)
             .Select(s => s.Slot)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 20));
