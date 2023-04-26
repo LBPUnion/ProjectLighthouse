@@ -68,4 +68,24 @@ public class ModerationSlotController : ControllerBase
 
         return this.Redirect("~/slots/0");
     }
+
+    [HttpGet("flag")]
+    public async Task<IActionResult> FlagLevel([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null) return this.StatusCode(403);
+
+        SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        if (slot == null) return this.StatusCode(400);
+        if (slot.Creator == null) return this.StatusCode(500);
+
+        await WebhookHelper.SendWebhook(title: "New duplicate level flag",
+            description: @$"Level **{slot.Name}** (#{slot.SlotId}) has been flagged as a duplicate level.
+                            
+                            **Reporter:** {user.Username}
+                            **Offender:** {slot.Creator.Username}",
+            dest: WebhookHelper.WebhookDestination.Moderation);
+
+        return this.Redirect($"~/slot/{slot.SlotId}");
+    }
 }

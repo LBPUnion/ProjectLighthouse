@@ -110,6 +110,14 @@
                     <i class="cog icon" style="margin: 0"></i>
                 </a>
             }
+            
+            @if (user != null && !mini && (user.UserId != Model.CreatorId))
+            {
+                <a class="ui red tiny button" href="/moderation/slot/@Model.SlotId/flag" title="Flag As Duplicate"
+                    onclick='return confirm("Are you sure you want to flag this level as a duplicate? False reports may result in punishment.")'>
+                    <i class="sync icon" style="margin: 0"></i>
+                </a>
+            }
         </div>
     <div class="cardButtons" style="margin-left: 0">
         <br>
