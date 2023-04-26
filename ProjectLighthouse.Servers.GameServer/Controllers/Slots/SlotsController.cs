@@ -145,7 +145,7 @@ public class SlotsController : ControllerBase
     {
         if (page != null) pageStart = (int)page * 30;
         // bit of a better placeholder until we can track average user interaction with /stream endpoint
-        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisWeek");
+        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisMonth");
     }
 
     [HttpGet("slots")]
@@ -157,10 +157,9 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-31);
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .Where(s => s.FirstUploaded >= cutoff.ToUnixTimeMilliseconds())
             .OrderByDescending(s => s.FirstUploaded)
+            .ThenByDescending(s => s.SlotId)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
@@ -280,10 +279,9 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-31);
+        const float biasFactor = .8f;
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .Where(s => s.FirstUploaded >= cutoff.ToUnixTimeMilliseconds())
-            .OrderBy(_ => EF.Functions.Random())
+            .OrderBy(s => EF.Functions.Random() * (1 / (s.FirstUploaded * biasFactor)))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
