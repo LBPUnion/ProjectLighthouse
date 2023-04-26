@@ -1,5 +1,4 @@
 ﻿using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Moderation.Reports;
 

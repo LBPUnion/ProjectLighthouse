@@ -1,5 +1,4 @@
 ﻿using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;

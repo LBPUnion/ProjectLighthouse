@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -17,7 +16,6 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Configuration;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 

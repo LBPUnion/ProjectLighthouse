@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
