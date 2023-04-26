@@ -79,11 +79,13 @@ public class ModerationSlotController : ControllerBase
         if (slot == null) return this.BadRequest();
         if (slot.CreatorId == user.UserId) return this.Redirect($"~/slot/{slot.SlotId}");
 
+        string externalUrl = ServerConfiguration.Instance.ExternalUrl;
+
         await WebhookHelper.SendWebhook(title: "New duplicate level flag",
-            description: @$"Level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/${slot.SlotId}) has been flagged as a duplicate level.
+            description: @$"Level [**{slot.Name}**]({externalUrl}/slot/${slot.SlotId}) has been flagged as a duplicate level.
                             
-                            > **Reporter:** [{user.Username}]({ServerConfiguration.Instance.ExternalUrl}/user/${user.UserId})
-                            > **Offender:** [{slot.Creator!.Username}]({ServerConfiguration.Instance.ExternalUrl}/slot/${slot.Creator!.UserId})
+                            > **Reporter:** [{user.Username}]({externalUrl}/user/${user.UserId})
+                            > **Offender:** [{slot.Creator!.Username}]({externalUrl}/slot/${slot.Creator!.UserId})
                             > **Level Hash:** {slot.RootLevel}",
             dest: WebhookHelper.WebhookDestination.Moderation);
 
