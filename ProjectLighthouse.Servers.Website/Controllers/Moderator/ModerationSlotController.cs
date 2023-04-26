@@ -77,13 +77,12 @@ public class ModerationSlotController : ControllerBase
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.BadRequest();
-        if (slot.Creator == null) return this.StatusCode(500);
 
         await WebhookHelper.SendWebhook(title: "New duplicate level flag",
             description: @$"Level **{slot.Name}** (#{slot.SlotId}) has been flagged as a duplicate level.
                             
                             **Reporter:** {user.Username}
-                            **Offender:** {slot.Creator.Username}",
+                            **Offender:** {slot.Creator!.Username}",
             dest: WebhookHelper.WebhookDestination.Moderation);
 
         return this.Redirect($"~/slot/{slot.SlotId}");
