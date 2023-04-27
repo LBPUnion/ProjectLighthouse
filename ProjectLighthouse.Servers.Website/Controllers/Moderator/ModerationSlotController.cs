@@ -84,7 +84,7 @@ public class ModerationSlotController : ControllerBase
         await WebhookHelper.SendWebhook(title: "New duplicate level flag",
             description: @$"Level [**{slot.Name}**]({externalUrl}/slot/{slot.SlotId}) has been flagged as a duplicate level.
                             
-                            > **Reporter:** [{user.Username}]({externalUrl}/user/${user.UserId})
+                            > **Reporter:** [{user.Username}]({externalUrl}/user/{user.UserId})
                             > **Offender:** [{slot.Creator!.Username}]({externalUrl}/slot/${slot.Creator!.UserId})
                             > **Level Hash:** {slot.RootLevel}",
             dest: WebhookHelper.WebhookDestination.Moderation);
