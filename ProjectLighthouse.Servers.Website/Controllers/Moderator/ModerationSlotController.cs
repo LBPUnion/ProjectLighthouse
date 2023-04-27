@@ -82,7 +82,7 @@ public class ModerationSlotController : ControllerBase
         string externalUrl = ServerConfiguration.Instance.ExternalUrl;
 
         await WebhookHelper.SendWebhook(title: "New duplicate level flag",
-            description: @$"Level [**{slot.Name}**]({externalUrl}/slot/${slot.SlotId}) has been flagged as a duplicate level.
+            description: @$"Level [**{slot.Name}**]({externalUrl}/slot/{slot.SlotId}) has been flagged as a duplicate level.
                             
                             > **Reporter:** [{user.Username}]({externalUrl}/user/${user.UserId})
                             > **Offender:** [{slot.Creator!.Username}]({externalUrl}/slot/${slot.Creator!.UserId})
