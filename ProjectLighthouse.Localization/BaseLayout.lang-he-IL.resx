@@ -21,10 +21,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
   </resheader>
-  <data name="header_home" xml:space="preserve">
-        <value>Home</value>
-        <comment>A button on the header that takes you to the landing page.</comment>
-    </data>
   <data name="header_users" xml:space="preserve">
         <value>Users</value>
         <comment>A button on the header that takes you to the user listing.</comment>
@@ -41,13 +37,13 @@
         <value>Authentication</value>
         <comment>A button on the header that takes you to a list of authentication attempts.</comment>
     </data>
+  <data name="header_login" xml:space="preserve">
+        <value>Login</value>
+        <comment>A button on the header that lets you log in.</comment>
+    </data>
   <data name="header_loginRegister" xml:space="preserve">
         <value>התחבר או צור חשבון</value>
         <comment>A button on the header that lets you log in or register.</comment>
-    </data>
-  <data name="header_profile" xml:space="preserve">
-        <value>Profile</value>
-        <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
     </data>
   <data name="header_adminPanel" xml:space="preserve">
         <value>Admin</value>
