@@ -23,7 +23,7 @@ public static class StatisticsHelper
 
     public static async Task<int> UserCount(DatabaseContext database) => await database.Users.CountAsync(u => u.PermissionLevel != PermissionLevel.Banned);
 
-    public static int UserCountInPod(DatabaseContext database, Platform platform) => RoomHelper.Rooms.Count(r => r.State == RoomState.DivingInWaiting || r.State == RoomState.PlayingLevel && r.RoomPlatform == platform);
+    public static int RoomCountForPlatform(Platform targetPlatform) => RoomHelper.Rooms.Count(r => r.IsLookingForPlayers && r.RoomPlatform == targetPlatform);
 
     public static async Task<int> TeamPickCount(DatabaseContext database) => await database.Slots.CountAsync(s => s.TeamPick);
 
