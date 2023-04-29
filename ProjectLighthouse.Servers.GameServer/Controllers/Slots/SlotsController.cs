@@ -1,5 +1,4 @@
 #nullable enable
-using System.Security.Cryptography;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -146,7 +145,7 @@ public class SlotsController : ControllerBase
     {
         if (page != null) pageStart = (int)page * 30;
         // bit of a better placeholder until we can track average user interaction with /stream endpoint
-        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisWeek");
+        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisMonth");
     }
 
     [HttpGet("slots")]
@@ -160,6 +159,7 @@ public class SlotsController : ControllerBase
 
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
             .OrderByDescending(s => s.FirstUploaded)
+            .ThenByDescending(s => s.SlotId)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
@@ -284,8 +284,9 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
+        const double biasFactor = .8f;
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .OrderBy(_ => EF.Functions.Random())
+            .OrderByDescending(s => EF.Functions.Random() * (s.FirstUploaded * biasFactor))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
