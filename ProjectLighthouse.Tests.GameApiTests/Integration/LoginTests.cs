@@ -10,7 +10,6 @@ using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Users;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.GameApiTests.Integration;
@@ -23,14 +22,16 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.True(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatus = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatus, response.StatusCode);
     }
 
     [Fact]
@@ -38,16 +39,17 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .setExpirationTime((ulong)TimeHelper.TimestampMillis - 1000 * 60)
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatus = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatus, response.StatusCode);
     }
     
     [Fact]
@@ -55,16 +57,17 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .SetTitleId("UP9000-BLUS30079_00")
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatus = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatus, response.StatusCode);
     }
 
     [Fact]
@@ -72,45 +75,48 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
         // Create second ticket and replace the first tickets signature with the first.
         byte[] ticketData2 = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
 
         Array.Copy(ticketData2, ticketData2.Length - 0x38, ticketData, ticketData.Length - 0x38, 0x38);
         
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatus = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatus, response.StatusCode);
     }
 
     [Fact]
     public async Task ShouldNotLoginIfBanned()
     {
-        await IntegrationHelper.GetIntegrationDatabase();
+        DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
-        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
-        UserEntity user = await database.Users.FirstAsync(u => u.Username == username);
+        UserEntity user = await this.CreateRandomUser();
+
         user.PermissionLevel = PermissionLevel.Banned;
+
+        database.Users.Update(user);
         await database.SaveChangesAsync();
 
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
         HttpResponseMessage response =
             await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
+
+        const HttpStatusCode expectedStatus = HttpStatusCode.Forbidden;
+
+        Assert.Equal(expectedStatus, response.StatusCode);
     }
 
 }

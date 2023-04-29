@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
@@ -32,33 +33,38 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
     public TestServer GetTestServer() => this.server;
 
-    protected async Task<string> CreateRandomUser(int number = -1, bool createUser = true)
+    protected async Task<UserEntity> CreateRandomUser()
     {
-        if (number == -1) number = new Random().Next();
-        const string username = "unitTestUser";
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
 
-        if (createUser)
+        int userId = RandomNumberGenerator.GetInt32(int.MaxValue);
+        const string username = "unitTestUser";
+        // if user already exists, find another random number
+        while (await database.Users.AnyAsync(u => u.Username == $"{username}{userId}"))
         {
-            await using DatabaseContext database = DatabaseContext.CreateNewInstance();
-            if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
-            {
-                UserEntity user = await database.CreateUser($"{username}{number}",
-                    CryptoHelper.BCryptHash($"unitTestPassword{number}"));
-                user.LinkedPsnId = (ulong)number;
-                await database.SaveChangesAsync();
-            }
+            userId = RandomNumberGenerator.GetInt32(int.MaxValue);
         }
 
-        return $"{username}{number}";
+        UserEntity user = new()
+        {
+            UserId = userId,
+            Username = $"{username}{userId}",
+            Password = CryptoHelper.BCryptHash($"unitTestPassword{userId}"),
+            LinkedPsnId = (ulong)userId,
+        };
+
+        database.Add(user);
+        await database.SaveChangesAsync();
+        return user;
     }
 
-    protected async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
+    protected async Task<HttpResponseMessage> AuthenticateResponse()
     {
-        string username = await this.CreateRandomUser(number, createUser);
+        UserEntity user = await this.CreateRandomUser();
 
         byte[] ticketData = new TicketBuilder()
-            .SetUsername($"{username}{number}")
-            .SetUserId((ulong)number)
+            .SetUsername($"{user.Username}{user.UserId}")
+            .SetUserId((ulong)user.UserId)
             .Build();
 
         HttpResponseMessage response = await this.Client.PostAsync
@@ -66,9 +72,9 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return response;
     }
 
-    protected async Task<LoginResult> Authenticate(int number = -1)
+    protected async Task<LoginResult> Authenticate()
     {
-        HttpResponseMessage response = await this.AuthenticateResponse(number);
+        HttpResponseMessage response = await this.AuthenticateResponse();
 
         string responseContent = await response.Content.ReadAsStringAsync();
 
@@ -84,7 +90,9 @@ public class LighthouseServerTest<TStartup> where TStartup : class
     {
         using HttpRequestMessage requestMessage = new(method, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
-        string digest = CryptoHelper.ComputeDigest(endpoint, GetDigestCookie(mmAuth), Array.Empty<byte>(), "lighthouse");
+        string path = endpoint.Split("?", StringSplitOptions.RemoveEmptyEntries)[0];
+
+        string digest = CryptoHelper.ComputeDigest(path, GetDigestCookie(mmAuth), Array.Empty<byte>(), "lighthouse");
         requestMessage.Headers.Add("X-Digest-A", digest);
 
         return this.Client.SendAsync(requestMessage);
@@ -105,7 +113,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, $"/LITTLEBIGPLANETPS3_XML/upload/{hash}");
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(bytes);
-        string digest = CryptoHelper.ComputeDigest($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", GetDigestCookie(mmAuth), bytes, "lighthouse");
+        string digest = CryptoHelper.ComputeDigest($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", GetDigestCookie(mmAuth), bytes, "lighthouse", true);
         requestMessage.Headers.Add("X-Digest-B", digest);
         return await this.Client.SendAsync(requestMessage);
     }

@@ -51,7 +51,7 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        LoginResult loginResult = await this.Authenticate(new Random().Next());
+        LoginResult loginResult = await this.Authenticate();
 
         await semaphore.WaitAsync();
 

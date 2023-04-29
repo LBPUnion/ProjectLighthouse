@@ -28,8 +28,10 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedUploadFileEndpointRequest("ExampleFiles/TestScript.ff", loginResult.AuthTicket);
-        Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
-        Assert.False(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.Conflict;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -41,8 +43,10 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedUploadFileEndpointRequest("ExampleFiles/TestFarc.farc", loginResult.AuthTicket);
-        Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
-        Assert.False(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.Conflict;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -53,8 +57,10 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedUploadFileEndpointRequest("ExampleFiles/TestGarbage.bin", loginResult.AuthTicket);
-        Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
-        Assert.False(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.Conflict;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -65,8 +71,10 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedUploadFileEndpointRequest("ExampleFiles/TestTexture.tex", loginResult.AuthTicket);
-        Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
-        Assert.True(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -77,7 +85,9 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedUploadFileEndpointRequest("ExampleFiles/TestLevel.lvl", loginResult.AuthTicket);
-        Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
-        Assert.True(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 }

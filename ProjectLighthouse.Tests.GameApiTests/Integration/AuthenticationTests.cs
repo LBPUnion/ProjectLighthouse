@@ -60,7 +60,9 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/enterLevel/420", loginResult.AuthTicket);
         await response.Content.ReadAsStringAsync();
 
-        Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
+        const HttpStatusCode expectedStatus = HttpStatusCode.NotFound;
+
+        Assert.Equal(expectedStatus, response.StatusCode);
     }
 
     [Fact]
@@ -69,7 +71,9 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         await IntegrationHelper.GetIntegrationDatabase();
 
         HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/announce");
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
+
+        const HttpStatusCode expectedStatus = HttpStatusCode.Forbidden;
+
+        Assert.Equal(expectedStatus, response.StatusCode);
     }
 }
