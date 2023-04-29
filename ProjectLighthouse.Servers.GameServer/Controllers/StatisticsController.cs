@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
@@ -22,7 +23,7 @@ public class StatisticsController : ControllerBase
     }
 
     [HttpGet("playersInPodCount")]
-    public IActionResult PlayersInPodCount() => this.Ok((StatisticsHelper.UserCountInPod(this.database)).ToString());
+    public IActionResult PlayersInPodCount() => this.Ok((StatisticsHelper.UserCountInPod(this.database, this.GetToken().Platform)).ToString());
 
     [HttpGet("totalPlayerCount")]
     public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatchesForGame(this.database, this.GetToken().GameVersion)).ToString());
