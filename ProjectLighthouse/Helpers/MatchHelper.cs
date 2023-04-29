@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
@@ -10,18 +11,18 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static partial class MatchHelper
 {
-    public static readonly Dictionary<int, string?> UserLocations = new();
-    public static readonly Dictionary<int, List<int>?> UserRecentlyDivedIn = new();
+    public static readonly ConcurrentDictionary<int, string?> UserLocations = new();
+    public static readonly ConcurrentDictionary<int, List<int>?> UserRecentlyDivedIn = new();
 
     public static void SetUserLocation(int userId, string location)
     {
-        if (UserLocations.TryGetValue(userId, out string? _)) UserLocations.Remove(userId);
-        UserLocations.Add(userId, location);
+        if (UserLocations.TryGetValue(userId, out string? _)) UserLocations.TryRemove(userId, out _);
+        UserLocations.TryAdd(userId, location);
     }
 
     public static void AddUserRecentlyDivedIn(int userId, int otherUserId)
     {
-        if (!UserRecentlyDivedIn.TryGetValue(userId, out List<int>? recentlyDivedIn)) UserRecentlyDivedIn.Add(userId, recentlyDivedIn = new List<int>());
+        if (!UserRecentlyDivedIn.TryGetValue(userId, out List<int>? recentlyDivedIn)) UserRecentlyDivedIn.TryAdd(userId, recentlyDivedIn = new List<int>());
 
         Debug.Assert(recentlyDivedIn != null, nameof(recentlyDivedIn) + " is null, somehow.");
 
@@ -35,7 +36,7 @@ public static partial class MatchHelper
         return recentlyDivedIn.Contains(otherUserId);
     }
 
-    public static bool ClearUserRecentDiveIns(int userId) => UserRecentlyDivedIn.Remove(userId);
+    public static void ClearUserRecentDiveIns(int userId) => UserRecentlyDivedIn.TryRemove(userId, out _);
 
     [GeneratedRegex("^\\[([^,]*),\\[(.*)\\]\\]")]
     private static partial Regex MatchJsonRegex();
