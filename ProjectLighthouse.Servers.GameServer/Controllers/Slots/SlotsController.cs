@@ -1,5 +1,4 @@
 #nullable enable
-using System.Security.Cryptography;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -287,7 +286,7 @@ public class SlotsController : ControllerBase
 
         const double biasFactor = .8f;
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .OrderBy(s => EF.Functions.Random() * (1 / (s.FirstUploaded * biasFactor)))
+            .OrderByDescending(s => EF.Functions.Random() * (s.FirstUploaded * biasFactor))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
