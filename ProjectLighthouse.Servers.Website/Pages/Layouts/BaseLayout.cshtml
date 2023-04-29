@@ -8,7 +8,14 @@
 @{
     if (Model.User == null)
     {
-        Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLoginRegister, "/login", "sign in"));
+        if (ServerConfiguration.Instance.Authentication.RegistrationEnabled)
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLoginRegister, "/login", "sign in"));
+        }
+        else
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLogin, "/login", "sign in"));
+        }
     }
     else
     {
