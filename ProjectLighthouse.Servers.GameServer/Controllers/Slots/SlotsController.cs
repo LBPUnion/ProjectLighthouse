@@ -285,7 +285,7 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
-        const float biasFactor = .8f;
+        const double biasFactor = .8f;
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
             .OrderBy(s => EF.Functions.Random() * (1 / (s.FirstUploaded * biasFactor)))
             .Take(Math.Min(pageSize, 30))
