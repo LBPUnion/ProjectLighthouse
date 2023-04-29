@@ -1,5 +1,4 @@
 #nullable enable
-using System.Security.Cryptography;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -8,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
+using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -145,7 +145,7 @@ public class SlotsController : ControllerBase
     {
         if (page != null) pageStart = (int)page * 30;
         // bit of a better placeholder until we can track average user interaction with /stream endpoint
-        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisWeek");
+        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisMonth");
     }
 
     [HttpGet("slots")]
@@ -159,6 +159,7 @@ public class SlotsController : ControllerBase
 
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
             .OrderByDescending(s => s.FirstUploaded)
+            .ThenByDescending(s => s.SlotId)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
@@ -213,8 +214,13 @@ public class SlotsController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .ToAsyncEnumerable()
-            .OrderByDescending(s => s.RatingLBP1)
+            .Select(s => new SlotMetadata
+            {
+                Slot = s,
+                RatingLbp1 = this.database.RatedLevels.Where(r => r.SlotId == s.SlotId).Average(r => (double?)r.RatingLBP1) ?? 3.0,
+            })
+            .OrderByDescending(s => s.RatingLbp1)
+            .Select(s => s.Slot)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
@@ -278,8 +284,9 @@ public class SlotsController : ControllerBase
 
         GameVersion gameVersion = token.GameVersion;
 
+        const double biasFactor = .8f;
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
-            .OrderBy(_ => EF.Functions.Random())
+            .OrderByDescending(s => EF.Functions.Random() * (s.FirstUploaded * biasFactor))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
@@ -304,12 +311,15 @@ public class SlotsController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        Random rand = new();
-
         List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
-            .AsAsyncEnumerable()
-            .OrderByDescending(s => s.Thumbsup)
-            .ThenBy(_ => rand.Next())
+            .Select(s => new SlotMetadata
+            {
+                Slot = s,
+                ThumbsUp = this.database.RatedLevels.Count(r => r.SlotId == s.SlotId && r.Rating == 1),
+            })
+            .OrderByDescending(s => s.ThumbsUp)
+            .ThenBy(_ => EF.Functions.Random())
+            .Select(s => s.Slot)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
@@ -335,24 +345,19 @@ public class SlotsController : ControllerBase
 
         if (pageSize <= 0) return this.BadRequest();
 
-        Random rand = new();
+        string game = getGameFilter(gameFilterType, token.GameVersion) switch
+        {
+            GameVersion.LittleBigPlanet1 => "LBP1",
+            GameVersion.LittleBigPlanet2 => "LBP2",
+            GameVersion.LittleBigPlanet3 => "LBP3",
+            GameVersion.LittleBigPlanetVita => "LBP2",
+            _ => "",
+        };
+
+        string colName = $"Plays{game}Unique";
 
         List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
-            .AsAsyncEnumerable()
-            .OrderByDescending(
-                // probably not the best way to do this?
-                s =>
-                {
-                    return getGameFilter(gameFilterType, token.GameVersion) switch
-                    {
-                        GameVersion.LittleBigPlanet1 => s.PlaysLBP1Unique,
-                        GameVersion.LittleBigPlanet2 => s.PlaysLBP2Unique,
-                        GameVersion.LittleBigPlanet3 => s.PlaysLBP3Unique,
-                        GameVersion.LittleBigPlanetVita => s.PlaysLBP2Unique,
-                        _ => s.PlaysUnique,
-                    };
-                })
-            .ThenBy(_ => rand.Next())
+            .OrderByDescending(s => EF.Property<int>(s, colName))
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
@@ -379,9 +384,13 @@ public class SlotsController : ControllerBase
         if (pageSize <= 0) return this.BadRequest();
 
         List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
-            .AsAsyncEnumerable()
+            .Select(s => new SlotMetadata
+            {
+                Slot = s,
+                Hearts = this.database.HeartedLevels.Count(r => r.SlotId == s.SlotId),
+            })
             .OrderByDescending(s => s.Hearts)
-            .ThenBy(_ => RandomNumberGenerator.GetInt32(int.MaxValue))
+            .Select(s => s.Slot)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));

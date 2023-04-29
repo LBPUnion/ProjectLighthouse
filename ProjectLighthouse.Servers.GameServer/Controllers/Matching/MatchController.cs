@@ -59,7 +59,7 @@ public class MatchController : ControllerBase
         }
         catch(Exception e)
         {
-            Logger.Error("Exception while parsing matchData: ", LogArea.Match);
+            Logger.Error($"Exception while parsing matchData: body='{bodyString}'", LogArea.Match);
             Logger.Error(e.ToDetailedException(), LogArea.Match);
 
             return this.BadRequest();
@@ -67,7 +67,7 @@ public class MatchController : ControllerBase
 
         if (matchData == null)
         {
-            Logger.Error($"Could not parse match data: {nameof(matchData)} is null", LogArea.Match);
+            Logger.Error($"Could not parse match data: {nameof(matchData)} is null, body='{bodyString}'", LogArea.Match);
             return this.BadRequest();
         }
 

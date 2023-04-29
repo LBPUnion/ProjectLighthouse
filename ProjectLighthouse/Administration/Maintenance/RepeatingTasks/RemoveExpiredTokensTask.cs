@@ -11,5 +11,5 @@ public class RemoveExpiredTokensTask : IRepeatingTask
     public TimeSpan RepeatInterval => TimeSpan.FromHours(1);
     public DateTime LastRan { get; set; }
 
-    public Task Run(DatabaseContext database) => database.RemoveExpiredTokens();
+    public async Task Run(DatabaseContext database) => await database.RemoveExpiredTokens();
 }

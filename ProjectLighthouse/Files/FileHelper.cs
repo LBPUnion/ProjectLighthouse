@@ -30,6 +30,7 @@ public static partial class FileHelper
         return file.FileType switch
         {
             LbpFileType.MotionRecording => true,
+            LbpFileType.StreamingChunk => true,
             LbpFileType.FileArchive => false,
             LbpFileType.CrossLevel => true,
             LbpFileType.Painting => true,

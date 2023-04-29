@@ -3,7 +3,6 @@ using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -134,6 +133,7 @@ public class PhotosController : ControllerBase
                 {
                     PhotoId = photoEntity.PhotoId,
                     UserId = subject.UserId,
+                    Bounds = subject.Bounds,
                 };
 
                 Logger.Debug($"Adding PhotoSubject (userid {subject.UserId}) to db", LogArea.Photos);
@@ -225,12 +225,6 @@ public class PhotosController : ControllerBase
         {
             SlotEntity? photoSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId && s.Type == SlotType.User);
             if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.Unauthorized();
-        }
-
-        HashSet<string> photoResources = new(){photo.LargeHash, photo.SmallHash, photo.MediumHash, photo.PlanHash,};
-        foreach (string hash in photoResources)
-        {
-            FileHelper.DeleteResource(hash);
         }
 
         this.database.Photos.Remove(photo);

@@ -163,9 +163,7 @@ public partial class DatabaseContext
     {
         if (userId == blockedUser.UserId) return;
 
-        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
-
-        await this.SaveChangesAsync();
+        await this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
     }
 
     public async Task<bool> IsUserBlockedBy(int userId, int targetId)

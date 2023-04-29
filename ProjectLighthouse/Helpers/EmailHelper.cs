@@ -60,7 +60,7 @@ public static class SMTPHelper
         string? existingToken = await database.EmailVerificationTokens.Where(v => v.UserId == user.UserId)
             .Select(v => v.EmailToken)
             .FirstOrDefaultAsync();
-        if (existingToken != null) database.EmailVerificationTokens.RemoveWhere(t => t.EmailToken == existingToken);
+        if (existingToken != null) await database.EmailVerificationTokens.RemoveWhere(t => t.EmailToken == existingToken);
 
         EmailVerificationTokenEntity verifyToken = new()
         {

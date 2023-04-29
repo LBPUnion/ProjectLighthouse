@@ -60,6 +60,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [XmlElement("resource")]
     public string[]? Resources { get; set; }
+    public bool ShouldSerializeResources() => false;
 
     [XmlElement("icon")]
     public string IconHash { get; set; } = "";
