@@ -119,7 +119,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     public bool IsMoveRequired { get; set; }
     public bool ShouldSerializeIsMoveRequired() => this.SerializationMode == SerializationMode.Full;
 
-    [XmlElement("crossControlRequired")]
+    [XmlElement("vitaCrossControlRequired")]
     public bool IsCrossControlRequired { get; set; }
     public bool ShouldSerializeIsCrossControlRequired() => this.SerializationMode == SerializationMode.Full;
 

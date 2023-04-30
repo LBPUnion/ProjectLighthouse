@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 
@@ -32,7 +33,8 @@ public class SearchController : ControllerBase
         [FromQuery] string query,
         [FromQuery] int pageSize,
         [FromQuery] int pageStart,
-        string? keyName = "slots"
+        string? keyName = "slots",
+        bool crosscontrol = false
     )
     {
         GameTokenEntity token = this.GetToken();
@@ -46,7 +48,7 @@ public class SearchController : ControllerBase
         string[] keywords = query.Split(" ");
 
         IQueryable<SlotEntity> dbQuery = this.database.Slots.ByGameVersion(token.GameVersion, false, true)
-            .Where(s => s.Type == SlotType.User)
+            .Where(s => s.Type == SlotType.User && s.CrossControllerRequired == crosscontrol)
             .OrderBy(s => !s.TeamPick)
             .ThenByDescending(s => s.FirstUploaded)
             .Where(s => s.SlotId >= 0); // dumb query to conv into IQueryable

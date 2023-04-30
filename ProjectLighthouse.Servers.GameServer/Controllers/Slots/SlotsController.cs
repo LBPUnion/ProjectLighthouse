@@ -29,7 +29,7 @@ public class SlotsController : ControllerBase
     }
 
     [HttpGet("slots/by")]
-    public async Task<IActionResult> SlotsBy([FromQuery(Name = "u")] string username, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> SlotsBy([FromQuery(Name = "u")] string username, [FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] bool crosscontrol = false)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -42,12 +42,13 @@ public class SlotsController : ControllerBase
 
         List<SlotBase> slots = (await this.database.Slots.Where(s => s.CreatorId == targetUserId)
             .ByGameVersion(token.GameVersion, token.UserId == targetUserId)
+            .Where(match => match.CrossControllerRequired == crosscontrol)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, usedSlots))
             .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
         
         int start = pageStart + Math.Min(pageSize, usedSlots);
-        int total = await this.database.Slots.CountAsync(s => s.CreatorId == targetUserId);
+        int total = await this.database.Slots.CountAsync(s => s.CreatorId == targetUserId && s.CrossControllerRequired == crosscontrol);
 
         return this.Ok(new GenericSlotResponse("slots", slots, total, start));
     }
@@ -137,19 +138,24 @@ public class SlotsController : ControllerBase
     (
         [FromQuery] int pageStart,
         [FromQuery] int pageSize,
+        [FromQuery] int players = 1,
         [FromQuery] string? gameFilterType = null,
-        [FromQuery] int? players = null,
-        [FromQuery] bool? move = null,
-        [FromQuery] int? page = null
+        [FromQuery] string? labelFilter0 = null,
+        [FromQuery] string? labelFilter1 = null,
+        [FromQuery] string? labelFilter2 = null,
+        [FromQuery] string? move = null,
+        [FromQuery] int? page = null,
+        [FromQuery] bool crosscontrol = false
     )
     {
         if (page != null) pageStart = (int)page * 30;
         // bit of a better placeholder until we can track average user interaction with /stream endpoint
-        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), gameFilterType, players, move, "thisMonth");
+        return await this.ThumbsSlots(pageStart, Math.Min(pageSize, 30), players, gameFilterType, "thisMonth", 
+            labelFilter0, labelFilter1, labelFilter2, move, crosscontrol);
     }
 
     [HttpGet("slots")]
-    public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> NewestSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] bool crosscontrol = false)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -158,6 +164,7 @@ public class SlotsController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
+            .Where(s => s.CrossControllerRequired == crosscontrol)
             .OrderByDescending(s => s.FirstUploaded)
             .ThenByDescending(s => s.SlotId)
             .Skip(Math.Max(0, pageStart - 1))
@@ -257,26 +264,51 @@ public class SlotsController : ControllerBase
     }
 
     [HttpGet("slots/mmpicks")]
-    public async Task<IActionResult> TeamPickedSlots([FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> TeamPickedSlots
+    (
+        [FromQuery] int pageStart, 
+        [FromQuery] int pageSize, 
+        [FromQuery] int players,
+        [FromQuery] string? gameFilterType = null,
+        [FromQuery] string? dateFilterType = null,
+        [FromQuery] string? labelFilter0 = null,
+        [FromQuery] string? labelFilter1 = null,
+        [FromQuery] string? labelFilter2 = null,
+        [FromQuery] string? move = null,
+        [FromQuery] bool crosscontrol = false
+    )
     {
         GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
-        List<SlotBase> slots = (await this.database.Slots.Where(s => s.TeamPick)
-            .ByGameVersion(token.GameVersion, false, true)
+        List<SlotBase> slots = this.filterSlots((await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+            .Where(s => s.TeamPick && s.CrossControllerRequired == crosscontrol)
             .OrderByDescending(s => s.LastUpdated)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            .ToListAsync()), players, labelFilter0, labelFilter1, labelFilter2, move).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
-        int total = await StatisticsHelper.TeamPickCountForGame(this.database, token.GameVersion);
+        int total = await StatisticsHelper.TeamPickCountForGame(this.database, token.GameVersion, crosscontrol);
 
         return this.Ok(new GenericSlotResponse(slots, total, start));
     }
 
     [HttpGet("slots/lbp2luckydip")]
-    public async Task<IActionResult> LuckyDipSlots([FromQuery] int pageStart, [FromQuery] int pageSize, [FromQuery] int seed)
+    public async Task<IActionResult> LuckyDipSlots
+    (
+        [FromQuery] int pageStart, 
+        [FromQuery] int pageSize, 
+        [FromQuery] int seed,
+        [FromQuery] int players = 1,
+        [FromQuery] string? gameFilterType = null,
+        [FromQuery] string? dateFilterType = null,
+        [FromQuery] string? labelFilter0 = null,
+        [FromQuery] string? labelFilter1 = null,
+        [FromQuery] string? labelFilter2 = null,
+        [FromQuery] string? move = null,
+        [FromQuery] bool crosscontrol = false
+    )
     {
         GameTokenEntity token = this.GetToken();
 
@@ -285,10 +317,11 @@ public class SlotsController : ControllerBase
         GameVersion gameVersion = token.GameVersion;
 
         const double biasFactor = .8f;
-        List<SlotBase> slots = (await this.database.Slots.ByGameVersion(gameVersion, false, true)
+        List<SlotBase> slots = this.filterSlots((await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+            .Where(s => s.CrossControllerRequired == crosscontrol)
             .OrderByDescending(s => EF.Functions.Random() * (s.FirstUploaded * biasFactor))
             .Take(Math.Min(pageSize, 30))
-            .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            .ToListAsync()), players, labelFilter0, labelFilter1, labelFilter2, move).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
@@ -301,17 +334,22 @@ public class SlotsController : ControllerBase
     (
         [FromQuery] int pageStart,
         [FromQuery] int pageSize,
+        [FromQuery] int players,
         [FromQuery] string? gameFilterType = null,
-        [FromQuery] int? players = null,
-        [FromQuery] bool? move = null,
-        [FromQuery] string? dateFilterType = null
+        [FromQuery] string? dateFilterType = null,
+        [FromQuery] string? labelFilter0 = null,
+        [FromQuery] string? labelFilter1 = null,
+        [FromQuery] string? labelFilter2 = null,
+        [FromQuery] string? move = null,
+        [FromQuery] bool crosscontrol = false
     )
     {
         GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
-        List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+        List<SlotBase> slots = this.filterSlots((await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+            .Where(s => s.CrossControllerRequired == crosscontrol)
             .Select(s => new SlotMetadata
             {
                 Slot = s,
@@ -322,7 +360,7 @@ public class SlotsController : ControllerBase
             .Select(s => s.Slot)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            .ToListAsync()), players, labelFilter0, labelFilter1, labelFilter2, move).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
@@ -335,10 +373,14 @@ public class SlotsController : ControllerBase
     (
         [FromQuery] int pageStart,
         [FromQuery] int pageSize,
+        [FromQuery] int players,
         [FromQuery] string? gameFilterType = null,
-        [FromQuery] int? players = null,
-        [FromQuery] bool? move = null,
-        [FromQuery] string? dateFilterType = null
+        [FromQuery] string? labelFilter0 = null,
+        [FromQuery] string? labelFilter1 = null,
+        [FromQuery] string? labelFilter2 = null,
+        [FromQuery] string? move = null,
+        [FromQuery] string? dateFilterType = null,
+        [FromQuery] bool crosscontrol = false
     )
     {
         GameTokenEntity token = this.GetToken();
@@ -356,11 +398,12 @@ public class SlotsController : ControllerBase
 
         string colName = $"Plays{game}Unique";
 
-        List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+        List<SlotBase> slots = this.filterSlots((await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+            .Where(s => s.CrossControllerRequired == crosscontrol)
             .OrderByDescending(s => EF.Property<int>(s, colName))
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            .ToListAsync()), players, labelFilter0, labelFilter1, labelFilter2, move).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
@@ -373,17 +416,22 @@ public class SlotsController : ControllerBase
     (
         [FromQuery] int pageStart,
         [FromQuery] int pageSize,
+        [FromQuery] int players,
         [FromQuery] string? gameFilterType = null,
-        [FromQuery] int? players = null,
-        [FromQuery] bool? move = null,
-        [FromQuery] string? dateFilterType = null
+        [FromQuery] string? labelFilter0 = null,
+        [FromQuery] string? labelFilter1 = null,
+        [FromQuery] string? labelFilter2 = null,
+        [FromQuery] string? move = null,
+        [FromQuery] string? dateFilterType = null,
+        [FromQuery] bool crosscontrol = false
     )
     {
         GameTokenEntity token = this.GetToken();
 
         if (pageSize <= 0) return this.BadRequest();
 
-        List<SlotBase> slots = (await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+        List<SlotBase> slots = this.filterSlots((await this.filterByRequest(gameFilterType, dateFilterType, token.GameVersion)
+            .Where(s => s.CrossControllerRequired == crosscontrol)
             .Select(s => new SlotMetadata
             {
                 Slot = s,
@@ -393,7 +441,7 @@ public class SlotsController : ControllerBase
             .Select(s => s.Slot)
             .Skip(Math.Max(0, pageStart - 1))
             .Take(Math.Min(pageSize, 30))
-            .ToListAsync()).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            .ToListAsync()), players, labelFilter0, labelFilter1, labelFilter2, move).ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
@@ -408,8 +456,12 @@ public class SlotsController : ControllerBase
         [FromQuery] int pageStart,
         [FromQuery] int pageSize,
         [FromQuery] string? gameFilterType = null,
-        [FromQuery] int? players = null,
-        [FromQuery] bool? move = null
+        [FromQuery] int players = 1,
+        [FromQuery] string? labelFilter0 = null,
+        [FromQuery] string? labelFilter1 = null,
+        [FromQuery] string? labelFilter2 = null,
+        [FromQuery] string? move = null,
+        [FromQuery] bool crosscontrol = false
     )
     {
         GameTokenEntity token = this.GetToken();
@@ -438,24 +490,44 @@ public class SlotsController : ControllerBase
             .OrderByDescending(kvp => kvp.Value)
             .Select(kvp => kvp.Key);
         
-        List<SlotBase> slots = new();
+        List<SlotEntity> slots = new();
 
         foreach (int slotId in orderedPlayersBySlotId)
         {
             SlotEntity? slot = await this.database.Slots.ByGameVersion(token.GameVersion, false, true)
-                .Where(s => s.SlotId == slotId)
+                .Where(s => s.SlotId == slotId && s.CrossControllerRequired == crosscontrol)
                 .FirstOrDefaultAsync();
             if (slot == null) continue; // shouldn't happen ever unless the room is borked
             
-            slots.Add(SlotBase.CreateFromEntity(slot, token));
+            slots.Add(slot);
         }
+
+        slots = this.filterSlots(slots, players, labelFilter0, labelFilter1, labelFilter2, move);
 
         int start = pageStart + Math.Min(pageSize, ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots);
         int total = playersBySlotId.Count;
 
-        return this.Ok(new GenericSlotResponse(slots, total, start));
+        return this.Ok(new GenericSlotResponse(slots.ToSerializableList(s => SlotBase.CreateFromEntity(s, token)), total, start));
     }
 
+    private List<SlotEntity> filterSlots(List<SlotEntity> slots, int players, string? labelFilter0 = null, string? labelFilter1 = null, string? labelFilter2 = null, [FromQuery] string? move = null) 
+    {
+        slots = slots.Where(s => s.MinimumPlayers == players).ToList();
+
+        if (labelFilter0 != null)
+            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter0));
+        if (labelFilter1 != null)
+            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter1));
+        if (labelFilter2 != null)
+            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter2));
+
+        if (move == "false")
+            slots.RemoveAll(s => s.MoveRequired);
+        if (move == "only")
+            slots.RemoveAll(s => !s.MoveRequired);
+
+        return slots;
+    }
 
     private static GameVersion getGameFilter(string? gameFilterType, GameVersion version)
     {
