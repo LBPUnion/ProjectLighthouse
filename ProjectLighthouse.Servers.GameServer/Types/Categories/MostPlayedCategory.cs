@@ -14,7 +14,7 @@ public class MostPlayedCategory : Category
     public override string IconHash { get; set; } = "g820608";
     public override string Endpoint { get; set; } = "mostUniquePlays";
     public override SlotEntity? GetPreviewSlot(DatabaseContext database) => database.Slots
-        .Where(s => s.Type == SlotType.User)
+        .Where(s => s.Type == SlotType.User && !s.CrossControllerRequired)
         .OrderByDescending(s => s.PlaysLBP1Unique + s.PlaysLBP2Unique + s.PlaysLBP3Unique)
         .ThenByDescending(s => s.PlaysLBP1 + s.PlaysLBP2 + s.PlaysLBP3)
         .FirstOrDefault();
