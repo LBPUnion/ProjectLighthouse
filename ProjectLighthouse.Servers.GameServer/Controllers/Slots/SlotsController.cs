@@ -510,9 +510,9 @@ public class SlotsController : ControllerBase
         return this.Ok(new GenericSlotResponse(slots.ToSerializableList(s => SlotBase.CreateFromEntity(s, token)), total, start));
     }
 
-    private List<SlotEntity> filterSlots(List<SlotEntity> slots, int players, string? labelFilter0 = null, string? labelFilter1 = null, string? labelFilter2 = null, [FromQuery] string? move = null) 
+    private List<SlotEntity> filterSlots(List<SlotEntity> slots, int players, string? labelFilter0 = null, string? labelFilter1 = null, string? labelFilter2 = null, string? move = null) 
     {
-        slots = slots.Where(s => s.MinimumPlayers == players).ToList();
+        slots.RemoveAll(s => s.MinimumPlayers != players);
 
         if (labelFilter0 != null)
             slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter0));

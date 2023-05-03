@@ -17,7 +17,7 @@ public class HeartedCategory : CategoryWithUser
     public override string Endpoint { get; set; } = "hearted";
     public override SlotEntity? GetPreviewSlot(DatabaseContext database, UserEntity user) // note: developer slots act up in LBP3 when listed here, so I omitted it
         => database.HeartedLevels.Where(h => h.UserId == user.UserId)
-            .Where(h => h.Slot.Type == SlotType.User && !h.Slot.Hidden && h.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
+            .Where(h => h.Slot.Type == SlotType.User && !h.Slot.Hidden && h.Slot.GameVersion <= GameVersion.LittleBigPlanet3 && !h.Slot.CrossControllerRequired)
             .OrderByDescending(h => h.HeartedLevelId)
             .Include(h => h.Slot.Creator)
             .Select(h => h.Slot)
@@ -26,7 +26,7 @@ public class HeartedCategory : CategoryWithUser
 
     public override IQueryable<SlotEntity> GetSlots(DatabaseContext database, UserEntity user, int pageStart, int pageSize)
         => database.HeartedLevels.Where(h => h.UserId == user.UserId)
-            .Where(h => h.Slot.Type == SlotType.User && !h.Slot.Hidden && h.Slot.GameVersion <= GameVersion.LittleBigPlanet3)
+            .Where(h => h.Slot.Type == SlotType.User && !h.Slot.Hidden && h.Slot.GameVersion <= GameVersion.LittleBigPlanet3 && !h.Slot.CrossControllerRequired)
             .OrderByDescending(h => h.HeartedLevelId)
             .Include(h => h.Slot.Creator)
             .Select(h => h.Slot)

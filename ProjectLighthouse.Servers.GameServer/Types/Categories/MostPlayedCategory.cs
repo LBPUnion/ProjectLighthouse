@@ -21,6 +21,7 @@ public class MostPlayedCategory : Category
     public override IQueryable<SlotEntity> GetSlots
         (DatabaseContext database, int pageStart, int pageSize)
         => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3, false, true)
+            .Where(s => !s.CrossControllerRequired)
             .OrderByDescending(s => s.PlaysLBP1Unique + s.PlaysLBP2Unique + s.PlaysLBP3Unique)
             .ThenByDescending(s => s.PlaysLBP1 + s.PlaysLBP2 + s.PlaysLBP3)
             .Skip(Math.Max(0, pageStart - 1))
