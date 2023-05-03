@@ -16,6 +16,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [ApiController]
 [Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
+[Produces("text/xml")]
 public class FriendsController : ControllerBase
 {
     private readonly DatabaseContext database;
