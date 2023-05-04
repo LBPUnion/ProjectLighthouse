@@ -194,7 +194,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         if (this.TargetGame == GameVersion.LittleBigPlanetVita)
         {
             this.Lbp2EntitledSlots = entitledSlots;
-            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync();
+            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanetVita).CountAsync();
         }
         else
         {
@@ -203,7 +203,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
             this.CrossControlEntitledSlots = entitledSlots;
             this.Lbp3EntitledSlots = entitledSlots;
             this.Lbp1UsedSlots = await SlotCount(GameVersion.LittleBigPlanet1).CountAsync();
-            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync();
+            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync(s => !s.CrossControllerRequired);
             this.Lbp3UsedSlots = await SlotCount(GameVersion.LittleBigPlanet3).CountAsync();
             
             this.Lbp1FreeSlots = this.Lbp1EntitledSlots - this.Lbp1UsedSlots;

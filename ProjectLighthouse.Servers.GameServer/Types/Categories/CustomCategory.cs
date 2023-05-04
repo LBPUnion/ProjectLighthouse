@@ -35,9 +35,9 @@ public class CustomCategory : Category
     public sealed override string Description { get; set; }
     public sealed override string IconHash { get; set; }
     public sealed override string Endpoint { get; set; }
-    public override SlotEntity? GetPreviewSlot(DatabaseContext database) => database.Slots.FirstOrDefault(s => s.SlotId == this.SlotIds[0]);
+    public override SlotEntity? GetPreviewSlot(DatabaseContext database) => database.Slots.FirstOrDefault(s => s.SlotId == this.SlotIds[0] && !s.CrossControllerRequired);
     public override IQueryable<SlotEntity> GetSlots
         (DatabaseContext database, int pageStart, int pageSize)
-        => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3).Where(s => this.SlotIds.Contains(s.SlotId));
+        => database.Slots.ByGameVersion(GameVersion.LittleBigPlanet3).Where(s => this.SlotIds.Contains(s.SlotId) && !s.CrossControllerRequired);
     public override int GetTotalSlots(DatabaseContext database) => this.SlotIds.Count;
 }
