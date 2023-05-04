@@ -20,6 +20,11 @@ public struct ApiUser
     public PrivacyType LevelVisibility { get; set; }
     public PrivacyType ProfileVisibility { get; set; }
     public bool CommentsEnabled { get; set; }
+    public bool IsBanned { get; set; }
+    public bool IsRestricted { get; set; }
+    public bool IsSilenced { get; set; }
+    public bool IsModerator { get; set; }
+    public bool IsAdmin { get; set; }
 
     public static ApiUser CreateFromEntity(UserEntity entity) =>
         new()
@@ -38,5 +43,10 @@ public struct ApiUser
             LevelVisibility = entity.LevelVisibility,
             ProfileVisibility = entity.ProfileVisibility,
             CommentsEnabled = entity.CommentsEnabled,
+            IsBanned = entity.IsBanned,
+            IsRestricted = entity.IsRestricted,
+            IsSilenced = entity.IsSilenced,
+            IsModerator = entity.IsModerator,
+            IsAdmin = entity.IsAdmin,
         };
 }
