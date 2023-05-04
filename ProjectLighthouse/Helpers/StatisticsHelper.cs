@@ -27,7 +27,7 @@ public static class StatisticsHelper
 
     public static async Task<int> TeamPickCount(DatabaseContext database) => await database.Slots.CountAsync(s => s.TeamPick);
 
-    public static async Task<int> TeamPickCountForGame(DatabaseContext database, GameVersion gameVersion) => await database.Slots.ByGameVersion(gameVersion).CountAsync(s => s.TeamPick);
+    public static async Task<int> TeamPickCountForGame(DatabaseContext database, GameVersion gameVersion, bool? crosscontrol = null) => await database.Slots.ByGameVersion(gameVersion).CountAsync(s => s.TeamPick && (crosscontrol == null || s.CrossControllerRequired == crosscontrol));
 
     public static async Task<int> PhotoCount(DatabaseContext database) => await database.Photos.CountAsync();
     
