@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("npdata")]
-public struct FriendResponse
+public struct FriendResponse : ILbpSerializable
 {
 
     public FriendResponse(List<MinimalUserProfile> friends)
