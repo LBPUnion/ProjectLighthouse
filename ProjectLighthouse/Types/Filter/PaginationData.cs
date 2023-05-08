@@ -2,7 +2,10 @@
 
 public struct PaginationData
 {
-    public int PageStart { get; set; }
-    public int PageSize { get; set; }
-    public int MaxElements { get; set; }
+    public PaginationData()
+    { }
+
+    public int PageStart { get; set; } = 0;
+    public int PageSize { get; set; } = 0;
+    public int MaxElements { get; set; } = -1;
 }

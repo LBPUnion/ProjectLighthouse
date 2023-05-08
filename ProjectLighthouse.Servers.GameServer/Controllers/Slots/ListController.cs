@@ -46,7 +46,7 @@ public class ListController : ControllerBase
             .FirstOrDefaultAsync();
         if (targetUserId == 0) return this.BadRequest();
 
-        pageData.PageSize = await this.database.QueuedLevels.CountAsync(q => q.UserId == targetUserId);
+        pageData.MaxElements = await this.database.QueuedLevels.CountAsync(q => q.UserId == targetUserId);
 
         IQueryable<SlotEntity> baseQuery = this.database.QueuedLevels.Where(h => h.UserId == targetUserId)
             .Include(q => q.Slot)
@@ -114,7 +114,7 @@ public class ListController : ControllerBase
             .FirstOrDefaultAsync();
         if (targetUserId == 0) return this.BadRequest();
 
-        pageData.PageSize = await this.database.HeartedLevels.CountAsync(h => h.UserId == targetUserId);
+        pageData.MaxElements = await this.database.HeartedLevels.CountAsync(h => h.UserId == targetUserId);
 
         IQueryable<SlotEntity> baseQuery = this.database.HeartedLevels.Where(h => h.UserId == targetUserId)
             .Include(h => h.Slot)
@@ -128,7 +128,7 @@ public class ListController : ControllerBase
         return this.Ok(new GenericSlotResponse("favouriteSlots", heartedLevels, pageData));
     }
 
-    private const int FirstLbp2DeveloperSlotId = 124806; // This is the first known level slot GUID in LBP2. Feel free to change it if a lower one is found.
+    private const int firstLbp2DeveloperSlotId = 124806; // This is the first known level slot GUID in LBP2. Feel free to change it if a lower one is found.
 
     [HttpPost("favourite/slot/{slotType}/{id:int}")]
     public async Task<IActionResult> AddFavouriteSlot(string slotType, int id)
@@ -144,7 +144,7 @@ public class ListController : ControllerBase
 
         if (slotType == "developer")
         {
-            GameVersion slotGameVersion = (slot.InternalSlotId < FirstLbp2DeveloperSlotId) ? GameVersion.LittleBigPlanet1 : token.GameVersion;
+            GameVersion slotGameVersion = (slot.InternalSlotId < firstLbp2DeveloperSlotId) ? GameVersion.LittleBigPlanet1 : token.GameVersion;
             slot.GameVersion = slotGameVersion;
         }
 
@@ -167,7 +167,7 @@ public class ListController : ControllerBase
 
         if (slotType == "developer")
         {
-            GameVersion slotGameVersion = (slot.InternalSlotId < FirstLbp2DeveloperSlotId) ? GameVersion.LittleBigPlanet1 : token.GameVersion;
+            GameVersion slotGameVersion = (slot.InternalSlotId < firstLbp2DeveloperSlotId) ? GameVersion.LittleBigPlanet1 : token.GameVersion;
             slot.GameVersion = slotGameVersion;
         }
         

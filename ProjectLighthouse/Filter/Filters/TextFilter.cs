@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Linq.Expressions;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -20,10 +19,14 @@ public class TextFilter : ISlotFilter
     {
         Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.False<SlotEntity>();
         string[] keywords = this.filter.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        return keywords.Aggregate(predicate,
-            (current, keyword) => current.Or(s =>
+        foreach (string keyword in keywords)
+        {
+            predicate = predicate.Or(s =>
                 s.Name.Contains(keyword) ||
                 s.Description.ToLower().Contains(keyword) ||
-                s.SlotId.ToString().Equals(keyword)));
+                s.SlotId.ToString().Equals(keyword));
+            predicate = predicate.Or(s => s.Creator != null && s.Creator.Username.Contains(keyword));
+        }
+        return predicate;
     }
 }

@@ -305,12 +305,6 @@ public class SlotsController : ControllerBase
         SlotSortBuilder<SlotEntity> sortBuilder = new();
         sortBuilder.AddSort(new UniquePlaysForGameSort(token.GameVersion));
 
-        string query = this.database.Slots.Where(this.FilterFromRequest(token).Build())
-            .ApplyOrdering(sortBuilder)
-            .ApplyPagination(pageData)
-            .ToQueryString();
-        Console.WriteLine(query);
-
         List<SlotBase> slots = await this.database.GetSlots(token, this.FilterFromRequest(token), pageData, sortBuilder);
 
         return this.Ok(new GenericSlotResponse(slots, pageData));

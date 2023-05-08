@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Filter.Sorts;
+using LBPUnion.ProjectLighthouse.Types.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Extensions;
 
@@ -13,6 +16,11 @@ public static class QueryExtensions
 
     public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> queryable, PaginationData pagination)
     {
+        if (pagination.MaxElements == -1)
+        {
+            Logger.Warn($"ApplyPagination() called with MaxElements of -1\n{queryable.ToQueryString()}", LogArea.Database);
+            pagination.MaxElements = pagination.PageSize;
+        }
         queryable = queryable.Skip(Math.Max(0, pagination.PageStart - 1));
         return queryable.Take(Math.Min(pagination.PageSize, pagination.MaxElements));
     }

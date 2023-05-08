@@ -36,6 +36,13 @@ public class SlotQueryBuilder : IQueryBuilder<SlotEntity>
         return this;
     }
 
+    public SlotQueryBuilder Clone()
+    {
+        SlotQueryBuilder clone = new();
+        clone.filters.AddRange(this.filters);
+        return clone;
+    }
+
     public SlotQueryBuilder AddFilter(ISlotFilter filter)
     {
         this.filters.Add(filter);

@@ -1,9 +1,12 @@
 ﻿using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -37,17 +40,19 @@ public class CategoryController : ControllerBase
 
         List<GameCategory> categories = new();
 
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+
         foreach (Category category in CategoryHelper.Categories.ToList())
         {
-            if(category is CategoryWithUser categoryWithUser) categories.Add(categoryWithUser.Serialize(this.database, user));
-            else categories.Add(category.Serialize(this.database));
+            if(category is CategoryWithUser categoryWithUser) categories.Add(await categoryWithUser.Serialize(this.database, user, queryBuilder));
+            else categories.Add(await category.Serialize(this.database, queryBuilder));
         }
 
         return this.Ok(new CategoryListResponse(categories, CategoryHelper.Categories.Count, 0, 1));
     }
 
     [HttpGet("searches/{endpointName}")]
-    public async Task<IActionResult> GetCategorySlots(string endpointName, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> GetCategorySlots(string endpointName)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -57,27 +62,35 @@ public class CategoryController : ControllerBase
         Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();
 
+        PaginationData pageData = this.Request.GetPaginationData();
+
         Logger.Debug("Found category " + category, LogArea.Category);
 
         List<SlotBase> slots;
-        int totalSlots;
+
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
 
         if (category is CategoryWithUser categoryWithUser)
         {
-            slots = (await categoryWithUser.GetSlots(this.database, user, pageStart, pageSize)
+            
+            int totalSlots = await categoryWithUser.GetSlots(this.database, user, queryBuilder).CountAsync();
+            pageData.MaxElements = totalSlots;
+            slots = (await categoryWithUser.GetSlots(this.database, user, queryBuilder)
+                .ApplyPagination(pageData)
                 .ToListAsync())
                 .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
-            totalSlots = categoryWithUser.GetTotalSlots(this.database, user);
         }
         else
         {
-            slots = category.GetSlots(this.database, pageStart, pageSize)
-                .ToList()
+            int totalSlots = await category.GetSlots(this.database, queryBuilder).CountAsync();
+            pageData.MaxElements = totalSlots;
+            slots = (await category.GetSlots(this.database, queryBuilder)
+                .ApplyPagination(pageData)
+                .ToListAsync())
                 .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
-            totalSlots = category.GetTotalSlots(this.database);
         }
 
-        return this.Ok(new GenericSlotResponse("results", slots, totalSlots, pageStart + pageSize));
+        return this.Ok(new GenericSlotResponse("results", slots, pageData));
     }
 
 }
