@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Login;
 
 [ApiController]
 [Authorize]

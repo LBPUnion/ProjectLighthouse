@@ -2,13 +2,8 @@
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
-using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
-using LBPUnion.ProjectLighthouse.Types.Levels;
-using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -147,96 +142,5 @@ public class CollectionController : ControllerBase
         if (targetUserId == 0) return this.BadRequest();
 
         return this.Ok(await this.GetUserPlaylists(targetUserId));
-    }
-
-    [HttpGet("searches")]
-    [HttpGet("genres")]
-    public async Task<IActionResult> GenresAndSearches()
-    {
-        GameTokenEntity token = this.GetToken();
-
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Forbid();
-
-        List<GameCategory> categories = new();
-
-        foreach (Category category in CategoryHelper.Categories.ToList())
-        {
-            if(category is CategoryWithUser categoryWithUser) categories.Add(categoryWithUser.Serialize(this.database, user));
-            else categories.Add(category.Serialize(this.database));
-        }
-
-        return this.Ok(new CategoryListResponse(categories, CategoryHelper.Categories.Count, 0, 1));
-    }
-
-    [HttpGet("searches/{endpointName}")]
-    public async Task<IActionResult> GetCategorySlots(string endpointName, [FromQuery] int pageStart, [FromQuery] int pageSize,
-        [FromQuery] int players = 0,
-        [FromQuery] string? labelFilter0 = null,
-        [FromQuery] string? labelFilter1 = null,
-        [FromQuery] string? labelFilter2 = null,
-        [FromQuery] string? labelFilter3 = null,
-        [FromQuery] string? labelFilter4 = null,
-        [FromQuery] string? move = null,
-        [FromQuery] string? adventure = null
-    )
-    {
-        GameTokenEntity token = this.GetToken();
-
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Forbid();
-
-        Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
-        if (category == null) return this.NotFound();
-
-        Logger.Debug("Found category " + category, LogArea.Category);
-
-        List<SlotEntity> slots;
-        int totalSlots;
-
-        if (category is CategoryWithUser categoryWithUser)
-        {
-            slots = (await categoryWithUser.GetSlots(this.database, user, pageStart, pageSize)
-                .ToListAsync());
-            totalSlots = categoryWithUser.GetTotalSlots(this.database, user);
-        }
-        else
-        {
-            slots = category.GetSlots(this.database, pageStart, pageSize)
-                .ToList();
-            totalSlots = category.GetTotalSlots(this.database);
-        }
-
-        slots = this.filterSlots(slots, players + 1, labelFilter0, labelFilter1, labelFilter2, labelFilter3, labelFilter4, move, adventure);
-
-        return this.Ok(new GenericSlotResponse("results", slots.ToSerializableList(s => SlotBase.CreateFromEntity(s, token)), totalSlots, pageStart + pageSize));
-    }
-
-    private List<SlotEntity> filterSlots(List<SlotEntity> slots, int players, string? labelFilter0 = null, string? labelFilter1 = null, string? labelFilter2 = null, string? labelFilter3 = null, string? labelFilter4 = null, string? move = null, string? adventure = null)
-    {
-        slots.RemoveAll(s => s.MinimumPlayers != players);
-
-        if (labelFilter0 != null)
-            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter0));
-        if (labelFilter1 != null)
-            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter1));
-        if (labelFilter2 != null)
-            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter2));
-        if (labelFilter3 != null)
-            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter3));
-        if (labelFilter4 != null)
-            slots.RemoveAll(s => !s.AuthorLabels.Split(',').ToList().Contains(labelFilter4));
-
-        if (move == "noneCan")
-            slots.RemoveAll(s => s.MoveRequired);
-        if (move == "allMust")
-            slots.RemoveAll(s => !s.MoveRequired);
-
-        if (adventure == "noneCan")
-            slots.RemoveAll(s => s.IsAdventurePlanet);
-        if (adventure == "allMust")
-            slots.RemoveAll(s => !s.IsAdventurePlanet);
-
-        return slots;
     }
 }
