@@ -20,6 +20,7 @@ public struct ApiUser
     public PrivacyType LevelVisibility { get; set; }
     public PrivacyType ProfileVisibility { get; set; }
     public bool CommentsEnabled { get; set; }
+    public PermissionLevel PermissionLevel { get; set; }
 
     public static ApiUser CreateFromEntity(UserEntity entity) =>
         new()
@@ -38,5 +39,6 @@ public struct ApiUser
             LevelVisibility = entity.LevelVisibility,
             ProfileVisibility = entity.ProfileVisibility,
             CommentsEnabled = entity.CommentsEnabled,
+            PermissionLevel = entity.PermissionLevel,
         };
 }
