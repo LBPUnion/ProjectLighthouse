@@ -4,11 +4,11 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
-using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,10 +16,10 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class RegisterForm : BaseLayout
 {
-    public readonly MailQueueService Mail;
+    public readonly IMailService Mail;
     private readonly ICaptchaService captchaService;
 
-    public RegisterForm(DatabaseContext database, MailQueueService mail, ICaptchaService captchaService) : base(database)
+    public RegisterForm(DatabaseContext database, IMailService mail, ICaptchaService captchaService) : base(database)
     {
         this.Mail = mail;
         this.captchaService = captchaService;

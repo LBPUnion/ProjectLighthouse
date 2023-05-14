@@ -2,18 +2,18 @@
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Email;
 
 public class SendVerificationEmailPage : BaseLayout
 {
-    public readonly MailQueueService Mail;
+    public readonly IMailService Mail;
 
-    public SendVerificationEmailPage(DatabaseContext database, MailQueueService mail) : base(database)
+    public SendVerificationEmailPage(DatabaseContext database, IMailService mail) : base(database)
     {
         this.Mail = mail;
     }

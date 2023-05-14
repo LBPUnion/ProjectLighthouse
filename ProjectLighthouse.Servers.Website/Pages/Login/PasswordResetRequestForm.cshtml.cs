@@ -2,10 +2,9 @@ using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,14 +12,13 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class PasswordResetRequestForm : BaseLayout
 {
-
-    public MailQueueService Mail;
+    public IMailService Mail;
 
     public string? Error { get; private set; }
 
     public string? Status { get; private set; }
 
-    public PasswordResetRequestForm(DatabaseContext database, MailQueueService mail) : base(database)
+    public PasswordResetRequestForm(DatabaseContext database, IMailService mail) : base(database)
     {
         this.Mail = mail;
     }
