@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Users;
 
@@ -7,18 +8,29 @@ public static class FormattingExtensions
 {
     public static string GetLevelLockIcon(this SlotEntity slot) => slot.InitiallyLocked ? "ui white icon lock" : "";
     public static string GetTeamPickedIcon(this SlotEntity slot) => slot.TeamPick ? "ui pink icon certificate" : "";
-    
-    // ReSharper disable once UnusedParameter.Global
-    public static string GetLevelWarningIcon(this SlotEntity slot) => "ui orange icon exclamation circle";
 
-    // ReSharper disable once ConvertIfStatementToReturnStatement
+    // ReSharper disable once UnusedParameter.Global
+    public static string GetLevelWarningIcon
+        (this SlotEntity slot) =>
+        slot.Lbp1Only || slot.CrossControllerRequired || slot.MoveRequired ? "ui orange icon exclamation circle" : "";
+
+    [SuppressMessage("ReSharper", "ArrangeTrailingCommaInSinglelineLists")]
     // These messages are sorted by logical priority. No two should happen at once.
     public static string GetLevelWarningText(this SlotEntity slot)
     {
-        if (slot.Lbp1Only) return "This slot is designed for LittleBigPlanet 1 only.";
-        if (slot.CrossControllerRequired) return "This slot is designed to be played in Cross-Controller mode.";
-        if (slot.MoveRequired) return "This level requires a PlayStation Move controller.";
-        return "";
+        return slot switch
+        {
+            {
+                Lbp1Only: true,
+            } => "This level is designed for LittleBigPlanet 1 only.",
+            {
+                CrossControllerRequired: true,
+            } => "This level is designed to be played in Cross-Controller mode.",
+            {
+                MoveRequired: true,
+            } => "This level requires a PlayStation Move controller.",
+            _ => "",
+        };
     }
 
     public static string ToHtmlColor(this PermissionLevel permissionLevel)
