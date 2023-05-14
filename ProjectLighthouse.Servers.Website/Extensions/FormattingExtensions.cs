@@ -5,7 +5,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 
 public static class FormattingExtensions
 {
-    private static string GetLevelLockIcon(this SlotEntity slot) => slot.InitiallyLocked ? "ui white icon lock" : "";
+    private static string GetLevelLockIcon(this SlotEntity slot) => slot.InitiallyLocked ? "ui black icon lock" : "";
     private static string GetTeamPickedIcon(this SlotEntity slot) => slot.TeamPick ? "ui pink icon certificate" : "";
 
     // ReSharper disable once UnusedParameter.Global

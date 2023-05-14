@@ -270,9 +270,9 @@ div.cardStatsUnderTitle > span {
     padding-left: 5px;
     vertical-align: center;
     min-height: 1rem;
-    font-size: 2rem;
-    position: relative;
-    top: 3px;    
+    font-size: x-large;
+    display: flex;
+    align-items: center;
 }
 
 /*#endregion Slot badges */
