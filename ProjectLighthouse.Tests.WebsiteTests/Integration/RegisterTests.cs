@@ -1,6 +1,6 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
@@ -19,7 +19,9 @@ public class RegisterTests : LighthouseWebTest
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
+        ServerConfiguration.Instance.Authentication.RegistrationEnabled = true;
+
+        string username = ("unitTestUser" + CryptoHelper.GenerateRandomInt32(0, int.MaxValue))[..16];
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
@@ -37,6 +39,8 @@ public class RegisterTests : LighthouseWebTest
         Assert.NotNull(user);
 
         await database.RemoveUser(user);
+
+        ServerConfiguration.Instance.Authentication.RegistrationEnabled = false;
     }
 
     [Fact]
@@ -44,7 +48,9 @@ public class RegisterTests : LighthouseWebTest
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = ("unitTestUser" + new Random().Next()).Substring(0, 16);
+        ServerConfiguration.Instance.Authentication.RegistrationEnabled = true;
+
+        string username = ("unitTestUser" + CryptoHelper.GenerateRandomInt32(0, int.MaxValue))[..16];
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/register");
@@ -60,6 +66,8 @@ public class RegisterTests : LighthouseWebTest
 
         UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
         Assert.Null(user);
+
+        ServerConfiguration.Instance.Authentication.RegistrationEnabled = false;
     }
 
     [Fact]
@@ -67,7 +75,9 @@ public class RegisterTests : LighthouseWebTest
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
-        string username = ("unitTestUser" + new Random().Next())[..16];
+        ServerConfiguration.Instance.Authentication.RegistrationEnabled = true;
+
+        string username = ("unitTestUser" + CryptoHelper.GenerateRandomInt32(0, int.MaxValue))[..16];
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
 
         await database.CreateUser(username, CryptoHelper.BCryptHash(password));
@@ -86,5 +96,7 @@ public class RegisterTests : LighthouseWebTest
         this.Driver.FindElement(By.Id("submit")).Click();
 
         Assert.Contains("The username you've chosen is already taken.", this.Driver.PageSource);
+
+        ServerConfiguration.Instance.Authentication.RegistrationEnabled = false;
     }
 }
