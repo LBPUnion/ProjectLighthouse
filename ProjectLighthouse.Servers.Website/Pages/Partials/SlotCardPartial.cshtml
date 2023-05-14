@@ -49,36 +49,45 @@
              onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
     </div>
     <div class="cardStats">
-        @if (!mini)
-        {
-            @if (showLink)
-            {
-                <h2>
-                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
-                </h2>
-            }
-            else
-            {
-                <h1>
-                    @slotName <i class="@Model.GetLevelLockIcon()"></i>
-                </h1>
-            }
-        }
-        else
-        {
-            @if (showLink)
-            {
-                <h3>
-                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
-                </h3>
-            }
-            else
-            {
-                <h3>
-                    @slotName <i class="@Model.GetLevelLockIcon()"></i>
-                </h3>
-            }
-        }
+        <div class="titleView">
+            <span>
+                 @if (!mini)
+                 {
+                     @if (showLink)
+                     {
+                         <h2>
+                             <a href="~/slot/@Model.SlotId">@slotName</a>
+                         </h2>
+                     }
+                     else
+                     {
+                         <h1>
+                             @slotName
+                         </h1>
+                     }
+                 }
+                 else
+                 {
+                     @if (showLink)
+                     {
+                         <h3>
+                             <a href="~/slot/@Model.SlotId">@slotName</a>
+                         </h3>
+                     }
+                     else
+                     {
+                         <h3>
+                             @slotName
+                         </h3>
+                     }
+                 }
+            </span> 
+            <span class="iconSet">
+                <i class="@Model.GetLevelLockIcon()"></i>
+                <i class="@Model.GetTeamPickedIcon()"></i>
+                <i class="@Model.GetLevelWarningIcon()" title="@Model.GetLevelWarningText()"></i>
+            </span>
+        </div>
 
         <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
@@ -95,8 +104,7 @@
         @if (Model.Creator != null)
         {
             string date = "";
-            if (!mini)
-                date = " on " + TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.FirstUploaded), timeZoneInfo).DateTime.ToShortDateString();
+            if (!mini) date = " on " + TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeMilliseconds(Model.FirstUploaded), timeZoneInfo).DateTime.ToShortDateString();
             <p>
                 <i>Created by @await Model.Creator.ToLink(Html, ViewData, language) in @Model.GameVersion.ToPrettyString()@date</i>
             </p>
