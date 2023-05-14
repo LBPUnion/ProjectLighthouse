@@ -39,6 +39,7 @@ public class AuthenticationController : ControllerBase
         }
 
         await this.database.GameTokens.RemoveWhere(t => t.UserId == user.UserId && invalidTokens.Contains(t.Platform));
+        await this.database.SaveChangesAsync();
 
         return this.Redirect("~/authentication");
     }
