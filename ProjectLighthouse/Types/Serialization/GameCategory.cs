@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.ComponentModel;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -18,6 +19,11 @@ public class GameCategory : ILbpSerializable
     [XmlElement("icon")]
     public string Icon { get; set; }
 
+    [DefaultValue("")]
+    [XmlArray("sorts")]
+    [XmlArrayItem("sort")]
+    public string[] Sorts { get; set; }
+
     [XmlElement("results")]
     public GenericSlotResponse Results { get; set; }
 
@@ -28,6 +34,7 @@ public class GameCategory : ILbpSerializable
             Description = category.Description,
             Icon = category.IconHash,
             Url = category.IngameEndpoint,
+            Sorts = category.Sorts,
             Results = results,
         };
 

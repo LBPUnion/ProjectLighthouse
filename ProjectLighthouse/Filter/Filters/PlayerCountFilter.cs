@@ -17,8 +17,12 @@ public class PlayerCountFilter : ISlotFilter
         this.maxPlayers = maxPlayers;
     }
 
-    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
-        PredicateExtensions.True<SlotEntity>()
-            .And(s => s.MinimumPlayers >= this.minPlayers)
-            .And(s => s.MaximumPlayers <= this.maxPlayers);
+    public Expression<Func<SlotEntity, bool>> GetPredicate()
+    {
+        Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.True<SlotEntity>();
+        if (this.minPlayers != 1) predicate = predicate.And(s => s.MinimumPlayers >= this.minPlayers);
+        if (this.maxPlayers != 4) predicate = predicate.And(s => s.MaximumPlayers <= this.maxPlayers);
+
+        return predicate;
+    }
 }

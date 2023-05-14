@@ -38,19 +38,15 @@ public class SlotSortBuilder<T> : ISortBuilder<T>
         {
             if (this.sortDescending)
             {
-                if (!usedFirstOrder)
-                {
-                    orderedQueryable = orderedQueryable.OrderByDescending(sort.GetExpression());
-                }
-                orderedQueryable = orderedQueryable.ThenByDescending(sort.GetExpression());
+                orderedQueryable = !usedFirstOrder
+                    ? orderedQueryable.OrderByDescending(sort.GetExpression())
+                    : orderedQueryable.ThenByDescending(sort.GetExpression());
             }
             else
             {
-                if (!usedFirstOrder)
-                {
-                    orderedQueryable = orderedQueryable.OrderBy(sort.GetExpression());
-                }
-                orderedQueryable = orderedQueryable.ThenBy(sort.GetExpression());
+                orderedQueryable = !usedFirstOrder
+                    ? orderedQueryable.OrderBy(sort.GetExpression())
+                    : orderedQueryable.ThenBy(sort.GetExpression());
             }
 
             usedFirstOrder = true;

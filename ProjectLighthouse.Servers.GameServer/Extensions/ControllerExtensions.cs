@@ -4,6 +4,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
 
@@ -42,13 +43,30 @@ public static class ControllerExtensions
         if (authorLabels.Count > 0) queryBuilder.AddFilter(new AuthorLabelFilter(authorLabels.ToArray()));
 
         if (int.TryParse(controller.Request.Query["players"], out int minPlayers) && minPlayers >= 1)
+        {
+            // LBP3 starts counting at 0
+            if (token.GameVersion == GameVersion.LittleBigPlanet3) minPlayers++;
+
             queryBuilder.AddFilter(new PlayerCountFilter(minPlayers));
+        }
 
         if (controller.Request.Query.ContainsKey("textFilter"))
         {
             string textFilter = (string?)controller.Request.Query["textFilter"] ?? "";
 
             if (!string.IsNullOrWhiteSpace(textFilter)) queryBuilder.AddFilter(new TextFilter(textFilter));
+        }
+
+        if (controller.Request.Query.ContainsKey("dateFilterType"))
+        {
+            string dateFilter = (string?)controller.Request.Query["dateFilterType"] ?? "";
+            long oldestTime = dateFilter switch
+            {
+                "thisWeek" => DateTimeOffset.UtcNow.AddDays(-7).ToUnixTimeMilliseconds(),
+                "thisMonth" => DateTimeOffset.UtcNow.AddDays(-31).ToUnixTimeMilliseconds(),
+                _ => 0,
+            };
+            if (oldestTime != 0) queryBuilder.AddFilter(new FirstUploadedFilter(oldestTime));
         }
 
         if (token.GameVersion != GameVersion.LittleBigPlanet3)
@@ -59,18 +77,6 @@ public static class ControllerExtensions
 
             if (bool.TryParse(controller.Request.Query["crosscontrol"], out bool crossControl) && crossControl)
                 queryBuilder.AddFilter(new CrossControlFilter());
-
-            if (controller.Request.Query.ContainsKey("dateFilterType"))
-            {
-                string dateFilter = (string?)controller.Request.Query["dateFilterType"] ?? "";
-                long oldestTime = dateFilter switch
-                {
-                    "thisWeek" => DateTimeOffset.Now.AddDays(-7).ToUnixTimeMilliseconds(),
-                    "thisMonth" => DateTimeOffset.Now.AddDays(-31).ToUnixTimeMilliseconds(),
-                    _ => 0,
-                };
-                if (oldestTime != 0) queryBuilder.AddFilter(new FirstUploadedFilter(oldestTime));
-            }
 
             GameVersion targetVersion = token.GameVersion;
 
@@ -123,6 +129,28 @@ public static class ControllerExtensions
                 () => queryBuilder.AddFilter(new ExcludeMovePackFilter()),
                 () =>
                 { });
+
+            string[]? ParseLbp3ArrayQuery(string key)
+            {
+                return !controller.Request.Query.TryGetValue($"{key}[]", out StringValues keys)
+                    ? null
+                    : keys.Where(s => s != null).Select(s => s!).ToArray();
+            }
+
+            string[]? gameFilters = ParseLbp3ArrayQuery("gameFilter");
+            if (gameFilters != null)
+            {
+                queryBuilder.AddFilter(new GameVersionListFilter(gameFilters
+                    .Select(s => GetGameFilter(s, token.GameVersion))
+                    .ToArray()));
+            }
+
+            // This filter doesn't actually do anything but it will be parsed later by the CategoryController
+            string[]? resultFilters = ParseLbp3ArrayQuery("resultType");
+            if (resultFilters != null)
+            {
+                queryBuilder.AddFilter(new ResultTypeFilter(resultFilters));
+            }
         }
 
         queryBuilder.AddFilter(new SubLevelFilter());

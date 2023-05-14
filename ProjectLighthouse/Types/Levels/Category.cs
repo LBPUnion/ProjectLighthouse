@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +20,8 @@ public abstract class Category
     public abstract string IconHash { get; set; }
 
     public abstract string Endpoint { get; set; }
+
+    public string[] Sorts { get; } = { "relevance", "likes", "plays", "hearts", "date", };
 
     public string IngameEndpoint => $"/searches/{this.Endpoint}";
 

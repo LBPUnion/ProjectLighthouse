@@ -1,14 +1,17 @@
 ﻿using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Filter;
+using LBPUnion.ProjectLighthouse.Filter.Sorts;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -66,29 +69,65 @@ public class CategoryController : ControllerBase
 
         Logger.Debug("Found category " + category, LogArea.Category);
 
-        List<SlotBase> slots;
+        IQueryable<SlotEntity> slotQuery;
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
 
         if (category is CategoryWithUser categoryWithUser)
         {
-            
             int totalSlots = await categoryWithUser.GetSlots(this.database, user, queryBuilder).CountAsync();
             pageData.MaxElements = totalSlots;
-            slots = (await categoryWithUser.GetSlots(this.database, user, queryBuilder)
-                .ApplyPagination(pageData)
-                .ToListAsync())
-                .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            slotQuery = categoryWithUser.GetSlots(this.database, user, queryBuilder).ApplyPagination(pageData);
         }
         else
         {
             int totalSlots = await category.GetSlots(this.database, queryBuilder).CountAsync();
             pageData.MaxElements = totalSlots;
-            slots = (await category.GetSlots(this.database, queryBuilder)
-                .ApplyPagination(pageData)
-                .ToListAsync())
-                .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
+            slotQuery = category.GetSlots(this.database, queryBuilder).ApplyPagination(pageData);
         }
+
+        if (bool.TryParse(this.Request.Query["includePlayed"], out bool includePlayed) && !includePlayed)
+        {
+            slotQuery = slotQuery.Select(s => new SlotMetadata
+                {
+                    Slot = s,
+                    Played = this.database.VisitedLevels.Any(v => v.SlotId == s.SlotId && v.UserId == token.UserId),
+                })
+                .Where(s => !s.Played)
+                .Select(s => s.Slot);
+        }
+
+        if (this.Request.Query.ContainsKey("sort"))
+        {
+            string sort = (string?)this.Request.Query["sort"] ?? "";
+            slotQuery = sort switch
+            {
+                "relevance" => slotQuery.ApplyOrdering(new SlotSortBuilder<SlotEntity>()
+                    .AddSort(new UniquePlaysTotalSort())
+                    .AddSort(new LastUpdatedSort())),
+                "likes" => slotQuery.Select(s => new SlotMetadata
+                    {
+                        Slot = s,
+                        ThumbsUp = this.database.RatedLevels.Count(r => r.SlotId == s.SlotId && r.Rating == 1),
+                    })
+                    .OrderByDescending(s => s.Hearts)
+                    .Select(s => s.Slot),
+                "hearts" => slotQuery.Select(s => new SlotMetadata
+                    {
+                        Slot = s,
+                        Hearts = this.database.HeartedLevels.Count(h => h.SlotId == s.SlotId),
+                    })
+                    .OrderByDescending(s => s.Hearts)
+                    .Select(s => s.Slot),
+                "date" => slotQuery.ApplyOrdering(new SlotSortBuilder<SlotEntity>().AddSort(new FirstUploadedSort())),
+                "plays" => slotQuery.ApplyOrdering(
+                    new SlotSortBuilder<SlotEntity>().AddSort(new UniquePlaysTotalSort())),
+                _ => slotQuery,
+            };
+        }
+
+        List<SlotBase> slots = (await slotQuery.ToListAsync())
+            .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
 
         return this.Ok(new GenericSlotResponse("results", slots, pageData));
     }

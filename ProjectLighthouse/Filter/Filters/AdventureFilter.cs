@@ -9,5 +9,5 @@ namespace LBPUnion.ProjectLighthouse.Filter.Filters;
 public class AdventureFilter : ISlotFilter
 {
     public Expression<Func<SlotEntity, bool>> GetPredicate() =>
-        PredicateExtensions.True<SlotEntity>().And(s => !s.IsAdventurePlanet);
+        PredicateExtensions.True<SlotEntity>().And(s => s.IsAdventurePlanet);
 }
