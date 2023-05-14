@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Users;
 
@@ -14,7 +13,6 @@ public static class FormattingExtensions
         (this SlotEntity slot) =>
         slot.Lbp1Only || slot.CrossControllerRequired || slot.MoveRequired ? "ui orange icon exclamation circle" : "";
 
-    [SuppressMessage("ReSharper", "ArrangeTrailingCommaInSinglelineLists")]
     // These messages are sorted by logical priority. No two should happen at once.
     private static string GetLevelWarningText(this SlotEntity slot)
     {
