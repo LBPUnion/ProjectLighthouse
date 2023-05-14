@@ -8,7 +8,6 @@ public static class FormattingExtensions
     private static string GetLevelLockIcon(this SlotEntity slot) => slot.InitiallyLocked ? "ui black icon lock" : "";
     private static string GetTeamPickedIcon(this SlotEntity slot) => slot.TeamPick ? "ui pink icon certificate" : "";
 
-    // ReSharper disable once UnusedParameter.Global
     private static string GetLevelWarningIcon
         (this SlotEntity slot) =>
         slot.Lbp1Only || slot.CrossControllerRequired || slot.MoveRequired ? "ui orange icon exclamation circle" : "";
