@@ -97,7 +97,7 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
         return this.Client.SendAsync(requestMessage);
     }
-                     
+
     public async Task<HttpResponseMessage> UploadFileEndpointRequest(string filePath)
     {
         byte[] bytes = await File.ReadAllBytesAsync(filePath);

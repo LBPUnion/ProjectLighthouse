@@ -21,7 +21,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class MessageController : ControllerBase
 {
     private readonly DatabaseContext database;
-    private readonly IMailService mail;
 
     private const string license = @"
 This program is free software: you can redistribute it and/or modify
@@ -37,10 +36,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
-    public MessageController(DatabaseContext database, IMailService mail)
+    public MessageController(DatabaseContext database)
     {
         this.database = database;
-        this.mail = mail;
     }
 
     [HttpGet("eula")]
@@ -82,7 +80,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     ///     The response sent is the text that will appear in-game.
     /// </summary>
     [HttpPost("filter")]
-    public async Task<IActionResult> Filter()
+    public async Task<IActionResult> Filter(IMailService mailService)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -99,7 +97,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             if (user == null || user.EmailAddressVerified) return this.Ok();
 
             user.EmailAddress = email;
-            await SMTPHelper.SendVerificationEmail(this.database, this.mail, user);
+            await SMTPHelper.SendVerificationEmail(this.database, mailService, user);
 
             return this.Ok();
         }
@@ -108,8 +106,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        if (ServerConfiguration.Instance.LogChatFiltering) 
-          Logger.Info($"{username}: {message} / {filteredText}", LogArea.Filter);
+        if (ServerConfiguration.Instance.LogChatFiltering)
+            Logger.Info($"{username}: {message} / {filteredText}", LogArea.Filter);
 
         return this.Ok(filteredText);
     }

@@ -37,7 +37,6 @@ public class UploadTests : LighthouseServerTest<GameServerTestStartup>
     [Fact]
     public async Task ShouldNotAcceptFarc()
     {
-        // Reset database state
         await IntegrationHelper.GetIntegrationDatabase();
 
         LoginResult loginResult = await this.Authenticate();

@@ -19,8 +19,10 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         await IntegrationHelper.GetIntegrationDatabase();
 
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", null!);
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -29,7 +31,10 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         await IntegrationHelper.GetIntegrationDatabase();
 
         HttpResponseMessage response = await this.AuthenticateResponse();
-        Assert.True(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
         string responseContent = await response.Content.ReadAsStringAsync();
         Assert.Contains("MM_AUTH=", responseContent);
         Assert.Contains(VersionHelper.EnvVer, responseContent);
@@ -60,9 +65,9 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/enterLevel/420", loginResult.AuthTicket);
         await response.Content.ReadAsStringAsync();
 
-        const HttpStatusCode expectedStatus = HttpStatusCode.NotFound;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.NotFound;
 
-        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -72,8 +77,8 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
 
         HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/announce");
 
-        const HttpStatusCode expectedStatus = HttpStatusCode.Forbidden;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.Forbidden;
 
-        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 }

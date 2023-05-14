@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -16,11 +17,10 @@ namespace ProjectLighthouse.Tests.GameApiTests.Unit.Controllers;
 [Trait("Category", "Unit")]
 public class MessageControllerTests
 {
-
     [Fact]
     public void Eula_ShouldReturnLicense_WhenConfigEmpty()
     {
-        MessageController messageController = new(null!, null!);
+        MessageController messageController = new(null!);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.EulaText = "";
@@ -51,7 +51,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\n";
     [Fact]
     public void Eula_ShouldReturnLicenseAndConfigString_WhenConfigNotEmpty()
     {
-        MessageController messageController = new(null!, null!);
+        MessageController messageController = new(null!);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.EulaText = "unit test eula text";
@@ -83,7 +83,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     public async Task Announcement_WithVariables_ShouldBeResolved()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
-        MessageController messageController = new(dbMock, null!);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.AnnounceText = "you are now logged in as %user (id: %id)";
@@ -103,7 +103,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     public async Task Announcement_WithEmptyString_ShouldBeEmpty()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
-        MessageController messageController = new(dbMock, null!);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController();
 
         ServerConfiguration.Instance.AnnounceText = "";
@@ -124,7 +124,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
-        MessageController messageController = new(dbMock, null!);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController();
 
         IActionResult result = messageController.Notification();
@@ -138,14 +138,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
         const string request = "unit test message";
-        MessageController messageController = new(dbMock, null!);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController(request);
 
         CensorConfiguration.Instance.UserInputFilterMode = FilterMode.None;
 
         const string expectedBody = "unit test message";
 
-        IActionResult result = await messageController.Filter();
+        IActionResult result = await messageController.Filter(new NullMailService());
 
         Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
@@ -160,7 +160,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
         const string request = "unit test message bruh";
-        MessageController messageController = new(dbMock, null!);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController(request);
 
         CensorConfiguration.Instance.UserInputFilterMode = FilterMode.Asterisks;
@@ -171,7 +171,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         const string expectedBody = "unit test message ****";
 
-        IActionResult result = await messageController.Filter();
+        IActionResult result = await messageController.Filter(new NullMailService());
 
         Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
@@ -194,7 +194,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
         Mock<IMailService> mailMock = getMailServiceMock();
         const string request = "/setemail unittest@unittest.com";
-        MessageController messageController = new(dbMock, mailMock.Object);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = false;
@@ -203,7 +203,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
         const int expectedStatus = 200;
         const string expected = "/setemail unittest@unittest.com";
 
-        IActionResult result = await messageController.Filter();
+        IActionResult result = await messageController.Filter(mailMock.Object);
 
         Assert.IsType<OkObjectResult>(result);
         OkObjectResult? okObjectResult = result as OkObjectResult;
@@ -221,14 +221,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         const string request = "/setemail unittest@unittest.com";
 
-        MessageController messageController = new(dbMock, mailMock.Object);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
         const string expectedEmail = "unittest@unittest.com";
 
-        IActionResult result = await messageController.Filter();
+        IActionResult result = await messageController.Filter(mailMock.Object);
 
         Assert.IsType<OkResult>(result);
         Assert.Equal(expectedEmail, dbMock.Users.First().EmailAddress);
@@ -253,12 +253,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         const string request = "/setemail unittest@unittest.com";
 
-        MessageController messageController = new(dbMock, mailMock.Object);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
-        IActionResult result = await messageController.Filter();
+        IActionResult result = await messageController.Filter(mailMock.Object);
 
         Assert.IsType<OkResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -278,12 +278,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         const string request = "/setemail unittest@unittest.com";
 
-        MessageController messageController = new(dbMock, mailMock.Object);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
-        IActionResult result = await messageController.Filter();
+        IActionResult result = await messageController.Filter(mailMock.Object);
 
         Assert.IsType<OkResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -303,15 +303,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         const string request = "/setemail unittestinvalidemail@@@";
 
-        MessageController messageController = new(dbMock, mailMock.Object);
+        MessageController messageController = new(dbMock);
         messageController.SetupTestController(request);
 
         ServerConfiguration.Instance.Mail.MailEnabled = true;
 
-        IActionResult result = await messageController.Filter();
+        IActionResult result = await messageController.Filter(mailMock.Object);
 
         Assert.IsType<OkResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
-    
 }

@@ -38,7 +38,7 @@ public class CommentEntity
     public int ThumbsUp { get; set; }
     public int ThumbsDown { get; set; }
 
-    public string getComment()
+    public string GetCommentMessage()
     {
         if (!this.Deleted)
         {

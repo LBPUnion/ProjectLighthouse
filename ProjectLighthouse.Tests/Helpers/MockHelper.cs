@@ -14,8 +14,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using Moq.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Tests.Helpers;
 
@@ -108,26 +106,6 @@ public static class MockHelper
         await context.SaveChangesAsync();
         await context.DisposeAsync();
         return new DatabaseContext(options);
-    }
-
-    public static Mock<DatabaseContext> GetDatabaseMock(List<UserEntity>? users = null, List<GameTokenEntity>? tokens = null)
-    {
-        users ??= new List<UserEntity>
-        {
-            GetUnitTestUser(),
-        };
-
-        tokens ??= new List<GameTokenEntity>
-        {
-            GetUnitTestToken(),
-        };
-        Mock<DatabaseContext> mock = new();
-        mock.SetupGet(x => x.Users).ReturnsDbSet(users);
-        mock.SetupGet(x => x.GameTokens).ReturnsDbSet(tokens);
-        mock.Setup(x => x.Users.FindAsync(It.IsAny<object[]>()))
-            .Returns<object[]>(async objects =>
-                await Task.FromResult(users.FirstOrDefault(u => u.UserId == (int)objects[0])));
-        return mock;
     }
 
     public static void SetupTestController(this ControllerBase controllerBase, string? body = null)

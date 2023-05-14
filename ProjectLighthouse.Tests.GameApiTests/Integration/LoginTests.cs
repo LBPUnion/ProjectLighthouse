@@ -29,9 +29,9 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
 
-        const HttpStatusCode expectedStatus = HttpStatusCode.OK;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
 
-        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -47,9 +47,9 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
 
-        const HttpStatusCode expectedStatus = HttpStatusCode.BadRequest;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
 
-        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
     
     [Fact]
@@ -65,9 +65,9 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
 
-        const HttpStatusCode expectedStatus = HttpStatusCode.BadRequest;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
 
-        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -90,9 +90,9 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
         
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
 
-        const HttpStatusCode expectedStatus = HttpStatusCode.BadRequest;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
 
-        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
@@ -114,9 +114,9 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
         HttpResponseMessage response =
             await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
 
-        const HttpStatusCode expectedStatus = HttpStatusCode.Forbidden;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.Forbidden;
 
-        Assert.Equal(expectedStatus, response.StatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
 }

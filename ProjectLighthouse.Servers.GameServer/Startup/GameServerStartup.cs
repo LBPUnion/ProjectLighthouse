@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -52,11 +53,15 @@ public class GameServerStartup
         );
 
         services.AddDbContext<DatabaseContext>(builder =>
+        {
             builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
-                MySqlServerVersion.LatestSupportedServerVersion));
+                MySqlServerVersion.LatestSupportedServerVersion);
+        });
 
-        services.AddSingleton<MailQueueService>(x =>
-            ActivatorUtilities.CreateInstance<MailQueueService>(x, new SmtpMailSender()));
+        IMailService mailService = ServerConfiguration.Instance.Mail.MailEnabled
+            ? new MailQueueService(new SmtpMailSender())
+            : new NullMailService();
+        services.AddSingleton(mailService);
 
         services.Configure<ForwardedHeadersOptions>
         (

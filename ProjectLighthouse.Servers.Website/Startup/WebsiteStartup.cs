@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -48,11 +49,15 @@ public class WebsiteStartup
         #endif
 
         services.AddDbContext<DatabaseContext>(builder =>
+        {
             builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
-                MySqlServerVersion.LatestSupportedServerVersion));
+                MySqlServerVersion.LatestSupportedServerVersion);
+        });
 
-        services.AddSingleton<MailQueueService>(x =>
-            ActivatorUtilities.CreateInstance<MailQueueService>(x, new SmtpMailSender()));
+        IMailService mailService = ServerConfiguration.Instance.Mail.MailEnabled
+            ? new MailQueueService(new SmtpMailSender())
+            : new NullMailService();
+        services.AddSingleton(mailService);
 
         services.AddHttpClient<ICaptchaService, CaptchaService>("CaptchaAPI",
             client =>

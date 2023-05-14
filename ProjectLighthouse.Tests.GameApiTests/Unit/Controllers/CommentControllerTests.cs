@@ -16,7 +16,6 @@ namespace ProjectLighthouse.Tests.GameApiTests.Unit.Controllers;
 [Trait("Category", "Unit")]
 public class CommentControllerTests
 {
-
     [Fact]
     public async Task PostComment_ShouldPostProfileComment_WhenBodyIsValid()
     {
@@ -215,15 +214,6 @@ public class CommentControllerTests
 
         Assert.IsType<BadRequestResult>(result);
     }
-    /*
-     * ---------------------------------
-     * | slotType |  slotId  | username
-     * |--------------------------------
-     * |  valid   |  invalid | invalid  | invalid
-     * |
-     * |
-     * |
-     */
 
     [Fact]
     public async Task PostComment_ShouldFail_WhenSlotTypeAndUsernameAreProvided()

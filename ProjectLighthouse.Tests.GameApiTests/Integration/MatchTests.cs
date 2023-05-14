@@ -1,6 +1,6 @@
 using System;
+using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -15,45 +15,41 @@ namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 [Trait("Category", "Integration")]
 public class MatchTests : LighthouseServerTest<GameServerTestStartup>
 {
-    private static readonly SemaphoreSlim semaphore = new(1, 1);
-
     [Fact]
-    public async Task ShouldRejectEmptyData()
+    public async Task Match_ShouldRejectEmptyData()
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
         LoginResult loginResult = await this.Authenticate();
-        await semaphore.WaitAsync();
 
         HttpResponseMessage result = await this.AuthenticatedUploadDataRequest("/LITTLEBIGPLANETPS3_XML/match", Array.Empty<byte>(), loginResult.AuthTicket);
 
-        semaphore.Release();
-        Assert.False(result.IsSuccessStatusCode);
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatusCode, result.StatusCode);
     }
 
     [Fact]
-    public async Task ShouldReturnOk()
+    public async Task Match_ShouldReturnOk_WithGoodRequest()
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
         LoginResult loginResult = await this.Authenticate();
-        await semaphore.WaitAsync();
 
         HttpResponseMessage result = await this.AuthenticatedUploadDataRequest
             ("/LITTLEBIGPLANETPS3_XML/match", "[UpdateMyPlayerData,[\"Player\":\"1984\"]]"u8.ToArray(), loginResult.AuthTicket);
 
-        semaphore.Release();
-        Assert.True(result.IsSuccessStatusCode);
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, result.StatusCode);
     }
 
     [Fact]
-    public async Task ShouldIncrementPlayerCount()
+    public async Task Match_ShouldIncrementPlayerCount()
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
         LoginResult loginResult = await this.Authenticate();
-
-        await semaphore.WaitAsync();
 
         await using DatabaseContext database = DatabaseContext.CreateNewInstance();
 
@@ -62,11 +58,12 @@ public class MatchTests : LighthouseServerTest<GameServerTestStartup>
         HttpResponseMessage result = await this.AuthenticatedUploadDataRequest
             ("/LITTLEBIGPLANETPS3_XML/match", "[UpdateMyPlayerData,[\"Player\":\"1984\"]]"u8.ToArray(), loginResult.AuthTicket);
 
-        Assert.True(result.IsSuccessStatusCode);
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, result.StatusCode);
 
         int playerCount = await StatisticsHelper.RecentMatches(database);
 
-        semaphore.Release();
         Assert.Equal(oldPlayerCount + 1, playerCount);
     }
 }

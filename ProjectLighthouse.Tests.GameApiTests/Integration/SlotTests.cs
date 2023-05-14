@@ -1,9 +1,7 @@
-using System;
+using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tests.Integration;
@@ -51,10 +49,10 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
         HttpResponseMessage respMessageB = await this.AuthenticatedRequest
             ($"/LITTLEBIGPLANETPS3_XML/slots/by?u={userB.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
 
-        const int expectedStatusCode = 200;
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
 
-        Assert.Equal(expectedStatusCode, (int)respMessageA.StatusCode);
-        Assert.Equal(expectedStatusCode, (int)respMessageB.StatusCode);
+        Assert.Equal(expectedStatusCode, respMessageA.StatusCode);
+        Assert.Equal(expectedStatusCode, respMessageB.StatusCode);
 
         string respA = await respMessageA.Content.ReadAsStringAsync();
         string respB = await respMessageB.Content.ReadAsStringAsync();

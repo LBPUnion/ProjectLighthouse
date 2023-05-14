@@ -25,7 +25,5 @@ public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
 
         Assert.NotNull(userA);
         Assert.NotNull(userB);
-
-        await database.RemoveUser(userA); // Only remove userA since userA and userB are the same user
     }
 }
