@@ -23,7 +23,7 @@ public static class FormattingExtensions
             } => "This level is designed for LittleBigPlanet 1 only.",
             {
                 CrossControllerRequired: true,
-            } => "This level is designed to be played in Cross-Controller mode.",
+            } => "This level is designed to be played in Cross-Controller mode using a PlayStation Vita system.",
             {
                 MoveRequired: true,
             } => "This level requires a PlayStation Move controller.",
