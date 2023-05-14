@@ -6,17 +6,17 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 
 public static class FormattingExtensions
 {
-    public static string GetLevelLockIcon(this SlotEntity slot) => slot.InitiallyLocked ? "ui white icon lock" : "";
-    public static string GetTeamPickedIcon(this SlotEntity slot) => slot.TeamPick ? "ui pink icon certificate" : "";
+    private static string GetLevelLockIcon(this SlotEntity slot) => slot.InitiallyLocked ? "ui white icon lock" : "";
+    private static string GetTeamPickedIcon(this SlotEntity slot) => slot.TeamPick ? "ui pink icon certificate" : "";
 
     // ReSharper disable once UnusedParameter.Global
-    public static string GetLevelWarningIcon
+    private static string GetLevelWarningIcon
         (this SlotEntity slot) =>
         slot.Lbp1Only || slot.CrossControllerRequired || slot.MoveRequired ? "ui orange icon exclamation circle" : "";
 
     [SuppressMessage("ReSharper", "ArrangeTrailingCommaInSinglelineLists")]
     // These messages are sorted by logical priority. No two should happen at once.
-    public static string GetLevelWarningText(this SlotEntity slot)
+    private static string GetLevelWarningText(this SlotEntity slot)
     {
         return slot switch
         {
@@ -31,6 +31,16 @@ public static class FormattingExtensions
             } => "This level requires a PlayStation Move controller.",
             _ => "",
         };
+    }
+
+    public static string RenderAllIcons(this SlotEntity slot)
+    { 
+        string GenerateIconHtml(string icon, string? title) => $"<i class=\"{icon}\" title=\"{title}\"></i>";
+
+        return string.Join("\n",
+            GenerateIconHtml(slot.GetLevelLockIcon(), null),
+            GenerateIconHtml(slot.GetTeamPickedIcon(), null),
+            GenerateIconHtml(slot.GetLevelWarningIcon(), slot.GetLevelWarningText()));
     }
 
     public static string ToHtmlColor(this PermissionLevel permissionLevel)
