@@ -26,7 +26,6 @@ public class PasswordResetRequestForm : BaseLayout
     [UsedImplicitly]
     public async Task<IActionResult> OnPost(string email)
     {
-
         if (!ServerConfiguration.Instance.Mail.MailEnabled)
         {
             this.Error = "Email is not configured on this server, so password resets cannot be issued. Please contact your instance administrator for more details.";
