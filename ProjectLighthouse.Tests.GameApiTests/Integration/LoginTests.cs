@@ -5,100 +5,118 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
-using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Users;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Tests;
+namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 
+[Trait("Category", "Integration")]
 public class LoginTests : LighthouseServerTest<GameServerTestStartup>
 {
     [Fact]
     public async Task ShouldLoginWithGoodTicket()
     {
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        await IntegrationHelper.GetIntegrationDatabase();
+
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.True(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
     public async Task ShouldNotLoginWithExpiredTicket()
     {
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        await IntegrationHelper.GetIntegrationDatabase();
+
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .setExpirationTime((ulong)TimeHelper.TimestampMillis - 1000 * 60)
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
     
     [Fact]
     public async Task ShouldNotLoginWithBadTitleId()
     {
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        await IntegrationHelper.GetIntegrationDatabase();
+
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .SetTitleId("UP9000-BLUS30079_00")
             .Build();
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
     public async Task ShouldNotLoginWithBadSignature()
     {
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
+        await IntegrationHelper.GetIntegrationDatabase();
+
+        UserEntity user = await this.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
         // Create second ticket and replace the first tickets signature with the first.
         byte[] ticketData2 = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
 
         Array.Copy(ticketData2, ticketData2.Length - 0x38, ticketData, ticketData.Length - 0x38, 0x38);
         
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
     [Fact]
     public async Task ShouldNotLoginIfBanned()
     {
-        string username = await this.CreateRandomUser();
-        ulong userId = (ulong)Convert.ToInt32(username["unitTestUser".Length..]);
-        await using DatabaseContext database = new();
-        UserEntity user = await database.Users.FirstAsync(u => u.Username == username);
+        DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+
+        UserEntity user = await this.CreateRandomUser();
+
         user.PermissionLevel = PermissionLevel.Banned;
+
+        database.Users.Update(user);
         await database.SaveChangesAsync();
 
         byte[] ticketData = new TicketBuilder()
-            .SetUsername(username)
-            .SetUserId(userId)
+            .SetUsername(user.Username)
+            .SetUserId((ulong)user.UserId)
             .Build();
         HttpResponseMessage response =
             await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", new ByteArrayContent(ticketData));
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.Forbidden;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
 }

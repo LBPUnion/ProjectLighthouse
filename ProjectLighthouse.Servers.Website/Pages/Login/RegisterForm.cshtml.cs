@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +16,12 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class RegisterForm : BaseLayout
 {
+    public readonly IMailService Mail;
     private readonly ICaptchaService captchaService;
 
-    public RegisterForm(DatabaseContext database, ICaptchaService captchaService) : base(database)
+    public RegisterForm(DatabaseContext database, IMailService mail, ICaptchaService captchaService) : base(database)
     {
+        this.Mail = mail;
         this.captchaService = captchaService;
     }
 
@@ -79,6 +82,8 @@ public class RegisterForm : BaseLayout
         }
 
         UserEntity user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
+
+        if(ServerConfiguration.Instance.Mail.MailEnabled) SMTPHelper.SendRegistrationEmail(this.Mail, user);
 
         WebTokenEntity webToken = new()
         {

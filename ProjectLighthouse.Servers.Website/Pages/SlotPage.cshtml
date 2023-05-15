@@ -55,7 +55,7 @@
                 string[] authorLabels;
                 if (Model.Slot?.GameVersion == GameVersion.LittleBigPlanet1)
                 {
-                    authorLabels = Model.Slot.LevelTags(new DatabaseContext());
+                    authorLabels = Model.Slot.LevelTags(DatabaseContext.CreateNewInstance());
                 }
                 else
                 {

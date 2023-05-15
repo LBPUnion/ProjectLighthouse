@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Concurrent;
-using System.Net;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 
-namespace LBPUnion.ProjectLighthouse.Helpers;
+namespace LBPUnion.ProjectLighthouse.Mail;
 
-public partial class SMTPHelper
+public class MailQueueService : IMailService, IDisposable
 {
-    internal static readonly SMTPHelper Instance = new();
-
     private readonly MailAddress fromAddress;
 
     private readonly ConcurrentQueue<EmailEntry> emailQueue = new();
@@ -24,13 +22,15 @@ public partial class SMTPHelper
 
     private readonly Task emailThread;
 
-    private SMTPHelper()
+    private readonly IMailSender mailSender;
+
+    public MailQueueService(IMailSender mailSender)
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled) return;
 
-        this.fromAddress = new MailAddress(ServerConfiguration.Instance.Mail.FromAddress, ServerConfiguration.Instance.Mail.FromName);
+        this.mailSender = mailSender;
 
-        this.stopSignal = false;
+        this.fromAddress = new MailAddress(ServerConfiguration.Instance.Mail.FromAddress, ServerConfiguration.Instance.Mail.FromName);
         this.emailThread = Task.Factory.StartNew(this.EmailQueue);
     }
 
@@ -43,12 +43,7 @@ public partial class SMTPHelper
 
             try
             {
-                using SmtpClient client = new(ServerConfiguration.Instance.Mail.Host, ServerConfiguration.Instance.Mail.Port)
-                {
-                    EnableSsl = ServerConfiguration.Instance.Mail.UseSSL,
-                    Credentials = new NetworkCredential(ServerConfiguration.Instance.Mail.Username, ServerConfiguration.Instance.Mail.Password),
-                };
-                await client.SendMailAsync(entry.Message);
+                this.mailSender.SendEmail(entry.Message);
                 entry.Result.SetResult(true);
             }
             catch (Exception e)
@@ -59,27 +54,31 @@ public partial class SMTPHelper
         }
     }
 
-    public static void Dispose()
+    public void Dispose()
     {
-        Instance.stopSignal = true;
-        Instance.emailThread.Wait();
-        Instance.emailThread.Dispose();
+        this.stopSignal = true;
+        if (this.emailThread != null)
+        {
+            this.emailThread.Wait();
+            this.emailThread.Dispose();
+        }
+        GC.SuppressFinalize(this);
     }
 
-    public static void SendEmail(string recipientAddress, string subject, string body)
+    public void SendEmail(string recipientAddress, string subject, string body)
     {
         TaskCompletionSource<bool> resultTask = new();
-        Instance.SendEmail(recipientAddress, subject, body, resultTask);
+        this.SendEmail(recipientAddress, subject, body, resultTask);
     }
 
-    public static Task<bool> SendEmailAsync(string recipientAddress, string subject, string body)
+    public Task<bool> SendEmailAsync(string recipientAddress, string subject, string body)
     {
         TaskCompletionSource<bool> resultTask = new();
-        Instance.SendEmail(recipientAddress, subject, body, resultTask);
+        this.SendEmail(recipientAddress, subject, body, resultTask);
         return resultTask.Task;
     }
 
-    public void SendEmail(string recipientAddress, string subject, string body, TaskCompletionSource<bool> resultTask)
+    private void SendEmail(string recipientAddress, string subject, string body, TaskCompletionSource<bool> resultTask)
     {
         if (!ServerConfiguration.Instance.Mail.MailEnabled)
         {
@@ -87,7 +86,7 @@ public partial class SMTPHelper
             return;
         }
 
-        MailMessage message = new(Instance.fromAddress, new MailAddress(recipientAddress))
+        MailMessage message = new(this.fromAddress, new MailAddress(recipientAddress))
         {
             Subject = subject,
             Body = body,
@@ -97,10 +96,10 @@ public partial class SMTPHelper
         this.emailSemaphore.Release();
     }
 
-    internal class EmailEntry
+    private class EmailEntry
     {
-        public MailMessage Message { get; set; }
-        public TaskCompletionSource<bool> Result { get; set; }
+        public MailMessage Message { get; }
+        public TaskCompletionSource<bool> Result { get; }
 
         public EmailEntry(MailMessage message, TaskCompletionSource<bool> result)
         {
