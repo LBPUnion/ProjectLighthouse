@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Filter;
@@ -23,7 +22,7 @@ public struct GenericUserResponse<T> : ILbpSerializable, IHasCustomRoot where T 
         this.RootTag = rootElement;
         this.Users = users;
         this.Total = pageData.MaxElements;
-        this.HintStart = pageData.PageStart + Math.Min(pageData.PageSize, pageData.MaxElements);
+        this.HintStart = pageData.HintStart;
     }
 
     public GenericUserResponse(string rootElement, List<T> users)
@@ -33,7 +32,7 @@ public struct GenericUserResponse<T> : ILbpSerializable, IHasCustomRoot where T 
     }
 
     [XmlIgnore]
-    public string RootTag { get; set; }
+    private string RootTag { get; }
 
     [XmlElement("user")]
     public List<T> Users { get; set; }

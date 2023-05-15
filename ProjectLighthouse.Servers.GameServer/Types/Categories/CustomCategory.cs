@@ -3,11 +3,11 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Filter.Filters;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
-using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
-public class CustomCategory : Category
+public class CustomCategory : SlotCategory
 {
     private readonly List<int> slotIds;
     public CustomCategory(string name, string description, string endpoint, string icon, IEnumerable<int> slotIds)
@@ -35,7 +35,9 @@ public class CustomCategory : Category
     public sealed override string IconHash { get; set; }
     public sealed override string Endpoint { get; set; }
 
-    public override IQueryable<SlotEntity> GetSlots(DatabaseContext database, SlotQueryBuilder queryBuilder)
+    public override string Tag => "custom_category";
+
+    public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity entity, SlotQueryBuilder queryBuilder)
     {
         queryBuilder.Clone().AddFilter(new SlotIdFilter(this.slotIds));
         return database.Slots.Where(queryBuilder.Build());

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Filter;
@@ -23,7 +22,7 @@ public struct GenericSlotResponse : ILbpSerializable, IHasCustomRoot
         this.RootTag = rootElement;
         this.Slots = slots;
         this.Total = pageData.MaxElements;
-        this.HintStart = pageData.PageStart + Math.Min(pageData.PageSize, pageData.MaxElements);
+        this.HintStart = pageData.HintStart;
     }
 
     public GenericSlotResponse(List<SlotBase> slots, PaginationData pageData) : this("slots", slots, pageData) { }

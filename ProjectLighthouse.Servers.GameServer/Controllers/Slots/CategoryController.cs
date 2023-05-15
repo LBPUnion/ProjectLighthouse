@@ -41,17 +41,26 @@ public class CategoryController : ControllerBase
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
 
+        PaginationData pageData = this.Request.GetPaginationData();
+
+        pageData.MaxElements = CategoryHelper.Categories.Count;
+
+        if (!int.TryParse(this.Request.Query["num_categories_with_results"], out int results)) results = 5;
+
         List<GameCategory> categories = new();
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
 
-        foreach (Category category in CategoryHelper.Categories.ToList())
+        foreach (Category category in CategoryHelper.Categories.Skip(Math.Max(0, pageData.PageStart - 1))
+                     .Take(Math.Min(pageData.PageSize, pageData.MaxElements))
+                     .ToList())
         {
-            if(category is CategoryWithUser categoryWithUser) categories.Add(await categoryWithUser.Serialize(this.database, user, queryBuilder));
-            else categories.Add(await category.Serialize(this.database, queryBuilder));
+            int numResults = results > 0 ? 1 : 0;
+            categories.Add(await category.Serialize(this.database, token, queryBuilder, numResults));
+            results--;
         }
 
-        return this.Ok(new CategoryListResponse(categories, CategoryHelper.Categories.Count, 0, 1));
+        return this.Ok(new CategoryListResponse(categories, pageData.MaxElements, "", pageData.HintStart));
     }
 
     [HttpGet("searches/{endpointName}")]
@@ -69,22 +78,48 @@ public class CategoryController : ControllerBase
 
         Logger.Debug("Found category " + category, LogArea.Category);
 
-        IQueryable<SlotEntity> slotQuery;
-
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
 
-        if (category is CategoryWithUser categoryWithUser)
+        GenericSerializableList returnList = category switch
         {
-            int totalSlots = await categoryWithUser.GetSlots(this.database, user, queryBuilder).CountAsync();
-            pageData.MaxElements = totalSlots;
-            slotQuery = categoryWithUser.GetSlots(this.database, user, queryBuilder).ApplyPagination(pageData);
-        }
-        else
-        {
-            int totalSlots = await category.GetSlots(this.database, queryBuilder).CountAsync();
-            pageData.MaxElements = totalSlots;
-            slotQuery = category.GetSlots(this.database, queryBuilder).ApplyPagination(pageData);
-        }
+            SlotCategory gc => await this.GetSlotCategory(gc, token, queryBuilder, pageData),
+            PlaylistCategory pc => await this.GetPlaylistCategory(pc, token, pageData),
+            UserCategory uc => await this.GetUserCategory(uc, token, pageData),
+            _ => new GenericSerializableList(),
+        };
+
+        return this.Ok(returnList);
+    }
+
+    private async Task<GenericSerializableList> GetUserCategory(UserCategory category, GameTokenEntity token, PaginationData pageData)
+    {
+        int totalPlaylists = await category.GetItems(this.database, token).CountAsync();
+        pageData.MaxElements = totalPlaylists;
+        IQueryable<UserEntity> playlistQuery = category.GetItems(this.database, token).ApplyPagination(pageData);
+
+        List<ILbpSerializable> slots =
+            (await playlistQuery.ToListAsync()).ToSerializableList<UserEntity, ILbpSerializable>(GameUser
+                .CreateFromEntity);
+        return new GenericSerializableList(slots, pageData);
+    }
+
+    private async Task<GenericSerializableList> GetPlaylistCategory(PlaylistCategory category, GameTokenEntity token, PaginationData pageData)
+    {
+        int totalPlaylists = await category.GetItems(this.database, token).CountAsync();
+        pageData.MaxElements = totalPlaylists;
+        IQueryable<PlaylistEntity> playlistQuery = category.GetItems(this.database, token).ApplyPagination(pageData);
+
+        List<ILbpSerializable> slots =
+            (await playlistQuery.ToListAsync()).ToSerializableList<PlaylistEntity, ILbpSerializable>(GamePlaylist
+                .CreateFromEntity);
+        return new GenericSerializableList(slots, pageData);
+    }
+
+    private async Task<GenericSerializableList> GetSlotCategory(SlotCategory category, GameTokenEntity token, SlotQueryBuilder queryBuilder, PaginationData pageData)
+    {
+        int totalSlots = await category.GetItems(this.database, token, queryBuilder).CountAsync();
+        pageData.MaxElements = totalSlots;
+        IQueryable<SlotEntity> slotQuery = category.GetItems(this.database, token, queryBuilder).ApplyPagination(pageData);
 
         if (bool.TryParse(this.Request.Query["includePlayed"], out bool includePlayed) && !includePlayed)
         {
@@ -126,10 +161,10 @@ public class CategoryController : ControllerBase
             };
         }
 
-        List<SlotBase> slots = (await slotQuery.ToListAsync())
-            .ToSerializableList(s => SlotBase.CreateFromEntity(s, token));
-
-        return this.Ok(new GenericSlotResponse("results", slots, pageData));
+        List<ILbpSerializable> slots =
+            (await slotQuery.ToListAsync()).ToSerializableList<SlotEntity, ILbpSerializable>(s =>
+                SlotBase.CreateFromEntity(s, token));
+        return new GenericSerializableList(slots, pageData);
     }
 
 }

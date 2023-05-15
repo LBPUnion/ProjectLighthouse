@@ -24,10 +24,18 @@ public class GameCategory : ILbpSerializable
     [XmlArrayItem("sort")]
     public string[] Sorts { get; set; }
 
-    [XmlElement("results")]
-    public GenericSlotResponse Results { get; set; }
+    [DefaultValue("")]
+    [XmlArray("types")]
+    [XmlArrayItem("type")]
+    public string[] Types { get; set; }
 
-    public static GameCategory CreateFromEntity(Category category, GenericSlotResponse results) =>
+    [XmlElement("tag")]
+    public string Tag { get; set; }
+
+    [XmlElement("results")]
+    public GenericSerializableList Results { get; set; }
+
+    public static GameCategory CreateFromEntity(Category category, GenericSerializableList results) =>
         new()
         {
             Name = category.Name,
@@ -35,6 +43,8 @@ public class GameCategory : ILbpSerializable
             Icon = category.IconHash,
             Url = category.IngameEndpoint,
             Sorts = category.Sorts,
+            Types = category.Types,
+            Tag = category.Tag,
             Results = results,
         };
 
