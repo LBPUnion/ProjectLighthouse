@@ -96,7 +96,7 @@ public class CommentController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         GameComment? comment = await this.DeserializeBody<GameComment>();
-        if (comment == null) return this.BadRequest();
+        if (comment?.Message == null) return this.BadRequest();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 

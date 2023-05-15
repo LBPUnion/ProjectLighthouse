@@ -25,7 +25,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands
             }
             key.Key = CryptoHelper.GenerateAuthToken();
             key.Created = DateTime.Now;
-            DatabaseContext database = new();
+            DatabaseContext database = DatabaseContext.CreateNewInstance();
             await database.APIKeys.AddAsync(key);
             await database.SaveChangesAsync();
             logger.LogSuccess($"The API key has been created (id: {key.Id}), however for security the token will only be shown once.", LogArea.Command);

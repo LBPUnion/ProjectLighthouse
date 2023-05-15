@@ -1,32 +1,30 @@
-using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
-using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Tests;
+namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 
+[Trait("Category", "Integration")]
 public class SlotTests : LighthouseServerTest<GameServerTestStartup>
 {
-    [DatabaseFact]
+    [Fact]
     public async Task ShouldOnlyShowUsersLevels()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
-        Random r = new();
-
-        UserEntity userA = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
-        UserEntity userB = await database.CreateUser($"unitTestUser{r.Next()}", CryptoHelper.GenerateAuthToken());
+        UserEntity userA = await this.CreateRandomUser();
+        UserEntity userB = await this.CreateRandomUser();
 
         SlotEntity slotA = new()
         {
-            Creator = userA,
             CreatorId = userA.UserId,
             Name = "slotA",
             ResourceCollection = "",
@@ -34,7 +32,6 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
 
         SlotEntity slotB = new()
         {
-            Creator = userB,
             CreatorId = userB.UserId,
             Name = "slotB",
             ResourceCollection = "",
@@ -48,31 +45,23 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage respMessageA = await this.AuthenticatedRequest
-            ($"LITTLEBIGPLANETPS3_XML/slots/by?u={userA.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
+            ($"/LITTLEBIGPLANETPS3_XML/slots/by?u={userA.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
         HttpResponseMessage respMessageB = await this.AuthenticatedRequest
-            ($"LITTLEBIGPLANETPS3_XML/slots/by?u={userB.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
+            ($"/LITTLEBIGPLANETPS3_XML/slots/by?u={userB.Username}&pageStart=1&pageSize=1", loginResult.AuthTicket);
 
-        Assert.True(respMessageA.IsSuccessStatusCode);
-        Assert.True(respMessageB.IsSuccessStatusCode);
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, respMessageA.StatusCode);
+        Assert.Equal(expectedStatusCode, respMessageB.StatusCode);
 
         string respA = await respMessageA.Content.ReadAsStringAsync();
         string respB = await respMessageB.Content.ReadAsStringAsync();
 
-        Assert.False(string.IsNullOrEmpty(respA));
-        Assert.False(string.IsNullOrEmpty(respB));
+        Assert.NotNull(respA);
+        Assert.NotNull(respB);
 
         Assert.NotEqual(respA, respB);
         Assert.DoesNotContain(respA, "slotB");
         Assert.DoesNotContain(respB, "slotA");
-
-        // Cleanup
-
-        database.Slots.Remove(slotA);
-        database.Slots.Remove(slotB);
-
-        await database.RemoveUser(userA);
-        await database.RemoveUser(userB);
-
-        await database.SaveChangesAsync();
     }
 }

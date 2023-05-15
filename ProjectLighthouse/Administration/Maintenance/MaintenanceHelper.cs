@@ -71,7 +71,7 @@ public static class MaintenanceHelper
 
     public static async Task RunMigration(IMigrationTask migrationTask, DatabaseContext? database = null)
     {
-        database ??= new DatabaseContext();
+        database ??= DatabaseContext.CreateNewInstance();
 
         // Migrations should never be run twice.
         Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name));

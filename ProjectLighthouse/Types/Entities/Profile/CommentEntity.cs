@@ -38,7 +38,7 @@ public class CommentEntity
     public int ThumbsUp { get; set; }
     public int ThumbsDown { get; set; }
 
-    public string getComment()
+    public string GetCommentMessage()
     {
         if (!this.Deleted)
         {
@@ -50,7 +50,7 @@ public class CommentEntity
             return "This comment has been deleted by the author.";
         }
 
-        using DatabaseContext database = new();
+        using DatabaseContext database = DatabaseContext.CreateNewInstance();
         UserEntity deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
 
         if (deletedBy != null && deletedBy.UserId == this.TargetId)

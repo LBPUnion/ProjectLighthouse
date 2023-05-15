@@ -21,7 +21,7 @@ public static class CategoryHelper
         Categories.Add(new HeartedCategory());
         Categories.Add(new LuckyDipCategory());
 
-        using DatabaseContext database = new();
+        using DatabaseContext database = DatabaseContext.CreateNewInstance();
         foreach (DatabaseCategoryEntity category in database.CustomCategories) Categories.Add(new CustomCategory(category));
     }
 }

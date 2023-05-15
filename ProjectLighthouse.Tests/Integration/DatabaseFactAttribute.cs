@@ -3,7 +3,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests;
+namespace LBPUnion.ProjectLighthouse.Tests.Integration;
 
 public sealed class DatabaseFactAttribute : FactAttribute
 {
@@ -16,7 +16,7 @@ public sealed class DatabaseFactAttribute : FactAttribute
         else
             lock (migrateLock)
             {
-                using DatabaseContext database = new();
+                using DatabaseContext database = DatabaseContext.CreateNewInstance();
                 database.Database.Migrate();
             }
     }
