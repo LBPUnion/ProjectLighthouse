@@ -80,7 +80,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     ///     The response sent is the text that will appear in-game.
     /// </summary>
     [HttpPost("filter")]
-    public async Task<IActionResult> Filter([FromServices] IMailService mailService)
+    public async Task<IActionResult> Filter(IMailService mailService)
     {
         GameTokenEntity token = this.GetToken();
 
