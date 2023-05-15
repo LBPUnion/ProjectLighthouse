@@ -492,13 +492,13 @@ public class FilterTests
     [Fact]
     public void PlayerCountFilter_ShouldReject_WhenHigherThanMaxPlayers()
     {
-        PlayerCountFilter playerCountFilter = new(maxPlayers: 4);
+        PlayerCountFilter playerCountFilter = new(maxPlayers: 2);
         Func<SlotEntity, bool> countFunc = playerCountFilter.GetPredicate().Compile();
 
         SlotEntity slot = new()
         {
             MinimumPlayers = 1,
-            MaximumPlayers = 1,
+            MaximumPlayers = 4,
         };
 
         Assert.False(countFunc(slot));
