@@ -20,7 +20,7 @@ public struct GenericSerializableList : ILbpSerializable
     {
         this.Items = new SerializableList<ILbpSerializable>();
         this.Items.AddRange(items);
-        this.Total = pageData.MaxElements;
+        this.Total = pageData.TotalElements;
         this.HintStart = pageData.HintStart;
     }
 

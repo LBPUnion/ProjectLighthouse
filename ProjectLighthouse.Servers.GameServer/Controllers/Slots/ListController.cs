@@ -46,7 +46,7 @@ public class ListController : ControllerBase
             .FirstOrDefaultAsync();
         if (targetUserId == 0) return this.BadRequest();
 
-        pageData.MaxElements = await this.database.QueuedLevels.CountAsync(q => q.UserId == targetUserId);
+        pageData.TotalElements = await this.database.QueuedLevels.CountAsync(q => q.UserId == targetUserId);
 
         IQueryable<SlotEntity> baseQuery = this.database.QueuedLevels.Where(h => h.UserId == targetUserId)
             .Include(q => q.Slot)
@@ -114,7 +114,7 @@ public class ListController : ControllerBase
             .FirstOrDefaultAsync();
         if (targetUserId == 0) return this.BadRequest();
 
-        pageData.MaxElements = await this.database.HeartedLevels.CountAsync(h => h.UserId == targetUserId);
+        pageData.TotalElements = await this.database.HeartedLevels.CountAsync(h => h.UserId == targetUserId);
 
         IQueryable<SlotEntity> baseQuery = this.database.HeartedLevels.Where(h => h.UserId == targetUserId)
             .Include(h => h.Slot)
@@ -181,26 +181,27 @@ public class ListController : ControllerBase
     #region Hearted Playlists
 
     [HttpGet("favouritePlaylists/{username}")]
-    public async Task<IActionResult> GetFavouritePlaylists(string username, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> GetFavouritePlaylists(string username)
     {
-        if (pageSize <= 0) return this.BadRequest();
 
         int targetUserId = await this.database.UserIdFromUsername(username);
         if (targetUserId == 0) return this.Forbid();
 
+        PaginationData pageData = this.Request.GetPaginationData();
+
         List<GamePlaylist> heartedPlaylists = (await this.database.HeartedPlaylists.Where(p => p.UserId == targetUserId)
             .Include(p => p.Playlist)
-            .Include(p => p.Playlist.Creator)
             .OrderByDescending(p => p.HeartedPlaylistId)
             .Select(p => p.Playlist)
+            .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(GamePlaylist.CreateFromEntity);
 
-        int total = await this.database.HeartedPlaylists.CountAsync(p => p.UserId == targetUserId);
+        pageData.TotalElements = await this.database.HeartedPlaylists.CountAsync(p => p.UserId == targetUserId);
 
         return this.Ok(new GenericPlaylistResponse<GamePlaylist>("favouritePlaylists", heartedPlaylists)
         {
-            Total = total,
-            HintStart = pageStart + Math.Min(pageSize, 30),
+            Total = pageData.TotalElements,
+            HintStart = pageData.HintStart,
         });
     }
 
@@ -248,7 +249,7 @@ public class ListController : ControllerBase
             .FirstOrDefaultAsync();
         if (targetUserId == 0) return this.BadRequest();
 
-        pageData.MaxElements = await this.database.HeartedProfiles.CountAsync(h => h.UserId == targetUserId);
+        pageData.TotalElements = await this.database.HeartedProfiles.CountAsync(h => h.UserId == targetUserId);
 
         List<GameUser> heartedProfiles = (await this.database.HeartedProfiles.Include(h => h.HeartedUser)
             .OrderBy(h => h.HeartedProfileId)

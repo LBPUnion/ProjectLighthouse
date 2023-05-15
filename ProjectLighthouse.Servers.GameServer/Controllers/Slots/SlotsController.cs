@@ -45,7 +45,7 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = await this.database.Slots.CountAsync(s => s.CreatorId == targetUserId);
+        pageData.TotalElements = await this.database.Slots.CountAsync(s => s.CreatorId == targetUserId);
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token).AddFilter(new CreatorFilter(targetUserId));
 
@@ -120,12 +120,8 @@ public class SlotsController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
-        SlotQueryBuilder queryBuilder = new SlotQueryBuilder().AddFilter(new GameVersionFilter(token.GameVersion))
-            .AddFilter(new SubLevelFilter())
-            .AddFilter(new HiddenSlotFilter())
-            .AddFilter(new SlotTypeFilter(SlotType.User));
-
-        SlotEntity? slot = await this.database.Slots.Where(queryBuilder.Build()).FirstOrDefaultAsync(s => s.SlotId == id);
+        SlotEntity? slot = await this.database.Slots.Where(this.GetDefaultFilters(token).Build())
+            .FirstOrDefaultAsync(s => s.SlotId == id);
 
         if (slot == null) return this.NotFound();
 
@@ -145,13 +141,15 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+
+        pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotEntity> sortBuilder = new();
         sortBuilder.AddSort(new FirstUploadedSort());
         sortBuilder.AddSort(new SlotIdSort());
 
-        List<SlotBase> slots = await this.database.GetSlots(token, this.FilterFromRequest(token), pageData, sortBuilder);
+        List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder);
 
         return this.Ok(new GenericSlotResponse(slots, pageData));
     }
@@ -176,7 +174,7 @@ public class SlotsController : ControllerBase
             .Select(r => r.SlotId)
             .ToList();
 
-        pageData.MaxElements = slotIdsWithTag.Count;
+        pageData.TotalElements = slotIdsWithTag.Count;
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token).AddFilter(0, new SlotIdFilter(slotIdsWithTag));
 
@@ -195,7 +193,9 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = await StatisticsHelper.SlotCount(this.database);
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+
+        pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotMetadata> sortBuilder = new();
         sortBuilder.AddSort(new RatingLBP1Sort());
@@ -207,7 +207,7 @@ public class SlotsController : ControllerBase
                 .Average(r => (double?)r.RatingLBP1) ?? 3.0,
         };
 
-        List<SlotBase> slots = await this.database.GetSlots(token, this.FilterFromRequest(token), pageData, sortBuilder, selectorFunc);
+        List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder, selectorFunc);
 
         return this.Ok(new GenericSlotResponse(slots, pageData));
     }
@@ -224,7 +224,7 @@ public class SlotsController : ControllerBase
             .Select(s => s.SlotId)
             .ToListAsync();
 
-        pageData.MaxElements = slotIdsWithTag.Count;
+        pageData.TotalElements = slotIdsWithTag.Count;
 
         SlotSortBuilder<SlotEntity> sortBuilder = new();
         sortBuilder.AddSort(new PlaysForGameSort(GameVersion.LittleBigPlanet1));
@@ -243,7 +243,7 @@ public class SlotsController : ControllerBase
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token).AddFilter(new TeamPickFilter());
 
-        pageData.MaxElements = await StatisticsHelper.TeamPickCountForGame(this.database, token.GameVersion);
+        pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotEntity> sortBuilder = new();
         sortBuilder.AddSort(new LastUpdatedSort());
@@ -260,12 +260,14 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+
+        pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotEntity> sortBuilder = new();
         sortBuilder.AddSort(new RandomFirstUploadedSort());
 
-        List<SlotBase> slots = await this.database.GetSlots(token, this.FilterFromRequest(token), pageData, sortBuilder);
+        List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder);
 
         return this.Ok(new GenericSlotResponse(slots, pageData));
     }
@@ -277,7 +279,9 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+
+        pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotMetadata> sortBuilder = new();
         sortBuilder.AddSort(new ThumbsUpSort());
@@ -288,7 +292,7 @@ public class SlotsController : ControllerBase
             ThumbsUp = this.database.RatedLevels.Count(r => r.SlotId == s.SlotId && r.Rating == 1),
         };
 
-        List<SlotBase> slots = await this.database.GetSlots(token, this.FilterFromRequest(token), pageData, sortBuilder, selectorFunc);
+        List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder, selectorFunc);
 
         return this.Ok(new GenericSlotResponse(slots, pageData));
     }
@@ -300,12 +304,14 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+
+        pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotEntity> sortBuilder = new();
         sortBuilder.AddSort(new UniquePlaysForGameSort(token.GameVersion));
 
-        List<SlotBase> slots = await this.database.GetSlots(token, this.FilterFromRequest(token), pageData, sortBuilder);
+        List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder);
 
         return this.Ok(new GenericSlotResponse(slots, pageData));
     }
@@ -317,7 +323,9 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = await StatisticsHelper.SlotCountForGame(this.database, token.GameVersion);
+        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+
+        pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotMetadata> sortBuilder = new();
         sortBuilder.AddSort(new HeartsSort());
@@ -328,7 +336,7 @@ public class SlotsController : ControllerBase
             Hearts = this.database.HeartedLevels.Count(r => r.SlotId == s.SlotId),
         };
 
-        List<SlotBase> slots = await this.database.GetSlots(token, this.FilterFromRequest(token), pageData, sortBuilder, selectorFunc);
+        List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder, selectorFunc);
 
         return this.Ok(new GenericSlotResponse(slots, pageData));
     }
@@ -357,7 +365,7 @@ public class SlotsController : ControllerBase
             playersBySlotId.Add(room.Slot.SlotId, playerCount);
         }
 
-        pageData.MaxElements = playersBySlotId.Count;
+        pageData.TotalElements = playersBySlotId.Count;
 
         List<int> orderedPlayersBySlotId = playersBySlotId.OrderByDescending(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
 

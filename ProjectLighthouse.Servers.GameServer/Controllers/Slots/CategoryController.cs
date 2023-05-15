@@ -43,7 +43,7 @@ public class CategoryController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.MaxElements = CategoryHelper.Categories.Count;
+        pageData.TotalElements = CategoryHelper.Categories.Count;
 
         if (!int.TryParse(this.Request.Query["num_categories_with_results"], out int results)) results = 5;
 
@@ -60,7 +60,7 @@ public class CategoryController : ControllerBase
             results--;
         }
 
-        return this.Ok(new CategoryListResponse(categories, pageData.MaxElements, "", pageData.HintStart));
+        return this.Ok(new CategoryListResponse(categories, pageData.TotalElements, "", pageData.HintStart));
     }
 
     [HttpGet("searches/{endpointName}")]
@@ -91,35 +91,35 @@ public class CategoryController : ControllerBase
         return this.Ok(returnList);
     }
 
-    private async Task<GenericSerializableList> GetUserCategory(UserCategory category, GameTokenEntity token, PaginationData pageData)
+    private async Task<GenericSerializableList> GetUserCategory(UserCategory userCategory, GameTokenEntity token, PaginationData pageData)
     {
-        int totalPlaylists = await category.GetItems(this.database, token).CountAsync();
-        pageData.MaxElements = totalPlaylists;
-        IQueryable<UserEntity> playlistQuery = category.GetItems(this.database, token).ApplyPagination(pageData);
+        int totalUsers = await userCategory.GetItems(this.database, token).CountAsync();
+        pageData.TotalElements = totalUsers;
+        IQueryable<UserEntity> userQuery = userCategory.GetItems(this.database, token).ApplyPagination(pageData);
 
-        List<ILbpSerializable> slots =
-            (await playlistQuery.ToListAsync()).ToSerializableList<UserEntity, ILbpSerializable>(GameUser
+        List<ILbpSerializable> users =
+            (await userQuery.ToListAsync()).ToSerializableList<UserEntity, ILbpSerializable>(GameUser
                 .CreateFromEntity);
-        return new GenericSerializableList(slots, pageData);
+        return new GenericSerializableList(users, pageData);
     }
 
-    private async Task<GenericSerializableList> GetPlaylistCategory(PlaylistCategory category, GameTokenEntity token, PaginationData pageData)
+    private async Task<GenericSerializableList> GetPlaylistCategory(PlaylistCategory playlistCategory, GameTokenEntity token, PaginationData pageData)
     {
-        int totalPlaylists = await category.GetItems(this.database, token).CountAsync();
-        pageData.MaxElements = totalPlaylists;
-        IQueryable<PlaylistEntity> playlistQuery = category.GetItems(this.database, token).ApplyPagination(pageData);
+        int totalPlaylists = await playlistCategory.GetItems(this.database, token).CountAsync();
+        pageData.TotalElements = totalPlaylists;
+        IQueryable<PlaylistEntity> playlistQuery = playlistCategory.GetItems(this.database, token).ApplyPagination(pageData);
 
-        List<ILbpSerializable> slots =
+        List<ILbpSerializable> playlists =
             (await playlistQuery.ToListAsync()).ToSerializableList<PlaylistEntity, ILbpSerializable>(GamePlaylist
                 .CreateFromEntity);
-        return new GenericSerializableList(slots, pageData);
+        return new GenericSerializableList(playlists, pageData);
     }
 
-    private async Task<GenericSerializableList> GetSlotCategory(SlotCategory category, GameTokenEntity token, SlotQueryBuilder queryBuilder, PaginationData pageData)
+    private async Task<GenericSerializableList> GetSlotCategory(SlotCategory slotCategory, GameTokenEntity token, SlotQueryBuilder queryBuilder, PaginationData pageData)
     {
-        int totalSlots = await category.GetItems(this.database, token, queryBuilder).CountAsync();
-        pageData.MaxElements = totalSlots;
-        IQueryable<SlotEntity> slotQuery = category.GetItems(this.database, token, queryBuilder).ApplyPagination(pageData);
+        int totalSlots = await slotCategory.GetItems(this.database, token, queryBuilder).CountAsync();
+        pageData.TotalElements = totalSlots;
+        IQueryable<SlotEntity> slotQuery = slotCategory.GetItems(this.database, token, queryBuilder).ApplyPagination(pageData);
 
         if (bool.TryParse(this.Request.Query["includePlayed"], out bool includePlayed) && !includePlayed)
         {

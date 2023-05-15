@@ -28,6 +28,12 @@ public static class ControllerExtensions
         };
     }
 
+    public static SlotQueryBuilder GetDefaultFilters(this ControllerBase controller, GameTokenEntity token) =>
+        new SlotQueryBuilder().AddFilter(new GameVersionFilter(token.GameVersion))
+            .AddFilter(new SubLevelFilter(token.UserId))
+            .AddFilter(new HiddenSlotFilter())
+            .AddFilter(new SlotTypeFilter(SlotType.User));
+
     public static SlotQueryBuilder FilterFromRequest(this ControllerBase controller, GameTokenEntity token)
     {
         SlotQueryBuilder queryBuilder = new();
@@ -81,7 +87,7 @@ public static class ControllerExtensions
             GameVersion targetVersion = token.GameVersion;
 
             if (targetVersion != GameVersion.LittleBigPlanet1)
-                queryBuilder.AddFilter(new ExcludeLBP1OnlyFilter(token.UserId));
+                queryBuilder.AddFilter(new ExcludeLBP1OnlyFilter(token.UserId, token.GameVersion));
 
             bool matchGameVersionExactly = false;
 
@@ -153,7 +159,7 @@ public static class ControllerExtensions
             }
         }
 
-        queryBuilder.AddFilter(new SubLevelFilter());
+        queryBuilder.AddFilter(new SubLevelFilter(token.UserId));
         queryBuilder.AddFilter(new HiddenSlotFilter());
         queryBuilder.AddFilter(new SlotTypeFilter(SlotType.User));
 

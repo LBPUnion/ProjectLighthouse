@@ -16,9 +16,9 @@ public static class QueryExtensions
 
     public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> queryable, PaginationData pagination)
     {
-        if (pagination.MaxElements == -1)
+        if (pagination.MaxElements <= 0)
         {
-            Logger.Warn($"ApplyPagination() called with MaxElements of -1\n{queryable.ToQueryString()}", LogArea.Database);
+            Logger.Warn($"ApplyPagination() called with MaxElements of {pagination.MaxElements}\n{queryable.ToQueryString()}", LogArea.Database);
             pagination.MaxElements = pagination.PageSize;
         }
         queryable = queryable.Skip(Math.Max(0, pagination.PageStart - 1));

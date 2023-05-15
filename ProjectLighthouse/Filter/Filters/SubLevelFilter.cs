@@ -8,20 +8,13 @@ namespace LBPUnion.ProjectLighthouse.Filter.Filters;
 
 public class SubLevelFilter : ISlotFilter
 {
-    private readonly bool includeSubLevels; 
+    private readonly int userId;
 
-    public SubLevelFilter(bool includeSubLevels = false)
+    public SubLevelFilter(int userId)
     {
-        this.includeSubLevels = includeSubLevels;
+        this.userId = userId;
     }
 
-    public Expression<Func<SlotEntity, bool>> GetPredicate()
-    {
-        Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.True<SlotEntity>();
-        if (!this.includeSubLevels)
-        {
-            predicate = predicate.And(s => !s.SubLevel);
-        }
-        return predicate;
-    }          
+    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
+        PredicateExtensions.True<SlotEntity>().And(s => !s.SubLevel || s.CreatorId == this.userId);
 }

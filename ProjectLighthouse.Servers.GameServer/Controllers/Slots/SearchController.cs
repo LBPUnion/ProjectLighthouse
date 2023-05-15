@@ -43,7 +43,7 @@ public class SearchController : ControllerBase
 
         queryBuilder.AddFilter(new TextFilter(query));
 
-        pageData.MaxElements = await this.database.Slots.Where(queryBuilder.Build()).CountAsync();
+        pageData.TotalElements = await this.database.Slots.Where(queryBuilder.Build()).CountAsync();
 
         List<SlotBase> slots = await this.database.Slots.Include(s => s.Creator)
             .GetSlots(token, queryBuilder, pageData, new SlotSortBuilder<SlotEntity>());

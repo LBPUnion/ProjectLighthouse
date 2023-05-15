@@ -5,8 +5,8 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
-using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +28,7 @@ public class ReviewController : ControllerBase
 
     // LBP1 rating
     [HttpPost("rate/user/{slotId:int}")]
-    public async Task<IActionResult> Rate(int slotId, [FromQuery] int rating)
+    public async Task<IActionResult> Rate(int slotId, int rating)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -57,7 +57,7 @@ public class ReviewController : ControllerBase
 
     // LBP2 and beyond rating
     [HttpPost("dpadrate/user/{slotId:int}")]
-    public async Task<IActionResult> DPadRate(int slotId, [FromQuery] int rating)
+    public async Task<IActionResult> DPadRate(int slotId, int rating)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -142,54 +142,47 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet("reviewsFor/user/{slotId:int}")]
-    public async Task<IActionResult> ReviewsFor(int slotId, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> ReviewsFor(int slotId)
     {
         GameTokenEntity token = this.GetToken();
 
-        if (pageSize <= 0) return this.BadRequest();
-
-        GameVersion gameVersion = token.GameVersion;
+        PaginationData pageData = this.Request.GetPaginationData();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slotId);
         if (slot == null) return this.BadRequest();
 
-        List<GameReview> reviews = (await this.database.Reviews.ByGameVersion(gameVersion, true)
+        List<GameReview> reviews = (await this.database.Reviews
             .Where(r => r.SlotId == slotId)
             .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
             .ThenByDescending(r => r.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
+            .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(r => GameReview.CreateFromEntity(r, token));
 
-
-        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart + Math.Min(pageSize, 30)));
+        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageData.HintStart));
     }
 
     [HttpGet("reviewsBy/{username}")]
-    public async Task<IActionResult> ReviewsBy(string username, [FromQuery] int pageStart = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> ReviewsBy(string username)
     {
         GameTokenEntity token = this.GetToken();
 
-        if (pageSize <= 0) return this.BadRequest();
-
-        GameVersion gameVersion = token.GameVersion;
+        PaginationData pageData = this.Request.GetPaginationData();
 
         int targetUserId = await this.database.UserIdFromUsername(username);
 
         if (targetUserId == 0) return this.BadRequest();
 
-        List<GameReview> reviews = (await this.database.Reviews.ByGameVersion(gameVersion, true)
+        List<GameReview> reviews = (await this.database.Reviews
             .Where(r => r.ReviewerId == targetUserId)
             .OrderByDescending(r => r.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
+            .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(r => GameReview.CreateFromEntity(r, token));
 
-        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageStart));
+        return this.Ok(new ReviewResponse(reviews, reviews.LastOrDefault()?.Timestamp ?? TimeHelper.TimestampMillis, pageData.HintStart));
     }
 
     [HttpPost("rateReview/user/{slotId:int}/{username}")]
-    public async Task<IActionResult> RateReview(int slotId, string username, [FromQuery] int rating = 0)
+    public async Task<IActionResult> RateReview(int slotId, string username, int rating = 0)
     {
         GameTokenEntity token = this.GetToken();
 

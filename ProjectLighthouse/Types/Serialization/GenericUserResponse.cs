@@ -21,7 +21,7 @@ public struct GenericUserResponse<T> : ILbpSerializable, IHasCustomRoot where T 
     {
         this.RootTag = rootElement;
         this.Users = users;
-        this.Total = pageData.MaxElements;
+        this.Total = pageData.TotalElements;
         this.HintStart = pageData.HintStart;
     }
 

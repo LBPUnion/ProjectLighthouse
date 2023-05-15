@@ -21,7 +21,7 @@ public struct GenericSlotResponse : ILbpSerializable, IHasCustomRoot
     {
         this.RootTag = rootElement;
         this.Slots = slots;
-        this.Total = pageData.MaxElements;
+        this.Total = pageData.TotalElements;
         this.HintStart = pageData.HintStart;
     }
 
