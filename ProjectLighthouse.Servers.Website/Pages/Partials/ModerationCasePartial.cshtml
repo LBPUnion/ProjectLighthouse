@@ -62,7 +62,7 @@
             on @TimeZoneInfo.ConvertTime(Model.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
             @if (Model.ExpiresAt != null)
             {
-                            <span>until @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")</span>
+                <span>until @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")</span>
             }
         </span><br>
     }
