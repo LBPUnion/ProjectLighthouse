@@ -64,7 +64,7 @@ public static class StartupTasks
         }
 
         if (!dbConnected) Environment.Exit(1);
-        using DatabaseContext database = new();
+        using DatabaseContext database = DatabaseContext.CreateNewInstance();
         
         migrateDatabase(database).Wait();
 

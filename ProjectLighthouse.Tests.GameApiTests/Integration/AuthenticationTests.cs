@@ -3,35 +3,48 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
-using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Tests;
+namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 
+[Trait("Category", "Integration")]
 public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
 {
     [Fact]
     public async Task ShouldReturnErrorOnNoPostData()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         HttpResponseMessage response = await this.Client.PostAsync("/LITTLEBIGPLANETPS3_XML/login", null!);
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
-    [DatabaseFact]
-    public async Task ShouldReturnWithValidData()
+    [Fact]
+    public async Task Login_ShouldReturnWithValidData()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         HttpResponseMessage response = await this.AuthenticateResponse();
-        Assert.True(response.IsSuccessStatusCode);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.OK;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
         string responseContent = await response.Content.ReadAsStringAsync();
         Assert.Contains("MM_AUTH=", responseContent);
         Assert.Contains(VersionHelper.EnvVer, responseContent);
     }
 
-    [DatabaseFact]
-    public async Task CanSerializeBack()
+    [Fact]
+    public async Task Login_CanSerializeBack()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         LoginResult loginResult = await this.Authenticate();
 
         Assert.NotNull(loginResult);
@@ -42,22 +55,30 @@ public class AuthenticationTests : LighthouseServerTest<GameServerTestStartup>
         Assert.Equal(VersionHelper.EnvVer, loginResult.ServerBrand);
     }
 
-    [DatabaseFact]
-    public async Task CanUseToken()
+    [Fact]
+    public async Task Login_CanUseToken()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         LoginResult loginResult = await this.Authenticate();
 
         HttpResponseMessage response = await this.AuthenticatedRequest("/LITTLEBIGPLANETPS3_XML/enterLevel/420", loginResult.AuthTicket);
         await response.Content.ReadAsStringAsync();
 
-        Assert.False(response.StatusCode == HttpStatusCode.Forbidden);
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.NotFound;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 
-    [DatabaseFact]
-    public async Task ShouldReturnForbiddenWhenNotAuthenticated()
+    [Fact]
+    public async Task Login_ShouldReturnForbiddenWhenNotAuthenticated()
     {
+        await IntegrationHelper.GetIntegrationDatabase();
+
         HttpResponseMessage response = await this.Client.GetAsync("/LITTLEBIGPLANETPS3_XML/announce");
-        Assert.False(response.IsSuccessStatusCode);
-        Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
+
+        const HttpStatusCode expectedStatusCode = HttpStatusCode.Forbidden;
+
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 }

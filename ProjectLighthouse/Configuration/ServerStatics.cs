@@ -16,7 +16,7 @@ public static class ServerStatics
         get {
             try
             {
-                using DatabaseContext db = new();
+                using DatabaseContext db = DatabaseContext.CreateNewInstance();
                 return db.Database.CanConnect();
             }
             catch(Exception e)

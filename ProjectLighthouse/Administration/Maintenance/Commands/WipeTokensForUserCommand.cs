@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class WipeTokensForUserCommand : ICommand
 {
-    private readonly DatabaseContext database = new();
+    private readonly DatabaseContext database = DatabaseContext.CreateNewInstance();
 
     public string Name() => "Wipe tokens for user";
     public string[] Aliases()

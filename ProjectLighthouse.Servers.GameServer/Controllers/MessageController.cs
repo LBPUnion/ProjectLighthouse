@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -79,13 +80,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     ///     The response sent is the text that will appear in-game.
     /// </summary>
     [HttpPost("filter")]
-    public async Task<IActionResult> Filter()
+    public async Task<IActionResult> Filter(IMailService mailService)
     {
         GameTokenEntity token = this.GetToken();
 
         string message = await this.ReadBodyAsync();
 
-        if (message.StartsWith("/setemail "))
+        if (message.StartsWith("/setemail ") && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
             if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
@@ -96,7 +97,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             if (user == null || user.EmailAddressVerified) return this.Ok();
 
             user.EmailAddress = email;
-            await SMTPHelper.SendVerificationEmail(this.database, user);
+            await SMTPHelper.SendVerificationEmail(this.database, mailService, user);
 
             return this.Ok();
         }
@@ -105,8 +106,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        if (ServerConfiguration.Instance.LogChatFiltering) 
-          Logger.Info($"{username}: {message} / {filteredText}", LogArea.Filter);
+        if (ServerConfiguration.Instance.LogChatFiltering)
+            Logger.Info($"{username}: {message} / {filteredText}", LogArea.Filter);
 
         return this.Ok(filteredText);
     }

@@ -12,7 +12,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class DeleteUserCommand : ICommand
 {
-    private readonly DatabaseContext database = new();
+    private readonly DatabaseContext database = DatabaseContext.CreateNewInstance();
     public string Name() => "Delete User";
     public string[] Aliases()
         => new[]

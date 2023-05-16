@@ -8,8 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests.Serialization;
+namespace LBPUnion.ProjectLighthouse.Tests.Integration.Serialization;
 
+[Trait("Category", "Integration")]
 public class SerializationDependencyTests
 {
     private static IServiceProvider GetTestServiceProvider(params object[] dependencies)

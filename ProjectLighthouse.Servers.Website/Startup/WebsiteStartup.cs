@@ -4,11 +4,14 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
@@ -26,7 +29,7 @@ public class WebsiteStartup
         this.Configuration = configuration;
     }
 
-    public IConfiguration Configuration { get; }
+    private IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -45,7 +48,16 @@ public class WebsiteStartup
         services.AddRazorPages().WithRazorPagesAtContentRoot();
         #endif
 
-        services.AddDbContext<DatabaseContext>();
+        services.AddDbContext<DatabaseContext>(builder =>
+        {
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion);
+        });
+
+        IMailService mailService = ServerConfiguration.Instance.Mail.MailEnabled
+            ? new MailQueueService(new SmtpMailSender())
+            : new NullMailService();
+        services.AddSingleton(mailService);
 
         services.AddHttpClient<ICaptchaService, CaptchaService>("CaptchaAPI",
             client =>

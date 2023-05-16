@@ -13,7 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
 public class ResetPasswordCommand : ICommand
 {
-    private readonly DatabaseContext database = new();
+    private readonly DatabaseContext database = DatabaseContext.CreateNewInstance();
     public string Name() => "Reset Password";
     public string[] Aliases()
         => new[]
