@@ -7,7 +7,7 @@ name: Continuous Integration
 jobs:
   test:
     name: Build & Test
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: "!startsWith(github.event.head_commit.message, '[skip ci]')"
     runs-on: ${{matrix.os.fullName}}
     strategy:
       fail-fast: false
@@ -16,9 +16,9 @@ jobs:
           - { prettyName: Linux, fullName: ubuntu-latest, database: true, webTest: true }
     timeout-minutes: 5
     env:
-      DB_DATABASE: lighthouse
+      DB_DATABASE: lighthouse_tests
       DB_USER: root
-      DB_PASSWORD: lighthouse
+      DB_PASSWORD: lighthouse_tests
     steps:
       - name: Checkout
         uses: actions/checkout@v3

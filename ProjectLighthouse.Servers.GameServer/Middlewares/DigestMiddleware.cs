@@ -85,7 +85,7 @@ public class DigestMiddleware : Middleware
             #if !DEBUG
             // The game doesn't start sending digests until after the announcement so if it's not one of those requests
             // and it doesn't include a digest we need to reject the request 
-            else if (!ServerStatics.IsUnitTesting && !exemptPathList.Contains(strippedPath))
+            else if (!exemptPathList.Contains(strippedPath))
             {
                 context.Response.StatusCode = 403;
                 return;

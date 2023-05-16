@@ -50,7 +50,7 @@
             int yourThumb = commentAndReaction.Value?.Rating ?? 0;
             DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000).ToLocalTime();
             StringWriter messageWriter = new();
-            HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
+            HttpUtility.HtmlDecode(comment.GetCommentMessage(), messageWriter);
 
             string decodedMessage = messageWriter.ToString();
             string? url = Url.RouteUrl(ViewContext.RouteData.Values);

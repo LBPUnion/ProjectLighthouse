@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Servers.Website.Startup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -7,21 +8,22 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.WebsiteTests.Tests;
+namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 
 [Collection(nameof(LighthouseWebTest))]
 public class LighthouseWebTest : IDisposable
 {
-    public readonly string BaseAddress;
+    protected readonly string BaseAddress;
 
-    public readonly IWebDriver Driver;
-    public readonly IWebHost WebHost = new WebHostBuilder().UseKestrel().UseStartup<WebsiteTestStartup>().UseWebRoot("StaticFiles").Build();
+    protected readonly IWebDriver Driver;
+    private readonly IWebHost webHost = new WebHostBuilder().UseKestrel().UseStartup<WebsiteTestStartup>().UseWebRoot("StaticFiles").Build();
 
-    public LighthouseWebTest()
+    protected LighthouseWebTest()
     {
-        this.WebHost.Start();
+        ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse_tests;database=lighthouse_tests";
+        this.webHost.Start();
 
-        IServerAddressesFeature? serverAddressesFeature = this.WebHost.ServerFeatures.Get<IServerAddressesFeature>();
+        IServerAddressesFeature? serverAddressesFeature = this.webHost.ServerFeatures.Get<IServerAddressesFeature>();
         if (serverAddressesFeature == null) throw new ArgumentNullException();
 
         this.BaseAddress = serverAddressesFeature.Addresses.First();
@@ -32,7 +34,7 @@ public class LighthouseWebTest : IDisposable
             chromeOptions.AddArgument("headless");
             chromeOptions.AddArgument("no-sandbox");
             chromeOptions.AddArgument("disable-dev-shm-usage");
-            Console.WriteLine("We are in a CI environment, so chrome headless mode has been enabled.");
+            Console.WriteLine(@"We are in a CI environment, so chrome headless mode has been enabled.");
         }
 
         this.Driver = new ChromeDriver(chromeOptions);
@@ -42,7 +44,7 @@ public class LighthouseWebTest : IDisposable
     {
         this.Driver.Close();
         this.Driver.Dispose();
-        this.WebHost.Dispose();
+        this.webHost.Dispose();
 
         GC.SuppressFinalize(this);
     }

@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
 public class DeleteAllTokensMaintenanceJob : IMaintenanceJob
 {
-    private readonly DatabaseContext database = new();
+    private readonly DatabaseContext database = DatabaseContext.CreateNewInstance();
 
     public string Name() => "Delete ALL Tokens";
     public string Description() => "Deletes ALL game tokens and web tokens.";

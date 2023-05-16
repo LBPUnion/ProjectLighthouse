@@ -1,9 +1,10 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Tickets;
@@ -12,48 +13,58 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
-namespace LBPUnion.ProjectLighthouse.Tests;
+namespace LBPUnion.ProjectLighthouse.Tests.Integration;
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[Collection(nameof(LighthouseServerTest<TStartup>))]
 public class LighthouseServerTest<TStartup> where TStartup : class
 {
-    public readonly HttpClient Client;
-    public readonly TestServer Server;
+    protected readonly HttpClient Client;
+    private readonly TestServer server;
 
-    public LighthouseServerTest()
+    protected LighthouseServerTest()
     {
-        this.Server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
-        this.Client = this.Server.CreateClient();
+        ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse_tests;database=lighthouse_tests";
+        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "lighthouse";
+        this.server = new TestServer(new WebHostBuilder().UseStartup<TStartup>());
+        this.Client = this.server.CreateClient();
     }
 
-    public async Task<string> CreateRandomUser(int number = -1, bool createUser = true)
-    {
-        if (number == -1) number = new Random().Next();
-        const string username = "unitTestUser";
+    public TestServer GetTestServer() => this.server;
 
-        if (createUser)
+    protected async Task<UserEntity> CreateRandomUser()
+    {
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
+
+        int userId = RandomNumberGenerator.GetInt32(int.MaxValue);
+        const string username = "unitTestUser";
+        // if user already exists, find another random number
+        while (await database.Users.AnyAsync(u => u.Username == $"{username}{userId}"))
         {
-            await using DatabaseContext database = new();
-            if (await database.Users.FirstOrDefaultAsync(u => u.Username == $"{username}{number}") == null)
-            {
-                UserEntity user = await database.CreateUser($"{username}{number}",
-                    CryptoHelper.BCryptHash($"unitTestPassword{number}"));
-                user.LinkedPsnId = (ulong)number;
-                await database.SaveChangesAsync();
-            }
+            userId = RandomNumberGenerator.GetInt32(int.MaxValue);
         }
 
-        return $"{username}{number}";
+        UserEntity user = new()
+        {
+            UserId = userId,
+            Username = $"{username}{userId}",
+            Password = CryptoHelper.BCryptHash($"unitTestPassword{userId}"),
+            LinkedPsnId = (ulong)userId,
+        };
+
+        database.Add(user);
+        await database.SaveChangesAsync();
+        return user;
     }
 
-    public async Task<HttpResponseMessage> AuthenticateResponse(int number = -1, bool createUser = true)
+    protected async Task<HttpResponseMessage> AuthenticateResponse()
     {
-        string username = await this.CreateRandomUser(number, createUser);
+        UserEntity user = await this.CreateRandomUser();
 
         byte[] ticketData = new TicketBuilder()
-            .SetUsername($"{username}{number}")
-            .SetUserId((ulong)number)
+            .SetUsername($"{user.Username}{user.UserId}")
+            .SetUserId((ulong)user.UserId)
             .Build();
 
         HttpResponseMessage response = await this.Client.PostAsync
@@ -61,9 +72,9 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return response;
     }
 
-    public async Task<LoginResult> Authenticate(int number = -1)
+    protected async Task<LoginResult> Authenticate()
     {
-        HttpResponseMessage response = await this.AuthenticateResponse(number);
+        HttpResponseMessage response = await this.AuthenticateResponse();
 
         string responseContent = await response.Content.ReadAsStringAsync();
 
@@ -71,12 +82,18 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return (LoginResult)serializer.Deserialize(new StringReader(responseContent))!;
     }
 
-    public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
+    protected Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth) => this.AuthenticatedRequest(endpoint, mmAuth, HttpMethod.Get);
 
-    public Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
+    private static string GetDigestCookie(string mmAuth) => mmAuth["MM_AUTH=".Length..];
+
+    private Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
     {
         using HttpRequestMessage requestMessage = new(method, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
+        string path = endpoint.Split("?", StringSplitOptions.RemoveEmptyEntries)[0];
+
+        string digest = CryptoHelper.ComputeDigest(path, GetDigestCookie(mmAuth), Array.Empty<byte>(), "lighthouse");
+        requestMessage.Headers.Add("X-Digest-A", digest);
 
         return this.Client.SendAsync(requestMessage);
     }
@@ -89,13 +106,15 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return await this.Client.PostAsync($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", new ByteArrayContent(bytes));
     }
 
-    public async Task<HttpResponseMessage> AuthenticatedUploadFileEndpointRequest(string filePath, string mmAuth)
+    protected async Task<HttpResponseMessage> AuthenticatedUploadFileEndpointRequest(string filePath, string mmAuth)
     {
         byte[] bytes = await File.ReadAllBytesAsync(filePath);
         string hash = CryptoHelper.Sha1Hash(bytes).ToLower();
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, $"/LITTLEBIGPLANETPS3_XML/upload/{hash}");
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(bytes);
+        string digest = CryptoHelper.ComputeDigest($"/LITTLEBIGPLANETPS3_XML/upload/{hash}", GetDigestCookie(mmAuth), bytes, "lighthouse", true);
+        requestMessage.Headers.Add("X-Digest-B", digest);
         return await this.Client.SendAsync(requestMessage);
     }
 
@@ -112,11 +131,13 @@ public class LighthouseServerTest<TStartup> where TStartup : class
         return await this.Client.SendAsync(requestMessage);
     }
 
-    public async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth)
+    protected async Task<HttpResponseMessage> AuthenticatedUploadDataRequest(string endpoint, byte[] data, string mmAuth)
     {
         using HttpRequestMessage requestMessage = new(HttpMethod.Post, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
         requestMessage.Content = new ByteArrayContent(data);
+        string digest = CryptoHelper.ComputeDigest(endpoint, GetDigestCookie(mmAuth), data, "lighthouse");
+        requestMessage.Headers.Add("X-Digest-A", digest);
         return await this.Client.SendAsync(requestMessage);
     }
 }

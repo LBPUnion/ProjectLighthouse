@@ -14,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
 public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
 {
-    private readonly DatabaseContext database = new();
+    private readonly DatabaseContext database = DatabaseContext.CreateNewInstance();
     public string Name() => "Cleanup Broken Photos";
     public string Description() => "Deletes all photos that have missing assets or invalid photo subjects.";
 

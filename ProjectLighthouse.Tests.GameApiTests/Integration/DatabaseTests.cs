@@ -3,18 +3,21 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
-using LBPUnion.ProjectLighthouse.Tests;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Integration;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Tests;
+namespace ProjectLighthouse.Tests.GameApiTests.Integration;
 
+[Trait("Category", "Integration")]
 public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
 {
-    [DatabaseFact]
+    [Fact]
     public async Task CanCreateUserTwice()
     {
-        await using DatabaseContext database = new();
+        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+
         int rand = new Random().Next();
 
         UserEntity userA = await database.CreateUser("unitTestUser" + rand, CryptoHelper.GenerateAuthToken());
@@ -22,7 +25,5 @@ public class DatabaseTests : LighthouseServerTest<GameServerTestStartup>
 
         Assert.NotNull(userA);
         Assert.NotNull(userB);
-
-        await database.RemoveUser(userA); // Only remove userA since userA and userB are the same user
     }
 }
