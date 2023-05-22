@@ -49,6 +49,10 @@
         <span>
             Case created by <a href="/user/@Model.Creator.UserId">@Model.Creator.Username</a>
             on @TimeZoneInfo.ConvertTime(Model.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+            @if (Model.ExpiresAt != null)
+            {
+                <span>until @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")</span>
+            }
         </span><br>
     }
     else
@@ -56,6 +60,10 @@
         <span>
             Case created by @Model.CreatorUsername
             on @TimeZoneInfo.ConvertTime(Model.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+            @if (Model.ExpiresAt != null)
+            {
+                <span>until @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")</span>
+            }
         </span><br>
     }
     
@@ -80,7 +88,7 @@
     <h3>Reason</h3>
     @if (!string.IsNullOrWhiteSpace(Model.Reason))
     {
-        <pre>@Model.Reason</pre>
+        <pre style="white-space: initial;">@Model.Reason</pre>
     }
     else
     {
@@ -90,7 +98,7 @@
     <h3>Moderator Notes</h3>
     @if (!string.IsNullOrWhiteSpace(Model.ModeratorNotes))
     {
-        <pre>@Model.ModeratorNotes</pre>
+        <pre style="white-space: initial;">@Model.ModeratorNotes</pre>
     }
     else
     {
