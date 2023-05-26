@@ -115,8 +115,6 @@ public class LoginForm : BaseLayout
 
         if (user.IsBanned)
         {
-            Logger.Warn($"User {user.Username} (id: {user.UserId}) logged in, but is banned",
-                LogArea.Login);
             return this.Redirect("~/banned");
         }
 
