@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
-public class UserBannedPage : BaseLayout
+public class BannedUserPage : BaseLayout
 {
-    public UserBannedPage(DatabaseContext database) : base(database)
+    public BannedUserPage(DatabaseContext database) : base(database)
     { }
 
     public ModerationCaseEntity ModCase = null!;
