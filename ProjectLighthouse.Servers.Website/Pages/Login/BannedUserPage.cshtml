@@ -15,7 +15,7 @@
     <h1>@Model.Translate(ModerationStrings.BanHeading)</h1>
     <p>@Model.Translate(ModerationStrings.BanExplanation, ServerConfiguration.Instance.Customization.ServerName)</p>
     <p>
-        @Model.Translate(ModerationStrings.BanCreated, TimeZoneInfo.ConvertTime(Model.ModCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")) <br />
+        @Model.Translate(ModerationStrings.BanIssued, TimeZoneInfo.ConvertTime(Model.ModCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")) <br />
         @if (Model.ModCase.ExpiresAt != null)
         {
             @Model.Translate(ModerationStrings.BanExpires, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))

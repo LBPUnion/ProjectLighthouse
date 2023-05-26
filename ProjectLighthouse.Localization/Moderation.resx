@@ -24,8 +24,8 @@
     <data name="ban_explanation" xml:space="preserve">
         <value>Your account has been banned due to violations of the {0} Terms of Service.</value>
     </data>
-    <data name="ban_created" xml:space="preserve">
-        <value>Ban Created: {0}</value>
+    <data name="ban_issued" xml:space="preserve">
+        <value>Ban Issued: {0}</value>
     </data>
     <data name="ban_expires" xml:space="preserve">
         <value>Ban Expires: {0}</value>
