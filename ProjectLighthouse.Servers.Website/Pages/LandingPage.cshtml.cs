@@ -13,14 +13,14 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
 public class LandingPage : BaseLayout
 {
-    public LandingPage(DatabaseContext database) : base(database)
-    {}
+    public List<SlotEntity>? LatestTeamPicks;
+    public List<SlotEntity>? NewestLevels;
 
     public int PendingAuthAttempts;
     public List<UserEntity> PlayersOnline = new();
 
-    public List<SlotEntity>? LatestTeamPicks;
-    public List<SlotEntity>? NewestLevels;
+    public LandingPage(DatabaseContext database) : base(database)
+    { }
 
     [UsedImplicitly]
     public async Task<IActionResult> OnGet()
@@ -29,10 +29,12 @@ public class LandingPage : BaseLayout
         if (user != null && user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");
 
         if (user != null)
-            this.PendingAuthAttempts = await this.Database.PlatformLinkAttempts
-                .CountAsync(l => l.UserId == user.UserId);
+            this.PendingAuthAttempts =
+                await this.Database.PlatformLinkAttempts.CountAsync(l => l.UserId == user.UserId);
 
-        List<int> userIds = await this.Database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300).Select(l => l.UserId).ToListAsync();
+        List<int> userIds = await this.Database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300)
+            .Select(l => l.UserId)
+            .ToListAsync();
 
         this.PlayersOnline = await this.Database.Users.Where(u => userIds.Contains(u.UserId)).ToListAsync();
 

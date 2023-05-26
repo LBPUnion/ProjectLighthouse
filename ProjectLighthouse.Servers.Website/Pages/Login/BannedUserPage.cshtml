@@ -1,32 +1,36 @@
 ﻿@page "/banned"
+@using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login.BannedUserPage
 
 @{
-    Layout = null;
-    Model.Title = Model.Translate(ModerationStrings.BannedHeading);
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ModerationStrings.BanHeading);
 
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
 <div class="ui middle aligned left aligned">
-    <h1>@Model.Translate(ModerationStrings.BannedHeading)</h1>
-    <p>@Model.Translate(ModerationStrings.BannedExplain)</p>
+    <h1>@Model.Translate(ModerationStrings.BanHeading)</h1>
+    <p>@Model.Translate(ModerationStrings.BanExplanation, ServerConfiguration.Instance.Customization.ServerName)</p>
     <p>
-        <strong>@Model.Translate(ModerationStrings.CaseCreated):</strong>
-        @TimeZoneInfo.ConvertTime(Model.ModCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt") <br />  
+        @Model.Translate(ModerationStrings.BanCreated, TimeZoneInfo.ConvertTime(Model.ModCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")) <br />
         @if (Model.ModCase.ExpiresAt != null)
         {
-            <strong>@Model.Translate(ModerationStrings.CaseExpires):</strong>
-            @TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+            @Model.Translate(ModerationStrings.BanExpires, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))
+        }
+        else
+        {
+            @Model.Translate(ModerationStrings.BanExpires, Model.Translate(ModerationStrings.BanDoesNotExpire))
         }
     </p>
     <p>
         <strong>@Model.Translate(ModerationStrings.BanReason):</strong>   
         @Model.ModCase.Reason
     </p>
-    <p>
-        @Model.Translate(ModerationStrings.AppealInstructions)
-    </p>
+    <a href="/logout" class="ui blue button">
+        <i class="user slash icon"></i>
+        @Model.Translate(BaseLayoutStrings.HeaderLogout)
+    </a>
 </div>

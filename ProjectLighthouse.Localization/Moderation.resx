@@ -18,22 +18,22 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="banned_heading" xml:space="preserve">
+    <data name="ban_heading" xml:space="preserve">
         <value>Account Banned</value>
     </data>
-    <data name="banned_explain" xml:space="preserve">
-        <value>Your account has been banned due to inappropriate, offensive, or violent behavior.</value>
+    <data name="ban_explanation" xml:space="preserve">
+        <value>Your account has been banned due to violations of the {0} Terms of Service.</value>
     </data>
-    <data name="case_created" xml:space="preserve">
-        <value>Case Created</value>
+    <data name="ban_created" xml:space="preserve">
+        <value>Ban Created: {0}</value>
     </data>
-    <data name="case_expires" xml:space="preserve">
-        <value>Case Expires</value>
+    <data name="ban_expires" xml:space="preserve">
+        <value>Ban Expires: {0}</value>
     </data>
     <data name="ban_reason" xml:space="preserve">
-        <value>Ban Reason</value>
+        <value>Ban Reason: {0}</value>
     </data>
-    <data name="appeal_instructions" xml:space="preserve">
-        <value>If you believe your ban was unjust, please contact an instance moderator.</value>
+    <data name="ban_does_not_expire" xml:space="preserve">
+        <value>Does not expire</value>
     </data>
 </root>

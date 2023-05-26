@@ -23,18 +23,18 @@
 @if (Model.ProfileUser.IsBanned)
 {
     <div class="ui inverted red segment">
-        <h3 style="margin-bottom:3px;"><i class="ban icon"></i> This user is currently banned.</h3>
+        <h3 style="margin-bottom:5px;"><i class="ban icon"></i> This user is currently banned.</h3>
         @if (Model.User != null && Model.User.IsModerator)
         {
             <b>Reason:</b>
-            <span>"@Model.ProfileUser.BannedReason"</span>
+            <span>"@Model.ProfileUser.BannedReason"</span> <br />
             <p>
                 <i>Only you and other moderators may view the ban reason.</i>
             </p>
         }
         else 
         {
-            <p>Users who engage in inappropriate, offensive, or violent actions will be moderated. Be sure to follow the rules!</p>
+            <p>This user has been banned for violating the Terms of Service. Remember to follow the rules!</p>
         }
     </div>
 }

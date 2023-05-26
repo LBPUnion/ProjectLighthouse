@@ -22,7 +22,7 @@ public class BannedUserPage : BaseLayout
         UserEntity? user = this.Database.UserFromWebRequest(this.Request);
 
         if (user == null) return this.Redirect("~/login");
-        if (user.IsBanned == false) return this.Redirect("~/");
+        if (!user.IsBanned) return this.Redirect("~/");
 
         ModerationCaseEntity? modCase = await this.Database.Cases
             .FirstOrDefaultAsync(c => c.AffectedId == user.UserId && c.Type == CaseType.UserBan);
