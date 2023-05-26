@@ -18,22 +18,34 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="ban_heading" xml:space="preserve">
-        <value>Account Banned</value>
+    <data name="suspension_heading" xml:space="preserve">
+        <value>Account Suspended</value>
     </data>
-    <data name="ban_explanation" xml:space="preserve">
-        <value>Your account has been banned due to violations of the {0} Terms of Service.</value>
+    <data name="suspension_explanation" xml:space="preserve">
+        <value>Your {0} account has been suspended due to code of conduct violations.</value>
     </data>
-    <data name="ban_issued" xml:space="preserve">
-        <value>Ban Issued: {0}</value>
+    <data name="suspension_expiration" xml:space="preserve">
+        <value>During this suspension, the following features will be limited until {0}:</value>
     </data>
-    <data name="ban_expires" xml:space="preserve">
-        <value>Ban Expires: {0}</value>
+    <data name="suspension_reason" xml:space="preserve">
+        <value>Reason for suspension: "{0}"</value>
     </data>
-    <data name="ban_reason" xml:space="preserve">
-        <value>Ban Reason: {0}</value>
+    <data name="suspension_circumvent_warning" xml:space="preserve">
+        <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
     </data>
-    <data name="ban_does_not_expire" xml:space="preserve">
+    <data name="lbp_online_multiplayer" xml:space="preserve">
+        <value>LittleBigPlanet™ Online multiplayer</value>
+    </data>
+    <data name="does_not_expire" xml:space="preserve">
         <value>Does not expire</value>
+    </data>
+    <data name="profile_visibility" xml:space="preserve">
+        <value>Profile visibility</value>
+    </data>
+    <data name="website_interactions" xml:space="preserve">
+        <value>Browsing levels, photos, and profiles</value>
+    </data>
+    <data name="account_profile_management" xml:space="preserve">
+        <value>Account and profile management</value>
     </data>
 </root>
