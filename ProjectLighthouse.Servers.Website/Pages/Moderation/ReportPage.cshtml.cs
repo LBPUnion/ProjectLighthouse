@@ -20,7 +20,7 @@ public class ReportPage : BaseLayout
     {
         UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
-        if (!user.IsAdmin) return this.NotFound();
+        if (!user.IsModerator) return this.NotFound();
 
         GriefReportEntity? report = await this.Database.Reports
             .Include(r => r.ReportingPlayer)
