@@ -15,7 +15,7 @@
     <p>@Model.Translate(ModerationStrings.BannedExplain)</p>
     <p>
         <strong>@Model.Translate(ModerationStrings.CaseCreated):</strong>
-        @TimeZoneInfo.ConvertTime(Model.ModCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")) <br />  
+        @TimeZoneInfo.ConvertTime(Model.ModCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt") <br />  
         @if (Model.ModCase.ExpiresAt != null)
         {
             <strong>@Model.Translate(ModerationStrings.CaseExpires):</strong>
