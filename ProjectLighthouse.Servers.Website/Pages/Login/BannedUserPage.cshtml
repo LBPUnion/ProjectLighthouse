@@ -26,8 +26,7 @@
         }
     </p>
     <p>
-        <strong>@Model.Translate(ModerationStrings.BanReason):</strong>   
-        @Model.ModCase.Reason
+        @Model.Translate(ModerationStrings.BanReason, Model.ModCase.Reason)
     </p>
     <a href="/logout" class="ui blue button">
         <i class="user slash icon"></i>
