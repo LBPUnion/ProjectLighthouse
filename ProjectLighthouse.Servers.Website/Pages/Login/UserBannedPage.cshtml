@@ -5,6 +5,9 @@
 @{
     Layout = null;
     Model.Title = Model.Translate(ModerationStrings.BannedHeading);
+
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
 <div class="ui middle aligned left aligned grid" style="padding: 10px;">
@@ -14,10 +17,13 @@
     </div>    
     <div>
         <p>
-            <strong>@Model.Translate(ModerationStrings.CaseCreated):</strong>     
-            @Model.ModCase.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss") <br />     
-            <strong>@Model.Translate(ModerationStrings.CaseExpires):</strong>   
-            @Model.ModCase.ExpiresAt?.ToString("dd/MM/yyyy HH:mm:ss")
+            <strong>@Model.Translate(ModerationStrings.CaseCreated):</strong>
+            @TimeZoneInfo.ConvertTime(Model.ModCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")) <br />  
+            @if (Model.ModCase.ExpiresAt != null)
+            {
+                <strong>@Model.Translate(ModerationStrings.CaseExpires):</strong>
+                @TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+            }
         </p>
     </div>
     <div>
