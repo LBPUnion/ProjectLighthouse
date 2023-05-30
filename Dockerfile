@@ -13,7 +13,7 @@ RUN dotnet sln list | grep ".csproj" \
 RUN dotnet restore
 
 COPY . .
-RUN dotnet publish -c Release --property:OutputPath=/ProjectLighthouse/publish --no-restore
+RUN dotnet publish -c Release --property:OutputPath=/ProjectLighthouse/publish/ --no-restore
 
 # Final running container
 FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS final
