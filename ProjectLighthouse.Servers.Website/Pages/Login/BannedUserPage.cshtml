@@ -1,0 +1,48 @@
+﻿@page "/banned"
+@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login.BannedUserPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ModerationStrings.SuspensionHeading);
+
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+}
+
+<div class="ui middle aligned left aligned">
+    <h1>@Model.Translate(ModerationStrings.SuspensionHeading)</h1>  
+
+    <p>
+        @Model.Translate(ModerationStrings.SuspensionExplanation, ServerConfiguration.Instance.Customization.ServerName)
+    </p>         
+   
+    <p>
+        <span>
+            @if (Model.ModCase.ExpiresAt != null)
+            {
+                @Model.Translate(ModerationStrings.SuspensionExpiration, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))
+            }
+            else
+            {
+                @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(ModerationStrings.DoesNotExpire))
+            }
+        </span>
+
+        <ul>
+            <li>@Model.Translate(ModerationStrings.LbpOnlineMultiplayer)</li>
+            <li>@Model.Translate(ModerationStrings.WebsiteInteractions)</li>
+            <li>@Model.Translate(ModerationStrings.ProfileVisibility)</li>
+            <li>@Model.Translate(ModerationStrings.AccountProfileManagement)</li>
+        </ul>
+    </p>
+    
+    <p>
+        @Model.Translate(ModerationStrings.SuspensionReason, Model.ModCase.Reason)
+    </p> 
+    
+    <p>
+        @Model.Translate(ModerationStrings.SuspensionCircumventWarning)
+    </p>
+</div>
