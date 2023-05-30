@@ -83,13 +83,6 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        if (user.IsBanned)
-        {
-            Logger.Warn($"User {user.Username} (id: {user.UserId}) failed to login on web due to being banned", LogArea.Login);
-            this.Error = this.Translate(ErrorStrings.UserIsBanned, user.BannedReason);
-            return this.Page();
-        }
-
         WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
@@ -118,6 +111,11 @@ public class LoginForm : BaseLayout
             return string.IsNullOrWhiteSpace(redirect)
                 ? this.Redirect("~/2fa")
                 : this.Redirect("~/2fa" + "?redirect=" + HttpUtility.UrlEncode(redirect));
+        }
+
+        if (user.IsBanned)
+        {
+            return this.Redirect("~/banned");
         }
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");

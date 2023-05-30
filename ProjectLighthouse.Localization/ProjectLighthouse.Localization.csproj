@@ -44,6 +44,10 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>TwoFactor.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Moderation.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Moderation.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>
