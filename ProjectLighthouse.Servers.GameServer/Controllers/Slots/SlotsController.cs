@@ -105,7 +105,7 @@ public class SlotsController : ControllerBase
     }
 
     [HttpGet("s/developer/{id:int}")]
-    public async Task<IActionResult> SDev(int id)
+    public async Task<IActionResult> DeveloperSlot(int id)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -116,7 +116,7 @@ public class SlotsController : ControllerBase
     } 
 
     [HttpGet("s/user/{id:int}")]
-    public async Task<IActionResult> SUser(int id)
+    public async Task<IActionResult> UserSlot(int id)
     {
         GameTokenEntity token = this.GetToken();
 

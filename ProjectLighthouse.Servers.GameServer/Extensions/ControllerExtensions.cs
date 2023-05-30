@@ -86,9 +86,6 @@ public static class ControllerExtensions
 
             GameVersion targetVersion = token.GameVersion;
 
-            if (targetVersion != GameVersion.LittleBigPlanet1)
-                queryBuilder.AddFilter(new ExcludeLBP1OnlyFilter(token.UserId, token.GameVersion));
-
             bool matchGameVersionExactly = false;
 
             if (controller.Request.Query.ContainsKey("gameFilterType"))
@@ -128,7 +125,8 @@ public static class ControllerExtensions
             ParseLbp3Query("adventure",
                 () => queryBuilder.AddFilter(new AdventureFilter()),
                 () => queryBuilder.AddFilter(new ExcludeAdventureFilter()),
-                () => { });
+                () =>
+                { });
 
             ParseLbp3Query("move",
                 () => queryBuilder.AddFilter(new MovePackFilter()),
@@ -150,14 +148,20 @@ public static class ControllerExtensions
                     .Select(s => GetGameFilter(s, token.GameVersion))
                     .ToArray()));
             }
+            else
+            {
+                queryBuilder.AddFilter(new GameVersionFilter(GameVersion.LittleBigPlanet3));
+            }
 
-            // This filter doesn't actually do anything but it will be parsed later by the CategoryController
             string[]? resultFilters = ParseLbp3ArrayQuery("resultType");
             if (resultFilters != null)
             {
                 queryBuilder.AddFilter(new ResultTypeFilter(resultFilters));
             }
         }
+
+        if (token.GameVersion != GameVersion.LittleBigPlanet1)
+            queryBuilder.AddFilter(new ExcludeLBP1OnlyFilter(token.UserId, token.GameVersion));
 
         queryBuilder.AddFilter(new SubLevelFilter(token.UserId));
         queryBuilder.AddFilter(new HiddenSlotFilter());

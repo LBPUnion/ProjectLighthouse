@@ -88,6 +88,8 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
     private Task<HttpResponseMessage> AuthenticatedRequest(string endpoint, string mmAuth, HttpMethod method)
     {
+        if (!endpoint.StartsWith("/")) endpoint = $"/{endpoint}";
+
         using HttpRequestMessage requestMessage = new(method, endpoint);
         requestMessage.Headers.Add("Cookie", mmAuth);
         string path = endpoint.Split("?", StringSplitOptions.RemoveEmptyEntries)[0];

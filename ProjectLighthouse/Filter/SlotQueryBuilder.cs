@@ -30,7 +30,9 @@ public class SlotQueryBuilder : IQueryBuilder<SlotEntity>
         return this;
     }
 
-    public IFilter<SlotEntity> GetFilter(Type type) => this.filters.FirstOrDefault(f => f.GetType() == type);
+    #nullable enable
+    public IEnumerable<ISlotFilter> GetFilters(Type type) => this.filters.Where(f => f.GetType() == type).ToList();
+    #nullable disable
 
     public SlotQueryBuilder AddFilter(int index, ISlotFilter filter)
     {

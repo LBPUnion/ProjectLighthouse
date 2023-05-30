@@ -22,7 +22,7 @@ public static class QueryExtensions
             pagination.MaxElements = pagination.PageSize;
         }
         queryable = queryable.Skip(Math.Max(0, pagination.PageStart - 1));
-        return queryable.Take(Math.Min(pagination.PageSize, pagination.MaxElements));
+        return queryable.Take(Math.Min(pagination.PageSize, Math.Min(1000, pagination.MaxElements)));
     }
 
     public static IOrderedQueryable<T> ApplyOrdering<T>

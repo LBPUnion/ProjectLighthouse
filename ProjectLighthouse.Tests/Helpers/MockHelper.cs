@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests.Helpers;
 
@@ -37,6 +38,18 @@ public static class MockHelper
             UserLocation = "127.0.0.1",
             UserToken = "unittest",
         };
+
+    public static T2 CastTo<T1, T2>(this IActionResult result) where T1 : ObjectResult
+    {
+        Assert.IsType<T1>(result);
+        T1? typedResult = result as T1;
+        Assert.NotNull(typedResult);
+        Assert.NotNull(typedResult.Value);
+        Assert.IsType<T2?>(typedResult.Value);
+        T2? finalResult = (T2?)typedResult.Value;
+        Assert.NotNull(finalResult);
+        return finalResult;
+    }
 
     public static async Task<DatabaseContext> GetTestDatabase(IEnumerable<IList> sets, [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0)
     {
@@ -110,8 +123,13 @@ public static class MockHelper
 
     public static void SetupTestController(this ControllerBase controllerBase, string? body = null)
     {
+        SetupTestController(controllerBase, GetUnitTestToken(), body);
+    }
+
+    public static void SetupTestController(this ControllerBase controllerBase, GameTokenEntity token, string? body = null)
+    {
         controllerBase.ControllerContext = GetMockControllerContext(body);
-        SetupTestGameToken(controllerBase, GetUnitTestToken());
+        SetupTestGameToken(controllerBase, token);
     }
 
     public static ControllerContext GetMockControllerContext() =>

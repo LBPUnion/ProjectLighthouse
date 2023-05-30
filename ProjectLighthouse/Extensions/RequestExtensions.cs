@@ -18,7 +18,7 @@ public static partial class RequestExtensions
             : ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots;
 
         if (start < 0) start = 0;
-        if (size <= 0) size = ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots;
+        if (size <= 0) size = 10;
 
         PaginationData paginationData = new()
         {

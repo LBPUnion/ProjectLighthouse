@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +16,6 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class SlotHelper
 {
-
     public static SlotType ParseType(string? slotType)
     {
         if (slotType == null) return SlotType.Unknown;
@@ -41,7 +42,8 @@ public static class SlotHelper
         };
     }
 
-    private static readonly SemaphoreSlim semaphore = new(1, 1);
+    private static readonly SemaphoreSlim slotSemaphore = new(1, 1);
+    private static readonly SemaphoreSlim userSemaphore = new(1, 1);
 
     public static async Task<int> GetPlaceholderUserId(DatabaseContext database)
     {
@@ -50,7 +52,13 @@ public static class SlotHelper
             .FirstOrDefaultAsync();
         if (devCreatorId != 0) return devCreatorId;
 
-        await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
+        bool acquired = await userSemaphore.WaitAsync(TimeSpan.FromSeconds(5));
+        if (!acquired)
+        {
+            Logger.Warn($"Failed to acquire lock for placeholder user, semaphoreCount={userSemaphore.CurrentCount}",
+                LogArea.Synchronization);
+            return 0;
+        }
         try
         {
             UserEntity devCreator = new()
@@ -66,7 +74,7 @@ public static class SlotHelper
         }
         finally
         {
-            semaphore.Release();
+            if (acquired) userSemaphore.Release();
         }
     }
 
@@ -75,7 +83,14 @@ public static class SlotHelper
         int slotId = await database.Slots.Where(s => s.Type == slotType && s.InternalSlotId == guid).Select(s => s.SlotId).FirstOrDefaultAsync();
         if (slotId != 0) return slotId;
 
-        await semaphore.WaitAsync(TimeSpan.FromSeconds(5));
+        bool acquired = await slotSemaphore.WaitAsync(TimeSpan.FromSeconds(5));
+        if (!acquired)
+        {
+            Logger.Warn(
+                $"Failed to acquire lock for placeholder slot, guid={guid}, slotType={slotType}, semaphoreCount={slotSemaphore.CurrentCount}",
+                LogArea.Synchronization);
+            return 0;
+        }
         try
         {
             // if two requests come in at the same time for the same story level which hasn't been generated
@@ -104,7 +119,7 @@ public static class SlotHelper
         }
         finally
         {
-            semaphore.Release();
+            if(acquired) slotSemaphore.Release();
         }
     }
 }

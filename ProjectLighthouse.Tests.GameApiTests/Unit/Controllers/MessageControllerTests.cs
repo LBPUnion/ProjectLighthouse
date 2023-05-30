@@ -41,11 +41,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\n";
 
         IActionResult result = messageController.Eula();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObjectResult = result as OkObjectResult;
-        Assert.NotNull(okObjectResult);
-        Assert.NotNull(okObjectResult.Value);
-        Assert.Equal(expected, (string)okObjectResult.Value);
+        string eulaMsg = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expected, eulaMsg);
     }
 
     [Fact]
@@ -72,11 +69,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = messageController.Eula();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObjectResult = result as OkObjectResult;
-        Assert.NotNull(okObjectResult);
-        Assert.NotNull(okObjectResult.Value);
-        Assert.Equal(expected, (string)okObjectResult.Value);
+        string eulaMsg = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expected, eulaMsg);
     }
 
     [Fact]
@@ -92,11 +86,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Announce();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObjectResult = result as OkObjectResult;
-        Assert.NotNull(okObjectResult);
-        Assert.NotNull(okObjectResult.Value);
-        Assert.Equal(expected, (string)okObjectResult.Value);
+        string announceMsg = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expected, announceMsg);
     }
 
     [Fact]
@@ -112,11 +103,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Announce();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObjectResult = result as OkObjectResult;
-        Assert.NotNull(okObjectResult);
-        Assert.NotNull(okObjectResult.Value);
-        Assert.Equal(expected, (string)okObjectResult.Value);
+        string announceMsg = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expected, announceMsg);
     }
 
     [Fact]
@@ -147,11 +135,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Filter(new NullMailService());
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObjectResult = result as OkObjectResult;
-        Assert.NotNull(okObjectResult);
-        Assert.NotNull(okObjectResult.Value);
-        Assert.Equal(expectedBody, (string)okObjectResult.Value);
+        string filteredMessage = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expectedBody, filteredMessage);
     }
 
     [Fact]
@@ -173,11 +158,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Filter(new NullMailService());
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObjectResult = result as OkObjectResult;
-        Assert.NotNull(okObjectResult);
-        Assert.NotNull(okObjectResult.Value);
-        Assert.Equal(expectedBody, (string)okObjectResult.Value);
+        string filteredMessage = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expectedBody, filteredMessage);
     }
 
     private static Mock<IMailService> getMailServiceMock()
@@ -189,7 +171,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     }
 
     [Fact]
-    public async void Filter_ShouldNotSendEmail_WhenMailDisabled()
+    public async Task Filter_ShouldNotSendEmail_WhenMailDisabled()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
         Mock<IMailService> mailMock = getMailServiceMock();
@@ -200,20 +182,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
         ServerConfiguration.Instance.Mail.MailEnabled = false;
         CensorConfiguration.Instance.FilteredWordList = new List<string>();
 
-        const int expectedStatus = 200;
         const string expected = "/setemail unittest@unittest.com";
 
         IActionResult result = await messageController.Filter(mailMock.Object);
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObjectResult = result as OkObjectResult;
-        Assert.NotNull(okObjectResult);
-        Assert.Equal(expectedStatus, okObjectResult.StatusCode);
-        Assert.Equal(expected, okObjectResult.Value);
+        string filteredMessage = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expected, filteredMessage);
     }
 
     [Fact]
-    public async void Filter_ShouldSendEmail_WhenMailEnabled_AndEmailNotTaken()
+    public async Task Filter_ShouldSendEmail_WhenMailEnabled_AndEmailNotTaken()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
         
@@ -236,7 +214,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     }
 
     [Fact]
-    public async void Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailTaken()
+    public async Task Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailTaken()
     {
         List<UserEntity> users = new()
         {
@@ -265,7 +243,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     }
 
     [Fact]
-    public async void Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailAlreadyVerified()
+    public async Task Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailAlreadyVerified()
     {
         UserEntity unitTestUser = MockHelper.GetUnitTestUser();
         unitTestUser.EmailAddressVerified = true;
@@ -290,7 +268,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     }
 
     [Fact]
-    public async void Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailFormatInvalid()
+    public async Task Filter_ShouldNotSendEmail_WhenMailEnabled_AndEmailFormatInvalid()
     {
         UserEntity unitTestUser = MockHelper.GetUnitTestUser();
         unitTestUser.EmailAddressVerified = true;

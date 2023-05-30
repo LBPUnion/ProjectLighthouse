@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
@@ -14,7 +15,7 @@ namespace ProjectLighthouse.Tests.GameApiTests.Unit.Controllers;
 public class UserControllerTests
 {
     [Fact]
-    public async void GetUser_WithValidUser_ShouldReturnUser()
+    public async Task GetUser_WithValidUser_ShouldReturnUser()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
@@ -25,16 +26,12 @@ public class UserControllerTests
 
         IActionResult result = await userController.GetUser("unittest");
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObject = result as OkObjectResult;
-        Assert.NotNull(okObject);
-        GameUser? gameUser = okObject.Value as GameUser;
-        Assert.NotNull(gameUser);
+        GameUser gameUser = result.CastTo<OkObjectResult, GameUser>();
         Assert.Equal(expectedId, gameUser.UserId);
     }
 
     [Fact]
-    public async void GetUser_WithInvalidUser_ShouldReturnNotFound()
+    public async Task GetUser_WithInvalidUser_ShouldReturnNotFound()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
@@ -47,7 +44,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public async void GetUserAlt_WithInvalidUser_ShouldReturnEmptyList()
+    public async Task GetUserAlt_WithInvalidUser_ShouldReturnEmptyList()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
@@ -56,16 +53,12 @@ public class UserControllerTests
 
         IActionResult result = await userController.GetUserAlt(new[]{"notfound",});
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObject = result as OkObjectResult;
-        Assert.NotNull(okObject);
-        MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
-        Assert.NotNull(userList);
-        Assert.Empty(userList.Value.Users);
+        MinimalUserListResponse userList = result.CastTo<OkObjectResult, MinimalUserListResponse>();
+        Assert.Empty(userList.Users);
     }
 
     [Fact]
-    public async void GetUserAlt_WithOnlyInvalidUsers_ShouldReturnEmptyList()
+    public async Task GetUserAlt_WithOnlyInvalidUsers_ShouldReturnEmptyList()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
@@ -77,16 +70,12 @@ public class UserControllerTests
             "notfound", "notfound2", "notfound3",
         });
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObject = result as OkObjectResult;
-        Assert.NotNull(okObject);
-        MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
-        Assert.NotNull(userList);
-        Assert.Empty(userList.Value.Users);
+        MinimalUserListResponse userList = result.CastTo<OkObjectResult, MinimalUserListResponse>();
+        Assert.Empty(userList.Users);
     }
 
     [Fact]
-    public async void GetUserAlt_WithTwoInvalidUsers_AndOneValidUser_ShouldReturnOne()
+    public async Task GetUserAlt_WithTwoInvalidUsers_AndOneValidUser_ShouldReturnOne()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
@@ -99,16 +88,12 @@ public class UserControllerTests
             "notfound", "unittest", "notfound3",
         });
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObject = result as OkObjectResult;
-        Assert.NotNull(okObject);
-        MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
-        Assert.NotNull(userList);
-        Assert.Single(userList.Value.Users);
+        MinimalUserListResponse userList = result.CastTo<OkObjectResult, MinimalUserListResponse>();
+        Assert.Single(userList.Users);
     }
 
     [Fact]
-    public async void GetUserAlt_WithTwoValidUsers_ShouldReturnTwo()
+    public async Task GetUserAlt_WithTwoValidUsers_ShouldReturnTwo()
     {
         List<UserEntity> users = new()
         {
@@ -132,16 +117,12 @@ public class UserControllerTests
             "unittest2", "unittest",
         });
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObject = result as OkObjectResult;
-        Assert.NotNull(okObject);
-        MinimalUserListResponse? userList = okObject.Value as MinimalUserListResponse? ?? default;
-        Assert.NotNull(userList);
-        Assert.Equal(expectedLength, userList.Value.Users.Count);
+        MinimalUserListResponse userList = result.CastTo<OkObjectResult, MinimalUserListResponse>();
+        Assert.Equal(expectedLength, userList.Users.Count);
     }
 
     [Fact]
-    public async void UpdateMyPins_ShouldReturnBadRequest_WhenBodyIsInvalid()
+    public async Task UpdateMyPins_ShouldReturnBadRequest_WhenBodyIsInvalid()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
@@ -155,7 +136,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public async void UpdateMyPins_ShouldUpdatePins()
+    public async Task UpdateMyPins_ShouldUpdatePins()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
@@ -167,15 +148,13 @@ public class UserControllerTests
 
         IActionResult result = await userController.UpdateMyPins();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObject = result as OkObjectResult;
-        Assert.NotNull(okObject);
+        string pinsResponse = result.CastTo<OkObjectResult, string>();
         Assert.Equal(expectedPins, dbMock.Users.First().Pins);
-        Assert.Equal(expectedResponse, okObject.Value);
+        Assert.Equal(expectedResponse, pinsResponse);
     }
 
     [Fact]
-    public async void UpdateMyPins_ShouldNotSave_WhenPinsAreEqual()
+    public async Task UpdateMyPins_ShouldNotSave_WhenPinsAreEqual()
     {
         UserEntity entity = MockHelper.GetUnitTestUser();
         entity.Pins = "1234";
@@ -193,10 +172,9 @@ public class UserControllerTests
 
         IActionResult result = await userController.UpdateMyPins();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? okObject = result as OkObjectResult;
-        Assert.NotNull(okObject);
+        string pinsResponse = result.CastTo<OkObjectResult, string>();
+
         Assert.Equal(expectedPins, dbMock.Users.First().Pins);
-        Assert.Equal(expectedResponse, okObject.Value);
+        Assert.Equal(expectedResponse, pinsResponse);
     }
 }

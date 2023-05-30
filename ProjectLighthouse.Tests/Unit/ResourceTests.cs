@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Types.Resources;
 using Xunit;
@@ -44,7 +45,7 @@ public class ResourceTests
     }
 
     [Fact]
-    public async void ShouldDeleteResourceAndImage()
+    public async Task ShouldDeleteResourceAndImage()
     {
         FileHelper.EnsureDirectoryCreated(FileHelper.ResourcePath);
         FileHelper.EnsureDirectoryCreated(FileHelper.ImagePath);

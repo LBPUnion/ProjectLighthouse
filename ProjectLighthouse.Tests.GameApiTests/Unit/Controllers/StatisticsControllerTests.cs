@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
@@ -14,7 +15,7 @@ namespace ProjectLighthouse.Tests.GameApiTests.Unit.Controllers;
 public class StatisticsControllerTests
 {
     [Fact]
-    public async void PlanetStats_ShouldReturnCorrectCounts_WhenEmpty()
+    public async Task PlanetStats_ShouldReturnCorrectCounts_WhenEmpty()
     {
         await using DatabaseContext db = await MockHelper.GetTestDatabase();
 
@@ -26,17 +27,13 @@ public class StatisticsControllerTests
 
         IActionResult result = await statsController.PlanetStats();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? objectResult = result as OkObjectResult;
-        Assert.NotNull(objectResult);
-        PlanetStatsResponse? response = objectResult.Value as PlanetStatsResponse;
-        Assert.NotNull(response);
-        Assert.Equal(expectedSlots, response.TotalSlotCount);
-        Assert.Equal(expectedTeamPicks, response.TeamPickCount);
+        PlanetStatsResponse statsResponse = result.CastTo<OkObjectResult, PlanetStatsResponse>();
+        Assert.Equal(expectedSlots, statsResponse.TotalSlotCount);
+        Assert.Equal(expectedTeamPicks, statsResponse.TeamPickCount);
     }
 
     [Fact]
-    public async void PlanetStats_ShouldReturnCorrectCounts_WhenNotEmpty()
+    public async Task PlanetStats_ShouldReturnCorrectCounts_WhenNotEmpty()
     {
         List<SlotEntity> slots = new()
         {
@@ -64,17 +61,13 @@ public class StatisticsControllerTests
 
         IActionResult result = await statsController.PlanetStats();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? objectResult = result as OkObjectResult;
-        Assert.NotNull(objectResult);
-        PlanetStatsResponse? response = objectResult.Value as PlanetStatsResponse;
-        Assert.NotNull(response);
-        Assert.Equal(expectedSlots, response.TotalSlotCount);
-        Assert.Equal(expectedTeamPicks, response.TeamPickCount);
+        PlanetStatsResponse statsResponse = result.CastTo<OkObjectResult, PlanetStatsResponse>();
+        Assert.Equal(expectedSlots, statsResponse.TotalSlotCount);
+        Assert.Equal(expectedTeamPicks, statsResponse.TeamPickCount);
     }
 
     [Fact]
-    public async void PlanetStats_ShouldReturnCorrectCounts_WhenSlotsAreIncompatibleGameVersion()
+    public async Task PlanetStats_ShouldReturnCorrectCounts_WhenSlotsAreIncompatibleGameVersion()
     {
         List<SlotEntity> slots = new()
         {
@@ -105,17 +98,13 @@ public class StatisticsControllerTests
 
         IActionResult result = await statsController.PlanetStats();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? objectResult = result as OkObjectResult;
-        Assert.NotNull(objectResult);
-        PlanetStatsResponse? response = objectResult.Value as PlanetStatsResponse;
-        Assert.NotNull(response);
-        Assert.Equal(expectedSlots, response.TotalSlotCount);
-        Assert.Equal(expectedTeamPicks, response.TeamPickCount);
+        PlanetStatsResponse statsResponse = result.CastTo<OkObjectResult, PlanetStatsResponse>();
+        Assert.Equal(expectedSlots, statsResponse.TotalSlotCount);
+        Assert.Equal(expectedTeamPicks, statsResponse.TeamPickCount);
     }
 
     [Fact]
-    public async void TotalLevelCount_ShouldReturnCorrectCount_WhenSlotsAreCompatible()
+    public async Task TotalLevelCount_ShouldReturnCorrectCount_WhenSlotsAreCompatible()
     {
         List<SlotEntity> slots = new()
         {
@@ -145,14 +134,12 @@ public class StatisticsControllerTests
 
         IActionResult result = await statsController.TotalLevelCount();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? objectResult = result as OkObjectResult;
-        Assert.NotNull(objectResult);
-        Assert.Equal(expectedTotal, objectResult.Value);
+        string totalSlotsResponse = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expectedTotal, totalSlotsResponse);
     }
 
     [Fact]
-    public async void TotalLevelCount_ShouldReturnCorrectCount_WhenSlotsAreNotCompatible()
+    public async Task TotalLevelCount_ShouldReturnCorrectCount_WhenSlotsAreNotCompatible()
     {
         List<SlotEntity> slots = new()
         {
@@ -178,15 +165,11 @@ public class StatisticsControllerTests
         StatisticsController statsController = new(dbMock);
         statsController.SetupTestController();
 
-        const int expectedStatusCode = 200;
         const string expectedTotal = "0";
 
         IActionResult result = await statsController.TotalLevelCount();
 
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult? objectResult = result as OkObjectResult;
-        Assert.NotNull(objectResult);
-        Assert.Equal(expectedStatusCode, objectResult.StatusCode);
-        Assert.Equal(expectedTotal, objectResult.Value);
+        string totalSlots = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expectedTotal, totalSlots);
     }
 }

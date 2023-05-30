@@ -8,7 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Tests.Helpers;
 
 public static class IntegrationHelper
 {
-
     private static readonly Lazy<bool> dbConnected = new(IsDbConnected);
 
     private static bool IsDbConnected() => ServerStatics.DbConnected;
