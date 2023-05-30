@@ -156,7 +156,7 @@ public class CategoryController : ControllerBase
                     .Select(s => s.Slot),
                 "date" => slotQuery.ApplyOrdering(new SlotSortBuilder<SlotEntity>().AddSort(new FirstUploadedSort())),
                 "plays" => slotQuery.ApplyOrdering(
-                    new SlotSortBuilder<SlotEntity>().AddSort(new UniquePlaysTotalSort())),
+                    new SlotSortBuilder<SlotEntity>().AddSort(new UniquePlaysTotalSort()).AddSort(new TotalPlaysSort())),
                 _ => slotQuery,
             };
         }
