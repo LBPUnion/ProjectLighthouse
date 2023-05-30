@@ -145,7 +145,7 @@ public class CategoryController : ControllerBase
                         Slot = s,
                         ThumbsUp = this.database.RatedLevels.Count(r => r.SlotId == s.SlotId && r.Rating == 1),
                     })
-                    .OrderByDescending(s => s.Hearts)
+                    .OrderByDescending(s => s.ThumbsUp)
                     .Select(s => s.Slot),
                 "hearts" => slotQuery.Select(s => new SlotMetadata
                     {
