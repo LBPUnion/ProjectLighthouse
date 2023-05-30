@@ -203,6 +203,29 @@ public class ControllerExtensionTests
     }
 
     [Fact]
+    public void FilterFromRequest_ShouldAddMoveFilter_WhenMoveEqualsOnly()
+    {
+        GameTokenEntity token = MockHelper.GetUnitTestToken();
+        token.GameVersion = GameVersion.LittleBigPlanet2;
+        SlotsController controller = new(null!)
+        {
+            ControllerContext =
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    Request =
+                    {
+                        QueryString = new QueryString("?move=only"),
+                    },
+                },
+            },
+        };
+
+        SlotQueryBuilder queryBuilder = controller.FilterFromRequest(token);
+        Assert.NotEmpty(queryBuilder.GetFilters(typeof(MovePackFilter)));
+    }
+
+    [Fact]
     public void FilterFromRequest_ShouldAddCrossControlFilter_WhenCrossControlEqualsTrue()
     {
         GameTokenEntity token = MockHelper.GetUnitTestToken();

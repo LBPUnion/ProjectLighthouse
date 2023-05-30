@@ -77,6 +77,20 @@ public static class ControllerExtensions
 
         if (token.GameVersion != GameVersion.LittleBigPlanet3)
         {
+            if (controller.Request.Query.ContainsKey("move"))
+            {
+                string moveFilter = (string?)controller.Request.Query["move"] ?? "";
+                // By default this will include levels with move so we don't handle true
+                switch (moveFilter)
+                {
+                    case "false": 
+                        queryBuilder.AddFilter(new ExcludeMovePackFilter());
+                        break;
+                    case "only": 
+                        queryBuilder.AddFilter(new MovePackFilter());
+                        break;
+                }
+            }
 
             if (bool.TryParse(controller.Request.Query["move"], out bool movePack) && !movePack)
                 queryBuilder.AddFilter(new ExcludeMovePackFilter());
@@ -86,8 +100,6 @@ public static class ControllerExtensions
 
             GameVersion targetVersion = token.GameVersion;
 
-            bool matchGameVersionExactly = false;
-
             if (controller.Request.Query.ContainsKey("gameFilterType"))
             {
                 string gameFilter = (string?)controller.Request.Query["gameFilterType"] ?? "";
@@ -96,10 +108,9 @@ public static class ControllerExtensions
                 if (filterVersion <= targetVersion)
                 {
                     targetVersion = filterVersion;
-                    matchGameVersionExactly = true;
                 }
             }
-            queryBuilder.AddFilter(new GameVersionFilter(targetVersion, matchGameVersionExactly));
+            queryBuilder.AddFilter(new GameVersionFilter(targetVersion));
         } 
         else if (token.GameVersion == GameVersion.LittleBigPlanet3)
         {
