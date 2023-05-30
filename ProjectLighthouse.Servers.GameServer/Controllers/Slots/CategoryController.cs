@@ -166,5 +166,4 @@ public class CategoryController : ControllerBase
                 SlotBase.CreateFromEntity(s, token));
         return new GenericSerializableList(slots, pageData);
     }
-
 }

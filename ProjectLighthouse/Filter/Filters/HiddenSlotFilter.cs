@@ -8,6 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Filter.Filters;
 
 public class HiddenSlotFilter : ISlotFilter
 {
-    public Expression<Func<SlotEntity, bool>> GetPredicate() 
-        => PredicateExtensions.True<SlotEntity>().And(s => !s.Hidden);
+    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
+        PredicateExtensions.True<SlotEntity>().And(s => !s.Hidden);
 }

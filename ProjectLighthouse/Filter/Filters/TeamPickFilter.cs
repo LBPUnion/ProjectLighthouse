@@ -8,6 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Filter.Filters;
 
 public class TeamPickFilter : ISlotFilter
 {
-    public Expression<Func<SlotEntity, bool>> GetPredicate() 
-        => PredicateExtensions.True<SlotEntity>().And(s => s.TeamPick);
+    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
+        PredicateExtensions.True<SlotEntity>().And(s => s.TeamPick);
 }

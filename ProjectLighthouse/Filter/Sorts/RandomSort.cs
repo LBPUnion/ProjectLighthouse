@@ -9,5 +9,4 @@ namespace LBPUnion.ProjectLighthouse.Filter.Sorts;
 public class RandomSort : ISlotSort
 {
     public Expression<Func<SlotEntity, dynamic>> GetExpression() => _ => EF.Functions.Random();
-    
 }

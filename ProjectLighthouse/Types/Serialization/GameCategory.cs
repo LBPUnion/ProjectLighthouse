@@ -47,7 +47,4 @@ public class GameCategory : ILbpSerializable
             Tag = category.Tag,
             Results = results,
         };
-
-
-
 }

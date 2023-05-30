@@ -17,9 +17,7 @@ public class GameVersionListFilter : ISlotFilter
         this.versions = versions;
     }
 
-    public Expression<Func<SlotEntity, bool>> GetPredicate()
-    {
-        return this.versions.Aggregate(PredicateExtensions.False<SlotEntity>(),
+    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
+        this.versions.Aggregate(PredicateExtensions.False<SlotEntity>(),
             (current, version) => current.Or(s => s.GameVersion == version));
-    }
 }

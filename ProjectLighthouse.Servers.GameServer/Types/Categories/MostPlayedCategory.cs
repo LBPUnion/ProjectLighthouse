@@ -18,5 +18,4 @@ public class MostPlayedCategory : SlotCategory
         database.Slots.Where(queryBuilder.Build())
             .OrderByDescending(s => s.PlaysLBP1Unique + s.PlaysLBP2Unique + s.PlaysLBP3Unique)
             .ThenByDescending(s => s.PlaysLBP1 + s.PlaysLBP2 + s.PlaysLBP3);
-
 }

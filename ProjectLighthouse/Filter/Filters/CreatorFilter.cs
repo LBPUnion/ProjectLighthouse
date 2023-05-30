@@ -15,6 +15,6 @@ public class CreatorFilter : ISlotFilter
         this.creatorId = creatorId;
     }
 
-    public Expression<Func<SlotEntity, bool>> GetPredicate() 
-        => PredicateExtensions.True<SlotEntity>().And(s => s.CreatorId == this.creatorId);
+    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
+        PredicateExtensions.True<SlotEntity>().And(s => s.CreatorId == this.creatorId);
 }
