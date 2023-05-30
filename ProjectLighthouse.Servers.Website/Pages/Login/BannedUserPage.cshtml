@@ -19,21 +19,20 @@
     </p>         
    
     <p>
-        @if (Model.ModCase.ExpiresAt != null)
-        {
-            <span>
+        <span>
+            @if (Model.ModCase.ExpiresAt != null)
+            {
                 @Model.Translate(ModerationStrings.SuspensionExpiration, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))
-            </span>
-        }
-        else
-        {
-            <span>
+            }
+            else
+            {
                 @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(ModerationStrings.DoesNotExpire))
-            </span>
-        } 
+            }
+        </span>
+
         <ul>
             <li>@Model.Translate(ModerationStrings.LbpOnlineMultiplayer)</li>
-            <li>@Model.Translate(ModerationStrings.WebsiteInteractions)</li>      
+            <li>@Model.Translate(ModerationStrings.WebsiteInteractions)</li>
             <li>@Model.Translate(ModerationStrings.ProfileVisibility)</li>
             <li>@Model.Translate(ModerationStrings.AccountProfileManagement)</li>
         </ul>
