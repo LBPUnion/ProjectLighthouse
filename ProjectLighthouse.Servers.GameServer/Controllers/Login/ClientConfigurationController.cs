@@ -10,7 +10,7 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Login;
 
 [ApiController]
 [Authorize]

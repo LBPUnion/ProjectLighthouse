@@ -8,4 +8,5 @@ public class SlotMetadata
     public double RatingLbp1 { get; init; }
     public int ThumbsUp { get; init; }
     public int Hearts { get; init; }
+    public bool Played { get; set; }
 }

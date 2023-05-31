@@ -1,4 +1,6 @@
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Filter;
+using LBPUnion.ProjectLighthouse.Filter.Filters;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -31,10 +33,10 @@ public class StatisticsEndpoints : ApiEndpointController
             new StatisticsResponse
             {
                 Photos = await StatisticsHelper.PhotoCount(this.database),
-                Slots = await StatisticsHelper.SlotCount(this.database),
+                Slots = await StatisticsHelper.SlotCount(this.database, new SlotQueryBuilder()),
                 Users = await StatisticsHelper.UserCount(this.database),
                 RecentMatches = await StatisticsHelper.RecentMatches(this.database),
-                TeamPicks = await StatisticsHelper.TeamPickCount(this.database),
+                TeamPicks = await StatisticsHelper.SlotCount(this.database, new SlotQueryBuilder().AddFilter(new TeamPickFilter())),
             }
         );
 

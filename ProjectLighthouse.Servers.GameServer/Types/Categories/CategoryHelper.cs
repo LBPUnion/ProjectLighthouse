@@ -15,6 +15,8 @@ public static class CategoryHelper
         Categories.Add(new NewestLevelsCategory());
         Categories.Add(new MostPlayedCategory());
         Categories.Add(new HighestRatedCategory());
+        Categories.Add(new MyHeartedCreatorsCategory());
+        Categories.Add(new MyPlaylistsCategory());
         Categories.Add(new QueueCategory());
         Categories.Add(new HeartedCategory());
         Categories.Add(new LuckyDipCategory());

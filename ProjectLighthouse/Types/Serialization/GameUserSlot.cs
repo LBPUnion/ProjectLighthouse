@@ -247,6 +247,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
                 HeartCount = database.HeartedLevels.Count(h => h.SlotId == this.SlotId),
                 Username = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => u.Username).First(),
             })
+            .OrderBy(_ => 1)
             .FirstAsync();
         ReflectionHelper.CopyAllFields(stats, this);
         this.AuthorHandle = new NpHandle(stats.Username, "");

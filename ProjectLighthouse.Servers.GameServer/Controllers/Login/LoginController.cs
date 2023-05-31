@@ -13,7 +13,7 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
+namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Login;
 
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/login")]

@@ -34,7 +34,7 @@ public class MailQueueService : IMailService, IDisposable
         this.emailThread = Task.Factory.StartNew(this.EmailQueue);
     }
 
-    private async void EmailQueue()
+    private async Task EmailQueue()
     {
         while (!this.stopSignal)
         {

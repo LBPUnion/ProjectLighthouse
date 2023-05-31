@@ -17,9 +17,8 @@ namespace ProjectLighthouse.Tests.GameApiTests.Unit.Middlewares;
 [Trait("Category", "Unit")]
 public class SetLastContactMiddlewareTests
 {
-
     [Fact]
-    public async void SetLastContact_ShouldAddLastContact_WhenTokenIsLBP1()
+    public async Task SetLastContact_ShouldAddLastContact_WhenTokenIsLBP1()
     {
         DefaultHttpContext context = new()
         {
@@ -56,7 +55,7 @@ public class SetLastContactMiddlewareTests
     }
 
     [Fact]
-    public async void SetLastContact_ShouldUpdateLastContact_WhenTokenIsLBP1()
+    public async Task SetLastContact_ShouldUpdateLastContact_WhenTokenIsLBP1()
     {
         DefaultHttpContext context = new()
         {
@@ -106,7 +105,7 @@ public class SetLastContactMiddlewareTests
     }
 
     [Fact]
-    public async void SetLastContact_ShouldNotAddLastContact_WhenTokenIsNotLBP1()
+    public async Task SetLastContact_ShouldNotAddLastContact_WhenTokenIsNotLBP1()
     {
         DefaultHttpContext context = new()
         {
@@ -146,5 +145,4 @@ public class SetLastContactMiddlewareTests
         LastContactEntity? lastContactEntity = dbMock.LastContacts.FirstOrDefault();
         Assert.Null(lastContactEntity);
     }
-
 }

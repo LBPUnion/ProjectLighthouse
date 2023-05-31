@@ -8,6 +8,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -159,54 +160,53 @@ public class PhotosController : ControllerBase
     }
 
     [HttpGet("photos/{slotType}/{id:int}")]
-    public async Task<IActionResult> SlotPhotos([FromQuery] int pageStart, [FromQuery] int pageSize, string slotType, int id)
+    public async Task<IActionResult> SlotPhotos(string slotType, int id)
     {
-        if (pageSize <= 0) return this.BadRequest();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
+        PaginationData pageData = this.Request.GetPaginationData();
+
         List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.SlotId == id)
             .OrderByDescending(s => s.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
+            .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
 
         return this.Ok(new PhotoListResponse(photos));
     }
 
     [HttpGet("photos/by")]
-    public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> UserPhotosBy(string user)
     {
-        if (pageSize <= 0) return this.BadRequest();
 
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
+        PaginationData pageData = this.Request.GetPaginationData();
+
         List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.CreatorId == targetUserId)
             .OrderByDescending(s => s.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
+            .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
         return this.Ok(new PhotoListResponse(photos));
     }
 
     [HttpGet("photos/with")]
-    public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> UserPhotosWith(string user)
     {
-        if (pageSize <= 0) return this.BadRequest();
-
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
+
+        PaginationData pageData = this.Request.GetPaginationData();
 
         List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.PhotoSubjects.Any(ps => ps.UserId == targetUserId))
             .OrderByDescending(s => s.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
+            .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
 
         return this.Ok(new PhotoListResponse(photos));

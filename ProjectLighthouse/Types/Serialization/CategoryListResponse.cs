@@ -8,7 +8,7 @@ public class CategoryListResponse : ILbpSerializable
 {
     public CategoryListResponse() { }
 
-    public CategoryListResponse(List<GameCategory> categories, int total, int hint, int hintStart)
+    public CategoryListResponse(List<GameCategory> categories, int total, string hint, int hintStart)
     {
         this.Categories = categories;
         this.Total = total;
@@ -20,7 +20,7 @@ public class CategoryListResponse : ILbpSerializable
     public int Total { get; set; }
 
     [XmlAttribute("hint")]
-    public int Hint { get; set; }
+    public string Hint { get; set; } = "";
 
     [XmlAttribute("hint_start")]
     public int HintStart { get; set; }

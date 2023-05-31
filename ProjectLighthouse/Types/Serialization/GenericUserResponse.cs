@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
@@ -16,6 +17,14 @@ public struct GenericUserResponse<T> : ILbpSerializable, IHasCustomRoot where T 
         this.HintStart = hintStart;
     }
 
+    public GenericUserResponse(string rootElement, List<T> users, PaginationData pageData)
+    {
+        this.RootTag = rootElement;
+        this.Users = users;
+        this.Total = pageData.TotalElements;
+        this.HintStart = pageData.HintStart;
+    }
+
     public GenericUserResponse(string rootElement, List<T> users)
     {
         this.RootTag = rootElement;
@@ -23,7 +32,7 @@ public struct GenericUserResponse<T> : ILbpSerializable, IHasCustomRoot where T 
     }
 
     [XmlIgnore]
-    public string RootTag { get; set; }
+    private string RootTag { get; }
 
     [XmlElement("user")]
     public List<T> Users { get; set; }
