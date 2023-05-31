@@ -24,7 +24,7 @@
         <value>Adgangskode</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Create an account</value>
+        <value>Opret en konto</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>Glemt adgangskode?</value>

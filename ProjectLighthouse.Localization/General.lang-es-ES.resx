@@ -24,7 +24,7 @@
         <value>Contraseña</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Create an account</value>
+        <value>Registrarse</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>¿Has olvidado la contraseña?</value>

@@ -18,33 +18,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="suspension_heading" xml:space="preserve">
-        <value>Account Suspended</value>
+        <value>Konto zawieszone</value>
     </data>
   <data name="suspension_explanation" xml:space="preserve">
-        <value>Your {0} account has been suspended due to code of conduct violations.</value>
+        <value>Twoje {0} konto zostało zawieszone z powodu naruszenia kodeksu postępowania.</value>
     </data>
   <data name="suspension_expiration" xml:space="preserve">
-        <value>During this suspension, the following features will be limited until {0}:</value>
+        <value>Podczas tego zawieszenia, poniższe funkcje będą ograniczone do {0}:</value>
     </data>
   <data name="suspension_reason" xml:space="preserve">
-        <value>Reason for suspension: "{0}"</value>
+        <value>Powód zawieszenia: "{0}"</value>
     </data>
   <data name="suspension_circumvent_warning" xml:space="preserve">
-        <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
+        <value>Wszystkie próby obejścia tego zawieszenia spowodują wydłużenie okresu zawieszenia.</value>
     </data>
   <data name="lbp_online_multiplayer" xml:space="preserve">
-        <value>LittleBigPlanet™ Online multiplayer</value>
+        <value>Gra wieloosobowa LittleBigPlanet™</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>Does not expire</value>
+        <value>Nie wygasa</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
-        <value>Profile visibility</value>
+        <value>Widoczność profilu</value>
     </data>
   <data name="website_interactions" xml:space="preserve">
-        <value>Browsing levels, photos, and profiles</value>
+        <value>Przeglądanie poziomów, zdjęć i profilów</value>
     </data>
   <data name="account_profile_management" xml:space="preserve">
-        <value>Account and profile management</value>
+        <value>Zarządzanie kontem i profilem</value>
     </data>
 </root>
