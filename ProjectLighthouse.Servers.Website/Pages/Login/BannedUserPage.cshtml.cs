@@ -24,10 +24,11 @@ public class BannedUserPage : BaseLayout
         if (user == null) return this.Redirect("~/login");
         if (!user.IsBanned) return this.Redirect("~/");
 
-        ModerationCaseEntity? modCase = await this.Database.Cases
-            .LastOrDefaultAsync(c => c.AffectedId == user.UserId
-                                     && c.Type == CaseType.UserBan
-                                     && !c.Dismissed);
+        ModerationCaseEntity? modCase = await this.Database.Cases.OrderByDescending(c => c.CreatedAt)
+            .Where(c => c.AffectedId == user.UserId)
+            .Where(c => c.Type == CaseType.UserBan)
+            .Where(c => c.DismissedAt != null)
+            .FirstOrDefaultAsync();
 
         if (modCase == null) return this.Redirect("~/");
 
