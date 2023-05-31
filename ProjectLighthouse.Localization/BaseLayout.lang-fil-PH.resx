@@ -22,7 +22,7 @@
         </value>
   </resheader>
   <data name="header_users" xml:space="preserve">
-        <value>Mga gumagamit</value>
+        <value>Users</value>
         <comment>A button on the header that takes you to the user listing.</comment>
     </data>
   <data name="header_photos" xml:space="preserve">
