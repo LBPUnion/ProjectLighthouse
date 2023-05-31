@@ -49,6 +49,7 @@ public class ListController : ControllerBase
         pageData.TotalElements = await this.database.QueuedLevels.CountAsync(q => q.UserId == targetUserId);
 
         IQueryable<SlotEntity> baseQuery = this.database.QueuedLevels.Where(h => h.UserId == targetUserId)
+            .OrderByDescending(q => q.QueuedLevelId)
             .Include(q => q.Slot)
             .Select(q => q.Slot);
 
@@ -117,6 +118,7 @@ public class ListController : ControllerBase
         pageData.TotalElements = await this.database.HeartedLevels.CountAsync(h => h.UserId == targetUserId);
 
         IQueryable<SlotEntity> baseQuery = this.database.HeartedLevels.Where(h => h.UserId == targetUserId)
+            .OrderByDescending(h => h.HeartedLevelId)
             .Include(h => h.Slot)
             .Select(h => h.Slot);
 
