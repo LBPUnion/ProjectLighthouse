@@ -25,7 +25,9 @@ public class BannedUserPage : BaseLayout
         if (!user.IsBanned) return this.Redirect("~/");
 
         ModerationCaseEntity? modCase = await this.Database.Cases
-            .FirstOrDefaultAsync(c => c.AffectedId == user.UserId && c.Type == CaseType.UserBan);
+            .LastOrDefaultAsync(c => c.AffectedId == user.UserId
+                                     && c.Type == CaseType.UserBan
+                                     && !c.Dismissed);
 
         if (modCase == null) return this.Redirect("~/");
 
