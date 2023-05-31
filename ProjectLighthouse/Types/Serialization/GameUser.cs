@@ -179,7 +179,8 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
                 HeartedPlaylistCount = database.HeartedPlaylists.Count(h => h.UserId == this.UserId),
                 QueuedLevelCount = database.QueuedLevels.Count(q => q.UserId == this.UserId),
             })
-            .FirstOrDefaultAsync();
+            .OrderBy(_ => 1)
+            .FirstAsync();
 
         this.UserHandle.Username = stats.Username;
         this.CommentsEnabled = this.CommentsEnabled && ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
