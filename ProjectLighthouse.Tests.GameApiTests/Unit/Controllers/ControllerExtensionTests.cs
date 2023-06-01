@@ -180,6 +180,29 @@ public class ControllerExtensionTests
     }
 
     [Fact]
+    public void FilterFromRequest_ShouldNotAddFirstUploadedFilter_WhenDateFilterInvalid()
+    {
+        GameTokenEntity token = MockHelper.GetUnitTestToken();
+        token.GameVersion = GameVersion.LittleBigPlanet2;
+        SlotsController controller = new(null!)
+        {
+            ControllerContext =
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    Request =
+                    {
+                        QueryString = new QueryString("?dateFilterType=thisMillenium"),
+                    },
+                },
+            },
+        };
+
+        SlotQueryBuilder queryBuilder = controller.FilterFromRequest(token);
+        Assert.Empty(queryBuilder.GetFilters(typeof(FirstUploadedFilter)));
+    }
+
+    [Fact]
     public void FilterFromRequest_ShouldAddExcludeMoveFilter_WhenMoveEqualsFalse()
     {
         GameTokenEntity token = MockHelper.GetUnitTestToken();

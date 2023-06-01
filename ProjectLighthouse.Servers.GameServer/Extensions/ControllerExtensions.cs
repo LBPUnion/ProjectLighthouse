@@ -92,9 +92,6 @@ public static class ControllerExtensions
                 }
             }
 
-            if (bool.TryParse(controller.Request.Query["move"], out bool movePack) && !movePack)
-                queryBuilder.AddFilter(new ExcludeMovePackFilter());
-
             if (bool.TryParse(controller.Request.Query["crosscontrol"], out bool crossControl) && crossControl)
                 queryBuilder.AddFilter(new CrossControlFilter());
 
