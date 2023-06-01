@@ -254,7 +254,7 @@ public class ListController : ControllerBase
         pageData.TotalElements = await this.database.HeartedProfiles.CountAsync(h => h.UserId == targetUserId);
 
         List<GameUser> heartedProfiles = (await this.database.HeartedProfiles.Include(h => h.HeartedUser)
-            .OrderBy(h => h.HeartedProfileId)
+            .OrderByDescending(h => h.HeartedProfileId)
             .Where(h => h.UserId == targetUserId)
             .Select(h => h.HeartedUser)
             .ApplyPagination(pageData)
