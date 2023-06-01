@@ -15,11 +15,11 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
-public class CollectionController : ControllerBase
+public class PlaylistController : ControllerBase
 {
     private readonly DatabaseContext database;
 
-    public CollectionController(DatabaseContext database)
+    public PlaylistController(DatabaseContext database)
     {
         this.database = database;
     }
@@ -38,6 +38,22 @@ public class CollectionController : ControllerBase
         int total = targetPlaylist.SlotIds.Length;
 
         return this.Ok(new GenericSlotResponse(slots, total, 0));
+    }
+
+    [HttpPost("playlists/{playlistId:int}/delete")]
+    public async Task<IActionResult> DeletePlaylist(int playlistId)
+    {
+        GameTokenEntity token = this.GetToken();
+
+        PlaylistEntity? targetPlaylist = await this.database.Playlists.FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
+        if (targetPlaylist == null) return this.BadRequest();
+
+        if (token.UserId != targetPlaylist.CreatorId) return this.Unauthorized();
+
+        this.database.Playlists.Remove(targetPlaylist);
+        await this.database.SaveChangesAsync();
+
+        return this.Ok(await this.GetUserPlaylists(token.UserId));
     }
 
     [HttpPost("playlists/{playlistId:int}")]
@@ -90,7 +106,7 @@ public class CollectionController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Ok(await this.GetUserPlaylists(token.UserId));
+        return this.Ok(GamePlaylist.CreateFromEntity(targetPlaylist));
     }
 
     private async Task<PlaylistResponse> GetUserPlaylists(int userId)
