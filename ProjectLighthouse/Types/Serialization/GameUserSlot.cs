@@ -245,16 +245,16 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
                 PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
                 AuthorPhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId),
                 HeartCount = database.HeartedLevels.Count(h => h.SlotId == this.SlotId),
-                AuthorHandle = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => new NpHandle
+                UsernameAndIcon = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => new
                 {
-                    Username = u.Username,
-                    IconHash = u.IconHash,
+                    u.Username,
+                    u.IconHash,
                 }).First(),
             })
             .OrderBy(_ => 1)
             .FirstAsync();
         ReflectionHelper.CopyAllFields(stats, this);
-        this.AuthorHandle = stats.AuthorHandle;
+        this.AuthorHandle = new NpHandle(stats.UsernameAndIcon.Username, stats.UsernameAndIcon.IconHash);
 
         if (this.GameVersion == GameVersion.LittleBigPlanet1)
         {
