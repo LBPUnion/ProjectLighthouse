@@ -43,7 +43,7 @@ public class CategoryController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        pageData.TotalElements = CategoryHelper.Categories.Count;
+        pageData.TotalElements = CategoryHelper.Categories.Count(c => !string.IsNullOrWhiteSpace(c.Name));
 
         if (!int.TryParse(this.Request.Query["num_categories_with_results"], out int results)) results = 5;
 
@@ -51,7 +51,8 @@ public class CategoryController : ControllerBase
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
 
-        foreach (Category category in CategoryHelper.Categories.Skip(Math.Max(0, pageData.PageStart - 1))
+        foreach (Category category in CategoryHelper.Categories.Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                     .Skip(Math.Max(0, pageData.PageStart - 1))
                      .Take(Math.Min(pageData.PageSize, pageData.MaxElements))
                      .ToList())
         {
@@ -60,7 +61,10 @@ public class CategoryController : ControllerBase
             results--;
         }
 
-        return this.Ok(new CategoryListResponse(categories, pageData.TotalElements, "", pageData.HintStart));
+        Category searchCategory = CategoryHelper.Categories.First(c => c.Tag == "text");
+        GameCategory gameSearchCategory = GameCategory.CreateFromEntity(searchCategory, null);
+
+        return this.Ok(new CategoryListResponse(categories, gameSearchCategory, pageData.TotalElements, "", pageData.HintStart));
     }
 
     [HttpGet("searches/{endpointName}")]

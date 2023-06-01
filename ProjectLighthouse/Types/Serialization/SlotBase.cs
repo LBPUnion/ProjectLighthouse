@@ -28,7 +28,7 @@ public abstract class SlotBase : ILbpSerializable
             Description = slot.Description,
             Location = slot.Location,
             IconHash = slot.IconHash,
-            BackgroundHash = slot.BackgroundHash ?? "",
+            BackgroundHash = slot.BackgroundHash,
             AuthorLabels = slot.AuthorLabels,
             GameVersion = slot.GameVersion,
             Shareable = slot.IsShareable,
@@ -49,7 +49,7 @@ public abstract class SlotBase : ILbpSerializable
     public static SlotBase CreateFromEntity(SlotEntity slot, GameTokenEntity token) 
         => CreateFromEntity(slot, token.GameVersion, token.UserId);
 
-    public static SlotBase CreateFromEntity(SlotEntity slot, GameVersion targetGame, int targetUserId)
+    private static SlotBase CreateFromEntity(SlotEntity slot, GameVersion targetGame, int targetUserId)
     {
         if (slot == null)
         {

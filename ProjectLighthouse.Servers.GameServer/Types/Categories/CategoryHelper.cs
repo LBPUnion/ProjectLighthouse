@@ -20,6 +20,7 @@ public static class CategoryHelper
         Categories.Add(new QueueCategory());
         Categories.Add(new HeartedCategory());
         Categories.Add(new LuckyDipCategory());
+        Categories.Add(new TextSearchCategory());
 
         using DatabaseContext database = DatabaseContext.CreateNewInstance();
         foreach (DatabaseCategoryEntity category in database.CustomCategories) Categories.Add(new CustomCategory(category));

@@ -26,10 +26,6 @@ public class SearchController : ControllerBase
         this.database = database;
     }
 
-    [HttpGet("searchLBP3")]
-    public Task<IActionResult> SearchSlotsLBP3([FromQuery] string textFilter) 
-        => this.SearchSlots(textFilter, "results");
-
     [HttpGet("search")]
     public async Task<IActionResult> SearchSlots([FromQuery] string query, string? keyName = "slots")
     {

@@ -91,8 +91,9 @@ public class CustomXmlSerializer : XmlSerializer
                 }
                 
             }
-            // Otherwise if the object isn't a ILbpSerializable, skip
-            else if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType))
+            // Otherwise if the object isn't a ILbpSerializable or a nullable ILbpSerializable, skip
+            else if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType) &&
+                     !typeof(ILbpSerializable).IsAssignableFrom(Nullable.GetUnderlyingType(propertyInfo.PropertyType)))
             {
                 continue;
             }

@@ -8,9 +8,10 @@ public class CategoryListResponse : ILbpSerializable
 {
     public CategoryListResponse() { }
 
-    public CategoryListResponse(List<GameCategory> categories, int total, string hint, int hintStart)
+    public CategoryListResponse(List<GameCategory> categories, GameCategory textSearch, int total, string hint, int hintStart)
     {
         this.Categories = categories;
+        this.Search = textSearch;
         this.Total = total;
         this.Hint = hint;
         this.HintStart = hintStart;
@@ -26,7 +27,7 @@ public class CategoryListResponse : ILbpSerializable
     public int HintStart { get; set; }
 
     [XmlElement("text_search")]
-    public TextSearch Search { get; set; } = new();
+    public GameCategory Search { get; set; }
 
     [XmlElement("category")]
     public List<GameCategory> Categories { get; set; }

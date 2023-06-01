@@ -8,15 +8,18 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 public class GameCategory : ILbpSerializable
 {
     [XmlElement("name")]
+    [DefaultValue("")]
     public string Name { get; set; }
 
     [XmlElement("description")]
+    [DefaultValue("")]
     public string Description { get; set; }
 
     [XmlElement("url")]
     public string Url { get; set; }
 
     [XmlElement("icon")]
+    [DefaultValue("")]
     public string Icon { get; set; }
 
     [DefaultValue("")]
@@ -32,10 +35,11 @@ public class GameCategory : ILbpSerializable
     [XmlElement("tag")]
     public string Tag { get; set; }
 
+    [DefaultValue(null)]
     [XmlElement("results")]
-    public GenericSerializableList Results { get; set; }
+    public GenericSerializableList? Results { get; set; }
 
-    public static GameCategory CreateFromEntity(Category category, GenericSerializableList results) =>
+    public static GameCategory CreateFromEntity(Category category, GenericSerializableList? results) =>
         new()
         {
             Name = category.Name,

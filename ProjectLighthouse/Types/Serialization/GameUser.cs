@@ -165,7 +165,6 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         var stats = await database.Users.Where(u => u.UserId == this.UserId)
             .Select(_ => new
             {
-                Username = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.Username).First(),
                 BonusSlots = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.AdminGrantedSlots).First(),
                 PlaylistCount = database.Playlists.Count(p => p.CreatorId == this.UserId),
                 ReviewCount = database.Reviews.Count(r => r.ReviewerId == this.UserId),
@@ -182,7 +181,6 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
             .OrderBy(_ => 1)
             .FirstAsync();
 
-        this.UserHandle.Username = stats.Username;
         this.CommentsEnabled = this.CommentsEnabled && ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
 
         int entitledSlots = ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + stats.BonusSlots;
@@ -236,7 +234,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         new()
         {
             UserId = entity.UserId,
-            UserHandle = new NpHandle("", entity.IconHash),
+            UserHandle = new NpHandle(entity.Username, entity.IconHash),
             Biography = entity.Biography,
             Location = entity.Location,
             ProfilePins = entity.Pins,
