@@ -246,7 +246,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
                 AuthorPhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId),
                 HeartCount = database.HeartedLevels.Count(h => h.SlotId == this.SlotId),
                 Username = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => u.Username).First(),
-                IconHash = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => u.Username).First(),
+                IconHash = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => u.IconHash).First(),
             })
             .OrderBy(_ => 1)
             .FirstAsync();
