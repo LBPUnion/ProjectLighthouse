@@ -89,7 +89,7 @@
 
                 <a class="item home-logo" href="/">
                     <img src="~/logo-mono.png" alt="Home" class="logo-mono"/>
-                    <img src="@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.Now.Month == 6 ? "~/logo-pride.png" : "~/logo-color.png")" 
+                    <img src="~/@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.Now.Month == 6 ? "logo-pride.png" : "logo-color.png")" 
                          alt="Home"
                          class="logo-color"/>
                 </a>
