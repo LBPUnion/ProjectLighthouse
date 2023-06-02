@@ -89,7 +89,9 @@
 
                 <a class="item home-logo" href="/">
                     <img src="~/logo-mono.png" alt="Home" class="logo-mono"/>
-                    <img src="~/logo-color.png" alt="Home" class="logo-color"/>
+                    <img src="~/@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.Now.Month == 6 ? "logo-pride.png" : "logo-color.png")" 
+                         alt="Home"
+                         class="logo-color"/>
                 </a>
                 @foreach (PageNavigationItem navigationItem in Model.NavigationItems)
                 {
