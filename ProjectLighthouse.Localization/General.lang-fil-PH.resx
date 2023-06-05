@@ -24,7 +24,7 @@
         <value>Password</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Create an account</value>
+        <value>Magrehistro</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>Nakalimutan ang password?</value>
@@ -39,19 +39,19 @@
         <value>Hindi kilala</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>Tagumpay!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Reset Password</value>
+        <value>I-reset ang Password</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Recent Activity</value>
+        <value>Kamakailang Aktibidad</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Coming soon!</value>
+        <value>Sisipagdating!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Most recent photos</value>
+        <value>Pinakabagong mga larawan</value>
     </data>
   <data name="email" xml:space="preserve">
         <value>Email</value>

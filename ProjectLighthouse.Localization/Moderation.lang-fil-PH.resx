@@ -18,33 +18,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="suspension_heading" xml:space="preserve">
-        <value>Account Suspended</value>
+        <value>Sinuspinde ang Account</value>
     </data>
   <data name="suspension_explanation" xml:space="preserve">
-        <value>Your {0} account has been suspended due to code of conduct violations.</value>
+        <value>Ang iyong {0} account ay sinuspinde dahil sa paglabag sa code of conduct.</value>
     </data>
   <data name="suspension_expiration" xml:space="preserve">
-        <value>During this suspension, the following features will be limited until {0}:</value>
+        <value>Sa panahong ito ng suspensyon, ang sumusunod na mga feature ay magiging limitado hanggang sa {0}:</value>
     </data>
   <data name="suspension_reason" xml:space="preserve">
-        <value>Reason for suspension: "{0}"</value>
+        <value>Dahilan ng suspensyon: "{0}"</value>
     </data>
   <data name="suspension_circumvent_warning" xml:space="preserve">
-        <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
+        <value>Ang pagtatangka na palampasin ang suspensyong ito ay magdudulot ng pahabang panahon ng suspensyon.</value>
     </data>
   <data name="lbp_online_multiplayer" xml:space="preserve">
         <value>LittleBigPlanet™ Online multiplayer</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>Does not expire</value>
+        <value>Hindi nag-eexpire</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
-        <value>Profile visibility</value>
+        <value>Nakikita ang profile</value>
     </data>
   <data name="website_interactions" xml:space="preserve">
-        <value>Browsing levels, photos, and profiles</value>
+        <value>Pagsusuri sa mga antas, mga larawan, at mga profile</value>
     </data>
   <data name="account_profile_management" xml:space="preserve">
-        <value>Account and profile management</value>
+        <value>Pamamahala ng account at profile</value>
     </data>
 </root>
