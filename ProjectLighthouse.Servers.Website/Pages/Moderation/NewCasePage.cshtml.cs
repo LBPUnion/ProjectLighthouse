@@ -41,14 +41,14 @@ public class NewCasePage : BaseLayout
         if (type == null) return this.BadRequest();
         if (affectedId == null) return this.BadRequest();
 
-        UserEntity? affectedUserEntity = await this.Database.Users
-            .FirstOrDefaultAsync(u => u.UserId == affectedId.Value);
-
         reason ??= string.Empty;
         modNotes ??= string.Empty;
         
         // if id is invalid then return bad request
         if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
+
+        UserEntity? affectedUserEntity =
+            await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == affectedId.Value);
 
         if (affectedUserEntity?.IsModerator ?? false)
         {
