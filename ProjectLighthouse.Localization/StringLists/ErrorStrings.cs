@@ -9,8 +9,7 @@ public static class ErrorStrings
     public static readonly TranslatableString EmailInvalid = create("email_invalid");
     public static readonly TranslatableString EmailTaken = create("email_taken");
     public static readonly TranslatableString CaptchaFailed = create("captcha_failed");
-    public static readonly TranslatableString TokenInvalid = create("token_invalid");
-    public static readonly TranslatableString UserIsBanned = create("user_banned");
+    public static readonly TranslatableString ActionNoPermission = create("action_no_permission");
     
     private static TranslatableString create(string key) => new(TranslationAreas.Error, key);
 }
