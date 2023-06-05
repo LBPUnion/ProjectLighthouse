@@ -1,4 +1,5 @@
 @page "/moderation/newCase"
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.NewCasePage
 
 @{
@@ -8,6 +9,16 @@
 
 <form method="post">
     @Html.AntiForgeryToken()
+    
+    @if (!string.IsNullOrWhiteSpace(Model.Error))
+    {
+        <div class="ui negative message">
+            <div class="header">
+                @Model.Translate(GeneralStrings.Error)
+            </div>
+            <p style="white-space: pre-line">@Model.Error</p>
+        </div>
+    }
     
     <input type="hidden" name="type" value="@((int)Model.Type)"/>
     <input type="hidden" name="affectedId" value="@Model.AffectedId"/>
