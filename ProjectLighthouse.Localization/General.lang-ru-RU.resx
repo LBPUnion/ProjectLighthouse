@@ -24,7 +24,7 @@
         <value>Пароль</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Create an account</value>
+        <value>Создать аккаунт</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>Забыли пароль?</value>
@@ -54,6 +54,6 @@
         <value>Самые последние фото</value>
     </data>
   <data name="email" xml:space="preserve">
-        <value>Email</value>
+        <value>Электронная Почта</value>
     </data>
 </root>

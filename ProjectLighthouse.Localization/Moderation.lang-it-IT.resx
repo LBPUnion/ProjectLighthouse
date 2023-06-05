@@ -18,13 +18,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="suspension_heading" xml:space="preserve">
-        <value>Account Suspended</value>
+        <value>Account sospeso</value>
     </data>
   <data name="suspension_explanation" xml:space="preserve">
-        <value>Your {0} account has been suspended due to code of conduct violations.</value>
+        <value>Il tuo {0} account è stato sospeso per di violazione del codice di condotta.</value>
     </data>
   <data name="suspension_expiration" xml:space="preserve">
-        <value>During this suspension, the following features will be limited until {0}:</value>
+        <value>Durante questa sospensione, le seguenti funzioni saranno limitate fino al {0}:</value>
     </data>
   <data name="suspension_reason" xml:space="preserve">
         <value>Reason for suspension: "{0}"</value>
