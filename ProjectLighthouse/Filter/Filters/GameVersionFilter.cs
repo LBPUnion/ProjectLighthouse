@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -18,12 +17,9 @@ public class GameVersionFilter : ISlotFilter
         this.matchExactly = matchExactly;
     }
 
-    public Expression<Func<SlotEntity, bool>> GetPredicate()
-    {
-        Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.True<SlotEntity>();
-        predicate = this.matchExactly || this.targetVersion is GameVersion.LittleBigPlanetVita or GameVersion.LittleBigPlanetPSP or GameVersion.Unknown
-                ? predicate.And(s => s.GameVersion == this.targetVersion)
-                : predicate.And(s => s.GameVersion <= this.targetVersion);
-        return predicate;
-    }
+    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
+        this.matchExactly ||
+        this.targetVersion is GameVersion.LittleBigPlanetVita or GameVersion.LittleBigPlanetPSP or GameVersion.Unknown
+            ? s => s.GameVersion == this.targetVersion
+            : s => s.GameVersion <= this.targetVersion;
 }

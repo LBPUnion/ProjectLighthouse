@@ -49,7 +49,9 @@ public class SlotsController : ControllerBase
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token).AddFilter(new CreatorFilter(targetUserId));
 
-        SlotSortBuilder<SlotEntity> sortBuilder = new SlotSortBuilder<SlotEntity>().AddSort(new FirstUploadedSort());
+        SlotSortBuilder<SlotEntity> sortBuilder = new SlotSortBuilder<SlotEntity>()
+            .AddSort(new FirstUploadedSort())
+            .SortDescending(false);
 
         List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder);
 
