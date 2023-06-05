@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 
@@ -15,6 +14,5 @@ public class CreatorFilter : ISlotFilter
         this.creatorId = creatorId;
     }
 
-    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
-        PredicateExtensions.True<SlotEntity>().And(s => s.CreatorId == this.creatorId);
+    public Expression<Func<SlotEntity, bool>> GetPredicate() => s => s.CreatorId == this.creatorId;
 }

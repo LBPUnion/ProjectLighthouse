@@ -92,8 +92,9 @@ public static class ControllerExtensions
                 }
             }
 
-            if (bool.TryParse(controller.Request.Query["crosscontrol"], out bool crossControl) && crossControl)
-                queryBuilder.AddFilter(new CrossControlFilter());
+            bool _ = bool.TryParse(controller.Request.Query["crosscontrol"], out bool showCrossControl);
+            if (showCrossControl) queryBuilder.AddFilter(new CrossControlFilter());
+            
 
             GameVersion targetVersion = token.GameVersion;
 
@@ -170,6 +171,9 @@ public static class ControllerExtensions
 
         if (token.GameVersion != GameVersion.LittleBigPlanet1)
             queryBuilder.AddFilter(new ExcludeLBP1OnlyFilter(token.UserId, token.GameVersion));
+
+        if (!queryBuilder.GetFilters(typeof(CrossControlFilter)).Any())
+            queryBuilder.AddFilter(new ExcludeCrossControlFilter());
 
         queryBuilder.AddFilter(new SubLevelFilter(token.UserId));
         queryBuilder.AddFilter(new HiddenSlotFilter());
