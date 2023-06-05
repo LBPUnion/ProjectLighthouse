@@ -44,17 +44,17 @@ public class NewCasePage : BaseLayout
         UserEntity? affectedUserEntity = await this.Database.Users
             .FirstOrDefaultAsync(u => u.UserId == affectedId.Value);
 
-        if (affectedUserEntity != null && affectedUserEntity.IsModerator)
-        {
-            this.Error = this.Translate(ErrorStrings.UserChangesDeny);
-            return this.Page();
-        }
-
         reason ??= string.Empty;
         modNotes ??= string.Empty;
         
         // if id is invalid then return bad request
         if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
+
+        if (affectedUserEntity?.IsModerator ?? false)
+        {
+            this.Error = this.Translate(ErrorStrings.ActionNoPermission);
+            return this.Page();
+        }
 
         ModerationCaseEntity @case = new()
         {

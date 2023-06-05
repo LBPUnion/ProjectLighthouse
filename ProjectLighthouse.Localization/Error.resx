@@ -39,7 +39,7 @@
     <data name="email_invalid" xml:space="preserve">
         <value>Email address field is required.</value>
     </data>
-    <data name="user_changes_deny" xml:space="preserve">
-        <value>You don't have permissions to make changes to this user.</value>
+    <data name="action_no_permission" xml:space="preserve">
+        <value>You don't have permissions to perform this action.</value>
     </data>
 </root>
