@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -18,10 +17,6 @@ public class ExcludeLBP1OnlyFilter : ISlotFilter
         this.targetGameVersion = targetGameVersion;
     }
 
-    public Expression<Func<SlotEntity, bool>> GetPredicate()
-    {
-        Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.True<SlotEntity>();
-        predicate = predicate.And(s => !s.Lbp1Only || s.CreatorId == this.userId || this.targetGameVersion == GameVersion.LittleBigPlanet1);
-        return predicate;
-    }
+    public Expression<Func<SlotEntity, bool>> GetPredicate() =>
+        s => !s.Lbp1Only || s.CreatorId == this.userId || this.targetGameVersion == GameVersion.LittleBigPlanet1;
 }

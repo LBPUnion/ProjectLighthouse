@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Types.Filter;
 
 namespace LBPUnion.ProjectLighthouse.Filter.Filters;
 
-public class ExcludeMovePackFilter : ISlotFilter
+public class ExcludeCrossControlFilter : ISlotFilter
 {
-    public Expression<Func<SlotEntity, bool>> GetPredicate() => s => !s.MoveRequired;
+    public Expression<Func<SlotEntity, bool>> GetPredicate() => s => !s.CrossControllerRequired;
 }

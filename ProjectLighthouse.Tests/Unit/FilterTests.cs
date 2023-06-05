@@ -209,6 +209,34 @@ public class FilterTests
     }
 
     [Fact]
+    public void ExcludeCrossControlFilter_ShouldAccept_WhenNotCrossControl()
+    {
+        ExcludeCrossControlFilter crossControlFilter = new();
+        Func<SlotEntity, bool> crossControlFunc = crossControlFilter.GetPredicate().Compile();
+
+        SlotEntity slot = new()
+        {
+            CrossControllerRequired = false,
+        };
+
+        Assert.True(crossControlFunc(slot));
+    }
+
+    [Fact]
+    public void ExcludeCrossControlFilter_ShouldReject_WhenCrossControl()
+    {
+        ExcludeCrossControlFilter crossControlFilter = new();
+        Func<SlotEntity, bool> crossControlFunc = crossControlFilter.GetPredicate().Compile();
+
+        SlotEntity slot = new()
+        {
+            CrossControllerRequired = true,
+        };
+
+        Assert.False(crossControlFunc(slot));
+    }
+
+    [Fact]
     public void ExcludeLBP1OnlyFilter_ShouldReject_WhenLbp1Only_AndTokenNotLbp1_AndNotCreator()
     {
         ExcludeLBP1OnlyFilter excludeLBP1 = new(10, GameVersion.LittleBigPlanet2);
