@@ -77,7 +77,7 @@ public class SlotControllerTests
     }
 
     [Fact]
-    public async Task SlotsBy_ResultsAreOrderedByFirstUploadedTimestampDescending()
+    public async Task SlotsBy_ResultsAreOrderedByFirstUploadedTimestampAscending()
     {
         List<SlotEntity> slots = new()
         {
@@ -119,9 +119,9 @@ public class SlotControllerTests
         IActionResult result = await slotsController.SlotsBy("bytest");
 
         const int expectedElements = 3;
-        const int expectedFirstSlotId = 1;
+        const int expectedFirstSlotId = 2;
         const int expectedSecondSlotId = 3;
-        const int expectedThirdSlotId = 2;
+        const int expectedThirdSlotId = 1;
 
         GenericSlotResponse slotResponse = result.CastTo<OkObjectResult, GenericSlotResponse>();
         Assert.Equal(expectedElements, slotResponse.Slots.Count);
