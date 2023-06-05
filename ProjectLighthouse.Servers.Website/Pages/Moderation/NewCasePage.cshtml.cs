@@ -1,9 +1,11 @@
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 
@@ -14,6 +16,8 @@ public class NewCasePage : BaseLayout
 
     public CaseType Type { get; set; }
     public int AffectedId { get; set; }
+
+    public string? Error { get; private set; }
 
     public IActionResult OnGet([FromQuery] CaseType? type, [FromQuery] int? affectedId)
     {
@@ -42,7 +46,16 @@ public class NewCasePage : BaseLayout
         
         // if id is invalid then return bad request
         if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
-        
+
+        UserEntity? affectedUserEntity =
+            await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == affectedId.Value);
+
+        if (affectedUserEntity?.IsModerator ?? false)
+        {
+            this.Error = this.Translate(ErrorStrings.ActionNoPermission);
+            return this.Page();
+        }
+
         ModerationCaseEntity @case = new()
         {
             Type = type.Value,
