@@ -94,7 +94,6 @@ public static class ControllerExtensions
 
             bool _ = bool.TryParse(controller.Request.Query["crosscontrol"], out bool showCrossControl);
             if (showCrossControl) queryBuilder.AddFilter(new CrossControlFilter());
-            
 
             GameVersion targetVersion = token.GameVersion;
 

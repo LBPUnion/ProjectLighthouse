@@ -22,5 +22,4 @@ public class GameVersionFilter : ISlotFilter
         this.targetVersion is GameVersion.LittleBigPlanetVita or GameVersion.LittleBigPlanetPSP or GameVersion.Unknown
             ? s => s.GameVersion == this.targetVersion
             : s => s.GameVersion <= this.targetVersion;
-
 }
