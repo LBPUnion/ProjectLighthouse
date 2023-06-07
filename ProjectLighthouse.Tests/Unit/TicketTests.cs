@@ -11,7 +11,8 @@ public class TicketTests
     [Fact]
     public void CanReadTicket()
     {
-        TicketBuilder builder = new TicketBuilder().SetCountry("br")
+        TicketBuilder builder = new TicketBuilder()
+            .SetCountry("br")
             .SetUserId(21)
             .SetDomain("us")
             .SetStatus(0)
