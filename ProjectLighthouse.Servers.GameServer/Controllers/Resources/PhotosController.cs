@@ -160,7 +160,7 @@ public class PhotosController : ControllerBase
     }
 
     [HttpGet("photos/{slotType}/{id:int}")]
-    public async Task<IActionResult> SlotPhotos(string slotType, int id)
+    public async Task<IActionResult> SlotPhotos(string slotType, int id, [FromQuery] string? by)
     {
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
@@ -169,7 +169,16 @@ public class PhotosController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
+        int creatorId = 0;
+        if (by != null)
+        {
+            creatorId = await this.database.Users.Where(u => u.Username == by)
+                .Select(u => u.UserId)
+                .FirstOrDefaultAsync();
+        }
+
         List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
+            .Where(p => creatorId == 0 || p.CreatorId == creatorId)
             .Where(p => p.SlotId == id)
             .OrderByDescending(s => s.Timestamp)
             .ApplyPagination(pageData)
