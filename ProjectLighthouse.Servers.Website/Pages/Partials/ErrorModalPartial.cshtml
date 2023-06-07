@@ -1,11 +1,8 @@
-﻿@using LBPUnion.ProjectLighthouse.Localization.StringLists
-@{
-    string error = (string?)ViewData["Error"] ?? "";
-}
+﻿@model (string Title, string Message)
 
 <div class="ui negative message">
     <div class="header">
-        @Model.Translate(GeneralStrings.Error)
+        @Model.Title
     </div>
-    <p style="white-space: pre-line">@error</p>
+    <p style="white-space: pre-line">@Model.Message</p>
 </div>

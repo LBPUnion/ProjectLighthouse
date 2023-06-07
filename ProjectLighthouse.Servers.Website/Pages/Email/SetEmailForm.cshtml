@@ -1,5 +1,6 @@
 @page "/login/setEmail"
 @using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Email.SetEmailForm
 
 @{
@@ -11,12 +12,7 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.Error))
 {
-    @await Html.PartialAsync("Partials/ErrorModalPartial", new ViewDataDictionary(ViewData)
-           {
-               {
-                   "Error", Model.Error
-               },
-           })
+    @await Html.PartialAsync("Partials/ErrorModalPartial", (Model.Translate(GeneralStrings.Error), Model.Error), ViewData)
 }
 
 <form class="ui form" onsubmit="return onSubmit(this)" method="post">

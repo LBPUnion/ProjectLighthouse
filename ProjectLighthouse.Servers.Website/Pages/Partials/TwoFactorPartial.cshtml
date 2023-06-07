@@ -11,12 +11,7 @@
     <div class="digits" id="2fa">
         @if (!string.IsNullOrWhiteSpace(error))
         {
-            @await Html.PartialAsync("Partials/ErrorModalPartial", new ViewDataDictionary(ViewData)
-                   {
-                       {
-                           "Error", error
-                       },
-                   })
+            @await Html.PartialAsync("Partials/ErrorModalPartial", ((string)Model.Translate(GeneralStrings.Error), (string)Model.Error), ViewData)
         }
         <input type="text" pattern="\d*" maxlength="1" id="digit1"/>
         <input type="text" pattern="\d*" maxlength="1" id="digit2"/>
