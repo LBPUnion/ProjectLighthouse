@@ -52,7 +52,7 @@ public class TicketReader : BinaryReader
         {
             Type = (SectionType)this.ReadByte(),
             Length = this.ReadUInt16BE(),
-            Position = (int)(this.BaseStream.Position - 1),
+            Position = (int)(this.BaseStream.Position - 4),
         };
 
         return sectionHeader;
