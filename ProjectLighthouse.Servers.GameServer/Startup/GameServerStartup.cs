@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
+using LBPUnion.ProjectLighthouse.Services;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +63,8 @@ public class GameServerStartup
             ? new MailQueueService(new SmtpMailSender())
             : new NullMailService();
         services.AddSingleton(mailService);
+
+        services.AddHostedService<RepeatingTaskService>();
 
         services.Configure<ForwardedHeadersOptions>
         (

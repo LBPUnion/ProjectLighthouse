@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -92,9 +91,6 @@ public static class StartupTasks
 
         Logger.Info("Initializing Redis...", LogArea.Startup);
         RedisDatabase.Initialize().Wait();
-
-        Logger.Info("Initializing repeating tasks...", LogArea.Startup);
-        RepeatingTaskHandler.Initialize();
 
         // Create admin user if no users exist
         if (serverType == ServerType.Website && database.Users.CountAsync().Result == 0)
