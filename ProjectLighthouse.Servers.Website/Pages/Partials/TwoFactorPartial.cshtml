@@ -14,7 +14,7 @@
             @await Html.PartialAsync("Partials/ErrorModalPartial", new ViewDataDictionary(ViewData)
                    {
                        {
-                           "Error", Model.Error
+                           "Error", error
                        },
                    })
         }
