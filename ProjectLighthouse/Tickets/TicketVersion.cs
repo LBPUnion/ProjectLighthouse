@@ -1,17 +1,7 @@
 namespace LBPUnion.ProjectLighthouse.Tickets;
 
-public struct TicketVersion
+public enum TicketVersion : ushort
 {
-    public byte Major { get; set; }
-    public byte Minor { get; set; }
-
-    public TicketVersion(byte major, byte minor)
-    {
-        this.Major = major;
-        this.Minor = minor;
-    }
-
-    public override string ToString() => $"{this.Major}.{this.Minor}";
-
-    public static implicit operator string(TicketVersion v) => v.ToString();
+    V21 = 0x2101,
+    V30 = 0x3100,
 }
