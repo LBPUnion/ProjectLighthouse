@@ -102,6 +102,12 @@ public class NPTicket
     /// </summary>
     public static NPTicket? CreateFromBytes(byte[] data)
     {
+        // Header should have at least 8 bytes
+        if (data.Length < 8)
+        {
+            Logger.Warn("NpTicket does not contain header", LogArea.Login);
+            return null;
+        }
         NPTicket npTicket = new()
         {
             Data = data,
