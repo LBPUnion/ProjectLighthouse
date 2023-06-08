@@ -12,12 +12,7 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.Error))
 {
-    <div class="ui negative message">
-        <div class="header">
-            @Model.Translate(GeneralStrings.Error)
-        </div>
-        <p style="white-space: pre-line">@Model.Error</p>
-    </div>
+    @await Html.PartialAsync("Partials/ErrorModalPartial", (Model.Translate(GeneralStrings.Error), Model.Error), ViewData)
 }
 
 <form class="ui form" onsubmit="return onSubmit(this)" method="post">
