@@ -136,7 +136,8 @@ public class UserEndpoints : ApiEndpointController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOnlineUsers()
     {
-        List<ApiUser> onlineUsers = (await this.database.Users.Where(u => u.PermissionLevel != PermissionLevel.Banned)
+        List<ApiUser> onlineUsers = (await this.database.Users
+            .Where(u => u.PermissionLevel != PermissionLevel.Banned)
             .Where(u => u.ProfileVisibility == PrivacyType.All)
             .Where(u => u.GetStatus(this.database).StatusType == StatusType.Online)
             .OrderByDescending(u => u.LastLogin)
