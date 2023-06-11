@@ -138,7 +138,8 @@ public class UserEndpoints : ApiEndpointController
             .Where(u => u.PermissionLevel != PermissionLevel.Banned)
             .Where(u => u.ProfileVisibility == PrivacyType.All)
             .Where(u => u.GetStatus(this.database).StatusType == StatusType.Online)
-            .OrderByDescending(u => u.LastLogin)
+            .OrderBy(u => u.LastLogin)
+            .Take(50)
             .ToListAsync()).ToSerializableList(ApiUser.CreateFromEntity);
 
         return this.Ok(onlineUsers);
