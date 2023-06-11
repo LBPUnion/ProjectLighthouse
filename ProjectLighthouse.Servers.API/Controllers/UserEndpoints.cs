@@ -96,8 +96,7 @@ public class UserEndpoints : ApiEndpointController
     [HttpPost("user/inviteToken/{username}")]
     public async Task<IActionResult> CreateUserInviteToken([FromRoute] string? username)
     {
-        if (!Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
-            return this.NotFound();
+        if (!Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled) return this.NotFound();
 
         string? authHeader = this.Request.Headers["Authorization"];
         if (string.IsNullOrWhiteSpace(authHeader)) return this.NotFound();
@@ -124,5 +123,26 @@ public class UserEndpoints : ApiEndpointController
         await this.database.SaveChangesAsync();
 
         return this.Ok(token.Token);
+    }
+
+    /// <summary>
+    /// Gets a list of online users and returns it.
+    /// </summary>
+    /// <returns>Array of online users ordered by login time</returns>
+    /// <response code="200">List of users</response>
+    /// <response code="404">No users were online</response>
+    [HttpGet("users/online")]
+    [ProducesResponseType(typeof(ApiUser), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetOnlineUsers()
+    {
+        List<ApiUser> onlineUsers = (await this.database.Users.Where(u => u.PermissionLevel != PermissionLevel.Banned)
+            .Where(u => u.ProfileVisibility == PrivacyType.All)
+            .Where(u => u.GetStatus(this.database).StatusType == StatusType.Online)
+            .OrderByDescending(u => u.LastLogin)
+            .ToListAsync()).ToSerializableList(ApiUser.CreateFromEntity);
+        if (!onlineUsers.Any()) return this.NotFound();
+
+        return this.Ok(onlineUsers);
     }
 }
