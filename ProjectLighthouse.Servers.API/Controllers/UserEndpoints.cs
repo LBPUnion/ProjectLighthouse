@@ -96,8 +96,7 @@ public class UserEndpoints : ApiEndpointController
     [HttpPost("user/inviteToken/{username}")]
     public async Task<IActionResult> CreateUserInviteToken([FromRoute] string? username)
     {
-        if (!Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
-            return this.NotFound();
+        if (!Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled) return this.NotFound();
 
         string? authHeader = this.Request.Headers["Authorization"];
         if (string.IsNullOrWhiteSpace(authHeader)) return this.NotFound();
@@ -124,5 +123,30 @@ public class UserEndpoints : ApiEndpointController
         await this.database.SaveChangesAsync();
 
         return this.Ok(token.Token);
+    }
+
+    /// <summary>
+    /// Gets a list of online users and returns it.
+    /// </summary>
+    /// <param name="page">Page number. Increments skip value by clamp value</param>
+    /// <param name="clamp">Number of entries to clamp response to</param>
+    /// <returns>Array of online users ordered by login time</returns>
+    /// <response code="200">List of users</response>
+    [HttpGet("users/online")]
+    [ProducesResponseType(typeof(ApiUser), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetOnlineUsers(int page = 0, int clamp = 50)
+    {
+        if (clamp > 100) return this.BadRequest();
+
+        List<ApiUser> onlineUsers = (await this.database.Users
+            .Where(u => u.PermissionLevel != PermissionLevel.Banned)
+            .Where(u => u.ProfileVisibility == PrivacyType.All)
+            .Where(u => u.GetStatus(this.database).StatusType == StatusType.Online)
+            .OrderByDescending(u => u.LastLogin)
+            .Skip(page * clamp)
+            .Take(clamp)
+            .ToListAsync()).ToSerializableList(ApiUser.CreateFromEntity);
+
+        return this.Ok(onlineUsers);
     }
 }
