@@ -130,10 +130,8 @@ public class UserEndpoints : ApiEndpointController
     /// </summary>
     /// <returns>Array of online users ordered by login time</returns>
     /// <response code="200">List of users</response>
-    /// <response code="404">No users were online</response>
     [HttpGet("users/online")]
     [ProducesResponseType(typeof(ApiUser), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOnlineUsers()
     {
         List<ApiUser> onlineUsers = (await this.database.Users
@@ -142,7 +140,6 @@ public class UserEndpoints : ApiEndpointController
             .Where(u => u.GetStatus(this.database).StatusType == StatusType.Online)
             .OrderByDescending(u => u.LastLogin)
             .ToListAsync()).ToSerializableList(ApiUser.CreateFromEntity);
-        if (!onlineUsers.Any()) return this.NotFound();
 
         return this.Ok(onlineUsers);
     }
