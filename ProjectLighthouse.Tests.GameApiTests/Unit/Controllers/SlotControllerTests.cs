@@ -320,7 +320,7 @@ public class SlotControllerTests
     }
 
     [Fact]
-    public async Task UserSlot_ShouldNotFetch_WhenSlotIsSubLevel()
+    public async Task UserSlot_ShouldFetch_WhenSlotIsSubLevel()
     {
         List<SlotEntity> slots = new()
         {
@@ -337,7 +337,7 @@ public class SlotControllerTests
 
         IActionResult result = await slotsController.UserSlot(27);
 
-        Assert.IsType<NotFoundResult>(result);
+        Assert.IsType<OkObjectResult>(result);
     }
     #endregion
 
