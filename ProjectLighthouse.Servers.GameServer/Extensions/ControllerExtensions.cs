@@ -30,7 +30,6 @@ public static class ControllerExtensions
 
     public static SlotQueryBuilder GetDefaultFilters(this ControllerBase controller, GameTokenEntity token) =>
         new SlotQueryBuilder().AddFilter(new GameVersionFilter(token.GameVersion))
-            .AddFilter(new SubLevelFilter(token.UserId))
             .AddFilter(new HiddenSlotFilter())
             .AddFilter(new SlotTypeFilter(SlotType.User));
 
