@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
@@ -25,11 +26,14 @@ public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
 
     public FilterMode UserInputFilterMode { get; set; } = FilterMode.None;
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public List<string> FilteredWordList { get; set; } = new()
     {
         "cunt",
         "fag",
         "faggot",
+        "tranny",
+        "dyke",
         "horny",
         "kook",
         "kys",
@@ -42,6 +46,8 @@ public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
         "retarded",
         "vagina",
         "vore",
+        "porn",
+        "pornography",
         // "restitched",
         // "h4h",
     };
