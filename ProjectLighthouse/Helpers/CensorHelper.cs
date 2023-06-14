@@ -25,6 +25,8 @@ public static class CensorHelper
         int profaneIndex;
         int profaneCount = 0;
 
+        string originalMessage = message;
+
         foreach (string profanity in CensorConfiguration.Instance.FilteredWordList)
             do
             {
@@ -38,7 +40,7 @@ public static class CensorHelper
             while (profaneIndex != -1);
 
         if (profaneCount > 0 && message.Length <= 94 && ServerConfiguration.Instance.LogChatFiltering) // 94 = lbp char limit
-            Logger.Info($"Censored {profaneCount} profane words from message \"{message}\"", LogArea.Filter);
+            Logger.Info($"Censored {profaneCount} profane words from message \"{originalMessage}\"", LogArea.Filter);
 
         return message;
     }
