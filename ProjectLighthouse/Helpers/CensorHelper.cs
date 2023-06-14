@@ -1,7 +1,8 @@
 using System;
-using System.IO;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -22,14 +23,22 @@ public static class CensorHelper
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
 
         int profaneIndex;
+        int profaneCount = 0;
 
         foreach (string profanity in CensorConfiguration.Instance.FilteredWordList)
             do
             {
                 profaneIndex = message.ToLower().IndexOf(profanity, StringComparison.Ordinal);
-                if (profaneIndex != -1) message = Censor(profaneIndex, profanity.Length, message);
+
+                if (profaneIndex == -1) continue;
+
+                message = Censor(profaneIndex, profanity.Length, message);
+                profaneCount += 1;
             }
             while (profaneIndex != -1);
+
+        if (profaneCount > 0 && message.Length <= 94 && ServerConfiguration.Instance.LogChatFiltering) // 94 = lbp char limit
+            Logger.Info($"Censored {profaneCount} profane words from message \"{message}\"", LogArea.Filter);
 
         return message;
     }
@@ -79,20 +88,5 @@ public static class CensorHelper
         sb.Append(message.AsSpan(profanityIndex + profanityLength));
 
         return sb.ToString();
-    }
-
-    public static string MaskEmail(string email)
-    {
-        if (string.IsNullOrEmpty(email) || !email.Contains('@')) return email;
-
-        string[] emailArr = email.Split('@');
-        string domainExt = Path.GetExtension(email);
-
-        // Hides everything except the first and last character of the username and domain, preserves the domain extension (.net, .com)
-        string maskedEmail = $"{emailArr[0][0]}****{emailArr[0][^1..]}@{emailArr[1][0]}****{emailArr[1]
-            .Substring(emailArr[1].Length - domainExt.Length - 1,
-                1)}{domainExt}";
-
-        return maskedEmail;
     }
 }
