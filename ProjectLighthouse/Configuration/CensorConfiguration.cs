@@ -42,8 +42,8 @@ public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
         "retarded",
         "vagina",
         "vore",
-        "restitched",
-        "h4h",
+        // "restitched",
+        // "h4h",
     };
     
     public override ConfigurationBase<CensorConfiguration> Deserialize(IDeserializer deserializer, string text) => deserializer.Deserialize<CensorConfiguration>(text);
