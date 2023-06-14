@@ -20,6 +20,7 @@ public static class CensorHelper
 
     public static string FilterMessage(string message)
     {
+        StringBuilder stringBuilder = new(message);
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
 
         int profaneIndex;
@@ -30,11 +31,11 @@ public static class CensorHelper
         foreach (string profanity in CensorConfiguration.Instance.FilteredWordList)
             do
             {
-                profaneIndex = message.ToLower().IndexOf(profanity, StringComparison.Ordinal);
+                profaneIndex = message.IndexOf(profanity, StringComparison.OrdinalIgnoreCase);
 
                 if (profaneIndex == -1) continue;
 
-                message = Censor(profaneIndex, profanity.Length, message);
+                Censor(profaneIndex, profanity.Length, stringBuilder);
                 profaneCount += 1;
             }
             while (profaneIndex != -1);
@@ -42,53 +43,49 @@ public static class CensorHelper
         if (profaneCount > 0 && message.Length <= 94 && ServerConfiguration.Instance.LogChatFiltering) // 94 = lbp char limit
             Logger.Info($"Censored {profaneCount} profane words from message \"{originalMessage}\"", LogArea.Filter);
 
-        return message;
+        return stringBuilder.ToString();
     }
 
-    private static string Censor(int profanityIndex, int profanityLength, string message)
+    private static void Censor(int profanityIndex, int profanityLength, StringBuilder message)
     {
-        StringBuilder sb = new();
-
-        sb.Append(message.AsSpan(0, profanityIndex));
-
         switch (CensorConfiguration.Instance.UserInputFilterMode)
         {
             case FilterMode.Random:
                 char prevRandomChar = '\0';
-                for (int i = 0; i < profanityLength; i++)
+                for (int i = profanityIndex; i < profanityIndex + profanityLength; i++)
                 {
-                    if (message[i] == ' ')
-                    {
-                        sb.Append(' ');
-                    }
-                    else
-                    {
-                        char randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
-                        if (randomChar == prevRandomChar) randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
+                    if (char.IsWhiteSpace(message[i])) continue;
+                    
+                    char randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
+                    if (randomChar == prevRandomChar)
+                        randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
 
-                        prevRandomChar = randomChar;
-                        sb.Append(randomChar);
-                    }
+                    prevRandomChar = randomChar;
+                    message[i] = randomChar;
                 }
 
                 break;
             case FilterMode.Asterisks:
-                for(int i = 0; i < profanityLength; i++)
+                for(int i = profanityIndex; i < profanityIndex + profanityLength; i++)
                 {
-                    sb.Append(message[i] == ' ' ? ' ' : '*');
+                    if (char.IsWhiteSpace(message[i])) continue;
+
+                    message[i] = '*';
                 }
 
                 break;
             case FilterMode.Furry:
                 string randomWord = randomFurry[CryptoHelper.GenerateRandomInt32(0, randomFurry.Length)];
-                sb.Append(randomWord);
+                string afterProfanity = message.ToString(profanityIndex + profanityLength,
+                    message.Length - (profanityIndex + profanityLength));
+
+                message.Length = profanityIndex;
+
+                message.Append(randomWord);
+                message.Append(afterProfanity);
                 break;
             case FilterMode.None: break;
             default: throw new ArgumentOutOfRangeException(nameof(message));
         }
-
-        sb.Append(message.AsSpan(profanityIndex + profanityLength));
-
-        return sb.ToString();
     }
 }
