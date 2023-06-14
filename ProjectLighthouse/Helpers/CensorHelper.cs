@@ -29,16 +29,21 @@ public static class CensorHelper
         string originalMessage = message;
 
         foreach (string profanity in CensorConfiguration.Instance.FilteredWordList)
+        {
+            int lastFoundProfanity = 0;
+            
             do
             {
-                profaneIndex = message.IndexOf(profanity, StringComparison.OrdinalIgnoreCase);
+                profaneIndex = message.IndexOf(profanity, lastFoundProfanity, StringComparison.OrdinalIgnoreCase);
 
                 if (profaneIndex == -1) continue;
 
                 Censor(profaneIndex, profanity.Length, stringBuilder);
                 profaneCount += 1;
+                lastFoundProfanity = profaneIndex + profanity.Length;
             }
             while (profaneIndex != -1);
+        }
 
         if (profaneCount > 0 && message.Length <= 94 && ServerConfiguration.Instance.LogChatFiltering) // 94 = lbp char limit
             Logger.Info($"Censored {profaneCount} profane words from message \"{originalMessage}\"", LogArea.Filter);
@@ -75,6 +80,10 @@ public static class CensorHelper
 
                 break;
             case FilterMode.Furry:
+                // Might wanna remove this.
+                // With the optimizations (using stringbuilders), this can cause corruption if the furry word isn't the same length as the profane word.
+                // I'm too fucking lazy and have too much of a migraine to fix this.
+                // - Rosie
                 string randomWord = randomFurry[CryptoHelper.GenerateRandomInt32(0, randomFurry.Length)];
                 string afterProfanity = message.ToString(profanityIndex + profanityLength,
                     message.Length - (profanityIndex + profanityLength));
