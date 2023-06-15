@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -29,18 +30,25 @@ public static class CensorHelper
         {
             int lastFoundProfanity = 0;
             int profaneIndex;
-
+            List<int> censorIndices = new List<int>();
+            
             do
             {
                 profaneIndex = message.IndexOf(profanity, lastFoundProfanity, StringComparison.OrdinalIgnoreCase);
 
                 if (profaneIndex == -1) continue;
 
-                Censor(profaneIndex, profanity.Length, stringBuilder);
-                profaneCount += 1;
+                censorIndices.Add(profaneIndex);
+                
                 lastFoundProfanity = profaneIndex + profanity.Length;
             }
             while (profaneIndex != -1);
+
+            for (int i = censorIndices.Count - 1; i >= 0; i--)
+            {
+                Censor(censorIndices[i], profanity.Length, stringBuilder);
+                profaneCount += 1;
+            }
         }
 
         if (profaneCount > 0 && message.Length <= 94 && ServerConfiguration.Instance.LogChatFiltering) // 94 = lbp char limit
