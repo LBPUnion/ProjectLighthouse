@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
@@ -26,7 +25,7 @@ public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
 
     public FilterMode UserInputFilterMode { get; set; } = FilterMode.None;
 
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    // ReSharper disable once StringLiteralTypo
     public List<string> FilteredWordList { get; set; } = new()
     {
         "cunt",
@@ -48,8 +47,6 @@ public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
         "vore",
         "porn",
         "pornography",
-        // "restitched",
-        // "h4h",
     };
     
     public override ConfigurationBase<CensorConfiguration> Deserialize(IDeserializer deserializer, string text) => deserializer.Deserialize<CensorConfiguration>(text);
