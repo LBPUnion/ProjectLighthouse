@@ -24,7 +24,7 @@ public static class CensorHelper
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
         StringBuilder stringBuilder = new(message);
 
-        const int charLimit = 94;
+        const int lbpCharLimit = 94;
 
         int profaneCount = 0;
 
@@ -51,7 +51,7 @@ public static class CensorHelper
             }
         }
 
-        if (ServerConfiguration.Instance.LogChatFiltering && profaneCount > 0 && message.Length <= charLimit)
+        if (ServerConfiguration.Instance.LogChatFiltering && profaneCount > 0 && message.Length <= lbpCharLimit)
             Logger.Info($"Censored {profaneCount} profane words from message \"{message}\"", LogArea.Filter);
 
         return stringBuilder.ToString();
