@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -18,16 +17,15 @@ public class RepeatingTaskService : BackgroundService
     private readonly IServiceProvider provider;
     private readonly List<IRepeatingTask> taskList;
 
-    public RepeatingTaskService(IServiceProvider provider)
+    public RepeatingTaskService(IServiceProvider provider, List<IRepeatingTask> tasks)
     {
         this.provider = provider;
-        this.taskList = new List<IRepeatingTask>();
-        foreach (IRepeatingTask task in MaintenanceHelper.RepeatingTasks) this.taskList.Add(task);
+        this.taskList = tasks;
 
         Logger.Info("Initializing repeating tasks service", LogArea.Startup);
     }
 
-    private bool TryGetNextTask(out IRepeatingTask? outTask)
+    public bool TryGetNextTask(out IRepeatingTask? outTask)
     {
         TimeSpan smallestSpan = TimeSpan.MaxValue;
         IRepeatingTask? smallestTask = null;

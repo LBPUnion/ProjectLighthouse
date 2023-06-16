@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using LBPUnion.ProjectLighthouse.Database;
@@ -60,7 +61,7 @@ public class WebsiteStartup
             : new NullMailService();
         services.AddSingleton(mailService);
 
-        services.AddHostedService<RepeatingTaskService>();
+        services.AddHostedService(provider => new RepeatingTaskService(provider, MaintenanceHelper.RepeatingTasks));
 
         services.AddHttpClient<ICaptchaService, CaptchaService>("CaptchaAPI",
             client =>
