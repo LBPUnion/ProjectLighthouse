@@ -59,10 +59,16 @@ public class RepeatingTaskService : BackgroundService
             // If the task's repeat interval hasn't elapsed
             if (timeElapsedSinceRun < task.RepeatInterval)
             {
-                Logger.Debug($"Waiting {task.RepeatInterval.Subtract(timeElapsedSinceRun)} for {task.Name}", LogArea.Maintenance);
-                if (!await Task.Delay(task.RepeatInterval.Subtract(timeElapsedSinceRun), stoppingToken)
-                        .ContinueWith(t => t.Exception == default, new CancellationToken()))
-                    continue;
+                TimeSpan timeToWait = task.RepeatInterval.Subtract(timeElapsedSinceRun);
+                Logger.Debug($"Waiting {timeToWait} for {task.Name}", LogArea.Maintenance);
+                try
+                {
+                    await Task.Delay(timeToWait, stoppingToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
             }
 
             using IServiceScope scope = this.provider.CreateScope();

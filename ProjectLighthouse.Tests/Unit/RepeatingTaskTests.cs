@@ -86,14 +86,14 @@ public class RepeatingTaskTests
         taskMock.Setup(t => t.Run(It.IsAny<DatabaseContext>())).Returns(Task.CompletedTask);
         taskMock.SetupGet(t => t.RepeatInterval).Returns(TimeSpan.FromSeconds(10));
         TaskCompletionSource taskCompletion = new();
-        DateTime lastRan;
+        DateTime lastRan = default;
         taskMock.SetupSet(t => t.LastRan = It.IsAny<DateTime>())
             .Callback<DateTime>(time =>
             {
                 lastRan = time;
-                taskMock.SetupGet(t => t.LastRan).Returns(lastRan);
                 taskCompletion.TrySetResult();
             });
+        taskMock.SetupGet(t => t.LastRan).Returns(() => lastRan);
         List<IRepeatingTask> tasks = new()
         {
             taskMock.Object,
