@@ -30,12 +30,10 @@ public static class CensorHelper
         {
             int lastFoundProfanity = 0;
             int profaneIndex;
-            List<int> censorIndices = new List<int>();
-            
+            List<int> censorIndices = new();
             do
             {
                 profaneIndex = message.IndexOf(profanity, lastFoundProfanity, StringComparison.OrdinalIgnoreCase);
-
                 if (profaneIndex == -1) continue;
 
                 censorIndices.Add(profaneIndex);
@@ -68,7 +66,7 @@ public static class CensorHelper
                     if (char.IsWhiteSpace(message[i])) continue;
                     
                     char randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
-                    if (randomChar == prevRandomChar)
+                    while (randomChar == prevRandomChar)
                         randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
 
                     prevRandomChar = randomChar;
@@ -83,17 +81,11 @@ public static class CensorHelper
 
                     message[i] = '*';
                 }
-
                 break;
             case FilterMode.Furry:
                 string randomWord = randomFurry[CryptoHelper.GenerateRandomInt32(0, randomFurry.Length)];
-                string afterProfanity = message.ToString(profanityIndex + profanityLength,
-                    message.Length - (profanityIndex + profanityLength));
-
-                message.Length = profanityIndex;
-
-                message.Append(randomWord);
-                message.Append(afterProfanity);
+                message.Remove(profanityIndex, profanityLength);
+                message.Insert(profanityIndex, randomWord);
                 break;
             case FilterMode.None: break;
             default: throw new ArgumentOutOfRangeException(nameof(message));
