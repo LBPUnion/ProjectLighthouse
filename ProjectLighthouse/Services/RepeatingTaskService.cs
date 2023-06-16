@@ -60,7 +60,9 @@ public class RepeatingTaskService : BackgroundService
             if (timeElapsedSinceRun < task.RepeatInterval)
             {
                 Logger.Debug($"Waiting {task.RepeatInterval.Subtract(timeElapsedSinceRun)} for {task.Name}", LogArea.Maintenance);
-                await Task.Delay(task.RepeatInterval.Subtract(timeElapsedSinceRun), stoppingToken);
+                if (!await Task.Delay(task.RepeatInterval.Subtract(timeElapsedSinceRun), stoppingToken)
+                        .ContinueWith(t => t.Exception == default, new CancellationToken()))
+                    continue;
             }
 
             using IServiceScope scope = this.provider.CreateScope();

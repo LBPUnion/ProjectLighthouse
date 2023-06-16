@@ -84,8 +84,16 @@ public class RepeatingTaskTests
     {
         Mock<IRepeatingTask> taskMock = new();
         taskMock.Setup(t => t.Run(It.IsAny<DatabaseContext>())).Returns(Task.CompletedTask);
-        taskMock.Setup(t => t.RepeatInterval).Returns(TimeSpan.FromSeconds(10));
-        taskMock.SetupProperty(t => t.LastRan);
+        taskMock.SetupGet(t => t.RepeatInterval).Returns(TimeSpan.FromSeconds(10));
+        TaskCompletionSource taskCompletion = new();
+        DateTime lastRan;
+        taskMock.SetupSet(t => t.LastRan = It.IsAny<DateTime>())
+            .Callback<DateTime>(time =>
+            {
+                lastRan = time;
+                taskMock.SetupGet(t => t.LastRan).Returns(lastRan);
+                taskCompletion.TrySetResult();
+            });
         List<IRepeatingTask> tasks = new()
         {
             taskMock.Object,
@@ -96,11 +104,13 @@ public class RepeatingTaskTests
 
         RepeatingTaskService service = new(provider, tasks);
 
-        CancellationTokenSource tokenSource = new();
+        CancellationTokenSource stoppingToken = new();
 
-        await service.StartAsync(tokenSource.Token);
+        await service.StartAsync(stoppingToken.Token);
 
-        tokenSource.CancelAfter(1);
+        await taskCompletion.Task;
+        stoppingToken.Cancel();
+
         Assert.NotNull(service.ExecuteTask);
         await service.ExecuteTask;
 
