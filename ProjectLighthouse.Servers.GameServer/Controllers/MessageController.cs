@@ -86,6 +86,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string message = await this.ReadBodyAsync();
 
+        const int lbpCharLimit = 94;
+        if (message.Length > lbpCharLimit) return this.BadRequest();
+
         if (message.StartsWith("/setemail ") && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
@@ -102,12 +105,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             return this.Ok();
         }
 
+        string username = await this.database.UsernameFromGameToken(token);
+        
         string filteredText = CensorHelper.FilterMessage(message);
 
-        string username = await this.database.UsernameFromGameToken(token);
-
-        if (ServerConfiguration.Instance.LogChatFiltering)
-            Logger.Info($"{username}: {message} / {filteredText}", LogArea.Filter);
+        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != message)
+            Logger.Info($"Censored profane word(s) from message sent by ${username}: {message} => {filteredText}",
+                LogArea.Filter);
+        if (ServerConfiguration.Instance.LogChatMessages)
+            Logger.Info($"{username}: {message}", LogArea.Chat);
 
         return this.Ok(filteredText);
     }
