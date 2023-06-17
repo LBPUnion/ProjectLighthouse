@@ -39,7 +39,7 @@
         <value>Unknown</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>Aye!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
         <value>New secret key</value>
