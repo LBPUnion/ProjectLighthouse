@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using LBPUnion.ProjectLighthouse.Database;
@@ -8,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
+using LBPUnion.ProjectLighthouse.Services;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
@@ -58,6 +60,8 @@ public class WebsiteStartup
             ? new MailQueueService(new SmtpMailSender())
             : new NullMailService();
         services.AddSingleton(mailService);
+
+        services.AddHostedService(provider => new RepeatingTaskService(provider, MaintenanceHelper.RepeatingTasks));
 
         services.AddHttpClient<ICaptchaService, CaptchaService>("CaptchaAPI",
             client =>
