@@ -2,6 +2,7 @@
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
+@inject DatabaseContext Database
 
 @{
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
@@ -42,15 +43,14 @@
             </h1>
         }
         @{
-            await using DatabaseContext context = DatabaseContext.CreateNewInstance();
 
-            int hearts = Model.GetHeartCount(context);
-            int comments = Model.GetCommentCount(context);
-            int levels = Model.GetUsedSlotCount(context);
-            int photos = Model.GetUploadedPhotoCount(context);
+            int hearts = Model.GetHeartCount(Database);
+            int comments = Model.GetCommentCount(Database);
+            int levels = Model.GetUsedSlotCount(Database);
+            int photos = Model.GetUploadedPhotoCount(Database);
         }
         <span>
-            <i>@Model.GetStatus(context).ToTranslatedString(language, timeZone)</i>
+            <i>@Model.GetStatus(Database).ToTranslatedString(language, timeZone)</i>
         </span>
         <div class="cardStatsUnderTitle">
             <i class="pink heart icon" title="Hearts"></i> <span>@hearts</span>

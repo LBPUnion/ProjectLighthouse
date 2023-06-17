@@ -4,9 +4,9 @@
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @model LBPUnion.ProjectLighthouse.Types.Entities.Moderation.ModerationCaseEntity
+@inject DatabaseContext Database
 
 @{
-    DatabaseContext database = DatabaseContext.CreateNewInstance();
     string color = "blue";
 
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
@@ -70,7 +70,7 @@
     
     @if (Model.Type.AffectsLevel())
     {
-        SlotEntity? slot = await Model.GetSlotAsync(database);
+        SlotEntity? slot = await Model.GetSlotAsync(Database);
         if (slot != null)
         {
             <p><strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name</a></p>
@@ -78,7 +78,7 @@
     }
     else if (Model.Type.AffectsUser())
     {
-        UserEntity? user = await Model.GetUserAsync(database);
+        UserEntity? user = await Model.GetUserAsync(Database);
         if (user != null)
         {
             <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>

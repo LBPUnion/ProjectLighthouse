@@ -22,6 +22,7 @@ using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Medallion.Threading.MySql;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LBPUnion.ProjectLighthouse;
 
@@ -52,19 +53,25 @@ public static class StartupTasks
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
 
         Logger.Info("Connecting to the database...", LogArea.Startup);
-        bool dbConnected = ServerStatics.DbConnected;
-        if (!dbConnected)
+
+        using DatabaseContext database = DatabaseContext.CreateNewInstance();
+
+        try
         {
-            Logger.Error("Database unavailable! Exiting.", LogArea.Startup);
+            if (!database.Database.CanConnect())
+            {
+                Logger.Error("Database unavailable! Exiting.", LogArea.Startup);
+                Logger.Error("Ensure that you have set the dbConnectionString field in lighthouse.yml", LogArea.Startup);
+                Environment.Exit(-1);
+            }
         }
-        else
+        catch (Exception e)
         {
-            Logger.Success("Connected to the database!", LogArea.Startup);
+            Logger.Error("There was an error connecting to the database:", LogArea.Startup);
+            Logger.Error(e.ToDetailedException(), LogArea.Startup);
+            Environment.Exit(-1);
         }
 
-        if (!dbConnected) Environment.Exit(1);
-        using DatabaseContext database = DatabaseContext.CreateNewInstance();
-        
         migrateDatabase(database).Wait();
 
         Logger.Debug
@@ -78,7 +85,10 @@ public static class StartupTasks
 
         if (args.Length != 0)
         {
-            List<LogLine> logLines = MaintenanceHelper.RunCommand(args).Result;
+            ServiceCollection collection = new();
+            collection.AddSingleton(database);
+            IServiceProvider databaseProvider = new DefaultServiceProviderFactory().CreateServiceProvider(collection);
+            List<LogLine> logLines = MaintenanceHelper.RunCommand(databaseProvider, args).Result;
             Console.WriteLine(logLines.ToLogString());
             return;
         }
@@ -179,7 +189,7 @@ public static class StartupTasks
 
             foreach (IMigrationTask migrationTask in migrationsToRun)
             {
-                MaintenanceHelper.RunMigration(migrationTask, database).Wait();
+                MaintenanceHelper.RunMigration(database, migrationTask).Wait();
             }
 
             stopwatch.Stop();

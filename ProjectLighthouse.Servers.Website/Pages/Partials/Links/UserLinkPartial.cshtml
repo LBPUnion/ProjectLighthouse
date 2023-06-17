@@ -1,14 +1,15 @@
 @using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
-@model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
+@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
+@model UserEntity
+@inject DatabaseContext Database
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     bool includeStatus = (bool?)ViewData["IncludeStatus"] ?? false;
-    await using DatabaseContext database = DatabaseContext.CreateNewInstance(); 
-    string userStatus = includeStatus ? Model.GetStatus(database).ToTranslatedString(language, timeZone) : "";
+    string userStatus = includeStatus ? Model.GetStatus(Database).ToTranslatedString(language, timeZone) : "";
 }
 
 <a href="/user/@Model.UserId" title="@userStatus" class="user-link">

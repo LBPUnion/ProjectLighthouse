@@ -14,14 +14,15 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MaintenanceJobs;
 
 public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
 {
-    private readonly DatabaseContext database = DatabaseContext.CreateNewInstance();
     public string Name() => "Cleanup Broken Photos";
     public string Description() => "Deletes all photos that have missing assets or invalid photo subjects.";
 
     [SuppressMessage("ReSharper", "LoopCanBePartlyConvertedToQuery")]
     public async Task Run()
     {
-        foreach (PhotoEntity photo in this.database.Photos)
+
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
+        foreach (PhotoEntity photo in database.Photos)
         {
             bool hashNullOrEmpty = false;
             bool noHashesExist = false;
@@ -86,18 +87,18 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
 
             Console.WriteLine
             (
-                $"Removing photo (id: {photo.PhotoId}): " +
-                $"{nameof(hashNullOrEmpty)}: {hashNullOrEmpty}, " +
-                $"{nameof(noHashesExist)}: {noHashesExist}, " +
-                $"{nameof(largeHashIsInvalidFile)}: {largeHashIsInvalidFile}, " +
-                $"{nameof(tooManyPhotoSubjects)}: {tooManyPhotoSubjects}" +
-                $"{nameof(duplicatePhotoSubjects)}: {duplicatePhotoSubjects}" +
-                $"{nameof(takenInTheFuture)}: {takenInTheFuture}"
+                @$"Removing photo (id: {photo.PhotoId}): " +
+                @$"{nameof(hashNullOrEmpty)}: {hashNullOrEmpty}, " +
+                @$"{nameof(noHashesExist)}: {noHashesExist}, " +
+                @$"{nameof(largeHashIsInvalidFile)}: {largeHashIsInvalidFile}, " +
+                @$"{nameof(tooManyPhotoSubjects)}: {tooManyPhotoSubjects}" +
+                @$"{nameof(duplicatePhotoSubjects)}: {duplicatePhotoSubjects}" +
+                @$"{nameof(takenInTheFuture)}: {takenInTheFuture}"
             );
 
-            this.database.Photos.Remove(photo);
+            database.Photos.Remove(photo);
         }
 
-        await this.database.SaveChangesAsync();
+        await database.SaveChangesAsync();
     }
 }

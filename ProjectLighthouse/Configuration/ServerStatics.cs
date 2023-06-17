@@ -1,9 +1,6 @@
 #nullable enable
 using System;
 using System.Linq;
-using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
@@ -11,21 +8,6 @@ namespace LBPUnion.ProjectLighthouse.Configuration;
 public static class ServerStatics
 {
     public const int PageSize = 20;
-
-    public static bool DbConnected {
-        get {
-            try
-            {
-                using DatabaseContext db = DatabaseContext.CreateNewInstance();
-                return db.Database.CanConnect();
-            }
-            catch(Exception e)
-            {
-                Logger.Error(e.ToString(), LogArea.Database);
-                return false;
-            }
-        }
-    }
 
     // FIXME: This needs to go at some point.
     public static bool IsUnitTesting => AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.FullName!.StartsWith("xunit"));

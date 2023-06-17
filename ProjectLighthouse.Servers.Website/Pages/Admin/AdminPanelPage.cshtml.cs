@@ -8,14 +8,12 @@ using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Servers.Website.Types;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
-using LBPUnion.ProjectLighthouse.Types.Maintenance;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
 
 public class AdminPanelPage : BaseLayout
 {
-    public List<ICommand> Commands = MaintenanceHelper.Commands;
     public AdminPanelPage(DatabaseContext database) : base(database)
     { }
 
@@ -40,7 +38,7 @@ public class AdminPanelPage : BaseLayout
             args = command + " " + args;
             string[] split = args.Split(" ");
 
-            List<LogLine> runCommand = await MaintenanceHelper.RunCommand(split);
+            List<LogLine> runCommand = await MaintenanceHelper.RunCommand(this.HttpContext.RequestServices, split);
             return this.Redirect($"~/admin?log={CryptoHelper.ToBase64(runCommand.ToLogString())}");
         }
 
