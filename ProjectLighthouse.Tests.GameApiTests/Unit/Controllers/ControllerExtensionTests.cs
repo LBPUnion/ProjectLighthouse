@@ -22,7 +22,6 @@ public class ControllerExtensionTests
         SlotQueryBuilder queryBuilder = new SlotsController(null!).GetDefaultFilters(MockHelper.GetUnitTestToken());
 
         Assert.NotEmpty(queryBuilder.GetFilters(typeof(GameVersionFilter)));
-        Assert.NotEmpty(queryBuilder.GetFilters(typeof(SubLevelFilter)));
         Assert.NotEmpty(queryBuilder.GetFilters(typeof(HiddenSlotFilter)));
         Assert.NotEmpty(queryBuilder.GetFilters(typeof(SlotTypeFilter)));
     }
@@ -78,14 +77,6 @@ public class ControllerExtensionTests
         Assert.NotEmpty(queryBuilder.GetFilters(typeof(HiddenSlotFilter)));
         Assert.NotEmpty(queryBuilder.GetFilters(typeof(SlotTypeFilter)));
     }
-
-    private static List<ISlotFilter> GetDefaultFilters
-        (SlotQueryBuilder queryBuilder) =>
-        queryBuilder.GetFilters(typeof(GameVersionFilter))
-            .Union(queryBuilder.GetFilters(typeof(SubLevelFilter))
-                .Union(queryBuilder.GetFilters(typeof(HiddenSlotFilter))
-                    .Union(queryBuilder.GetFilters(typeof(SlotTypeFilter)))))
-            .ToList();
 
     [Fact]
     public void FilterFromRequest_ShouldAddLabelFilter_WhenAuthorLabelPresent()

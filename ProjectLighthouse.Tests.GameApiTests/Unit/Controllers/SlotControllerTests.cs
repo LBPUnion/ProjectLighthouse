@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -320,7 +323,7 @@ public class SlotControllerTests
     }
 
     [Fact]
-    public async Task UserSlot_ShouldNotFetch_WhenSlotIsSubLevel()
+    public async Task UserSlot_ShouldFetch_WhenSlotIsSubLevel()
     {
         List<SlotEntity> slots = new()
         {
@@ -337,7 +340,7 @@ public class SlotControllerTests
 
         IActionResult result = await slotsController.UserSlot(27);
 
-        Assert.IsType<NotFoundResult>(result);
+        Assert.IsType<OkObjectResult>(result);
     }
     #endregion
 
@@ -377,4 +380,139 @@ public class SlotControllerTests
     }
     #endregion
 
+    #region BusiestLevels
+
+    // Rather than trying to mock a singleton
+    // we just make the unit tests take turns
+    private static readonly Mutex roomMutex = new(false);
+
+    private static async Task AddRoom(int slotId, SlotType type, params int[] playerIds)
+    {
+        await RoomHelper.Rooms.AddAsync(new Room
+        {
+            PlayerIds = new List<int>(playerIds),
+            Slot = new RoomSlot
+            {
+                SlotId = slotId,
+                SlotType = type,
+            },
+        });
+    }
+
+    [Fact]
+    public async Task BusiestLevels_ShouldReturnSlots_OrderedByRoomCount()
+    {
+        roomMutex.WaitOne();
+        try
+        {
+            DatabaseContext db = await MockHelper.GetTestDatabase(new[]
+            {
+                new List<SlotEntity>
+                {
+                    new()
+                    {
+                        SlotId = 1,
+                        Type = SlotType.User,
+                    },
+                    new()
+                    {
+                        SlotId = 2,
+                        Type = SlotType.User,
+                    },
+                    new()
+                    {
+                        SlotId = 3,
+                        Type = SlotType.User,
+                    },
+                    new()
+                    {
+                        SlotId = 4,
+                        Type = SlotType.Developer,
+                        InternalSlotId = 10,
+                    },
+                },
+            });
+            SlotsController controller = new(db);
+            controller.SetupTestController();
+
+            await AddRoom(1, SlotType.User, 1);
+            await AddRoom(2, SlotType.User, 2);
+            await AddRoom(2, SlotType.User, 3);
+            await AddRoom(3, SlotType.User, 4);
+            await AddRoom(3, SlotType.User, 5);
+            await AddRoom(3, SlotType.User, 6);
+
+            await AddRoom(10, SlotType.Developer, 7);
+
+            IActionResult result = await controller.BusiestLevels();
+            GenericSlotResponse slotResponse = result.CastTo<OkObjectResult, GenericSlotResponse>();
+            Assert.Equal(3, slotResponse.Slots.Count);
+            Assert.IsType<GameUserSlot>(slotResponse.Slots[0]);
+            Assert.Equal(3, ((GameUserSlot)slotResponse.Slots[0]).SlotId);
+            Assert.IsType<GameUserSlot>(slotResponse.Slots[1]);
+            Assert.Equal(2, ((GameUserSlot)slotResponse.Slots[1]).SlotId);
+            Assert.IsType<GameUserSlot>(slotResponse.Slots[2]);
+            Assert.Equal(1, ((GameUserSlot)slotResponse.Slots[2]).SlotId);
+        }
+        finally
+        {
+            roomMutex.ReleaseMutex();
+        }
+    }
+
+    [Fact]
+    public async Task BusiestLevels_ShouldNotIncludeDeveloperSlots()
+    {
+        roomMutex.WaitOne();
+        try
+        {
+            DatabaseContext db = await MockHelper.GetTestDatabase(new[]
+            {
+                new List<SlotEntity>
+                {
+                    new()
+                    {
+                        SlotId = 4,
+                        Type = SlotType.Developer,
+                        InternalSlotId = 10,
+                    },
+                },
+            });
+            SlotsController controller = new(db);
+            controller.SetupTestController();
+
+            await AddRoom(10, SlotType.Developer, 1);
+
+            IActionResult result = await controller.BusiestLevels();
+            GenericSlotResponse slotResponse = result.CastTo<OkObjectResult, GenericSlotResponse>();
+            Assert.Empty(slotResponse.Slots);
+        }
+        finally
+        {
+            roomMutex.ReleaseMutex();
+        }
+    }
+
+    [Fact]
+    public async Task BusiestLevels_ShouldNotIncludeInvalidSlots()
+    {
+        roomMutex.WaitOne();
+        try
+        {
+            DatabaseContext db = await MockHelper.GetTestDatabase();
+            SlotsController controller = new(db);
+            controller.SetupTestController();
+
+            await AddRoom(1, SlotType.User, 1);
+
+            IActionResult result = await controller.BusiestLevels();
+            GenericSlotResponse slotResponse = result.CastTo<OkObjectResult, GenericSlotResponse>();
+            Assert.Empty(slotResponse.Slots);
+        }
+        finally
+        {
+            roomMutex.ReleaseMutex();
+        }
+    }
+    #endregion
 }

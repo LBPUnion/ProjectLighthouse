@@ -17,16 +17,19 @@
     </p>         
    
     <p>
-        <span>
-            @if (Model.ModCase.ExpiresAt != null)
-            {
-                @Model.Translate(ModerationStrings.SuspensionExpiration, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))
-            }
-            else
-            {
-                @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(ModerationStrings.DoesNotExpire))
-            }
-        </span>
+        @if (Model.ModCase != null)
+        {
+            <span>
+                @if (Model.ModCase.ExpiresAt != null)
+                {
+                    @Model.Translate(ModerationStrings.SuspensionExpiration, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))
+                }
+                else
+                {
+                    @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(ModerationStrings.DoesNotExpire))
+                }
+            </span>    
+        }
 
         <ul>
             <li>@Model.Translate(ModerationStrings.LbpOnlineMultiplayer)</li>
@@ -36,10 +39,13 @@
         </ul>
     </p>
     
-    <p>
-        @Model.Translate(ModerationStrings.SuspensionReason, Model.ModCase.Reason)
-    </p> 
-    
+    @if (Model.ModCase != null)
+    {
+        <p>
+            @Model.Translate(ModerationStrings.SuspensionReason, Model.ModCase.Reason)
+        </p>     
+    }
+
     <p>
         @Model.Translate(ModerationStrings.SuspensionCircumventWarning)
     </p>

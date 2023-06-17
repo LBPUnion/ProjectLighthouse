@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -53,6 +54,8 @@ public static class MockHelper
 
     public static async Task<DatabaseContext> GetTestDatabase(IEnumerable<IList> sets, [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0)
     {
+        await RoomHelper.Rooms.RemoveAllAsync();
+
         Dictionary<Type, IList> setDict = new();
         foreach (IList list in sets)
         {
@@ -77,7 +80,6 @@ public static class MockHelper
             };
         }
 
-
         DbContextOptions<DatabaseContext> options = new DbContextOptionsBuilder<DatabaseContext>()
             .UseInMemoryDatabase($"{caller}_{lineNum}")
             .Options;
@@ -101,6 +103,8 @@ public static class MockHelper
         [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0
     )
     {
+        await RoomHelper.Rooms.RemoveAllAsync();
+
         users ??= new List<UserEntity>
         {
             GetUnitTestUser(),

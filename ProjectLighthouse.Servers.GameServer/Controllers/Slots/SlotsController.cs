@@ -351,30 +351,29 @@ public class SlotsController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        Dictionary<int, int> playersBySlotId = new();
+        List<int> busiestSlots = RoomHelper.Rooms.Where(r => r.Slot.SlotType == SlotType.User)
+            .GroupBy(r => r.Slot.SlotId)
+            .OrderByDescending(kvp => kvp.Count())
+            .Select(kvp => kvp.Key)
+            .AsQueryable()
+            .ApplyPagination(pageData)
+            .ToList();
 
-        foreach (Room room in RoomHelper.Rooms)
+        pageData.TotalElements = busiestSlots.Count;
+
+        List<SlotBase> slots = new();
+
+        Expression<Func<SlotEntity, bool>> filterQuery = this.FilterFromRequest(token).Build();
+
+        foreach (int slotId in busiestSlots)
         {
-            // TODO: support developer slotTypes?
-            if (room.Slot.SlotType != SlotType.User) continue;
-
-            if (!playersBySlotId.TryGetValue(room.Slot.SlotId, out int playerCount)) 
-                playersBySlotId.Add(room.Slot.SlotId, 0);
-
-            playerCount += room.PlayerIds.Count;
-
-            playersBySlotId.Remove(room.Slot.SlotId);
-            playersBySlotId.Add(room.Slot.SlotId, playerCount);
+            SlotBase? slot = await this.database.Slots.Where(s => s.SlotId == slotId)
+                .Where(filterQuery)
+                .Select(s => SlotBase.CreateFromEntity(s, token))
+                .FirstOrDefaultAsync();
+            if (slot == null) continue;
+            slots.Add(slot);
         }
-
-        pageData.TotalElements = playersBySlotId.Count;
-
-        List<int> orderedPlayersBySlotId = playersBySlotId.OrderByDescending(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
-
-        SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
-        queryBuilder.AddFilter(0, new SlotIdFilter(orderedPlayersBySlotId));
-
-        List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, new SlotSortBuilder<SlotEntity>());
 
         return this.Ok(new GenericSlotResponse(slots, pageData));
     }

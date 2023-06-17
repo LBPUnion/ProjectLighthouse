@@ -1,7 +1,9 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -20,79 +22,75 @@ public static class CensorHelper
     public static string FilterMessage(string message)
     {
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
+        StringBuilder stringBuilder = new(message);
 
-        int profaneIndex;
+        const int lbpCharLimit = 94;
+
+        int profaneCount = 0;
 
         foreach (string profanity in CensorConfiguration.Instance.FilteredWordList)
+        {
+            int lastFoundProfanity = 0;
+            int profaneIndex;
+            List<int> censorIndices = new();
             do
             {
-                profaneIndex = message.ToLower().IndexOf(profanity, StringComparison.Ordinal);
-                if (profaneIndex != -1) message = Censor(profaneIndex, profanity.Length, message);
+                profaneIndex = message.IndexOf(profanity, lastFoundProfanity, StringComparison.OrdinalIgnoreCase);
+                if (profaneIndex == -1) continue;
+
+                censorIndices.Add(profaneIndex);
+                
+                lastFoundProfanity = profaneIndex + profanity.Length;
             }
             while (profaneIndex != -1);
 
-        return message;
+            for (int i = censorIndices.Count - 1; i >= 0; i--)
+            {
+                Censor(censorIndices[i], profanity.Length, stringBuilder);
+                profaneCount += 1;
+            }
+        }
+
+        if (ServerConfiguration.Instance.LogChatFiltering && profaneCount > 0 && message.Length <= lbpCharLimit)
+            Logger.Info($"Censored {profaneCount} profane words from message \"{message}\"", LogArea.Filter);
+
+        return stringBuilder.ToString();
     }
 
-    private static string Censor(int profanityIndex, int profanityLength, string message)
+    private static void Censor(int profanityIndex, int profanityLength, StringBuilder message)
     {
-        StringBuilder sb = new();
-
-        sb.Append(message.AsSpan(0, profanityIndex));
-
         switch (CensorConfiguration.Instance.UserInputFilterMode)
         {
             case FilterMode.Random:
                 char prevRandomChar = '\0';
-                for (int i = 0; i < profanityLength; i++)
+                for (int i = profanityIndex; i < profanityIndex + profanityLength; i++)
                 {
-                    if (message[i] == ' ')
-                    {
-                        sb.Append(' ');
-                    }
-                    else
-                    {
-                        char randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
-                        if (randomChar == prevRandomChar) randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
+                    if (char.IsWhiteSpace(message[i])) continue;
+                    
+                    char randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
+                    while (randomChar == prevRandomChar)
+                        randomChar = randomCharacters[CryptoHelper.GenerateRandomInt32(0, randomCharacters.Length)];
 
-                        prevRandomChar = randomChar;
-                        sb.Append(randomChar);
-                    }
+                    prevRandomChar = randomChar;
+                    message[i] = randomChar;
                 }
 
                 break;
             case FilterMode.Asterisks:
-                for(int i = 0; i < profanityLength; i++)
+                for(int i = profanityIndex; i < profanityIndex + profanityLength; i++)
                 {
-                    sb.Append(message[i] == ' ' ? ' ' : '*');
-                }
+                    if (char.IsWhiteSpace(message[i])) continue;
 
+                    message[i] = '*';
+                }
                 break;
             case FilterMode.Furry:
                 string randomWord = randomFurry[CryptoHelper.GenerateRandomInt32(0, randomFurry.Length)];
-                sb.Append(randomWord);
+                message.Remove(profanityIndex, profanityLength);
+                message.Insert(profanityIndex, randomWord);
                 break;
             case FilterMode.None: break;
             default: throw new ArgumentOutOfRangeException(nameof(message));
         }
-
-        sb.Append(message.AsSpan(profanityIndex + profanityLength));
-
-        return sb.ToString();
-    }
-
-    public static string MaskEmail(string email)
-    {
-        if (string.IsNullOrEmpty(email) || !email.Contains('@')) return email;
-
-        string[] emailArr = email.Split('@');
-        string domainExt = Path.GetExtension(email);
-
-        // Hides everything except the first and last character of the username and domain, preserves the domain extension (.net, .com)
-        string maskedEmail = $"{emailArr[0][0]}****{emailArr[0][^1..]}@{emailArr[1][0]}****{emailArr[1]
-            .Substring(emailArr[1].Length - domainExt.Length - 1,
-                1)}{domainExt}";
-
-        return maskedEmail;
     }
 }
