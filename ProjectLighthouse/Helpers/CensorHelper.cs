@@ -22,10 +22,6 @@ public static class CensorHelper
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
         StringBuilder stringBuilder = new(message);
 
-        const int lbpCharLimit = 94;
-
-        int profaneCount = 0;
-
         foreach (string profanity in CensorConfiguration.Instance.FilteredWordList)
         {
             int lastFoundProfanity = 0;
@@ -45,7 +41,6 @@ public static class CensorHelper
             for (int i = censorIndices.Count - 1; i >= 0; i--)
             {
                 Censor(censorIndices[i], profanity.Length, stringBuilder);
-                profaneCount += 1;
             }
         }
         
