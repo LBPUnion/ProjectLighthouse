@@ -64,6 +64,10 @@ public partial class DatabaseContext : DbContext
 
     #endregion
 
+    // Used for mocking DbContext
+    protected internal DatabaseContext()
+    { }
+
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     { }
 

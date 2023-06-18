@@ -122,6 +122,8 @@ public partial class DatabaseContext
 
     public async Task HeartUser(int userId, UserEntity heartedUser)
     {
+        if (userId == heartedUser.UserId) return;
+
         HeartedProfileEntity? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) return;
 
