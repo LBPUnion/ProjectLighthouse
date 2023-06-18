@@ -109,11 +109,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         
         string filteredText = CensorHelper.FilterMessage(message);
 
+        if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
+
         if (ServerConfiguration.Instance.LogChatFiltering && filteredText != message)
-            Logger.Info($"Censored profane word(s) from in-game text sent by {username}: \"{message}\" => \"{filteredText}\"",
+            Logger.Info(
+                $"Censored profane word(s) from in-game text sent by {username}: \"{message}\" => \"{filteredText}\"",
                 LogArea.Filter);
-        if (ServerConfiguration.Instance.LogChatMessages)
-            Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
 
         return this.Ok(filteredText);
     }

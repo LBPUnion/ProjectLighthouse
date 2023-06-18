@@ -43,7 +43,7 @@ public static class CensorHelper
                 Censor(censorIndices[i], profanity.Length, stringBuilder);
             }
         }
-        
+
         return stringBuilder.ToString();
     }
 
