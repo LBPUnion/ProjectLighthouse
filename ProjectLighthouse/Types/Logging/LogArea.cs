@@ -12,7 +12,6 @@ public enum LogArea
     Config,
     Database,
     Filter,
-    Chat,
     HTTP,
     Match,
     Photos,

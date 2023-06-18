@@ -113,7 +113,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             Logger.Info($"Censored profane word(s) from in-game text sent by {username}: \"{message}\" => \"{filteredText}\"",
                 LogArea.Filter);
         if (ServerConfiguration.Instance.LogChatMessages)
-            Logger.Info($"{username}: \"{message}\"", LogArea.Chat);
+            Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
 
         return this.Ok(filteredText);
     }
