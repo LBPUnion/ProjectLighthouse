@@ -86,7 +86,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string message = await this.ReadBodyAsync();
 
-        const int lbpCharLimit = 95;
+        const int lbpCharLimit = 512;
         if (message.Length > lbpCharLimit) return this.BadRequest();
 
         if (message.StartsWith("/setemail ") && ServerConfiguration.Instance.Mail.MailEnabled)
