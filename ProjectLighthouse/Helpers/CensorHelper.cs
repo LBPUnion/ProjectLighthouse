@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -24,10 +22,6 @@ public static class CensorHelper
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
         StringBuilder stringBuilder = new(message);
 
-        const int lbpCharLimit = 94;
-
-        int profaneCount = 0;
-
         foreach (string profanity in CensorConfiguration.Instance.FilteredWordList)
         {
             int lastFoundProfanity = 0;
@@ -47,12 +41,8 @@ public static class CensorHelper
             for (int i = censorIndices.Count - 1; i >= 0; i--)
             {
                 Censor(censorIndices[i], profanity.Length, stringBuilder);
-                profaneCount += 1;
             }
         }
-
-        if (ServerConfiguration.Instance.LogChatFiltering && profaneCount > 0 && message.Length <= lbpCharLimit)
-            Logger.Info($"Censored {profaneCount} profane words from message \"{message}\"", LogArea.Filter);
 
         return stringBuilder.ToString();
     }
