@@ -123,7 +123,7 @@ public class CommentController : ControllerBase
         string filteredText = CensorHelper.FilterMessage(comment.Message);
 
         if (ServerConfiguration.Instance.LogChatFiltering && filteredText != comment.Message)
-            Logger.Info($"Censored profane word(s) from in-game comment sent by {username}: {comment.Message} => {filteredText}",
+            Logger.Info($"Censored profane word(s) from in-game comment sent by {username}: \"{comment.Message}\" => \"{filteredText}\"",
                 LogArea.Filter);
 
         bool success = await this.database.PostComment(token.UserId, targetId, type, filteredText);
