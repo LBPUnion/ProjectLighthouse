@@ -49,7 +49,7 @@ public class UserPageController : ControllerBase
         string filteredText = CensorHelper.FilterMessage(msg);
 
         if (ServerConfiguration.Instance.LogChatFiltering && filteredText != msg)
-            Logger.Info($"Censored profane word(s) from user comment sent by ${username}: \"{msg}\" => \"{filteredText}\"",
+            Logger.Info($"Censored profane word(s) from user comment sent by {username}: \"{msg}\" => \"{filteredText}\"",
                 LogArea.Filter);
 
         bool success = await this.database.PostComment(token.UserId, id, CommentType.Profile, filteredText);
