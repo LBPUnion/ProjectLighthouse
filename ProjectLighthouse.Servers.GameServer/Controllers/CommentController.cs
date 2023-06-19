@@ -1,11 +1,14 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -118,6 +121,10 @@ public class CommentController : ControllerBase
         }
 
         string filteredText = CensorHelper.FilterMessage(comment.Message);
+
+        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != comment.Message)
+            Logger.Info($"Censored profane word(s) from in-game comment sent by {username}: \"{comment.Message}\" => \"{filteredText}\"",
+                LogArea.Filter);
 
         bool success = await this.database.PostComment(token.UserId, targetId, type, filteredText);
         if (success) return this.Ok();

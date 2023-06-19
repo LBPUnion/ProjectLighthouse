@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -44,16 +45,21 @@ public class UserPageController : ControllerBase
             return this.Redirect("~/user/" + id);
         }
 
-        msg = CensorHelper.FilterMessage(msg);
+        string username = await this.database.UsernameFromWebToken(token);
+        string filteredText = CensorHelper.FilterMessage(msg);
 
-        bool success = await this.database.PostComment(token.UserId, id, CommentType.Profile, msg);
+        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != msg)
+            Logger.Info($"Censored profane word(s) from user comment sent by {username}: \"{msg}\" => \"{filteredText}\"",
+                LogArea.Filter);
+
+        bool success = await this.database.PostComment(token.UserId, id, CommentType.Profile, filteredText);
         if (success)
         {
-            Logger.Success($"Posted comment from {token.UserId}: \"{msg}\" on user {id}", LogArea.Comments);
+            Logger.Success($"Posted comment from {username}: \"{filteredText}\" on user {id}", LogArea.Comments);
         }
         else
         {
-            Logger.Error($"Failed to post comment from {token.UserId}: \"{msg}\" on user {id}", LogArea.Comments);
+            Logger.Error($"Failed to post comment from {username}: \"{filteredText}\" on user {id}", LogArea.Comments);
         }
 
         return this.Redirect("~/user/" + id);
