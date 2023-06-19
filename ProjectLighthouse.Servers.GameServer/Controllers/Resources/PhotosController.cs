@@ -34,17 +34,17 @@ public class PhotosController : ControllerBase
     [HttpPost("uploadPhoto")]
     public async Task<IActionResult> UploadPhoto()
     {
-        UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
-        if (user == null) return this.Forbid();
+        GameTokenEntity token = this.GetToken();
 
-        if (user.GetUploadedPhotoCount(this.database) >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
+        int photoCount = await this.database.Photos.CountAsync(p => p.CreatorId == token.UserId);
+        if (photoCount >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
 
         GamePhoto? photo = await this.DeserializeBody<GamePhoto>();
         if (photo == null) return this.BadRequest();
 
-        foreach (PhotoEntity p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
+        foreach (PhotoEntity p in this.database.Photos.Where(p => p.CreatorId == token.UserId))
         {
-            if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uplaoded
+            if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uploaded
             if (p.MediumHash == photo.MediumHash) return this.Ok();
             if (p.SmallHash == photo.SmallHash) return this.Ok();
             if (p.PlanHash == photo.PlanHash) return this.Ok();
@@ -52,8 +52,7 @@ public class PhotosController : ControllerBase
 
         PhotoEntity photoEntity = new()
         {
-            CreatorId = user.UserId,
-            Creator = user,
+            CreatorId = token.UserId,
             SmallHash = photo.SmallHash,
             MediumHash = photo.MediumHash,
             LargeHash = photo.LargeHash,
@@ -145,12 +144,14 @@ public class PhotosController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
+        string username = await this.database.UsernameFromGameToken(token);
+
         await WebhookHelper.SendWebhook
         (
             new EmbedBuilder
             {
                 Title = "New photo uploaded!",
-                Description = $"{user.Username} uploaded a new photo.",
+                Description = $"{username} uploaded a new photo.",
                 ImageUrl = $"{ServerConfiguration.Instance.ExternalUrl}/gameAssets/{photo.LargeHash}",
                 Color = WebhookHelper.GetEmbedColor(),
             }

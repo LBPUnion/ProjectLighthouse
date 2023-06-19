@@ -1,11 +1,9 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
@@ -148,18 +146,4 @@ public class SlotEntity
 
     [NotMapped]
     public int PlaysComplete => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete;
-
-    public int Hearts(DatabaseContext db) => db.HeartedLevels.Count(s => s.SlotId == this.SlotId);
-
-    public int Comments(DatabaseContext db) => db.Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
-
-    public int Photos(DatabaseContext db) => db.Photos.Count(p => p.SlotId == this.SlotId);
-
-    public int PhotosWithAuthor(DatabaseContext db) => db.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId);
-
-    public double RatingLBP1(DatabaseContext db) => db.RatedLevels.Where(r => r.SlotId == this.SlotId).Average(r => (double?)r.RatingLBP1) ?? 3.0;
-
-    public int Thumbsup(DatabaseContext db) => db.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
-
-    public int Thumbsdown(DatabaseContext db) => db.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
 }
