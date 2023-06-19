@@ -45,8 +45,7 @@ public class CleanupBrokenPhotosMaintenanceJob : IMaintenanceJob
                 goto removePhoto;
             }
 
-            hashNullOrEmpty = string.IsNullOrEmpty
-                                  (photo.LargeHash) ||
+            hashNullOrEmpty = string.IsNullOrEmpty(photo.LargeHash) ||
                               string.IsNullOrEmpty(photo.MediumHash) ||
                               string.IsNullOrEmpty(photo.SmallHash) ||
                               string.IsNullOrEmpty(photo.PlanHash);

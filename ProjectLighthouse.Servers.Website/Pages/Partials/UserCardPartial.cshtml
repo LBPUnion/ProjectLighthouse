@@ -1,6 +1,7 @@
 @using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
+@using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
 @inject DatabaseContext Database
 
@@ -43,20 +44,22 @@
             </h1>
         }
         @{
-
-            int hearts = Model.GetHeartCount(Database);
-            int comments = Model.GetCommentCount(Database);
-            int levels = Model.GetUsedSlotCount(Database);
-            int photos = Model.GetUploadedPhotoCount(Database);
+            var stats = await Database.Users.Where(u => u.UserId == Model.UserId).Select(_ => new
+            {
+                HeartCount = Database.HeartedProfiles.Count(hp => hp.HeartedUserId == Model.UserId),
+                CommentCount = Database.Comments.Count(c => c.PosterUserId == Model.UserId),
+                LevelCount = Database.Slots.Count(s => s.CreatorId == Model.UserId),
+                PhotoCount = Database.Photos.Count(p => p.CreatorId == Model.UserId),
+            }).OrderBy(_ => 1).FirstAsync();
         }
         <span>
             <i>@Model.GetStatus(Database).ToTranslatedString(language, timeZone)</i>
         </span>
         <div class="cardStatsUnderTitle">
-            <i class="pink heart icon" title="Hearts"></i> <span>@hearts</span>
-            <i class="blue comment icon" title="Comments"></i> <span>@comments</span>
-            <i class="green upload icon" title="Uploaded Levels"></i><span>@levels</span>
-            <i class="purple camera icon" title="Uploaded Photos"></i><span>@photos</span>
+            <i class="pink heart icon" title="Hearts"></i> <span>@stats.HeartCount</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@stats.CommentCount</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@stats.LevelCount</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@stats.PhotoCount</span>
         </div>
     </div>
 </div>

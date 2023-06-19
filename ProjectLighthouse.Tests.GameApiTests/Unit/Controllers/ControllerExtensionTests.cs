@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using LBPUnion.ProjectLighthouse.Filter;
+﻿using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Filter.Filters;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
-using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Http;
 using Xunit;

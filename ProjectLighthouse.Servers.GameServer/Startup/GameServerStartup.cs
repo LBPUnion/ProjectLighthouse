@@ -113,6 +113,5 @@ public class GameServerStartup
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints => endpoints.MapControllers());
-        app.UseEndpoints(endpoints => endpoints.MapRazorPages());
     }
 }

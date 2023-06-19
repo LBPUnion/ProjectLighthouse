@@ -42,7 +42,7 @@ public class WebsiteStartup
         {
             // jank but works
             string projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
-            
+
             options.FileProviders.Clear();
             options.FileProviders.Add(new PhysicalFileProvider(projectDir));
         });
@@ -131,7 +131,10 @@ public class WebsiteStartup
 
         app.UseRequestLocalization();
 
-        app.UseEndpoints(endpoints => endpoints.MapControllers());
-        app.UseEndpoints(endpoints => endpoints.MapRazorPages());
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+            endpoints.MapRazorPages();
+        });
     }
 }
