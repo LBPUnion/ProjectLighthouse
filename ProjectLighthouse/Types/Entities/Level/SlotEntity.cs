@@ -77,21 +77,13 @@ public class SlotEntity
 
     public string[] LevelTags(DatabaseContext database)
     {
-
         if (this.GameVersion != GameVersion.LittleBigPlanet1) return Array.Empty<string>();
 
-        // Sort tags by most popular
-        SortedDictionary<string, int> occurrences = new();
-        foreach (RatedLevelEntity r in database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0))
-        {
-            if (!occurrences.ContainsKey(r.TagLBP1))
-                occurrences.Add(r.TagLBP1, 1);
-            else
-                occurrences[r.TagLBP1]++;
-        }
-
-        return occurrences.OrderBy(r => r.Value).Select(r => r.Key).ToArray();
-
+        return database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0)
+            .GroupBy(r => r.TagLBP1)
+            .OrderByDescending(kvp => kvp.Count())
+            .Select(kvp => kvp.Key)
+            .ToArray();
     }
 
     public string BackgroundHash { get; set; } = "";
