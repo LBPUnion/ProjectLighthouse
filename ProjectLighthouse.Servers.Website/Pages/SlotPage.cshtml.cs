@@ -29,7 +29,7 @@ public class SlotPage : BaseLayout
     public async Task<IActionResult> OnGet([FromRoute] int id)
     {
         SlotEntity? slot = await this.Database.Slots.Include(s => s.Creator)
-            .Where(s => s.Type == SlotType.User)
+            .Where(s => s.Type == SlotType.User || (this.User != null && this.User.PermissionLevel >= PermissionLevel.Moderator))
             .FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
         System.Diagnostics.Debug.Assert(slot.Creator != null);
