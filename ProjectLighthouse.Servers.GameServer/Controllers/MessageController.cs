@@ -1,4 +1,5 @@
 #nullable enable
+using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -51,25 +52,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        string announceText = ServerConfiguration.Instance.AnnounceText;
+        StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
 
-        announceText = announceText.Replace("%user", username);
-        announceText = announceText.Replace("%id", token.UserId.ToString());
+        announceText.Replace("%user", username);
+        announceText.Replace("%id", token.UserId.ToString());
 
-        return this.Ok
-        (
-            announceText +
-            #if DEBUG
-            "\n\n---DEBUG INFO---\n" +
-            $"user.UserId: {token.UserId}\n" +
-            $"token.UserLocation: {token.UserLocation}\n" +
-            $"token.GameVersion: {token.GameVersion}\n" +
-            $"token.TicketHash: {token.TicketHash}\n" +
-            $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
-            "---DEBUG INFO---" +
-            #endif
-            (string.IsNullOrWhiteSpace(announceText) ? "" : "\n")
-        );
+        #if DEBUG
+        announceText.Append("\n\n---DEBUG INFO---\n" +
+                                  $"user.UserId: {token.UserId}\n" +
+                                  $"token.UserLocation: {token.UserLocation}\n" +
+                                  $"token.GameVersion: {token.GameVersion}\n" +
+                                  $"token.TicketHash: {token.TicketHash}\n" +
+                                  $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
+                                  "---DEBUG INFO---");
+        #endif
+        
+        return this.Ok(announceText);
     }
 
     [HttpGet("notification")]
