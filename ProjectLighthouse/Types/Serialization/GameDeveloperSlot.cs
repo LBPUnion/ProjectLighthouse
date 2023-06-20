@@ -32,6 +32,8 @@ public class GameDeveloperSlot : SlotBase, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
+        if (this.SlotId == 0 || this.InternalSlotId == 0) return;
+
         var stats = await database.Slots.Where(s => s.SlotId == this.SlotId)
             .Select(_ => new
             {

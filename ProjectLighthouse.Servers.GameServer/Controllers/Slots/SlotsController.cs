@@ -73,7 +73,7 @@ public class SlotsController : ControllerBase
                 {
                     slots.Add(new GameDeveloperSlot
                     {
-                        SlotId = slotId,
+                        InternalSlotId = slotId,
                     });
                     continue;
                 }
