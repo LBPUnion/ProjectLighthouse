@@ -9,7 +9,6 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class StatisticsHelper
 {
-
     public static async Task<int> RecentMatches(DatabaseContext database) => await database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300).CountAsync();
 
     public static async Task<int> RecentMatchesForGame(DatabaseContext database, GameVersion gameVersion)

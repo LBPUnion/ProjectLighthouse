@@ -7,11 +7,10 @@
 @using LBPUnion.ProjectLighthouse.Types.Users
 @using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity
+@inject DatabaseContext Database
 
 @{
     UserEntity? user = (UserEntity?)ViewData["User"];
-
-    await using DatabaseContext database = DatabaseContext.CreateNewInstance();
 
     string slotName = HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model!.Name) ? "Unnamed Level" : Model.Name);
 
@@ -26,8 +25,8 @@
 
     if (user != null)
     {
-        isQueued = await database.QueuedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
-        isHearted = await database.HeartedLevels.FirstOrDefaultAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId) != null;
+        isQueued = await Database.QueuedLevels.AnyAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId);
+        isHearted = await Database.HeartedLevels.AnyAsync(h => h.SlotId == Model.SlotId && h.UserId == user.UserId);
     }
 
     string callbackUrl = (string)ViewData["CallbackUrl"]!;
@@ -81,15 +80,24 @@
         }
 
         <div class="cardStatsUnderTitle">
-            <i class="pink heart icon" title="Hearts"></i> <span>@Model.Hearts</span>
+            @{
+                var slotStats = await Database.Slots.Where(s => s.SlotId == Model.SlotId).Select(_ => new
+                {
+                    HeartCount = Database.HeartedLevels.Count(h => h.SlotId == Model.SlotId),
+                    ThumbsUp = Database.RatedLevels.Count(r => r.SlotId == Model.SlotId && r.Rating == 1),
+                    ThumbsDown = Database.RatedLevels.Count(r => r.SlotId == Model.SlotId && r.Rating == -1),
+                    RatingLbp1 = Database.RatedLevels.Where(r => r.SlotId == Model.SlotId).Average(r => (double?)r.RatingLBP1) ?? 3.0,
+                }).OrderBy(_ => 1).FirstAsync();
+            }
+            <i class="pink heart icon" title="Hearts"></i> <span>@slotStats.HeartCount</span>
             <i class="blue play icon" title="Plays"></i> <span>@Model.PlaysUnique</span>
-            <i class="green thumbs up icon" title="Yays"></i> <span>@Model.Thumbsup</span>
-            <i class="red thumbs down icon" title="Boos"></i> <span>@Model.Thumbsdown</span>
+            <i class="green thumbs up icon" title="Yays"></i> <span>@slotStats.ThumbsUp</span>
+            <i class="red thumbs down icon" title="Boos"></i> <span>@slotStats.ThumbsDown</span>
 
             @if (Model.GameVersion == GameVersion.LittleBigPlanet1)
             {
                 <i class="yellow star icon" title="Star Rating"></i>
-                <span>@(Math.Round(Model.RatingLBP1 * 10) / 10)</span>
+                <span>@(Math.Round(slotStats.RatingLbp1 * 10) / 10)</span>
             }
         </div>
         @if (Model.Creator != null)

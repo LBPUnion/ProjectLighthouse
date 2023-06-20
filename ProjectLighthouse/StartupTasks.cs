@@ -27,7 +27,7 @@ namespace LBPUnion.ProjectLighthouse;
 
 public static class StartupTasks
 {
-    public static void Run(string[] args, ServerType serverType)
+    public static async Task Run(ServerType serverType)
     {
         // Log startup time
         Stopwatch stopwatch = new();
@@ -42,7 +42,7 @@ public static class StartupTasks
         Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
 
         Logger.Info("Loading configurations...", LogArea.Startup);
-        if (!loadConfigurations())
+        if (!LoadConfigurations())
         {
             Logger.Error("Failed to load one or more configurations", LogArea.Config);
             Environment.Exit(1);
@@ -50,22 +50,26 @@ public static class StartupTasks
 
         // Version info depends on ServerConfig 
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
-
         Logger.Info("Connecting to the database...", LogArea.Startup);
-        bool dbConnected = ServerStatics.DbConnected;
-        if (!dbConnected)
+
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
+        try
         {
-            Logger.Error("Database unavailable! Exiting.", LogArea.Startup);
+            if (!await database.Database.CanConnectAsync())
+            {
+                Logger.Error("Database unavailable! Exiting.", LogArea.Startup);
+                Logger.Error("Ensure that you have set the dbConnectionString field in lighthouse.yml", LogArea.Startup);
+                Environment.Exit(-1);
+            }
         }
-        else
+        catch (Exception e)
         {
-            Logger.Success("Connected to the database!", LogArea.Startup);
+            Logger.Error("There was an error connecting to the database:", LogArea.Startup);
+            Logger.Error(e.ToDetailedException(), LogArea.Startup);
+            Environment.Exit(-1);
         }
 
-        if (!dbConnected) Environment.Exit(1);
-        using DatabaseContext database = DatabaseContext.CreateNewInstance();
-        
-        migrateDatabase(database).Wait();
+        await MigrateDatabase(database);
 
         Logger.Debug
         (
@@ -75,13 +79,6 @@ public static class StartupTasks
             LogArea.Startup
         );
         Logger.Debug("You can do so by running any dotnet command with the flag: \"-c Release\". ", LogArea.Startup);
-
-        if (args.Length != 0)
-        {
-            List<LogLine> logLines = MaintenanceHelper.RunCommand(args).Result;
-            Console.WriteLine(logLines.ToLogString());
-            return;
-        }
 
         if (ServerConfiguration.Instance.WebsiteConfiguration.ConvertAssetsOnStartup
             && serverType == ServerType.Website)
@@ -102,7 +99,7 @@ public static class StartupTasks
             admin.PermissionLevel = PermissionLevel.Administrator;
             admin.PasswordResetRequired = true;
 
-            database.SaveChanges();
+            await database.SaveChangesAsync();
 
             Logger.Success("No users were found, so an admin user was created. " + 
                            $"The username is 'admin' and the password is '{passwordClear}'.", LogArea.Startup);
@@ -112,7 +109,7 @@ public static class StartupTasks
         Logger.Success($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
     }
 
-    private static bool loadConfigurations()
+    private static bool LoadConfigurations()
     {
         Assembly assembly = Assembly.GetAssembly(typeof(ConfigurationBase<>));
         if (assembly == null) return false;
@@ -147,7 +144,7 @@ public static class StartupTasks
         return didLoad;
     }
 
-    private static async Task migrateDatabase(DatabaseContext database)
+    private static async Task MigrateDatabase(DatabaseContext database)
     {
         int? originalTimeout = database.Database.GetCommandTimeout();
         database.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
@@ -179,7 +176,7 @@ public static class StartupTasks
 
             foreach (IMigrationTask migrationTask in migrationsToRun)
             {
-                MaintenanceHelper.RunMigration(migrationTask, database).Wait();
+                MaintenanceHelper.RunMigration(database, migrationTask).Wait();
             }
 
             stopwatch.Stop();

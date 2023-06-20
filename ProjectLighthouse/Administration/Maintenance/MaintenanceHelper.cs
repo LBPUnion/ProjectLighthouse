@@ -30,11 +30,11 @@ public static class MaintenanceHelper
     public static List<IMigrationTask> MigrationTasks { get; }
     public static List<IRepeatingTask> RepeatingTasks { get; }
 
-    public static async Task<List<LogLine>> RunCommand(string[] args)
+    public static async Task<List<LogLine>> RunCommand(IServiceProvider provider, string[] args)
     {
         if (args.Length < 1)
-            throw new Exception
-                ("This should never happen. " + "If it did, its because you tried to run a command before validating that the user actually wants to run one.");
+            throw new Exception("This should never happen. " +
+                                "If it did, its because you tried to run a command before validating that the user actually wants to run one.");
 
         string baseCmd = args[0];
         args = args.Skip(1).ToArray();
@@ -44,21 +44,32 @@ public static class MaintenanceHelper
         InMemoryLogger memoryLogger = new();
         logger.AddLogger(memoryLogger);
 
-        IEnumerable<ICommand> suitableCommands = Commands.Where
-                (command => command.Aliases().Any(a => a.ToLower() == baseCmd.ToLower()))
-            .Where(command => args.Length >= command.RequiredArgs());
-        foreach (ICommand command in suitableCommands)
+        ICommand? command = Commands
+            .Where(command =>
+                command.Aliases().Any(a => string.Equals(a, baseCmd, StringComparison.CurrentCultureIgnoreCase)))
+            .FirstOrDefault(command => args.Length >= command.RequiredArgs());
+        if (command == null)
         {
-            logger.LogInfo("Running command " + command.Name(), LogArea.Command);
-            
-            await command.Run(args, logger);
+            logger.LogError("Failed to find command", LogArea.Command);
             logger.Flush();
             return memoryLogger.Lines;
         }
+        try
+        {
+            logger.LogInfo("Running command " + command.Name(), LogArea.Command);
 
-        logger.LogError("Command not found.", LogArea.Command);
-        logger.Flush();
-        return memoryLogger.Lines;
+            await command.Run(provider, args, logger);
+
+            logger.Flush();
+            return memoryLogger.Lines;
+        }
+        catch(Exception e)
+        {
+            logger.LogError($"Failed to run command: {e.Message}", LogArea.Command);
+            logger.LogError(e.ToDetailedException(), LogArea.Command);
+            logger.Flush();
+            return memoryLogger.Lines;
+        }
     }
 
     public static async Task RunMaintenanceJob(string jobName)
@@ -69,9 +80,8 @@ public static class MaintenanceHelper
         await job.Run();
     }
 
-    public static async Task RunMigration(IMigrationTask migrationTask, DatabaseContext? database = null)
+    public static async Task RunMigration(DatabaseContext database, IMigrationTask migrationTask)
     {
-        database ??= DatabaseContext.CreateNewInstance();
 
         // Migrations should never be run twice.
         Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name));

@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Misc;
@@ -49,10 +48,6 @@ public class UserEntity
     }
 
     public UserStatus GetStatus(DatabaseContext database) => new(database, this.UserId);
-    public int GetHeartCount(DatabaseContext database) => database.HeartedProfiles.Count(hp => hp.HeartedUserId == this.UserId);
-    public int GetCommentCount(DatabaseContext database) => database.Comments.Count(c => c.TargetId == this.UserId && c.Type == CommentType.Profile);
-    public int GetUsedSlotCount(DatabaseContext database) => database.Slots.Count(s => s.CreatorId == this.UserId);
-    public int GetUploadedPhotoCount(DatabaseContext database) => database.Photos.Count(p => p.CreatorId == this.UserId);
 
     /// <summary>
     ///     The location of the profile card on the user's earth

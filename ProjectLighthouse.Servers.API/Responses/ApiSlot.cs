@@ -68,7 +68,7 @@ public struct ApiSlot
             PlaysUnique = slot.PlaysUnique,
             PlaysComplete = slot.PlaysComplete,
             CommentsEnabled = slot.CommentsEnabled,
-            AverageRating = slot.RatingLBP1,
+            AverageRating = context.RatedLevels.Where(r => r.SlotId == slot.SlotId).Average(r => (double?)r.RatingLBP1) ?? 3.0,
             LevelType = slot.LevelType,
         };
 }

@@ -27,7 +27,7 @@ public static class RoomHelper
     private static int roomIdIncrement;
     internal static int RoomIdIncrement => roomIdIncrement++;
 
-    public static FindBestRoomResponse? FindBestRoom(UserEntity? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform, string? location)
+    public static FindBestRoomResponse? FindBestRoom(DatabaseContext database, UserEntity? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform, string? location)
     {
         if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
         {
@@ -87,7 +87,7 @@ public static class RoomHelper
                 Locations = new List<string>(),
             };
 
-            foreach (UserEntity player in room.GetPlayers(DatabaseContext.CreateNewInstance()))
+            foreach (UserEntity player in room.GetPlayers(database))
             {
                 response.Players.Add
                 (
@@ -157,8 +157,8 @@ public static class RoomHelper
             RoomVersion = roomVersion,
             RoomPlatform = roomPlatform,
         };
-
-        CleanupRooms(room.HostId, room);
+        using DatabaseContext database = DatabaseContext.CreateNewInstance();
+        CleanupRooms(database, room.HostId, room);
         lock(RoomLock) Rooms.Add(room);
         Logger.Info($"Created room (id: {room.RoomId}) for host {room.HostId}", LogArea.Match);
 
@@ -175,20 +175,11 @@ public static class RoomHelper
 
     public static Room? FindRoomByUserId(int userId)
     {
-        // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (Room room in Rooms)
-        {
-            if (room.PlayerIds.Any(p => p == userId))
-            {
-                return room;
-            }
-        }
-
-        return null;
+        return Rooms.FirstOrDefault(room => room.PlayerIds.Any(p => p == userId));
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    public static Task CleanupRooms(int? hostId = null, Room? newRoom = null, DatabaseContext? database = null)
+    public static Task CleanupRooms(DatabaseContext database, int? hostId = null, Room? newRoom = null)
     {
         #if DEBUG
         Stopwatch stopwatch = new();
@@ -203,8 +194,6 @@ public static class RoomHelper
             Logger.Debug($"Cleaning up rooms... (took {stopwatch.ElapsedMilliseconds}ms to get lock on {nameof(RoomLock)})", LogArea.Match);
             #endif
             int roomCountBeforeCleanup = rooms.Count();
-
-            database ??= DatabaseContext.CreateNewInstance();
 
             // Remove offline players from rooms
             foreach (Room room in rooms)

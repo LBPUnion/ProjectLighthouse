@@ -8,9 +8,12 @@ namespace LBPUnion.ProjectLighthouse.Tests.Helpers;
 
 public static class IntegrationHelper
 {
-    private static readonly Lazy<bool> dbConnected = new(IsDbConnected);
+    private static readonly Lazy<bool> dbConnected = new(() =>
+    {
+        using DatabaseContext database = DatabaseContext.CreateNewInstance();
+        return database.Database.CanConnect();
+    });
 
-    private static bool IsDbConnected() => ServerStatics.DbConnected;
 
     /// <summary>
     /// Resets the database to a clean state and returns a new DatabaseContext.

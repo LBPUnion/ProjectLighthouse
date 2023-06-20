@@ -98,17 +98,22 @@ public class MatchController : ControllerBase
             case FindBestRoom diveInData when MatchHelper.UserLocations.Count > 1:
             #endif
             {
-                FindBestRoomResponse? response = RoomHelper.FindBestRoom
-                    (user, token.GameVersion, diveInData.RoomSlot, token.Platform, token.UserLocation);
+                FindBestRoomResponse? response = RoomHelper.FindBestRoom(this.database,
+                    user,
+                    token.GameVersion,
+                    diveInData.RoomSlot,
+                    token.Platform,
+                    token.UserLocation);
 
                 if (response == null) return this.NotFound();
 
                 string serialized = JsonSerializer.Serialize(response, typeof(FindBestRoomResponse));
-                foreach (Player player in response.Players) MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
+                foreach (Player player in response.Players)
+                    MatchHelper.AddUserRecentlyDivedIn(user.UserId, player.User.UserId);
 
                 return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
             }
-            case CreateRoom createRoom when MatchHelper.UserLocations.Count >= 1:
+            case CreateRoom createRoom when !MatchHelper.UserLocations.IsEmpty:
             {
                 List<int> users = new();
                 foreach (string playerUsername in createRoom.Players)
@@ -139,9 +144,8 @@ public class MatchController : ControllerBase
                     }
 
                     room.PlayerIds = users.Select(u => u.UserId).ToList();
-                    await RoomHelper.CleanupRooms(null, room);
+                    await RoomHelper.CleanupRooms(this.database, null, room);
                 }
-
                 break;
             }
         }

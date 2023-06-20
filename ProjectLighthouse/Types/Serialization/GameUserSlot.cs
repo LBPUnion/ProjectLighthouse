@@ -235,7 +235,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        var stats = await database.Slots
+        var stats = await database.Slots.Where(s => s.SlotId == this.SlotId)
             .Select(_ => new
             {
                 ThumbsUp = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1),

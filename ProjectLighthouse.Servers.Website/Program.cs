@@ -1,38 +1,22 @@
-#nullable enable
+using LBPUnion.ProjectLighthouse;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging.Loggers.AspNet;
 using LBPUnion.ProjectLighthouse.Servers.Website.Startup;
 using LBPUnion.ProjectLighthouse.Types.Misc;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace LBPUnion.ProjectLighthouse.Servers.Website;
+await StartupTasks.Run(ServerType.Website);
 
-public static class Program
+IHostBuilder builder = Host.CreateDefaultBuilder();
+builder.ConfigureWebHostDefaults(webBuilder =>
 {
-    public static void Main(string[] args)
-    {
-        StartupTasks.Run(args, ServerType.Website);
+    webBuilder.UseStartup<WebsiteStartup>();
+    webBuilder.UseUrls(ServerConfiguration.Instance.WebsiteListenUrl);
+    webBuilder.UseWebRoot("StaticFiles");
+});
 
-        CreateHostBuilder(args).Build().Run();
-    }
-
-    public static IHostBuilder CreateHostBuilder(string[] args)
-        => Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults
-            (
-                webBuilder =>
-                {
-                    webBuilder.UseStartup<WebsiteStartup>();
-                    webBuilder.UseWebRoot("StaticFiles");
-                    webBuilder.UseUrls(ServerConfiguration.Instance.WebsiteListenUrl);
-                }
-            )
-            .ConfigureLogging
-            (
-                logging =>
-                {
-                    logging.ClearProviders();
-                    logging.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, AspNetToLighthouseLoggerProvider>());
-                }
-            );
-}
+builder.ConfigureLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddProvider(new AspNetToLighthouseLoggerProvider());
+});
+await builder.Build().RunAsync();

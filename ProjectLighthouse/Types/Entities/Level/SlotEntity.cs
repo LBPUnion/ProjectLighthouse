@@ -1,11 +1,9 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
@@ -79,21 +77,13 @@ public class SlotEntity
 
     public string[] LevelTags(DatabaseContext database)
     {
-
         if (this.GameVersion != GameVersion.LittleBigPlanet1) return Array.Empty<string>();
 
-        // Sort tags by most popular
-        SortedDictionary<string, int> occurrences = new();
-        foreach (RatedLevelEntity r in database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0))
-        {
-            if (!occurrences.ContainsKey(r.TagLBP1))
-                occurrences.Add(r.TagLBP1, 1);
-            else
-                occurrences[r.TagLBP1]++;
-        }
-
-        return occurrences.OrderBy(r => r.Value).Select(r => r.Key).ToArray();
-
+        return database.RatedLevels.Where(r => r.SlotId == this.SlotId && r.TagLBP1.Length > 0)
+            .GroupBy(r => r.TagLBP1)
+            .OrderByDescending(kvp => kvp.Count())
+            .Select(kvp => kvp.Key)
+            .ToArray();
     }
 
     public string BackgroundHash { get; set; } = "";
@@ -141,18 +131,6 @@ public class SlotEntity
     public bool CommentsEnabled { get; set; } = true;
 
     [NotMapped]
-    public int Hearts => DatabaseContext.CreateNewInstance().HeartedLevels.Count(s => s.SlotId == this.SlotId);
-
-    [NotMapped]
-    public int Comments => DatabaseContext.CreateNewInstance().Comments.Count(c => c.Type == CommentType.Level && c.TargetId == this.SlotId);
-
-    [NotMapped]
-    public int Photos => DatabaseContext.CreateNewInstance().Photos.Count(p => p.SlotId == this.SlotId);
-
-    [NotMapped]
-    public int PhotosWithAuthor => DatabaseContext.CreateNewInstance().Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId);
-
-    [NotMapped]
     public int Plays => this.PlaysLBP1 + this.PlaysLBP2 + this.PlaysLBP3;
 
     [NotMapped]
@@ -160,12 +138,4 @@ public class SlotEntity
 
     [NotMapped]
     public int PlaysComplete => this.PlaysLBP1Complete + this.PlaysLBP2Complete + this.PlaysLBP3Complete;
-
-    public double RatingLBP1 => DatabaseContext.CreateNewInstance().RatedLevels.Where(r => r.SlotId == this.SlotId).Average(r => (double?)r.RatingLBP1) ?? 3.0;
-
-    [NotMapped]
-    public int Thumbsup => DatabaseContext.CreateNewInstance().RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1);
-
-    [NotMapped]
-    public int Thumbsdown => DatabaseContext.CreateNewInstance().RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1);
 }

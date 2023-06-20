@@ -9,6 +9,7 @@
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotPage
+@inject DatabaseContext Database
 
 @{
     Layout = "Layouts/BaseLayout";
@@ -55,7 +56,7 @@
                 string[] authorLabels;
                 if (Model.Slot?.GameVersion == GameVersion.LittleBigPlanet1)
                 {
-                    authorLabels = Model.Slot.LevelTags(DatabaseContext.CreateNewInstance());
+                    authorLabels = Model.Slot.LevelTags(Database);
                 }
                 else
                 {
