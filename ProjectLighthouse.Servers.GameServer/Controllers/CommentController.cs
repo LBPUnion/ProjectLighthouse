@@ -94,7 +94,7 @@ public class CommentController : ControllerBase
             .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(c => GameComment.CreateFromEntity(c, token.UserId));
 
-        if (type == CommentType.Level && slotType == "developer" && user.IsModerator)
+        if (type == CommentType.Level && slotType == "developer" && user.IsModerator && pageData.PageStart == 1)
         {
             comments.Insert(0, new GameComment
             {
