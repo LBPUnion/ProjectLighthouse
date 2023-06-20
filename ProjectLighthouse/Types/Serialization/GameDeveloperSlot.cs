@@ -32,7 +32,7 @@ public class GameDeveloperSlot : SlotBase, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        var stats = await database.Slots.Where(s => s.SlotId == this.InternalSlotId)
+        var stats = await database.Slots.Where(s => s.SlotId == this.SlotId)
             .Select(_ => new
             {
                 CommentCount = database.Comments.Count(c => c.TargetId == this.SlotId && c.Type == CommentType.Level),
