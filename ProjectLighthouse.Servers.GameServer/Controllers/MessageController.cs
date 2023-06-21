@@ -67,7 +67,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
                                   "---DEBUG INFO---");
         #endif
         
-        return this.Ok(announceText);
+        return this.Ok(announceText.ToString());
     }
 
     [HttpGet("notification")]
