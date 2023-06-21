@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -82,12 +83,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         ServerConfiguration.Instance.AnnounceText = "you are now logged in as %user (id: %id)";
 
-        const string expected = "you are now logged in as unittest (id: 1)\n";
+        const string expected = "you are now logged in as unittest (id: 1)";
 
         IActionResult result = await messageController.Announce();
 
-        string announceMsg = result.CastTo<OkObjectResult, string>();
-        Assert.Equal(expected, announceMsg);
+        StringBuilder announceMsg = result.CastTo<OkObjectResult, StringBuilder>();
+        Assert.Equal(expected, announceMsg.ToString());
     }
 
     [Fact]
@@ -103,8 +104,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Announce();
 
-        string announceMsg = result.CastTo<OkObjectResult, string>();
-        Assert.Equal(expected, announceMsg);
+        StringBuilder announceMsg = result.CastTo<OkObjectResult, StringBuilder>();
+        Assert.Equal(expected, announceMsg.ToString());
     }
 
     [Fact]
