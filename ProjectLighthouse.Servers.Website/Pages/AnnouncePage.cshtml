@@ -32,27 +32,37 @@
     </div>
 }
 
-@foreach (WebsiteAnnouncementEntity announcement in Model.Announcements)
+@if (Model.Announcements.Any())
+{
+    @foreach (WebsiteAnnouncementEntity announcement in Model.Announcements)
+    {
+        <div class="ui blue segment" style="position: relative;">
+            <h3>@announcement.Title</h3>
+            <p style="white-space: initial;">
+                @announcement.Content
+            </p>
+
+            @if (Model.User != null && Model.User.IsAdmin)
+            {
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <button
+                        asp-page-handler="delete"
+                        asp-route-id="@announcement.Identifier"
+                        onclick="return confirm('Are you sure you want to delete this announcement?')"
+                        class="ui red icon button"
+                        style="position: absolute;
+                    right: 0.5em; top: 0.5em">
+                        <i class="trash icon"></i>
+                    </button>
+                </form>
+            }
+        </div>
+    }    
+}
+else
 {
     <div class="ui blue segment" style="position: relative;">
-        <h3>@announcement.Title</h3>
-        <p style="white-space: initial;">
-            @announcement.Content
-        </p>
-        @if (Model.User != null && Model.User.IsAdmin)
-        {
-            <form method="post">
-                @Html.AntiForgeryToken()
-                <button
-                    asp-page-handler="delete"
-                    asp-route-id="@announcement.Identifier"
-                    onclick="return confirm('Are you sure you want to delete this announcement?')"
-                    class="ui red icon button"
-                    style="position: absolute;
-                    right: 0.5em; top: 0.5em">
-                    <i class="trash icon"></i>
-                </button>
-            </form>
-        }
+        <p>There are no announcements to display.</p>
     </div>
 }
