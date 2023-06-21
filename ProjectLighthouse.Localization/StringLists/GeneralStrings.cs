@@ -15,6 +15,7 @@ public static class GeneralStrings
     public static readonly TranslatableString RecentPhotos = create("recent_photos");
     public static readonly TranslatableString RecentActivity = create("recent_activity");
     public static readonly TranslatableString Soon = create("soon");
+    public static readonly TranslatableString Announcements = create("announcements");
     
     private static TranslatableString create(string key) => new(TranslationAreas.General, key);
 }
