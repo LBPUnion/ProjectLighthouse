@@ -14,7 +14,7 @@ namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 [Trait("Category", "Integration")]
 public class AdminTests : LighthouseWebTest
 {
-    private const string adminPanelButtonXPath = "/html/body/div/header/div/div/div/a[1]";
+    private const string adminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]";
 
     [Fact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
