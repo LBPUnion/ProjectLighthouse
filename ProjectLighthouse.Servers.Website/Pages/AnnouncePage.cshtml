@@ -48,7 +48,7 @@
                     @Html.AntiForgeryToken()
                     <button
                         asp-page-handler="delete"
-                        asp-route-id="@announcement.Identifier"
+                        asp-route-id="@announcement.AnnouncementId"
                         onclick="return confirm('Are you sure you want to delete this announcement?')"
                         class="ui red icon button"
                         style="position: absolute;

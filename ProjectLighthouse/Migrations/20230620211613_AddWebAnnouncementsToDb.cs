@@ -17,7 +17,7 @@ namespace ProjectLighthouse.Migrations
                 name: "WebsiteAnnouncements",
                 columns: table => new
                 {
-                    Identifier = table.Column<int>(
+                    AnnouncementId = table.Column<int>(
                             type: "int", 
                             nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
@@ -34,7 +34,7 @@ namespace ProjectLighthouse.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WebsiteAnnouncements", x => x.Identifier);
+                    table.PrimaryKey("PK_WebsiteAnnouncements", x => x.AnnouncementId);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
         }

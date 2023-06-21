@@ -22,7 +22,7 @@ public class AnnouncePage : BaseLayout
     public async Task<IActionResult> OnGet()
     {
         this.Announcements = await this.Database.WebsiteAnnouncements
-            .OrderByDescending(a => a.Identifier)
+            .OrderByDescending(a => a.AnnouncementId)
             .ToListAsync();
 
         return this.Page();
@@ -69,7 +69,7 @@ public class AnnouncePage : BaseLayout
         if (!user.IsAdmin) return this.BadRequest();
 
         WebsiteAnnouncementEntity? announcement = await this.Database.WebsiteAnnouncements
-            .Where(a => a.Identifier == id)
+            .Where(a => a.AnnouncementId == id)
             .FirstOrDefaultAsync();
 
         if (announcement == null) return this.BadRequest();

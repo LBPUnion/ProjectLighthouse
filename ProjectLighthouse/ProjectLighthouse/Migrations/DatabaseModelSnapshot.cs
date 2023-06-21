@@ -1026,7 +1026,7 @@ namespace ProjectLighthouse.Migrations
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Website.WebsiteAnnouncementEntity", b =>
                 {
-                    b.Property<int>("Identifier")
+                    b.Property<int>("AnnouncementId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
