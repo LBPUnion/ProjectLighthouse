@@ -51,11 +51,11 @@ public class AnnouncePage : BaseLayout
 
         if (DiscordConfiguration.Instance.DiscordIntegrationEnabled)
         {
-            string truncatedAnnouncement = content.Length > 100 ? content[..100] + "..." : content;
+            string truncatedAnnouncement = content.Length > 250 ? content[..250] + "..." : content;
             
             await WebhookHelper.SendWebhook(
                 title: "A new announcement has been posted",
-                description: $"{truncatedAnnouncement} [read more]({ServerConfiguration.Instance.ExternalUrl}/announce)",
+                description: $"{truncatedAnnouncement} ([read more]({ServerConfiguration.Instance.ExternalUrl}/announce))",
                 dest: WebhookHelper.WebhookDestination.Public);    
         }
 
