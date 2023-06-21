@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -87,8 +86,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Announce();
 
-        StringBuilder announceMsg = result.CastTo<OkObjectResult, StringBuilder>();
-        Assert.Equal(expected, announceMsg.ToString());
+        string announceMsg = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expected, announceMsg);
     }
 
     [Fact]
@@ -104,8 +103,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Announce();
 
-        StringBuilder announceMsg = result.CastTo<OkObjectResult, StringBuilder>();
-        Assert.Equal(expected, announceMsg.ToString());
+        string announceMsg = result.CastTo<OkObjectResult, string>();
+        Assert.Equal(expected, announceMsg);
     }
 
     [Fact]
