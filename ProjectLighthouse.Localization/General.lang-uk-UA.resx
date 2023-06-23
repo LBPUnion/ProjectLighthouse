@@ -56,4 +56,7 @@
   <data name="email" xml:space="preserve">
         <value>Електронна пошта</value>
     </data>
+  <data name="announcements" xml:space="preserve">
+        <value>Announcements</value>
+    </data>
 </root>
