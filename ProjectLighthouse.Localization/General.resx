@@ -57,4 +57,7 @@
     <data name="email" xml:space="preserve">
         <value>Email</value>
     </data>
+    <data name="announcements" xml:space="preserve">
+        <value>Announcements</value>
+    </data>
 </root>
