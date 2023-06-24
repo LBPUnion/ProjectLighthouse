@@ -42,8 +42,9 @@ public class AnnouncePage : BaseLayout
 
         WebsiteAnnouncementEntity announcement = new()
         {
-            Title = title,
-            Content = content,
+            Title = title.Trim(),
+            Content = content.Trim(),
+            Publisher = user.Username,
         };
 
         await this.Database.WebsiteAnnouncements.AddAsync(announcement);

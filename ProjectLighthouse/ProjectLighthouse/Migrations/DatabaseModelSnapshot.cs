@@ -1033,10 +1033,13 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Publisher")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Title")
                         .HasColumnType("longtext");
 
-                    b.HasKey("Identifier");
+                    b.HasKey("AnnouncementId");
 
                     b.ToTable("WebsiteAnnouncements");
                 });

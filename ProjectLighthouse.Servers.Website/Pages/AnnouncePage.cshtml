@@ -37,11 +37,15 @@
     @foreach (WebsiteAnnouncementEntity announcement in Model.Announcements)
     {
         <div class="ui blue segment" style="position: relative;">
-            <h3>@announcement.Title</h3>
-            <p style="white-space: pre-line;">
-                @announcement.Content
-            </p>
-
+            <div>
+                <h3>@announcement.Title</h3>
+                <p style="padding-bottom: 10px;">
+                    <span style="white-space: pre-line; ">@announcement.Content</span>
+                </p>
+                <div class="ui tiny bottom left attached label">
+                    Posted by <span style="color: black">@announcement.Publisher</span>
+                </div>
+            </div>
             @if (Model.User != null && Model.User.IsAdmin)
             {
                 <form method="post">
