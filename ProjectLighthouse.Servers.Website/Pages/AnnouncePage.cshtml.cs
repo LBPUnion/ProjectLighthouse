@@ -22,6 +22,7 @@ public class AnnouncePage : BaseLayout
     public async Task<IActionResult> OnGet()
     {
         this.Announcements = await this.Database.WebsiteAnnouncements
+            .Include(a => a.Publisher)
             .OrderByDescending(a => a.AnnouncementId)
             .ToListAsync();
 
@@ -44,7 +45,7 @@ public class AnnouncePage : BaseLayout
         {
             Title = title.Trim(),
             Content = content.Trim(),
-            Publisher = user.Username,
+            PublisherId = user.UserId,
         };
 
         await this.Database.WebsiteAnnouncements.AddAsync(announcement);

@@ -1033,13 +1033,15 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Publisher")
-                        .HasColumnType("longtext");
+                    b.Property<int>("PublisherId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("longtext");
 
                     b.HasKey("AnnouncementId");
+
+                    b.HasIndex("PublisherId");
 
                     b.ToTable("WebsiteAnnouncements");
                 });
@@ -1395,6 +1397,17 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Website.WebsiteAnnouncementEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Publisher")
+                        .WithMany()
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Publisher");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", b =>
