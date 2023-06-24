@@ -21,8 +21,7 @@ public class AnnouncePage : BaseLayout
 
     public async Task<IActionResult> OnGet()
     {
-        this.Announcements = await this.Database.WebsiteAnnouncements
-            .Include(a => a.Publisher)
+        this.Announcements = await this.Database.WebsiteAnnouncements.Include(a => a.Publisher)
             .OrderByDescending(a => a.AnnouncementId)
             .ToListAsync();
 
@@ -57,8 +56,7 @@ public class AnnouncePage : BaseLayout
                 ? content[..250] + $"... [read more]({ServerConfiguration.Instance.ExternalUrl}/announce)"
                 : content;
 
-            await WebhookHelper.SendWebhook($":mega: {title}",
-                truncatedAnnouncement);
+            await WebhookHelper.SendWebhook($":mega: {title}", truncatedAnnouncement);
         }
 
         return this.RedirectToPage();
