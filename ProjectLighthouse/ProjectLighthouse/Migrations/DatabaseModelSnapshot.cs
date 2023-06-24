@@ -1033,7 +1033,7 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("PublisherId")
+                    b.Property<int?>("PublisherId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -1403,9 +1403,7 @@ namespace ProjectLighthouse.Migrations
                 {
                     b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "Publisher")
                         .WithMany()
-                        .HasForeignKey("PublisherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PublisherId");
 
                     b.Navigation("Publisher");
                 });

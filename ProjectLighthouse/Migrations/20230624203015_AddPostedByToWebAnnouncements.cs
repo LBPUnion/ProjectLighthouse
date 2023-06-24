@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230624190348_AddPostedByToWebAnnouncements")]
+    [Migration("20230624203015_AddPostedByToWebAnnouncements")]
     public partial class AddPostedByToWebAnnouncements : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,8 +16,7 @@ namespace ProjectLighthouse.Migrations
                 name: "PublisherId",
                 table: "WebsiteAnnouncements",
                 type: "int",
-                nullable: false,
-                defaultValue: 0);
+                nullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_WebsiteAnnouncements_PublisherId",
@@ -29,10 +28,9 @@ namespace ProjectLighthouse.Migrations
                 table: "WebsiteAnnouncements",
                 column: "PublisherId",
                 principalTable: "Users",
-                principalColumn: "UserId",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "UserId");
         }
-        
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
