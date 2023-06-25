@@ -21,7 +21,8 @@ public class AnnouncePage : BaseLayout
 
     public async Task<IActionResult> OnGet()
     {
-        this.Announcements = await this.Database.WebsiteAnnouncements.Include(a => a.Publisher)
+        this.Announcements = await this.Database.WebsiteAnnouncements
+            .Include(a => a.Publisher)
             .OrderByDescending(a => a.AnnouncementId)
             .ToListAsync();
 
