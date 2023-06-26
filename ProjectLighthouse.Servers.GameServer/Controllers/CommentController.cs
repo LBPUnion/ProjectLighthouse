@@ -50,7 +50,12 @@ public class CommentController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Unauthorized();
+
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
+
+        int originalSlotId = slotId;
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
@@ -88,6 +93,17 @@ public class CommentController : ControllerBase
             .Where(p => p.Poster.PermissionLevel != PermissionLevel.Banned)
             .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(c => GameComment.CreateFromEntity(c, token.UserId));
+
+        if (type == CommentType.Level && slotType == "developer" && user.IsModerator && pageData.PageStart == 1)
+        {
+            comments.Insert(0, new GameComment
+            {
+                CommentId = 0,
+                Timestamp = 0,
+                AuthorUsername = "LH",
+                Message = $"Slot ID: {targetId}, Story level ID: {originalSlotId}",
+            });
+        }
 
         return this.Ok(new CommentListResponse(comments));
     }
