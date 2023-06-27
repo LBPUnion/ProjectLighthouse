@@ -53,6 +53,8 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
+        if (this.CommentId == 0 || this.PosterUserId == 0) return;
+
         this.AuthorUsername = await database.Users.Where(u => u.UserId == this.PosterUserId)
             .Select(u => u.Username)
             .FirstOrDefaultAsync();

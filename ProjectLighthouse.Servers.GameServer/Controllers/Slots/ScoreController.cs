@@ -77,11 +77,7 @@ public class ScoreController : ControllerBase
         if (score.PlayerIds.Length == 1)
         {
             char[] delimiters = { ':', ',', };
-            foreach (char delimiter in delimiters)
-            {
-                score.PlayerIds = score.PlayerIds[0].Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
-            }
-                
+            score.PlayerIds = score.PlayerIds[0].Split(delimiters).Distinct().ToArray();
         }
 
         if (score.PlayerIds.Length == 0)
