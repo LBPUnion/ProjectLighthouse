@@ -18,7 +18,7 @@ public class ModerationPageController : ControllerBase
     }
 
     [HttpPost("findStoryLevel")]
-    public async Task<IActionResult> FindStorySlot([FromForm] int placeholderSlotId)
+    public async Task<IActionResult> FindStorySlot([FromForm] int? placeholderSlotId)
     {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
@@ -30,6 +30,6 @@ public class ModerationPageController : ControllerBase
             .Select(s => s.SlotId)
             .FirstOrDefaultAsync();
 
-        return this.Redirect(slotId == 0 ? "~/" : $"~/slot/{slotId}");
+        return this.Redirect(slotId == 0 ? "~/moderation" : $"~/slot/{slotId}");
     }
 }
