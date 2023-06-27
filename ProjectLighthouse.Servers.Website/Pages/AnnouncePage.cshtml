@@ -37,11 +37,21 @@
     @foreach (WebsiteAnnouncementEntity announcement in Model.Announcements)
     {
         <div class="ui blue segment" style="position: relative;">
-            <h3>@announcement.Title</h3>
-            <p style="white-space: initial;">
-                @announcement.Content
-            </p>
-
+            <div>
+                <h3>@announcement.Title</h3>
+                <div style="padding-bottom: 2em;">
+                    <span style="white-space: pre-line; ">@announcement.Content</span>
+                </div>
+                @if (announcement.Publisher != null)
+                {
+                    <div class="ui tiny bottom left attached label">
+                        Posted by
+                        <a style="color: black" href="~/user/@announcement.Publisher.UserId">
+                            @announcement.Publisher.Username
+                        </a>
+                    </div>
+                }
+            </div>
             @if (Model.User != null && Model.User.IsAdmin)
             {
                 <form method="post">
@@ -57,7 +67,7 @@
                 </form>
             }
         </div>
-    }    
+    }
 }
 else
 {
