@@ -51,7 +51,7 @@ else
     <div class="ui blue segment">
         <h3>@command.Name()</h3>
         <form>
-            <input type="text" name="command" style="display: none;" value="@command.FirstAlias">
+            <input autocomplete="off" type="text" name="command" style="display: none;" value="@command.FirstAlias">
             @if (command.RequiredArgs() > 0)
             {
                 <div class="ui left action input" style="width: 100%">
