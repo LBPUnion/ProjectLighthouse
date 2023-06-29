@@ -42,11 +42,11 @@ public class ResourcesController : ControllerBase
         string fullPath = Path.GetFullPath(path);
 
         // Prevent directory traversal attacks
-        if (!fullPath.StartsWith(FileHelper.FullResourcePath)) return this.BadRequest();
+        if (!fullPath.StartsWith(FileHelper.FullResourcePath)) return this.StatusCode(400);
 
         if (FileHelper.ResourceExists(hash)) return this.File(IOFile.OpenRead(path), "application/octet-stream");
 
-        return this.NotFound();
+        return this.StatusCode(404);
     }
 
     // TODO: check if this is a valid hash

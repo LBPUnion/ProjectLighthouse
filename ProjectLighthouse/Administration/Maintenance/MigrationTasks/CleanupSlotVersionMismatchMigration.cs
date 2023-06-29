@@ -8,11 +8,11 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MigrationTasks;
 
-public class CleanupSlotVersionMismatchMigration : IMigrationTask
+public class CleanupSlotVersionMismatchMigration : MigrationTask
 {
-    public string Name() => "Cleanup slot versions";
+    public override string Name() => "Cleanup slot versions";
 
-    async Task<bool> IMigrationTask.Run(DatabaseContext database)
+    public override async Task<bool> Run(DatabaseContext database)
     {
         foreach (SlotEntity slot in database.Slots)
         {

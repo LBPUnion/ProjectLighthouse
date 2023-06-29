@@ -19,15 +19,15 @@ public static class MaintenanceHelper
 {
     static MaintenanceHelper()
     {
-        Commands = getListOfInterfaceObjects<ICommand>();
-        MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
-        MigrationTasks = getListOfInterfaceObjects<IMigrationTask>();
-        RepeatingTasks = getListOfInterfaceObjects<IRepeatingTask>();
+        Commands = GetListOfInterfaceObjects<ICommand>();
+        MaintenanceJobs = GetListOfInterfaceObjects<IMaintenanceJob>();
+        MigrationTasks = GetListOfInterfaceObjects<MigrationTask>();
+        RepeatingTasks = GetListOfInterfaceObjects<IRepeatingTask>();
     }
     
     public static List<ICommand> Commands { get; }
     public static List<IMaintenanceJob> MaintenanceJobs { get; }
-    public static List<IMigrationTask> MigrationTasks { get; }
+    public static List<MigrationTask> MigrationTasks { get; }
     public static List<IRepeatingTask> RepeatingTasks { get; }
 
     public static async Task<List<LogLine>> RunCommand(IServiceProvider provider, string[] args)
@@ -80,9 +80,8 @@ public static class MaintenanceHelper
         await job.Run();
     }
 
-    public static async Task RunMigration(DatabaseContext database, IMigrationTask migrationTask)
+    public static async Task RunMigration(DatabaseContext database, MigrationTask migrationTask)
     {
-
         // Migrations should never be run twice.
         Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name));
         
@@ -121,11 +120,11 @@ public static class MaintenanceHelper
         await database.SaveChangesAsync();
     }
 
-    private static List<T> getListOfInterfaceObjects<T>() where T : class
+    private static List<T> GetListOfInterfaceObjects<T>() where T : class
     {
         return Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.GetInterfaces().Contains(typeof(T)) && t.GetConstructor(Type.EmptyTypes) != null)
+            .Where(t => (t.IsSubclassOf(typeof(T)) || t.GetInterfaces().Contains(typeof(T))) && t.GetConstructor(Type.EmptyTypes) != null)
             .Select(t => Activator.CreateInstance(t) as T)
             .ToList()!;
     }

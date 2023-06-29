@@ -330,7 +330,13 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("SlotId")
                         .HasColumnType("int");
 
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("ScoreId");
