@@ -10,7 +10,7 @@
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 
-    DateTime maximumExpiration = new(9999, 12, 31, 11, 59, 00, DateTimeKind.Utc);
+    DateTime maximumExpiration = new(9999, 12, 31, 23, 59, 00, DateTimeKind.Utc);
 }
 
 <div class="ui middle aligned left aligned">
