@@ -9,6 +9,8 @@
 
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+
+    DateTime maximumExpiration = new(9999, 12, 31, 11, 59, 00, DateTimeKind.Utc);
 }
 
 <div class="ui middle aligned left aligned">
@@ -20,7 +22,7 @@
         @if (Model.ModCase != null)
         {
             <span>
-                @if (Model.ModCase.ExpiresAt != null)
+                @if (Model.ModCase.ExpiresAt < maximumExpiration)
                 {
                     @Model.Translate(ModerationStrings.SuspensionExpiration, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))
                 }
@@ -29,6 +31,12 @@
                     @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(ModerationStrings.DoesNotExpire))
                 }
             </span>    
+        }
+        else
+        {
+            <span>
+                @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(GeneralStrings.Unknown))
+            </span>
         }
 
         <ul>

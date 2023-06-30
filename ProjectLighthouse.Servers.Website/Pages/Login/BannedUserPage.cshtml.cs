@@ -29,7 +29,7 @@ public class BannedUserPage : BaseLayout
         ModerationCaseEntity? modCase = await this.Database.Cases.OrderByDescending(c => c.CreatedAt)
             .Where(c => c.AffectedId == user.UserId)
             .Where(c => c.Type == CaseType.UserBan)
-            .Where(c => c.DismissedAt != null)
+            .Where(c => c.ExpiresAt != null)
             .FirstOrDefaultAsync();
 
         if (modCase == null) Logger.Warn($"User {user.UserId} is banned but has no mod case?", LogArea.Login);
