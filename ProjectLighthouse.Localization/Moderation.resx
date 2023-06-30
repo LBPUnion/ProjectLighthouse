@@ -48,4 +48,7 @@
     <data name="account_profile_management" xml:space="preserve">
         <value>Account and profile management</value>
     </data>
+    <data name="suspension_expiration_generic" xml:space="preserve">
+        <value>During this suspension, the following features will be limited:</value>
+    </data>
 </root>

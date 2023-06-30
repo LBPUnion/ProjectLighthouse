@@ -11,6 +11,9 @@ public static class ModerationStrings
 
     // Translatable string in case a ban doesn't expire
     public static readonly TranslatableString DoesNotExpire = create("does_not_expire");
+    
+    // A non-specific version of SuspensionExpiration (doesn't show expiration time)
+    public static readonly TranslatableString SuspensionExpirationGeneric = create("suspension_expiration_generic");
 
     // Restricted features strings
     public static readonly TranslatableString LbpOnlineMultiplayer = create("lbp_online_multiplayer");
