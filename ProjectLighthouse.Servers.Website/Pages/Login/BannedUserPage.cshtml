@@ -38,14 +38,16 @@
                 @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(GeneralStrings.Unknown))
             </span>
         }
-
+    </p>
+    
+    <div>
         <ul>
             <li>@Model.Translate(ModerationStrings.LbpOnlineMultiplayer)</li>
             <li>@Model.Translate(ModerationStrings.WebsiteInteractions)</li>
             <li>@Model.Translate(ModerationStrings.ProfileVisibility)</li>
             <li>@Model.Translate(ModerationStrings.AccountProfileManagement)</li>
         </ul>
-    </p>
+    </div>
 
     @if (Model.ModCase != null)
     {
