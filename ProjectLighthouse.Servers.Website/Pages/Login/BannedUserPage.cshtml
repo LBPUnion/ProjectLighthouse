@@ -46,11 +46,18 @@
             <li>@Model.Translate(ModerationStrings.AccountProfileManagement)</li>
         </ul>
     </p>
-    
+
     @if (Model.ModCase != null)
     {
         <p>
-            @Model.Translate(ModerationStrings.SuspensionReason, Model.ModCase.Reason)
+            @if (!string.IsNullOrWhiteSpace(Model.ModCase.Reason))
+            {
+                @Model.Translate(ModerationStrings.SuspensionReason, Model.ModCase.Reason)    
+            }
+            else
+            {
+                @Model.Translate(ModerationStrings.SuspensionReason, "No reason was provided.")
+            }
         </p>     
     }
 
