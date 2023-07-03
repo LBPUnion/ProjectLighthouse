@@ -17,6 +17,14 @@ public class BannedUserPage : BaseLayout
     { }
 
     public ModerationCaseEntity? ModCase;
+    
+    /*
+     * Used for deciding when to show the permanent ban string rather than the expiration time
+     *
+     * The DateTime.MaxValue expression wouldn't work in this case because the it exceeds the
+     * maximum value the case creation form lets you enter.
+     */
+    public static DateTime MaximumExpiration { get; } = new(9999, 12, 31, 23, 59, 00, DateTimeKind.Utc);
 
     [UsedImplicitly]
     public async Task<IActionResult> OnGet()
