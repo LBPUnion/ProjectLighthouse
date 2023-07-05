@@ -36,7 +36,7 @@
         <value>Multijugador en línea de LittleBigPlanet™</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>No caduca</value>
+        <value>manually dismissed</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
         <value>Visibilidad del perfil</value>
