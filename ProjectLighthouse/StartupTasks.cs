@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
-using LBPUnion.ProjectLighthouse.Administration.Maintenance.MigrationTasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -19,8 +14,6 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
 using LBPUnion.ProjectLighthouse.StorableLists;
-using LBPUnion.ProjectLighthouse.Types.Entities.Level;
-using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
@@ -28,43 +21,15 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Medallion.Threading.MySql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using ServerType = LBPUnion.ProjectLighthouse.Types.Misc.ServerType;
 
 namespace LBPUnion.ProjectLighthouse;
 
 public static class StartupTasks
 {
-
-    private class OldScoreEntity
-    {
-        public int ScoreId { get; set; }
-
-        public int SlotId { get; set; }
-
-        public int ChildSlotId { get; set; }
-
-        public int Type { get; set; }
-
-        public string PlayerIdCollection { get; set; }
-
-        [NotMapped]
-        public string[] PlayerIds
-        {
-            get => this.PlayerIdCollection.Split(",");
-            set => this.PlayerIdCollection = string.Join(',', value);
-        }
-
-        public int UserId { get; set; }
-
-        public int Points { get; set; }
-
-        public long Timestamp { get; set; }
-    }
     public static async Task Run(ServerType serverType)
     {
         // Log startup time
@@ -200,39 +165,43 @@ public static class StartupTasks
 
             stopwatch.Restart();
             List<string> pendingMigrations = (await database.Database.GetPendingMigrationsAsync()).ToList();
-            IMigrator migrator = database.GetInfrastructure().GetService<IMigrator>();
+            IMigrator migrator = database.GetInfrastructure().GetRequiredService<IMigrator>();
 
-            async Task RunLighthouseMigrations(Func<MigrationTask, bool> predicate)
+            async Task<bool> RunLighthouseMigrations(Func<MigrationTask, bool> predicate)
             {
                 List<MigrationTask> tasks = MaintenanceHelper.MigrationTasks
                     .Where(predicate)
                     .ToList();
                 foreach (MigrationTask task in tasks)
                 {
-                    await MaintenanceHelper.RunMigration(database, task);
+                    if (!await MaintenanceHelper.RunMigration(database, task)) return false;
                 }
+                return true;
             }
 
             Logger.Info($"There are {pendingMigrations.Count} pending migrations", LogArea.Database);
+
             foreach (string migration in pendingMigrations)
             {
                 try
                 {
-                    stopwatch.Restart();
                     await using IDbContextTransaction transaction = await database.Database.BeginTransactionAsync();
-                    await RunLighthouseMigrations(m => m.Name() == migration && m.HookType() == MigrationHook.Before);
+                    Logger.Debug($"Running migration '{migration}", LogArea.Database);
+                    stopwatch.Restart();
+                    if (!await RunLighthouseMigrations(m => m.Name() == migration && m.HookType() == MigrationHook.Before))
+                        throw new Exception($"Failed to run pre migration hook for {migration}");
+
                     await migrator.MigrateAsync(migration);
-                    await RunLighthouseMigrations(m => m.Name() == migration && m.HookType() == MigrationHook.After);
-                    await transaction.CommitAsync();
+
                     stopwatch.Stop();
                     Logger.Success($"Running migration '{migration}' took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
-                    
                 }
                 catch (Exception e)
                 {
-                    await database.Database.RollbackTransactionAsync();
                     Logger.Error($"Failed to run migration '{migration}'", LogArea.Database);
                     Logger.Error(e.ToDetailedException(), LogArea.Database);
+                    if (database.Database.CurrentTransaction != null)
+                        await database.Database.RollbackTransactionAsync();
                     Environment.Exit(-1);
                 }
             }
@@ -241,7 +210,7 @@ public static class StartupTasks
 
             List<string> completedMigrations = database.CompletedMigrations.Select(m => m.MigrationName).ToList();
 
-            await RunLighthouseMigrations(m => m.HookType() == MigrationHook.None && !completedMigrations.Contains(m.Name()));
+            await RunLighthouseMigrations(m => !completedMigrations.Contains(m.GetType().Name) && m.HookType() == MigrationHook.None);
 
             stopwatch.Stop();
             totalStopwatch.Stop();

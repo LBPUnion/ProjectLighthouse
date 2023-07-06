@@ -6,7 +6,6 @@ namespace LBPUnion.ProjectLighthouse.Types.Maintenance;
 public enum MigrationHook
 {
     Before,
-    After,
     None,
 }
 

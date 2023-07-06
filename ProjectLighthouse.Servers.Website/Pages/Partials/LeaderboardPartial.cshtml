@@ -38,8 +38,6 @@
             </span>
             <div class="content">
                 <div class="list" style="padding-top: 0">
-                    @* @for (int j = 0; j < userIds.Length; j++) *@
-                    @* { *@
                     @{
                         UserEntity? user = await database.Users.FindAsync(score.UserId);
                     }
@@ -52,7 +50,6 @@
                                 }
                             </div>
                         </div>
-                    // }
                 </div>
             </div>
         </div>

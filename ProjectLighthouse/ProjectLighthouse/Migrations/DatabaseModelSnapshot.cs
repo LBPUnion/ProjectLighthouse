@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.7")
+                .HasAnnotation("ProductVersion", "7.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
@@ -321,9 +321,6 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("ChildSlotId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PlayerIdCollection")
-                        .HasColumnType("longtext");
-
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
@@ -342,6 +339,8 @@ namespace ProjectLighthouse.Migrations
                     b.HasKey("ScoreId");
 
                     b.HasIndex("SlotId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Scores");
                 });
@@ -1242,7 +1241,15 @@ namespace ProjectLighthouse.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Slot");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", b =>

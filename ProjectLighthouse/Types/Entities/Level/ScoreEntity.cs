@@ -20,11 +20,9 @@ public class ScoreEntity
     
     public int UserId { get; set; }
     
-    // [ForeignKey(nameof(UserId))]
-    // public UserEntity User { get; set; }
+    [ForeignKey(nameof(UserId))]
+    public UserEntity User { get; set; }
 
-    public string PlayerIdCollection { get; set; }
-    
     public int Points { get; set; }
     
     public long Timestamp { get; set; }

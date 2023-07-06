@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
-using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MigrationTasks;
 
@@ -19,16 +22,11 @@ public class SwitchScoreToUserIdMigration : MigrationTask
 {
     #region DB entity replication stuff
 
-    [Table("Scores")]
-    private class OldScoreEntity
+    private class MigrationScore
     {
-        [Key]
         public int ScoreId { get; set; }
 
         public int SlotId { get; set; }
-
-        [ForeignKey(nameof(SlotId))]
-        public SlotEntity Slot { get; set; }
 
         public int ChildSlotId { get; set; }
 
@@ -37,75 +35,183 @@ public class SwitchScoreToUserIdMigration : MigrationTask
         public string PlayerIdCollection { get; set; }
 
         [NotMapped]
-        public string[] PlayerIds
-        {
-            get => this.PlayerIdCollection.Split(",");
-            set => this.PlayerIdCollection = string.Join(',', value);
-        }
-
-        public int UserId { get; set; }
+        public IEnumerable<string> PlayerIds => this.PlayerIdCollection.Split(",");
 
         public int Points { get; set; }
-
-        public long Timestamp { get; set; }
     }
 
-    private sealed class CustomDbContext : DbContext
+    private class MigrationSlot
     {
-        public CustomDbContext(DbContextOptions<CustomDbContext> options) : base(options)
-        { }
+        public int SlotId { get; set; }
+    }
 
-        public DbSet<OldScoreEntity> Scores { get; set; }
-        public DbSet<SlotEntity> Slots { get; set; }
-        public DbSet<UserEntity> Users { get; set; }
+    private class MigrationUser
+    {
+        public int UserId { get; set; }
+
+        public string Username { get; set; }
     }
 
     #endregion
 
-    public override string Name() => "20230628023610_AddUserIdAndTimestampToScore";
+    public override string Name() => "20230706020914_DropPlayerIdCollectionAndAddUserForeignKey";
 
-    public override MigrationHook HookType() => MigrationHook.After;
+    public override MigrationHook HookType() => MigrationHook.Before;
 
-    private List<SlotEntity> GetAllSlots(DatabaseContext database)
+    private static DbTransaction GetDbTransaction(IDbContextTransaction dbContextTransaction)
     {
-        return null;
+        if (dbContextTransaction is not IInfrastructure<DbTransaction> accessor)
+        {
+            throw new InvalidOperationException(RelationalStrings.RelationalNotInUse);
+        }
+
+        return accessor.GetInfrastructure();
     }
 
-    public override async Task<bool> Run(DatabaseContext db)
+    private static async Task<List<T>> GetAllObjects<T>(DbContext database, string commandText, Func<DbDataReader, T> returnFunc)
     {
-        DbContextOptionsBuilder<CustomDbContext> builder = new();
-        builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
-            MySqlServerVersion.LatestSupportedServerVersion);
+        DbConnection dbConnection = database.Database.GetDbConnection();
 
+        await using DbCommand cmd = dbConnection.CreateCommand();
+        cmd.CommandText = commandText;
+        cmd.Transaction = GetDbTransaction(database.Database.CurrentTransaction);
+
+        await using DbDataReader reader = await cmd.ExecuteReaderAsync();
+        List<T> items = new();
+
+        if (!reader.HasRows) return default;
+
+        while (await reader.ReadAsync())
+        {
+            items.Add(returnFunc(reader));
+        }
+        return items;
+    }
+
+    private static async Task<List<MigrationScore>> GetAllScores(DbContext database)
+    {
+        return await GetAllObjects(database,
+            "select * from Scores",
+            reader => new MigrationScore
+            {
+                ScoreId = reader.GetInt32("ScoreId"),
+                SlotId = reader.GetInt32("SlotId"),
+                ChildSlotId = reader.GetInt32("ChildSlotId"),
+                Type = reader.GetInt32("Type"),
+                PlayerIdCollection = reader.GetString("PlayerIdCollection"),
+                Points = reader.GetInt32("Points"),
+            });
+    }
+
+    private static async Task<List<MigrationUser>> GetAllUsers(DbContext database)
+    {
+        return await GetAllObjects(database,
+            "select UserId, Username from Users",
+            reader => new MigrationUser()
+            {
+                UserId = reader.GetInt32("UserId"),
+                Username = reader.GetString("Username"),
+            });
+    }
+
+    private static async Task<List<MigrationSlot>> GetAllSlots(DbContext database)
+    {
+        return await GetAllObjects(database,
+            "select SlotId from Slots",
+            reader => new MigrationSlot
+            {
+                SlotId = reader.GetInt32("SlotId"),
+            });
+    }
+
+    private static async Task ApplyFixedScores(DatabaseContext database, IReadOnlyList<ScoreEntity> newScores)
+    {
+        // Re-order scores (The order doesn't make any difference but since we're already deleting everything we may as well) 
+        newScores = newScores.OrderByDescending(s => s.SlotId)
+            .ThenByDescending(s => s.ChildSlotId)
+            .ThenByDescending(s => s.Type)
+            .ToList();
+
+        // Set IDs for new scores
+        for (int i = 1; i < newScores.Count; i++)
+        {
+            newScores[i].ScoreId = i;
+        }
+        // Delete all existing scores
+        await database.Scores.ExecuteDeleteAsync();
+
+        StringBuilder insertionScript = new();
+        // This is significantly faster than using standard EntityFramework Add and Save albeit a little wacky
+        foreach (ScoreEntity score in newScores)
+        {
+            insertionScript.AppendLine($"""insert into Scores values('{score.ScoreId}', '{score.SlotId}', '{score.Type}', '', '{score.Points}', '{score.ChildSlotId}', '{score.Timestamp}', '{score.UserId}');""");
+        }
+
+        await database.Database.ExecuteSqlRawAsync(insertionScript.ToString());
+    }
+
+    public override async Task<bool> Run(DatabaseContext database)
+    {
         int[] scoreTypes =
         {
             1, 2, 3, 4, 7,
         };
-        CustomDbContext database = new(builder.Options);
-        List<ScoreEntity> newScores = new();
+        ConcurrentBag<ScoreEntity> newScores = new();
         // Get all slots with at least 1 score
-        foreach (SlotEntity slot in await database.Slots
-                     .Where(s => database.Scores.Count(score => s.SlotId == score.SlotId) > 0)
-                     .ToListAsync())
+        List<MigrationSlot> slots = await GetAllSlots(database);
+        List<MigrationScore> scores = await GetAllScores(database);
+        // Don't run migration if there are no scores
+        if (scores == null || scores.Count == 0) return true;
+
+        List<MigrationUser> users = await GetAllUsers(database);
+
+        ConcurrentQueue<(MigrationSlot slot, int type)> collection = new();
+        foreach (MigrationSlot slot in slots.Where(s => scores.Any(score => s.SlotId == score.SlotId)))
         {
             foreach (int type in scoreTypes)
             {
-                newScores.AddRange(await FixScores(database, slot, type));
+                collection.Enqueue((slot, type));
             }
         }
+
+        ConcurrentBag<Task> taskList = new();
+        for (int i = 0; i < Environment.ProcessorCount; i++)
+        {
+            Task task = Task.Run(() =>
+            {
+                while (collection.TryDequeue(out (MigrationSlot slot, int type) item))
+                {
+                    List<ScoreEntity> fixedScores = FixScores(users,
+                            item.slot,
+                            scores.Where(s => s.SlotId == item.slot.SlotId).Where(s => s.Type == item.type).ToList(),
+                            item.type)
+                        .ToList();
+                    fixedScores.AsParallel().ForAll(score => newScores.Add(score));
+                }
+            });
+            taskList.Add(task);
+        }
+
+        await Task.WhenAll(taskList);
+
+        await ApplyFixedScores(database, newScores.ToList());
 
         return true;
     }
 
-    private static Dictionary<string, int> CreateHighestScores(CustomDbContext database, List<OldScoreEntity> scores)
+    /// <summary>
+    /// 
+    /// </summary>
+    private static Dictionary<string, int> CreateHighestScores(List<MigrationScore> scores, IReadOnlyCollection<MigrationUser> userCache)
     {
-        Dictionary<string, int> maxPointsByPlayer = new();
-        foreach (OldScoreEntity score in scores)
+        Dictionary<string, int> maxPointsByPlayer = new(StringComparer.InvariantCultureIgnoreCase);
+        foreach (MigrationScore score in scores)
         {
-            string[] players = score.PlayerIds;
+            IEnumerable<string> players = score.PlayerIds;
             foreach (string player in players)
             {
-                if (!database.Users.Any(u => u.Username == player)) continue;
+                // Remove non existent users to ensure foreign key constraint
+                if (userCache.All(u => u.Username != player)) continue;
 
                 _ = maxPointsByPlayer.TryGetValue(player, out int highestScore);
                 highestScore = Math.Max(highestScore, score.Points);
@@ -116,34 +222,25 @@ public class SwitchScoreToUserIdMigration : MigrationTask
         return maxPointsByPlayer;
     }
 
-    private static async Task<List<ScoreEntity>> FixScores(CustomDbContext database, SlotEntity slot, int scoreType)
+    /// <summary>
+    /// This function groups slots by ChildSlotId to account for adventure scores and then for each user
+    /// finds their highest score on that level and adds a new Score 
+    /// </summary>
+    private static IEnumerable<ScoreEntity> FixScores(IReadOnlyCollection<MigrationUser> userCache, MigrationSlot slot, IEnumerable<MigrationScore> scores, int scoreType)
     {
-        //TODO create a map of all players with scores submitted, then find their highest score for this type and create a new score
-        List<ScoreEntity> newScores = new();
-
-        // Loop over all scores for this level grouped by ChildSlotId (to account for adventure levels)
-        foreach (IGrouping<int, OldScoreEntity> group in database.Scores.Where(s => s.SlotId == slot.SlotId)
-                     .Where(s => s.Type == scoreType)
-                     .GroupBy(s => s.ChildSlotId))
-        {
-            Dictionary<string, int> highestScores = CreateHighestScores(database, group.ToList());
-            foreach (KeyValuePair<string, int> kvp in highestScores)
+        return (
+            from slotGroup in scores.GroupBy(s => s.ChildSlotId)
+            let highestScores = CreateHighestScores(slotGroup.ToList(), userCache)
+            from kvp in highestScores
+            let userId = userCache.Where(u => u.Username == kvp.Key).Select(u => u.UserId).First()
+            select new ScoreEntity
             {
-                int userId = await database.Users.Where(u => u.Username == kvp.Key).Select(u => u.UserId).FirstAsync();
-                ScoreEntity scoreEntity = new()
-                {
-                    UserId = userId,
-                    SlotId = slot.SlotId,
-                    ChildSlotId = group.Key,
-                    Points = kvp.Value,
-                    Timestamp = TimeHelper.TimestampMillis,
-                    Type = scoreType,
-                };
-                newScores.Add(scoreEntity);
-            }
-        }
-
-        return newScores;
+                UserId = userId,
+                SlotId = slot.SlotId,
+                ChildSlotId = slotGroup.Key,
+                Points = kvp.Value,
+                Timestamp = TimeHelper.TimestampMillis,
+                Type = scoreType,
+            }).ToList();
     }
-
 }
