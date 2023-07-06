@@ -37,7 +37,7 @@
         <value>LittleBigPlanet™ Online multiplayer</value>
     </data>
     <data name="does_not_expire" xml:space="preserve">
-        <value>Does not expire</value>
+        <value>manually dismissed</value>
     </data>
     <data name="profile_visibility" xml:space="preserve">
         <value>Profile visibility</value>

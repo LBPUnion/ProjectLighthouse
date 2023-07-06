@@ -36,7 +36,7 @@
         <value>LittleBigPlanet™ Online-moninpeli</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>Ei vanhene</value>
+        <value>manually dismissed</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
         <value>Profiilin näkyvyys</value>
