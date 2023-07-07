@@ -172,11 +172,10 @@
         string divLength = isMobile ? "sixteen" : "thirteen";
     }
     <div class="@divLength wide stretched column">
-        <div class="lh-content" id="lh-comments">
+        <div class="lh-content active" id="lh-comments">
             <iframe src="~/comments/user/@Model.ProfileUser.UserId"
                     title="Comments"
                     style="width: 100%; height: 100%; border: 0"
-                    sandbox="allow-top-navigation allow-scripts allow-same-origin"
                     onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
             </iframe>
         </div>
@@ -184,7 +183,6 @@
             <iframe src="~/photos/user/@Model.ProfileUser.UserId"
                     title="Photos"
                     style="width: 100%; height: 100%; border: 0"
-                    sandbox="allow-top-navigation allow-scripts allow-same-origin"
                     onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
             </iframe>
         </div>
@@ -192,7 +190,6 @@
             <iframe src="~/slots/by/@Model.ProfileUser.UserId"
                     title="Photos"
                     style="width: 100%; height: 100%; border: 0"
-                    sandbox="allow-top-navigation allow-scripts allow-same-origin"
                     onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
             </iframe>
         </div>

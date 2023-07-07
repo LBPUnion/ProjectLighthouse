@@ -67,8 +67,12 @@
     @* If non-frame page is loaded in iFrame, redirect top level window *@
     <script>
         if (window.self !== window.top) {
+            console.log("referrer: " + document.referrer);
             console.log("we loaded in iframe");
-            window.top.location = window.location;
+            let locationHref = window.location.href;
+            location.replace(document.referrer);
+            
+            window.top.location.replace(locationHref);
         }
     </script>
 
