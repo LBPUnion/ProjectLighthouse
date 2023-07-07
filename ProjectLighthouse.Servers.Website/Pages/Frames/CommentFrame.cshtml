@@ -1,0 +1,26 @@
+@page "/comments/{type}/{id:int}"
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.CommentFrame
+
+@{
+    Model.Title = "Comments";
+    Layout = "Layouts/BaseFrame";
+
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
+    string type = (string?)RouteData.Values["type"] ?? "";
+    _ = int.TryParse((string?)RouteData.Values["id"], out int id);
+}
+
+@await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+       {
+           {
+               "PageOwner", Model.PageOwner
+           },
+           {
+               "BaseUrl", $"/{type}/{id}"
+           },
+           {
+               "RedirectUrl", $"/comments/{type}/{id}"
+           },
+       })

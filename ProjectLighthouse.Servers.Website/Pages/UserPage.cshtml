@@ -4,7 +4,6 @@
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types.Entities.Level
-@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
 
@@ -27,12 +26,13 @@
         @if (Model.User != null && Model.User.IsModerator)
         {
             <b>Reason:</b>
-            <span>"@Model.ProfileUser.BannedReason"</span> <br />
+            <span>"@Model.ProfileUser.BannedReason"</span>
+            <br/>
             <p>
                 <i>Only you and other moderators may view the ban reason.</i>
             </p>
         }
-        else 
+        else
         {
             <p>This user has been banned for violating the Terms of Service. Remember to follow the rules!</p>
         }
@@ -42,20 +42,20 @@
 <div class="@(isMobile ? "" : "ui grid")">
     <div class="eight wide column">
         @await Html.PartialAsync("Partials/UserCardPartial", Model.ProfileUser, new ViewDataDictionary(ViewData)
-        {
-            {
-                "ShowLink", false
-            },
-            {
-                "IsMobile", Model.Request.IsMobile()
-            },
-            {
-                "Language", Model.GetLanguage()
-            },
-            {
-                "TimeZone", Model.GetTimeZone()
-            },
-        })
+               {
+                   {
+                       "ShowLink", false
+                   },
+                   {
+                       "IsMobile", Model.Request.IsMobile()
+                   },
+                   {
+                       "Language", Model.GetLanguage()
+                   },
+                   {
+                       "TimeZone", Model.GetTimeZone()
+                   },
+               })
     </div>
     <div class="eight wide right aligned column">
         <br>
@@ -140,12 +140,8 @@
 
 <div class="ui grid">
     @{
-        string outerDiv = isMobile ?
-            "horizontal-scroll" :
-            "three wide column";
-        string innerDiv = isMobile ?
-            "ui top attached tabular menu horizontal-scroll" :
-            "ui vertical fluid tabular menu";
+        string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
+        string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
     }
     <div class="@outerDiv">
         <div class="@innerDiv">
@@ -155,7 +151,6 @@
             <a class="item lh-sidebar" target="lh-photos">
                 @Model.Translate(BaseLayoutStrings.HeaderPhotos)
             </a>
-                
             <a class="item lh-sidebar" target="lh-levels">
                 @Model.Translate(BaseLayoutStrings.HeaderSlots)
             </a>
@@ -178,56 +173,28 @@
     }
     <div class="@divLength wide stretched column">
         <div class="lh-content" id="lh-comments">
-            @if (Model.ProfileUser.IsBanned)
-            {
-                <div class="ui yellow segment" id="comments">
-                    <p><i>Comments are disabled because the user is banned.</i></p>
-                </div>
-            }
-            else
-            {
-                @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
-                    { {"PageOwner", Model.ProfileUser.UserId}, })
-            }
+            <iframe src="~/comments/user/@Model.ProfileUser.UserId"
+                    title="Comments"
+                    style="width: 100%; height: 100%; border: 0"
+                    sandbox="allow-top-navigation allow-scripts"
+                    onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
+            </iframe>
         </div>
         <div class="lh-content" id="lh-photos">
-            <div class="ui purple segment" id="photos">
-                @if (Model.Photos != null && Model.Photos.Count != 0)
-                {
-                    <div class="ui center aligned grid">
-                        @foreach (PhotoEntity photo in Model.Photos)
-                        {
-                            string width = isMobile ? "sixteen" : "eight";
-                            bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
-                            <div class="@width wide column">
-                                @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
-                            </div>
-                        }
-                    </div>
-                    @if (isMobile)
-                    {
-                        <br/>
-                    }
-                }
-                else
-                {
-                    <p>This user hasn't uploaded any photos</p>
-                }
-            </div>
+            <iframe src="~/photos/user/@Model.ProfileUser.UserId"
+                    title="Photos"
+                    style="width: 100%; height: 100%; border: 0"
+                    sandbox="allow-top-navigation allow-scripts"
+                    onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
+            </iframe>
         </div>
         <div class="lh-content" id="lh-levels">
-            <div class="ui green segment" id="levels">
-                @if (Model.Slots?.Count == 0)
-                {
-                    <p>This user hasn't published any levels</p>
-                }
-                @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
-                {
-                    <div class="ui segment">
-                        @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
-                    </div>
-                }
-            </div>
+            <iframe src="~/slots/by/@Model.ProfileUser.UserId"
+                    title="Photos"
+                    style="width: 100%; height: 100%; border: 0"
+                    sandbox="allow-top-navigation allow-scripts"
+                    onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
+            </iframe>
         </div>
         <div class="lh-content" id="lh-playlists">
             <div class="ui purple segment">
@@ -291,7 +258,7 @@
             </div>
             <div class="ui fitted hidden divider"></div>
         }
-        
+
         @if (Model.ProfileUser.CommentsEnabled)
         {
             <div>
@@ -302,7 +269,7 @@
             </div>
             <div class="ui fitted hidden divider"></div>
         }
-        
+
         <div>
             <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
                 <i class="trash alternate icon"></i>
@@ -310,7 +277,7 @@
             </a>
         </div>
         <div class="ui fitted hidden divider"></div>
-        
+
         @if (Model.User.IsAdmin)
         {
             @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
@@ -344,6 +311,12 @@ function setVisible(e){
     }
     // unhide content
     eTarget.style.display = "";
+    let frame = eTarget.children[0] || undefined;
+    if (frame !== undefined && frame.nodeName === "IFRAME"){
+        console.log(eTarget.id + " - frame not null - " + frame.contentWindow.document.body.scrollHeight);
+        frame.style.height = frame.contentWindow.document.body.scrollHeight + "px"; 
+    }
+    console.dir(eTarget);
     
     e.classList.add("active");
 }

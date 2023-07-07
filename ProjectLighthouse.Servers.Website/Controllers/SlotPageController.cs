@@ -46,49 +46,6 @@ public class SlotPageController : ControllerBase
         return this.Redirect("~/slots/0");
     }
 
-    [HttpGet("rateComment")]
-    public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int commentId, [FromQuery] int rating)
-    {
-        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
-        if (token == null) return this.Redirect("~/login");
-
-        await this.database.RateComment(token.UserId, commentId, rating);
-
-        return this.Redirect($"~/slot/{id}#{commentId}");
-    }
-
-    [HttpPost("postComment")]
-    public async Task<IActionResult> PostComment([FromRoute] int id, [FromForm] string? msg)
-    {
-        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
-        if (token == null) return this.Redirect("~/login");
-
-        if (msg == null)
-        {
-            Logger.Error($"Refusing to post comment from {token.UserId} on level {id}, {nameof(msg)} is null", LogArea.Comments);
-            return this.Redirect("~/slot/" + id);
-        }
-
-        string username = await this.database.UsernameFromWebToken(token);
-        string filteredText = CensorHelper.FilterMessage(msg);
-
-        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != msg)
-            Logger.Info($"Censored profane word(s) from slot comment sent by {username}: \"{msg}\" => \"{filteredText}\"",
-                LogArea.Filter);
-
-        bool success = await this.database.PostComment(token.UserId, id, CommentType.Level, filteredText);
-        if (success)
-        {
-            Logger.Success($"Posted comment from {username}: \"{filteredText}\" on level {id}", LogArea.Comments);
-        }
-        else
-        {
-            Logger.Error($"Failed to post comment from {username}: \"{filteredText}\" on level {id}", LogArea.Comments);
-        }
-
-        return this.Redirect("~/slot/" + id);
-    }
-
     [HttpGet("heart")]
     public async Task<IActionResult> HeartLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
     {

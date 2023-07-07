@@ -1,0 +1,27 @@
+@page "/slots/{route}/{id:int}"
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using LBPUnion.ProjectLighthouse.Types.Entities.Level
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.SlotsFrame
+
+@{
+    Layout = "Layouts/BaseFrame";
+    Model.Title = "Photos";
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
+    bool isMobile = Model.IsMobile;
+    string route = (string?)RouteData.Values["route"] ?? "";
+    _ = int.TryParse((string?)RouteData.Values["id"], out int id);
+}
+
+<div class="ui green segment" id="levels">
+    @if (Model.Slots.Count == 0)
+    {
+        <p>This user hasn't published any levels</p>
+    }
+    @foreach (SlotEntity slot in Model.Slots)
+    {
+        <div class="ui segment">
+            @await slot.ToHtml(Html, ViewData, Model.User, $"~/slots/{route}/{id}", language, timeZone, isMobile, true)
+        </div>
+    }
+</div>

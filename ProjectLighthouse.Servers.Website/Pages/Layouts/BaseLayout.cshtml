@@ -63,6 +63,14 @@
     }
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    @* If non-frame page is loaded in iFrame, redirect top level window *@
+    <script>
+        if (window.self !== window.top) {
+            console.log("we loaded in iframe");
+            window.top.location = window.location;
+        }
+    </script>
 
     @* Google Analytics *@
     @if (ServerConfiguration.Instance.GoogleAnalytics.AnalyticsEnabled)

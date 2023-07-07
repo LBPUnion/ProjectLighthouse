@@ -1,0 +1,21 @@
+@using LBPUnion.ProjectLighthouse.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts.BaseFrame
+
+<!DOCTYPE html>      
+
+@{
+    Model.IsMobile = Model.Request.IsMobile();
+}
+
+<html lang="en">
+<head>
+    <title>@Model.Title</title>         
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="~/css/semantic.min.css">
+</head>
+<body>
+<div>
+       @RenderBody()
+</div>
+</body>
+</html>

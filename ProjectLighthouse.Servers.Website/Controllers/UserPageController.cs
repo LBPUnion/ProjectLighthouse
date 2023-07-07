@@ -1,11 +1,7 @@
 #nullable enable
-using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
-using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,49 +16,6 @@ public class UserPageController : ControllerBase
     public UserPageController(DatabaseContext database)
     {
         this.database = database;
-    }
-
-    [HttpGet("rateComment")]
-    public async Task<IActionResult> RateComment([FromRoute] int id, [FromQuery] int? commentId, [FromQuery] int? rating)
-    {
-        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
-        if (token == null) return this.Redirect("~/login");
-
-        await this.database.RateComment(token.UserId, commentId.GetValueOrDefault(), rating.GetValueOrDefault());
-
-        return this.Redirect($"~/user/{id}#{commentId}");
-    }
-
-    [HttpPost("postComment")]
-    public async Task<IActionResult> PostComment([FromRoute] int id, [FromForm] string? msg)
-    {
-        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
-        if (token == null) return this.Redirect("~/login");
-
-        if (msg == null)
-        {
-            Logger.Error($"Refusing to post comment from {token.UserId} on user {id}, {nameof(msg)} is null", LogArea.Comments);
-            return this.Redirect("~/user/" + id);
-        }
-
-        string username = await this.database.UsernameFromWebToken(token);
-        string filteredText = CensorHelper.FilterMessage(msg);
-
-        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != msg)
-            Logger.Info($"Censored profane word(s) from user comment sent by {username}: \"{msg}\" => \"{filteredText}\"",
-                LogArea.Filter);
-
-        bool success = await this.database.PostComment(token.UserId, id, CommentType.Profile, filteredText);
-        if (success)
-        {
-            Logger.Success($"Posted comment from {username}: \"{filteredText}\" on user {id}", LogArea.Comments);
-        }
-        else
-        {
-            Logger.Error($"Failed to post comment from {username}: \"{filteredText}\" on user {id}", LogArea.Comments);
-        }
-
-        return this.Redirect("~/user/" + id);
     }
 
     [HttpGet("heart")]

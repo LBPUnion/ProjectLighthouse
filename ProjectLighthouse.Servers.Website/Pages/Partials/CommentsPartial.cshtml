@@ -12,6 +12,8 @@
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
     int pageOwnerId = (int?)ViewData["PageOwner"] ?? 0;
+    string baseUrl = (string?)ViewData["BaseUrl"] ?? Url.RouteUrl(ViewContext.RouteData.Values) ?? "~/";
+    string? redirectUrl = (string?)ViewData["RedirectUrl"];
 }
 
 <div class="ui yellow segment" id="comments">
@@ -32,7 +34,8 @@
     @if (Model.CommentsEnabled && Model.User != null)
     {
         <div class="ui divider"></div>
-        <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment" method="post">
+
+        <form class="ui reply form" action="@baseUrl/postComment?redirect=@redirectUrl" method="post">
             <div class="field">
                 <textarea style="min-height: 70px; height: 70px; max-height:120px" maxlength="100" name="msg"></textarea>
             </div>
@@ -55,8 +58,6 @@
             HttpUtility.HtmlDecode(comment.GetCommentMessage(Database), messageWriter);
 
             string decodedMessage = messageWriter.ToString();
-            string? url = Url.RouteUrl(ViewContext.RouteData.Values);
-            if (url == null) continue;
 
             int rating = comment.ThumbsUp - comment.ThumbsDown;
 
@@ -69,11 +70,11 @@
                     }
                 }
                 <div class="voting" style="@(style)">
-                    <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == 1 ? 0 : 1)">
+                    <a href="@baseUrl/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == 1 ? 0 : 1)&redirect=@redirectUrl">
                         <i class="fitted @(yourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
                     </a>
                     <span style="text-align: center; margin: auto; @(rating < 0 ? "margin-left: -5px" : "")">@(rating)</span>
-                    <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == -1 ? 0 : -1)">
+                    <a href="@baseUrl/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == -1 ? 0 : -1)&redirect=@redirectUrl">
                         <i class="fitted @(yourThumb == -1 ? "red" : "grey") arrow down link icon" style="display: block"></i>
                     </a>
                 </div>
