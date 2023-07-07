@@ -77,6 +77,13 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot!.CommentsEnabled = true;
                         break;
                     }
+                    case CaseType.LevelLock:
+                    {
+                        slot!.InitiallyLocked = false;
+                        slot.LockedByModerator = false;
+                        slot.LockedReason = "";
+                        break;
+                    }
                     default: throw new ArgumentOutOfRangeException();
                 }
             }
@@ -119,6 +126,13 @@ public class PerformCaseActionsTask : IRepeatingTask
                     case CaseType.LevelDisableComments:
                     {
                         slot!.CommentsEnabled = false;
+                        break;
+                    }
+                    case CaseType.LevelLock:
+                    {
+                        slot!.InitiallyLocked = true;
+                        slot.LockedByModerator = true;
+                        slot.LockedReason = @case.Reason;
                         break;
                     }
                     default: throw new ArgumentOutOfRangeException();
