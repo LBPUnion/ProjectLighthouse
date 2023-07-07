@@ -236,7 +236,7 @@
             </a>
         }
         
-        @if (!Model.Slot!.LockedByModerator)
+        @if (!Model.Slot!.InitiallyLocked && !Model.Slot!.LockedByModerator)
         {
             <a href="/moderation/newCase?type=@((int)CaseType.LevelLock)&affectedId=@Model.Slot?.SlotId">
                 <div class="ui yellow button">
