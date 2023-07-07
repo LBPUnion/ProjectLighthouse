@@ -240,6 +240,12 @@ public class PublishController : ControllerBase
 
             oldSlot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
             oldSlot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
+            
+            // Check if the level has been locked by a moderator to avoid unlocking it
+            if (oldSlot.LockedByModerator)
+            {
+                oldSlot.InitiallyLocked = true;
+            }
 
             await this.database.SaveChangesAsync();
             return this.Ok(SlotBase.CreateFromEntity(oldSlot, token));
