@@ -1,0 +1,33 @@
+@using LBPUnion.ProjectLighthouse.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.PaginatedFrame
+
+<!DOCTYPE html>
+
+@{
+    Model.IsMobile = Model.Request.IsMobile();
+}
+
+<html lang="en">
+<head>
+    <title>@Model.Title</title>
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="~/css/semantic.min.css">
+</head>
+<body>
+<div>
+    @RenderBody()
+
+    <div>
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.RouteUrl(ViewContext.RouteData.Values)?page=@(Model.CurrentPage - 1)">Previous Page</a>
+        }
+        Page @Model.CurrentPage / @Model.TotalPages
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.RouteUrl(ViewContext.RouteData.Values)?page=@(Model.CurrentPage + 1)">Next Page</a>
+        }
+    </div>
+</div>
+</body>
+</html>

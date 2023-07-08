@@ -4,24 +4,26 @@
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.SlotsFrame
 
 @{
-    Layout = "Layouts/BaseFrame";
+    Layout = "PaginatedFrame";
     Model.Title = "Photos";
     string language = Model.GetLanguage();
     string timeZone = Model.GetTimeZone();
     bool isMobile = Model.IsMobile;
-    string route = (string?)RouteData.Values["route"] ?? "";
-    _ = int.TryParse((string?)RouteData.Values["id"], out int id);
 }
 
-<div class="ui green segment" id="levels">
+<div class="ui @Model.Color segment" id="levels">
     @if (Model.Slots.Count == 0)
     {
-        <p>This user hasn't published any levels</p>
+        <p>@Model.SlotsEmptyText</p>
     }
-    @foreach (SlotEntity slot in Model.Slots)
+    else
     {
-        <div class="ui segment">
-            @await slot.ToHtml(Html, ViewData, Model.User, $"~/slots/{route}/{id}", language, timeZone, isMobile, true)
-        </div>
+        <p>@Model.SlotsPresentText</p>
+        foreach (SlotEntity slot in Model.Slots)
+        {
+            <div class="ui segment">
+                @await slot.ToHtml(Html, ViewData, Model.User, $"~/slots/{Model.Type}/{Model.Id}", language, timeZone, isMobile, true)
+            </div>
+        }
     }
 </div>

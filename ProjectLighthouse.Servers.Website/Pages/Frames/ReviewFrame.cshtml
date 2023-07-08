@@ -1,0 +1,35 @@
+@page "/reviews/{slotId:int}"
+@using LBPUnion.ProjectLighthouse.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.ReviewFrame
+
+@{
+    Layout = "PaginatedFrame";
+}
+
+<div class="ui purple segment">
+    @if (Model.Reviews.Count == 0 && Model.ReviewsEnabled)
+    {
+        <p>There are no reviews.</p>
+    }
+    else if (!Model.ReviewsEnabled)
+    {
+        <b>
+            <i>Reviews are disabled on this level.</i>
+        </b>
+    }
+    else
+    {
+        int count = Model.TotalItems;
+        <p>There @(count == 1 ? "is" : "are") @count review@(count == 1 ? "" : "s").</p>
+        <div class="ui divider"></div>
+        @await Html.PartialAsync("Partials/ReviewPartial", Model.Reviews, new ViewDataDictionary(ViewData)
+               {
+                   {
+                       "isMobile", Request.IsMobile()
+                   },
+                   {
+                       "CanDelete", Model.User?.IsModerator ?? false
+                   },
+               })
+    }
+</div>

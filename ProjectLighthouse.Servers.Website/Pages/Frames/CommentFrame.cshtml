@@ -4,23 +4,36 @@
 
 @{
     Model.Title = "Comments";
-    Layout = "Layouts/BaseFrame";
+    Layout = "PaginatedFrame";
 
     string language = Model.GetLanguage();
     string timeZone = Model.GetTimeZone();
-    string type = (string?)RouteData.Values["type"] ?? "";
-    _ = int.TryParse((string?)RouteData.Values["id"], out int id);
 }
 
-@await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
-       {
-           {
-               "PageOwner", Model.PageOwner
-           },
-           {
-               "BaseUrl", $"/{type}/{id}"
-           },
-           {
-               "RedirectUrl", $"/comments/{type}/{id}"
-           },
-       })
+<div class="ui yellow segment" id="comments">
+    @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
+    {
+        <p>There are no comments.</p>
+    }
+    else if (!Model.CommentsEnabled)
+    {
+        <i>Comments are disabled.</i>
+    }
+    else
+    {
+        int count = Model.TotalItems;
+        <p>There @(count == 1 ? "is" : "are") @count comment@(count == 1 ? "" : "s").</p>
+        @await Html.PartialAsync("Partials/CommentsPartial", (Model.User, Model.Comments, Model.CommentsEnabled), new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+               {
+                   {
+                       "PageOwner", Model.PageOwner
+                   },
+                   {
+                       "BaseUrl", $"/{Model.Type}/{Model.Id}"
+                   },
+                   {
+                       "RedirectUrl", $"/comments/{Model.Type}/{Model.Id}"
+                   },
+               })
+    }
+</div>

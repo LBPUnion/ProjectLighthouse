@@ -50,9 +50,11 @@ public class CommentEntity
             return "This comment has been deleted by the author.";
         }
 
-        UserEntity deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
+        int deletedById = database.Users.Where(u => u.Username == this.DeletedBy)
+            .Select(u => u.UserId)
+            .FirstOrDefault();
 
-        if (deletedBy != null && deletedBy.UserId == this.TargetId)
+        if (deletedById != 0 && deletedById == this.TargetId)
         {
             return "This comment has been deleted by the player.";
         }

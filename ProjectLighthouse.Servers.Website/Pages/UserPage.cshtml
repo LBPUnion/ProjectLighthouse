@@ -2,8 +2,6 @@
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
-@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
-@using LBPUnion.ProjectLighthouse.Types.Entities.Level
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
 
@@ -15,8 +13,6 @@
     Model.Description = Model.ProfileUser!.Biography;
 
     bool isMobile = Request.IsMobile();
-    string language = Model.GetLanguage();
-    string timeZone = Model.GetTimeZone();
 }
 
 @if (Model.ProfileUser.IsBanned)
@@ -172,26 +168,14 @@
         string divLength = isMobile ? "sixteen" : "thirteen";
     }
     <div class="@divLength wide stretched column">
-        <div class="lh-content active" id="lh-comments">
-            <iframe src="~/comments/user/@Model.ProfileUser.UserId"
-                    title="Comments"
-                    style="width: 100%; height: 100%; border: 0"
-                    onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
-            </iframe>
+        <div class="lh-content" id="lh-comments">
+            @await Html.PartialAsync("Partials/FramePartial", ($"/comments/user/{Model.ProfileUser.UserId}", "Comments"))
         </div>
-        <div class="lh-content" id="lh-photos">
-            <iframe src="~/photos/user/@Model.ProfileUser.UserId"
-                    title="Photos"
-                    style="width: 100%; height: 100%; border: 0"
-                    onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
-            </iframe>
+        <div class="lh-content" id="lh-photos" style="display: none">
+            @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.ProfileUser.UserId}", "Photos"))
         </div>
-        <div class="lh-content" id="lh-levels">
-            <iframe src="~/slots/by/@Model.ProfileUser.UserId"
-                    title="Photos"
-                    style="width: 100%; height: 100%; border: 0"
-                    onload="this.style.height=(this.contentWindow.document.body.scrollHeight)+'px';">
-            </iframe>
+        <div class="lh-content" id="lh-levels" style="display: none">      
+            @await Html.PartialAsync("Partials/FramePartial", ($"/slots/by/{Model.ProfileUser.UserId}", "Slots"))
         </div>
         <div class="lh-content" id="lh-playlists">
             <div class="ui purple segment">
@@ -201,40 +185,10 @@
         @if (Model.User == Model.ProfileUser)
         {
             <div class="lh-content" id="lh-hearted">
-                <div class="ui pink segment" id="hearted">
-                    @if (Model.HeartedSlots?.Count == 0)
-                    {
-                        <p>You haven't hearted any levels</p>
-                    }
-                    else
-                    {
-                        <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
-                    }
-                    @foreach (SlotEntity slot in Model.HeartedSlots ?? new List<SlotEntity>())
-                    {
-                        <div class="ui segment">
-                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#hearted", language, timeZone, isMobile, true)
-                        </div>
-                    }
-                </div>
+                @await Html.PartialAsync("Partials/FramePartial", ($"/slots/hearted/{Model.ProfileUser.UserId}", "Hearted Slots"))
             </div>
             <div class="lh-content" id="lh-queued">
-                <div class="ui yellow segment" id="queued">
-                    @if (Model.QueuedSlots?.Count == 0)
-                    {
-                        <p>You haven't queued any levels</p>
-                    }
-                    else
-                    {
-                        <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
-                    }
-                    @foreach (SlotEntity slot in Model.QueuedSlots ?? new List<SlotEntity>())
-                    {
-                        <div class="ui segment">
-                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#queued", language, timeZone, isMobile, true)
-                        </div>
-                    }
-                </div>
+                @await Html.PartialAsync("Partials/FramePartial", ($"/slots/queued/{Model.ProfileUser.UserId}", "Queued Slots"))
             </div>
         }
     </div>
@@ -286,55 +240,4 @@
     }
 }
 
-<script>
-const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
-const contentElements = Array.from(document.querySelectorAll(".lh-content"));
-let selectedId = window.location.hash;
-if (selectedId.startsWith("#"))
-    selectedId = selectedId.substring(1);
-let selectedElement = document.getElementById(selectedId);
-// id = lh-sidebar element
-function setVisible(e){
-    let eTarget = document.getElementById(e.target);
-    if (!e || !eTarget) return;
-
-    // make all active elements not active
-    for (let active of document.getElementsByClassName("active")) {
-        active.classList.remove("active");
-    }
-    // hide all content divs
-    for (let i = 0; i < contentElements.length; i++){
-        contentElements[i].style.display = "none";
-    }
-    // unhide content
-    eTarget.style.display = "";
-    let frame = eTarget.children[0] || undefined;
-    if (frame !== undefined && frame.nodeName === "IFRAME"){
-        console.log(eTarget.id + " - frame not null - " + frame.contentWindow.document.body.scrollHeight);
-        frame.style.height = frame.contentWindow.document.body.scrollHeight + "px"; 
-    }
-    console.dir(eTarget);
-    
-    e.classList.add("active");
-}
-
-sidebarElements.forEach(el => {
-    if (el.classList.contains("active")){
-        setVisible(el);
-    }
-    el.addEventListener('click', event => {
-        if (!event.target.target) return;
-
-        setVisible(event.target)
-    })
-})
-// set the active content window based on url
-if (selectedElement != null) {
-    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
-        selectedElement = selectedElement.parentElement;
-    }
-    
-    let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
-    setVisible(sidebarEle);
-}
-</script>
+@await Html.PartialAsync("Partials/SectionScriptPartial")

@@ -4,7 +4,7 @@
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.PhotoFrame
 
 @{
-    Layout = "Layouts/BaseFrame";
+    Layout = "PaginatedFrame";
     Model.Title = "Photos";
     string language = Model.GetLanguage();
     string timeZone = Model.GetTimeZone();
@@ -12,7 +12,6 @@
 }
 
 <div class="ui purple segment" id="photos">
-
     @if (Model.Photos.Count > 0)
     {
         <div class="ui center aligned grid">
@@ -32,6 +31,6 @@
     }
     else
     {
-        <p>This user hasn't uploaded any photos</p>
+        <p>There are no photos</p>
     }
 </div>

@@ -1,0 +1,51 @@
+<script>
+const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
+const contentElements = Array.from(document.querySelectorAll(".lh-content"));
+let selectedId = window.location.hash;
+if (selectedId.startsWith("#"))
+    selectedId = selectedId.substring(1);
+let selectedElement = document.getElementById(selectedId);
+// id = lh-sidebar element
+function setVisible(e){
+    let eTarget = document.getElementById(e.target);
+    if (!e || !eTarget) return;
+
+    // make all active elements not active
+    for (let active of document.getElementsByClassName("active")) {
+        active.classList.remove("active");
+    }
+    // hide all content divs
+    for (let i = 0; i < contentElements.length; i++){
+        contentElements[i].style.display = "none";
+    }
+    // unhide content
+    eTarget.style.display = "";
+    let frame = eTarget.children[0] || undefined;
+    // set iframe height
+    if (frame !== undefined && frame.nodeName === "IFRAME"){
+        frame.style.height = (frame.contentWindow.document.body.scrollHeight+2) + "px"; 
+    }
+    
+    e.classList.add("active");
+}
+
+sidebarElements.forEach(el => {
+    if (el.classList.contains("active")){
+        setVisible(el);
+    }
+    el.addEventListener('click', event => {
+        if (!event.target.target) return;
+
+        setVisible(event.target)
+    })
+})
+// set the active content window based on url
+if (selectedElement != null) {
+    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
+        selectedElement = selectedElement.parentElement;
+    }
+    
+    let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
+    setVisible(sidebarEle);
+}
+</script>

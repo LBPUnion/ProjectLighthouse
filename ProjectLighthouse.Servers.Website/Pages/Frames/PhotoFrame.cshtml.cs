@@ -1,26 +1,28 @@
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames;
 
-public class PhotoFrame : BaseFrame
+public class PhotoFrame : PaginatedFrame
 {
     public List<PhotoEntity> Photos { get; set; } = new();
 
     public PhotoFrame(DatabaseContext database) : base(database)
-    { }
-
-    public async Task<IActionResult> OnGet(string type, int id)
     {
+        this.ItemsPerPage = 10;
+    }
+
+    public async Task<IActionResult> OnGet([FromQuery] int page, string type, int id)
+    {
+        this.CurrentPage = page;
         if (type != "user" && type != "slot") return this.BadRequest();
 
         IQueryable<PhotoEntity> photoQuery = this.Database.Photos.Include(p => p.Slot)
             .Include(p => p.PhotoSubjects)
-            .ThenInclude(ps => ps.User)
-            .OrderByDescending(p => p.Timestamp);
+            .ThenInclude(ps => ps.User);
 
         switch (type)
         {
@@ -33,7 +35,11 @@ public class PhotoFrame : BaseFrame
                 break;
         }
 
-        this.Photos = await photoQuery.Take(6).ToListAsync();
+        this.TotalItems = await photoQuery.CountAsync();
+
+        this.ClampPage();
+
+        this.Photos = await photoQuery.OrderByDescending(p => p.Timestamp).ApplyPagination(this.PageData).ToListAsync();
 
         return this.Page();
     }

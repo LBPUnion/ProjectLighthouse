@@ -1,0 +1,23 @@
+@page "/scores/{slotId:int}/{scoreType:int?}"  
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.ScoreFrame
+
+@{
+    Layout = "PaginatedFrame";
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
+}
+
+<div class="ui blue segment" id="scores">
+    @if (Model.TotalItems == 0)
+    {
+        <p>There are no scores.</p>
+    }
+    else
+    {
+        int count = Model.TotalItems;
+        <p>There @(count == 1 ? "is" : "are") @count score@(count == 1 ? "" : "s").</p>
+        <div class="ui divider"></div>
+        @await Html.PartialAsync("Partials/LeaderboardPartial", (Model.Scores, Model.ScoreType), ViewData.WithLang(language).WithTime(timeZone).CanDelete(Model.User?.IsModerator ?? false))
+    }
+</div>

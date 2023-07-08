@@ -81,10 +81,7 @@ public class CommentController : ControllerBase
 
         if (targetId == 0) return this.NotFound();
 
-        List<int> blockedUsers =  await (
-                from blockedProfile in this.database.BlockedProfiles
-                where blockedProfile.UserId == token.UserId
-                select blockedProfile.BlockedUserId).ToListAsync();
+        List<int> blockedUsers = await this.database.GetBlockedUsers(token.UserId);
 
         List<GameComment> comments = (await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
             .OrderByDescending(p => p.Timestamp)
