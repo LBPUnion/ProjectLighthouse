@@ -18,14 +18,22 @@
     @RenderBody()
 
     <div>
+        @{
+            string? url = Url.RouteUrl(ViewContext.RouteData.Values);
+        }
+         ]
         @if (Model.CurrentPage > 1)
         {
-            <a href="@Url.RouteUrl(ViewContext.RouteData.Values)?page=@(Model.CurrentPage - 1)">Previous Page</a>
+            <a href="@url?page=1">First Page</a>
+            <text> | </text>
+            <a href="@url?page=@(Model.CurrentPage - 1)">Previous Page</a>
         }
         Page @Model.CurrentPage / @Model.TotalPages
         @if (Model.CurrentPage < Model.TotalPages)
         {
-            <a href="@Url.RouteUrl(ViewContext.RouteData.Values)?page=@(Model.CurrentPage + 1)">Next Page</a>
+            <a href="@url?page=@(Model.CurrentPage + 1)">Next Page</a>
+            <text> | </text>
+            <a href="@url?page=@Model.TotalPages">Last Page</a>
         }
     </div>
 </div>
