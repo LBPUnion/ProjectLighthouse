@@ -114,13 +114,13 @@
         <div class="lh-content" id="lh-comments">
             @await Html.PartialAsync("Partials/FramePartial", ($"/comments/slot/{Model.Slot?.SlotId}", "Comments"))
         </div>
-        <div class="lh-content" id="lh-photos">
+        <div class="lh-content" id="lh-photos" style="display: none">
             @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.Slot?.SlotId}", "Photos"))
         </div>
-        <div class="lh-content" id="lh-reviews">
+        <div class="lh-content" id="lh-reviews" style="display: none">
             @await Html.PartialAsync("Partials/FramePartial", ($"/reviews/{Model.Slot?.SlotId}", "Reviews"))
         </div>
-        <div class="lh-content" id="lh-scores">
+        <div class="lh-content" id="lh-scores" style="display: none">
             @await Html.PartialAsync("Partials/FramePartial", ($"/scores/{Model.Slot?.SlotId}", "Scores"))
         </div>
     </div>

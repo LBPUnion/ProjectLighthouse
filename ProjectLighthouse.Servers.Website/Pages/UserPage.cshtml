@@ -177,17 +177,17 @@
         <div class="lh-content" id="lh-levels" style="display: none">      
             @await Html.PartialAsync("Partials/FramePartial", ($"/slots/by/{Model.ProfileUser.UserId}", "Slots"))
         </div>
-        <div class="lh-content" id="lh-playlists">
+        <div class="lh-content" id="lh-playlists" style="display: none">
             <div class="ui purple segment">
                 <p>@Model.Translate(GeneralStrings.Soon)</p>
             </div>
         </div>
         @if (Model.User == Model.ProfileUser)
         {
-            <div class="lh-content" id="lh-hearted">
+            <div class="lh-content" id="lh-hearted" style="display: none">
                 @await Html.PartialAsync("Partials/FramePartial", ($"/slots/hearted/{Model.ProfileUser.UserId}", "Hearted Slots"))
             </div>
-            <div class="lh-content" id="lh-queued">
+            <div class="lh-content" id="lh-queued" style="display: none">
                 @await Html.PartialAsync("Partials/FramePartial", ($"/slots/queued/{Model.ProfileUser.UserId}", "Queued Slots"))
             </div>
         }
