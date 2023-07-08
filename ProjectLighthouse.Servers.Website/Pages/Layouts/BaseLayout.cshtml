@@ -65,8 +65,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     @* If non-frame page is loaded in iFrame, redirect top level window *@
-    <script>
+    <script type="text/javascript">
         if (window.self !== window.top) {
+            window.stop()
             let locationHref = window.location.href;
             location.replace(document.referrer);
             
