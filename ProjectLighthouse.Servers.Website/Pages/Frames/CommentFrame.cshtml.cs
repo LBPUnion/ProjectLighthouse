@@ -88,6 +88,7 @@ public class CommentFrame : PaginatedFrame
         }
         else
         {
+            this.ClampPage();
             this.Comments = new Dictionary<CommentEntity, RatedCommentEntity?>();
         }
 

@@ -26,7 +26,11 @@ public class ReviewFrame : PaginatedFrame
         SlotEntity? slot = await this.Database.Slots.FindAsync(slotId);
         if (slot == null) return this.BadRequest();
 
-        if (!this.ReviewsEnabled) return this.Page();
+        if (!this.ReviewsEnabled)
+        {
+            this.ClampPage();
+            return this.Page();
+        }
 
         List<int> blockedUsers = await this.Database.GetBlockedUsers(this.User?.UserId);
 
