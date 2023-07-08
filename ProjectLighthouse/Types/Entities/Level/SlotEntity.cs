@@ -66,6 +66,10 @@ public class SlotEntity
     public UserEntity? Creator { get; set; }
 
     public bool InitiallyLocked { get; set; }
+    
+    public bool LockedByModerator { get; set; }
+
+    public string LockedReason { get; set; } = "";
 
     public bool SubLevel { get; set; }
 

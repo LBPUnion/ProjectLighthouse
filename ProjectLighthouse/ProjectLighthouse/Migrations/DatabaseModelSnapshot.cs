@@ -411,6 +411,13 @@ namespace ProjectLighthouse.Migrations
                     b.Property<ulong>("LocationPacked")
                         .HasColumnType("bigint unsigned");
 
+                    b.Property<bool>("LockedByModerator")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LockedReason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("MaximumPlayers")
                         .HasColumnType("int");
 
