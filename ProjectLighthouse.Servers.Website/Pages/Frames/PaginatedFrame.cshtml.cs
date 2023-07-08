@@ -12,14 +12,14 @@ public abstract class PaginatedFrame : BaseFrame
     public int CurrentPage { get; set; }
     public int TotalItems { get; set; }
     public int ItemsPerPage { get; set; }
-    public int TotalPages => Math.Max(1, this.TotalItems / this.ItemsPerPage);
+    public int TotalPages => Math.Max(1, (int)Math.Ceiling(this.TotalItems / (float)this.ItemsPerPage));
 
     public PaginationData PageData =>
         new()
         {
             MaxElements = this.ItemsPerPage,
             PageSize = this.ItemsPerPage,
-            PageStart = this.CurrentPage,
+            PageStart = this.CurrentPage * this.ItemsPerPage,
             TotalElements = this.TotalItems,
         };
 
