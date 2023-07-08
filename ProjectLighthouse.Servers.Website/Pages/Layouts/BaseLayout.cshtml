@@ -70,7 +70,8 @@
             window.stop()
             let locationHref = window.location.href;
             location.replace(document.referrer);
-            
+            document.documentElement.style.display = "none";
+
             window.top.location.replace(locationHref);
         }
     </script>
