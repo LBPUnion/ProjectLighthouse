@@ -1,9 +1,11 @@
 <script>
 const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
 const contentElements = Array.from(document.querySelectorAll(".lh-content"));
+
 let selectedId = window.location.hash;
-if (selectedId.startsWith("#"))
-    selectedId = selectedId.substring(1);
+if (selectedId.startsWith("#")) selectedId = selectedId.substring(1);
+if (!selectedId.startsWith("lh-")) selectedId = "lh-" + selectedId;
+
 let selectedElement = document.getElementById(selectedId);
 // id = lh-sidebar element
 function setVisible(e){
@@ -24,7 +26,7 @@ function setVisible(e){
     let frame = eTarget.children[0] || undefined;
     // set iframe height
     if (frame?.nodeName === "IFRAME"){
-        let mainDiv = frame.contentWindow.document.querySelector('div');
+        let mainDiv = frame.contentWindow.document.querySelector('body');
         if (mainDiv != null){
             frame.style.height = mainDiv.scrollHeight + "px";
         } 
