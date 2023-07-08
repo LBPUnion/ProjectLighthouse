@@ -21,7 +21,7 @@
         @{
             string? url = Url.RouteUrl(ViewContext.RouteData.Values);
         }
-         ]
+
         @if (Model.CurrentPage > 1)
         {
             <a href="@url?page=1">First Page</a>
