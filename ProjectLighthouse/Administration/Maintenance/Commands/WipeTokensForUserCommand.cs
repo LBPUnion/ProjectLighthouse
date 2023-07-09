@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ public class WipeTokensForUserCommand : ICommand
             user = await database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null)
             {
-                Console.WriteLine(@$"Could not find user by parameter '{args[0]}'");
+                logger.LogError(@$"Could not find user by parameter '{args[0]}'", LogArea.Command);
                 return;
             }
         }
@@ -40,6 +41,6 @@ public class WipeTokensForUserCommand : ICommand
         await database.GameTokens.RemoveWhere(t => t.UserId == user.UserId);
         await database.WebTokens.RemoveWhere(t => t.UserId == user.UserId);
 
-        Console.WriteLine(@$"Deleted all tokens for {user.Username} (id: {user.UserId}).");
+        logger.LogSuccess(@$"Deleted all tokens for {user.Username} (id: {user.UserId}).", LogArea.Command);
     }
 }
