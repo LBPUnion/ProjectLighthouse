@@ -18,5 +18,5 @@ public class LuckyDipCategory : SlotCategory
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.Slots.Where(queryBuilder.Build())
-            .ApplyOrdering(new SlotSortBuilder<SlotEntity>().AddSort(new FirstUploadedSort()));
+            .ApplyOrdering(new SlotSortBuilder<SlotEntity>().AddSort(new RandomFirstUploadedSort()));
 }
