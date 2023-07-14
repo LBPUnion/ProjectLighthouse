@@ -1,4 +1,5 @@
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
@@ -24,6 +25,10 @@ public partial class DatabaseContext : DbContext
     public DbSet<PasswordResetTokenEntity> PasswordResetTokens { get; set; }
     public DbSet<RegistrationTokenEntity> RegistrationTokens { get; set; }
     public DbSet<WebTokenEntity> WebTokens { get; set; }
+    #endregion
+
+    #region Activity
+    public DbSet<ActivityEntity> Activities { get; set; }
     #endregion
 
     #region Users
@@ -80,6 +85,16 @@ public partial class DatabaseContext : DbContext
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<LevelActivityEntity>().UseTpcMappingStrategy();
+        modelBuilder.Entity<PhotoActivityEntity>().UseTpcMappingStrategy();
+        modelBuilder.Entity<PlaylistActivityEntity>().UseTpcMappingStrategy();
+        modelBuilder.Entity<ScoreActivityEntity>().UseTpcMappingStrategy();
+        modelBuilder.Entity<UserActivityEntity>().UseTpcMappingStrategy();
+        base.OnModelCreating(modelBuilder);
+    }
 
     public static DatabaseContext CreateNewInstance()
     {
