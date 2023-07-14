@@ -25,12 +25,32 @@
 @if (Model.Slot!.Hidden)
 {
     <div class="ui inverted red segment">
-        <h2>This level is currently hidden.</h2>
-        <p><b>Only you and moderators may view this level.</b></p>
-        
-        <b>Reason:</b> <span>"@Model.Slot.HiddenReason"</span>
-        
-        <p><b>For more information please contact a moderator.</b></p>
+        <h3><i class="ban icon"></i> This level is currently hidden.</h3>
+        @if (Model.User != null && Model.User.IsModerator)
+        {
+            <b>Reason:</b>
+            <span>"@Model.Slot.HiddenReason"</span>
+        }
+        else
+        {
+            <p>This level has been hidden for violating the Terms of Service. Remember to follow the rules!</p>
+        }
+    </div>
+}
+
+@if (Model.Slot!.LockedByModerator)
+{
+    <div class="ui inverted red segment">
+        <h3><i class="lock icon"></i> This level has been locked by a moderator.</h3>
+        @if (Model.User != null && Model.User.IsModerator)
+        {
+            <b>Reason:</b>
+            <span>"@Model.Slot.LockedReason"</span>
+        }
+        else
+        {
+            <p>This level has been locked for violating the Terms of Service. Remember to follow the rules!</p>
+        }
     </div>
 }
 
@@ -168,6 +188,16 @@
                 <div class="ui yellow button">
                     <i class="lock icon"></i>
                     <span>Hide</span>
+                </div>
+            </a>
+        }
+        
+        @if (!Model.Slot!.InitiallyLocked && !Model.Slot!.LockedByModerator)
+        {
+            <a href="/moderation/newCase?type=@((int)CaseType.LevelLock)&affectedId=@Model.Slot?.SlotId">
+                <div class="ui yellow button">
+                    <i class="lock icon"></i>
+                    <span>Forcibly Lock Level</span>
                 </div>
             </a>
         }

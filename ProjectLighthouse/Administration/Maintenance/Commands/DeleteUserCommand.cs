@@ -28,7 +28,8 @@ public class DeleteUserCommand : ICommand
         UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username.Length > 0 && u.Username == args[0]);
         if (user == null)
         {
-            user = await database.Users.FirstOrDefaultAsync(u => u.UserId == Convert.ToInt32(args[0]));
+            _ = int.TryParse(args[0], out int userId);
+            user = await database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null)
             {
                 logger.LogError($"Could not find user by parameter '{args[0]}'", LogArea.Command);

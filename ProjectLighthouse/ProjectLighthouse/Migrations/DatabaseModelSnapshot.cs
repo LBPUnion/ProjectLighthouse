@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.7")
+                .HasAnnotation("ProductVersion", "7.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
@@ -405,6 +405,13 @@ namespace ProjectLighthouse.Migrations
 
                     b.Property<ulong>("LocationPacked")
                         .HasColumnType("bigint unsigned");
+
+                    b.Property<bool>("LockedByModerator")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LockedReason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("MaximumPlayers")
                         .HasColumnType("int");

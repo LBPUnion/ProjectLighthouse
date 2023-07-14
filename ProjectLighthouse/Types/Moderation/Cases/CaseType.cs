@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 
 namespace LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 
-// Next available ID for use: 6
+// Next available ID for use: 7
 // PLEASE UPDATE THIS WHEN YOU ADD SOMETHING HERE!
 // IF YOU DO NOT ADD THIS IN ORDER PROPERLY THEN THERE WILL BE DATA CORRUPTION!
 // THE VALUE MUST ALWAYS BE EXPLICITLY SET.
@@ -18,6 +18,7 @@ public enum CaseType
     
     LevelHide = 4,
     LevelDisableComments = 5,
+    LevelLock = 6,
 }
 
 public static class CaseTypeExtensions
@@ -40,6 +41,7 @@ public static class CaseTypeExtensions
         {
             CaseType.LevelHide => true,
             CaseType.LevelDisableComments => true,
+            CaseType.LevelLock => true,
             _ => false,
         };
     }

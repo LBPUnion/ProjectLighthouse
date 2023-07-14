@@ -18,15 +18,11 @@
 @if (Model.ProfileUser.IsBanned)
 {
     <div class="ui inverted red segment">
-        <h3 style="margin-bottom:5px;"><i class="ban icon"></i> This user is currently banned.</h3>
+        <h3><i class="ban icon"></i> This user is currently banned.</h3>
         @if (Model.User != null && Model.User.IsModerator)
         {
             <b>Reason:</b>
             <span>"@Model.ProfileUser.BannedReason"</span>
-            <br/>
-            <p>
-                <i>Only you and other moderators may view the ban reason.</i>
-            </p>
         }
         else
         {
@@ -136,8 +132,12 @@
 
 <div class="ui grid">
     @{
-        string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
-        string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
+        string outerDiv = isMobile ?
+            "horizontal-scroll" :
+            "three wide column";
+        string innerDiv = isMobile ?
+            "ui top attached tabular menu horizontal-scroll" :
+            "ui vertical fluid tabular menu";
     }
     <div class="@outerDiv">
         <div class="@innerDiv">
