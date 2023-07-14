@@ -168,7 +168,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
                 BonusSlots = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.AdminGrantedSlots).First(),
                 PlaylistCount = database.Playlists.Count(p => p.CreatorId == this.UserId),
                 ReviewCount = database.Reviews.Count(r => r.ReviewerId == this.UserId),
-                CommentCount = database.Comments.Count(c => c.TargetId == this.UserId && c.Type == CommentType.Profile),
+                CommentCount = database.Comments.Count(c => c.Type == CommentType.Profile && this.UserId == c.TargetUserId),
                 HeartCount = database.HeartedProfiles.Count(h => h.HeartedUserId == this.UserId),
                 PhotosByMeCount = database.Photos.Count(p => p.CreatorId == this.UserId),
                 PhotosWithMeCount = database.Photos.Include(p => p.PhotoSubjects)

@@ -241,7 +241,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
                 ThumbsUp = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1),
                 ThumbsDown = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1),
                 ReviewCount = database.Reviews.Count(r => r.SlotId == this.SlotId),
-                CommentCount = database.Comments.Count(c => c.TargetId == this.SlotId && c.Type == CommentType.Level),
+                CommentCount = database.Comments.Count(c => c.Type == CommentType.Level && c.TargetSlotId == this.SlotId),
                 PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
                 AuthorPhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId),
                 HeartCount = database.HeartedLevels.Count(h => h.SlotId == this.SlotId),

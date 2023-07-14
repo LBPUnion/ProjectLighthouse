@@ -71,9 +71,9 @@ public class SlotPage : BaseLayout
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.Slot.CommentsEnabled;
         if (this.CommentsEnabled)
         {
-            this.Comments = await this.Database.Comments.Include(p => p.Poster)
-                .OrderByDescending(p => p.Timestamp)
-                .Where(c => c.TargetId == id && c.Type == CommentType.Level)
+            this.Comments = await this.Database.Comments.Include(c => c.Poster)
+                .OrderByDescending(c => c.Timestamp)
+                .Where(c => c.Type == CommentType.Level && c.TargetSlotId == id)
                 .Where(c => !blockedUsers.Contains(c.PosterUserId))
                 .Include(c => c.Poster)
                 .Where(c => c.Poster.PermissionLevel != PermissionLevel.Banned)

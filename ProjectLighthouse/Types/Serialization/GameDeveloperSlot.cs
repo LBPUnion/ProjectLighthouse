@@ -37,7 +37,7 @@ public class GameDeveloperSlot : SlotBase, INeedsPreparationForSerialization
         var stats = await database.Slots.Where(s => s.SlotId == this.SlotId)
             .Select(_ => new
             {
-                CommentCount = database.Comments.Count(c => c.TargetId == this.SlotId && c.Type == CommentType.Level),
+                CommentCount = database.Comments.Count(c => c.Type == CommentType.Level && c.TargetSlotId == this.SlotId),
                 PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
             })
             .OrderBy(_ => 1)

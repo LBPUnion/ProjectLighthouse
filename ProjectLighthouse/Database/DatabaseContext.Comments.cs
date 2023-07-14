@@ -89,17 +89,15 @@ public partial class DatabaseContext
             if (await this.IsUserBlockedBy(userId, creatorId)) return false;
         }
 
-        this.Comments.Add
-        (
-            new CommentEntity
-            {
-                PosterUserId = userId,
-                TargetId = targetId,
-                Type = type,
-                Message = message,
-                Timestamp = TimeHelper.TimestampMillis,
-            }
-        );
+        this.Comments.Add(new CommentEntity
+        {
+            PosterUserId = userId,
+            TargetUserId = type == CommentType.Profile ? targetId : null,
+            TargetSlotId = type == CommentType.Level ? targetId : null,
+            Type = type,
+            Message = message,
+            Timestamp = TimeHelper.TimestampMillis,
+        });
         await this.SaveChangesAsync();
 
         return true;

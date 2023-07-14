@@ -100,10 +100,10 @@ public class UserPage : BaseLayout
                 where blockedProfile.UserId == this.User.UserId
                 select blockedProfile.BlockedUserId).ToListAsync();
             
-            this.Comments = await this.Database.Comments.Include(p => p.Poster)
-                .OrderByDescending(p => p.Timestamp)
-                .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
-                .Where(p => !blockedUsers.Contains(p.PosterUserId))
+            this.Comments = await this.Database.Comments.Include(c => c.Poster)
+                .OrderByDescending(c => c.Timestamp)
+                .Where(c => c.Type == CommentType.Profile && c.TargetUserId == userId)
+                .Where(c => !blockedUsers.Contains(c.PosterUserId))
                 .Take(50)
                 .ToDictionaryAsync(c => c, _ => (RatedCommentEntity?) null);
         }
