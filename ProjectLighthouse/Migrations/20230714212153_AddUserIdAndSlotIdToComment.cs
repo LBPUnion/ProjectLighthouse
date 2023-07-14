@@ -10,7 +10,6 @@ namespace ProjectLighthouse.Migrations
     [Migration("20230714212153_AddUserIdAndSlotIdToComment")]
     public partial class AddUserIdAndSlotIdToComment : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
@@ -33,7 +32,6 @@ namespace ProjectLighthouse.Migrations
             migrationBuilder.Sql("DELETE FROM Comments WHERE TargetUserId IS NULL AND TargetSlotId IS NULL");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
