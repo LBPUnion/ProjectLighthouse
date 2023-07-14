@@ -39,8 +39,8 @@ public class DigestMiddlewareTests
         const int expectedCode = 200;
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.Empty(context.Response.Headers["X-Digest-A"]);
-        Assert.Empty(context.Response.Headers["X-Digest-B"]);
+        Assert.False(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.False(context.Response.Headers.TryGetValue("X-Digest-B", out _));
     }
 
     [Fact]
@@ -72,8 +72,8 @@ public class DigestMiddlewareTests
         const int expectedCode = 403;
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.Empty(context.Response.Headers["X-Digest-A"]);
-        Assert.Empty(context.Response.Headers["X-Digest-B"]);
+        Assert.False(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.False(context.Response.Headers.TryGetValue("X-Digest-B", out _));
     }
 
     [Fact]
@@ -107,8 +107,8 @@ public class DigestMiddlewareTests
         const int expectedCode = 403;
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.Empty(context.Response.Headers["X-Digest-A"]);
-        Assert.Empty(context.Response.Headers["X-Digest-B"]);
+        Assert.False(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.False(context.Response.Headers.TryGetValue("X-Digest-B", out _));
     }
 
     [Fact]
