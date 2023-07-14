@@ -33,7 +33,7 @@ public class CreateUserCommand : ICommand
         password = CryptoHelper.Sha256Hash(password);
 
         UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == onlineId);
-        if (user == null)
+        if (user != null)
         {
             logger.LogError("A user with this username already exists.", LogArea.Command);
             return;
