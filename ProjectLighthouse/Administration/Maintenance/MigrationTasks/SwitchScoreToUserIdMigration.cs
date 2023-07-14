@@ -58,39 +58,9 @@ public class SwitchScoreToUserIdMigration : MigrationTask
 
     public override MigrationHook HookType() => MigrationHook.Before;
 
-    private static DbTransaction GetDbTransaction(IDbContextTransaction dbContextTransaction)
-    {
-        if (dbContextTransaction is not IInfrastructure<DbTransaction> accessor)
-        {
-            throw new InvalidOperationException(RelationalStrings.RelationalNotInUse);
-        }
-
-        return accessor.GetInfrastructure();
-    }
-
-    private static async Task<List<T>> GetAllObjects<T>(DbContext database, string commandText, Func<DbDataReader, T> returnFunc)
-    {
-        DbConnection dbConnection = database.Database.GetDbConnection();
-
-        await using DbCommand cmd = dbConnection.CreateCommand();
-        cmd.CommandText = commandText;
-        cmd.Transaction = GetDbTransaction(database.Database.CurrentTransaction);
-
-        await using DbDataReader reader = await cmd.ExecuteReaderAsync();
-        List<T> items = new();
-
-        if (!reader.HasRows) return default;
-
-        while (await reader.ReadAsync())
-        {
-            items.Add(returnFunc(reader));
-        }
-        return items;
-    }
-
     private static async Task<List<MigrationScore>> GetAllScores(DbContext database)
     {
-        return await GetAllObjects(database,
+        return await MigrationHelper.GetAllObjects(database,
             "select * from Scores",
             reader => new MigrationScore
             {
@@ -105,9 +75,9 @@ public class SwitchScoreToUserIdMigration : MigrationTask
 
     private static async Task<List<MigrationUser>> GetAllUsers(DbContext database)
     {
-        return await GetAllObjects(database,
+        return await MigrationHelper.GetAllObjects(database,
             "select UserId, Username from Users",
-            reader => new MigrationUser()
+            reader => new MigrationUser
             {
                 UserId = reader.GetInt32("UserId"),
                 Username = reader.GetString("Username"),
@@ -116,7 +86,7 @@ public class SwitchScoreToUserIdMigration : MigrationTask
 
     private static async Task<List<MigrationSlot>> GetAllSlots(DbContext database)
     {
-        return await GetAllObjects(database,
+        return await MigrationHelper.GetAllObjects(database,
             "select SlotId from Slots",
             reader => new MigrationSlot
             {
@@ -124,6 +94,10 @@ public class SwitchScoreToUserIdMigration : MigrationTask
             });
     }
 
+    /// <summary>
+    /// This function deletes all existing scores and inserts the new generated scores
+    /// <para>All scores must be deleted because MySQL doesn't allow you to change primary keys</para>
+    /// </summary>
     private static async Task ApplyFixedScores(DatabaseContext database, IReadOnlyList<ScoreEntity> newScores)
     {
         // Re-order scores (The order doesn't make any difference but since we're already deleting everything we may as well) 
@@ -144,7 +118,10 @@ public class SwitchScoreToUserIdMigration : MigrationTask
         // This is significantly faster than using standard EntityFramework Add and Save albeit a little wacky
         foreach (ScoreEntity score in newScores)
         {
-            insertionScript.AppendLine($"""insert into Scores values('{score.ScoreId}', '{score.SlotId}', '{score.Type}', '', '{score.Points}', '{score.ChildSlotId}', '{score.Timestamp}', '{score.UserId}');""");
+            insertionScript.AppendLine($"""
+                    insert into Scores (ScoreId, SlotId, Type, Points, ChildSlotId, Timestamp, UserId) 
+                    values('{score.ScoreId}', '{score.SlotId}', '{score.Type}', '', '{score.Points}', '{score.ChildSlotId}', '{score.Timestamp}', '{score.UserId}');
+                    """);
         }
 
         await database.Database.ExecuteSqlRawAsync(insertionScript.ToString());
@@ -160,6 +137,7 @@ public class SwitchScoreToUserIdMigration : MigrationTask
         // Get all slots with at least 1 score
         List<MigrationSlot> slots = await GetAllSlots(database);
         List<MigrationScore> scores = await GetAllScores(database);
+
         // Don't run migration if there are no scores
         if (scores == null || scores.Count == 0) return true;
 
@@ -200,7 +178,7 @@ public class SwitchScoreToUserIdMigration : MigrationTask
     }
 
     /// <summary>
-    /// 
+    /// This function takes in a list of scores and creates a map of players and their highest score 
     /// </summary>
     private static Dictionary<string, int> CreateHighestScores(List<MigrationScore> scores, IReadOnlyCollection<MigrationUser> userCache)
     {
