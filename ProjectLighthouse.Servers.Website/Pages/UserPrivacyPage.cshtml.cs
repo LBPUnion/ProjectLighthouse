@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
-public class UserInteractionsPage : BaseLayout
+public class UserPrivacyPage : BaseLayout
 {
     public List<UserEntity> BlockedUsers = new();
 
@@ -16,7 +16,7 @@ public class UserInteractionsPage : BaseLayout
 
     public bool CommentsDisabledByModerator;
 
-    public UserInteractionsPage(DatabaseContext database) : base(database)
+    public UserPrivacyPage(DatabaseContext database) : base(database)
     { }
 
     public async Task<IActionResult> OnGet([FromRoute] int userId)

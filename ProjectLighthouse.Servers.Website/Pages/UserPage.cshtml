@@ -89,16 +89,16 @@
         }
         @if (Model.ProfileUser == Model.User)
         {
-            <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/interactions">
+            <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/privacy">
                 <i class="cog icon"></i>
-                <span>Interactions</span>
+                <span>Privacy Settings</span>
             </a>
         }
         @if (Model.ProfileUser == Model.User || (Model.User?.IsModerator ?? false))
         {
             <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/settings">
                 <i class="cog icon"></i>
-                <span>Settings</span>
+                <span>Profile Settings</span>
             </a>
         }
         @if (Model.ProfileUser == Model.User)
