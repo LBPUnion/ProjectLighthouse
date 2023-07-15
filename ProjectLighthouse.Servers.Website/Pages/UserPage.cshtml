@@ -143,9 +143,10 @@
     }
 </div>
 
-@if (Model.ProfileUser.ProfileVisibility == PrivacyType.PSN && Model.User == null ||
-     Model.User?.IsModerator == false ||
-     Model.User != Model.ProfileUser)
+@if (Model.ProfileUser.ProfileVisibility == PrivacyType.PSN &&
+     Model.User != Model.ProfileUser &&
+     Model.User == null &&
+     Model.User?.IsModerator == false)
 {
     <div class="ui red segment">
         <p>
@@ -153,9 +154,9 @@
         </p>
     </div>
 }
-else if (Model.ProfileUser.ProfileVisibility == PrivacyType.Game ||
-         Model.User?.IsModerator == false || 
-         Model.User != Model.ProfileUser)
+else if (Model.ProfileUser.ProfileVisibility == PrivacyType.Game &&
+         Model.User != Model.ProfileUser &&
+         Model.User?.IsModerator == false)
 {
     <div class="ui red segment">
         <p>
