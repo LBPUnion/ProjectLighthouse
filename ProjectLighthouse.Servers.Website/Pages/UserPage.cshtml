@@ -235,18 +235,29 @@ else
                 </div>
             </div>
             <div class="lh-content" id="lh-levels">
-                <div class="ui green segment" id="levels">
-                    @if (Model.Slots?.Count == 0)
-                    {
-                        <p>This user hasn't published any levels</p>
-                    }
-                    @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
-                    {
-                        <div class="ui segment">
-                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
-                        </div>
-                    }
-                </div>
+                @if (Model.LevelsPrivate)
+                {
+                    <div class="ui red segment">
+                        <p>
+                            <i>This user's privacy settings prevents you from viewing this page.</i>
+                        </p>
+                    </div>    
+                }
+                else
+                {
+                    <div class="ui green segment" id="levels">
+                        @if (Model.Slots?.Count == 0)
+                        {
+                            <p>This user hasn't published any levels</p>
+                        }
+                        @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
+                        {
+                            <div class="ui segment">
+                                @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
+                            </div>
+                        }
+                    </div>    
+                }
             </div>
             <div class="lh-content" id="lh-playlists">
                 <div class="ui purple segment">

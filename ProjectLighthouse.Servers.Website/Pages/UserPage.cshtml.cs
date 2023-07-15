@@ -31,6 +31,7 @@ public class UserPage : BaseLayout
     public List<SlotEntity>? Slots;
 
     public bool ProfilePrivate;
+    public bool LevelsPrivate;
 
     public UserPage(DatabaseContext database) : base(database)
     { }
@@ -63,6 +64,34 @@ public class UserPage : BaseLayout
                 default:
                 {
                     this.ProfilePrivate = false;
+                    break;
+                }
+            }
+        }
+
+        // Determine if user can view levels according to profileUser's privacy settings
+        if (this.User == null || !this.User.IsModerator)
+        {
+            switch (this.ProfileUser.LevelVisibility)
+            {
+                case PrivacyType.Game:
+                {
+                    if (this.ProfileUser != this.User) this.LevelsPrivate = true;
+                    break;
+                }
+                case PrivacyType.PSN:
+                {
+                    if (this.User == null) this.LevelsPrivate = true;
+                    break;
+                }
+                case PrivacyType.All:
+                {
+                    this.LevelsPrivate = false;
+                    break;
+                }
+                default:
+                {
+                    this.LevelsPrivate = false;
                     break;
                 }
             }

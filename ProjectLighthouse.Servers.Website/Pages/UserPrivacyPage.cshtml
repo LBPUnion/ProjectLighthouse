@@ -13,6 +13,12 @@
     bool isMobile = Request.IsMobile();
 }
 
+@*
+    The submit button on the settings form is duplicated for styling
+    so that I can keep utilize one form, whilst keeping the settings
+    areas separate from each other. -koko
+*@
+
 <div class="@(isMobile ? "" : "ui left aligned grid")">
     <div class="column">
         <div class="ui blue segment">
@@ -24,27 +30,39 @@
                 <div class="ui yellow segment">
                     <h2><i class="ui icon comment alternate"></i> Profile Privacy</h2>
                     <div class="field">
-                            <label style="text-align: left" for="privacyLevel">Privacy Level</label>
-                            <select class="ui fluid dropdown" type="text" name="privacyLevel" id="privacyLevel">
+                            <label style="text-align: left" for="profilePrivacyLevel">Privacy Level</label>
+                            <select class="ui fluid dropdown" type="text" name="profilePrivacyLevel" id="profilePrivacyLevel">
                                 <option value="public" @(Model.ProfileUser.ProfileVisibility == PrivacyType.All ? "selected" : "")>Public</option>
                                 <option value="signedInOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.PSN ? "selected" : "")>Signed-In Only</option>
                                 <option value="inGameOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
                             </select>
                         </div>
                         <div class="field">
-                            <label style="text-align: left" for="commentsEnabled">
+                            <label style="text-align: left" for="profileCommentsEnabled">
                                 Comments Enabled
                                 @if (Model.CommentsDisabledByModerator)
                                 {
                                     <small style="color: red">Locked by a moderator</small>
                                 }
                             </label>
-                            <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="commentsEnabled" id="commentsEnabled">
+                            <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="profileCommentsEnabled" id="profileCommentsEnabled">
                                 <option value="true" @(Model.ProfileUser.CommentsEnabled ? "selected" : "")>Enabled</option>
                                 <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>Disabled</option>
                             </select>
                         </div>
                         <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
+                </div>
+                <div class="ui yellow segment">
+                    <h2><i class="ui icon play"></i> Level Privacy</h2>
+                    <div class="field">
+                        <label style="text-align: left" for="slotPrivacyLevel">Privacy Level</label>
+                        <select class="ui fluid dropdown" type="text" name="slotPrivacyLevel" id="slotPrivacyLevel">
+                            <option value="public" @(Model.ProfileUser.LevelVisibility == PrivacyType.All ? "selected" : "")>Public</option>
+                            <option value="signedInOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.PSN ? "selected" : "")>Signed-In Only</option>
+                            <option value="inGameOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
                 </div>
             </form>
 

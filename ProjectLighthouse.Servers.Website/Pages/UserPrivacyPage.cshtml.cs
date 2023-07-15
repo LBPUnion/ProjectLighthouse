@@ -41,7 +41,7 @@ public class UserPrivacyPage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string privacyLevel, [FromForm] string commentsEnabled)
+    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string profilePrivacyLevel, [FromForm] string profileCommentsEnabled, [FromForm] string slotPrivacyLevel)
     {
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
@@ -57,7 +57,7 @@ public class UserPrivacyPage : BaseLayout
 
         if (!this.CommentsDisabledByModerator)
         {
-            this.ProfileUser.CommentsEnabled = commentsEnabled switch
+            this.ProfileUser.CommentsEnabled = profileCommentsEnabled switch
             {
                 "true" => true,
                 "false" => false,
@@ -69,12 +69,20 @@ public class UserPrivacyPage : BaseLayout
             this.ProfileUser.CommentsEnabled = false;
         }
 
-        this.ProfileUser.ProfileVisibility = privacyLevel switch
+        this.ProfileUser.ProfileVisibility = profilePrivacyLevel switch
         {
             "public" => PrivacyType.All,
             "signedInOnly" => PrivacyType.PSN,
             "inGameOnly" => PrivacyType.Game,
             _ => this.ProfileUser.ProfileVisibility,
+        };
+
+        this.ProfileUser.LevelVisibility = slotPrivacyLevel switch
+        {
+            "public" => PrivacyType.All,
+            "signedInOnly" => PrivacyType.PSN,
+            "inGameOnly" => PrivacyType.Game,
+            _ => this.ProfileUser.LevelVisibility,
         };
         
         await this.Database.SaveChangesAsync();
