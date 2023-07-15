@@ -18,35 +18,35 @@
         <div class="ui blue segment">
             <h1><i class="ui icon cog"></i> @Model.ProfileUser.Username's Interactions Settings</h1>
             <div class="ui divider"></div>
-
-            <div class="ui yellow segment">
-                <h2><i class="ui icon comment alternate"></i> Profile Interactions</h2>
-                <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/interactions">
-                    @Html.AntiForgeryToken()
+            
+            <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/interactions">
+            @Html.AntiForgeryToken()
+                <div class="ui yellow segment">
+                    <h2><i class="ui icon comment alternate"></i> Profile Interactions</h2>
                     <div class="field">
-                        <label style="text-align: left" for="privacyLevel">Privacy Level</label>
-                        <select class="ui fluid dropdown" type="text" name="privacyLevel" id="privacyLevel">
-                            <option value="public" @(Model.ProfileUser.ProfileVisibility == PrivacyType.All ? "selected" : "")>Public</option>
-                            <option value="signedInOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.PSN ? "selected" : "")>Signed-In Only</option>
-                            <option value="inGameOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label style="text-align: left" for="commentsEnabled">
-                            Comments Enabled
-                            @if (Model.CommentsDisabledByModerator)
-                            {
-                                <small style="color: red">Locked by a moderator</small>
-                            }
-                        </label>
-                        <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="commentsEnabled" id="commentsEnabled">
-                            <option value="true" @(Model.ProfileUser.CommentsEnabled ? "selected" : "")>Enabled</option>
-                            <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>Disabled</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
-                </form>
-            </div>
+                            <label style="text-align: left" for="privacyLevel">Privacy Level</label>
+                            <select class="ui fluid dropdown" type="text" name="privacyLevel" id="privacyLevel">
+                                <option value="public" @(Model.ProfileUser.ProfileVisibility == PrivacyType.All ? "selected" : "")>Public</option>
+                                <option value="signedInOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.PSN ? "selected" : "")>Signed-In Only</option>
+                                <option value="inGameOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label style="text-align: left" for="commentsEnabled">
+                                Comments Enabled
+                                @if (Model.CommentsDisabledByModerator)
+                                {
+                                    <small style="color: red">Locked by a moderator</small>
+                                }
+                            </label>
+                            <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="commentsEnabled" id="commentsEnabled">
+                                <option value="true" @(Model.ProfileUser.CommentsEnabled ? "selected" : "")>Enabled</option>
+                                <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>Disabled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
+                </div>
+            </form>
 
             <div class="ui red segment">
                 <h2><i class="user alternate slash icon"></i> Blocked Users</h2>
