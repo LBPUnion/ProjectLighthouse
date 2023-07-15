@@ -60,21 +60,23 @@
                 }
                 @foreach (UserEntity user in Model.BlockedUsers)
                 {
-                    @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)
-                           {
+                    <div class="ui segment">
+                        @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)
                                {
-                                   "ShowLink", true
-                               },
-                               {
-                                   "IsMobile", isMobile
-                               },
-                               {
-                                   "Language", Model.GetLanguage()
-                               },
-                               {
-                                   "TimeZone", Model.GetTimeZone()
-                               },
-                           })
+                                   {
+                                       "ShowLink", true
+                                   },
+                                   {
+                                       "IsMobile", isMobile
+                                   },
+                                   {
+                                       "Language", Model.GetLanguage()
+                                   },
+                                   {
+                                       "TimeZone", Model.GetTimeZone()
+                                   },
+                               })
+                    </div>
                 }
             </div>
         </div>

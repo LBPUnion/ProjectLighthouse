@@ -48,9 +48,6 @@ public class UserInteractionsPage : BaseLayout
 
         if (this.User == null) return this.Redirect("~/user/" + userId);
         if (this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
-        
-        if (string.IsNullOrWhiteSpace(privacyLevel)) return this.Redirect($"~/user/{userId}");
-        if (string.IsNullOrWhiteSpace(commentsEnabled)) return this.Redirect($"~/user/{userId}");
 
         this.CommentsDisabledByModerator = await this.Database.Cases
             .Where(c => c.AffectedId == this.ProfileUser.UserId)
