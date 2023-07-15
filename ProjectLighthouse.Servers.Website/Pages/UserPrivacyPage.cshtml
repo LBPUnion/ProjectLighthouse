@@ -14,9 +14,9 @@
 }
 
 @*
-    The submit button on the settings form is duplicated for styling
-    so that I can keep utilize one form, whilst keeping the settings
-    areas separate from each other. -koko
+    The submit/discard buttons on the settings form is duplicated for
+    styling so that I can keep utilize one form, whilst keeping the
+    settings areas separate from each other. -koko
 *@
 
 <div class="@(isMobile ? "" : "ui left aligned grid")">
@@ -51,6 +51,7 @@
                         </select>
                     </div>
                     <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
+                    <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
                 </div>
                 
                 <div class="ui yellow segment">
@@ -64,6 +65,7 @@
                         </select>
                     </div>
                     <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
+                    <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
                 </div>
             </form>
 
