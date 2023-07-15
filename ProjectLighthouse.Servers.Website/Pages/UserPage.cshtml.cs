@@ -30,6 +30,8 @@ public class UserPage : BaseLayout
     public List<SlotEntity>? QueuedSlots;
     public List<SlotEntity>? Slots;
 
+    public bool ProfilePrivate;
+
     public UserPage(DatabaseContext database) : base(database)
     { }
 
@@ -39,24 +41,30 @@ public class UserPage : BaseLayout
         if (this.ProfileUser == null) return this.NotFound();
 
         // Determine if user can view profile according to profileUser's privacy settings
-        if (this.User == null || !this.User.IsAdmin)
+        if (this.User == null || !this.User.IsModerator)
         {
             switch (this.ProfileUser.ProfileVisibility)
             {
-                case PrivacyType.PSN:
-                {
-                    if (this.User != null) return this.NotFound();
-
-                    break;
-                }
                 case PrivacyType.Game:
                 {
-                    if (this.ProfileUser != this.User) return this.NotFound();
-
+                    if (this.ProfileUser != this.User) this.ProfilePrivate = true;
                     break;
                 }
-                case PrivacyType.All: break;
-                default: throw new ArgumentOutOfRangeException();
+                case PrivacyType.PSN:
+                {
+                    if (this.User != null) this.ProfilePrivate = true;
+                    break;
+                }
+                case PrivacyType.All:
+                {
+                    this.ProfilePrivate = false;
+                    break;
+                }
+                default:
+                {
+                    this.ProfilePrivate = false;
+                    break;
+                }
             }
         }
 

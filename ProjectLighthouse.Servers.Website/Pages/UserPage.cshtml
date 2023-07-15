@@ -6,7 +6,6 @@
 @using LBPUnion.ProjectLighthouse.Types.Entities.Level
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
-@using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
 
 @{
@@ -114,48 +113,39 @@
     {
         <br/>
     }
-    <div class="eight wide column">
-        <div class="ui blue segment">
-            <h2>@Model.Translate(ProfileStrings.Biography)</h2>
-            @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
-            {
-                <p>@Model.Translate(ProfileStrings.NoBiography, Model.ProfileUser.Username)</p>
-            }
-            else
-            {
-                <p style="overflow-wrap: anywhere;">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
-            }
-        </div>
-    </div>
-    @if (isMobile)
+    @if (!Model.ProfilePrivate)
     {
-        <br/>
-    }
-    <div class="eight wide column">
-        <div class="ui red segment">
-            <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
-            <p>@Model.Translate(GeneralStrings.Soon)</p>
+        <div class="eight wide column">
+            <div class="ui blue segment">
+                <h2>@Model.Translate(ProfileStrings.Biography)</h2>
+                @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
+                {
+                    <p>@Model.Translate(ProfileStrings.NoBiography, Model.ProfileUser.Username)</p>
+                }
+                else
+                {
+                    <p style="overflow-wrap: anywhere;">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
+                }
+            </div>
         </div>
-    </div>
-    @if (isMobile)
-    {
-        <br/>
+        @if (isMobile)
+        {
+            <br/>
+        }
+        <div class="eight wide column">
+            <div class="ui red segment">
+                <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
+                <p>@Model.Translate(GeneralStrings.Soon)</p>
+            </div>
+        </div>
+        @if (isMobile)
+        {
+            <br/>
+        }    
     }
 </div>
 
-@if (Model.ProfileUser.ProfileVisibility == PrivacyType.PSN &&
-     Model.User == null &&
-     Model.User?.IsModerator == false)
-{
-    <div class="ui red segment">
-        <p>
-            <i>This user's privacy settings prevents you from viewing this page.</i>
-        </p>
-    </div>
-}
-else if (Model.ProfileUser.ProfileVisibility == PrivacyType.Game &&
-         Model.User != Model.ProfileUser &&
-         Model.User?.IsModerator == false)
+@if (Model.ProfilePrivate)
 {
     <div class="ui red segment">
         <p>
