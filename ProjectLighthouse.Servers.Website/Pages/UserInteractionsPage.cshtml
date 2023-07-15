@@ -1,0 +1,73 @@
+﻿@page "/user/{userId:int}/interactions"
+@using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
+@using LBPUnion.ProjectLighthouse.Types.Users
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserInteractionsPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
+    Model.ShowTitleInPage = false;
+
+    bool isMobile = Request.IsMobile();
+}
+
+<div class="@(isMobile ? "" : "ui left aligned grid")">
+    <div class="column">
+        <div class="ui blue segment">
+            <h1><i class="ui icon cog"></i> @Model.ProfileUser.Username's Interactions Settings</h1>
+            <div class="ui divider"></div>
+
+            <div class="ui yellow segment">
+                <h2><i class="ui icon comment alternate"></i> Profile Interactions</h2>
+                <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/interactions">
+                    <div class="field">
+                        <label style="text-align: left" for="privacyLevel">Privacy Level</label>
+                        <select class="ui fluid dropdown" type="text" name="privacyLevel" id="privacyLevel">
+                            <option value="public" @(Model.ProfileUser.ProfileVisibility == PrivacyType.All ? "selected" : "")>Public</option>
+                            <option value="signedInOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.PSN ? "selected" : "")>Signed-In Only</option>
+                            <option value="inGameOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label style="text-align: left" for="commentsEnabled">
+                            Comments Enabled
+                            @if (Model.CommentsDisabledByModerator)
+                            {
+                                <small style="color: red">Locked by a moderator</small>
+                            }
+                        </label>
+                        <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="commentsEnabled" id="commentsEnabled">
+                            <option value="true" @(Model.ProfileUser.CommentsEnabled ? "selected" : "")>Enabled</option>
+                            <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>Disabled</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
+                </form>
+            </div>
+
+            <div class="ui red segment">
+                <h2><i class="user alternate slash icon"></i> Blocked Users</h2>
+                @foreach (UserEntity user in Model.BlockedUsers)
+                {
+                    @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)
+                           {
+                               {
+                                   "ShowLink", true
+                               },
+                               {
+                                   "IsMobile", isMobile
+                               },
+                               {
+                                   "Language", Model.GetLanguage()
+                               },
+                               {
+                                   "TimeZone", Model.GetTimeZone()
+                               },
+                           })
+                }
+            </div>
+        </div>
+    </div>
+</div>
