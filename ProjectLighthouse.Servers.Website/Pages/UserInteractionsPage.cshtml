@@ -22,6 +22,7 @@
             <div class="ui yellow segment">
                 <h2><i class="ui icon comment alternate"></i> Profile Interactions</h2>
                 <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/interactions">
+                    @Html.AntiForgeryToken()
                     <div class="field">
                         <label style="text-align: left" for="privacyLevel">Privacy Level</label>
                         <select class="ui fluid dropdown" type="text" name="privacyLevel" id="privacyLevel">
