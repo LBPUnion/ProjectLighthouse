@@ -49,6 +49,14 @@
 
             <div class="ui red segment">
                 <h2><i class="user alternate slash icon"></i> Blocked Users</h2>
+                @if (Model.BlockedUsers.Count == 0)
+                {
+                    <span>You have not blocked any users.</span>
+                }
+                else
+                {
+                    <p>You have blocked <b>@Model.BlockedUsers.Count</b> user(s).</p>
+                }
                 @foreach (UserEntity user in Model.BlockedUsers)
                 {
                     @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)

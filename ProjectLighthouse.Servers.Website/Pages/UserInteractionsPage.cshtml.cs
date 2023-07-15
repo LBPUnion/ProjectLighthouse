@@ -34,7 +34,7 @@ public class UserInteractionsPage : BaseLayout
         this.CommentsDisabledByModerator = await this.Database.Cases
             .Where(c => c.AffectedId == this.ProfileUser.UserId)
             .Where(c => c.Type == CaseType.UserDisableComments)
-            .Where(c => c.Dismissed == false)
+            .Where(c => c.DismissedAt == null)
             .AnyAsync();
 
         return this.Page();
