@@ -16,7 +16,7 @@
 <div class="@(isMobile ? "" : "ui left aligned grid")">
     <div class="column">
         <div class="ui blue segment">
-            <h1><i class="ui icon cog"></i> @Model.ProfileUser.Username's Privacy Settings</h1>
+            <h1><i class="ui icon eye"></i> @Model.ProfileUser.Username's Privacy Settings</h1>
             <div class="ui divider"></div>
             
             <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/privacy">
