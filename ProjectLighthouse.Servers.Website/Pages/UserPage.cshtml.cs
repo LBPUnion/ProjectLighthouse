@@ -52,7 +52,7 @@ public class UserPage : BaseLayout
                 }
                 case PrivacyType.PSN:
                 {
-                    if (this.User != null) this.ProfilePrivate = true;
+                    if (this.User == null) this.ProfilePrivate = true;
                     break;
                 }
                 case PrivacyType.All:
