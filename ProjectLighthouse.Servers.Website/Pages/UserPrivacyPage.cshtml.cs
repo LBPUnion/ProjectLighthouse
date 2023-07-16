@@ -27,13 +27,11 @@ public class UserPrivacyPage : BaseLayout
         if (this.User == null) return this.Redirect("~/user/" + userId);
         if (this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
-        this.BlockedUsers = await this.Database.BlockedProfiles
-            .Where(b => b.UserId == this.ProfileUser.UserId)
+        this.BlockedUsers = await this.Database.BlockedProfiles.Where(b => b.UserId == this.ProfileUser.UserId)
             .Select(b => b.BlockedUser)
             .ToListAsync();
 
-        this.CommentsDisabledByModerator = await this.Database.Cases
-            .Where(c => c.AffectedId == this.ProfileUser.UserId)
+        this.CommentsDisabledByModerator = await this.Database.Cases.Where(c => c.AffectedId == this.ProfileUser.UserId)
             .Where(c => c.Type == CaseType.UserDisableComments)
             .Where(c => c.DismissedAt == null)
             .AnyAsync();
@@ -41,7 +39,13 @@ public class UserPrivacyPage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string profilePrivacyLevel, [FromForm] string profileCommentsEnabled, [FromForm] string slotPrivacyLevel)
+    public async Task<IActionResult> OnPost
+    (
+        [FromRoute] int userId,
+        [FromForm] string profilePrivacyLevel,
+        [FromForm] string profileCommentsEnabled,
+        [FromForm] string slotPrivacyLevel
+    )
     {
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
@@ -49,8 +53,7 @@ public class UserPrivacyPage : BaseLayout
         if (this.User == null) return this.Redirect("~/user/" + userId);
         if (this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
-        this.CommentsDisabledByModerator = await this.Database.Cases
-            .Where(c => c.AffectedId == this.ProfileUser.UserId)
+        this.CommentsDisabledByModerator = await this.Database.Cases.Where(c => c.AffectedId == this.ProfileUser.UserId)
             .Where(c => c.Type == CaseType.UserDisableComments)
             .Where(c => c.DismissedAt == null)
             .AnyAsync();

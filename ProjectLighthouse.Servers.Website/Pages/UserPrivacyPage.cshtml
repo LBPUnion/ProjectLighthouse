@@ -23,9 +23,15 @@
                 <div class="field">
                     <label style="text-align: left" for="profilePrivacyLevel">Privacy Level</label>
                     <select class="ui fluid dropdown" type="text" name="profilePrivacyLevel" id="profilePrivacyLevel">
-                        <option value="public" @(Model.ProfileUser.ProfileVisibility == PrivacyType.All ? "selected" : "")>Public</option>
-                        <option value="signedInOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.PSN ? "selected" : "")>Signed-In Only</option>
-                        <option value="inGameOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
+                        <option value="public" @(Model.ProfileUser.ProfileVisibility == PrivacyType.All ? "selected" : "")>
+                            Share your profile with everyone!
+                        </option>
+                        <option value="signedInOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.PSN ? "selected" : "")>
+                            Only share your profile with users who are signed into the website or playing in-game.
+                        </option>
+                        <option value="inGameOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.Game ? "selected" : "")>
+                            Only share your profile with users who are playing in-game.
+                        </option>
                     </select>
                 </div>
                 <div class="field">
@@ -45,9 +51,15 @@
                 <div class="field">
                     <label style="text-align: left" for="slotPrivacyLevel">Privacy Level</label>
                     <select class="ui fluid dropdown" type="text" name="slotPrivacyLevel" id="slotPrivacyLevel">
-                        <option value="public" @(Model.ProfileUser.LevelVisibility == PrivacyType.All ? "selected" : "")>Public</option>
-                        <option value="signedInOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.PSN ? "selected" : "")>Signed-In Only</option>
-                        <option value="inGameOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
+                        <option value="public" @(Model.ProfileUser.LevelVisibility == PrivacyType.All ? "selected" : "")>
+                            Share your levels with everyone!
+                        </option>
+                        <option value="signedInOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.PSN ? "selected" : "")>
+                            Only share your levels with users who are signed into the website or playing in-game.
+                        </option>
+                        <option value="inGameOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.Game ? "selected" : "")>
+                            Only share your levels with users who are playing in-game.
+                        </option>
                     </select>
                 </div>
                 <div class="ui divider"></div>
