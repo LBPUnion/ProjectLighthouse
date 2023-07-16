@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,8 @@ public class UserPage : BaseLayout
 
     public bool ProfilePrivate;
     public bool LevelsPrivate;
+    
+    public bool CommentsDisabledByModerator;
 
     public UserPage(DatabaseContext database) : base(database)
     { }
@@ -167,6 +170,12 @@ public class UserPage : BaseLayout
             .AnyAsync();
 
         this.IsProfileUserBlocked = await this.Database.IsUserBlockedBy(this.ProfileUser.UserId, this.User.UserId);
+
+        this.CommentsDisabledByModerator = await this.Database.Cases
+            .Where(c => c.AffectedId == this.ProfileUser.UserId)
+            .Where(c => c.Type == CaseType.UserDisableComments)
+            .Where(c => c.DismissedAt == null)
+            .AnyAsync();
 
         return this.Page();
     }

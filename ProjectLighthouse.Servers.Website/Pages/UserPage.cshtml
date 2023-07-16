@@ -322,8 +322,15 @@ else
             </div>
             <div class="ui fitted hidden divider"></div>
         }
+        
+        <div>
+            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
+                <i class="trash alternate icon"></i>
+                <span>Wipe Earth Decorations</span>
+            </a>
+        </div>
 
-        @if (Model.ProfileUser.CommentsEnabled)
+        @if (!Model.CommentsDisabledByModerator && Model.ProfileUser.CommentsEnabled)
         {
             <div>
                 <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
@@ -333,13 +340,6 @@ else
             </div>
             <div class="ui fitted hidden divider"></div>
         }
-
-        <div>
-            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
-                <i class="trash alternate icon"></i>
-                <span>Wipe user's earth decorations</span>
-            </a>
-        </div>
         <div class="ui fitted hidden divider"></div>
 
         @if (Model.User.IsAdmin)
