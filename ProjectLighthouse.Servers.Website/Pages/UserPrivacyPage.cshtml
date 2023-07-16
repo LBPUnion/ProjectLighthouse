@@ -15,7 +15,7 @@
 
 <div class="@(isMobile ? "" : "ui left aligned grid")">
     <div class="column">
-        <h1><i class="ui icon eye"></i> @Model.ProfileUser.Username's Privacy Settings</h1>
+        <h1>@Model.ProfileUser.Username's Privacy Settings</h1>
         <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/privacy">
             @Html.AntiForgeryToken()
             <div class="ui yellow segment">
