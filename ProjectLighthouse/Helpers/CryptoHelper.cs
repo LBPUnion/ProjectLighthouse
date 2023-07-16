@@ -60,6 +60,12 @@ public static class CryptoHelper
     /// <returns>The randomly generated integer</returns>
     public static int GenerateRandomInt32(int fromInclusive, int toExclusive) => RandomNumberGenerator.GetInt32(fromInclusive, toExclusive);
 
+    /// <summary>
+    /// Generates a random 32 bit integer between 0 and 2^32 - 1
+    /// </summary>
+    /// <returns>The randomly generated integer</returns>
+    public static int GenerateRandomInt32() => RandomNumberGenerator.GetInt32(0, int.MaxValue);
+
     public static string ToBase64(string str)
     {
         byte[] bytes = Encoding.UTF8.GetBytes(str);
