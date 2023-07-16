@@ -48,7 +48,7 @@ public class SlotPage : BaseLayout
                 }
                 case PrivacyType.PSN:
                 {
-                    if (this.User != null) this.SlotPrivate = true;
+                    if (this.User == null) this.SlotPrivate = true;
                     break;
                 }
                 case PrivacyType.All:
