@@ -39,13 +39,7 @@ public class UserPrivacyPage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost
-    (
-        [FromRoute] int userId,
-        [FromForm] string profilePrivacyLevel,
-        [FromForm] string profileCommentsEnabled,
-        [FromForm] string slotPrivacyLevel
-    )
+    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string profilePrivacyLevel, [FromForm] string profileCommentsEnabled, [FromForm] string slotPrivacyLevel)
     {
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
