@@ -13,18 +13,10 @@
     bool isMobile = Request.IsMobile();
 }
 
-@*
-    The submit/discard buttons on the settings form is duplicated for
-    styling so that I can keep utilize one form, whilst keeping the
-    settings areas separate from each other. -koko
-*@
-
 <div class="@(isMobile ? "" : "ui left aligned grid")">
     <div class="column">
         <div class="ui blue segment">
             <h1><i class="ui icon eye"></i> @Model.ProfileUser.Username's Privacy Settings</h1>
-            <div class="ui divider"></div>
-
             <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/privacy">
                 @Html.AntiForgeryToken()
                 <div class="ui yellow segment">
@@ -50,11 +42,6 @@
                             <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>Disabled</option>
                         </select>
                     </div>
-                    <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
-                    <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
-                </div>
-                
-                <div class="ui yellow segment">
                     <h2><i class="ui icon play"></i> Level Privacy</h2>
                     <div class="field">
                         <label style="text-align: left" for="slotPrivacyLevel">Privacy Level</label>
@@ -64,6 +51,7 @@
                             <option value="inGameOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.Game ? "selected" : "")>In-Game Only</option>
                         </select>
                     </div>
+                    <div class="ui divider"></div>
                     <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
                     <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
                 </div>
