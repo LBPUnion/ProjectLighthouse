@@ -67,11 +67,8 @@ public class UserPage : BaseLayout
                     break;
                 }
             }
-        }
 
-        // Determine if user can view levels according to profileUser's privacy settings
-        if (this.User == null || !this.User.IsModerator)
-        {
+            // Determine if user can view levels according to profileUser's privacy settings
             switch (this.ProfileUser.LevelVisibility)
             {
                 case PrivacyType.Game:
