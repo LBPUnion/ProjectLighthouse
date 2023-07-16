@@ -330,7 +330,7 @@ else
             </a>
         </div>
 
-        @if (!Model.CommentsDisabledByModerator && Model.ProfileUser.CommentsEnabled)
+        @if (!Model.CommentsDisabledByModerator)
         {
             <div>
                 <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
