@@ -43,8 +43,12 @@
                         }
                     </label>
                     <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="profileCommentsEnabled" id="profileCommentsEnabled">
-                        <option value="true" @(Model.ProfileUser.CommentsEnabled ? "selected" : "")>Enabled</option>
-                        <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>Disabled</option>
+                        <option value="true" @(Model.ProfileUser.CommentsEnabled ? "selected" : "")>
+                            Enable commenting on your profile.
+                        </option>
+                        <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>
+                            Disable commenting on your profile.
+                        </option>
                     </select>
                 </div>
                 <h2><i class="ui icon play"></i> Level Privacy</h2>
