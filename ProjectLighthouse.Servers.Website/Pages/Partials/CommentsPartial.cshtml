@@ -50,10 +50,9 @@
             CommentEntity comment = commentAndReaction.Key;
             int yourThumb = commentAndReaction.Value?.Rating ?? 0;
             DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000).ToLocalTime();
-            StringWriter messageWriter = new();
-            HttpUtility.HtmlDecode(comment.GetCommentMessage(Database), messageWriter);
 
-            string decodedMessage = messageWriter.ToString();
+            string decodedMessage = HttpUtility.HtmlDecode(comment.GetCommentMessage(Database));
+            
             string? url = Url.RouteUrl(ViewContext.RouteData.Values);
             if (url == null) continue;
 
