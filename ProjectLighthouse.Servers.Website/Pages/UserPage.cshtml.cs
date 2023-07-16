@@ -32,7 +32,7 @@ public class UserPage : BaseLayout
     public List<SlotEntity>? Slots;
 
     public bool ProfilePrivate;
-    public bool LevelsPrivate;
+    public bool SlotsPrivate;
     
     public bool CommentsDisabledByModerator;
 
@@ -76,22 +76,22 @@ public class UserPage : BaseLayout
             {
                 case PrivacyType.Game:
                 {
-                    if (this.ProfileUser != this.User) this.LevelsPrivate = true;
+                    if (this.ProfileUser != this.User) this.SlotsPrivate = true;
                     break;
                 }
                 case PrivacyType.PSN:
                 {
-                    if (this.User == null) this.LevelsPrivate = true;
+                    if (this.User == null) this.SlotsPrivate = true;
                     break;
                 }
                 case PrivacyType.All:
                 {
-                    this.LevelsPrivate = false;
+                    this.SlotsPrivate = false;
                     break;
                 }
                 default:
                 {
-                    this.LevelsPrivate = false;
+                    this.SlotsPrivate = false;
                     break;
                 }
             }
