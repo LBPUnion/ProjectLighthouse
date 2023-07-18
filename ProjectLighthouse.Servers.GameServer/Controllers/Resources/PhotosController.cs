@@ -102,7 +102,7 @@ public class PhotosController : ControllerBase
 
         if (photo.Subjects?.Count > 4) return this.BadRequest();
 
-        if (photo.Timestamp > TimeHelper.Timestamp) photo.Timestamp = TimeHelper.Timestamp;
+        if (photo.Timestamp > TimeHelper.Timestamp) photoEntity.Timestamp = TimeHelper.Timestamp;
 
         this.database.Photos.Add(photoEntity);
 
