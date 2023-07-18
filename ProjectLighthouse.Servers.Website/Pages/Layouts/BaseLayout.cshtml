@@ -69,9 +69,7 @@
         if (window.self !== window.top) {
             window.stop()
             let locationHref = window.location.href;
-            location.replace(document.referrer);
-            document.documentElement.style.display = "none";
-
+            history.replaceState({}, '', window.top.location);
             window.top.location.replace(locationHref);
         }
     </script>

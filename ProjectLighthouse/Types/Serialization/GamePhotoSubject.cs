@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.ComponentModel;
+using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -18,6 +19,7 @@ public class GamePhotoSubject : ILbpSerializable
     public string DisplayName => this.Username;
 
     [XmlElement("bounds")]
+    [DefaultValue(null)]
     public string Bounds { get; set; }
 
     public static GamePhotoSubject CreateFromEntity(PhotoSubjectEntity entity) =>

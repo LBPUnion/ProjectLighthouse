@@ -1,7 +1,7 @@
 @using LBPUnion.ProjectLighthouse.Extensions
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts.BaseFrame
 
-<!DOCTYPE html>      
+<!DOCTYPE html>
 
 @{
     Model.IsMobile = Model.Request.IsMobile();
@@ -12,10 +12,24 @@
     <title>@Model.Title</title>         
     <link rel="stylesheet" type="text/css" href="~/css/styles.css">
     <link rel="stylesheet" type="text/css" href="~/css/semantic.min.css">
+    <script>
+        // Set the outer frame's height in case page changed
+        function setHeight() {
+            let height = document.querySelector("div").scrollHeight;
+            if (height === 0) return;
+            
+            window.frameElement.style.height = height + "px";
+        }
+        window.addEventListener("DOMContentLoaded", setHeight);
+        window.addEventListener("load", setHeight);
+
+    </script>
 </head>
 <body>
 <div>
     @RenderBody()
+    
+    @await RenderSectionAsync("Pagination", false)
 </div>
 </body>
 </html>

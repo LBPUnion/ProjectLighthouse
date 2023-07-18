@@ -132,12 +132,8 @@
 
 <div class="ui grid">
     @{
-        string outerDiv = isMobile ?
-            "horizontal-scroll" :
-            "three wide column";
-        string innerDiv = isMobile ?
-            "ui top attached tabular menu horizontal-scroll" :
-            "ui vertical fluid tabular menu";
+        string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
+        string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
     }
     <div class="@outerDiv">
         <div class="@innerDiv">
@@ -168,26 +164,37 @@
         string divLength = isMobile ? "sixteen" : "thirteen";
     }
     <div class="@divLength wide stretched column">
-        <div class="lh-content" id="lh-comments">
+        <div class="ui fluid placeholder" id="lh-placeholder">
+            @for (int i = 0; i < 3; i++)
+            {
+                <div class="paragraph">
+                    @for (int j = 0; j < 5; j++)
+                    {
+                        <div class="line"></div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="lh-content hidden" id="lh-comments">
             @await Html.PartialAsync("Partials/FramePartial", ($"/comments/user/{Model.ProfileUser.UserId}", "Comments"))
         </div>
-        <div class="lh-content" id="lh-photos" style="display: none">
+        <div class="lh-content hidden" id="lh-photos">
             @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.ProfileUser.UserId}", "Photos"))
         </div>
-        <div class="lh-content" id="lh-levels" style="display: none">      
-            @await Html.PartialAsync("Partials/FramePartial", ($"/slots/by/{Model.ProfileUser.UserId}", "Slots"))
+        <div class="lh-content hidden" id="lh-levels">
+            @await Html.PartialAsync("Partials/FramePartial", ($"/slots/by/{Model.ProfileUser.UserId}", "Published Slots"))
         </div>
-        <div class="lh-content" id="lh-playlists" style="display: none">
+        <div class="lh-content hidden" id="lh-playlists">
             <div class="ui purple segment">
                 <p>@Model.Translate(GeneralStrings.Soon)</p>
             </div>
         </div>
         @if (Model.User == Model.ProfileUser)
         {
-            <div class="lh-content" id="lh-hearted" style="display: none">
+            <div class="lh-content hidden" id="lh-hearted">
                 @await Html.PartialAsync("Partials/FramePartial", ($"/slots/hearted/{Model.ProfileUser.UserId}", "Hearted Slots"))
             </div>
-            <div class="lh-content" id="lh-queued" style="display: none">
+            <div class="lh-content hidden" id="lh-queued">
                 @await Html.PartialAsync("Partials/FramePartial", ($"/slots/queued/{Model.ProfileUser.UserId}", "Queued Slots"))
             </div>
         }

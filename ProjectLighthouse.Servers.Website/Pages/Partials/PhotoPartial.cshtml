@@ -28,7 +28,7 @@
           }
         </script>
     }
-    <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId" width="1920" height="1080"
+    <canvas class="hide-subjects" id="canvas-subjects-@Model.PhotoId"
             style="position: absolute; transform: rotate(180deg)">
     </canvas>
     <img id="game-image-@Model.PhotoId" src="/gameAssets/@Model.LargeHash"
@@ -53,7 +53,9 @@
                 case SlotType.User:
                     <span>
                         @(Model.Slot.IsAdventurePlanet ? "on an adventure in" : "in level")
-                        <b><a href="/slot/@Model.SlotId">@HttpUtility.HtmlDecode(Model.Slot.Name)</a></b>
+                        <b>
+                            <a href="/slot/@Model.SlotId" target="_top">@HttpUtility.HtmlDecode(Model.Slot.Name)</a>
+                        </b>
                     </span>
                     break;
                 case SlotType.Developer:
@@ -93,11 +95,14 @@
     GamePhotoSubject[] subjects = Model.PhotoSubjects.Select(GamePhotoSubject.CreateFromEntity).ToArray();
     foreach (GamePhotoSubject subject in subjects)
     {
+        subject.Bounds ??= "";
         subject.Username = Model.PhotoSubjects.Where(ps => ps.UserId == subject.UserId).Select(ps => ps.User.Username).First();
     }
 }
 
-<script>
+@if (subjects.Length > 0)
+{
+    <script>
     // render the page first so that image heights have been calculated
     window.addEventListener("load", function () {
         const canvas = document.getElementById("canvas-subjects-@Model.PhotoId");
@@ -185,4 +190,5 @@
             context.setTransform(1, 0, 0, 1, 0, 0);
         })
     }, false);
-</script>
+    </script>
+}

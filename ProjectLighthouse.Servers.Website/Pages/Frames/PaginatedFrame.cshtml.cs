@@ -19,7 +19,7 @@ public abstract class PaginatedFrame : BaseFrame
         {
             MaxElements = this.ItemsPerPage,
             PageSize = this.ItemsPerPage,
-            PageStart = (this.CurrentPage - 1) * this.ItemsPerPage,
+            PageStart = (this.CurrentPage - 1) * this.ItemsPerPage + 1,
             TotalElements = this.TotalItems,
         };
 

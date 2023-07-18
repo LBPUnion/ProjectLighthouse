@@ -41,20 +41,20 @@ public class CommentFrame : PaginatedFrame
         {
             case CommentType.Level:
             {
-                this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
                 SlotEntity? slot = await this.Database.Slots.FindAsync(id);
                 if (slot == null) return this.BadRequest();
                 this.PageOwner = slot.CreatorId;
-                this.CommentsEnabled &= slot.CommentsEnabled;
+                this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled &&
+                                       slot.CommentsEnabled;
                 break;
             }
             case CommentType.Profile:
             {
-                this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
                 UserEntity? user = await this.Database.Users.FindAsync(id);
                 if (user == null) return this.BadRequest();
                 this.PageOwner = user.UserId;
-                this.CommentsEnabled &= user.CommentsEnabled;
+                this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled &&
+                                       user.CommentsEnabled;
                 break;
             }
             default: return this.BadRequest();
@@ -75,16 +75,12 @@ public class CommentFrame : PaginatedFrame
 
             this.Comments = await commentQuery.OrderByDescending(c => c.Timestamp)
                 .ApplyPagination(this.PageData)
-                .ToDictionaryAsync(c => c, _ => (RatedCommentEntity?)null);
-
-            if (this.User == null) return this.Page();
-
-            foreach (KeyValuePair<CommentEntity, RatedCommentEntity?> kvp in this.Comments)
-            {
-                RatedCommentEntity? reaction = await this.Database.RatedComments.FirstOrDefaultAsync(r =>
-                    r.UserId == this.User.UserId && r.CommentId == kvp.Key.CommentId);
-                this.Comments[kvp.Key] = reaction;
-            }
+                .Select(c => new
+                {
+                    Comment = c,
+                    YourRating = this.Database.RatedComments.FirstOrDefault(r => r.CommentId == c.CommentId),
+                })
+                .ToDictionaryAsync(c => c.Comment, c => c.YourRating);
         }
         else
         {

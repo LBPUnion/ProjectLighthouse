@@ -42,7 +42,7 @@
             <img class="cardIcon slotCardIcon" src="@ServerConfiguration.Instance.ExternalUrl/gameAssets/@faceHash" alt="@faceAlt" title="@faceAlt" style="min-width: @(size)px; width: @(size)px; height: @(size)px">
         </div>
         <div class="cardStats">
-            <a href="/user/@review.Reviewer?.UserId">
+            <a href="/user/@review.Reviewer?.UserId" target="_top">
                 <h3 style="margin-bottom: 5px;">@review.Reviewer?.Username</h3>
             </a>
             @if (review.Deleted)

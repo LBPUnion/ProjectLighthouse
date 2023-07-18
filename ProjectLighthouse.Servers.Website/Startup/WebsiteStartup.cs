@@ -142,6 +142,8 @@ public class WebsiteStartup
 
         app.UseRequestLocalization();
 
+        app.UseResponseCaching();
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();

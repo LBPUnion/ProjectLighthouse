@@ -100,15 +100,11 @@
         <br/>
     }
 </div>
-    
+
 <div class="ui grid">
     @{
-        string outerDiv = isMobile ?
-            "horizontal-scroll" :
-            "three wide column";
-        string innerDiv = isMobile ?
-            "ui top attached tabular menu horizontal-scroll" :
-            "ui vertical fluid tabular menu";
+        string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
+        string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
     }
     <div class="@outerDiv">
         <div class="@innerDiv">
@@ -131,25 +127,36 @@
         string divLength = isMobile ? "sixteen" : "thirteen";
     }
     <div class="@divLength wide stretched column">
-        <div class="lh-content" id="lh-comments">
+        <div class="ui fluid placeholder" id="lh-placeholder">
+            @for (int i = 0; i < 3; i++)
+            {
+                <div class="paragraph">
+                    @for (int j = 0; j < 5; j++)
+                    {
+                        <div class="line"></div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="lh-content hidden" id="lh-comments">
             @await Html.PartialAsync("Partials/FramePartial", ($"/comments/slot/{Model.Slot?.SlotId}", "Comments"))
         </div>
-        <div class="lh-content" id="lh-photos" style="display: none">
+        <div class="lh-content hidden" id="lh-photos">
             @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.Slot?.SlotId}", "Photos"))
         </div>
-        <div class="lh-content" id="lh-reviews" style="display: none">
+        <div class="lh-content hidden" id="lh-reviews">
             @await Html.PartialAsync("Partials/FramePartial", ($"/reviews/{Model.Slot?.SlotId}", "Reviews"))
         </div>
-        <div class="lh-content" id="lh-scores" style="display: none">
+        <div class="lh-content hidden" id="lh-scores">
             @await Html.PartialAsync("Partials/FramePartial", ($"/scores/{Model.Slot?.SlotId}", "Scores"))
         </div>
     </div>
 </div>
 
-    @if (isMobile)
-    {
-        <br/>
-    }
+@if (isMobile)
+{
+    <br/>
+}
 
 @if (Model.User != null && Model.User.IsModerator)
 {
@@ -181,7 +188,7 @@
                 <span>Delete</span>
             </div>
         </a>
-        
+
         @if (!Model.Slot!.Hidden)
         {
             <a href="/moderation/newCase?type=@((int)CaseType.LevelHide)&affectedId=@Model.Slot?.SlotId">
@@ -191,7 +198,7 @@
                 </div>
             </a>
         }
-        
+
         @if (!Model.Slot!.InitiallyLocked && !Model.Slot!.LockedByModerator)
         {
             <a href="/moderation/newCase?type=@((int)CaseType.LevelLock)&affectedId=@Model.Slot?.SlotId">
@@ -201,7 +208,7 @@
                 </div>
             </a>
         }
-        
+
         @if (Model.Slot!.CommentsEnabled)
         {
             <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.LevelDisableComments)&affectedId=@Model.Slot?.SlotId">
