@@ -44,8 +44,8 @@ public class UserPage : BaseLayout
         if (this.ProfileUser == null) return this.NotFound();
 
         // Determine if user can view profile according to profileUser's privacy settings
-        this.IsProfilePrivate = this.ProfileUser.ProfileVisibility.IsPrivate(this.User);
-        this.IsSlotsPrivate = this.ProfileUser.LevelVisibility.IsPrivate(this.User);
+        this.IsProfilePrivate = this.ProfileUser.ProfileVisibility.IsPrivate(this.User != null, this.ProfileUser == this.User);
+        this.IsSlotsPrivate = this.ProfileUser.LevelVisibility.IsPrivate(this.User != null, this.ProfileUser == this.User);
 
         this.Photos = await this.Database.Photos.Include(p => p.Slot)
             .Include(p => p.PhotoSubjects)

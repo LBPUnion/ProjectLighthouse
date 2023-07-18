@@ -1,5 +1,3 @@
-using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
-
 namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 /// <summary>
@@ -48,13 +46,13 @@ public static class PrivacyTypeExtensions
         };
     }
     
-    public static bool IsPrivate(this PrivacyType type, UserEntity user)
+    public static bool IsPrivate(this PrivacyType type, bool isSignedIn, bool isOwner)
     {
-        return type switch                                   
+        return type switch
         {
             PrivacyType.All => false,
-            PrivacyType.PSN => user == null || !user.IsModerator, 
-            PrivacyType.Game => !user.IsModerator,
+            PrivacyType.PSN => !isOwner || !isSignedIn,
+            PrivacyType.Game => !isOwner,
             _ => false,
         };
     }

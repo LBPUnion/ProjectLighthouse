@@ -37,7 +37,7 @@ public class SlotPage : BaseLayout
         System.Diagnostics.Debug.Assert(slot.Creator != null);
 
         // Determine if user can view slot according to creator's privacy settings
-        this.IsSlotPrivate = slot.Creator.LevelVisibility.IsPrivate(this.User);
+        this.IsSlotPrivate = slot.Creator.LevelVisibility.IsPrivate(this.User != null, slot.Creator == this.User);
 
         if ((slot.Hidden || slot.SubLevel && (this.User == null && this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
             return this.NotFound();
