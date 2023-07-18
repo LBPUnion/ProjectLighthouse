@@ -22,7 +22,7 @@ public class SlotPage : BaseLayout
     public bool CommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
 
-    public bool SlotPrivate;
+    public bool IsSlotPrivate;
 
     public SlotEntity? Slot;
     public SlotPage(DatabaseContext database) : base(database)
@@ -37,32 +37,7 @@ public class SlotPage : BaseLayout
         System.Diagnostics.Debug.Assert(slot.Creator != null);
 
         // Determine if user can view slot according to creator's privacy settings
-        if (this.User == null || !this.User.IsAdmin)
-        {
-            switch (slot.Creator.LevelVisibility)
-            {
-                case PrivacyType.Game:
-                {
-                    if (this.User == null || slot.Creator != this.User) this.SlotPrivate = true;
-                    break;
-                }
-                case PrivacyType.PSN:
-                {
-                    if (this.User == null) this.SlotPrivate = true;
-                    break;
-                }
-                case PrivacyType.All:
-                {
-                    this.SlotPrivate = false;
-                    break;
-                }
-                default:
-                {
-                    this.SlotPrivate = false;
-                    break;
-                }
-            }
-        }
+        this.IsSlotPrivate = slot.Creator.LevelVisibility.IsPrivate(this.User);
 
         if ((slot.Hidden || slot.SubLevel && (this.User == null && this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
             return this.NotFound();

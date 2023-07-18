@@ -37,8 +37,7 @@ public class UsersPage : BaseLayout
 
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount) return this.Redirect($"/users/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
-        this.Users = await this.Database.Users
-            .Where(u => u.Username.Contains(this.SearchValue))
+        this.Users = await this.Database.Users.Where(u => u.Username.Contains(this.SearchValue))
             .Where(u => u.PermissionLevel != PermissionLevel.Banned)
             .OrderByDescending(b => b.UserId)
             .Skip(pageNumber * ServerStatics.PageSize)

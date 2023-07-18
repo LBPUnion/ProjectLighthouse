@@ -24,7 +24,7 @@ public class UserPrivacyPage : BaseLayout
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
 
-        if (this.User == null) return this.Redirect("~/user/" + userId);
+        if (this.User == null) return this.Redirect("~/login");
         if (this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
         this.BlockedUsers = await this.Database.BlockedProfiles.Where(b => b.UserId == this.ProfileUser.UserId)
@@ -39,12 +39,12 @@ public class UserPrivacyPage : BaseLayout
         return this.Page();
     }
 
-    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string profilePrivacyLevel, [FromForm] string profileCommentsEnabled, [FromForm] string slotPrivacyLevel)
+    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string profilePrivacyLevel, [FromForm] bool profileCommentsEnabled, [FromForm] string slotPrivacyLevel)
     {
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
 
-        if (this.User == null) return this.Redirect("~/user/" + userId);
+        if (this.User == null) return this.Redirect("~/login");
         if (this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
         this.CommentsDisabledByModerator = await this.Database.Cases.Where(c => c.AffectedId == this.ProfileUser.UserId)
@@ -54,36 +54,25 @@ public class UserPrivacyPage : BaseLayout
 
         if (!this.CommentsDisabledByModerator)
         {
-            this.ProfileUser.CommentsEnabled = profileCommentsEnabled switch
-            {
-                "true" => true,
-                "false" => false,
-                _ => this.ProfileUser.CommentsEnabled,
-            };
-        }
-        else
-        {
-            this.ProfileUser.CommentsEnabled = false;
+            this.ProfileUser.CommentsEnabled = profileCommentsEnabled;
         }
 
-        this.ProfileUser.ProfileVisibility = profilePrivacyLevel switch
-        {
-            "public" => PrivacyType.All,
-            "signedInOnly" => PrivacyType.PSN,
-            "inGameOnly" => PrivacyType.Game,
-            _ => this.ProfileUser.ProfileVisibility,
-        };
-
-        this.ProfileUser.LevelVisibility = slotPrivacyLevel switch
-        {
-            "public" => PrivacyType.All,
-            "signedInOnly" => PrivacyType.PSN,
-            "inGameOnly" => PrivacyType.Game,
-            _ => this.ProfileUser.LevelVisibility,
-        };
+        this.ProfileUser.ProfileVisibility = PrivacyTypeFromString(profilePrivacyLevel);
+        this.ProfileUser.LevelVisibility = PrivacyTypeFromString(slotPrivacyLevel);
 
         await this.Database.SaveChangesAsync();
 
         return this.Redirect($"~/user/{userId}");
+    }
+
+    private static PrivacyType PrivacyTypeFromString(string type)
+    {
+        return type switch
+        {
+            "all" => PrivacyType.All,
+            "psn" => PrivacyType.PSN,
+            "game" => PrivacyType.Game,
+            _ => PrivacyType.All,
+        };
     }
 }

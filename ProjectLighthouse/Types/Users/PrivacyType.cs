@@ -1,3 +1,5 @@
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+
 namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 /// <summary>
@@ -21,6 +23,17 @@ public enum PrivacyType
 
 public static class PrivacyTypeExtensions
 {
+    public static string ToReadableString(this PrivacyType type, string area)
+    {
+        return type switch
+        {
+            PrivacyType.All => $"Share your {area} with everyone!",
+            PrivacyType.PSN => $"Only share your {area} with users who are signed into the website or playing in-game.",
+            PrivacyType.Game => $"Only share your {area} with users who are playing in-game.",
+            _ => null,
+        };
+    }
+    
     public static string ToSerializedString(this PrivacyType type) 
         => type.ToString().ToLower();
 
@@ -32,6 +45,17 @@ public static class PrivacyTypeExtensions
             "game" => PrivacyType.Game,
             "all" => PrivacyType.All,
             _ => null,
+        };
+    }
+    
+    public static bool IsPrivate(this PrivacyType type, UserEntity user)
+    {
+        return type switch                                   
+        {
+            PrivacyType.All => false,
+            PrivacyType.PSN => user == null || !user.IsModerator, 
+            PrivacyType.Game => !user.IsModerator,
+            _ => false,
         };
     }
 }

@@ -23,15 +23,12 @@
                 <div class="field">
                     <label style="text-align: left" for="profilePrivacyLevel">Privacy Level</label>
                     <select class="ui fluid dropdown" type="text" name="profilePrivacyLevel" id="profilePrivacyLevel">
-                        <option value="public" @(Model.ProfileUser.ProfileVisibility == PrivacyType.All ? "selected" : "")>
-                            Share your profile with everyone!
-                        </option>
-                        <option value="signedInOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.PSN ? "selected" : "")>
-                            Only share your profile with users who are signed into the website or playing in-game.
-                        </option>
-                        <option value="inGameOnly" @(Model.ProfileUser.ProfileVisibility == PrivacyType.Game ? "selected" : "")>
-                            Only share your profile with users who are playing in-game.
-                        </option>
+                        @foreach (PrivacyType type in Enum.GetValues(typeof(PrivacyType)))
+                        {
+                            <option value="@type.ToString()" @(Model.ProfileUser.ProfileVisibility == type ? "selected" : "")>
+                                @type.ToReadableString("profile")
+                            </option>
+                        }
                     </select>
                 </div>
                 <div class="field">
@@ -39,7 +36,7 @@
                         Comments
                         @if (Model.CommentsDisabledByModerator)
                         {
-                            <small style="color: red">Locked by a moderator</small>
+                            <small class="ui red text">Locked by a moderator</small>
                         }
                     </label>
                     <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="profileCommentsEnabled" id="profileCommentsEnabled">
@@ -55,15 +52,12 @@
                 <div class="field">
                     <label style="text-align: left" for="slotPrivacyLevel">Privacy Level</label>
                     <select class="ui fluid dropdown" type="text" name="slotPrivacyLevel" id="slotPrivacyLevel">
-                        <option value="public" @(Model.ProfileUser.LevelVisibility == PrivacyType.All ? "selected" : "")>
-                            Share your levels with everyone!
-                        </option>
-                        <option value="signedInOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.PSN ? "selected" : "")>
-                            Only share your levels with users who are signed into the website or playing in-game.
-                        </option>
-                        <option value="inGameOnly" @(Model.ProfileUser.LevelVisibility == PrivacyType.Game ? "selected" : "")>
-                            Only share your levels with users who are playing in-game.
-                        </option>
+                        @foreach (PrivacyType type in Enum.GetValues(typeof(PrivacyType)))
+                        {
+                            <option value="@type.ToString()" @(Model.ProfileUser.LevelVisibility == type ? "selected" : "")>
+                                @type.ToReadableString("levels")
+                            </option>
+                        }
                     </select>
                 </div>
                 <div class="ui divider"></div>

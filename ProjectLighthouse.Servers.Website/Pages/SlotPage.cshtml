@@ -58,7 +58,7 @@
 @await Model.Slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{Model.Slot?.SlotId}", language, timeZone, isMobile)
 <br>
 
-@if (Model.SlotPrivate)
+@if (Model.IsSlotPrivate)
 {
     <div class="ui red segment">
         <p>

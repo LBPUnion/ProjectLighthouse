@@ -18,23 +18,22 @@ public class UserPage : BaseLayout
     public Dictionary<CommentEntity, RatedCommentEntity?> Comments = new();
 
     public bool CommentsEnabled;
-
-    public List<SlotEntity>? HeartedSlots;
-
-    public bool IsProfileUserBlocked;
+    public bool CommentsDisabledByModerator;
 
     public bool IsProfileUserHearted;
 
-    public List<PhotoEntity>? Photos;
+    public bool IsProfileUserBlocked;
 
-    public UserEntity? ProfileUser;
-    public List<SlotEntity>? QueuedSlots;
+    public List<PhotoEntity>? Photos;
     public List<SlotEntity>? Slots;
 
-    public bool ProfilePrivate;
-    public bool SlotsPrivate;
-    
-    public bool CommentsDisabledByModerator;
+    public List<SlotEntity>? HeartedSlots;
+    public List<SlotEntity>? QueuedSlots;
+
+    public UserEntity? ProfileUser;
+
+    public bool IsProfilePrivate;
+    public bool IsSlotsPrivate;
 
     public UserPage(DatabaseContext database) : base(database)
     { }
@@ -45,57 +44,8 @@ public class UserPage : BaseLayout
         if (this.ProfileUser == null) return this.NotFound();
 
         // Determine if user can view profile according to profileUser's privacy settings
-        if (this.User == null || !this.User.IsModerator)
-        {
-            switch (this.ProfileUser.ProfileVisibility)
-            {
-                case PrivacyType.Game:
-                {
-                    if (this.ProfileUser != this.User) this.ProfilePrivate = true;
-                    break;
-                }
-                case PrivacyType.PSN:
-                {
-                    if (this.User == null) this.ProfilePrivate = true;
-                    break;
-                }
-                case PrivacyType.All:
-                {
-                    this.ProfilePrivate = false;
-                    break;
-                }
-                default:
-                {
-                    this.ProfilePrivate = false;
-                    break;
-                }
-            }
-
-            // Determine if user can view levels according to profileUser's privacy settings
-            switch (this.ProfileUser.LevelVisibility)
-            {
-                case PrivacyType.Game:
-                {
-                    if (this.ProfileUser != this.User) this.SlotsPrivate = true;
-                    break;
-                }
-                case PrivacyType.PSN:
-                {
-                    if (this.User == null) this.SlotsPrivate = true;
-                    break;
-                }
-                case PrivacyType.All:
-                {
-                    this.SlotsPrivate = false;
-                    break;
-                }
-                default:
-                {
-                    this.SlotsPrivate = false;
-                    break;
-                }
-            }
-        }
+        this.IsProfilePrivate = this.ProfileUser.ProfileVisibility.IsPrivate(this.User);
+        this.IsSlotsPrivate = this.ProfileUser.LevelVisibility.IsPrivate(this.User);
 
         this.Photos = await this.Database.Photos.Include(p => p.Slot)
             .Include(p => p.PhotoSubjects)
@@ -157,22 +107,19 @@ public class UserPage : BaseLayout
 
         foreach (KeyValuePair<CommentEntity, RatedCommentEntity?> kvp in this.Comments)
         {
-            RatedCommentEntity? reaction = await this.Database.RatedComments
-                .Where(r => r.CommentId == kvp.Key.CommentId)
+            RatedCommentEntity? reaction = await this.Database.RatedComments.Where(r => r.CommentId == kvp.Key.CommentId)
                 .Where(r => r.UserId == this.User.UserId)
                 .FirstOrDefaultAsync();
             this.Comments[kvp.Key] = reaction;
         }
 
-        this.IsProfileUserHearted = await this.Database.HeartedProfiles
-            .Where(h => h.HeartedUserId == this.ProfileUser.UserId)
+        this.IsProfileUserHearted = await this.Database.HeartedProfiles.Where(h => h.HeartedUserId == this.ProfileUser.UserId)
             .Where(h => h.UserId == this.User.UserId)
             .AnyAsync();
 
         this.IsProfileUserBlocked = await this.Database.IsUserBlockedBy(this.ProfileUser.UserId, this.User.UserId);
 
-        this.CommentsDisabledByModerator = await this.Database.Cases
-            .Where(c => c.AffectedId == this.ProfileUser.UserId)
+        this.CommentsDisabledByModerator = await this.Database.Cases.Where(c => c.AffectedId == this.ProfileUser.UserId)
             .Where(c => c.Type == CaseType.UserDisableComments)
             .Where(c => c.DismissedAt == null)
             .AnyAsync();
