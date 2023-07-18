@@ -44,10 +44,10 @@ public class LighthouseWebTest : IDisposable
         this.Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
     }
 
-    protected static string Translate(TranslatableString translatableString) => translatableString.Translate("en");
+    protected static string Translate(TranslatableString translatableString) => translatableString.Translate(LocalizationManager.DefaultLang);
 
     protected static string Translate(TranslatableString translatableString, params object?[] objects) =>
-        translatableString.Translate("en", objects);
+        translatableString.Translate(LocalizationManager.DefaultLang, objects);
 
     public void Dispose()
     {
