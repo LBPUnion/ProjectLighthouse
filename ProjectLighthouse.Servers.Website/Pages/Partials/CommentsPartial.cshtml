@@ -13,7 +13,7 @@
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
     int pageOwnerId = (int?)ViewData["PageOwner"] ?? 0;
     string baseUrl = (string?)ViewData["BaseUrl"] ?? Url.RouteUrl(ViewContext.RouteData.Values) ?? "~/";
-    string? redirectUrl = (string?)ViewData["RedirectUrl"];
+    string redirectUrl = (string?)ViewData["RedirectUrl"] ?? "";
 }
 
 

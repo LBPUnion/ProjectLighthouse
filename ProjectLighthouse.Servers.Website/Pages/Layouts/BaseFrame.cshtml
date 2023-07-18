@@ -17,8 +17,12 @@
         function setHeight() {
             let height = document.querySelector("div").scrollHeight;
             if (height === 0) return;
-            
+
             window.frameElement.style.height = height + "px";
+            if (!window.frameElement.parentElement.classList.contains("hidden")) return;
+
+            window.frameElement.parentElement.style.display = "none";
+            window.frameElement.parentElement.classList.remove("hidden");
         }
         window.addEventListener("DOMContentLoaded", setHeight);
         window.addEventListener("load", setHeight);

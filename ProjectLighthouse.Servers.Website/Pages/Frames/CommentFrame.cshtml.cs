@@ -73,12 +73,14 @@ public class CommentFrame : PaginatedFrame
 
             this.ClampPage();
 
+            int userId = this.User?.UserId ?? 0;
+
             this.Comments = await commentQuery.OrderByDescending(c => c.Timestamp)
                 .ApplyPagination(this.PageData)
                 .Select(c => new
                 {
                     Comment = c,
-                    YourRating = this.Database.RatedComments.FirstOrDefault(r => r.CommentId == c.CommentId),
+                    YourRating = this.Database.RatedComments.FirstOrDefault(r => r.CommentId == c.CommentId && r.UserId == userId),
                 })
                 .ToDictionaryAsync(c => c.Comment, c => c.YourRating);
         }

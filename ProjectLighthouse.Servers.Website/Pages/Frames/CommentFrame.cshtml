@@ -32,7 +32,7 @@
                        "BaseUrl", $"/{Model.Type}/{Model.Id}"
                    },
                    {
-                       "RedirectUrl", $"/comments/{Model.Type}/{Model.Id}"
+                       "RedirectUrl", $"/comments/{Model.Type}/{Model.Id}?page=" + Model.CurrentPage
                    },
                })
     }

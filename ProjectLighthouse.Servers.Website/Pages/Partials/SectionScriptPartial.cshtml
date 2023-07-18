@@ -1,4 +1,4 @@
-<script>
+<script data-cfasync="false" type="text/javascript">
 const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
 const contentElements = Array.from(document.querySelectorAll(".lh-content"));
 
@@ -60,10 +60,6 @@ for (let element of contentElements){
     if (frame !== null){
        frame.contentWindow.addEventListener("load", () => {
            let contentItem = frame.parentElement;
-           
-           frame.style.height = getHeight(frame) + 'px';
-           frame.parentElement.classList.remove('hidden');
-           frame.parentElement.style.display = 'none';
 
            loadedContent[contentItem.id] = true;
 
