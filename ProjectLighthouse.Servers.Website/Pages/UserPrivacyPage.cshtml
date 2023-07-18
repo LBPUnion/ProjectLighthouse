@@ -25,7 +25,7 @@
                     <select class="ui fluid dropdown" type="text" name="profilePrivacyLevel" id="profilePrivacyLevel">
                         @foreach (PrivacyType type in Enum.GetValues(typeof(PrivacyType)))
                         {
-                            <option value="@type.ToString()" @(Model.ProfileUser.ProfileVisibility == type ? "selected" : "")>
+                            <option value="@type.ToSerializedString()" @(Model.ProfileUser.ProfileVisibility == type ? "selected" : "")>
                                 @type.ToReadableString("profile")
                             </option>
                         }
@@ -54,7 +54,7 @@
                     <select class="ui fluid dropdown" type="text" name="slotPrivacyLevel" id="slotPrivacyLevel">
                         @foreach (PrivacyType type in Enum.GetValues(typeof(PrivacyType)))
                         {
-                            <option value="@type.ToString()" @(Model.ProfileUser.LevelVisibility == type ? "selected" : "")>
+                            <option value="@type.ToSerializedString()" @(Model.ProfileUser.LevelVisibility == type ? "selected" : "")>
                                 @type.ToReadableString("levels")
                             </option>
                         }
