@@ -113,7 +113,7 @@
     {
         <br/>
     }
-    @if (!Model.IsProfilePrivate)
+    @if (!Model.CanAccessProfile)
     {
         <div class="eight wide column">
             <div class="ui blue segment">
@@ -145,7 +145,7 @@
     }
 </div>
 
-@if (Model.IsProfilePrivate)
+@if (!Model.CanAccessProfile)
 {
     <div class="ui red segment">
         <p>
@@ -235,7 +235,7 @@ else
                 </div>
             </div>
             <div class="lh-content" id="lh-levels">
-                @if (Model.IsSlotsPrivate)
+                @if (Model.CanAccessSlots)
                 {
                     <div class="ui red segment">
                         <p>

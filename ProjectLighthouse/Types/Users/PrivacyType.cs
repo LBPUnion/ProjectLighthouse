@@ -45,14 +45,14 @@ public static class PrivacyTypeExtensions
             _ => null,
         };
     }
-    
-    public static bool IsPrivate(this PrivacyType type, bool isSignedIn, bool isOwner)
+
+    public static bool CanAccess(this PrivacyType type, bool authenticated, bool owner)
     {
         return type switch
         {
-            PrivacyType.All => false,
-            PrivacyType.PSN => !isOwner || !isSignedIn,
-            PrivacyType.Game => !isOwner,
+            PrivacyType.All => true,
+            PrivacyType.PSN => authenticated,
+            PrivacyType.Game => authenticated && owner,
             _ => false,
         };
     }
