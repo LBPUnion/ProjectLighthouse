@@ -46,10 +46,10 @@ public class UserPage : BaseLayout
         // Determine if user can view profile according to profileUser's privacy settings
         this.CanAccessProfile = this.ProfileUser.ProfileVisibility.CanAccess(
             this.User != null, 
-            this.ProfileUser == this.User || !(this.User != null && this.User.IsModerator));
+            this.ProfileUser == this.User || this.User != null && this.User.IsModerator);
         this.CanAccessSlots = this.ProfileUser.LevelVisibility.CanAccess(
             this.User != null, 
-            this.ProfileUser == this.User || !(this.User != null && this.User.IsModerator));
+            this.ProfileUser == this.User || this.User != null && this.User.IsModerator);
 
         this.Photos = await this.Database.Photos.Include(p => p.Slot)
             .Include(p => p.PhotoSubjects)

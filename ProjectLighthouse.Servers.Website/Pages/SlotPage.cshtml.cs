@@ -39,7 +39,7 @@ public class SlotPage : BaseLayout
         // Determine if user can view slot according to creator's privacy settings
         this.CanAccessSlot = slot.Creator.LevelVisibility.CanAccess(
             this.User != null, 
-            slot.Creator == this.User || !(this.User != null && this.User.IsModerator));
+            slot.Creator == this.User || this.User != null && this.User.IsModerator);
 
         if ((slot.Hidden || slot.SubLevel && (this.User == null && this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
             return this.NotFound();

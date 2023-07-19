@@ -113,7 +113,7 @@
     {
         <br/>
     }
-    @if (!Model.CanAccessProfile)
+    @if (Model.CanAccessProfile)
     {
         <div class="eight wide column">
             <div class="ui blue segment">
@@ -235,7 +235,7 @@ else
                 </div>
             </div>
             <div class="lh-content" id="lh-levels">
-                @if (Model.CanAccessSlots)
+                @if (!Model.CanAccessSlots)
                 {
                     <div class="ui red segment">
                         <p>
