@@ -57,12 +57,15 @@ public class CommentEntity
 
         UserEntity deletedBy = database.Users.FirstOrDefault(u => u.Username == this.DeletedBy);
 
-        if (deletedBy == null) return "This comment has been deleted";
+        if (deletedBy == null) return "This comment has been deleted.";
 
         // If the owner of the comment section deletes
         if (deletedBy.UserId == this.TargetUserId || deletedBy.UserId == database.Slots.Find(this.TargetSlotId)?.CreatorId)
             return "This comment has been deleted by the player.";
 
-        return "This comment has been deleted";
+        if (this.DeletedType == "moderator" && deletedBy.IsModerator)
+            return "This comment has been deleted by a moderator.";
+
+        return "This comment has been deleted.";
     }
 }
