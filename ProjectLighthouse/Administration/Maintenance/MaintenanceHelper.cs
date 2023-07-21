@@ -112,7 +112,7 @@ public static class MaintenanceHelper
         }
         stopwatch.Stop();
 
-        Logger.Success($"Successfully completed LH migration {migrationTask.Name()} in {stopwatch.ElapsedMilliseconds}", LogArea.Database);
+        Logger.Success($"Successfully completed LH migration {migrationTask.Name()} in {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
         CompletedMigrationEntity completedMigration = new()
         {

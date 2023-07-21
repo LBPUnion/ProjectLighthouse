@@ -110,17 +110,22 @@ public class SwitchScoreToUserIdMigration : MigrationTask
         // Delete all existing scores
         await database.Scores.ExecuteDeleteAsync();
 
-        StringBuilder insertionScript = new();
-        // This is significantly faster than using standard EntityFramework Add and Save albeit a little wacky
-        foreach (ScoreEntity score in newScores)
-        {
-            insertionScript.AppendLine($"""
-                    insert into Scores (ScoreId, SlotId, Type, Points, ChildSlotId, Timestamp, UserId) 
-                    values('{score.ScoreId}', '{score.SlotId}', '{score.Type}', '', '{score.Points}', '{score.ChildSlotId}', '{score.Timestamp}', '{score.UserId}');
-                    """);
-        }
+        long timestamp = TimeHelper.TimestampMillis;
 
-        await database.Database.ExecuteSqlRawAsync(insertionScript.ToString());
+        // This is significantly faster than using standard EntityFramework Add and Save albeit a little wacky
+        foreach (ScoreEntity[] scoreChunk in newScores.Chunk(50_000))
+        {
+            StringBuilder insertionScript = new();
+            foreach (ScoreEntity score in scoreChunk)
+            {
+                insertionScript.AppendLine($"""
+                    insert into Scores (ScoreId, SlotId, Type, Points, ChildSlotId, Timestamp, UserId) 
+                    values('{score.ScoreId}', '{score.SlotId}', '{score.Type}', '{score.Points}', '{score.ChildSlotId}', '{timestamp}', '{score.UserId}');
+                    """);
+            }
+
+            await database.Database.ExecuteSqlRawAsync(insertionScript.ToString());
+        }
     }
 
     public override async Task<bool> Run(DatabaseContext database)
@@ -213,7 +218,8 @@ public class SwitchScoreToUserIdMigration : MigrationTask
                 SlotId = slot.SlotId,
                 ChildSlotId = slotGroup.Key,
                 Points = kvp.Value,
-                Timestamp = TimeHelper.TimestampMillis,
+                // This gets set before insertion
+                Timestamp = 0L,
                 Type = scoreType,
             }).ToList();
     }

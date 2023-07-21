@@ -18,7 +18,7 @@ namespace ProjectLighthouse.Migrations
                 table: "Scores",
                 type: "bigint",
                 nullable: false,
-                defaultValue: TimeHelper.TimestampMillis);
+                defaultValue: 0L);
 
             migrationBuilder.AddColumn<int>(
                 name: "UserId",
