@@ -1,4 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Helpers;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -17,7 +18,7 @@ namespace ProjectLighthouse.Migrations
                 table: "Scores",
                 type: "bigint",
                 nullable: false,
-                defaultValue: 0L);
+                defaultValue: TimeHelper.TimestampMillis);
 
             migrationBuilder.AddColumn<int>(
                 name: "UserId",
