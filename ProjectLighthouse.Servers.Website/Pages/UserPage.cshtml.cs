@@ -32,8 +32,8 @@ public class UserPage : BaseLayout
 
     public UserEntity? ProfileUser;
 
-    public bool CanAccessProfile;
-    public bool CanAccessSlots;
+    public bool CanViewProfile;
+    public bool CanViewSlots;
 
     public UserPage(DatabaseContext database) : base(database)
     { }
@@ -43,13 +43,12 @@ public class UserPage : BaseLayout
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
 
+        bool isAuthenticated = this.User != null;
+        bool isOwner = this.ProfileUser == this.User || this.User != null && this.User.IsModerator;
+        
         // Determine if user can view profile according to profileUser's privacy settings
-        this.CanAccessProfile = this.ProfileUser.ProfileVisibility.CanAccess(
-            this.User != null, 
-            this.ProfileUser == this.User || this.User != null && this.User.IsModerator);
-        this.CanAccessSlots = this.ProfileUser.LevelVisibility.CanAccess(
-            this.User != null, 
-            this.ProfileUser == this.User || this.User != null && this.User.IsModerator);
+        this.CanViewProfile = this.ProfileUser.ProfileVisibility.CanAccess(isAuthenticated, isOwner);
+        this.CanViewSlots = this.ProfileUser.LevelVisibility.CanAccess(isAuthenticated, isOwner);
 
         this.Photos = await this.Database.Photos.Include(p => p.Slot)
             .Include(p => p.PhotoSubjects)
