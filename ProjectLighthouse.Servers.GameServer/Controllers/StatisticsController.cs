@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Filter.Filters;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Slot;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 

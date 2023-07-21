@@ -1,4 +1,5 @@
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Types.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -86,16 +87,6 @@ public partial class DatabaseContext : DbContext
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     { }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<LevelActivityEntity>().UseTpcMappingStrategy();
-        modelBuilder.Entity<PhotoActivityEntity>().UseTpcMappingStrategy();
-        modelBuilder.Entity<PlaylistActivityEntity>().UseTpcMappingStrategy();
-        modelBuilder.Entity<ScoreActivityEntity>().UseTpcMappingStrategy();
-        modelBuilder.Entity<UserActivityEntity>().UseTpcMappingStrategy();
-        base.OnModelCreating(modelBuilder);
-    }
-
     public static DatabaseContext CreateNewInstance()
     {
         DbContextOptionsBuilder<DatabaseContext> builder = new();
@@ -103,4 +94,26 @@ public partial class DatabaseContext : DbContext
             MySqlServerVersion.LatestSupportedServerVersion);
         return new DatabaseContext(builder.Options);
     }
+
+    #region Activity
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        //TODO implement reviews 
+        modelBuilder.Entity<LevelActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<PhotoActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<PlaylistActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<ScoreActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<NewsActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<CommentActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
+        base.OnModelCreating(modelBuilder);
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(new ActivityInterceptor(new ActivityEntityEventHandler()));
+        base.OnConfiguring(optionsBuilder);
+    }
+    #endregion
 }
