@@ -285,19 +285,20 @@ public class ScoreController : ControllerBase
             .Select(s => new
             {
                 Score = s,
-                Rank = scoreQuery.Count(s2 => s2.Points > s.Points)+1,
+                Rank = scoreQuery.Count(s2 => s2.Points > s.Points) + 1,
             }).FirstOrDefaultAsync();
 
         int skipAmt = options.PageStart != -1 || myScore == null ? options.PageStart - 1 : myScore.Rank - 3;
 
         var rankedScores = scoreQuery.OrderByDescending(s => s.Points)
+            .ThenBy(s => s.Timestamp)
             .ThenBy(s => s.ScoreId)
             .Skip(Math.Max(0, skipAmt))
             .Take(Math.Min(options.PageSize, 30))
             .Select(s => new
             {
                Score = s,
-               Rank = scoreQuery.Count(s2 => s2.Points > s.Points)+1,
+               Rank = scoreQuery.Count(s2 => s2.Points > s.Points) + 1,
             })
             .ToList();
 
