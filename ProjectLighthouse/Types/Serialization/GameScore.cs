@@ -10,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("playRecord")]
 [XmlType("playRecord")]
-public class GameScore : ILbpSerializable
+public class GameScore : ILbpSerializable, INeedsPreparationForSerialization
 {
     [XmlIgnore]
     public int UserId { get; set; }
