@@ -1,3 +1,6 @@
+using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
+
 namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 /// <summary>
@@ -21,13 +24,13 @@ public enum PrivacyType
 
 public static class PrivacyTypeExtensions
 {
-    public static string ToReadableString(this PrivacyType type, string area)
+    public static TranslatableString ToReadableString(this PrivacyType type)
     {
         return type switch
         {
-            PrivacyType.All => $"Share your {area} with everyone!",
-            PrivacyType.PSN => $"Only share your {area} with users who are signed into the website or playing in-game.",
-            PrivacyType.Game => $"Only share your {area} with users who are playing in-game.",
+            PrivacyType.All => PrivacyStrings.PrivacyAll,
+            PrivacyType.PSN => PrivacyStrings.PrivacyPSN,
+            PrivacyType.Game => PrivacyStrings.PrivacyGame,
             _ => null,
         };
     }
