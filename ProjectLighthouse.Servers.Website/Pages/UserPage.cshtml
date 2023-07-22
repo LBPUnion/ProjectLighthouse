@@ -29,7 +29,7 @@
             <b>Reason:</b>
             <span>"@Model.ProfileUser.BannedReason"</span>
         }
-        else 
+        else
         {
             <p>This user has been banned for violating the Terms of Service. Remember to follow the rules!</p>
         }
@@ -39,20 +39,20 @@
 <div class="@(isMobile ? "" : "ui grid")">
     <div class="eight wide column">
         @await Html.PartialAsync("Partials/UserCardPartial", Model.ProfileUser, new ViewDataDictionary(ViewData)
-        {
-            {
-                "ShowLink", false
-            },
-            {
-                "IsMobile", Model.Request.IsMobile()
-            },
-            {
-                "Language", Model.GetLanguage()
-            },
-            {
-                "TimeZone", Model.GetTimeZone()
-            },
-        })
+               {
+                   {
+                       "ShowLink", false
+                   },
+                   {
+                       "IsMobile", Model.Request.IsMobile()
+                   },
+                   {
+                       "Language", Model.GetLanguage()
+                   },
+                   {
+                       "TimeZone", Model.GetTimeZone()
+                   },
+               })
     </div>
     <div class="eight wide right aligned column">
         <br>
@@ -87,11 +87,18 @@
                 </a>
             }
         }
+        @if (Model.ProfileUser == Model.User)
+        {
+            <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/privacy">
+                <i class="eye icon"></i>
+                <span>Privacy Settings</span>
+            </a>
+        }
         @if (Model.ProfileUser == Model.User || (Model.User?.IsModerator ?? false))
         {
             <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/settings">
                 <i class="cog icon"></i>
-                <span>Settings</span>
+                <span>Profile Settings</span>
             </a>
         }
         @if (Model.ProfileUser == Model.User)
@@ -106,172 +113,199 @@
     {
         <br/>
     }
-    <div class="eight wide column">
-        <div class="ui blue segment">
-            <h2>@Model.Translate(ProfileStrings.Biography)</h2>
-            @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
-            {
-                <p>@Model.Translate(ProfileStrings.NoBiography, Model.ProfileUser.Username)</p>
-            }
-            else
-            {
-                <p style="overflow-wrap: anywhere;">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
-            }
-        </div>
-    </div>
-    @if (isMobile)
+    @if (Model.CanViewProfile)
     {
-        <br/>
-    }
-    <div class="eight wide column">
-        <div class="ui red segment">
-            <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
-            <p>@Model.Translate(GeneralStrings.Soon)</p>
-        </div>
-    </div>
-    @if (isMobile)
-    {
-        <br/>
-    }
-</div>
-
-<div class="ui grid">
-    @{
-        string outerDiv = isMobile ?
-            "horizontal-scroll" :
-            "three wide column";
-        string innerDiv = isMobile ?
-            "ui top attached tabular menu horizontal-scroll" :
-            "ui vertical fluid tabular menu";
-    }
-    <div class="@outerDiv">
-        <div class="@innerDiv">
-            <a class="item active lh-sidebar" target="lh-comments">
-                Comments
-            </a>
-            <a class="item lh-sidebar" target="lh-photos">
-                @Model.Translate(BaseLayoutStrings.HeaderPhotos)
-            </a>
-                
-            <a class="item lh-sidebar" target="lh-levels">
-                @Model.Translate(BaseLayoutStrings.HeaderSlots)
-            </a>
-            <a class="item lh-sidebar" target="lh-playlists">
-                Playlists
-            </a>
-            @if (Model.User == Model.ProfileUser)
-            {
-                <a class="item lh-sidebar" target="lh-hearted">
-                    Hearted Levels
-                </a>
-                <a class="item lh-sidebar" target="lh-queued">
-                    Queued Levels
-                </a>
-            }
-        </div>
-    </div>
-    @{
-        string divLength = isMobile ? "sixteen" : "thirteen";
-    }
-    <div class="@divLength wide stretched column">
-        <div class="lh-content" id="lh-comments">
-            @if (Model.ProfileUser.IsBanned)
-            {
-                <div class="ui yellow segment" id="comments">
-                    <p><i>Comments are disabled because the user is banned.</i></p>
-                </div>
-            }
-            else
-            {
-                @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
-                    { {"PageOwner", Model.ProfileUser.UserId}, })
-            }
-        </div>
-        <div class="lh-content" id="lh-photos">
-            <div class="ui purple segment" id="photos">
-                @if (Model.Photos != null && Model.Photos.Count != 0)
+        <div class="eight wide column">
+            <div class="ui blue segment">
+                <h2>@Model.Translate(ProfileStrings.Biography)</h2>
+                @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
                 {
-                    <div class="ui center aligned grid">
-                        @foreach (PhotoEntity photo in Model.Photos)
-                        {
-                            string width = isMobile ? "sixteen" : "eight";
-                            bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
-                            <div class="@width wide column">
-                                @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
-                            </div>
-                        }
-                    </div>
-                    @if (isMobile)
-                    {
-                        <br/>
-                    }
+                    <p>@Model.Translate(ProfileStrings.NoBiography, Model.ProfileUser.Username)</p>
                 }
                 else
                 {
-                    <p>This user hasn't uploaded any photos</p>
+                    <p style="overflow-wrap: anywhere;">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
                 }
             </div>
         </div>
-        <div class="lh-content" id="lh-levels">
-            <div class="ui green segment" id="levels">
-                @if (Model.Slots?.Count == 0)
-                {
-                    <p>This user hasn't published any levels</p>
-                }
-                @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
-                {
-                    <div class="ui segment">
-                        @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="lh-content" id="lh-playlists">
-            <div class="ui purple segment">
+        @if (isMobile)
+        {
+            <br/>
+        }
+        <div class="eight wide column">
+            <div class="ui red segment">
+                <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
                 <p>@Model.Translate(GeneralStrings.Soon)</p>
             </div>
         </div>
-        @if (Model.User == Model.ProfileUser)
+        @if (isMobile)
         {
-            <div class="lh-content" id="lh-hearted">
-                <div class="ui pink segment" id="hearted">
-                    @if (Model.HeartedSlots?.Count == 0)
-                    {
-                        <p>You haven't hearted any levels</p>
-                    }
-                    else
-                    {
-                        <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
-                    }
-                    @foreach (SlotEntity slot in Model.HeartedSlots ?? new List<SlotEntity>())
-                    {
-                        <div class="ui segment">
-                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#hearted", language, timeZone, isMobile, true)
-                        </div>
-                    }
-                </div>
-            </div>
-            <div class="lh-content" id="lh-queued">
-                <div class="ui yellow segment" id="queued">
-                    @if (Model.QueuedSlots?.Count == 0)
-                    {
-                        <p>You haven't queued any levels</p>
-                    }
-                    else
-                    {
-                        <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
-                    }
-                    @foreach (SlotEntity slot in Model.QueuedSlots ?? new List<SlotEntity>())
-                    {
-                        <div class="ui segment">
-                            @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#queued", language, timeZone, isMobile, true)
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-    </div>
+            <br/>
+        }    
+    }
 </div>
+
+@if (!Model.CanViewProfile)
+{
+    <div class="ui red segment">
+        <p>
+            <i>The user's privacy settings prevent you from viewing this page.</i>
+        </p>
+    </div>
+}
+else
+{
+    <div class="ui grid">
+        @{
+            string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
+            string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
+        }
+        <div class="@outerDiv">
+            <div class="@innerDiv">
+                <a class="item active lh-sidebar" target="lh-comments">
+                    Comments
+                </a>
+                <a class="item lh-sidebar" target="lh-photos">
+                    @Model.Translate(BaseLayoutStrings.HeaderPhotos)
+                </a>
+
+                <a class="item lh-sidebar" target="lh-levels">
+                    @Model.Translate(BaseLayoutStrings.HeaderSlots)
+                </a>
+                <a class="item lh-sidebar" target="lh-playlists">
+                    Playlists
+                </a>
+                @if (Model.User == Model.ProfileUser)
+                {
+                    <a class="item lh-sidebar" target="lh-hearted">
+                        Hearted Levels
+                    </a>
+                    <a class="item lh-sidebar" target="lh-queued">
+                        Queued Levels
+                    </a>
+                }
+            </div>
+        </div>
+        @{
+            string divLength = isMobile ? "sixteen" : "thirteen";
+        }
+        <div class="@divLength wide stretched column">
+            <div class="lh-content" id="lh-comments">
+                @if (Model.ProfileUser.IsBanned)
+                {
+                    <div class="ui yellow segment" id="comments">
+                        <p>
+                            <i>Comments are disabled because the user is banned.</i>
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+                           {
+                               {
+                                   "PageOwner", Model.ProfileUser.UserId
+                               },
+                           })
+                }
+            </div>
+            <div class="lh-content" id="lh-photos">
+                <div class="ui purple segment" id="photos">
+                    @if (Model.Photos != null && Model.Photos.Count != 0)
+                    {
+                        <div class="ui center aligned grid">
+                            @foreach (PhotoEntity photo in Model.Photos)
+                            {
+                                string width = isMobile ? "sixteen" : "eight";
+                                bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
+                                <div class="@width wide column">
+                                    @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
+                                </div>
+                            }
+                        </div>
+                        @if (isMobile)
+                        {
+                            <br/>
+                        }
+                    }
+                    else
+                    {
+                        <p>This user hasn't uploaded any photos</p>
+                    }
+                </div>
+            </div>
+            <div class="lh-content" id="lh-levels">
+                @if (!Model.CanViewSlots)
+                {
+                    <div class="ui red segment">
+                        <p>
+                            <i>The user's privacy settings prevent you from viewing this page.</i>
+                        </p>
+                    </div>    
+                }
+                else
+                {
+                    <div class="ui green segment" id="levels">
+                        @if (Model.Slots?.Count == 0)
+                        {
+                            <p>This user hasn't published any levels</p>
+                        }
+                        @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
+                        {
+                            <div class="ui segment">
+                                @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
+                            </div>
+                        }
+                    </div>    
+                }
+            </div>
+            <div class="lh-content" id="lh-playlists">
+                <div class="ui purple segment">
+                    <p>@Model.Translate(GeneralStrings.Soon)</p>
+                </div>
+            </div>
+            @if (Model.User == Model.ProfileUser)
+            {
+                <div class="lh-content" id="lh-hearted">
+                    <div class="ui pink segment" id="hearted">
+                        @if (Model.HeartedSlots?.Count == 0)
+                        {
+                            <p>You haven't hearted any levels</p>
+                        }
+                        else
+                        {
+                            <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
+                        }
+                        @foreach (SlotEntity slot in Model.HeartedSlots ?? new List<SlotEntity>())
+                        {
+                            <div class="ui segment">
+                                @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#hearted", language, timeZone, isMobile, true)
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="lh-content" id="lh-queued">
+                    <div class="ui yellow segment" id="queued">
+                        @if (Model.QueuedSlots?.Count == 0)
+                        {
+                            <p>You haven't queued any levels</p>
+                        }
+                        else
+                        {
+                            <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
+                        }
+                        @foreach (SlotEntity slot in Model.QueuedSlots ?? new List<SlotEntity>())
+                        {
+                            <div class="ui segment">
+                                @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#queued", language, timeZone, isMobile, true)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @if (Model.User != null && Model.User.IsModerator)
 {
@@ -289,25 +323,25 @@
             <div class="ui fitted hidden divider"></div>
         }
         
-        @if (Model.ProfileUser.CommentsEnabled)
+        <div>
+            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
+                <i class="trash alternate icon"></i>
+                <span>Wipe Earth Decorations</span>
+            </a>
+        </div>
+        <div class="ui fitted hidden divider"></div>
+
+        @if (!Model.CommentsDisabledByModerator)
         {
             <div>
                 <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
                     <i class="lock icon"></i>
-                    <span>Disable Comments</span>
+                    <span>Forcibly Disable Comments</span>
                 </a>
             </div>
             <div class="ui fitted hidden divider"></div>
         }
-        
-        <div>
-            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
-                <i class="trash alternate icon"></i>
-                <span>Wipe user's earth decorations</span>
-            </a>
-        </div>
-        <div class="ui fitted hidden divider"></div>
-        
+
         @if (Model.User.IsAdmin)
         {
             @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)

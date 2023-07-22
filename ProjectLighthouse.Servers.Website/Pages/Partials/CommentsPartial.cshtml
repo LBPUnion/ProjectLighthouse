@@ -1,5 +1,4 @@
 ﻿@using System.Web
-@using System.IO
 @using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
@@ -17,11 +16,11 @@
 <div class="ui yellow segment" id="comments">
     @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
     {
-        <p><i>There are no comments.</i></p>
+        <span><i>There are no comments.</i></span>
     }
     else if (!Model.CommentsEnabled)
     {
-        <p><i>Comments are disabled.</i></p>
+        <span><i>Comments are disabled.</i></span>
     }
     else
     {
@@ -51,10 +50,9 @@
             CommentEntity comment = commentAndReaction.Key;
             int yourThumb = commentAndReaction.Value?.Rating ?? 0;
             DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000).ToLocalTime();
-            StringWriter messageWriter = new();
-            HttpUtility.HtmlDecode(comment.GetCommentMessage(Database), messageWriter);
 
-            string decodedMessage = messageWriter.ToString();
+            string decodedMessage = HttpUtility.HtmlDecode(comment.GetCommentMessage(Database));
+            
             string? url = Url.RouteUrl(ViewContext.RouteData.Values);
             if (url == null) continue;
 

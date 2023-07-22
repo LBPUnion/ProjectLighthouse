@@ -1,0 +1,101 @@
+﻿@page "/user/{userId:int}/privacy"
+@using LBPUnion.ProjectLighthouse.Extensions
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
+@using LBPUnion.ProjectLighthouse.Types.Users
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPrivacyPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
+    Model.ShowTitleInPage = false;
+
+    bool isMobile = Request.IsMobile();
+}
+
+<div class="@(isMobile ? "" : "ui left aligned grid")">
+    <div class="column">
+        <h1>@Model.ProfileUser.Username's Privacy Settings</h1>
+        <form method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/privacy">
+            @Html.AntiForgeryToken()
+            <div class="ui yellow segment">
+                <h2><i class="ui icon comment alternate"></i> Profile Privacy</h2>
+                <div class="field">
+                    <label style="text-align: left" for="profilePrivacyLevel">Privacy Level</label>
+                    <select class="ui fluid dropdown" type="text" name="profilePrivacyLevel" id="profilePrivacyLevel">
+                        @foreach (PrivacyType type in Enum.GetValues(typeof(PrivacyType)))
+                        {
+                            <option value="@type.ToSerializedString()" @(Model.ProfileUser.ProfileVisibility == type ? "selected" : "")>
+                                @Model.Translate(type.ToReadableString(), "profile")
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="field">
+                    <label style="text-align: left" for="profileCommentsEnabled">
+                        Comments
+                        @if (Model.CommentsDisabledByModerator)
+                        {
+                            <small class="ui red text">Locked by a moderator</small>
+                        }
+                    </label>
+                    <select class="ui fluid dropdown @(Model.CommentsDisabledByModerator ? "disabled" : "")" type="text" name="profileCommentsEnabled" id="profileCommentsEnabled">
+                        <option value="true" @(Model.ProfileUser.CommentsEnabled ? "selected" : "")>
+                            @Model.Translate(PrivacyStrings.EnableComments)
+                        </option>
+                        <option value="false" @(!Model.ProfileUser.CommentsEnabled ? "selected" : "")>
+                            @Model.Translate(PrivacyStrings.DisableComments)
+                        </option>
+                    </select>
+                </div>
+                <h2><i class="ui icon play"></i> Level Privacy</h2>
+                <div class="field">
+                    <label style="text-align: left" for="slotPrivacyLevel">Privacy Level</label>
+                    <select class="ui fluid dropdown" type="text" name="slotPrivacyLevel" id="slotPrivacyLevel">
+                        @foreach (PrivacyType type in Enum.GetValues(typeof(PrivacyType)))
+                        {
+                            <option value="@type.ToSerializedString()" @(Model.ProfileUser.LevelVisibility == type ? "selected" : "")>
+                                @Model.Translate(type.ToReadableString(), "levels")
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="ui divider"></div>
+                <button type="submit" class="ui button green" tabindex="0">Save Changes</button>
+                <a class="ui button red" href="/user/@Model.ProfileUser.UserId">Discard Changes</a>
+            </div>
+        </form>
+
+        <div class="ui red segment">
+            <h2><i class="user alternate slash icon"></i> Blocked Users</h2>
+            @if (Model.BlockedUsers.Count == 0)
+            {
+                <span>@Model.Translate(PrivacyStrings.NoBlockedUsers)</span>
+            }
+            else
+            {
+                <p>@Model.Translate(PrivacyStrings.BlockedUsers, Model.BlockedUsers.Count)</p>
+            }
+            @foreach (UserEntity user in Model.BlockedUsers)
+            {
+                <div class="ui segment">
+                    @await Html.PartialAsync("Partials/UserCardPartial", user, new ViewDataDictionary(ViewData)
+                           {
+                               {
+                                   "ShowLink", true
+                               },
+                               {
+                                   "IsMobile", isMobile
+                               },
+                               {
+                                   "Language", Model.GetLanguage()
+                               },
+                               {
+                                   "TimeZone", Model.GetTimeZone()
+                               },
+                           })
+                </div>
+            }
+        </div>
+    </div>
+</div>

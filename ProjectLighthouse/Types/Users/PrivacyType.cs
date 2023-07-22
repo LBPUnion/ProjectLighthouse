@@ -1,3 +1,6 @@
+using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
+
 namespace LBPUnion.ProjectLighthouse.Types.Users;
 
 /// <summary>
@@ -21,6 +24,17 @@ public enum PrivacyType
 
 public static class PrivacyTypeExtensions
 {
+    public static TranslatableString ToReadableString(this PrivacyType type)
+    {
+        return type switch
+        {
+            PrivacyType.All => PrivacyStrings.PrivacyAll,
+            PrivacyType.PSN => PrivacyStrings.PrivacyPSN,
+            PrivacyType.Game => PrivacyStrings.PrivacyGame,
+            _ => null,
+        };
+    }
+    
     public static string ToSerializedString(this PrivacyType type) 
         => type.ToString().ToLower();
 
@@ -32,6 +46,17 @@ public static class PrivacyTypeExtensions
             "game" => PrivacyType.Game,
             "all" => PrivacyType.All,
             _ => null,
+        };
+    }
+
+    public static bool CanAccess(this PrivacyType type, bool authenticated, bool owner)
+    {
+        return type switch
+        {
+            PrivacyType.All => true,
+            PrivacyType.PSN => authenticated,
+            PrivacyType.Game => authenticated && owner,
+            _ => false,
         };
     }
 }

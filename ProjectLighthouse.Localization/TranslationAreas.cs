@@ -13,4 +13,5 @@ public enum TranslationAreas
     ModPanel,
     TwoFactor,
     Moderation,
+    Privacy,
 }
