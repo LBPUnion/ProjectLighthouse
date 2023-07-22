@@ -44,7 +44,7 @@ function onSubmit(e){
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
         <div class="ui blue segment">
-            <h1><i class="cog icon"></i>@Model.ProfileUser.Username's Settings</h1>
+            <h1><i class="cog icon"></i>@Model.ProfileUser.Username's Profile Settings</h1>
             <div class="ui divider"></div>
             <form id="form" method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/settings" onsubmit="onSubmit(event)">
                 @Html.AntiForgeryToken()
