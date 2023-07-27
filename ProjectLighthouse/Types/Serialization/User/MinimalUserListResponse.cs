@@ -19,7 +19,6 @@ public struct MinimalUserListResponse : ILbpSerializable
 
 public class MinimalUserProfile : ILbpSerializable
 {
-
     [XmlElement("npHandle")]
     public NpHandle UserHandle { get; set; } = new();
 }
