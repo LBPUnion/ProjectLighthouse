@@ -99,7 +99,7 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
     }
 
     public static GameStream CreateFromGroups
-        (GameTokenEntity token, List<OuterActivityGroup> groups, long startTimestamp, long endTimestamp)
+        (GameTokenEntity token, List<OuterActivityGroup> groups, long startTimestamp, long endTimestamp, bool dontNest = false)
     {
         GameStream gameStream = new()
         {
@@ -117,7 +117,7 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
         gameStream.Groups = groups.Select(GameStreamGroup.CreateFromGroup).ToList();
 
         // Workaround for level activity because it shouldn't contain nested activity groups
-        if (gameStream.Groups.Count == 1 && groups.First().Key.GroupType == ActivityGroupType.Level)
+        if (gameStream.Groups.Count == 1 && groups.First().Key.GroupType == ActivityGroupType.Level && !dontNest)
         {
             gameStream.Groups = gameStream.Groups.First().Groups;
         }

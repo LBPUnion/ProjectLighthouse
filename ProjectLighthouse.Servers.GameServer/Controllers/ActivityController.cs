@@ -295,7 +295,7 @@ public class ActivityController : ControllerBase
 
     [HttpGet("slot/{slotType}/{slotId:int}")]
     [HttpGet("user2/{username}")]
-    public async Task<IActionResult> SlotActivity(string? slotType, int slotId, string? username, long? timestamp)
+    public async Task<IActionResult> LocalActivity(string? slotType, int slotId, string? username, long? timestamp)
     {
         GameTokenEntity token = this.GetToken();
 
@@ -344,6 +344,6 @@ public class ActivityController : ControllerBase
         return this.Ok(GameStream.CreateFromGroups(token,
             outerGroups,
             times.Start.ToUnixTimeMilliseconds(),
-            oldestTimestamp));
+            oldestTimestamp, isLevelActivity));
     }
 }
