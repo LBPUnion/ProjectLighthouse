@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Website;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types.Activity;
 
@@ -44,7 +45,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 Type = EventType.Score,
                 ScoreId = score.ScoreId,
                 //TODO merge score migration
-                // UserId = int.Parse(score.PlayerIds[0]),
+                UserId = database.Users.Where(u => u.Username == score.PlayerIds[0]).Select(u => u.UserId).First(),
             },
             HeartedLevelEntity heartedLevel => new LevelActivityEntity
             {
@@ -58,11 +59,41 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 TargetUserId = heartedProfile.HeartedUserId,
                 UserId = heartedProfile.UserId,
             },
+            HeartedPlaylistEntity heartedPlaylist => new PlaylistActivityEntity
+            {
+                Type = EventType.HeartPlaylist,
+                PlaylistId = heartedPlaylist.PlaylistId,
+                UserId = heartedPlaylist.UserId,
+            },
             VisitedLevelEntity visitedLevel => new LevelActivityEntity
             {
                 Type = EventType.PlayLevel,
                 SlotId = visitedLevel.SlotId,
                 UserId = visitedLevel.UserId,
+            },
+            ReviewEntity review => new ReviewActivityEntity
+            {
+                Type = EventType.ReviewLevel,
+                ReviewId = review.ReviewId,
+                UserId = review.ReviewerId,
+            },
+            RatedLevelEntity ratedLevel => new LevelActivityEntity
+            {
+                Type = ratedLevel.Rating != 0 ? EventType.DpadRateLevel : EventType.RateLevel,
+                SlotId = ratedLevel.SlotId,
+                UserId = ratedLevel.UserId,
+            },
+            PlaylistEntity playlist => new PlaylistActivityEntity
+            {
+                Type = EventType.CreatePlaylist,
+                PlaylistId = playlist.PlaylistId,
+                UserId = playlist.CreatorId,
+            },
+            WebsiteAnnouncementEntity announcement => new NewsActivityEntity
+            {
+                Type = EventType.NewsPost,
+                UserId = announcement.PublisherId ?? 0,
+                NewsId = announcement.AnnouncementId,
             },
             _ => null,
         };
@@ -82,6 +113,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 
     public void OnEntityChanged<T>(DatabaseContext database, T origEntity, T currentEntity) where T : class
     {
+        #if DEBUG
         foreach (PropertyInfo propInfo in currentEntity.GetType().GetProperties())
         {
             if (!propInfo.CanRead || !propInfo.CanWrite) continue;
@@ -97,14 +129,19 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             Console.WriteLine($@"Orig val: {origVal?.ToString() ?? "null"}");
             Console.WriteLine($@"New val: {newVal?.ToString() ?? "null"}");
         }
-
         Console.WriteLine($@"OnEntityChanged: {currentEntity.GetType().Name}");
+        #endif
+
         ActivityEntity? activity = null;
         switch (currentEntity)
         {
             case VisitedLevelEntity visitedLevel:
             {
-                if (origEntity is not VisitedLevelEntity) break;
+                if (origEntity is not VisitedLevelEntity oldVisitedLevel) break;
+
+                int Plays(VisitedLevelEntity entity) => entity.PlaysLBP1 + entity.PlaysLBP2 + entity.PlaysLBP3;
+
+                if (Plays(oldVisitedLevel) >= Plays(visitedLevel)) break;
 
                 activity = new LevelActivityEntity
                 {
@@ -118,25 +155,88 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             {
                 if (origEntity is not SlotEntity oldSlotEntity) break;
 
-                if (!oldSlotEntity.TeamPick && slotEntity.TeamPick)
+                switch (oldSlotEntity.TeamPick)
                 {
-                    activity = new LevelActivityEntity
+                    // When a level is team picked
+                    case false when slotEntity.TeamPick:
+                        activity = new LevelActivityEntity
+                        {
+                            Type = EventType.MMPickLevel,
+                            SlotId = slotEntity.SlotId,
+                            UserId = slotEntity.CreatorId,
+                        };
+                        break;
+                    // When a level has its team pick removed then remove the corresponding activity
+                    case true when !slotEntity.TeamPick:
+                        database.Activities.OfType<LevelActivityEntity>()
+                            .Where(a => a.Type == EventType.MMPickLevel)
+                            .Where(a => a.SlotId == slotEntity.SlotId)
+                            .ExecuteDelete();
+                        break;
+                    default:
                     {
-                        Type = EventType.MMPickLevel,
-                        SlotId = slotEntity.SlotId,
-                        UserId = SlotHelper.GetPlaceholderUserId(database).Result,
-                    };
-                }
-                else if (oldSlotEntity.SlotId == slotEntity.SlotId && slotEntity.Type == SlotType.User)
-                {
-                    activity = new LevelActivityEntity
-                    {
-                        Type = EventType.PublishLevel,
-                        SlotId = slotEntity.SlotId,
-                        UserId = slotEntity.CreatorId,
-                    };
-                }
+                        if (oldSlotEntity.SlotId == slotEntity.SlotId &&
+                            slotEntity.Type == SlotType.User &&
+                            oldSlotEntity.LastUpdated != slotEntity.LastUpdated)
+                        {
+                            activity = new LevelActivityEntity
+                            {
+                                Type = EventType.PublishLevel,
+                                SlotId = slotEntity.SlotId,
+                                UserId = slotEntity.CreatorId,
+                            };
+                        }
 
+                        break;
+                    }
+                }
+                break;
+            }
+            case CommentEntity comment:
+            {
+                if (origEntity is not CommentEntity oldComment) break;
+
+                if (oldComment.Deleted || !comment.Deleted) break;
+
+                if (comment.Type != CommentType.Level) break;
+
+                activity = new CommentActivityEntity
+                {
+                    Type = EventType.DeleteLevelComment,
+                    CommentId = comment.CommentId,
+                    UserId = comment.PosterUserId,
+                };
+                break;
+            }
+            case PlaylistEntity playlist:
+            {
+                if (origEntity is not PlaylistEntity oldPlaylist) break;
+
+                int[] newSlots = playlist.SlotIds;
+                int[] oldSlots = oldPlaylist.SlotIds;
+                Console.WriteLine($@"Old playlist slots: {string.Join(",", oldSlots)}");
+                Console.WriteLine($@"New playlist slots: {string.Join(",", newSlots)}");
+
+                int[] addedSlots = newSlots.Except(oldSlots).ToArray();
+
+                Console.WriteLine($@"Added playlist slots: {string.Join(",", addedSlots)}");
+
+                // If no new level have been added
+                if (addedSlots.Length == 0) break;
+
+                // Normally events only need 1 resulting ActivityEntity but here
+                // we need multiple, so we have to do the inserting ourselves.
+                foreach (int slotId in addedSlots)
+                {
+                    ActivityEntity entity = new PlaylistWithSlotActivityEntity
+                    {
+                        Type = EventType.AddLevelToPlaylist,
+                        PlaylistId = playlist.PlaylistId,
+                        SlotId = slotId,
+                        UserId = playlist.CreatorId,
+                    };
+                    InsertActivity(database, entity);
+                }
                 break;
             }
         }
@@ -149,17 +249,6 @@ public class ActivityEntityEventHandler : IEntityEventHandler
         Console.WriteLine($@"OnEntityDeleted: {entity.GetType().Name}");
         ActivityEntity? activity = entity switch
         {
-            //TODO move this to EntityModified and use CommentEntity.Deleted
-            CommentEntity comment => comment.Type switch
-            {
-                CommentType.Level => new CommentActivityEntity
-                {
-                    Type = EventType.DeleteLevelComment,
-                    CommentId = comment.CommentId,
-                    UserId = comment.PosterUserId,
-                },
-                _ => null,
-            },
             HeartedLevelEntity heartedLevel => new LevelActivityEntity
             {
                 Type = EventType.UnheartLevel,

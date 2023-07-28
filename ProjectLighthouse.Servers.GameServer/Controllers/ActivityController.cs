@@ -1,11 +1,10 @@
 ﻿using System.Linq.Expressions;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Filter.Filters.Activity;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Activity;
-using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
-using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Activity;
@@ -29,143 +28,210 @@ public class ActivityController : ControllerBase
         this.database = database;
     }
 
-    public class ActivityDto
-    {
-        public required ActivityEntity Activity { get; set; }
-        public int? TargetSlotId { get; set; }
-        public int? TargetUserId { get; set; }
-        public int? TargetPlaylistId { get; set; }
-        public int? SlotCreatorId { get; set; }
-    }
-    //TODO refactor this mess into a separate db file or something
-
-    private static Expression<Func<ActivityEntity, ActivityDto>> ActivityToDto()
-    {
-        return a => new ActivityDto
-        {
-            Activity = a,
-            TargetSlotId = a is LevelActivityEntity
-                ? ((LevelActivityEntity)a).SlotId
-                : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.PhotoId != 0
-                    ? ((PhotoActivityEntity)a).Photo.SlotId
-                    : a is CommentActivityEntity && ((CommentActivityEntity)a).Comment.Type == CommentType.Level
-                        ? ((CommentActivityEntity)a).Comment.TargetId
-                        : a is ScoreActivityEntity
-                            ? ((ScoreActivityEntity)a).Score.SlotId
-                            : 0,
-
-            TargetUserId = a is UserActivityEntity
-                ? ((UserActivityEntity)a).TargetUserId
-                : a is CommentActivityEntity && ((CommentActivityEntity)a).Comment.Type == CommentType.Profile
-                    ? ((CommentActivityEntity)a).Comment.TargetId
-                    : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId != 0
-                        ? ((PhotoActivityEntity)a).Photo.CreatorId
-                        : 0,
-            TargetPlaylistId = a is PlaylistActivityEntity ? ((PlaylistActivityEntity)a).PlaylistId : 0,
-        };
-    }
-
-    private static IQueryable<IGrouping<ActivityGroup, ActivityEntity>> GroupActivities
-        (IQueryable<ActivityEntity> activityQuery)
-    {
-        return activityQuery.Select(ActivityToDto())
-            .GroupBy(dto => new ActivityGroup
-                {
-                    Timestamp = dto.Activity.Timestamp.Date,
-                    UserId = dto.Activity.UserId,
-                    TargetUserId = dto.TargetUserId,
-                    TargetSlotId = dto.TargetSlotId,
-                    TargetPlaylistId = dto.TargetPlaylistId,
-                },
-                dto => dto.Activity);
-    }
-
-    private static IQueryable<IGrouping<ActivityGroup, ActivityEntity>> GroupActivities
-        (IQueryable<ActivityDto> activityQuery)
-    {
-        return activityQuery.GroupBy(dto => new ActivityGroup
-            {
-                Timestamp = dto.Activity.Timestamp.Date,
-                UserId = dto.Activity.UserId,
-                TargetUserId = dto.TargetUserId,
-                TargetSlotId = dto.TargetSlotId,
-                TargetPlaylistId = dto.TargetPlaylistId,
-            },
-            dto => dto.Activity);
-    }
-
-    // TODO this is kinda ass, can maybe improve once comment migration is merged
-    private async Task<IQueryable<ActivityEntity>> GetFilters
+    /// <summary>
+    /// This method is only used for LBP2 so we exclude playlists
+    /// </summary>
+    private async Task<IQueryable<ActivityDto>> GetFilters
     (
+        IQueryable<ActivityDto> dtoQuery,
         GameTokenEntity token,
         bool excludeNews,
         bool excludeMyLevels,
         bool excludeFriends,
         bool excludeFavouriteUsers,
-        bool excludeMyself
+        bool excludeMyself,
+        bool excludeMyPlaylists = true
     )
     {
-        IQueryable<ActivityEntity> query = this.database.Activities.AsQueryable();
-        if (excludeNews) query = query.Where(a => a.Type != EventType.NewsPost);
-
-        IQueryable<ActivityDto> dtoQuery = query.Select(a => new ActivityDto
-        {
-            Activity = a,
-            SlotCreatorId = a is LevelActivityEntity
-                ? ((LevelActivityEntity)a).Slot.CreatorId
-                : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId != 0
-                    ? ((PhotoActivityEntity)a).Photo.Slot!.CreatorId
-                    : a is CommentActivityEntity && ((CommentActivityEntity)a).Comment.Type == CommentType.Level
-                        ? ((CommentActivityEntity)a).Comment.TargetId
-                        : a is ScoreActivityEntity
-                            ? ((ScoreActivityEntity)a).Score.Slot.CreatorId
-                            : 0,
-        });
-
         Expression<Func<ActivityDto, bool>> predicate = PredicateExtensions.False<ActivityDto>();
-
-        predicate = predicate.Or(a => a.SlotCreatorId == 0 || excludeMyLevels
-            ? a.SlotCreatorId != token.UserId
-            : a.SlotCreatorId == token.UserId);
-
-        List<int>? friendIds = UserFriendStore.GetUserFriendData(token.UserId)?.FriendIds;
-        if (friendIds != null)
-        {
-            predicate = excludeFriends
-                ? predicate.Or(a => !friendIds.Contains(a.Activity.UserId))
-                : predicate.Or(a => friendIds.Contains(a.Activity.UserId));
-        }
 
         List<int> favouriteUsers = await this.database.HeartedProfiles.Where(hp => hp.UserId == token.UserId)
             .Select(hp => hp.HeartedUserId)
             .ToListAsync();
 
-        predicate = excludeFavouriteUsers
-            ? predicate.Or(a => !favouriteUsers.Contains(a.Activity.UserId))
-            : predicate.Or(a => favouriteUsers.Contains(a.Activity.UserId));
+        List<int>? friendIds = UserFriendStore.GetUserFriendData(token.UserId)?.FriendIds;
+        friendIds ??= new List<int>();
 
-        predicate = excludeMyself
-            ? predicate.Or(a => a.Activity.UserId != token.UserId)
-            : predicate.Or(a => a.Activity.UserId == token.UserId);
+        // This is how lbp3 does its filtering
+        GameStreamFilter? filter = await this.DeserializeBody<GameStreamFilter>();
+        if (filter?.Sources != null)
+        {
+            foreach (GameStreamFilterEventSource filterSource in filter.Sources.Where(filterSource =>
+                         filterSource.SourceType != null && filterSource.Types?.Count != 0))
+            {
+                EventType[] types = filterSource.Types?.ToArray() ?? Array.Empty<EventType>();
+                EventTypeFilter eventFilter = new(types);
+                predicate = filterSource.SourceType switch
+                {
+                    "MyLevels" => predicate.Or(new MyLevelActivityFilter(token.UserId, eventFilter).GetPredicate()),
+                    "FavouriteUsers" => predicate.Or(
+                        new IncludeUserIdFilter(favouriteUsers, eventFilter).GetPredicate()),
+                    "Friends" => predicate.Or(new IncludeUserIdFilter(friendIds, eventFilter).GetPredicate()),
+                    _ => predicate,
+                };
+            }
+        }
 
-        query = dtoQuery.Where(predicate).Select(dto => dto.Activity);
+        Expression<Func<ActivityDto, bool>> newsPredicate = !excludeNews
+            ? new IncludeNewsFilter().GetPredicate()
+            : new ExcludeNewsFilter().GetPredicate();
 
-        return query.OrderByDescending(a => a.Timestamp);
+        predicate = predicate.Or(newsPredicate);
+
+        if (!excludeMyLevels)
+        {
+            predicate = predicate.Or(dto => dto.TargetSlotCreatorId == token.UserId);
+        }
+
+        List<int> includedUserIds = new();
+
+        if (!excludeFriends)
+        {
+            includedUserIds.AddRange(friendIds);
+        }
+
+        if (!excludeFavouriteUsers)
+        {
+            includedUserIds.AddRange(favouriteUsers);
+        }
+
+        if (!excludeMyself)
+        {
+            includedUserIds.Add(token.UserId);
+        }
+
+        predicate = predicate.Or(dto => includedUserIds.Contains(dto.Activity.UserId));
+
+        if (!excludeMyPlaylists)
+        {
+            List<int> creatorPlaylists = await this.database.Playlists.Where(p => p.CreatorId == token.UserId)
+                .Select(p => p.PlaylistId)
+                .ToListAsync();
+            predicate = predicate.Or(new PlaylistActivityFilter(creatorPlaylists).GetPredicate());
+        }
+        else
+        {
+            predicate = predicate.And(dto =>
+                dto.Activity.Type != EventType.CreatePlaylist &&
+                dto.Activity.Type != EventType.HeartPlaylist &&
+                dto.Activity.Type != EventType.AddLevelToPlaylist);
+        }
+
+        Console.WriteLine(predicate);
+
+        dtoQuery = dtoQuery.Where(predicate);
+
+        return dtoQuery;
     }
 
-    public Task<DateTime> GetMostRecentEventTime(GameTokenEntity token, DateTime upperBound)
+    public Task<DateTime> GetMostRecentEventTime(IQueryable<ActivityDto> activity, DateTime upperBound)
     {
-        return this.database.Activities.Where(a => a.UserId == token.UserId)
-            .Where(a => a.Timestamp < upperBound)
-            .OrderByDescending(a => a.Timestamp)
-            .Select(a => a.Timestamp)
+        return activity.OrderByDescending(a => a.Activity.Timestamp)
+            .Where(a => a.Activity.Timestamp < upperBound)
+            .Select(a => a.Activity.Timestamp)
             .FirstOrDefaultAsync();
+    }
+
+    private async Task<(DateTime Start, DateTime End)> GetTimeBounds
+        (IQueryable<ActivityDto> activityQuery, long? startTime, long? endTime)
+    {
+        if (startTime is null or 0) startTime = TimeHelper.TimestampMillis;
+
+        DateTime start = DateTimeExtensions.FromUnixTimeMilliseconds(startTime.Value);
+        DateTime end;
+
+        if (endTime == null)
+        {
+            end = await this.GetMostRecentEventTime(activityQuery, start);
+            // If there is no recent event then set it to the the start
+            if (end == DateTime.MinValue) end = start;
+            end = end.Subtract(TimeSpan.FromDays(7));
+        }
+        else
+        {
+            end = DateTimeExtensions.FromUnixTimeMilliseconds(endTime.Value);
+            // Don't allow more than 7 days worth of activity in a single page
+            if (start.Subtract(end).TotalDays > 7)
+            {
+                end = start.Subtract(TimeSpan.FromDays(7));
+            }
+        }
+
+        return (start, end);
+    }
+
+    private static DateTime GetOldestTime
+        (IReadOnlyCollection<IGrouping<ActivityGroup, ActivityDto>> groups, DateTime defaultTimestamp) =>
+        groups.Any()
+            ? groups.Min(g => g.MinBy(a => a.Activity.Timestamp)?.Activity.Timestamp ?? defaultTimestamp)
+            : defaultTimestamp;
+
+    /// <summary>
+    /// Speeds up serialization because many nested entities need to find Slots by id
+    /// and since they use the Find() method they can benefit from having the entities
+    /// already tracked by the context
+    /// </summary>
+    private async Task CacheEntities(IReadOnlyCollection<OuterActivityGroup> groups)
+    {
+        List<int> slotIds = groups.GetIds(ActivityGroupType.Level);
+        List<int> userIds = groups.GetIds(ActivityGroupType.User);
+        List<int> playlistIds = groups.GetIds(ActivityGroupType.Playlist);
+        List<int> newsIds = groups.GetIds(ActivityGroupType.News);
+
+        // Cache target levels and users within DbContext
+        if (slotIds.Count > 0) await this.database.Slots.Where(s => slotIds.Contains(s.SlotId)).LoadAsync();
+        if (userIds.Count > 0) await this.database.Users.Where(u => userIds.Contains(u.UserId)).LoadAsync();
+        if (playlistIds.Count > 0)
+            await this.database.Playlists.Where(p => playlistIds.Contains(p.PlaylistId)).LoadAsync();
+        if (newsIds.Count > 0)
+            await this.database.WebsiteAnnouncements.Where(a => newsIds.Contains(a.AnnouncementId)).LoadAsync();
+    }
+
+    /// <summary>
+    /// LBP3 uses a different grouping format that wants the actor to be the top level group and the events should be the subgroups
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> GlobalActivityLBP3
+        (long timestamp, bool excludeMyPlaylists, bool excludeNews, bool excludeMyself)
+    {
+        GameTokenEntity token = this.GetToken();
+
+        if (token.GameVersion != GameVersion.LittleBigPlanet3) return this.NotFound();
+
+        IQueryable<ActivityDto> activityEvents = await this.GetFilters(
+            this.database.Activities.ToActivityDto(true, true),
+            token,
+            excludeNews,
+            true,
+            true,
+            true,
+            excludeMyself,
+            excludeMyPlaylists);
+
+        (DateTime Start, DateTime End) times = await this.GetTimeBounds(activityEvents, timestamp, null);
+
+        // LBP3 is grouped by actorThenObject meaning it wants all events by a user grouped together rather than
+        // all user events for a level or profile grouped together
+        List<IGrouping<ActivityGroup, ActivityDto>> groups = await activityEvents
+            .Where(dto => dto.Activity.Timestamp < times.Start && dto.Activity.Timestamp > times.End)
+            .ToActivityGroups(true)
+            .ToListAsync();
+
+        List<OuterActivityGroup> outerGroups = groups.ToOuterActivityGroups(true);
+
+        long oldestTimestamp = GetOldestTime(groups, times.Start).ToUnixTimeMilliseconds();
+
+        return this.Ok(GameStream.CreateFromGroups(token,
+            outerGroups,
+            times.Start.ToUnixTimeMilliseconds(),
+            oldestTimestamp));
     }
 
     [HttpGet]
     public async Task<IActionResult> GlobalActivity
     (
         long timestamp,
+        long endTimestamp,
         bool excludeNews,
         bool excludeMyLevels,
         bool excludeFriends,
@@ -175,112 +241,109 @@ public class ActivityController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
-        if (token.GameVersion == GameVersion.LittleBigPlanet1) return this.BadRequest();
+        if (token.GameVersion == GameVersion.LittleBigPlanet1) return this.NotFound();
 
-        if (timestamp > TimeHelper.TimestampMillis || timestamp <= 0) timestamp = TimeHelper.TimestampMillis;
-
-        DateTime start = DateTimeExtensions.FromUnixTimeMilliseconds(timestamp);
-
-        DateTime soonestTime = await this.GetMostRecentEventTime(token, start);
-        Console.WriteLine(@"Most recent event occurred at " + soonestTime);
-        soonestTime = soonestTime.Subtract(TimeSpan.FromDays(1));
-
-        long soonestTimestamp = soonestTime.ToUnixTimeMilliseconds();
-        
-        long endTimestamp = soonestTimestamp - 86_400_000;
-
-        Console.WriteLine(@$"soonestTime: {soonestTimestamp}, endTime: {endTimestamp}");
-
-        IQueryable<ActivityEntity> activityEvents = await this.GetFilters(token,
+        IQueryable<ActivityDto> activityEvents = await this.GetFilters(this.database.Activities.ToActivityDto(true),
+            token,
             excludeNews,
             excludeMyLevels,
             excludeFriends,
             excludeFavouriteUsers,
             excludeMyself);
 
-        DateTime end = DateTimeExtensions.FromUnixTimeMilliseconds(endTimestamp);
+        (DateTime Start, DateTime End) times = await this.GetTimeBounds(activityEvents, timestamp, endTimestamp);
 
-        activityEvents = activityEvents.Where(a => a.Timestamp < start && a.Timestamp > end);
+        List<IGrouping<ActivityGroup, ActivityDto>> groups = await activityEvents
+            .Where(dto => dto.Activity.Timestamp < times.Start && dto.Activity.Timestamp > times.End)
+            .ToActivityGroups()
+            .ToListAsync();
 
-        Console.WriteLine($@"start: {start}, end: {end}");
+        List<OuterActivityGroup> outerGroups = groups.ToOuterActivityGroups();
 
-        List<IGrouping<ActivityGroup, ActivityEntity>> groups = await GroupActivities(activityEvents).ToListAsync();
+        long oldestTimestamp = GetOldestTime(groups, times.Start).ToUnixTimeMilliseconds();
 
-        foreach (IGrouping<ActivityGroup, ActivityEntity> group in groups)
+        await this.CacheEntities(outerGroups);
+
+        GameStream? gameStream = GameStream.CreateFromGroups(token,
+            outerGroups,
+            times.Start.ToUnixTimeMilliseconds(),
+            oldestTimestamp);
+
+        return this.Ok(gameStream);
+    }
+
+    #if DEBUG
+    private static void PrintOuterGroups(List<OuterActivityGroup> outerGroups)
+    {
+        foreach (OuterActivityGroup outer in outerGroups)
         {
-            ActivityGroup key = group.Key;
-            Console.WriteLine(
-                $@"{key.GroupType}: Timestamp: {key.Timestamp}, UserId: {key.UserId}, TargetSlotId: {key.TargetSlotId}, " +
-                @$"TargetUserId: {key.TargetUserId}, TargetPlaylistId: {key.TargetPlaylistId}");
-            foreach (ActivityEntity activity in group)
+            Console.WriteLine(@$"Outer group key: {outer.Key}");
+            List<IGrouping<InnerActivityGroup, ActivityDto>> itemGroup = outer.Groups;
+            foreach (IGrouping<InnerActivityGroup, ActivityDto> item in itemGroup)
             {
-                Console.WriteLine($@"  {activity.Type}: Timestamp: {activity.Timestamp}");
+                Console.WriteLine(
+                    @$"  Inner group key: TargetId={item.Key.TargetId}, UserId={item.Key.UserId}, Type={item.Key.Type}");
+                foreach (ActivityDto activity in item)
+                {
+                    Console.WriteLine(
+                        @$"        Activity: {activity.GroupType}, Timestamp: {activity.Activity.Timestamp}, UserId: {activity.Activity.UserId}, EventType: {activity.Activity.Type}, TargetId: {activity.TargetId}");
+                }
             }
         }
-
-        DateTime oldestTime = groups.Any() ? groups.Min(g => g.Any() ? g.Min(a => a.Timestamp) : end) : end;
-        long oldestTimestamp = oldestTime.ToUnixTimeMilliseconds();
-
-        return this.Ok(await GameStream.CreateFromEntityResult(this.database, token, groups, timestamp, oldestTimestamp));
     }
+    #endif
 
     [HttpGet("slot/{slotType}/{slotId:int}")]
-    public async Task<IActionResult> SlotActivity(string slotType, int slotId, long timestamp)
+    [HttpGet("user2/{username}")]
+    public async Task<IActionResult> SlotActivity(string? slotType, int slotId, string? username, long? timestamp)
     {
         GameTokenEntity token = this.GetToken();
 
-        if (token.GameVersion == GameVersion.LittleBigPlanet1) return this.BadRequest();
+        if (token.GameVersion == GameVersion.LittleBigPlanet1) return this.NotFound();
 
-        if (timestamp > TimeHelper.TimestampMillis || timestamp <= 0) timestamp = TimeHelper.TimestampMillis;
+        if ((SlotHelper.IsTypeInvalid(slotType) || slotId == 0) == (username == null)) return this.BadRequest();
 
-        long endTimestamp = timestamp - 864_000;
+        IQueryable<ActivityDto> activityQuery = this.database.Activities.ToActivityDto()
+            .Where(a => a.Activity.Type != EventType.NewsPost && a.Activity.Type != EventType.MMPickLevel);
 
-        if (slotType is not ("developer" or "user")) return this.BadRequest();
+        bool isLevelActivity = username == null;
 
-        if (slotType == "developer")
-            slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
+        // Slot activity
+        if (isLevelActivity)
+        {
+            if (slotType == "developer")
+                slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-        IQueryable<ActivityDto> slotActivity = this.database.Activities.Select(ActivityToDto())
-            .Where(a => a.TargetSlotId == slotId);
+            if (!await this.database.Slots.AnyAsync(s => s.SlotId == slotId)) return this.NotFound();
 
-        DateTime start = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;
-        DateTime end = DateTimeOffset.FromUnixTimeMilliseconds(endTimestamp).DateTime;
+            activityQuery = activityQuery.Where(dto => dto.TargetSlotId == slotId);
+        }
+        // User activity
+        else
+        {
+            int userId = await this.database.Users.Where(u => u.Username == username)
+                .Select(u => u.UserId)
+                .FirstOrDefaultAsync();
+            if (userId == 0) return this.NotFound();
+            activityQuery = activityQuery.Where(dto => dto.Activity.UserId == userId);
+        }
 
-        slotActivity = slotActivity.Where(a => a.Activity.Timestamp < start && a.Activity.Timestamp > end);
+        (DateTime Start, DateTime End) times = await this.GetTimeBounds(activityQuery, timestamp, null);
 
-        List<IGrouping<ActivityGroup, ActivityEntity>> groups = await GroupActivities(slotActivity).ToListAsync();
+        activityQuery = activityQuery.Where(dto =>
+            dto.Activity.Timestamp < times.Start && dto.Activity.Timestamp > times.End);
 
-        DateTime oldestTime = groups.Max(g => g.Max(a => a.Timestamp));
-        long oldestTimestamp = new DateTimeOffset(oldestTime).ToUnixTimeMilliseconds();
+        List<IGrouping<ActivityGroup, ActivityDto>> groups = await activityQuery.ToActivityGroups().ToListAsync();
 
-        return this.Ok(await GameStream.CreateFromEntityResult(this.database, token, groups, timestamp, oldestTimestamp));
-    }
+        List<OuterActivityGroup> outerGroups = groups.ToOuterActivityGroups();
 
-    [HttpGet("user2/{userId:int}/")]
-    public async Task<IActionResult> UserActivity(int userId, long timestamp)
-    {
-        GameTokenEntity token = this.GetToken();
+        long oldestTimestamp = GetOldestTime(groups, times.Start).ToUnixTimeMilliseconds();
 
-        if (token.GameVersion == GameVersion.LittleBigPlanet1) return this.BadRequest();
+        await this.CacheEntities(outerGroups);
 
-        if (timestamp > TimeHelper.TimestampMillis || timestamp <= 0) timestamp = TimeHelper.TimestampMillis;
-
-        long endTimestamp = timestamp - 864_000;
-
-        IQueryable<ActivityDto> userActivity = this.database.Activities.Select(ActivityToDto())
-            .Where(a => a.TargetUserId == userId);
-
-        DateTime start = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;
-        DateTime end = DateTimeOffset.FromUnixTimeMilliseconds(endTimestamp).DateTime;
-
-        userActivity = userActivity.Where(a => a.Activity.Timestamp < start && a.Activity.Timestamp > end);
-
-        List<IGrouping<ActivityGroup, ActivityEntity>> groups = await GroupActivities(userActivity).ToListAsync();
-
-        DateTime oldestTime = groups.Max(g => g.Max(a => a.Timestamp));
-        long oldestTimestamp = new DateTimeOffset(oldestTime).ToUnixTimeMilliseconds();
-
-        return this.Ok(
-            await GameStream.CreateFromEntityResult(this.database, token, groups, timestamp, oldestTimestamp));
+        return this.Ok(GameStream.CreateFromGroups(token,
+            outerGroups,
+            times.Start.ToUnixTimeMilliseconds(),
+            oldestTimestamp));
     }
 }

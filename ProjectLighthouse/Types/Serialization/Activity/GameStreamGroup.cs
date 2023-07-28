@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Activity;
-using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Activity.Events;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Review;
 
@@ -19,6 +19,8 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity;
 /// </summary>
 [XmlInclude(typeof(GameUserStreamGroup))]
 [XmlInclude(typeof(GameSlotStreamGroup))]
+[XmlInclude(typeof(GamePlaylistStreamGroup))]
+[XmlInclude(typeof(GameNewsStreamGroup))]
 public class GameStreamGroup : ILbpSerializable
 {
     [XmlAttribute("type")]
@@ -35,46 +37,62 @@ public class GameStreamGroup : ILbpSerializable
     [XmlArray("events")]
     [XmlArrayItem("event")]
     [DefaultValue(null)]
+    // ReSharper disable once MemberCanBePrivate.Global
+    // (the serializer can't see this if it's private)
     public List<GameEvent> Events { get; set; }
 
-    public static GameStreamGroup CreateFromGrouping(IGrouping<ActivityGroup, ActivityEntity> group)
+    public static GameStreamGroup CreateFromGroup(OuterActivityGroup group)
     {
-        ActivityGroupType type = group.Key.GroupType;
+        GameStreamGroup gameGroup = CreateGroup(group.Key.GroupType,
+            group.Key.TargetId,
+            streamGroup =>
+            {
+                streamGroup.Timestamp = group.Groups
+                    .Max(g => g.MaxBy(a => a.Activity.Timestamp)?.Activity.Timestamp ?? group.Key.Timestamp)
+                    .ToUnixTimeMilliseconds();
+            });
+
+        gameGroup.Groups = new List<GameStreamGroup>(group.Groups.Select(g => CreateGroup(g.Key.Type,
+                g.Key.TargetId,
+                streamGroup =>
+                {
+                    streamGroup.Timestamp =
+                        g.MaxBy(a => a.Activity.Timestamp).Activity.Timestamp.ToUnixTimeMilliseconds();
+                    streamGroup.Events = GameEvent.CreateFromActivities(g).ToList();
+                }))
+            .ToList());
+
+        return gameGroup;
+    }
+
+    private static GameStreamGroup CreateGroup
+        (ActivityGroupType type, int targetId, Action<GameStreamGroup> groupAction)
+    {
         GameStreamGroup gameGroup = type switch
         {
-            ActivityGroupType.Level => new GameSlotStreamGroup
+            ActivityGroupType.Level or ActivityGroupType.TeamPick => new GameSlotStreamGroup
             {
                 Slot = new ReviewSlot
                 {
-                    SlotId = group.Key.TargetId,
+                    SlotId = targetId,
                 },
             },
             ActivityGroupType.User => new GameUserStreamGroup
             {
-                UserId = group.Key.TargetId,
+                UserId = targetId,
+            },
+            ActivityGroupType.Playlist => new GamePlaylistStreamGroup
+            {
+                PlaylistId = targetId,
+            },
+            ActivityGroupType.News => new GameNewsStreamGroup
+            {
+                NewsId = targetId,
             },
             _ => new GameStreamGroup(),
         };
-        gameGroup.Timestamp = new DateTimeOffset(group.Select(a => a.Timestamp).MaxBy(a => a)).ToUnixTimeMilliseconds();
         gameGroup.Type = type;
-
-        List<IGrouping<EventType, ActivityEntity>> eventGroups = group.OrderByDescending(a => a.Timestamp).GroupBy(g => g.Type).ToList();
-        //TODO removeme debug
-        foreach (IGrouping<EventType, ActivityEntity> bruh in eventGroups)
-        {
-            Console.WriteLine($@"group key: {bruh.Key}, count={bruh.Count()}");
-        }
-        gameGroup.Groups = new List<GameStreamGroup>
-        {
-            new GameUserStreamGroup
-            {
-                UserId = group.Key.UserId,
-                Type = ActivityGroupType.User,
-                Timestamp = gameGroup.Timestamp,
-                Events = eventGroups.SelectMany(GameEvent.CreateFromActivityGroups).ToList(),
-            },
-        };
-
+        groupAction(gameGroup);
         return gameGroup;
     }
 }

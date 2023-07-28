@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 
-namespace LBPUnion.ProjectLighthouse.Filter.Filters;
+namespace LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 
 public class SlotTypeFilter : ISlotFilter
 {

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -185,15 +187,21 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
 
         int entitledSlots = ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + stats.BonusSlots;
 
-        IQueryable<SlotEntity> SlotCount(GameVersion version)
-        {
-            return database.Slots.Where(s => s.CreatorId == this.UserId && s.GameVersion == version);
-        }
+        Dictionary<GameVersion, int> slotsByGame = await database.Slots.Where(s => s.CreatorId == this.UserId && !s.CrossControllerRequired)
+            .GroupBy(s => s.GameVersion)
+            .Select(g => new
+            {
+                Game = g.Key,
+                Count = g.Count(),
+            })
+            .ToDictionaryAsync(k => k.Game, k => k.Count);
+
+        int GetSlotCount(GameVersion version) => slotsByGame.TryGetValue(version, out int count) ? count : 0;
 
         if (this.TargetGame == GameVersion.LittleBigPlanetVita)
         {
             this.Lbp2EntitledSlots = entitledSlots;
-            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanetVita).CountAsync();
+            this.Lbp2UsedSlots = GetSlotCount(GameVersion.LittleBigPlanetVita);
         }
         else
         {
@@ -201,9 +209,9 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
             this.Lbp2EntitledSlots = entitledSlots;
             this.CrossControlEntitledSlots = entitledSlots;
             this.Lbp3EntitledSlots = entitledSlots;
-            this.Lbp1UsedSlots = await SlotCount(GameVersion.LittleBigPlanet1).CountAsync();
-            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync(s => !s.CrossControllerRequired);
-            this.Lbp3UsedSlots = await SlotCount(GameVersion.LittleBigPlanet3).CountAsync();
+            this.Lbp1UsedSlots = GetSlotCount(GameVersion.LittleBigPlanet1);
+            this.Lbp2UsedSlots = GetSlotCount(GameVersion.LittleBigPlanet2);
+            this.Lbp3UsedSlots = GetSlotCount(GameVersion.LittleBigPlanet3);
             
             this.Lbp1FreeSlots = this.Lbp1EntitledSlots - this.Lbp1UsedSlots;
 

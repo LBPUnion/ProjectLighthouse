@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 
-namespace LBPUnion.ProjectLighthouse.Filter.Filters;
+namespace LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 
 public class AuthorLabelFilter : ISlotFilter
 {
@@ -20,7 +20,7 @@ public class AuthorLabelFilter : ISlotFilter
     {
         Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.True<SlotEntity>();
         predicate = this.labels.Aggregate(predicate,
-            (current, label) => current.And(s => s.AuthorLabels.Contains(label)));
+            (current, label) => PredicateExtensions.And<SlotEntity>(current, s => s.AuthorLabels.Contains(label)));
         return predicate;
     }
 }

@@ -2,68 +2,71 @@
 
 namespace LBPUnion.ProjectLighthouse.Types.Activity;
 
+/// <summary>
+/// UnheartLevel, UnheartUser, DeleteLevelComment, and UnpublishLevel don't actually do anything
+/// </summary>
 public enum EventType
 {
     [XmlEnum("heart_level")]
-    HeartLevel,
+    HeartLevel = 0,
 
     [XmlEnum("unheart_level")]
-    UnheartLevel,
+    UnheartLevel = 1,
 
     [XmlEnum("heart_user")]
-    HeartUser,
+    HeartUser = 2,
 
     [XmlEnum("unheart_user")]
-    UnheartUser,
+    UnheartUser = 3,
 
     [XmlEnum("play_level")]
-    PlayLevel,
+    PlayLevel = 4,
 
     [XmlEnum("rate_level")]
-    RateLevel,
+    RateLevel = 5,
 
     [XmlEnum("tag_level")]
-    TagLevel,
+    TagLevel = 6,
 
     [XmlEnum("comment_on_level")]
-    CommentOnLevel,
+    CommentOnLevel = 7,
 
     [XmlEnum("delete_level_comment")]
-    DeleteLevelComment,
+    DeleteLevelComment = 8,
 
     [XmlEnum("upload_photo")]
-    UploadPhoto,
+    UploadPhoto = 9,
 
     [XmlEnum("publish_level")]
-    PublishLevel,
+    PublishLevel = 10,
 
     [XmlEnum("unpublish_level")]
-    UnpublishLevel,
+    UnpublishLevel = 11,
 
     [XmlEnum("score")]
-    Score,
+    Score = 12,
 
     [XmlEnum("news_post")]
-    NewsPost,
+    NewsPost = 13,
 
     [XmlEnum("mm_pick_level")]
-    MMPickLevel,
+    MMPickLevel = 14,
 
     [XmlEnum("dpad_rate_level")]
-    DpadRateLevel,
+    DpadRateLevel = 15,
 
     [XmlEnum("review_level")]
-    ReviewLevel,
+    ReviewLevel = 16,
 
     [XmlEnum("comment_on_user")]
-    CommentOnUser,
+    CommentOnUser = 17,
 
     [XmlEnum("create_playlist")]
-    CreatePlaylist,
+    CreatePlaylist = 18,
 
     [XmlEnum("heart_playlist")]
-    HeartPlaylist,
+    HeartPlaylist = 19,
 
     [XmlEnum("add_level_to_playlist")]
-    AddLevelToPlaylist,
+    AddLevelToPlaylist = 20,
 }

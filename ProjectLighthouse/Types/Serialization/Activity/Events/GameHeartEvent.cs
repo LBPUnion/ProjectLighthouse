@@ -41,3 +41,14 @@ public class GameHeartLevelEvent : GameEvent
         this.TargetSlot = ReviewSlot.CreateFromEntity(slot);
     }
 }
+
+public class GameHeartPlaylistEvent : GameEvent
+{
+    [XmlElement("object_playlist_id")]
+    public int TargetPlaylistId { get; set; }
+
+    public new async Task PrepareSerialization(DatabaseContext database)
+    {
+        await base.PrepareSerialization(database);
+    }
+}

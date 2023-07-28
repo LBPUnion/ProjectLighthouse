@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -19,10 +20,19 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity.Events;
 [XmlInclude(typeof(GameScoreEvent))]
 [XmlInclude(typeof(GameHeartLevelEvent))]
 [XmlInclude(typeof(GameHeartUserEvent))]
+[XmlInclude(typeof(GameHeartPlaylistEvent))]
+[XmlInclude(typeof(GameReviewEvent))]
+[XmlInclude(typeof(GamePublishLevelEvent))]
+[XmlInclude(typeof(GameRateLevelEvent))]
+[XmlInclude(typeof(GameDpadRateLevelEvent))]
+[XmlInclude(typeof(GameTeamPickLevelEvent))]
+[XmlInclude(typeof(GameNewsEvent))]
+[XmlInclude(typeof(GameCreatePlaylistEvent))]
+[XmlInclude(typeof(GameAddLevelToPlaylistEvent))]
 public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
 {
     [XmlIgnore]
-    private int UserId { get; set; }
+    protected int UserId { get; set; }
 
     [XmlAttribute("type")]
     public EventType Type { get; set; }
@@ -31,100 +41,190 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
     public long Timestamp { get; set; }
 
     [XmlElement("actor")]
+    [DefaultValue(null)]
     public string Username { get; set; }
 
     protected async Task PrepareSerialization(DatabaseContext database)
     {
-        Console.WriteLine($@"SERIALIZATION!! {this.UserId} - {this.GetHashCode()}");
+        Console.WriteLine($@"EVENT SERIALIZATION!! {this.UserId} - {this.GetHashCode()}");
         UserEntity user = await database.Users.FindAsync(this.UserId);
         if (user == null) return;
         this.Username = user.Username;
     }
 
-    public static IEnumerable<GameEvent> CreateFromActivityGroups(IGrouping<EventType, ActivityEntity> group)
+    public static IEnumerable<GameEvent> CreateFromActivities(IEnumerable<ActivityDto> activities)
     {
         List<GameEvent> events = new();
-
-        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-        // Events with Count need special treatment
-        switch (group.Key)
+        List<IGrouping<EventType, ActivityDto>> typeGroups = activities.GroupBy(g => g.Activity.Type).ToList();
+        foreach (IGrouping<EventType, ActivityDto> typeGroup in typeGroups)
         {
-            case EventType.PlayLevel:
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            // Events with Count need special treatment
+            switch (typeGroup.Key)
             {
-                if (group.First() is not LevelActivityEntity levelActivity) break;
-
-                events.Add(new GamePlayLevelEvent
+                case EventType.PlayLevel:
                 {
-                    Slot = new ReviewSlot
-                    {
-                        SlotId = levelActivity.SlotId,
-                    },
-                    Count = group.Count(),
-                    UserId = levelActivity.UserId,
-                    Timestamp = levelActivity.Timestamp.ToUnixTimeMilliseconds(),
-                    Type = levelActivity.Type,
-                });
-                break;
-            }
-            case EventType.PublishLevel:
-            {
-                if (group.First() is not LevelActivityEntity levelActivity) break;
+                    if (typeGroup.First().Activity is not LevelActivityEntity levelActivity) break;
 
-                events.Add(new GamePublishLevelEvent
-                {
-                    Slot = new ReviewSlot
+                    events.Add(new GamePlayLevelEvent
                     {
-                        SlotId = levelActivity.SlotId,
-                    },
-                    Count = group.Count(),
-                    UserId = levelActivity.UserId,
-                    Timestamp = levelActivity.Timestamp.ToUnixTimeMilliseconds(),
-                    Type = levelActivity.Type,
-                });
-                break;
+                        Slot = new ReviewSlot
+                        {
+                            SlotId = levelActivity.SlotId,
+                        },
+                        Count = typeGroup.Count(),
+                        UserId = levelActivity.UserId,
+                        Timestamp = levelActivity.Timestamp.ToUnixTimeMilliseconds(),
+                        Type = levelActivity.Type,
+                    });
+                    break;
+                }
+                // Everything else can be handled as normal
+                default:
+                    events.AddRange(typeGroup.Select(CreateFromActivity).Where(a => a != null));
+                    break;
             }
-            // Everything else can be handled as normal
-            default: events.AddRange(group.Select(CreateFromActivity));
-                break;
         }
+
         return events.AsEnumerable();
     }
 
-    private static GameEvent CreateFromActivity(ActivityEntity activity)
+    private static bool IsValidActivity(ActivityEntity activity)
     {
-        GameEvent gameEvent = activity.Type switch
+        return activity switch
+        {
+            CommentActivityEntity => activity.Type is EventType.CommentOnLevel or EventType.CommentOnUser
+                or EventType.DeleteLevelComment,
+            LevelActivityEntity => activity.Type is EventType.PlayLevel or EventType.HeartLevel
+                or EventType.UnheartLevel or EventType.DpadRateLevel or EventType.RateLevel or EventType.MMPickLevel
+                or EventType.PublishLevel or EventType.TagLevel,
+            NewsActivityEntity => activity.Type is EventType.NewsPost,
+            PhotoActivityEntity => activity.Type is EventType.UploadPhoto,
+            PlaylistActivityEntity => activity.Type is EventType.CreatePlaylist or EventType.HeartPlaylist,
+            PlaylistWithSlotActivityEntity => activity.Type is EventType.AddLevelToPlaylist,
+            ReviewActivityEntity => activity.Type is EventType.ReviewLevel,
+            ScoreActivityEntity => activity.Type is EventType.Score,
+            UserActivityEntity => activity.Type is EventType.HeartUser or EventType.UnheartUser
+                or EventType.CommentOnUser,
+            _ => false,
+        };
+    }
+
+    private static GameEvent CreateFromActivity(ActivityDto activity)
+    {
+        if (!IsValidActivity(activity.Activity))
+        {
+            Console.WriteLine(@"Invalid Activity: " + activity.Activity.ActivityId);
+            return null;
+        }
+
+        int targetId = activity.TargetId;
+
+        GameEvent gameEvent = activity.Activity.Type switch
         {
             EventType.PlayLevel => new GamePlayLevelEvent
             {
                 Slot = new ReviewSlot
                 {
-                    SlotId = ((LevelActivityEntity)activity).SlotId,
+                    SlotId = targetId,
                 },
-            },
-            EventType.CommentOnLevel => new GameSlotCommentEvent
-            {
-                CommentId = ((CommentActivityEntity)activity).CommentId,
-            },
-            EventType.CommentOnUser => new GameUserCommentEvent
-            {
-                CommentId = ((CommentActivityEntity)activity).CommentId,
-            },
-            EventType.HeartUser or EventType.UnheartUser => new GameHeartUserEvent
-            {
-                TargetUserId = ((UserActivityEntity)activity).TargetUserId,
             },
             EventType.HeartLevel or EventType.UnheartLevel => new GameHeartLevelEvent
             {
                 TargetSlot = new ReviewSlot
                 {
-                    SlotId = ((LevelActivityEntity)activity).SlotId,
+                    SlotId = targetId,
+                },
+            },
+            EventType.DpadRateLevel => new GameDpadRateLevelEvent
+            {
+                Slot = new ReviewSlot
+                {
+                    SlotId = targetId,
+                },
+            },
+            EventType.Score => new GameScoreEvent
+            {
+                ScoreId = ((ScoreActivityEntity)activity.Activity).ScoreId,
+                Slot = new ReviewSlot
+                {
+                    SlotId = targetId,
+                },
+            },
+            EventType.RateLevel => new GameRateLevelEvent
+            {
+                Slot = new ReviewSlot
+                {
+                    SlotId = targetId
+                },
+            },
+            EventType.CommentOnLevel => new GameSlotCommentEvent
+            {
+                CommentId = ((CommentActivityEntity)activity.Activity).CommentId,
+            },
+            EventType.CommentOnUser => new GameUserCommentEvent
+            {
+                CommentId = ((CommentActivityEntity)activity.Activity).CommentId,
+            },
+            EventType.HeartUser or EventType.UnheartUser => new GameHeartUserEvent
+            {
+                TargetUserId = targetId,
+            },
+            EventType.ReviewLevel => new GameReviewEvent
+            {
+                ReviewId = ((ReviewActivityEntity)activity.Activity).ReviewId,
+                Slot = new ReviewSlot
+                {
+                    SlotId = targetId,
+                },
+            },
+            EventType.UploadPhoto => new GamePhotoUploadEvent
+            {
+                Slot = new ReviewSlot
+                {
+                    SlotId = targetId,
+                },
+            },
+            EventType.MMPickLevel => new GameTeamPickLevelEvent
+            {
+                Slot = new ReviewSlot
+                {
+                    SlotId = targetId,
+                },
+            },
+            EventType.PublishLevel => new GamePublishLevelEvent
+            {
+                Slot = new ReviewSlot
+                {
+                    SlotId = targetId,
+                },
+                Count = 1,
+            },
+            EventType.NewsPost => new GameNewsEvent
+            {
+                NewsId = targetId,
+            },
+            EventType.CreatePlaylist => new GameCreatePlaylistEvent
+            {
+                TargetPlaylistId = targetId,
+            },
+            EventType.HeartPlaylist => new GameHeartPlaylistEvent
+            {
+                TargetPlaylistId = targetId,
+            },
+            EventType.AddLevelToPlaylist => new GameAddLevelToPlaylistEvent
+            {
+                TargetPlaylistId = targetId,
+                Slot = new ReviewSlot
+                {
+                    SlotId = ((PlaylistWithSlotActivityEntity)activity.Activity).SlotId,
                 },
             },
             _ => new GameEvent(),
         };
-        gameEvent.UserId = activity.UserId;
-        gameEvent.Type = activity.Type;
-        gameEvent.Timestamp = activity.Timestamp.ToUnixTimeMilliseconds();
+        gameEvent.UserId = activity.Activity.UserId;
+        gameEvent.Type = activity.Activity.Type;
+        gameEvent.Timestamp = activity.Activity.Timestamp.ToUnixTimeMilliseconds();
         return gameEvent;
     }
 }

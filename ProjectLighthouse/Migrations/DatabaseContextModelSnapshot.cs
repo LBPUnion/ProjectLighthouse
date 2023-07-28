@@ -19,6 +19,36 @@ namespace ProjectLighthouse.Migrations
                 .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity", b =>
+                {
+                    b.Property<int>("ActivityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ActivityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Activities");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ActivityEntity");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
                 {
                     b.Property<int>("HeartedLevelId")
@@ -1090,6 +1120,136 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("WebsiteAnnouncements");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.CommentActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasDiscriminator().HasValue("CommentActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("SlotId");
+
+                    b.HasDiscriminator().HasValue("LevelActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.NewsActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("NewsId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("NewsId");
+
+                    b.HasDiscriminator().HasValue("NewsActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PhotoActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("PhotoId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("PhotoId");
+
+                    b.HasDiscriminator().HasValue("PhotoActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("PlaylistId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("PlaylistId");
+
+                    b.HasIndex("PlaylistId");
+
+                    b.HasDiscriminator().HasValue("PlaylistActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistWithSlotActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("PlaylistId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("PlaylistId");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("PlaylistId");
+
+                    b.HasDiscriminator().HasValue("PlaylistWithSlotActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ReviewActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasDiscriminator().HasValue("ReviewActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ScoreActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("ScoreId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ScoreId");
+
+                    b.HasDiscriminator().HasValue("ScoreActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("TargetUserId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.HasDiscriminator().HasValue("UserActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
                 {
                     b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
@@ -1481,6 +1641,105 @@ namespace ProjectLighthouse.Migrations
                         .HasForeignKey("PublisherId");
 
                     b.Navigation("Publisher");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.CommentActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.CommentEntity", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.NewsActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Website.WebsiteAnnouncementEntity", "News")
+                        .WithMany()
+                        .HasForeignKey("NewsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("News");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PhotoActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", "Photo")
+                        .WithMany()
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Photo");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.PlaylistEntity", "Playlist")
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Playlist");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistWithSlotActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.PlaylistEntity", "Playlist")
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Playlist");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ReviewActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.ReviewEntity", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ScoreActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.ScoreEntity", "Score")
+                        .WithMany()
+                        .HasForeignKey("ScoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Score");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", b =>

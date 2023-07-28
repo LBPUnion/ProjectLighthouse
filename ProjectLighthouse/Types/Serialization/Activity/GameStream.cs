@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Activity;
-using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Entities.Website;
+using LBPUnion.ProjectLighthouse.Types.Serialization.News;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Playlist;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Slot;
 using LBPUnion.ProjectLighthouse.Types.Serialization.User;
 using LBPUnion.ProjectLighthouse.Types.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity;
 
@@ -23,10 +26,16 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity;
 public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
 {
     [XmlIgnore]
-    private List<int> SlotIds { get; set; }
+    public List<int> SlotIds { get; set; }
 
     [XmlIgnore]
-    private List<int> UserIds { get; set; }
+    public List<int> UserIds { get; set; }
+
+    [XmlIgnore]
+    public List<int> PlaylistIds { get; set; }
+
+    [XmlIgnore]
+    public List<int> NewsIds { get; set; }
 
     [XmlIgnore]
     private int TargetUserId { get; set; }
@@ -42,84 +51,85 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
 
     [XmlArray("groups")]
     [XmlArrayItem("group")]
+    [DefaultValue(null)]
     public List<GameStreamGroup> Groups { get; set; }
 
     [XmlArray("slots")]
     [XmlArrayItem("slot")]
+    [DefaultValue(null)]
     public List<SlotBase> Slots { get; set; }
 
     [XmlArray("users")]
     [XmlArrayItem("user")]
+    [DefaultValue(null)]
     public List<GameUser> Users { get; set; }
+
+    [XmlArray("playlists")]
+    [XmlArrayItem("playlist")]
+    [DefaultValue(null)]
+    public List<GamePlaylist> Playlists { get; set; }
 
     [XmlArray("news")]
     [XmlArrayItem("item")]
-    public List<object> News { get; set; }
-    //TODO implement lbp1 and lbp2 news objects
+    [DefaultValue(null)]
+    public List<GameNewsObject> News { get; set; }
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        if (this.SlotIds.Count > 0)
+        async Task<List<TResult>> LoadEntities<TFrom, TResult>(List<int> ids, Func<TFrom, TResult> transformation) 
+            where TFrom : class
         {
-            this.Slots = new List<SlotBase>();
-            foreach (int slotId in this.SlotIds)
+            List<TResult> results = new();
+            if (ids.Count <= 0) return null;
+            foreach (int id in ids)
             {
-                SlotEntity slot = await database.Slots.FindAsync(slotId);
-                if (slot == null) continue;
+                TFrom entity = await database.Set<TFrom>().FindAsync(id);
+                if (entity == null) continue;
 
-                this.Slots.Add(SlotBase.CreateFromEntity(slot, this.TargetGame, this.TargetUserId));
+                results.Add(transformation(entity));
             }
+
+            return results;
         }
 
-        if (this.UserIds.Count > 0)
-        {
-            this.Users = new List<GameUser>();
-            foreach (int userId in this.UserIds)
-            {
-                UserEntity user = await database.Users.FindAsync(userId);
-                if (user == null) continue;
-
-                this.Users.Add(GameUser.CreateFromEntity(user, this.TargetGame));
-            }
-        }
+        this.Slots = await LoadEntities<SlotEntity, SlotBase>(this.SlotIds, slot => SlotBase.CreateFromEntity(slot, this.TargetGame, this.TargetUserId));
+        this.Users = await LoadEntities<UserEntity, GameUser>(this.UserIds, user => GameUser.CreateFromEntity(user, this.TargetGame));
+        this.Playlists = await LoadEntities<PlaylistEntity, GamePlaylist>(this.PlaylistIds, GamePlaylist.CreateFromEntity);
+        this.News = await LoadEntities<WebsiteAnnouncementEntity, GameNewsObject>(this.NewsIds, GameNewsObject.CreateFromEntity);
     }
 
-    public static async Task<GameStream> CreateFromEntityResult
-    (
-        DatabaseContext database,
-        GameTokenEntity token,
-        List<IGrouping<ActivityGroup, ActivityEntity>> results,
-        long startTimestamp,
-        long endTimestamp
-    )
+    public static GameStream CreateFromGroups
+        (GameTokenEntity token, List<OuterActivityGroup> groups, long startTimestamp, long endTimestamp)
     {
-        List<int> slotIds = results.Where(g => g.Key.TargetSlotId != null && g.Key.TargetSlotId.Value != 0)
-            .Select(g => g.Key.TargetSlotId.Value)
-            .ToList();
-        Console.WriteLine($@"slotIds: {string.Join(",", slotIds)}");
-        List<int> userIds = results.Where(g => g.Key.TargetUserId != null && g.Key.TargetUserId.Value != 0)
-            .Select(g => g.Key.TargetUserId.Value)
-            .Distinct()
-            .Union(results.Select(g => g.Key.UserId))
-            .ToList();
-        // Cache target levels and users within DbContext
-        await database.Slots.Where(s => slotIds.Contains(s.SlotId)).LoadAsync();
-        await database.Users.Where(u => userIds.Contains(u.UserId)).LoadAsync();
-        Console.WriteLine($@"userIds: {string.Join(",", userIds)}");
-        Console.WriteLine($@"Stream contains {slotIds.Count} slots and {userIds.Count} users");
         GameStream gameStream = new()
         {
             TargetUserId = token.UserId,
             TargetGame = token.GameVersion,
             StartTimestamp = startTimestamp,
             EndTimestamp = endTimestamp,
-            SlotIds = slotIds,
-            UserIds = userIds,
-            Groups = new List<GameStreamGroup>(),
+            SlotIds = groups.GetIds(ActivityGroupType.Level),
+            UserIds = groups.GetIds(ActivityGroupType.User),
+            PlaylistIds = groups.GetIds(ActivityGroupType.Playlist),
+            NewsIds = groups.GetIds(ActivityGroupType.News),
         };
-        foreach (IGrouping<ActivityGroup, ActivityEntity> group in results)
+        if (groups.Count == 0) return gameStream;
+
+        gameStream.Groups = groups.Select(GameStreamGroup.CreateFromGroup).ToList();
+
+        // Workaround for level activity because it shouldn't contain nested activity groups
+        if (gameStream.Groups.Count == 1 && groups.First().Key.GroupType == ActivityGroupType.Level)
         {
-            gameStream.Groups.Add(GameStreamGroup.CreateFromGrouping(group));
+            gameStream.Groups = gameStream.Groups.First().Groups;
+        }
+
+        // Workaround to turn a single subgroup into the primary group for news and team picks
+        for (int i = 0; i < gameStream.Groups.Count; i++)
+        {
+            GameStreamGroup group = gameStream.Groups[i];
+            if (group.Type is not (ActivityGroupType.TeamPick or ActivityGroupType.News)) continue;
+            if (group.Groups.Count > 1) continue;
+
+            gameStream.Groups[i] = group.Groups.First();
         }
 
         return gameStream;

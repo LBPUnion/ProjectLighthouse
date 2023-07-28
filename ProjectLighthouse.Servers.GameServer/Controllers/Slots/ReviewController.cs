@@ -141,6 +141,22 @@ public class ReviewController : ControllerBase
         return this.Ok();
     }
 
+    [HttpGet("review/user/{slotId:int}/{reviewerName}")]
+    public async Task<IActionResult> GetReview(int slotId, string reviewerName)
+    {
+        GameTokenEntity token = this.GetToken();
+
+        int reviewerId = await this.database.Users.Where(u => u.Username == reviewerName)
+            .Select(s => s.UserId)
+            .FirstOrDefaultAsync();
+        if (reviewerId == 0) return this.NotFound();
+
+        ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.ReviewerId == reviewerId && r.SlotId == slotId);
+        if (review == null) return this.NotFound();
+
+        return this.Ok(GameReview.CreateFromEntity(review, token));
+    }
+
     [HttpGet("reviewsFor/user/{slotId:int}")]
     public async Task<IActionResult> ReviewsFor(int slotId)
     {

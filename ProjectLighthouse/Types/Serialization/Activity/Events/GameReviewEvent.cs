@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
@@ -9,7 +10,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity.Events;
 
 public class GameReviewEvent : GameEvent
 {
-    [XmlElement("slot_id")]
+    [XmlElement("object_slot_id")]
     public ReviewSlot Slot { get; set; }
 
     [XmlElement("review_id")]
@@ -21,8 +22,12 @@ public class GameReviewEvent : GameEvent
 
     public new async Task PrepareSerialization(DatabaseContext database)
     {
+        await base.PrepareSerialization(database);
+
         ReviewEntity review = await database.Reviews.FindAsync(this.ReviewId);
         if (review == null) return;
+
+        this.ReviewTimestamp = this.Timestamp;
 
         SlotEntity slot = await database.Slots.FindAsync(review.SlotId);
         if (slot == null) return;

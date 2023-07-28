@@ -18,7 +18,7 @@ public class GamePhotoUploadEvent : GameEvent
 
     [XmlElement("object_slot_id")]
     [DefaultValue(null)]
-    public ReviewSlot SlotId { get; set; }
+    public ReviewSlot Slot { get; set; }
 
     [XmlElement("user_in_photo")]
     public List<string> PhotoParticipants { get; set; }
@@ -40,6 +40,6 @@ public class GamePhotoUploadEvent : GameEvent
         SlotEntity slot = await database.Slots.FindAsync(photo.SlotId);
         if (slot == null) return;
 
-        this.SlotId = ReviewSlot.CreateFromEntity(slot);
+        this.Slot = ReviewSlot.CreateFromEntity(slot);
     }
 }

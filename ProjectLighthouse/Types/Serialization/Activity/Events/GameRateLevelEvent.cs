@@ -1,22 +1,20 @@
-﻿using System;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Review;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity.Events;
 
-public class GamePublishLevelEvent : GameEvent
+public class GameRateLevelEvent : GameEvent
 {
     [XmlElement("object_slot_id")]
     public ReviewSlot Slot { get; set; }
 
-    [XmlElement("republish")]
-    public int IsRepublish { get; set; }
-
-    [XmlElement("count")]
-    public int Count { get; set; }
+    [XmlElement("rating")]
+    public double Rating { get; set; }
 
     public new async Task PrepareSerialization(DatabaseContext database)
     {
@@ -26,8 +24,9 @@ public class GamePublishLevelEvent : GameEvent
         if (slot == null) return;
 
         this.Slot = ReviewSlot.CreateFromEntity(slot);
-        // TODO does this work?
-        bool republish = Math.Abs(this.Timestamp - slot.FirstUploaded) > 5000;
-        this.IsRepublish = Convert.ToInt32(republish);
+
+        this.Rating = await database.RatedLevels.Where(r => r.SlotId == slot.SlotId && r.UserId == this.UserId)
+            .Select(r => r.RatingLBP1)
+            .FirstOrDefaultAsync();
     }
 }

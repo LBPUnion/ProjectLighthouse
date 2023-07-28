@@ -1,3 +1,4 @@
+using System;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Types.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
@@ -90,30 +91,34 @@ public partial class DatabaseContext : DbContext
     public static DatabaseContext CreateNewInstance()
     {
         DbContextOptionsBuilder<DatabaseContext> builder = new();
-        builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
-            MySqlServerVersion.LatestSupportedServerVersion);
+        ConfigureBuilder()(builder);
         return new DatabaseContext(builder.Options);
+    }
+
+    public static Action<DbContextOptionsBuilder> ConfigureBuilder()
+    {
+        return builder =>
+        {
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion);
+            builder.AddInterceptors(new ActivityInterceptor(new ActivityEntityEventHandler()));
+        };
     }
 
     #region Activity
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //TODO implement reviews 
         modelBuilder.Entity<LevelActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<PhotoActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<PlaylistActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<PlaylistWithSlotActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<ScoreActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<NewsActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<CommentActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<ReviewActivityEntity>().UseTphMappingStrategy();
         base.OnModelCreating(modelBuilder);
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.AddInterceptors(new ActivityInterceptor(new ActivityEntityEventHandler()));
-        base.OnConfiguring(optionsBuilder);
     }
     #endregion
 }

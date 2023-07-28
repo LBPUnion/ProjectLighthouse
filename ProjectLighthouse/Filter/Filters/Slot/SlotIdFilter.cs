@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 
-namespace LBPUnion.ProjectLighthouse.Filter.Filters;
+namespace LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 
 public class SlotIdFilter : ISlotFilter
 {
@@ -20,7 +20,7 @@ public class SlotIdFilter : ISlotFilter
     public Expression<Func<SlotEntity, bool>> GetPredicate()
     {
         Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.False<SlotEntity>();
-        predicate = this.slotIds.Aggregate(predicate, (current, slotId) => current.Or(s => s.SlotId == slotId));
+        predicate = this.slotIds.Aggregate(predicate, (current, slotId) => PredicateExtensions.Or<SlotEntity>(current, s => s.SlotId == slotId));
         return predicate;
     }
 }

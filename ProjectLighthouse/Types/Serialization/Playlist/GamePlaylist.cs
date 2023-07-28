@@ -30,7 +30,6 @@ public class GamePlaylist : ILbpSerializable, INeedsPreparationForSerialization
     [XmlElement("name")]
     public string Name { get; set; } = "";
 
-    [DefaultValue("")]
     [XmlElement("description")]
     public string Description { get; set; } = "";
 
@@ -62,6 +61,7 @@ public class GamePlaylist : ILbpSerializable, INeedsPreparationForSerialization
             Username = authorUsername,
         };
 
+        this.LevelCount = this.SlotIds.Length;
         this.Hearts = await database.HeartedPlaylists.CountAsync(h => h.HeartedPlaylistId == this.PlaylistId);
         this.PlaylistQuota = ServerConfiguration.Instance.UserGeneratedContentLimits.ListsQuota;
         List<string> iconList = this.SlotIds.Select(id => database.Slots.FirstOrDefault(s => s.SlotId == id))
