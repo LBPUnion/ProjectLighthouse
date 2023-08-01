@@ -25,7 +25,7 @@
         @foreach (ReportPlayer player in Model.XmlPlayers)
         {
             <div id="hover-subjects-@Model.ReportId" class="hover-players">
-                <a href="/">@player.Name</a>
+                <a href="/users/0?name=@player.Name">@player.Name</a>
             </div>
         }
 
