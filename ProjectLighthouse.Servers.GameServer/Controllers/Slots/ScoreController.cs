@@ -1,5 +1,4 @@
 #nullable enable
-using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -34,11 +33,10 @@ public class ScoreController : ControllerBase
     {
         UserFriendData? store = UserFriendStore.GetUserFriendData(userId);
         List<int>? friendIds = store?.FriendIds;
-        friendIds ??= new List<int>
-        {
-            userId,
-        };
-        return friendIds.Append(userId).Distinct().ToArray();
+        friendIds ??= new List<int>();
+        friendIds.Add(userId);
+
+        return friendIds.Distinct().ToArray();
     }
 
     [HttpPost("scoreboard/{slotType}/{id:int}")]
