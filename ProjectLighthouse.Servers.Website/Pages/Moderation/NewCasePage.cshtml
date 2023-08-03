@@ -55,13 +55,20 @@
     <h3>Moderation History for user @Model.AffectedId</h3>
     <select class="ui fluid dropdown">
         <option disabled selected>--- moderation history ---</option>
-        @foreach (ModerationCaseEntity moderationCase in Model.AffectedIdHistory)
+        @if (Model.AffectedIdHistory.Count != 0)
         {
-            <option disabled style="color: black;">
-                @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
-                on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
-                with reason "@moderationCase.Reason"
-            </option>        
+            @foreach (ModerationCaseEntity moderationCase in Model.AffectedIdHistory)
+            {
+                <option disabled style="color: black;">
+                    @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
+                    on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+                    with reason "@moderationCase.Reason"
+                </option>
+            }    
+        }
+        else
+        {
+            <option disabled style="color: black;">No moderation history found for user @Model.AffectedId</option>    
         }
     </select>
 </div>
