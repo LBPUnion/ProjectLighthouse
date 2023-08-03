@@ -17,7 +17,7 @@ public class NewCasePage : BaseLayout
     public CaseType Type { get; set; }
     
     public int AffectedId { get; set; }
-    public List<ModerationCaseEntity> AffectedIdHistory { get; set; }
+    public List<ModerationCaseEntity> AffectedIdHistory { get; set; } = new();
 
     public string? Error { get; private set; }
 
@@ -25,8 +25,6 @@ public class NewCasePage : BaseLayout
     {
         UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.Redirect("/login");
-        
-        List<ModerationCaseEntity> affectedIdHistory = this.Database.Cases.Where(c => c.AffectedId == affectedId).ToList();
 
         if (type == null) return this.BadRequest();
         if (affectedId == null) return this.BadRequest();
@@ -34,7 +32,7 @@ public class NewCasePage : BaseLayout
         this.Type = type.Value;
         
         this.AffectedId = affectedId.Value;
-        this.AffectedIdHistory = affectedIdHistory;
+        this.AffectedIdHistory = this.Database.Cases.Where(c => c.AffectedId == affectedId).ToList();
         
         return this.Page();
     }

@@ -25,18 +25,18 @@
     <div class="ui yellow segment">
         <div class="field">
             <label style="text-align: left" for="reason">Reason</label>
-            <textarea name="reason" id="reason" spellcheck="false" rows="2"></textarea>
+            <textarea name="reason" id="reason" spellcheck="false" rows="2" required></textarea>
         </div>
         <div class="field">
             <label style="text-align: left" for="mod-notes">Mod Notes</label>
-            <textarea name="modNotes" id="mod-notes" spellcheck="false" rows="2"></textarea>
+            <textarea name="modNotes" id="mod-notes" spellcheck="false" rows="2" required></textarea>
         </div>
     </div>
     
     <div class="ui yellow segment">
         <div class="field">
             <label style="text-align: left" for="expires">Expiration</label>
-            <input type="datetime-local" name="expires" id="expires" spellcheck="false" rows="2" />
+            <input type="datetime-local" name="expires" id="expires" spellcheck="false" rows="2" required />
         </div>
         <button type="button" class="ui yellow button" onclick="setPermanent()">Permanent Ban</button>
     </div>
