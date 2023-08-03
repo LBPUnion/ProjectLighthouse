@@ -1,13 +1,17 @@
 @page "/moderation/newCase"
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Types.Entities.Moderation
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.NewCasePage
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = $"New {Model.Type.ToString()} Case";
+
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
-<form method="post">
+<form method="post" class="ui form center aligned">
     @Html.AntiForgeryToken()
 
     @if (!string.IsNullOrWhiteSpace(Model.Error))
@@ -17,21 +21,53 @@
 
     <input type="hidden" name="type" value="@((int)Model.Type)"/>
     <input type="hidden" name="affectedId" value="@Model.AffectedId"/>
+    
+    <div class="ui yellow segment">
+        <div class="field">
+            <label style="text-align: left" for="reason">Reason</label>
+            <textarea name="reason" id="reason" spellcheck="false" rows="2"></textarea>
+        </div>
+        <div class="field">
+            <label style="text-align: left" for="mod-notes">Mod Notes</label>
+            <textarea name="modNotes" id="mod-notes" spellcheck="false" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="ui yellow segment">
+        <div class="field">
+            <label style="text-align: left" for="expires">Expiration</label>
+            <input type="datetime-local" name="expires" id="expires" spellcheck="false" rows="2" />
+        </div>
+        <button type="button" class="ui yellow button" onclick="setPermanent()">Permanent Ban</button>
+    </div>
 
-    <div class="ui left labeled input">
-        <label for="reason" class="ui blue label">Reason: </label>
-        <input type="text" name="reason" id="reason"/>
-    </div><br/><br/>
+    <div class="ui red segment">
+        <div style="margin-bottom: 1em;">
+            <i class="ui icon warning"></i><i>Remember to dismiss your case after expiration otherwise it will remain in effect!</i>
+        </div>
+        <button type="submit" class="ui red button">Create Case</button>
+    </div>
+</form> 
 
-    <div class="ui left labeled input">
-        <label for="mod-notes" class="ui blue label">Mod Notes: </label>
-        <input type="text" name="modNotes" id="mod-notes"/>
-    </div><br/><br/>
+<hr />
 
-    <div class="ui left labeled input">
-        <label for="expires" class="ui blue label">Expires: </label>
-        <input type="datetime-local" name="expires" id="expires"/>
-    </div><br/><br/>
+<div class="ui green segment">
+    <h3>Moderation History for (user)</h3>
+    <select class="ui fluid dropdown">
+        <option disabled selected>--- moderation history ---</option>
+        @foreach (ModerationCaseEntity moderationCase in Model.AffectedIdHistory)
+        {
+            <option disabled style="color: black;">
+                @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
+                on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+                with reason "@moderationCase.Reason"
+            </option>        
+        }
+    </select>
+</div>
 
-    <br/><input type="submit" value="Create case" class="ui red button"/>
-</form>
+<script>
+    function setPermanent() {
+        document.getElementById("expires").value = "9999-12-31T23:59";
+    }
+</script>
