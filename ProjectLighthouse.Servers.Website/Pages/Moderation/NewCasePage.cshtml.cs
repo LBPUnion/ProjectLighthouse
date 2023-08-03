@@ -57,10 +57,10 @@ public class NewCasePage : BaseLayout
         // if id is invalid then return bad request
         if (!await type.Value.IsIdValid((int)affectedId, this.Database)) return this.BadRequest();
 
-        UserEntity? affectedUserEntity =
+        UserEntity? affectedUser =
             await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == affectedId.Value);
 
-        if (affectedUserEntity?.IsModerator ?? false)
+        if (affectedUser?.IsModerator ?? false)
         {
             this.Error = this.Translate(ErrorStrings.ActionNoPermission);
             return this.Page();
