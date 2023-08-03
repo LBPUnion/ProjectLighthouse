@@ -5,7 +5,7 @@
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = $"New {Model.Type.ToString()} Case";
+    Model.Title = "New Moderation Case";
 
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
@@ -21,6 +21,11 @@
 
     <input type="hidden" name="type" value="@((int)Model.Type)"/>
     <input type="hidden" name="affectedId" value="@Model.AffectedId"/>
+    
+    <div class="ui yellow segment">
+        <span><b>Case Type:</b> @Model.Type.ToString()</span>
+        <span><b>Affected User:</b> @Model.AffectedUser!.Username (@Model.AffectedId)</span>
+    </div>
     
     <div class="ui yellow segment">
         <div class="field">
@@ -49,30 +54,28 @@
     </div>
     
     <hr />
-         
-    @if (Model.AffectedUser != null)
-    {
-        <div class="ui green segment">
-            <h3>Moderation History for @Model.AffectedUser.Username</h3>
-            <select class="ui fluid dropdown">
-                @if (Model.AffectedHistory.Count != 0)
+    
+    <div class="ui blue segment">
+        <label style="text-align: left" for="mod-history">Moderation History</label> 
+        <select class="ui fluid dropdown" id="mod-history">
+            @if (Model.AffectedHistory.Count != 0)
+            {
+                <option disabled selected>--- Previous moderation history for @Model.AffectedUser.Username (@Model.AffectedId) ---</option>
+                @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
                 {
-                    @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
-                    {
-                        <option disabled style="color: black;">
-                            @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
-                            on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
-                            with reason "@moderationCase.Reason"
-                        </option>
-                    }
+                    <option disabled style="color: black;">
+                        @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
+                        on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+                        with reason "@moderationCase.Reason"
+                    </option>
                 }
-                else
-                {
-                    <option disabled selected>No moderation history found for user @Model.AffectedUser.Username</option>
-                }
-            </select>
-        </div>    
-    }
+            }
+            else
+            {
+                <option disabled selected>No moderation history found for user @Model.AffectedUser.Username (@Model.AffectedId)</option>
+            }
+        </select>
+    </div>
 </form> 
 
 <script>

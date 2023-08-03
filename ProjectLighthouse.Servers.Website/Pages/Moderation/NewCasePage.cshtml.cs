@@ -37,6 +37,8 @@ public class NewCasePage : BaseLayout
         this.AffectedHistory = await this.Database.Cases.Where(c => c.AffectedId == this.AffectedId)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
+        
+        if (this.AffectedUser == null) return this.BadRequest();
 
         return this.Page();
     }
