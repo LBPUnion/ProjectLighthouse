@@ -24,7 +24,7 @@
     
     <div class="ui yellow segment">
         <div><b>Case Type:</b> @Model.Type.ToString()</div>
-        <div><b>Affected User:</b> @Model.AffectedUser!.Username (@Model.AffectedId)</div>
+        <div><b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (@Model.AffectedId)</a></div>
     </div>
     
     <div class="ui yellow segment">
