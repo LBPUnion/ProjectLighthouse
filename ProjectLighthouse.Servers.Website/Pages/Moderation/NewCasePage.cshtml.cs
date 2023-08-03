@@ -17,11 +17,12 @@ public class NewCasePage : BaseLayout
     public CaseType Type { get; set; }
     
     public int AffectedId { get; set; }
-    public List<ModerationCaseEntity> AffectedIdHistory { get; set; } = new();
+    public UserEntity? AffectedUser { get; set; }
+    public List<ModerationCaseEntity> AffectedHistory { get; set; } = new();
 
     public string? Error { get; private set; }
 
-    public IActionResult OnGet([FromQuery] CaseType? type, [FromQuery] int? affectedId)
+    public async Task<IActionResult> OnGet([FromQuery] CaseType? type, [FromQuery] int? affectedId)
     {
         UserEntity? user = this.Database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.Redirect("/login");
@@ -32,7 +33,8 @@ public class NewCasePage : BaseLayout
         this.Type = type.Value;
         
         this.AffectedId = affectedId.Value;
-        this.AffectedIdHistory = this.Database.Cases.Where(c => c.AffectedId == affectedId).ToList();
+        this.AffectedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId);
+        this.AffectedHistory = await this.Database.Cases.Where(c => c.AffectedId == this.AffectedId).ToListAsync();
         
         return this.Page();
     }

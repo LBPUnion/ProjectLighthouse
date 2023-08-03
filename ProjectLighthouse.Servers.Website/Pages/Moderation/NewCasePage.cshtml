@@ -49,28 +49,30 @@
     </div>
     
     <hr />
-    
-    <div class="ui green segment">
-        <h3>Moderation History for user @Model.AffectedId</h3>
-        <select class="ui fluid dropdown">
-            @if (Model.AffectedIdHistory.Count != 0)
-            {
-                <option disabled selected>--- moderation history ---</option>
-                @foreach (ModerationCaseEntity moderationCase in Model.AffectedIdHistory)
+         
+    @if (Model.AffectedUser != null)
+    {
+        <div class="ui green segment">
+            <h3>Moderation History for @Model.AffectedUser.Username</h3>
+            <select class="ui fluid dropdown">
+                @if (Model.AffectedHistory.Count != 0)
                 {
-                    <option disabled style="color: black;">
-                        @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
-                        on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
-                        with reason "@moderationCase.Reason"
-                    </option>
-                }    
-            }
-            else
-            {
-                <option disabled selected>No moderation history found for user @Model.AffectedId</option>    
-            }
-        </select>
-    </div>
+                    @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
+                    {
+                        <option disabled style="color: black;">
+                            @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
+                            on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+                            with reason "@moderationCase.Reason"
+                        </option>
+                    }
+                }
+                else
+                {
+                    <option disabled selected>No moderation history found for user @Model.AffectedId</option>
+                }
+            </select>
+        </div>    
+    }
 </form> 
 
 <script>
