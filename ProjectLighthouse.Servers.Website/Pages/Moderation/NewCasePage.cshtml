@@ -55,7 +55,7 @@
                         <option disabled style="color: black;">
                             @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
                             on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
-                            with reason "@moderationCase.Reason"
+                            with reason "@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")"
                         </option>
                     }
                 }
