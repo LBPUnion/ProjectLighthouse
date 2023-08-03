@@ -49,7 +49,7 @@
             <select class="ui fluid dropdown" id="mod-history">
                 @if (Model.AffectedHistory.Count != 0)
                 {
-                    <option disabled selected>--- Previous moderation history for @Model.AffectedUser.Username (@Model.AffectedId) ---</option>
+                    <option disabled selected>--- Previous moderation history for user @Model.AffectedUser.Username (@Model.AffectedId) ---</option>
                     @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
                     {
                         <option disabled style="color: black;">
