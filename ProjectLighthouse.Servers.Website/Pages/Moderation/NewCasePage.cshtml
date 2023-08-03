@@ -23,25 +23,25 @@
     <input type="hidden" name="affectedId" value="@Model.AffectedId"/>
     
     <div class="ui yellow segment">
-        <span><b>Case Type:</b> @Model.Type.ToString()</span>
-        <span><b>Affected User:</b> @Model.AffectedUser!.Username (@Model.AffectedId)</span>
+        <div><b>Case Type:</b> @Model.Type.ToString()</div>
+        <div><b>Affected User:</b> @Model.AffectedUser!.Username (@Model.AffectedId)</div>
     </div>
     
     <div class="ui yellow segment">
         <div class="field">
             <label style="text-align: left" for="reason">Reason</label>
-            <textarea name="reason" id="reason" spellcheck="false" rows="2"></textarea>
+            <textarea name="reason" id="reason" spellcheck="true" rows="1"></textarea>
         </div>
         <div class="field">
             <label style="text-align: left" for="mod-notes">Mod Notes</label>
-            <textarea name="modNotes" id="mod-notes" spellcheck="false" rows="2"></textarea>
+            <textarea name="modNotes" id="mod-notes" spellcheck="true" rows="1"></textarea>
         </div>
     </div>
     
     <div class="ui yellow segment">
         <div class="field">
             <label style="text-align: left" for="expires">Expiration</label>
-            <input type="datetime-local" name="expires" id="expires" spellcheck="false" rows="2" required />
+            <input type="datetime-local" name="expires" id="expires" required />
         </div>
         <button type="button" class="ui yellow button" onclick="setPermanent()">Permanent Ban</button>
     </div>
@@ -56,25 +56,27 @@
     <hr />
     
     <div class="ui blue segment">
-        <label style="text-align: left" for="mod-history">Moderation History</label> 
-        <select class="ui fluid dropdown" id="mod-history">
-            @if (Model.AffectedHistory.Count != 0)
-            {
-                <option disabled selected>--- Previous moderation history for @Model.AffectedUser.Username (@Model.AffectedId) ---</option>
-                @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
+        <div class="field">
+            <label style="text-align: left" for="mod-history">Moderation History</label>
+            <select class="ui fluid dropdown" id="mod-history">
+                @if (Model.AffectedHistory.Count != 0)
                 {
-                    <option disabled style="color: black;">
-                        @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
-                        on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
-                        with reason "@moderationCase.Reason"
-                    </option>
+                    <option disabled selected>--- Previous moderation history for @Model.AffectedUser.Username (@Model.AffectedId) ---</option>
+                    @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
+                    {
+                        <option disabled style="color: black;">
+                            @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
+                            on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+                            with reason "@moderationCase.Reason"
+                        </option>
+                    }
                 }
-            }
-            else
-            {
-                <option disabled selected>No moderation history found for user @Model.AffectedUser.Username (@Model.AffectedId)</option>
-            }
-        </select>
+                else
+                {
+                    <option disabled selected>No moderation history found for user @Model.AffectedUser.Username (@Model.AffectedId)</option>
+                }
+            </select>
+        </div>
     </div>
 </form> 
 
