@@ -12,6 +12,7 @@ public class ReviewFrame : PaginatedFrame
 {
     public List<ReviewEntity> Reviews = new();
 
+    public bool CanViewReviews { get; set; }
     public bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
 
     public ReviewFrame(DatabaseContext database) : base(database)
@@ -23,10 +24,15 @@ public class ReviewFrame : PaginatedFrame
     {
         this.CurrentPage = page;
 
-        SlotEntity? slot = await this.Database.Slots.FindAsync(slotId);
-        if (slot == null) return this.BadRequest();
+        SlotEntity? slot = await this.Database.Slots.Include(s => s.Creator)
+            .Where(s => s.SlotId == slotId)
+            .FirstOrDefaultAsync();
+        if (slot == null || slot.Creator == null) return this.BadRequest();
 
-        if (!this.ReviewsEnabled)
+        this.CanViewReviews = slot.Creator.LevelVisibility.CanAccess(this.User != null,
+            this.User == slot.Creator || this.User != null && this.User.IsModerator);
+
+        if (!this.ReviewsEnabled || !this.CanViewReviews)
         {
             this.ClampPage();
             return this.Page();

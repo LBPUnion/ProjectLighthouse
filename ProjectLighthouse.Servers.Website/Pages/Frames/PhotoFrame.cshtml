@@ -12,7 +12,18 @@
 }
 
 <div class="ui purple segment" id="photos">
-    @if (Model.Photos.Count > 0)
+    @if (!Model.CanViewPhotos)
+    {
+        if (Model.Type == "user")
+        {
+            <span>This user's privacy settings prevent you from viewing this page.</span>
+        }
+        else
+        {
+            <span>This level creator's privacy settings prevent you from viewing this page.</span>
+        }
+    }
+    else if (Model.Photos.Count > 0)
     {
         <div class="ui center aligned grid">
             @foreach (PhotoEntity photo in Model.Photos)

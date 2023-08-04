@@ -12,7 +12,11 @@
 }
 
 <div class="ui @Model.Color segment" id="levels">
-    @if (Model.Slots.Count == 0)
+    @if (!Model.CanViewSlots)
+    {
+        <p>This user's privacy settings prevent you from viewing this page.</p>
+    }
+    else if (Model.Slots.Count == 0)
     {
         <p>@Model.SlotsEmptyText</p>
     }

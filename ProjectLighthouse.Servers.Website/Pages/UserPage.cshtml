@@ -82,11 +82,18 @@
                 </a>
             }
         }
+        @if (Model.ProfileUser == Model.User)
+        {
+            <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/privacy">
+                <i class="eye icon"></i>
+                <span>Privacy Settings</span>
+            </a>
+        }
         @if (Model.ProfileUser == Model.User || (Model.User?.IsModerator ?? false))
         {
             <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/settings">
                 <i class="cog icon"></i>
-                <span>Settings</span>
+                <span>Profile Settings</span>
             </a>
         }
         @if (Model.ProfileUser == Model.User)
@@ -101,105 +108,119 @@
     {
         <br/>
     }
-    <div class="eight wide column">
-        <div class="ui blue segment">
-            <h2>@Model.Translate(ProfileStrings.Biography)</h2>
-            @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
-            {
-                <p>@Model.Translate(ProfileStrings.NoBiography, Model.ProfileUser.Username)</p>
-            }
-            else
-            {
-                <p style="overflow-wrap: anywhere;">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
-            }
-        </div>
-    </div>
-    @if (isMobile)
+    @if (Model.CanViewProfile)
     {
-        <br/>
-    }
-    <div class="eight wide column">
-        <div class="ui red segment">
-            <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
-            <p>@Model.Translate(GeneralStrings.Soon)</p>
+        <div class="eight wide column">
+            <div class="ui blue segment">
+                <h2>@Model.Translate(ProfileStrings.Biography)</h2>
+                @if (string.IsNullOrWhiteSpace(Model.ProfileUser.Biography))
+                {
+                    <p>@Model.Translate(ProfileStrings.NoBiography, Model.ProfileUser.Username)</p>
+                }
+                else
+                {
+                    <p style="overflow-wrap: anywhere;">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</p>
+                }
+            </div>
         </div>
-    </div>
-    @if (isMobile)
-    {
-        <br/>
-    }
-</div>
-
-<div class="ui grid">
-    @{
-        string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
-        string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
-    }
-    <div class="@outerDiv">
-        <div class="@innerDiv">
-            <a class="item active lh-sidebar" target="lh-comments">
-                Comments
-            </a>
-            <a class="item lh-sidebar" target="lh-photos">
-                @Model.Translate(BaseLayoutStrings.HeaderPhotos)
-            </a>
-            <a class="item lh-sidebar" target="lh-levels">
-                @Model.Translate(BaseLayoutStrings.HeaderSlots)
-            </a>
-            <a class="item lh-sidebar" target="lh-playlists">
-                Playlists
-            </a>
-            @if (Model.User == Model.ProfileUser)
-            {
-                <a class="item lh-sidebar" target="lh-hearted">
-                    Hearted Levels
-                </a>
-                <a class="item lh-sidebar" target="lh-queued">
-                    Queued Levels
-                </a>
-            }
-        </div>
-    </div>
-    @{
-        string divLength = isMobile ? "sixteen" : "thirteen";
-    }
-    <div class="@divLength wide stretched column">
-        <div class="ui fluid placeholder" id="lh-placeholder">
-            @for (int i = 0; i < 3; i++)
-            {
-                <div class="paragraph">
-                    @for (int j = 0; j < 5; j++)
-                    {
-                        <div class="line"></div>
-                    }
-                </div>
-            }
-        </div>
-        <div class="lh-content hidden" id="lh-comments">
-            @await Html.PartialAsync("Partials/FramePartial", ($"/comments/user/{Model.ProfileUser.UserId}", "Comments"))
-        </div>
-        <div class="lh-content hidden" id="lh-photos">
-            @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.ProfileUser.UserId}", "Photos"))
-        </div>
-        <div class="lh-content hidden" id="lh-levels">
-            @await Html.PartialAsync("Partials/FramePartial", ($"/slots/by/{Model.ProfileUser.UserId}", "Published Slots"))
-        </div>
-        <div class="lh-content hidden" id="lh-playlists">
-            <div class="ui purple segment">
+        @if (isMobile)
+        {
+            <br/>
+        }
+        <div class="eight wide column">
+            <div class="ui red segment">
+                <h2>@Model.Translate(GeneralStrings.RecentActivity)</h2>
                 <p>@Model.Translate(GeneralStrings.Soon)</p>
             </div>
         </div>
-        @if (Model.User == Model.ProfileUser)
+        @if (isMobile)
         {
-            <div class="lh-content hidden" id="lh-hearted">
-                @await Html.PartialAsync("Partials/FramePartial", ($"/slots/hearted/{Model.ProfileUser.UserId}", "Hearted Slots"))
-            </div>
-            <div class="lh-content hidden" id="lh-queued">
-                @await Html.PartialAsync("Partials/FramePartial", ($"/slots/queued/{Model.ProfileUser.UserId}", "Queued Slots"))
-            </div>
+            <br/>
         }
-    </div>
+    }
 </div>
+
+@if (!Model.CanViewProfile)
+{
+    <div class="ui red segment">
+        <p>
+            <i>The user's privacy settings prevent you from viewing this page.</i>
+        </p>
+    </div>
+}
+else
+{
+    <div class="ui grid">
+        @{
+            string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
+            string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
+        }
+        <div class="@outerDiv">
+            <div class="@innerDiv">
+                <a class="item active lh-sidebar" target="lh-comments">
+                    Comments
+                </a>
+                <a class="item lh-sidebar" target="lh-photos">
+                    @Model.Translate(BaseLayoutStrings.HeaderPhotos)
+                </a>
+                <a class="item lh-sidebar" target="lh-levels">
+                    @Model.Translate(BaseLayoutStrings.HeaderSlots)
+                </a>
+                <a class="item lh-sidebar" target="lh-playlists">
+                    Playlists
+                </a>
+                @if (Model.User == Model.ProfileUser)
+                {
+                    <a class="item lh-sidebar" target="lh-hearted">
+                        Hearted Levels
+                    </a>
+                    <a class="item lh-sidebar" target="lh-queued">
+                        Queued Levels
+                    </a>
+                }
+            </div>
+        </div>
+        @{
+            string divLength = isMobile ? "sixteen" : "thirteen";
+        }
+        <div class="@divLength wide stretched column">
+            <div class="ui fluid placeholder" id="lh-placeholder">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <div class="paragraph">
+                        @for (int j = 0; j < 5; j++)
+                        {
+                            <div class="line"></div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="lh-content hidden" id="lh-comments">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/comments/user/{Model.ProfileUser.UserId}", "Comments"))
+            </div>
+            <div class="lh-content hidden" id="lh-photos">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.ProfileUser.UserId}", "Photos"))
+            </div>
+            <div class="lh-content hidden" id="lh-levels">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/slots/by/{Model.ProfileUser.UserId}", "Published Slots"))
+            </div>
+            <div class="lh-content hidden" id="lh-playlists">
+                <div class="ui purple segment">
+                    <p>@Model.Translate(GeneralStrings.Soon)</p>
+                </div>
+            </div>
+            @if (Model.User == Model.ProfileUser)
+            {
+                <div class="lh-content hidden" id="lh-hearted">
+                    @await Html.PartialAsync("Partials/FramePartial", ($"/slots/hearted/{Model.ProfileUser.UserId}", "Hearted Slots"))
+                </div>
+                <div class="lh-content hidden" id="lh-queued">
+                    @await Html.PartialAsync("Partials/FramePartial", ($"/slots/queued/{Model.ProfileUser.UserId}", "Queued Slots"))
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @if (Model.User != null && Model.User.IsModerator)
 {
@@ -247,4 +268,7 @@
     }
 }
 
-@await Html.PartialAsync("Partials/SectionScriptPartial")
+@if (Model.CanViewProfile)
+{
+    @await Html.PartialAsync("Partials/SectionScriptPartial")
+}

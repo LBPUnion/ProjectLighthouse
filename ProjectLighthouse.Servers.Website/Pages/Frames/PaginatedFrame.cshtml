@@ -30,8 +30,8 @@
     <script>
        for (let link of document.querySelectorAll("#pagination > a")){
            link.addEventListener("click", () => {
-               let top = window.frameElement.getBoundingClientRect().y
-               if (window.parent.scrollX < top) return;
+               let top = (window.frameElement.getBoundingClientRect().top + window.parent.scrollY) - 50;
+               if (window.parent.scrollY < top) return;
                window.parent.scrollTo({
                    'behavior': 'smooth',
                    'left': 0,

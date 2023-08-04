@@ -9,7 +9,11 @@
 }
 
 <div class="ui blue segment" id="scores">
-    @if (Model.TotalItems == 0)
+    @if (!Model.CanViewScores)
+    {
+        <span>This level creator's privacy settings prevent you from viewing this page.</span>
+    }
+    else if (Model.TotalItems == 0)
     {
         <p>There are no scores.</p>
     }

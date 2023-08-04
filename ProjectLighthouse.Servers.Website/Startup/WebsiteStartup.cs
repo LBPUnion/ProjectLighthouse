@@ -123,6 +123,8 @@ public class WebsiteStartup
         #if DEBUG
         app.UseDeveloperExceptionPage();
         app.UseCors();
+        #else
+        app.UseExceptionHandler("/error");
         #endif
 
         app.UseStatusCodePagesWithReExecute("/404");

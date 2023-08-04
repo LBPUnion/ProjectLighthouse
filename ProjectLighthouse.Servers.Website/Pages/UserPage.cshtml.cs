@@ -10,8 +10,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
 public class UserPage : BaseLayout
 {
-    public bool IsProfileUserHearted;
+    public bool CanViewProfile;
 
+    public bool IsProfileUserHearted;
     public bool IsProfileUserBlocked;
 
     public UserEntity? ProfileUser;
@@ -23,27 +24,8 @@ public class UserPage : BaseLayout
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
 
-        // Determine if user can view profile according to profileUser's privacy settings
-        if (this.User == null || !this.User.IsAdmin)
-        {
-            switch (this.ProfileUser.ProfileVisibility)
-            {
-                case PrivacyType.PSN:
-                {
-                    if (this.User != null) return this.NotFound();
-
-                    break;
-                }
-                case PrivacyType.Game:
-                {
-                    if (this.ProfileUser != this.User) return this.NotFound();
-
-                    break;
-                }
-                case PrivacyType.All: break;
-                default: throw new ArgumentOutOfRangeException();
-            }
-        }
+        this.CanViewProfile = this.ProfileUser.ProfileVisibility.CanAccess(this.User != null,
+            this.ProfileUser == this.User || this.User != null && this.User.IsModerator);
 
         if (this.User == null) return this.Page();
 

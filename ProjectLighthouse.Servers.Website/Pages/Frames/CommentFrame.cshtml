@@ -11,7 +11,18 @@
 }
 
 <div class="ui yellow segment" id="comments">
-    @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
+    @if (!Model.CanViewComments)
+    {
+        if (Model.Type == "user")
+        {
+            <span>This user's privacy settings prevent you from viewing this page.</span>
+        }
+        else
+        {
+            <span>This level creator's privacy settings prevent you from viewing this page.</span>
+        }
+    }
+    else if (Model.Comments.Count == 0 && Model.CommentsEnabled)
     {
         <p>There are no comments.</p>
     }

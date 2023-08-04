@@ -55,103 +55,114 @@
 }
 
 @await Model.Slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{Model.Slot?.SlotId}", language, timeZone, isMobile)
-<br>
 
-<div class="@(isMobile ? "" : "ui grid")">
-    <div class="eight wide column">
-        <div class="ui blue segment">
-            <h2>Description</h2>
-            <p style="overflow-wrap: anywhere">@HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model.Slot?.Description) ? "This level has no description." : Model.Slot.Description)</p>
-        </div>
+@if (!Model.CanViewLevel)
+{
+    <div class="ui red segment">
+        <p>
+            <i>The creator's privacy settings prevent you from viewing this page.</i>
+        </p>
     </div>
-    @if (isMobile)
-    {
-        <br/>
-    }
-    <div class="eight wide column">
-        <div class="ui red segment">
-            <h2>Tags</h2>
-            @{
-                string[] authorLabels;
-                if (Model.Slot?.GameVersion == GameVersion.LittleBigPlanet1)
-                {
-                    authorLabels = Model.Slot.LevelTags(Database);
-                }
-                else
-                {
-                    authorLabels = Model.Slot?.AuthorLabels.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
-                }
-                if (authorLabels.Length == 0)
-                {
-                    <p>This level has no tags.</p>
-                }
-                else
-                {
-                    foreach (string label in authorLabels.Where(label => !string.IsNullOrEmpty(label)))
+}
+else
+{
+    <div class="@(isMobile ? "" : "ui equal height stretched grid")">
+        <div class="eight wide column">
+            <div class="ui blue segment">
+                <h2>Description</h2>
+                <p style="overflow-wrap: anywhere">@HttpUtility.HtmlDecode(string.IsNullOrEmpty(Model.Slot?.Description) ? "This level has no description." : Model.Slot.Description)</p>
+            </div>
+        </div>
+        @if (isMobile)
+        {
+            <br/>
+        }
+        <div class="eight wide column">
+            <div class="ui red segment">
+                <h2>Tags</h2>
+                @{
+                    string[] authorLabels;
+                    if (Model.Slot?.GameVersion == GameVersion.LittleBigPlanet1)
                     {
-                        <div class="ui blue label">@LabelHelper.TranslateTag(label)</div>
+                        authorLabels = Model.Slot.LevelTags(Database);
+                    }
+                    else
+                    {
+                        authorLabels = Model.Slot?.AuthorLabels.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+                    }
+                    if (authorLabels.Length == 0)
+                    {
+                        <p>This level has no tags.</p>
+                    }
+                    else
+                    {
+                        foreach (string label in authorLabels.Where(label => !string.IsNullOrEmpty(label)))
+                        {
+                            <div class="ui blue label">@LabelHelper.TranslateTag(label)</div>
+                        }
                     }
                 }
-            }
+            </div>
         </div>
-    </div>
-    @if (isMobile)
-    {
-        <br/>
-    }
-</div>
-
-<div class="ui grid">
-    @{
-        string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
-        string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
-    }
-    <div class="@outerDiv">
-        <div class="@innerDiv">
-            <a class="item active lh-sidebar" target="lh-comments">
-                Comments
-            </a>
-            <a class="item lh-sidebar" target="lh-photos">
-                @Model.Translate(BaseLayoutStrings.HeaderPhotos)
-            </a>
-            <a class="item lh-sidebar" target="lh-reviews">
-                Reviews
-            </a>
-            <a class="item lh-sidebar" target="lh-scores">
-                Scores
-            </a>
-        </div>
+        @if (isMobile)
+        {
+            <br/>
+        }
     </div>
 
-    @{
-        string divLength = isMobile ? "sixteen" : "thirteen";
-    }
-    <div class="@divLength wide stretched column">
-        <div class="ui fluid placeholder" id="lh-placeholder">
-            @for (int i = 0; i < 3; i++)
-            {
-                <div class="paragraph">
-                    @for (int j = 0; j < 5; j++)
-                    {
-                        <div class="line"></div>
-                    }
-                </div>
-            }
+    <div class="ui grid">
+        @{
+            string outerDiv = isMobile ? "horizontal-scroll" : "three wide column";
+            string innerDiv = isMobile ? "ui top attached tabular menu horizontal-scroll" : "ui vertical fluid tabular menu";
+        }
+        <div class="@outerDiv">
+            <div class="@innerDiv">
+                <a class="item active lh-sidebar" target="lh-comments">
+                    Comments
+                </a>
+                <a class="item lh-sidebar" target="lh-photos">
+                    @Model.Translate(BaseLayoutStrings.HeaderPhotos)
+                </a>
+                <a class="item lh-sidebar" target="lh-reviews">
+                    Reviews
+                </a>
+                <a class="item lh-sidebar" target="lh-scores">
+                    Scores
+                </a>
+            </div>
         </div>
-        <div class="lh-content hidden" id="lh-comments">
-            @await Html.PartialAsync("Partials/FramePartial", ($"/comments/slot/{Model.Slot?.SlotId}", "Comments"))
-        </div>
-        <div class="lh-content hidden" id="lh-photos">
-            @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.Slot?.SlotId}", "Photos"))
-        </div>
-        <div class="lh-content hidden" id="lh-reviews">
-            @await Html.PartialAsync("Partials/FramePartial", ($"/reviews/{Model.Slot?.SlotId}", "Reviews"))
-        </div>
-        <div class="lh-content hidden" id="lh-scores">
-            @await Html.PartialAsync("Partials/FramePartial", ($"/scores/{Model.Slot?.SlotId}", "Scores"))
+
+        @{
+            string divLength = isMobile ? "sixteen" : "thirteen";
+        }
+        <div class="@divLength wide stretched column">
+            <div class="ui fluid placeholder" id="lh-placeholder">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <div class="paragraph">
+                        @for (int j = 0; j < 5; j++)
+                        {
+                            <div class="line"></div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="lh-content hidden" id="lh-comments">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/comments/slot/{Model.Slot?.SlotId}", "Comments"))
+            </div>
+            <div class="lh-content hidden" id="lh-photos">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/photos/slot/{Model.Slot?.SlotId}", "Photos"))
+            </div>
+            <div class="lh-content hidden" id="lh-reviews">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/reviews/{Model.Slot?.SlotId}", "Reviews"))
+            </div>
+            <div class="lh-content hidden" id="lh-scores">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/scores/{Model.Slot?.SlotId}", "Scores"))
+            </div>
         </div>
     </div>
-</div>
+}
+
 
 @if (isMobile)
 {
@@ -223,4 +234,7 @@
     }
 }
 
-@await Html.PartialAsync("Partials/SectionScriptPartial")
+@if (Model.CanViewLevel)
+{
+    @await Html.PartialAsync("Partials/SectionScriptPartial")
+}

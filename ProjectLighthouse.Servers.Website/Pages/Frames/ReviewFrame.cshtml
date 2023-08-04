@@ -7,7 +7,11 @@
 }
 
 <div class="ui purple segment">
-    @if (Model.Reviews.Count == 0 && Model.ReviewsEnabled)
+    @if (!Model.CanViewReviews)
+    {
+        <span>This level creator's privacy settings prevent you from viewing this page.</span>
+    }
+    else if (Model.Reviews.Count == 0 && Model.ReviewsEnabled)
     {
         <p>There are no reviews.</p>
     }
