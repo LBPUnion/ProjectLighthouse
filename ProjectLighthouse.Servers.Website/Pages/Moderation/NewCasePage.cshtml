@@ -40,7 +40,7 @@
             <label style="text-align: left" for="expires">Expiration</label>
             <input type="datetime-local" name="expires" id="expires" required />
         </div>
-        <button type="button" class="ui yellow button" onclick="setPermanent()">Permanent Ban</button>
+        <button type="button" class="ui yellow button" onclick="document.getElementById('expires').value = '9999-12-31T23:59';">Permanent Ban</button>
     </div>
     
     <div class="ui blue segment">
@@ -74,9 +74,3 @@
         <button type="submit" class="ui red button">Create Case</button>
     </div>
 </form> 
-
-<script>
-    function setPermanent() {
-        document.getElementById("expires").value = "9999-12-31T23:59";
-    }
-</script>
