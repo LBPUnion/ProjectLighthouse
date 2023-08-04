@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.EntityFrameworkCore;
 using OpenQA.Selenium;
+using ProjectLighthouse.Tests.WebsiteTests.Extensions;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
@@ -18,6 +20,7 @@ public class RegisterTests : LighthouseWebTest
     public async Task ShouldRegister()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+        this.Driver.Manage().Cookies.DeleteAllCookies();
 
         ServerConfiguration.Instance.Authentication.RegistrationEnabled = true;
 
@@ -38,7 +41,7 @@ public class RegisterTests : LighthouseWebTest
         UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
         Assert.NotNull(user);
 
-        await database.RemoveUser(user);
+        Assert.Equal("/", this.Driver.GetPath());
 
         ServerConfiguration.Instance.Authentication.RegistrationEnabled = false;
     }
@@ -47,6 +50,7 @@ public class RegisterTests : LighthouseWebTest
     public async Task ShouldNotRegisterWithMismatchingPasswords()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+        this.Driver.Manage().Cookies.DeleteAllCookies();
 
         ServerConfiguration.Instance.Authentication.RegistrationEnabled = true;
 
@@ -67,6 +71,9 @@ public class RegisterTests : LighthouseWebTest
         UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
         Assert.Null(user);
 
+        Assert.Equal("/register", this.Driver.GetPath());
+        Assert.Equal(Translate(ErrorStrings.PasswordDoesntMatch), this.Driver.GetErrorMessage());
+
         ServerConfiguration.Instance.Authentication.RegistrationEnabled = false;
     }
 
@@ -74,6 +81,7 @@ public class RegisterTests : LighthouseWebTest
     public async Task ShouldNotRegisterWithTakenUsername()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+        this.Driver.Manage().Cookies.DeleteAllCookies();
 
         ServerConfiguration.Instance.Authentication.RegistrationEnabled = true;
 
@@ -95,7 +103,9 @@ public class RegisterTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
-        Assert.Contains("The username you've chosen is already taken.", this.Driver.PageSource);
+        Assert.Equal("/register", this.Driver.GetPath());
+
+        Assert.Equal(Translate(ErrorStrings.UsernameTaken), this.Driver.GetErrorMessage());
 
         ServerConfiguration.Instance.Authentication.RegistrationEnabled = false;
     }

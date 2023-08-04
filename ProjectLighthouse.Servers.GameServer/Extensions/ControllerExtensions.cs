@@ -96,6 +96,8 @@ public static class ControllerExtensions
 
             GameVersion targetVersion = token.GameVersion;
 
+            bool matchVersionExactly = false;
+
             if (controller.Request.Query.ContainsKey("gameFilterType"))
             {
                 string gameFilter = (string?)controller.Request.Query["gameFilterType"] ?? "";
@@ -103,10 +105,11 @@ public static class ControllerExtensions
                 // Don't serve lbp3 levels to lbp2 just cause of the game filter
                 if (filterVersion <= targetVersion)
                 {
+                    matchVersionExactly = gameFilter != "both";
                     targetVersion = filterVersion;
                 }
             }
-            queryBuilder.AddFilter(new GameVersionFilter(targetVersion));
+            queryBuilder.AddFilter(new GameVersionFilter(targetVersion, matchVersionExactly));
         } 
         else if (token.GameVersion == GameVersion.LittleBigPlanet3)
         {
