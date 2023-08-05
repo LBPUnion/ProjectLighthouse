@@ -1,5 +1,6 @@
 @page "/moderation/newCase"
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types.Entities.Moderation
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.NewCasePage
 
@@ -21,12 +22,16 @@
 
     <input type="hidden" name="type" value="@((int)Model.Type)"/>
     <input type="hidden" name="affectedId" value="@Model.AffectedId"/>
-    
+
     <div class="ui yellow segment">
-        <div><b>Case Type:</b> @Model.Type.ToString()</div>
-        <div><b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (id: @Model.AffectedId)</a></div>
+        <div>
+            <b>Case Type:</b> @Model.Type.ToString()
+        </div>
+        <div>
+            <b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (id: @Model.AffectedId)</a>
+        </div>
     </div>
-    
+
     <div class="ui yellow segment">
         <div class="field">
             <label style="text-align: left" for="reason">Reason</label>
@@ -38,30 +43,33 @@
         </div>
         <div class="field">
             <label style="text-align: left" for="expires">Expiration</label>
-            <input type="datetime-local" name="expires" id="expires" required />
+            <input type="datetime-local" name="expires" id="expires" required/>
         </div>
         <button type="button" class="ui yellow button" onclick="document.getElementById('expires').value = '9999-12-31T23:59';">Permanent Ban</button>
     </div>
-    
+
     <div class="ui blue segment">
-        <details>
+        <details style="transition: max-height 0.25s ease-in-out;">
             <summary>Moderation history for user <b>@Model.AffectedUser.Username</b> (id: @Model.AffectedId) </summary>
-            <div class="ui list">
+            <div class="ui list" style="padding-left: 1vh;">
                 @if (Model.AffectedHistory.Count != 0)
                 {
                     @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
                     {
                         <div class="item">
-                            @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
-                            on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
-                            with reason "@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")"
+                            <i class="@moderationCase.Type.GetCaseTypeIcon()"></i>
+                            <div class="content">
+                                @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
+                                on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
+                                with reason "@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")"
+                            </div>
                         </div>
                     }
                 }
                 else
                 {
-                    <div>No moderation history found for user <b>@Model.AffectedUser.Username</b> (id: @Model.AffectedId)</div>
-                }    
+                    <div class="item">No moderation history found for user <b>@Model.AffectedUser.Username</b> (id: @Model.AffectedId)</div>
+                }
             </div>
         </details>
     </div>
@@ -72,4 +80,4 @@
         </div>
         <button type="submit" class="ui red button">Create Case</button>
     </div>
-</form> 
+</form>
