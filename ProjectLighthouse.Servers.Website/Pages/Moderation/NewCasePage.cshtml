@@ -24,7 +24,7 @@
     
     <div class="ui yellow segment">
         <div><b>Case Type:</b> @Model.Type.ToString()</div>
-        <div><b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (@Model.AffectedId)</a></div>
+        <div><b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (id: @Model.AffectedId)</a></div>
     </div>
     
     <div class="ui yellow segment">
@@ -44,27 +44,26 @@
     </div>
     
     <div class="ui blue segment">
-        <div class="field">
-            <label style="text-align: left" for="mod-history">Moderation History</label>
-            <select class="ui fluid dropdown" id="mod-history">
+        <details>
+            <summary>Moderation history for user <b>@Model.AffectedUser.Username</b> (id: @Model.AffectedId) </summary>
+            <div class="ui list">
                 @if (Model.AffectedHistory.Count != 0)
                 {
-                    <option disabled selected>--- Previous moderation history for user @Model.AffectedUser.Username (@Model.AffectedId) ---</option>
                     @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
                     {
-                        <option disabled style="color: black;">
+                        <div class="item">
                             @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
                             on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
                             with reason "@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")"
-                        </option>
+                        </div>
                     }
                 }
                 else
                 {
-                    <option disabled selected>--- No moderation history found for user @Model.AffectedUser.Username (@Model.AffectedId) ---</option>
-                }
-            </select>
-        </div>
+                    <div>No moderation history found for user <b>@Model.AffectedUser.Username</b> (id: @Model.AffectedId)</div>
+                }    
+            </div>
+        </details>
     </div>
 
     <div class="ui red segment">
