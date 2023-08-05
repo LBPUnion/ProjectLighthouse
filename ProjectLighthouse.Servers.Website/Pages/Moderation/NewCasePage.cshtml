@@ -28,7 +28,7 @@
             <b>Case Type:</b> @Model.Type.ToString()
         </div>
         <div>
-            <b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (id: @Model.AffectedId)</a>
+            <b>Affected User:</b> <a href="/user/@Model.AffectedId"><b>@Model.AffectedUser!.Username</b> (id: @Model.AffectedId)</a>
         </div>
     </div>
 
@@ -50,7 +50,7 @@
 
     <div class="ui blue segment">
         <details style="transition: max-height 0.25s ease-in-out;">
-            <summary>Moderation history for user <b>@Model.AffectedUser.Username</b> (id: @Model.AffectedId) </summary>
+            <summary>Moderation history for user <a href="/user/@Model.AffectedId"><b>@Model.AffectedUser!.Username</b> (id: @Model.AffectedId)</a></summary>
             <div class="ui list" style="padding-left: 1vh;">
                 @if (Model.AffectedHistory.Count != 0)
                 {
@@ -59,16 +59,16 @@
                         <div class="item">
                             <i class="@moderationCase.Type.GetCaseTypeIcon()"></i>
                             <div class="content">
-                                @moderationCase.Type.ToString() by @moderationCase.CreatorUsername
-                                on @TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")
-                                with reason "@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")"
+                                <b>@moderationCase.Type.ToString()</b> by <a href="/user/@moderationCase.CreatorId">@moderationCase.CreatorUsername</a>
+                                on <b>@TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")</b>
+                                with reason <b>@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")</b>
                             </div>
                         </div>
                     }
                 }
                 else
                 {
-                    <div class="item">No moderation history found for user <b>@Model.AffectedUser.Username</b> (id: @Model.AffectedId)</div>
+                    <div class="item">No moderation history found for user <a href="/user/@Model.AffectedId"><b>@Model.AffectedUser!.Username</b> (id: @Model.AffectedId)</a></div>
                 }
             </div>
         </details>
