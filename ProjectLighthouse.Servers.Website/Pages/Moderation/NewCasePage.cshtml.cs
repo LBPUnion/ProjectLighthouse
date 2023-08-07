@@ -33,12 +33,13 @@ public class NewCasePage : BaseLayout
         this.Type = type.Value;
 
         this.AffectedId = affectedId.Value;
+        
         this.AffectedUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == this.AffectedId);
+        if (this.AffectedUser == null) return this.BadRequest();
+        
         this.AffectedHistory = await this.Database.Cases.Where(c => c.AffectedId == this.AffectedId)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
-        
-        if (this.AffectedUser == null) return this.BadRequest();
 
         return this.Page();
     }
@@ -60,7 +61,7 @@ public class NewCasePage : BaseLayout
         UserEntity? affectedUser =
             await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == affectedId.Value);
 
-        if (affectedUser?.IsModerator ?? false)
+        if (affectedUser == null || affectedUser.IsModerator)
         {
             this.Error = this.Translate(ErrorStrings.ActionNoPermission);
             return this.Page();
