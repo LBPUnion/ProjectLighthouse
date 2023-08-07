@@ -1,5 +1,7 @@
 ﻿namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 
+// ReSharper disable UnusedMember.Global
+
 public class RichPresenceConfiguration
 {
     public long ApplicationId { get; set; } = 1060973475151495288;

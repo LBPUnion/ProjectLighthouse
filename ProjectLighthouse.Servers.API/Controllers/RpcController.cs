@@ -7,15 +7,15 @@ namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 public class RpcController : ApiEndpointController
 {
     /// <summary>
-    /// Returns basic information that RPC clients can use for self-configuration.
+    /// Returns basic information that Discord RPC clients can use for self-configuration.
     /// </summary>
-    /// <returns>RpcInformation</returns>
-    /// <response code="200">The RPC information.</response>
+    /// <returns>RpcResponse</returns>
+    /// <response code="200">The RPC configuration.</response>
     [HttpGet("rpc")]
-    [ProducesResponseType(typeof(RpcInformation), StatusCodes.Status200OK)]
-    public IActionResult GetRpc()
+    [ProducesResponseType(typeof(RpcResponse), StatusCodes.Status200OK)]
+    public IActionResult GetRpcConfiguration()
     {
-        RpcInformation rpcInformation = new()
+        RpcResponse rpcResponse = new()
         {
             ApplicationId = ServerConfiguration.Instance.RichPresenceConfiguration.ApplicationId,
             PartyIdPrefix = ServerConfiguration.Instance.RichPresenceConfiguration.PartyIdPrefix,
@@ -23,6 +23,6 @@ public class RpcController : ApiEndpointController
             Assets = ServerConfiguration.Instance.RichPresenceConfiguration.Assets,
         };
         
-        return this.Ok(rpcInformation);
+        return this.Ok(rpcResponse);
     }
 }

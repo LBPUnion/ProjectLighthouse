@@ -4,7 +4,7 @@ using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 
 namespace LBPUnion.ProjectLighthouse.Servers.API.Responses;
 
-public class RpcInformation
+public class RpcResponse
 {
     public long ApplicationId { get; set; }
     public string PartyIdPrefix { get; set; }
