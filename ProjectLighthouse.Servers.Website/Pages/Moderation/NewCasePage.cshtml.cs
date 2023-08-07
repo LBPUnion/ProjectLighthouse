@@ -61,7 +61,9 @@ public class NewCasePage : BaseLayout
         UserEntity? affectedUser =
             await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == affectedId.Value);
 
-        if (affectedUser == null || affectedUser.IsModerator)
+        if (affectedUser == null) return this.NotFound();
+        
+        if (affectedUser.IsModerator)
         {
             this.Error = this.Translate(ErrorStrings.ActionNoPermission);
             return this.Page();
