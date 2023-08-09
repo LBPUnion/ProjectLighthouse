@@ -2,6 +2,7 @@
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types.Entities.Moderation
+@using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation.NewCasePage
 
 @{
@@ -27,9 +28,18 @@
         <div>
             <b>Case Type:</b> @Model.Type.ToString()
         </div>
-        <div>
-            <b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (id: @Model.AffectedId)</a>
-        </div>
+        @if (Model.Type.AffectsUser())
+        {
+            <div>
+                <b>Affected User:</b> <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username (id: @Model.AffectedId)</a>
+            </div>    
+        }
+        else if (Model.Type.AffectsLevel())
+        {
+            <div>
+                <b>Affected Level:</b> <a href="/user/@Model.AffectedId">@Model.AffectedSlot!.Name (id: @Model.AffectedId)</a>
+            </div>    
+        }
     </div>
 
     <div class="ui yellow segment">
@@ -50,36 +60,39 @@
         </button>
     </div>
 
-    <div class="ui blue segment">
-        <details style="transition: max-height 0.25s ease-in-out;">
-            <summary>Moderation history for user <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username</a></summary>
-            <div class="ui list" style="padding-left: 1vh;">
-                @if (Model.AffectedHistory.Count != 0)
-                {
-                    @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
+    @if (Model.Type.AffectsUser())
+    {
+        <div class="ui blue segment">
+            <details style="transition: max-height 0.25s ease-in-out;">
+                <summary>Moderation history for user <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username</a></summary>
+                <div class="ui list" style="padding-left: 1vh;">
+                    @if (Model.AffectedHistory.Count != 0)
+                    {
+                        @foreach (ModerationCaseEntity moderationCase in Model.AffectedHistory)
+                        {
+                            <div class="item">
+                                <i class="@moderationCase.Type.GetCaseTypeIcon()"></i>
+                                <div class="content">
+                                    <b>@moderationCase.Type.ToString()</b> by <a href="/user/@moderationCase.CreatorId">@moderationCase.CreatorUsername</a>
+                                    on <b>@TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")</b>
+                                    with reason <b>@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")</b>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
                     {
                         <div class="item">
-                            <i class="@moderationCase.Type.GetCaseTypeIcon()"></i>
+                            <i class="ui icon check"></i>
                             <div class="content">
-                                <b>@moderationCase.Type.ToString()</b> by <a href="/user/@moderationCase.CreatorId">@moderationCase.CreatorUsername</a>
-                                on <b>@TimeZoneInfo.ConvertTime(moderationCase.CreatedAt, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt")</b>
-                                with reason <b>@(!string.IsNullOrWhiteSpace(moderationCase.Reason) ? moderationCase.Reason : "No reason provided")</b>
+                                No moderation history found for user <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username</a>
                             </div>
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="item">
-                        <i class="ui icon check"></i>
-                        <div class="content">
-                            No moderation history found for user <a href="/user/@Model.AffectedId">@Model.AffectedUser!.Username</a>
-                        </div>
-                    </div>
-                }
-            </div>
-        </details>
-    </div>
+                </div>
+            </details>
+        </div>    
+    }
 
     <div class="ui red segment">
         <div style="margin-bottom: 1em;">
