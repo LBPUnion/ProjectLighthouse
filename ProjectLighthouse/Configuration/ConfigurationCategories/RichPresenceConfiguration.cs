@@ -1,13 +1,15 @@
-﻿namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
+﻿using JetBrains.Annotations;
+
+namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 
 // ReSharper disable UnusedMember.Global
 
 public class RichPresenceConfiguration
 {
-    public long ApplicationId { get; set; } = 1060973475151495288;
-    public string PartyIdPrefix { get; set; } = "project-lighthouse";
-    public UsernameType UsernameType { get; set; } = UsernameType.Integer;
-    public RpcAssets Assets { get; set; } = new();
+    public long ApplicationId { get; [UsedImplicitly] set; } = 1060973475151495288;
+    public string PartyIdPrefix { get; [UsedImplicitly] set; } = "project-lighthouse";
+    public UsernameType UsernameType { get; [UsedImplicitly] set; } = UsernameType.Integer;
+    public RpcAssets Assets { get; [UsedImplicitly] set; } = new();
 }
 
 public class RpcAssets
