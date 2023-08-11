@@ -32,3 +32,7 @@ Returns a JSON object containing the following information:
     - `developerAdventureAsset`: Asset used when playing an adventure level.
     - `dlcAsset`: Asset used when playing a DLC level.
     - `fallbackAsset`: Asset used when client can't determine the slot type.
+
+> **Warning**
+> All `assets` properties are nullable and will return `null` if not set in configuration. Be sure to account
+> for this when using the returned data.
