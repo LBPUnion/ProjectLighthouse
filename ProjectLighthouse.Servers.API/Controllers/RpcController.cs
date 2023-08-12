@@ -13,16 +13,6 @@ public class RpcController : ApiEndpointController
     /// <response code="200">The RPC configuration.</response>
     [HttpGet("rpc")]
     [ProducesResponseType(typeof(RpcResponse), StatusCodes.Status200OK)]
-    public IActionResult GetRpcConfiguration()
-    {
-        RpcResponse rpcResponse = new()
-        {
-            ApplicationId = ServerConfiguration.Instance.RichPresenceConfiguration.ApplicationId,
-            PartyIdPrefix = ServerConfiguration.Instance.RichPresenceConfiguration.PartyIdPrefix,
-            UsernameType = ServerConfiguration.Instance.RichPresenceConfiguration.UsernameType,
-            Assets = ServerConfiguration.Instance.RichPresenceConfiguration.Assets,
-        };
-        
-        return this.Ok(rpcResponse);
-    }
+    public IActionResult GetRpcConfiguration() =>
+        this.Ok(RpcResponse.CreateFromConfiguration(ServerConfiguration.Instance.RichPresenceConfiguration));
 }
