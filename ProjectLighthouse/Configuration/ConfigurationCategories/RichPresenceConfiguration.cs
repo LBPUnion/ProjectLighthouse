@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 [Serializable]
 public class RichPresenceConfiguration
 {
-    public long ApplicationId { get; set; } = 1060973475151495288;
+    public string ApplicationId { get; set; } = "1060973475151495288";
     public string PartyIdPrefix { get; set; } = "project-lighthouse";
     public UsernameType UsernameType { get; set; } = UsernameType.Integer;
     public RpcAssets Assets { get; set; } = new();
