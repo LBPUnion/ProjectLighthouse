@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 
@@ -12,6 +13,8 @@ public class WebsiteAnnouncementEntity
     public string Title { get; set; }
 
     public string Content { get; set; }
+
+    public DateTime PublishedAt { get; set; }
 
     #nullable enable
 

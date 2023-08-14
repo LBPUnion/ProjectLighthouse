@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Website;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization.News;
@@ -37,9 +38,10 @@ public class GameNewsObject : ILbpSerializable
         {
             Id = entity.AnnouncementId,
             Title = entity.Title,
-            Summary = "there's an extra spot for summary here",
+            Summary = "",
             Text = entity.Content,
             Category = "no_category",
+            Timestamp = entity.PublishedAt.ToUnixTimeMilliseconds(),
         };
 }
 
