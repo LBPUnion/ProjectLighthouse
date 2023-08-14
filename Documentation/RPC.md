@@ -1,4 +1,5 @@
-﻿# RPC (Rich Presence)
+﻿
+# RPC (Rich Presence)
 
 Lighthouse supports Discord's [Rich Presence](https://discordapp.com/rich-presence) feature, which allows you
 to display your current activity in Lighthouse to your Discord friends.
@@ -22,8 +23,7 @@ Returns a JSON object containing the following information:
 - `partyIdPrefix`: The prefix to use for the party ID. This is used to prevent collisions between
   multiple instances of Lighthouse running on the same Discord application.
 - `usernameType`: Some compatible APIs require usernames instead of user IDs. A return value of `0`
-  indicates that usernames should be used, while a return value of `1` indicates that user
-  IDs should be used.
+  indicates that user IDs should be used, while a return value of `1` indicates that usernames should be used.
 - `assets`: A JSON object containing the following information:
     - `podAsset`: Asset used when in the Pod.
     - `moonAsset`: Asset used when creating on the Moon.
