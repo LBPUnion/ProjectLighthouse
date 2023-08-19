@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Servers.Website.Startup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -21,6 +22,8 @@ public class LighthouseWebTest : IDisposable
     protected LighthouseWebTest()
     {
         ServerConfiguration.Instance.DbConnectionString = "server=127.0.0.1;uid=root;pwd=lighthouse_tests;database=lighthouse_tests";
+        ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled = false;
+
         this.webHost.Start();
 
         IServerAddressesFeature? serverAddressesFeature = this.webHost.ServerFeatures.Get<IServerAddressesFeature>();
@@ -38,7 +41,13 @@ public class LighthouseWebTest : IDisposable
         }
 
         this.Driver = new ChromeDriver(chromeOptions);
+        this.Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
     }
+
+    protected static string Translate(TranslatableString translatableString) => translatableString.Translate(LocalizationManager.DefaultLang);
+
+    protected static string Translate(TranslatableString translatableString, params object?[] objects) =>
+        translatableString.Translate(LocalizationManager.DefaultLang, objects);
 
     public void Dispose()
     {

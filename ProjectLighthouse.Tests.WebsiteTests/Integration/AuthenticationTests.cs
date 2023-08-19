@@ -3,11 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.EntityFrameworkCore;
 using OpenQA.Selenium;
+using ProjectLighthouse.Tests.WebsiteTests.Extensions;
 using Xunit;
 
 namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
@@ -19,10 +21,10 @@ public class AuthenticationTests : LighthouseWebTest
     public async Task ShouldLoginWithPassword()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
-        Random random = new();
+        this.Driver.Manage().Cookies.DeleteAllCookies();
 
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
-        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
+        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -33,16 +35,15 @@ public class AuthenticationTests : LighthouseWebTest
 
         WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.NotNull(webToken);
-
-        await database.RemoveUser(user);
     }
 
     [Fact]
     public async Task ShouldNotLoginWithNoPassword()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
-        Random random = new();
-        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("just like the hindenberg,"));
+        this.Driver.Manage().Cookies.DeleteAllCookies();
+
+        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("just like the hindenberg,"));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -53,15 +54,17 @@ public class AuthenticationTests : LighthouseWebTest
         WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.Null(webToken);
 
-        await database.RemoveUser(user);
+        Assert.Equal("/login", this.Driver.GetPath());
+        Assert.Equal("The username or password you entered is invalid.", this.Driver.GetErrorMessage());
     }
 
     [Fact]
     public async Task ShouldNotLoginWithWrongPassword()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
-        Random random = new();
-        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        this.Driver.Manage().Cookies.DeleteAllCookies();
+
+        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
 
@@ -72,8 +75,6 @@ public class AuthenticationTests : LighthouseWebTest
 
         WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.Null(webToken);
-
-        await database.RemoveUser(user);
     }
 
     [Fact]
@@ -82,8 +83,7 @@ public class AuthenticationTests : LighthouseWebTest
         const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/div/p[1]";
 
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
-        Random random = new();
-        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         WebTokenEntity webToken = new()
         {
@@ -102,8 +102,7 @@ public class AuthenticationTests : LighthouseWebTest
         Assert.DoesNotContain(user.Username, this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)).Text);
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         navigation.Refresh();
-        Assert.Contains(user.Username, this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)).Text);
 
-        await database.RemoveUser(user);
+        Assert.Equal(Translate(LandingPageStrings.LoggedInAs, user.Username), this.Driver.FindElement(By.XPath(loggedInAsUsernameTextXPath)).Text);
     }
 }
