@@ -1,21 +1,27 @@
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Database;
 
 namespace LBPUnion.ProjectLighthouse.Types.Maintenance;
 
-[UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
-public interface IMigrationTask
+public enum MigrationHook
+{
+    Before,
+    None,
+}
+
+public abstract class MigrationTask
 {
     /// <summary>
     /// The user-friendly name of a migration.
     /// </summary>
-    public string Name();
-    
+    public abstract string Name();
+
+    public virtual MigrationHook HookType() => MigrationHook.None;
+
     /// <summary>
     /// Performs the migration.
     /// </summary>
     /// <param name="database">The Lighthouse database.</param>
     /// <returns>True if successful, false if not.</returns>
-    internal Task<bool> Run(DatabaseContext database);
+    public abstract Task<bool> Run(DatabaseContext database);
 }

@@ -24,7 +24,6 @@
     @for(int i = 0; i < Model.Scores.Count; i++)
     {
         ScoreEntity score = Model.Scores[i];
-        string[] playerIds = score.PlayerIds;
         DatabaseContext database = Model.Database;          
         <div class="item">
             <span class="ui large text">
@@ -39,9 +38,9 @@
             </span>
             <div class="content">
                 <div class="list" style="padding-top: 0">
-                    @for (int j = 0; j < playerIds.Length; j++)
-                    {
-                        UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == playerIds[j]);
+                    @{
+                        UserEntity? user = await database.Users.FindAsync(score.UserId);
+                    }
                         <div class="item">
                             <i class="minus icon" style="padding-top: 9px"></i>
                             <div class="content" style="padding-left: 0">
@@ -49,13 +48,8 @@
                                 {
                                     @await user.ToLink(Html, ViewData, language, timeZone)
                                 }
-                                else
-                                {
-                                    <p style="margin-top: 5px;">@playerIds[j]</p>
-                                }
                             </div>
                         </div>
-                    }
                 </div>
             </div>
         </div>

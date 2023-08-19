@@ -321,21 +321,26 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("ChildSlotId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PlayerIdCollection")
-                        .HasColumnType("longtext");
-
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
                     b.Property<int>("SlotId")
                         .HasColumnType("int");
 
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("ScoreId");
 
                     b.HasIndex("SlotId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Scores");
                 });
@@ -1243,7 +1248,15 @@ namespace ProjectLighthouse.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Slot");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", b =>
