@@ -1,16 +1,16 @@
-﻿using System;
+#nullable enable
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
-using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Database;
@@ -30,9 +30,11 @@ public partial class DatabaseContext
         // 16 is PSN max, 3 is PSN minimum
         if (!ServerStatics.IsUnitTesting || !username.StartsWith("unitTestUser"))
         {
-            if (username.Length is > 16 or < 3) throw new ArgumentException(nameof(username) + " is either too long or too short");
+            if (username.Length is > 16 or < 3)
+                throw new ArgumentException(nameof(username) + " is either too long or too short");
 
-            if (!this.IsUsernameValid(username)) throw new ArgumentException(nameof(username) + " does not match the username regex");
+            if (!this.IsUsernameValid(username))
+                throw new ArgumentException(nameof(username) + " does not match the username regex");
         }
 
         UserEntity? user = await this.Users.Where(u => u.Username == username).FirstOrDefaultAsync();
@@ -58,29 +60,6 @@ public partial class DatabaseContext
         return await this.Users.Where(u => u.Username == username).Select(u => u.UserId).FirstOrDefaultAsync();
     }
 
-    public async Task<GameTokenEntity?> AuthenticateUser(UserEntity? user, NPTicket npTicket, string userLocation)
-    {
-        if (user == null) return null;
-
-        GameTokenEntity gameToken = new()
-        {
-            UserToken = CryptoHelper.GenerateAuthToken(),
-            User = user,
-            UserId = user.UserId,
-            UserLocation = userLocation,
-            GameVersion = npTicket.GameVersion,
-            Platform = npTicket.Platform,
-            TicketHash = npTicket.TicketHash,
-            // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
-            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
-        };
-
-        this.GameTokens.Add(gameToken);
-        await this.SaveChangesAsync();
-
-        return gameToken;
-    }
-
     public async Task RemoveUser(UserEntity? user)
     {
         if (user == null) return;
@@ -93,13 +72,12 @@ public partial class DatabaseContext
                      .Where(c => c.CreatorId == user.UserId || c.DismisserId == user.UserId)
                      .ToListAsync())
         {
-            if(modCase.DismisserId == user.UserId)
-                modCase.DismisserId = null;
-            if(modCase.CreatorId == user.UserId)
-                modCase.CreatorId = await SlotHelper.GetPlaceholderUserId(this);
+            if (modCase.DismisserId == user.UserId) modCase.DismisserId = null;
+            if (modCase.CreatorId == user.UserId) modCase.CreatorId = await SlotHelper.GetPlaceholderUserId(this);
         }
 
-        foreach (SlotEntity slot in this.Slots.Where(s => s.CreatorId == user.UserId)) await this.RemoveSlot(slot, false);
+        foreach (SlotEntity slot in this.Slots.Where(s => s.CreatorId == user.UserId))
+            await this.RemoveSlot(slot, false);
 
         this.HeartedProfiles.RemoveRange(this.HeartedProfiles.Where(h => h.UserId == user.UserId));
         this.PhotoSubjects.RemoveRange(this.PhotoSubjects.Where(s => s.UserId == user.UserId));
@@ -124,7 +102,9 @@ public partial class DatabaseContext
     {
         if (userId == heartedUser.UserId) return;
 
-        HeartedProfileEntity? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
+        HeartedProfileEntity? heartedProfile =
+            await this.HeartedProfiles.FirstOrDefaultAsync(q =>
+                q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) return;
 
         this.HeartedProfiles.Add(new HeartedProfileEntity
@@ -138,7 +118,9 @@ public partial class DatabaseContext
 
     public async Task UnheartUser(int userId, UserEntity heartedUser)
     {
-        HeartedProfileEntity? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
+        HeartedProfileEntity? heartedProfile =
+            await this.HeartedProfiles.FirstOrDefaultAsync(q =>
+                q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) this.HeartedProfiles.Remove(heartedProfile);
 
         await this.SaveChangesAsync();
@@ -168,11 +150,17 @@ public partial class DatabaseContext
         await this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
     }
 
+    public Task<List<int>> GetBlockedUsers(int? userId)
+    {
+        return userId == null
+            ? Task.FromResult(new List<int>())
+            : this.BlockedProfiles.Where(b => b.UserId == userId).Select(b => b.BlockedUserId).ToListAsync();
+    }
+
     public async Task<bool> IsUserBlockedBy(int userId, int targetId)
     {
         if (targetId == userId) return false;
 
         return await this.BlockedProfiles.Has(bp => bp.BlockedUserId == userId && bp.UserId == targetId);
     }
-
 }

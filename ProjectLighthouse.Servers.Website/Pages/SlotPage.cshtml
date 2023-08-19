@@ -5,7 +5,6 @@
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
-@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.SlotPage
@@ -56,9 +55,8 @@
 }
 
 @await Model.Slot.ToHtml(Html, ViewData, Model.User, $"~/slot/{Model.Slot?.SlotId}", language, timeZone, isMobile)
-<br>
 
-@if (!Model.CanViewSlot)
+@if (!Model.CanViewLevel)
 {
     <div class="ui red segment">
         <p>
@@ -68,7 +66,7 @@
 }
 else
 {
-    <div class="@(isMobile ? "" : "ui grid")">
+    <div class="@(isMobile ? "" : "ui equal height stretched grid")">
         <div class="eight wide column">
             <div class="ui blue segment">
                 <h2>Description</h2>
@@ -138,64 +136,38 @@ else
             string divLength = isMobile ? "sixteen" : "thirteen";
         }
         <div class="@divLength wide stretched column">
-            <div class="lh-content" id="lh-comments">
-                @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
-                       {
-                           {
-                               "PageOwner", Model.Slot?.CreatorId
-                           },
-                       })
-            </div>
-            <div class="lh-content" id="lh-photos">
-                <div class="ui purple segment" id="photos">
-                    @if (Model.Photos.Count != 0)
-                    {
-                        <div class="ui center aligned grid">
-                            @foreach (PhotoEntity photo in Model.Photos)
-                            {
-                                string width = isMobile ? "sixteen" : "eight";
-                                bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
-                                <div class="@width wide column">
-                                    @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
-                                </div>
-                            }
-                        </div>
-                        @if (isMobile)
+            <div class="ui fluid placeholder" id="lh-placeholder">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <div class="paragraph">
+                        @for (int j = 0; j < 5; j++)
                         {
-                            <br/>
+                            <div class="line"></div>
                         }
-                    }
-                    else
-                    {
-                        <p>This level has no photos yet.</p>
-                    }
-
-                </div>
+                    </div>
+                }
             </div>
-            <div class="lh-content" id="lh-reviews">
-                @await Html.PartialAsync("Partials/ReviewPartial", new ViewDataDictionary(ViewData)
-                       {
-                           {
-                               "isMobile", isMobile
-                           },
-                           {
-                               "CanDelete", Model.User?.IsModerator ?? false
-                           },
-                       })
+            <div class="lh-content hidden" id="lh-comments">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/comments/slot/{Model.Slot?.SlotId}", "Comments"))
             </div>
-            <div class="lh-content" id="lh-scores">
-                <div class="eight wide column">
-                    @await Html.PartialAsync("Partials/LeaderboardPartial", ViewData.WithLang(language).WithTime(timeZone).CanDelete(Model.User?.IsModerator ?? false))
-                </div>
+            <div class="lh-content hidden" id="lh-photos">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/photos/slot/{Model.Slot?.SlotId}", "Photos"))
+            </div>
+            <div class="lh-content hidden" id="lh-reviews">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/reviews/{Model.Slot?.SlotId}", "Reviews"))
+            </div>
+            <div class="lh-content hidden" id="lh-scores">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/scores/{Model.Slot?.SlotId}", "Scores"))
             </div>
         </div>
     </div>
 }
 
-    @if (isMobile)
-    {
-        <br/>
-    }
+
+@if (isMobile)
+{
+    <br/>
+}
 
 @if (Model.User != null && Model.User.IsModerator)
 {
@@ -227,7 +199,7 @@ else
                 <span>Delete</span>
             </div>
         </a>
-        
+
         @if (!Model.Slot!.Hidden)
         {
             <a href="/moderation/newCase?type=@((int)CaseType.LevelHide)&affectedId=@Model.Slot?.SlotId">
@@ -237,7 +209,7 @@ else
                 </div>
             </a>
         }
-        
+
         @if (!Model.Slot!.InitiallyLocked && !Model.Slot!.LockedByModerator)
         {
             <a href="/moderation/newCase?type=@((int)CaseType.LevelLock)&affectedId=@Model.Slot?.SlotId">
@@ -247,7 +219,7 @@ else
                 </div>
             </a>
         }
-        
+
         @if (Model.Slot!.CommentsEnabled)
         {
             <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.LevelDisableComments)&affectedId=@Model.Slot?.SlotId">
@@ -262,49 +234,7 @@ else
     }
 }
 
-<script>
-const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
-const contentElements = Array.from(document.querySelectorAll(".lh-content"));
-let selectedId = window.location.hash;
-if (selectedId.startsWith("#"))
-    selectedId = selectedId.substring(1);
-let selectedElement = document.getElementById(selectedId);
-// id = lh-sidebar element
-function setVisible(e){
-    let eTarget = document.getElementById(e.target);
-    if (!e || !eTarget) return;
-
-    // make all active elements not active
-    for (let active of document.getElementsByClassName("active")) {
-        active.classList.remove("active");
-    }
-    // hide all content divs
-    for (let i = 0; i < contentElements.length; i++){
-        contentElements[i].style.display = "none";
-    }
-    // unhide content
-    eTarget.style.display = "";
-    
-    e.classList.add("active");
+@if (Model.CanViewLevel)
+{
+    @await Html.PartialAsync("Partials/SectionScriptPartial")
 }
-
-sidebarElements.forEach(el => {
-    if (el.classList.contains("active")){
-        setVisible(el);
-    }
-    el.addEventListener('click', event => {
-        if (!event.target.target) return;
-
-        setVisible(event.target)
-    })
-})
-// set the active content window based on url
-if (selectedElement != null) {
-    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
-        selectedElement = selectedElement.parentElement;
-    }
-    
-    let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
-    setVisible(sidebarEle);
-}
-</script>

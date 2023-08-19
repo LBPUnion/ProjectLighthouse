@@ -1,0 +1,33 @@
+@page "/slots/{route}/{id:int}"
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using LBPUnion.ProjectLighthouse.Types.Entities.Level
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.SlotsFrame
+
+@{
+    Layout = "PaginatedFrame";
+    Model.Title = "Photos";
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
+    bool isMobile = Model.IsMobile;
+}
+
+<div class="ui @Model.Color segment" id="levels">
+    @if (!Model.CanViewSlots)
+    {
+        <p>This user's privacy settings prevent you from viewing this page.</p>
+    }
+    else if (Model.Slots.Count == 0)
+    {
+        <p>@Model.SlotsEmptyText</p>
+    }
+    else
+    {
+        <p>@Model.SlotsPresentText</p>
+        foreach (SlotEntity slot in Model.Slots)
+        {
+            <div class="ui segment">
+                @await slot.ToHtml(Html, ViewData, Model.User, $"~/slots/{Model.Type}/{Model.Id}", language, timeZone, isMobile, true)
+            </div>
+        }
+    }
+</div>

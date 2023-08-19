@@ -2,6 +2,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +13,28 @@ namespace LBPUnion.ProjectLighthouse.Database;
 
 public partial class DatabaseContext
 {
+    public async Task<GameTokenEntity?> AuthenticateUser(UserEntity? user, NPTicket npTicket, string userLocation)
+    {
+        if (user == null) return null;
+
+        GameTokenEntity gameToken = new()
+        {
+            UserToken = CryptoHelper.GenerateAuthToken(),
+            User = user,
+            UserId = user.UserId,
+            UserLocation = userLocation,
+            GameVersion = npTicket.GameVersion,
+            Platform = npTicket.Platform,
+            TicketHash = npTicket.TicketHash,
+            // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
+            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
+        };
+
+        this.GameTokens.Add(gameToken);
+        await this.SaveChangesAsync();
+
+        return gameToken;
+    }
 
     public async Task<string> UsernameFromGameToken(GameTokenEntity? token)
     {

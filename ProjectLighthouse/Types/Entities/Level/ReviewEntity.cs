@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -15,12 +14,12 @@ public class ReviewEntity
     public int ReviewerId { get; set; }
 
     [ForeignKey(nameof(ReviewerId))]
-    public UserEntity? Reviewer { get; set; }
+    public UserEntity Reviewer { get; set; }
 
     public int SlotId { get; set; }
 
     [ForeignKey(nameof(SlotId))]
-    public SlotEntity? Slot { get; set; }
+    public SlotEntity Slot { get; set; }
 
     public long Timestamp { get; set; }
 

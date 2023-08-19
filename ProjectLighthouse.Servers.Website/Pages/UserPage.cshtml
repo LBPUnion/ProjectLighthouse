@@ -2,9 +2,6 @@
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
-@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
-@using LBPUnion.ProjectLighthouse.Types.Entities.Level
-@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Moderation.Cases
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.UserPage
 
@@ -16,8 +13,6 @@
     Model.Description = Model.ProfileUser!.Biography;
 
     bool isMobile = Request.IsMobile();
-    string language = Model.GetLanguage();
-    string timeZone = Model.GetTimeZone();
 }
 
 @if (Model.ProfileUser.IsBanned)
@@ -141,7 +136,7 @@
         @if (isMobile)
         {
             <br/>
-        }    
+        }
     }
 </div>
 
@@ -168,7 +163,6 @@ else
                 <a class="item lh-sidebar" target="lh-photos">
                     @Model.Translate(BaseLayoutStrings.HeaderPhotos)
                 </a>
-
                 <a class="item lh-sidebar" target="lh-levels">
                     @Model.Translate(BaseLayoutStrings.HeaderSlots)
                 </a>
@@ -190,117 +184,38 @@ else
             string divLength = isMobile ? "sixteen" : "thirteen";
         }
         <div class="@divLength wide stretched column">
-            <div class="lh-content" id="lh-comments">
-                @if (Model.ProfileUser.IsBanned)
+            <div class="ui fluid placeholder" id="lh-placeholder">
+                @for (int i = 0; i < 3; i++)
                 {
-                    <div class="ui yellow segment" id="comments">
-                        <p>
-                            <i>Comments are disabled because the user is banned.</i>
-                        </p>
+                    <div class="paragraph">
+                        @for (int j = 0; j < 5; j++)
+                        {
+                            <div class="line"></div>
+                        }
                     </div>
                 }
-                else
-                {
-                    @await Html.PartialAsync("Partials/CommentsPartial", new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
-                           {
-                               {
-                                   "PageOwner", Model.ProfileUser.UserId
-                               },
-                           })
-                }
             </div>
-            <div class="lh-content" id="lh-photos">
-                <div class="ui purple segment" id="photos">
-                    @if (Model.Photos != null && Model.Photos.Count != 0)
-                    {
-                        <div class="ui center aligned grid">
-                            @foreach (PhotoEntity photo in Model.Photos)
-                            {
-                                string width = isMobile ? "sixteen" : "eight";
-                                bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
-                                <div class="@width wide column">
-                                    @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
-                                </div>
-                            }
-                        </div>
-                        @if (isMobile)
-                        {
-                            <br/>
-                        }
-                    }
-                    else
-                    {
-                        <p>This user hasn't uploaded any photos</p>
-                    }
-                </div>
+            <div class="lh-content hidden" id="lh-comments">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/comments/user/{Model.ProfileUser.UserId}", "Comments"))
             </div>
-            <div class="lh-content" id="lh-levels">
-                @if (!Model.CanViewSlots)
-                {
-                    <div class="ui red segment">
-                        <p>
-                            <i>The user's privacy settings prevent you from viewing this page.</i>
-                        </p>
-                    </div>    
-                }
-                else
-                {
-                    <div class="ui green segment" id="levels">
-                        @if (Model.Slots?.Count == 0)
-                        {
-                            <p>This user hasn't published any levels</p>
-                        }
-                        @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
-                        {
-                            <div class="ui segment">
-                                @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
-                            </div>
-                        }
-                    </div>    
-                }
+            <div class="lh-content hidden" id="lh-photos">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/photos/user/{Model.ProfileUser.UserId}", "Photos"))
             </div>
-            <div class="lh-content" id="lh-playlists">
+            <div class="lh-content hidden" id="lh-levels">
+                @await Html.PartialAsync("Partials/FramePartial", ($"/slots/by/{Model.ProfileUser.UserId}", "Published Slots"))
+            </div>
+            <div class="lh-content hidden" id="lh-playlists">
                 <div class="ui purple segment">
                     <p>@Model.Translate(GeneralStrings.Soon)</p>
                 </div>
             </div>
             @if (Model.User == Model.ProfileUser)
             {
-                <div class="lh-content" id="lh-hearted">
-                    <div class="ui pink segment" id="hearted">
-                        @if (Model.HeartedSlots?.Count == 0)
-                        {
-                            <p>You haven't hearted any levels</p>
-                        }
-                        else
-                        {
-                            <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
-                        }
-                        @foreach (SlotEntity slot in Model.HeartedSlots ?? new List<SlotEntity>())
-                        {
-                            <div class="ui segment">
-                                @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#hearted", language, timeZone, isMobile, true)
-                            </div>
-                        }
-                    </div>
+                <div class="lh-content hidden" id="lh-hearted">
+                    @await Html.PartialAsync("Partials/FramePartial", ($"/slots/hearted/{Model.ProfileUser.UserId}", "Hearted Slots"))
                 </div>
-                <div class="lh-content" id="lh-queued">
-                    <div class="ui yellow segment" id="queued">
-                        @if (Model.QueuedSlots?.Count == 0)
-                        {
-                            <p>You haven't queued any levels</p>
-                        }
-                        else
-                        {
-                            <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
-                        }
-                        @foreach (SlotEntity slot in Model.QueuedSlots ?? new List<SlotEntity>())
-                        {
-                            <div class="ui segment">
-                                @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#queued", language, timeZone, isMobile, true)
-                            </div>
-                        }
-                    </div>
+                <div class="lh-content hidden" id="lh-queued">
+                    @await Html.PartialAsync("Partials/FramePartial", ($"/slots/queued/{Model.ProfileUser.UserId}", "Queued Slots"))
                 </div>
             }
         </div>
@@ -322,25 +237,25 @@ else
             </div>
             <div class="ui fitted hidden divider"></div>
         }
-        
-        <div>
-            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
-                <i class="trash alternate icon"></i>
-                <span>Wipe Earth Decorations</span>
-            </a>
-        </div>
-        <div class="ui fitted hidden divider"></div>
 
-        @if (!Model.CommentsDisabledByModerator)
+        @if (Model.ProfileUser.CommentsEnabled)
         {
             <div>
                 <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
                     <i class="lock icon"></i>
-                    <span>Forcibly Disable Comments</span>
+                    <span>Disable Comments</span>
                 </a>
             </div>
             <div class="ui fitted hidden divider"></div>
         }
+
+        <div>
+            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
+                <i class="trash alternate icon"></i>
+                <span>Wipe user's earth decorations</span>
+            </a>
+        </div>
+        <div class="ui fitted hidden divider"></div>
 
         @if (Model.User.IsAdmin)
         {
@@ -353,49 +268,7 @@ else
     }
 }
 
-<script>
-const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
-const contentElements = Array.from(document.querySelectorAll(".lh-content"));
-let selectedId = window.location.hash;
-if (selectedId.startsWith("#"))
-    selectedId = selectedId.substring(1);
-let selectedElement = document.getElementById(selectedId);
-// id = lh-sidebar element
-function setVisible(e){
-    let eTarget = document.getElementById(e.target);
-    if (!e || !eTarget) return;
-
-    // make all active elements not active
-    for (let active of document.getElementsByClassName("active")) {
-        active.classList.remove("active");
-    }
-    // hide all content divs
-    for (let i = 0; i < contentElements.length; i++){
-        contentElements[i].style.display = "none";
-    }
-    // unhide content
-    eTarget.style.display = "";
-    
-    e.classList.add("active");
+@if (Model.CanViewProfile)
+{
+    @await Html.PartialAsync("Partials/SectionScriptPartial")
 }
-
-sidebarElements.forEach(el => {
-    if (el.classList.contains("active")){
-        setVisible(el);
-    }
-    el.addEventListener('click', event => {
-        if (!event.target.target) return;
-
-        setVisible(event.target)
-    })
-})
-// set the active content window based on url
-if (selectedElement != null) {
-    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
-        selectedElement = selectedElement.parentElement;
-    }
-    
-    let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
-    setVisible(sidebarEle);
-}
-</script>

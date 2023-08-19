@@ -1,0 +1,39 @@
+@using LBPUnion.ProjectLighthouse.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts.BaseFrame
+
+<!DOCTYPE html>
+
+@{
+    Model.IsMobile = Model.Request.IsMobile();
+}
+
+<html lang="en">
+<head>
+    <title>@Model.Title</title>         
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="~/css/semantic.min.css">
+    <script>
+        // Set the outer frame's height in case page changed
+        function setHeight() {
+            let height = document.querySelector("div").scrollHeight;
+            if (height === 0) return;
+
+            window.frameElement.style.height = height + "px";
+            if (!window.frameElement.parentElement.classList.contains("hidden")) return;
+
+            window.frameElement.parentElement.style.display = "none";
+            window.frameElement.parentElement.classList.remove("hidden");
+        }
+        window.addEventListener("DOMContentLoaded", setHeight);
+        window.addEventListener("load", setHeight);
+
+    </script>
+</head>
+<body>
+<div>
+    @RenderBody()
+    
+    @await RenderSectionAsync("Pagination", false)
+</div>
+</body>
+</html>

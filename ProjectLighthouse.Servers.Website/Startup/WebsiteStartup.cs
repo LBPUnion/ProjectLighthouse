@@ -38,6 +38,16 @@ public class WebsiteStartup
     {
         services.AddControllers();
         #if DEBUG
+        // Add CORS for debugging
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.AllowAnyHeader();
+                policy.AllowAnyMethod();
+                policy.AllowAnyOrigin();
+            });
+        });
         services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation((options) =>
         {
             // jank but works
@@ -112,6 +122,9 @@ public class WebsiteStartup
     {
         #if DEBUG
         app.UseDeveloperExceptionPage();
+        app.UseCors();
+        #else
+        app.UseExceptionHandler("/error");
         #endif
 
         app.UseStatusCodePagesWithReExecute("/404");
@@ -130,6 +143,8 @@ public class WebsiteStartup
         });
 
         app.UseRequestLocalization();
+
+        app.UseResponseCaching();
 
         app.UseEndpoints(endpoints =>
         {

@@ -1,0 +1,50 @@
+@page "/comments/{type}/{id:int}"
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.CommentFrame
+
+@{
+    Model.Title = "Comments";
+    Layout = "PaginatedFrame";
+
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
+}
+
+<div class="ui yellow segment" id="comments">
+    @if (!Model.CanViewComments)
+    {
+        if (Model.Type == "user")
+        {
+            <span>This user's privacy settings prevent you from viewing this page.</span>
+        }
+        else
+        {
+            <span>This level creator's privacy settings prevent you from viewing this page.</span>
+        }
+    }
+    else if (Model.Comments.Count == 0 && Model.CommentsEnabled)
+    {
+        <p>There are no comments.</p>
+    }
+    else if (!Model.CommentsEnabled)
+    {
+        <i>Comments are disabled.</i>
+    }
+    else
+    {
+        int count = Model.TotalItems;
+        <p>There @(count == 1 ? "is" : "are") @count comment@(count == 1 ? "" : "s").</p>
+        @await Html.PartialAsync("Partials/CommentsPartial", (Model.User, Model.Comments, Model.CommentsEnabled), new ViewDataDictionary(ViewData.WithLang(language).WithTime(timeZone))
+               {
+                   {
+                       "PageOwner", Model.PageOwner
+                   },
+                   {
+                       "BaseUrl", $"/{Model.Type}/{Model.Id}"
+                   },
+                   {
+                       "RedirectUrl", $"/comments/{Model.Type}/{Model.Id}?page=" + Model.CurrentPage
+                   },
+               })
+    }
+</div>

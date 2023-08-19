@@ -1,0 +1,43 @@
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.PaginatedFrame
+
+@{
+    Layout = "Layouts/BaseFrame";
+}
+
+@RenderBody()
+
+@section Pagination
+{
+    <div id="pagination">
+        @{
+            string? url = Url.RouteUrl(ViewContext.RouteData.Values);
+        }
+
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@url?page=1">First Page</a>
+            <text> | </text>
+            <a href="@url?page=@(Model.CurrentPage - 1)">Previous Page</a>
+        }
+        Page @Model.CurrentPage / @Model.TotalPages
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@url?page=@(Model.CurrentPage + 1)">Next Page</a>
+            <text> | </text>
+            <a href="@url?page=@Model.TotalPages">Last Page</a>
+        }
+    </div>
+    <script>
+       for (let link of document.querySelectorAll("#pagination > a")){
+           link.addEventListener("click", () => {
+               let top = (window.frameElement.getBoundingClientRect().top + window.parent.scrollY) - 50;
+               if (window.parent.scrollY < top) return;
+               window.parent.scrollTo({
+                   'behavior': 'smooth',
+                   'left': 0,
+                   'top': top,
+               })
+           })
+       }
+    </script>
+}

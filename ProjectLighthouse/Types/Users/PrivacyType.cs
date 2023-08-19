@@ -49,13 +49,13 @@ public static class PrivacyTypeExtensions
         };
     }
 
-    public static bool CanAccess(this PrivacyType type, bool authenticated, bool owner)
+    public static bool CanAccess(this PrivacyType type, bool isAuthenticated, bool isOwner)
     {
         return type switch
         {
             PrivacyType.All => true,
-            PrivacyType.PSN => authenticated,
-            PrivacyType.Game => authenticated && owner,
+            PrivacyType.PSN => isAuthenticated,
+            PrivacyType.Game => isAuthenticated && isOwner,
             _ => false,
         };
     }

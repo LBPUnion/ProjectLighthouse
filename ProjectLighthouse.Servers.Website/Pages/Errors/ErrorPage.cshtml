@@ -1,0 +1,45 @@
+﻿@page "/error"
+@using System.Globalization
+@using LBPUnion.ProjectLighthouse.Configuration
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Errors.ErrorPage
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>An error has occurred</title>
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="~/css/semantic.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="pageContainer">
+    <div class="ui grid middle aligned">
+        <div class="eight center aligned column wide">
+            <img src="~/@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.Now.Month == 6 ? "logo-pride.png" : "logo-color.png")"
+                 alt="Instance logo"
+                 class="image"
+                 style="width: 15vw;"/>
+            <h1>An error has occurred</h1>
+            <p>The server encountered an error while processing your request</p>
+            <p>
+                Try to refresh this page, if the problem persists, <br/>please <a href="https://github.com/LBPUnion/ProjectLighthouse/issues/new">report</a>
+                your problem and mention this error message
+            </p>
+            <h6>
+                Request ID: @Model.RequestId
+                <br/>
+                Timestamp: @DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) UTC
+            </h6>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -155,6 +155,15 @@ div.cardStatsUnderTitle > span {
 
 /*#endregion Cards*/
 
+/* #region Profiles & Slots */
+
+.hidden {
+    visibility: hidden;
+    max-height: 0;
+}
+
+/* #endregion Profiles & Slots */
+
 /* #region Two Factor */
 .digits input {
     font-size: 2rem;

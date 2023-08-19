@@ -1,0 +1,47 @@
+@page "/photos/{type}/{id:int}"
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Frames.PhotoFrame
+
+@{
+    Layout = "PaginatedFrame";
+    Model.Title = "Photos";
+    string language = Model.GetLanguage();
+    string timeZone = Model.GetTimeZone();
+    bool isMobile = Model.IsMobile;
+}
+
+<div class="ui purple segment" id="photos">
+    @if (!Model.CanViewPhotos)
+    {
+        if (Model.Type == "user")
+        {
+            <span>This user's privacy settings prevent you from viewing this page.</span>
+        }
+        else
+        {
+            <span>This level creator's privacy settings prevent you from viewing this page.</span>
+        }
+    }
+    else if (Model.Photos.Count > 0)
+    {
+        <div class="ui center aligned grid">
+            @foreach (PhotoEntity photo in Model.Photos)
+            {
+                string width = isMobile ? "sixteen" : "eight";
+                bool canDelete = Model.User != null && (Model.User.IsModerator || Model.User.UserId == photo.CreatorId);
+                <div class="@width wide column">
+                    @await photo.ToHtml(Html, ViewData, language, timeZone, canDelete)
+                </div>
+            }
+        </div>
+        @if (isMobile)
+        {
+            <br/>
+        }
+    }
+    else
+    {
+        <p>There are no photos</p>
+    }
+</div>

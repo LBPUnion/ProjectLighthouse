@@ -53,7 +53,7 @@
             @if (showLink)
             {
                 <h2>
-                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
+                    <a href="~/slot/@Model.SlotId" target="_top">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
                 </h2>
             }
             else
@@ -68,7 +68,7 @@
             @if (showLink)
             {
                 <h3>
-                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
+                    <a href="~/slot/@Model.SlotId" target="_top">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
                 </h3>
             }
             else
@@ -114,12 +114,12 @@
             <br>
             @if (user != null && !mini && (user.IsModerator || Model.CreatorId == user.UserId))
             {
-                <a class="ui blue tiny button" href="/slot/@Model.SlotId/settings" title="Settings">
+                <a class="ui blue tiny button" href="/slot/@Model.SlotId/settings" title="Settings" target="_top">
                     <i class="cog icon" style="margin: 0"></i>
                 </a>
             }
             
-            @if (user != null && !mini && (user.UserId != Model.CreatorId))
+            @if (user != null && !mini && user.UserId != Model.CreatorId)
             {
                 <a class="ui red tiny button" href="/moderation/slot/@Model.SlotId/flag" title="Flag As Duplicate"
                     onclick='return confirm("Are you sure you want to flag this level as a duplicate? False reports may result in punishment.")'>

@@ -1,0 +1,93 @@
+<script data-cfasync="false" type="text/javascript">
+const sidebarElements = Array.from(document.querySelectorAll(".lh-sidebar"));
+const contentElements = Array.from(document.querySelectorAll(".lh-content"));
+
+let selectedId = window.location.hash;
+if (selectedId.startsWith("#")) selectedId = selectedId.substring(1);
+if (!selectedId.startsWith("lh-")) selectedId = "lh-" + selectedId;
+
+let selectedElement = document.getElementById(selectedId);
+const loadedContent = {};
+
+// id = lh-sidebar element
+function setVisible(e){
+    let eTarget = document.getElementById(e.target);
+    if (!e || !eTarget) return;
+
+    // Make all sidebar elements inactive
+    for (let active of document.getElementsByClassName("active")) {
+        active.classList.remove("active");
+    }
+
+    // Hide all content containers
+    for (let i = 0; i < contentElements.length; i++){
+        // Don't try and hide elements that may still be loading
+        if (contentElements[i].classList.contains("hidden")) continue;
+
+        contentElements[i].style.display = "none";
+    }
+
+    // Show placeholder if a frame hasn't finished loading yet
+    if (loadedContent[eTarget.id]){
+        eTarget.classList.remove("hidden");
+        document.getElementById("lh-placeholder").style.display = "none";
+    } else if (document.getElementById("lh-placeholder").style.display === "none") {
+        document.getElementById("lh-placeholder").style.display = "";
+    }
+
+    // Show the element
+    if (!eTarget.classList.contains("hidden")) eTarget.style.display = "";
+
+    let frame = eTarget.querySelector("iframe");
+    // Fail safe if somehow the frame's height is 0
+    // (like if it's height was measured when it was set to not display)
+    if (frame !== null && !eTarget.classList.contains("hidden") && frame.getBoundingClientRect().height === 0){
+        frame.style.height = getHeight(frame) + "px";
+    }
+
+    window.location.hash = eTarget.id.replace("lh-", "");
+    
+    e.classList.add("active");
+}
+
+function getHeight(frame) {
+    return frame.contentDocument.body.querySelector("div").scrollHeight;
+}
+
+// Setup pre-load listeners for iFrames
+for (let element of contentElements){
+    let frame = element.querySelector("iframe");
+    if (frame !== null){
+       frame.contentWindow.addEventListener("load", () => {
+           let contentItem = frame.parentElement;
+
+           loadedContent[contentItem.id] = true;
+
+           setVisible(document.querySelector(".lh-sidebar.active"));
+       });
+    } else {
+        loadedContent[element.id] = true;
+    }
+}
+
+// Setup click listeners for sidebar
+sidebarElements.forEach(el => {
+    el.addEventListener('click', event => {
+        if (!event.target.target) return;
+        
+        if (event.target.classList.contains("active")) return;
+
+        setVisible(event.target)
+    })
+})
+
+// Set initial active element
+if (selectedElement != null) {
+    while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
+        selectedElement = selectedElement.parentElement;
+    }
+    setVisible(document.querySelector("[target=" + selectedElement.id + "]"));
+} else {
+    setVisible(document.querySelector(".lh-sidebar.active"));
+}
+</script>
