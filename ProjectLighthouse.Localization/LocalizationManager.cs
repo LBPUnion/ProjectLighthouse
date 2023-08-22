@@ -11,8 +11,6 @@ public static class LocalizationManager
 
     public static string GetLocalizedString(TranslationAreas translationArea, string language, string key)
     {
-//        return $"{translationArea.ToString()}.{language}.{key}";
-
         // ASP.NET requires specific names for certain languages (like ja for japanese as opposed to the standard ja-JP)
         // We map that value back here.
         language = mapLanguageBack(language);

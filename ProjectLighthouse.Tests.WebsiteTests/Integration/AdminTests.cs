@@ -14,14 +14,15 @@ namespace ProjectLighthouse.Tests.WebsiteTests.Integration;
 [Trait("Category", "Integration")]
 public class AdminTests : LighthouseWebTest
 {
-    private const string adminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]";
+    private const string adminPanelButtonXPath = "/html/body/div/header/div/div/div/a[2]/span";
 
     [Fact]
     public async Task ShouldShowAdminPanelButtonWhenAdmin()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
-        Random random = new();
-        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        this.Driver.Manage().Cookies.DeleteAllCookies();
+
+        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         WebTokenEntity webToken = new()
         {
@@ -39,15 +40,16 @@ public class AdminTests : LighthouseWebTest
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.Contains("Admin", this.Driver.FindElement(By.XPath(adminPanelButtonXPath)).Text);
+        Assert.Equal("Admin", this.Driver.FindElement(By.XPath(adminPanelButtonXPath)).Text);
     }
 
     [Fact]
     public async Task ShouldNotShowAdminPanelButtonWhenNotAdmin()
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
-        Random random = new();
-        UserEntity user = await database.CreateUser($"unitTestUser{random.Next()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        this.Driver.Manage().Cookies.DeleteAllCookies();
+
+        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
 
         WebTokenEntity webToken = new()
         {
@@ -65,6 +67,6 @@ public class AdminTests : LighthouseWebTest
         this.Driver.Manage().Cookies.AddCookie(new Cookie("LighthouseToken", webToken.UserToken));
         this.Driver.Navigate().Refresh();
 
-        Assert.DoesNotContain("Admin", this.Driver.FindElement(By.XPath(adminPanelButtonXPath)).Text);
+        Assert.Empty(this.Driver.FindElements(By.XPath(adminPanelButtonXPath)));
     }
 }

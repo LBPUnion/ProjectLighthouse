@@ -14,14 +14,17 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
 using LBPUnion.ProjectLighthouse.StorableLists;
-using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Medallion.Threading.MySql;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using ServerType = LBPUnion.ProjectLighthouse.Types.Misc.ServerType;
 
 namespace LBPUnion.ProjectLighthouse;
 
@@ -161,23 +164,53 @@ public static class StartupTasks
             Logger.Success($"Acquiring migration lock took {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
             stopwatch.Restart();
-            await database.Database.MigrateAsync();
-            stopwatch.Stop();
-            Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+            List<string> pendingMigrations = (await database.Database.GetPendingMigrationsAsync()).ToList();
+            IMigrator migrator = database.GetInfrastructure().GetRequiredService<IMigrator>();
+
+            async Task<bool> RunLighthouseMigrations(Func<MigrationTask, bool> predicate)
+            {
+                List<MigrationTask> tasks = MaintenanceHelper.MigrationTasks
+                    .Where(predicate)
+                    .ToList();
+                foreach (MigrationTask task in tasks)
+                {
+                    if (!await MaintenanceHelper.RunMigration(database, task)) return false;
+                }
+                return true;
+            }
+
+            Logger.Info($"There are {pendingMigrations.Count} pending migrations", LogArea.Database);
+
+            foreach (string migration in pendingMigrations)
+            {
+                try
+                {
+                    await using IDbContextTransaction transaction = await database.Database.BeginTransactionAsync();
+                    Logger.Debug($"Running migration '{migration}", LogArea.Database);
+                    stopwatch.Restart();
+                    if (!await RunLighthouseMigrations(m => m.Name() == migration && m.HookType() == MigrationHook.Before))
+                        throw new Exception($"Failed to run pre migration hook for {migration}");
+
+                    await migrator.MigrateAsync(migration);
+
+                    stopwatch.Stop();
+                    Logger.Success($"Running migration '{migration}' took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error($"Failed to run migration '{migration}'", LogArea.Database);
+                    Logger.Error(e.ToDetailedException(), LogArea.Database);
+                    if (database.Database.CurrentTransaction != null)
+                        await database.Database.RollbackTransactionAsync();
+                    Environment.Exit(-1);
+                }
+            }
 
             stopwatch.Restart();
 
-            List<CompletedMigrationEntity> completedMigrations = database.CompletedMigrations.ToList();
-            List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
-                .Where(migrationTask => !completedMigrations
-                    .Select(m => m.MigrationName)
-                    .Contains(migrationTask.GetType().Name)
-                ).ToList();
+            List<string> completedMigrations = database.CompletedMigrations.Select(m => m.MigrationName).ToList();
 
-            foreach (IMigrationTask migrationTask in migrationsToRun)
-            {
-                MaintenanceHelper.RunMigration(database, migrationTask).Wait();
-            }
+            await RunLighthouseMigrations(m => !completedMigrations.Contains(m.GetType().Name) && m.HookType() == MigrationHook.None);
 
             stopwatch.Stop();
             totalStopwatch.Stop();

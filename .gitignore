@@ -3,6 +3,7 @@
 /_ReSharper.Caches/
 /.idea/.idea.ProjectLighthouse/.idea/workspace.xml
 /.idea/.idea.ProjectLighthouse/.idea/dataSources/
+/.idea/.idea.ProjectLighthouse/.idea/dataSources.xml
 /.idea/.idea.ProjectLighthouse/.idea/dataSources.local.xml
 /ProjectLighthouse/ProjectLighthouse.csproj.user
 *.sln.DotSettings.user

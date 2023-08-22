@@ -19,15 +19,15 @@ public static class MaintenanceHelper
 {
     static MaintenanceHelper()
     {
-        Commands = getListOfInterfaceObjects<ICommand>();
-        MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
-        MigrationTasks = getListOfInterfaceObjects<IMigrationTask>();
-        RepeatingTasks = getListOfInterfaceObjects<IRepeatingTask>();
+        Commands = GetListOfInterfaceObjects<ICommand>();
+        MaintenanceJobs = GetListOfInterfaceObjects<IMaintenanceJob>();
+        MigrationTasks = GetListOfInterfaceObjects<MigrationTask>();
+        RepeatingTasks = GetListOfInterfaceObjects<IRepeatingTask>();
     }
     
     public static List<ICommand> Commands { get; }
     public static List<IMaintenanceJob> MaintenanceJobs { get; }
-    public static List<IMigrationTask> MigrationTasks { get; }
+    public static List<MigrationTask> MigrationTasks { get; }
     public static List<IRepeatingTask> RepeatingTasks { get; }
 
     public static async Task<List<LogLine>> RunCommand(IServiceProvider provider, string[] args)
@@ -80,16 +80,18 @@ public static class MaintenanceHelper
         await job.Run();
     }
 
-    public static async Task RunMigration(DatabaseContext database, IMigrationTask migrationTask)
+    public static async Task<bool> RunMigration(DatabaseContext database, MigrationTask migrationTask)
     {
-
         // Migrations should never be run twice.
-        Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name));
+        Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name),
+            $"Tried to run migration {migrationTask.GetType().Name} twice");
         
-        Logger.Info($"Running migration task {migrationTask.Name()}", LogArea.Database);
+        Logger.Info($"Running LH migration task {migrationTask.Name()}", LogArea.Database);
         
         bool success;
         Exception? exception = null;
+
+        Stopwatch stopwatch = Stopwatch.StartNew();
         
         try
         {
@@ -103,13 +105,14 @@ public static class MaintenanceHelper
         
         if (!success)
         {
-            Logger.Error($"Could not run migration {migrationTask.Name()}", LogArea.Database);
+            Logger.Error($"Could not run LH migration {migrationTask.Name()}", LogArea.Database);
             if (exception != null) Logger.Error(exception.ToDetailedException(), LogArea.Database);
             
-            return;
+            return false;
         }
-        
-        Logger.Success($"Successfully completed migration {migrationTask.Name()}", LogArea.Database);
+        stopwatch.Stop();
+
+        Logger.Success($"Successfully completed LH migration {migrationTask.Name()} in {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
         CompletedMigrationEntity completedMigration = new()
         {
@@ -119,13 +122,14 @@ public static class MaintenanceHelper
 
         database.CompletedMigrations.Add(completedMigration);
         await database.SaveChangesAsync();
+        return true;
     }
 
-    private static List<T> getListOfInterfaceObjects<T>() where T : class
+    private static List<T> GetListOfInterfaceObjects<T>() where T : class
     {
         return Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.GetInterfaces().Contains(typeof(T)) && t.GetConstructor(Type.EmptyTypes) != null)
+            .Where(t => (t.IsSubclassOf(typeof(T)) || t.GetInterfaces().Contains(typeof(T))) && t.GetConstructor(Type.EmptyTypes) != null)
             .Select(t => Activator.CreateInstance(t) as T)
             .ToList()!;
     }
