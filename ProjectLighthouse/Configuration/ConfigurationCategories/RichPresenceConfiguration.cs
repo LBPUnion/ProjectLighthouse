@@ -15,6 +15,7 @@ public class RichPresenceConfiguration
 
 public class RpcAssets
 {
+    public bool UseApplicationAssets { get; init; }
     public string PodAsset { get; init; }
     public string MoonAsset { get; init; }
     public string RemoteMoonAsset { get; init; }
