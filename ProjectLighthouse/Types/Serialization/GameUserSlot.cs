@@ -11,7 +11,6 @@ using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
-using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -241,7 +240,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
                 ThumbsUp = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1),
                 ThumbsDown = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1),
                 ReviewCount = database.Reviews.Count(r => r.SlotId == this.SlotId),
-                CommentCount = database.Comments.Count(c => c.Type == CommentType.Level && c.TargetSlotId == this.SlotId),
+                CommentCount = database.Comments.Count(c => c.TargetSlotId == this.SlotId),
                 PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
                 AuthorPhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId),
                 HeartCount = database.HeartedLevels.Count(h => h.SlotId == this.SlotId),

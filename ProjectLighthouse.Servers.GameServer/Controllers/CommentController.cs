@@ -64,7 +64,7 @@ public class CommentController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
-        IQueryable<CommentEntity> baseQuery;
+        IQueryable<CommentEntity> baseQuery = this.database.Comments.Where(c => c.Type == type);
 
         if (type == CommentType.Level)
         {
@@ -73,7 +73,7 @@ public class CommentController : ControllerBase
                 .Select(s => s.SlotId)
                 .FirstOrDefaultAsync();
 
-            baseQuery = this.database.Comments.Where(c => c.Type == type && c.TargetSlotId == targetId);
+            baseQuery = baseQuery.Where(c => c.TargetSlotId == targetId);
         }
         else
         {
@@ -82,7 +82,7 @@ public class CommentController : ControllerBase
                 .Select(u => u.UserId)
                 .FirstOrDefaultAsync();
 
-            baseQuery = this.database.Comments.Where(c => c.Type == type && c.TargetUserId == targetId);
+            baseQuery = baseQuery.Where(c => c.TargetUserId == targetId);
         }
 
         if (targetId == 0) return this.NotFound();
