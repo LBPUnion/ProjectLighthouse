@@ -19,6 +19,7 @@ public class RpcResponse
             UsernameType = configuration.UsernameType,
             Assets = new RpcAssets
             {
+                UseApplicationAssets = configuration.Assets.UseApplicationAssets,
                 PodAsset = AssetConvertNull(configuration.Assets.PodAsset),
                 MoonAsset = AssetConvertNull(configuration.Assets.MoonAsset),
                 RemoteMoonAsset = AssetConvertNull(configuration.Assets.RemoteMoonAsset),
