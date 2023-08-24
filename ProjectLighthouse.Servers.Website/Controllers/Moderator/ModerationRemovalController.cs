@@ -59,13 +59,13 @@ public class ModerationRemovalController : ControllerBase
         switch (comment.Type)
         {
             case CommentType.Level:
-                int slotCreatorId = await this.database.Slots.Where(s => s.SlotId == comment.TargetId)
+                int slotCreatorId = await this.database.Slots.Where(s => s.SlotId == comment.TargetSlotId)
                     .Select(s => s.CreatorId)
                     .FirstOrDefaultAsync();
                 canDelete = user.UserId == comment.PosterUserId || user.UserId == slotCreatorId;
                 break;
             case CommentType.Profile:
-                canDelete = user.UserId == comment.PosterUserId || user.UserId == comment.TargetId;
+                canDelete = user.UserId == comment.PosterUserId || user.UserId == comment.TargetUserId;
                 break;
             default: throw new ArgumentOutOfRangeException(nameof(commentId));
         }

@@ -64,12 +64,16 @@ public class CommentController : ControllerBase
 
         PaginationData pageData = this.Request.GetPaginationData();
 
+        IQueryable<CommentEntity> baseQuery = this.database.Comments.Where(c => c.Type == type);
+
         if (type == CommentType.Level)
         {
             targetId = await this.database.Slots.Where(s => s.SlotId == slotId)
                 .Where(s => s.CommentsEnabled && !s.Hidden)
                 .Select(s => s.SlotId)
                 .FirstOrDefaultAsync();
+
+            baseQuery = baseQuery.Where(c => c.TargetSlotId == targetId);
         }
         else
         {
@@ -77,6 +81,8 @@ public class CommentController : ControllerBase
                 .Where(u => u.CommentsEnabled)
                 .Select(u => u.UserId)
                 .FirstOrDefaultAsync();
+
+            baseQuery = baseQuery.Where(c => c.TargetUserId == targetId);
         }
 
         if (targetId == 0) return this.NotFound();
@@ -86,11 +92,10 @@ public class CommentController : ControllerBase
                 where blockedProfile.UserId == token.UserId
                 select blockedProfile.BlockedUserId).ToListAsync();
 
-        List<GameComment> comments = (await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
-            .OrderByDescending(p => p.Timestamp)
-            .Where(p => !blockedUsers.Contains(p.PosterUserId))
+        List<GameComment> comments = (await baseQuery.OrderByDescending(c => c.Timestamp)
+            .Where(c => !blockedUsers.Contains(c.PosterUserId))
             .Include(c => c.Poster)
-            .Where(p => p.Poster.PermissionLevel != PermissionLevel.Banned)
+            .Where(c => c.Poster.PermissionLevel != PermissionLevel.Banned)
             .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(c => GameComment.CreateFromEntity(c, token.UserId));
 
@@ -164,15 +169,15 @@ public class CommentController : ControllerBase
         bool canDelete;
         if (comment.Type == CommentType.Profile)
         {
-            canDelete = comment.PosterUserId == token.UserId || comment.TargetId == token.UserId;
+            canDelete = comment.PosterUserId == token.UserId || comment.TargetUserId == token.UserId;
         }
         else
         {
             if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-            if (slotId != comment.TargetId) return this.BadRequest();
+            if (slotId != comment.TargetSlotId) return this.BadRequest();
 
-            int slotCreator = await this.database.Slots.Where(s => s.SlotId == comment.TargetId)
+            int slotCreator = await this.database.Slots.Where(s => s.SlotId == comment.TargetSlotId)
                 .Where(s => s.CommentsEnabled)
                 .Select(s => s.CreatorId)
                 .FirstOrDefaultAsync();

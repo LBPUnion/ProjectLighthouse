@@ -96,7 +96,7 @@ public class UserPage : BaseLayout
 
             this.Comments = await this.Database.Comments.Include(p => p.Poster)
                 .OrderByDescending(p => p.Timestamp)
-                .Where(p => p.TargetId == userId && p.Type == CommentType.Profile)
+                .Where(p => p.TargetUserId == userId && p.Type == CommentType.Profile)
                 .Where(p => !blockedUsers.Contains(p.PosterUserId))
                 .Take(50)
                 .ToDictionaryAsync(c => c, _ => (RatedCommentEntity?)null);

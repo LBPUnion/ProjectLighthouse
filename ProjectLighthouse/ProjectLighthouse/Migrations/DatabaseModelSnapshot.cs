@@ -640,7 +640,10 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PosterUserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TargetId")
+                    b.Property<int?>("TargetSlotId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TargetUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("ThumbsDown")
@@ -658,6 +661,10 @@ namespace ProjectLighthouse.Migrations
                     b.HasKey("CommentId");
 
                     b.HasIndex("PosterUserId");
+
+                    b.HasIndex("TargetSlotId");
+
+                    b.HasIndex("TargetUserId");
 
                     b.ToTable("Comments");
                 });
@@ -1325,7 +1332,19 @@ namespace ProjectLighthouse.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "TargetSlot")
+                        .WithMany()
+                        .HasForeignKey("TargetSlotId");
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId");
+
                     b.Navigation("Poster");
+
+                    b.Navigation("TargetSlot");
+
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.LastContactEntity", b =>
