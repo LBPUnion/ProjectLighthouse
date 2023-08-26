@@ -28,7 +28,7 @@ public static class FormattingExtensions
         return permissionLevel switch
         {
             PermissionLevel.Administrator => "red",
-            PermissionLevel.Moderator => "rgb(200, 130, 0)",
+            PermissionLevel.Moderator => "orange",
             _ => "",
         };
     }
