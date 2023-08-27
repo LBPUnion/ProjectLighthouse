@@ -244,7 +244,7 @@ div.cardStatsUnderTitle > span {
 
 /*#region User permission badge */
 
-.permission-badge {
+.profile-tag {
     position: relative;
     bottom: 0.45rem;
 }

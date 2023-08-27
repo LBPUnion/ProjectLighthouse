@@ -72,6 +72,10 @@ function onSubmit(e){
                     </div>
                 }
                 <div class="field">
+                    <label style="text-align: left" for="vanityTag">@Model.Translate(ProfileStrings.ProfileTag)</label>
+                    <input type="text" name="vanityTag" id="vanityTag" value="@Model.ProfileUser.ProfileVanityTag" placeholder="Profile Tag">    
+                </div>
+                <div class="field">
                     <label style="text-align: left" for="biography">@Model.Translate(ProfileStrings.Biography)</label>
                     <textarea name="biography" id="biography" spellcheck="false" placeholder="Biography">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</textarea>
                 </div>
