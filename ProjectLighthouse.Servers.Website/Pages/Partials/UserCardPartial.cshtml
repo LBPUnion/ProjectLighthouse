@@ -37,7 +37,7 @@
                 @Model.Username
                 @if (Model.IsModerator)
                 {
-                    <span class="permission-badge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                    <span class="permission-badge ui label @Model.PermissionLevel.ToHtmlColor()">
                         @Model.PermissionLevel.ToString()
                     </span>
                 }
