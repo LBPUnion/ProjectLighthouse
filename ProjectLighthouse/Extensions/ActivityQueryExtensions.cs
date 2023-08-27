@@ -82,7 +82,7 @@ public static class ActivityQueryExtensions
                 : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.PhotoId != 0
                     ? ((PhotoActivityEntity)a).Photo.SlotId
                     : a is CommentActivityEntity && ((CommentActivityEntity)a).Comment.Type == CommentType.Level
-                        ? ((CommentActivityEntity)a).Comment.TargetId
+                        ? ((CommentActivityEntity)a).Comment.TargetSlotId
                         : a is ScoreActivityEntity
                             ? ((ScoreActivityEntity)a).Score.SlotId
                             : a is ReviewActivityEntity
@@ -92,7 +92,7 @@ public static class ActivityQueryExtensions
             TargetUserId = a is UserActivityEntity
                 ? ((UserActivityEntity)a).TargetUserId
                 : a is CommentActivityEntity && ((CommentActivityEntity)a).Comment.Type == CommentType.Profile
-                    ? ((CommentActivityEntity)a).Comment.TargetId
+                    ? ((CommentActivityEntity)a).Comment.TargetUserId
                     : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId != 0
                         ? ((PhotoActivityEntity)a).Photo.CreatorId
                         : 0,
@@ -109,7 +109,7 @@ public static class ActivityQueryExtensions
                     : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId != 0
                         ? ((PhotoActivityEntity)a).Photo.Slot!.CreatorId
                         : a is CommentActivityEntity && ((CommentActivityEntity)a).Comment.Type == CommentType.Level
-                            ? ((CommentActivityEntity)a).Comment.TargetId
+                            ? ((CommentActivityEntity)a).Comment.TargetSlot.CreatorId
                             : a is ScoreActivityEntity
                                 ? ((ScoreActivityEntity)a).Score.Slot.CreatorId
                                 : a is ReviewActivityEntity

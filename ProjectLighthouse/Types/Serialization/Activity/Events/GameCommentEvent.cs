@@ -27,7 +27,7 @@ public class GameUserCommentEvent : GameCommentEvent
         CommentEntity comment = await database.Comments.FindAsync(this.CommentId);
         if (comment == null) return;
 
-        UserEntity user = await database.Users.FindAsync(comment.TargetId);
+        UserEntity user = await database.Users.FindAsync(comment.TargetUserId);
         if (user == null) return;
 
         this.TargetUsername = user.Username;
@@ -46,7 +46,7 @@ public class GameSlotCommentEvent : GameCommentEvent
         CommentEntity comment = await database.Comments.FindAsync(this.CommentId);
         if (comment == null) return;
 
-        SlotEntity slot = await database.Slots.FindAsync(comment.TargetId);
+        SlotEntity slot = await database.Slots.FindAsync(comment.TargetSlotId);
 
         if (slot == null) return;
 

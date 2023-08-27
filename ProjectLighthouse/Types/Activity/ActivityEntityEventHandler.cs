@@ -1,8 +1,6 @@
 ﻿#nullable enable
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Reflection;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
@@ -44,8 +42,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             {
                 Type = EventType.Score,
                 ScoreId = score.ScoreId,
-                //TODO merge score migration
-                UserId = database.Users.Where(u => u.Username == score.PlayerIds[0]).Select(u => u.UserId).First(),
+                UserId = score.UserId,
             },
             HeartedLevelEntity heartedLevel => new LevelActivityEntity
             {
