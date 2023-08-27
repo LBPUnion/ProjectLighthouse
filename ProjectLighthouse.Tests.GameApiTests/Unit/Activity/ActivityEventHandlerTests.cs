@@ -56,6 +56,12 @@ public class ActivityEventHandlerTests
             },
         });
 
+        SlotEntity slot = new()
+        {
+            SlotId = 1,
+        };
+        database.Slots.Add(slot);
+
         CommentEntity comment = new()
         {
             CommentId = 1,
