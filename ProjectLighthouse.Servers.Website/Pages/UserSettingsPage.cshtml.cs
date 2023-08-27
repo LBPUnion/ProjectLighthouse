@@ -20,7 +20,7 @@ public class UserSettingsPage : BaseLayout
     {}
 
     [SuppressMessage("ReSharper", "SpecifyStringComparison")]
-    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string? avatar, [FromForm] string? username, [FromForm] string? email, [FromForm] string vanityTag, [FromForm] string? biography, [FromForm] string? timeZone, [FromForm] string? language)
+    public async Task<IActionResult> OnPost([FromRoute] int userId, [FromForm] string? avatar, [FromForm] string? username, [FromForm] string? email, [FromForm] string profileTag, [FromForm] string? biography, [FromForm] string? timeZone, [FromForm] string? language)
     {
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
@@ -33,7 +33,7 @@ public class UserSettingsPage : BaseLayout
 
         if (avatarHash != null) this.ProfileUser.IconHash = avatarHash;
 
-        if (this.User.IsAdmin) this.ProfileUser.ProfileVanityTag = vanityTag;
+        if (this.User.IsAdmin) this.ProfileUser.ProfileTag = profileTag;
 
         if (biography != null)
         {

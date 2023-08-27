@@ -29,10 +29,10 @@
                             @Model.PermissionLevel.ToString()
                         </span>
                     }
-                    @if (!string.IsNullOrWhiteSpace(Model.ProfileVanityTag))
+                    @if (!string.IsNullOrWhiteSpace(Model.ProfileTag))
                     {
                         <span class="profile-tag ui label">
-                            @Model.ProfileVanityTag
+                            @Model.ProfileTag
                         </span>
                     }
             </h2>
@@ -47,10 +47,10 @@
                         @Model.PermissionLevel.ToString()
                     </span>
                 }
-                @if (!string.IsNullOrWhiteSpace(Model.ProfileVanityTag))
+                @if (!string.IsNullOrWhiteSpace(Model.ProfileTag))
                 {
                     <span class="profile-tag ui label">
-                        @Model.ProfileVanityTag
+                        @Model.ProfileTag
                     </span>
                 }
             </h1>

@@ -132,7 +132,7 @@ public class UserEntity
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;
     
-    public string ProfileVanityTag { get; set; } = "";
+    public string ProfileTag { get; set; } = "";
 
     #nullable enable
     public override bool Equals(object? obj)

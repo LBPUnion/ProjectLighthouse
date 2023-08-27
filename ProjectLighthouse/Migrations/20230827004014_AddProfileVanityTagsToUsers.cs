@@ -13,7 +13,7 @@ namespace ProjectLighthouse.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "ProfileVanityTag",
+                name: "ProfileTag",
                 table: "Users",
                 type: "longtext",
                 nullable: true)
@@ -23,7 +23,7 @@ namespace ProjectLighthouse.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ProfileVanityTag",
+                name: "ProfileTag",
                 table: "Users");
         }
     }

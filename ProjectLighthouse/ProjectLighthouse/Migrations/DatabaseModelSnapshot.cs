@@ -858,7 +858,7 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("PlanetHashLBPVita")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("ProfileVanityTag")
+                    b.Property<string>("ProfileTag")
                         .HasColumnType("longtext");
 
                     b.Property<int>("ProfileVisibility")
