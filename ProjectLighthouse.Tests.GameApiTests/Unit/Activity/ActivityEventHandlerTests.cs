@@ -59,6 +59,7 @@ public class ActivityEventHandlerTests
         SlotEntity slot = new()
         {
             SlotId = 1,
+            CreatorId = 1,
         };
         database.Slots.Add(slot);
 
