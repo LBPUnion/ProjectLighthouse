@@ -9,6 +9,10 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Website;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.EntityFrameworkCore;
+#if DEBUG
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Types.Activity;
 

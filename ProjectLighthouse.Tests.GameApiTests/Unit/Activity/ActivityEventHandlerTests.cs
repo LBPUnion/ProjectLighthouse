@@ -60,7 +60,7 @@ public class ActivityEventHandlerTests
         {
             CommentId = 1,
             PosterUserId = 1,
-            TargetId = 1,
+            TargetSlotId = 1,
             Type = CommentType.Level,
         };
         database.Comments.Add(comment);
@@ -89,7 +89,7 @@ public class ActivityEventHandlerTests
         {
             CommentId = 1,
             PosterUserId = 1,
-            TargetId = 1,
+            TargetUserId = 1,
             Type = CommentType.Profile,
         };
         database.Comments.Add(comment);
@@ -152,7 +152,7 @@ public class ActivityEventHandlerTests
         {
             ScoreId = 1,
             SlotId = 1,
-            PlayerIdCollection = "test",
+            UserId = 1,
         };
         database.Scores.Add(score);
         await database.SaveChangesAsync();
