@@ -73,7 +73,7 @@ function onSubmit(e){
                 }
                 <div class="field">
                     <label style="text-align: left" for="vanityTag">@Model.Translate(ProfileStrings.ProfileTag)</label>
-                    <input type="text" name="vanityTag" id="vanityTag" value="@Model.ProfileUser.ProfileVanityTag" placeholder="Profile Tag">    
+                    <input type="text" name="vanityTag" id="vanityTag" value="@Model.ProfileUser.ProfileVanityTag" placeholder="Profile Tag" @(!Model.User!.IsAdmin ? "readonly" : "")>    
                 </div>
                 <div class="field">
                     <label style="text-align: left" for="biography">@Model.Translate(ProfileStrings.Biography)</label>
