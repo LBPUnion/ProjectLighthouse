@@ -244,19 +244,9 @@ div.cardStatsUnderTitle > span {
 
 /*#region User permission badge */
 
-.permissionBadge {
-    width: auto;
-    height: auto;
-    color: white;
-    background-color: inherit;
-    border: 0px solid black;
-    border-radius: 50px;
-    font-weight: 200;
-    font-size: 10pt;
-    padding: 1px;
-    padding-left: 6px;
-    padding-right: 6px;
-    vertical-align: top;
+.profile-tag {
+    position: relative;
+    bottom: 0.45rem;
 }
 
 /*#endregion User permission badge */

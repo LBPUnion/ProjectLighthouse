@@ -25,8 +25,14 @@
                 <a href="~/user/@Model.UserId">@Model.Username</a>
                     @if (Model.IsModerator)
                     {
-                        <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                        <span class="profile-tag ui label @Model.PermissionLevel.ToHtmlColor()">
                             @Model.PermissionLevel.ToString()
+                        </span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.ProfileTag))
+                    {
+                        <span class="profile-tag ui label">
+                            @Model.ProfileTag
                         </span>
                     }
             </h2>
@@ -37,8 +43,14 @@
                 @Model.Username
                 @if (Model.IsModerator)
                 {
-                    <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                    <span class="profile-tag ui label @Model.PermissionLevel.ToHtmlColor()">
                         @Model.PermissionLevel.ToString()
+                    </span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.ProfileTag))
+                {
+                    <span class="profile-tag ui label">
+                        @Model.ProfileTag
                     </span>
                 }
             </h1>

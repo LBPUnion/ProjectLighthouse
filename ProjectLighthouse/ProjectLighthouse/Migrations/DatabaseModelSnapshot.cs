@@ -16,7 +16,7 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.8")
+                .HasAnnotation("ProductVersion", "7.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
@@ -856,6 +856,9 @@ namespace ProjectLighthouse.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("PlanetHashLBPVita")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProfileTag")
                         .HasColumnType("longtext");
 
                     b.Property<int>("ProfileVisibility")

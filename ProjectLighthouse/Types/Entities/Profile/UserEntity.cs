@@ -72,6 +72,7 @@ public class UserEntity
 
     public string PlanetHashLBP2 { get; set; } = "";
 
+    // ReSharper disable once InconsistentNaming
     public string PlanetHashLBP2CC { get; set; } = "";
 
     public string PlanetHashLBP3 { get; set; } = "";
@@ -130,6 +131,8 @@ public class UserEntity
 
     // should not be adjustable by user
     public bool CommentsEnabled { get; set; } = true;
+    
+    public string ProfileTag { get; set; } = "";
 
     #nullable enable
     public override bool Equals(object? obj)
