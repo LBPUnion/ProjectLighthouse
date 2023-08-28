@@ -136,14 +136,10 @@ public class ScoreController : ControllerBase
             .Where(s => s.UserId == token.UserId)
             .Where(s => s.Type == score.Type)
             .FirstOrDefaultAsync();
-        if (existingScore != null)
+
+        if (existingScore == null)
         {
-            existingScore.Points = Math.Max(existingScore.Points, score.Points);
-            existingScore.Timestamp = TimeHelper.TimestampMillis;
-        }
-        else
-        {
-            ScoreEntity playerScore = new()
+            existingScore = new ScoreEntity
             {
                 UserId = token.UserId,
                 Type = score.Type,
@@ -152,7 +148,13 @@ public class ScoreController : ControllerBase
                 ChildSlotId = childId,
                 Timestamp = TimeHelper.TimestampMillis,
             };
-            this.database.Scores.Add(playerScore);
+            this.database.Scores.Add(existingScore);
+        }
+
+        if (score.Points > existingScore.Points)
+        {
+            existingScore.Points = score.Points;
+            existingScore.Timestamp = TimeHelper.TimestampMillis;
         }
 
         await this.database.SaveChangesAsync();
