@@ -79,7 +79,7 @@ function onSubmit(e){
                             <i class="ui icon lock"></i>
                         }
                     </label>
-                    <input type="text" name="profileTag" id="profileTag" value="@Model.ProfileUser.ProfileTag" placeholder="Profile Tag"@(!Model.User!.IsAdmin ? "readonly" : "")>
+                    <input type="text" name="profileTag" id="profileTag" value="@Model.ProfileUser.ProfileTag" placeholder="Profile Tag" @(!Model.User!.IsAdmin ? "readonly" : "")>
                 </div>
                 <div class="field">
                     <label style="text-align: left" for="biography">@Model.Translate(ProfileStrings.Biography)</label>
