@@ -8,9 +8,9 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 [XmlType("privacySettings")]
 public class PrivacySettings : ILbpSerializable
 {
-    [XmlElement("levelVisiblity")]
+    [XmlElement("levelVisibility")]
     public string? LevelVisibility { get; set; }
 
-    [XmlElement("profileVisiblity")]
+    [XmlElement("profileVisibility")]
     public string? ProfileVisibility { get; set; }
 }
