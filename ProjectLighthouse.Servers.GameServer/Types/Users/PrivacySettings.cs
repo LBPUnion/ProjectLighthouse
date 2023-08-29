@@ -1,4 +1,3 @@
-#nullable enable
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 
