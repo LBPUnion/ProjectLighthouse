@@ -102,7 +102,7 @@ public class ActivityController : ControllerBase
 
         predicate = predicate.Or(dto => includedUserIds.Contains(dto.Activity.UserId));
 
-        if (!excludeMyPlaylists)
+        if (!excludeMyPlaylists && !excludeMyself && token.GameVersion == GameVersion.LittleBigPlanet3)
         {
             List<int> creatorPlaylists = await this.database.Playlists.Where(p => p.CreatorId == token.UserId)
                 .Select(p => p.PlaylistId)

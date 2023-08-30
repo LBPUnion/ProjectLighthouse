@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -17,6 +18,7 @@ public class GameScoreEvent : GameEvent
     [XmlElement("score")]
     public int Score { get; set; }
 
+    [DefaultValue(0)]
     [XmlElement("user_count")]
     public int UserCount { get; set; }
 
@@ -32,7 +34,7 @@ public class GameScoreEvent : GameEvent
 
         this.Score = score.Points;
         //TODO is this correct?
-        this.UserCount = score.Type;
+        this.UserCount = score.Type == 7 ? 0 : score.Type;
 
         this.Slot = ReviewSlot.CreateFromEntity(slot);
     }

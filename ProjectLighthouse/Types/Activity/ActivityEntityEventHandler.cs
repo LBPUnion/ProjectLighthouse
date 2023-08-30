@@ -140,8 +140,6 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             {
                 if (origEntity is not VisitedLevelEntity oldVisitedLevel) break;
 
-                int Plays(VisitedLevelEntity entity) => entity.PlaysLBP1 + entity.PlaysLBP2 + entity.PlaysLBP3;
-
                 if (Plays(oldVisitedLevel) >= Plays(visitedLevel)) break;
 
                 activity = new LevelActivityEntity
@@ -151,6 +149,8 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                     UserId = visitedLevel.UserId,
                 };
                 break;
+
+                int Plays(VisitedLevelEntity entity) => entity.PlaysLBP1 + entity.PlaysLBP2 + entity.PlaysLBP3;
             }
             case SlotEntity slotEntity:
             {
