@@ -2,12 +2,14 @@
 using System;
 using System.Linq;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Website;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.EntityFrameworkCore;
 #if DEBUG
 using System.ComponentModel.DataAnnotations.Schema;
@@ -20,7 +22,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 {
     public void OnEntityInserted<T>(DatabaseContext database, T entity) where T : class
     {
-        Console.WriteLine($@"OnEntityInserted: {entity.GetType().Name}");
+        Logger.Debug($@"OnEntityInserted: {entity.GetType().Name}", LogArea.Activity);
         ActivityEntity? activity = entity switch
         {
             SlotEntity slot => slot.Type switch
@@ -125,7 +127,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
     {
         if (activity == null) return;
 
-        Console.WriteLine("Inserting activity: " + activity.GetType().Name);
+        Logger.Debug("Inserting activity: " + activity.GetType().Name, LogArea.Activity);
 
         activity.Timestamp = DateTime.UtcNow;
         database.Activities.Add(activity);
@@ -145,11 +147,11 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             object? newVal = propInfo.GetValue(currentEntity);
             if ((origVal == null && newVal == null) || (origVal != null && newVal != null && origVal.Equals(newVal))) continue;
 
-            Console.WriteLine($@"Value for {propInfo.Name} changed");
-            Console.WriteLine($@"Orig val: {origVal?.ToString() ?? "null"}");
-            Console.WriteLine($@"New val: {newVal?.ToString() ?? "null"}");
+            Logger.Debug($@"Value for {propInfo.Name} changed", LogArea.Activity);
+            Logger.Debug($@"Orig val: {origVal?.ToString() ?? "null"}", LogArea.Activity);
+            Logger.Debug($@"New val: {newVal?.ToString() ?? "null"}", LogArea.Activity);
         }
-        Console.WriteLine($@"OnEntityChanged: {currentEntity.GetType().Name}");
+        Logger.Debug($@"OnEntityChanged: {currentEntity.GetType().Name}", LogArea.Activity);
         #endif
 
         ActivityEntity? activity = null;
@@ -242,12 +244,12 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 
                 int[] newSlots = playlist.SlotIds;
                 int[] oldSlots = oldPlaylist.SlotIds;
-                Console.WriteLine($@"Old playlist slots: {string.Join(",", oldSlots)}");
-                Console.WriteLine($@"New playlist slots: {string.Join(",", newSlots)}");
+                Logger.Debug($@"Old playlist slots: {string.Join(",", oldSlots)}", LogArea.Activity);
+                Logger.Debug($@"New playlist slots: {string.Join(",", newSlots)}", LogArea.Activity);
 
                 int[] addedSlots = newSlots.Except(oldSlots).ToArray();
 
-                Console.WriteLine($@"Added playlist slots: {string.Join(",", addedSlots)}");
+                Logger.Debug($@"Added playlist slots: {string.Join(",", addedSlots)}", LogArea.Activity);
 
                 // If no new level have been added
                 if (addedSlots.Length == 0) break;
@@ -275,7 +277,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 
     public void OnEntityDeleted<T>(DatabaseContext database, T entity) where T : class
     {
-        Console.WriteLine($@"OnEntityDeleted: {entity.GetType().Name}");
+        Logger.Debug($@"OnEntityDeleted: {entity.GetType().Name}", LogArea.Activity);
         ActivityEntity? activity = entity switch
         {
             HeartedLevelEntity heartedLevel => heartedLevel.Slot.Type switch

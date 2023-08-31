@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Review;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity.Events;
@@ -46,7 +48,9 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
 
     protected async Task PrepareSerialization(DatabaseContext database)
     {
-        Console.WriteLine($@"EVENT SERIALIZATION!! {this.UserId} - {this.GetHashCode()}");
+        #if DEBUG
+        Logger.Debug($@"EVENT SERIALIZATION!! userId: {this.UserId} - hashCode: {this.GetHashCode()}", LogArea.Activity);
+        #endif
         UserEntity user = await database.Users.FindAsync(this.UserId);
         if (user == null) return;
         this.Username = user.Username;
@@ -114,7 +118,7 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
     {
         if (!IsValidActivity(activity.Activity))
         {
-            Console.WriteLine(@"Invalid Activity: " + activity.Activity.ActivityId);
+            Logger.Error(@"Invalid Activity: " + activity.Activity.ActivityId, LogArea.Activity);
             return null;
         }
 

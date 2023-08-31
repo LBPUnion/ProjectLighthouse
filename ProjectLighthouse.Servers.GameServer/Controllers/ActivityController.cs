@@ -3,10 +3,12 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Filter.Filters.Activity;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Activity;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -121,7 +123,7 @@ public class ActivityController : ControllerBase
                 dto.Activity.Type != EventType.AddLevelToPlaylist);
         }
 
-        Console.WriteLine(predicate);
+        Logger.Debug(predicate.ToString(), LogArea.Activity);
 
         dtoQuery = dtoQuery.Where(predicate);
 
@@ -281,16 +283,16 @@ public class ActivityController : ControllerBase
     {
         foreach (OuterActivityGroup outer in outerGroups)
         {
-            Console.WriteLine(@$"Outer group key: {outer.Key}");
+            Logger.Debug(@$"Outer group key: {outer.Key}", LogArea.Activity);
             List<IGrouping<InnerActivityGroup, ActivityDto>> itemGroup = outer.Groups;
             foreach (IGrouping<InnerActivityGroup, ActivityDto> item in itemGroup)
             {
-                Console.WriteLine(
-                    @$"  Inner group key: TargetId={item.Key.TargetId}, UserId={item.Key.UserId}, Type={item.Key.Type}");
+                Logger.Debug(
+                    @$"  Inner group key: TargetId={item.Key.TargetId}, UserId={item.Key.UserId}, Type={item.Key.Type}", LogArea.Activity);
                 foreach (ActivityDto activity in item)
                 {
-                    Console.WriteLine(
-                        @$"        Activity: {activity.GroupType}, Timestamp: {activity.Activity.Timestamp}, UserId: {activity.Activity.UserId}, EventType: {activity.Activity.Type}, TargetId: {activity.TargetId}");
+                    Logger.Debug(
+                        @$"        Activity: {activity.GroupType}, Timestamp: {activity.Activity.Timestamp}, UserId: {activity.Activity.UserId}, EventType: {activity.Activity.Type}, TargetId: {activity.TargetId}", LogArea.Activity);
                 }
             }
         }
