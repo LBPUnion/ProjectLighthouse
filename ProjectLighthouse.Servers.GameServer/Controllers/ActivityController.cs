@@ -43,6 +43,10 @@ public class ActivityController : ControllerBase
         bool excludeMyPlaylists = true
     )
     {
+        dtoQuery = token.GameVersion == GameVersion.LittleBigPlanetVita
+            ? dtoQuery.Where(dto => dto.TargetSlotGameVersion == null || dto.TargetSlotGameVersion == token.GameVersion)
+            : dtoQuery.Where(dto => dto.TargetSlotGameVersion == null || dto.TargetSlotGameVersion <= token.GameVersion);
+
         Expression<Func<ActivityDto, bool>> predicate = PredicateExtensions.False<ActivityDto>();
 
         List<int> favouriteUsers = await this.database.HeartedProfiles.Where(hp => hp.UserId == token.UserId)

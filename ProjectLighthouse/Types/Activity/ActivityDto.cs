@@ -1,4 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Types.Activity;
 
@@ -7,6 +8,7 @@ public class ActivityDto
     public required ActivityEntity Activity { get; set; }
     public int? TargetSlotId { get; set; }
     public int? TargetSlotCreatorId { get; set; }
+    public GameVersion? TargetSlotGameVersion { get; set; }
     public int? TargetUserId { get; set; }
     public int? TargetPlaylistId { get; set; }
     public int? TargetNewsId { get; set; }

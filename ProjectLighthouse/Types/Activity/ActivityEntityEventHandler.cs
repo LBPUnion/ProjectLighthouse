@@ -16,7 +16,6 @@ using System.Reflection;
 
 namespace LBPUnion.ProjectLighthouse.Types.Activity;
 
-//TODO implement missing event triggers
 public class ActivityEntityEventHandler : IEntityEventHandler
 {
     public void OnEntityInserted<T>(DatabaseContext database, T entity) where T : class
@@ -24,35 +23,56 @@ public class ActivityEntityEventHandler : IEntityEventHandler
         Console.WriteLine($@"OnEntityInserted: {entity.GetType().Name}");
         ActivityEntity? activity = entity switch
         {
-            SlotEntity slot => new LevelActivityEntity
+            SlotEntity slot => slot.Type switch
             {
-                Type = EventType.PublishLevel,
-                SlotId = slot.SlotId,
-                UserId = slot.CreatorId,
+                SlotType.User => new LevelActivityEntity
+                {
+                    Type = EventType.PublishLevel,
+                    SlotId = slot.SlotId,
+                    UserId = slot.CreatorId,
+                },
+                _ => null,
             },
-            CommentEntity comment => new CommentActivityEntity
+            CommentEntity comment => comment.TargetSlot?.Type switch
             {
-                Type = comment.Type == CommentType.Level ? EventType.CommentOnLevel : EventType.CommentOnUser,
-                CommentId = comment.CommentId,
-                UserId = comment.PosterUserId,
+                SlotType.User => new CommentActivityEntity
+                {
+                    Type = comment.Type == CommentType.Level ? EventType.CommentOnLevel : EventType.CommentOnUser,
+                    CommentId = comment.CommentId,
+                    UserId = comment.PosterUserId,
+                },
+                _ => null,
             },
-            PhotoEntity photo => new PhotoActivityEntity
+            PhotoEntity photo => photo.Slot?.Type switch
             {
-                Type = EventType.UploadPhoto,
-                PhotoId = photo.PhotoId,
-                UserId = photo.CreatorId,
+                SlotType.User => new PhotoActivityEntity
+                {
+                    Type = EventType.UploadPhoto,
+                    PhotoId = photo.PhotoId,
+                    UserId = photo.CreatorId,
+                },
+                _ => null,
             },
-            ScoreEntity score => new ScoreActivityEntity
+            ScoreEntity score => score.Slot.Type switch
             {
-                Type = EventType.Score,
-                ScoreId = score.ScoreId,
-                UserId = score.UserId,
+                // Don't add story scores or versus scores
+                SlotType.User when score.Type != 7 => new ScoreActivityEntity
+                {
+                    Type = EventType.Score,
+                    ScoreId = score.ScoreId,
+                    UserId = score.UserId,
+                },
+                _ => null,
             },
-            HeartedLevelEntity heartedLevel => new LevelActivityEntity
+            HeartedLevelEntity heartedLevel => heartedLevel.Slot.Type switch
             {
-                Type = EventType.HeartLevel,
-                SlotId = heartedLevel.SlotId,
-                UserId = heartedLevel.UserId,
+                SlotType.User => new LevelActivityEntity
+                {
+                    Type = EventType.HeartLevel,
+                    SlotId = heartedLevel.SlotId,
+                    UserId = heartedLevel.UserId,
+                },
+                _ => null,
             },
             HeartedProfileEntity heartedProfile => new UserActivityEntity
             {
@@ -123,8 +143,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 
             object? origVal = propInfo.GetValue(origEntity);
             object? newVal = propInfo.GetValue(currentEntity);
-            if ((origVal == null && newVal == null) || (origVal != null && newVal != null && origVal.Equals(newVal)))
-                continue;
+            if ((origVal == null && newVal == null) || (origVal != null && newVal != null && origVal.Equals(newVal))) continue;
 
             Console.WriteLine($@"Value for {propInfo.Name} changed");
             Console.WriteLine($@"Orig val: {origVal?.ToString() ?? "null"}");
@@ -197,6 +216,14 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             {
                 if (origEntity is not CommentEntity oldComment) break;
 
+                if (comment.TargetSlotId != null)
+                {
+                    SlotType slotType = database.Slots.Where(s => s.SlotId == comment.TargetSlotId)
+                        .Select(s => s.Type)
+                        .FirstOrDefault();
+                    if (slotType != SlotType.User) break;
+                }
+
                 if (oldComment.Deleted || !comment.Deleted) break;
 
                 if (comment.Type != CommentType.Level) break;
@@ -238,6 +265,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                     };
                     InsertActivity(database, entity);
                 }
+
                 break;
             }
         }
@@ -250,11 +278,15 @@ public class ActivityEntityEventHandler : IEntityEventHandler
         Console.WriteLine($@"OnEntityDeleted: {entity.GetType().Name}");
         ActivityEntity? activity = entity switch
         {
-            HeartedLevelEntity heartedLevel => new LevelActivityEntity
+            HeartedLevelEntity heartedLevel => heartedLevel.Slot.Type switch
             {
-                Type = EventType.UnheartLevel,
-                SlotId = heartedLevel.SlotId,
-                UserId = heartedLevel.UserId,
+                SlotType.User => new LevelActivityEntity
+                {
+                    Type = EventType.UnheartLevel,
+                    SlotId = heartedLevel.SlotId,
+                    UserId = heartedLevel.UserId,
+                },
+                _ => null,
             },
             HeartedProfileEntity heartedProfile => new UserActivityEntity
             {
