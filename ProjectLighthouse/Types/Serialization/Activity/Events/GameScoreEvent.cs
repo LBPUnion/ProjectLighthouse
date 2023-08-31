@@ -34,7 +34,7 @@ public class GameScoreEvent : GameEvent
 
         this.Score = score.Points;
         //TODO is this correct?
-        this.UserCount = score.Type == 7 ? 0 : score.Type;
+        this.UserCount = score.Type;
 
         this.Slot = ReviewSlot.CreateFromEntity(slot);
     }
