@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Review;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,12 +35,13 @@ public class GamePhotoUploadEvent : GameEvent
         if (photo == null) return;
 
         this.PhotoParticipants = photo.PhotoSubjects.Select(ps => ps.User.Username).ToList();
+        this.PhotoId = photo.PhotoId;
 
         if (photo.SlotId == null) return;
 
         SlotEntity slot = await database.Slots.FindAsync(photo.SlotId);
         if (slot == null) return;
 
-        this.Slot = ReviewSlot.CreateFromEntity(slot);
+        if (slot.Type == SlotType.User) this.Slot = ReviewSlot.CreateFromEntity(slot);
     }
 }
