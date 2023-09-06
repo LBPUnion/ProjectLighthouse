@@ -57,6 +57,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             },
             PhotoEntity photo => photo.SlotId switch
             {
+                // Photos without levels
                 null => new PhotoActivityEntity
                 {
                     Type = EventType.UploadPhoto,
@@ -65,13 +66,14 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 },
                 _ => photo.Slot?.Type switch
                 {
-                    SlotType.User => new PhotoActivityEntity
+                    SlotType.Developer => null,
+                    // Non-story levels (moon, pod, etc)
+                    _ => new PhotoActivityEntity
                     {
                         Type = EventType.UploadPhoto,
                         PhotoId = photo.PhotoId,
                         UserId = photo.CreatorId,
                     },
-                    _ => null,
                 },
             },
             ScoreEntity score => score.Slot.Type switch
