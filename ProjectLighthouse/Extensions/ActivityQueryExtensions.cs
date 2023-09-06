@@ -88,7 +88,7 @@ public static class ActivityQueryExtensions
                             ? ((ScoreActivityEntity)a).Score.SlotId
                             : a is ReviewActivityEntity
                                 ? ((ReviewActivityEntity)a).Review.SlotId
-                                : null,
+                                : 0,
             TargetSlotGameVersion = a is LevelActivityEntity
                 ? ((LevelActivityEntity)a).Slot.GameVersion
                 : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId != 0
@@ -99,7 +99,7 @@ public static class ActivityQueryExtensions
                             ? ((ScoreActivityEntity)a).Score.Slot.GameVersion
                             : a is ReviewActivityEntity
                                 ? ((ReviewActivityEntity)a).Review.Slot.GameVersion
-                                : null,
+                                : 0,
             TargetSlotCreatorId = includeSlotCreator
                 ? a is LevelActivityEntity
                     ? ((LevelActivityEntity)a).Slot.CreatorId
@@ -111,8 +111,8 @@ public static class ActivityQueryExtensions
                                 ? ((ScoreActivityEntity)a).Score.Slot.CreatorId
                                 : a is ReviewActivityEntity
                                     ? ((ReviewActivityEntity)a).Review.Slot!.CreatorId
-                                    : null
-                : null,
+                                    : 0
+                : 0,
 
             TargetUserId = a is UserActivityEntity
                 ? ((UserActivityEntity)a).TargetUserId
@@ -120,13 +120,13 @@ public static class ActivityQueryExtensions
                     ? ((CommentActivityEntity)a).Comment.TargetUserId
                     : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId != 0
                         ? ((PhotoActivityEntity)a).Photo.CreatorId
-                        : null,
+                        : 0,
             TargetPlaylistId = a is PlaylistActivityEntity || a is PlaylistWithSlotActivityEntity
                 ? ((PlaylistActivityEntity)a).PlaylistId
-                : null,
-            TargetNewsId = a is NewsActivityEntity ? ((NewsActivityEntity)a).NewsId : null,
+                : 0,
+            TargetNewsId = a is NewsActivityEntity ? ((NewsActivityEntity)a).NewsId : 0,
             TargetTeamPickId = includeTeamPick
-                ? a.Type == EventType.MMPickLevel && a is LevelActivityEntity ? ((LevelActivityEntity)a).SlotId : null
-                : null, });
+                ? a.Type == EventType.MMPickLevel && a is LevelActivityEntity ? ((LevelActivityEntity)a).SlotId : 0
+                : 0, });
     }
 }
