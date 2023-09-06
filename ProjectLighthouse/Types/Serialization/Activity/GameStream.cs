@@ -76,6 +76,12 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
+        this.Slots = await LoadEntities<SlotEntity, SlotBase>(this.SlotIds, slot => SlotBase.CreateFromEntity(slot, this.TargetGame, this.TargetUserId));
+        this.Users = await LoadEntities<UserEntity, GameUser>(this.UserIds, user => GameUser.CreateFromEntity(user, this.TargetGame));
+        this.Playlists = await LoadEntities<PlaylistEntity, GamePlaylist>(this.PlaylistIds, GamePlaylist.CreateFromEntity);
+        this.News = await LoadEntities<WebsiteAnnouncementEntity, GameNewsObject>(this.NewsIds, a => GameNewsObject.CreateFromEntity(a, this.TargetGame));
+        return;
+
         async Task<List<TResult>> LoadEntities<TFrom, TResult>(List<int> ids, Func<TFrom, TResult> transformation) 
             where TFrom : class
         {
@@ -91,11 +97,6 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
 
             return results;
         }
-
-        this.Slots = await LoadEntities<SlotEntity, SlotBase>(this.SlotIds, slot => SlotBase.CreateFromEntity(slot, this.TargetGame, this.TargetUserId));
-        this.Users = await LoadEntities<UserEntity, GameUser>(this.UserIds, user => GameUser.CreateFromEntity(user, this.TargetGame));
-        this.Playlists = await LoadEntities<PlaylistEntity, GamePlaylist>(this.PlaylistIds, GamePlaylist.CreateFromEntity);
-        this.News = await LoadEntities<WebsiteAnnouncementEntity, GameNewsObject>(this.NewsIds, GameNewsObject.CreateFromEntity);
     }
 
     public static GameStream CreateFromGroups

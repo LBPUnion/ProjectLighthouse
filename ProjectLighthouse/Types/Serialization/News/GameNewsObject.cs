@@ -2,6 +2,7 @@
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Website;
+using LBPUnion.ProjectLighthouse.Types.Users;
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization.News;
 
@@ -33,12 +34,12 @@ public class GameNewsObject : ILbpSerializable
     [XmlElement("category")]
     public string Category { get; set; }
 
-    public static GameNewsObject CreateFromEntity(WebsiteAnnouncementEntity entity) =>
+    public static GameNewsObject CreateFromEntity(WebsiteAnnouncementEntity entity, GameVersion gameVersion) =>
         new()
         {
             Id = entity.AnnouncementId,
             Title = entity.Title,
-            Summary = "",
+            Summary = gameVersion == GameVersion.LittleBigPlanet2 ? entity.Content : "",
             Text = entity.Content,
             Category = "no_category",
             Timestamp = entity.PublishedAt.ToUnixTimeMilliseconds(),
