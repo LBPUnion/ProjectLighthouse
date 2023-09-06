@@ -196,6 +196,7 @@ public class ActivityEventHandlerTests
             HeartedLevelId = 1,
             UserId = 1,
             SlotId = 1,
+            Slot = slot,
         };
 
         eventHandler.OnEntityInserted(database, heartedLevel);

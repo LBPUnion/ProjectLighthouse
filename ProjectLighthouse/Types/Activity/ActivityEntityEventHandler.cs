@@ -35,25 +35,44 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 },
                 _ => null,
             },
-            CommentEntity comment => comment.TargetSlot?.Type switch
+            CommentEntity comment => comment.Type switch
             {
-                SlotType.User => new CommentActivityEntity
+                CommentType.Level => comment.TargetSlot?.Type switch
                 {
-                    Type = comment.Type == CommentType.Level ? EventType.CommentOnLevel : EventType.CommentOnUser,
+                    SlotType.User => new CommentActivityEntity
+                    {
+                        Type = EventType.CommentOnLevel,
+                        CommentId = comment.CommentId,
+                        UserId = comment.PosterUserId,
+                    },
+                    _ => null,
+                },
+                CommentType.Profile => new CommentActivityEntity
+                {
+                    Type = EventType.CommentOnUser,
                     CommentId = comment.CommentId,
                     UserId = comment.PosterUserId,
-                },
+                }, 
                 _ => null,
             },
-            PhotoEntity photo => photo.Slot?.Type switch
+            PhotoEntity photo => photo.SlotId switch
             {
-                SlotType.User => new PhotoActivityEntity
+                null => new PhotoActivityEntity
                 {
                     Type = EventType.UploadPhoto,
                     PhotoId = photo.PhotoId,
                     UserId = photo.CreatorId,
                 },
-                _ => null,
+                _ => photo.Slot?.Type switch
+                {
+                    SlotType.User => new PhotoActivityEntity
+                    {
+                        Type = EventType.UploadPhoto,
+                        PhotoId = photo.PhotoId,
+                        UserId = photo.CreatorId,
+                    },
+                    _ => null,
+                },
             },
             ScoreEntity score => score.Slot.Type switch
             {
