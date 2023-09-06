@@ -61,7 +61,7 @@ public static class ActivityQueryExtensions
                     {
                         Type = groupByActor ? gr.GroupType : gr.GroupType != ActivityGroupType.News ? ActivityGroupType.User : ActivityGroupType.News,
                         UserId = gr.Activity.UserId,
-                        TargetId = groupByActor ? gr.TargetId : gr.Activity.UserId,
+                        TargetId = groupByActor ? gr.TargetId : gr.GroupType != ActivityGroupType.News ? gr.Activity.UserId : gr.TargetNewsId ?? 0,
                     })
                     .ToList(),
             })
