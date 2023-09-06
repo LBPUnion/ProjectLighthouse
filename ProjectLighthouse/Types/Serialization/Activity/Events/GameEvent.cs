@@ -184,6 +184,7 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
             },
             EventType.UploadPhoto => new GamePhotoUploadEvent
             {
+                PhotoId = ((PhotoActivityEntity)activity.Activity).PhotoId,
                 Slot = new ReviewSlot
                 {
                     SlotId = targetId,

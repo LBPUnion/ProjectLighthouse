@@ -35,7 +35,6 @@ public class GamePhotoUploadEvent : GameEvent
         if (photo == null) return;
 
         this.PhotoParticipants = photo.PhotoSubjects.Select(ps => ps.User.Username).ToList();
-        this.PhotoId = photo.PhotoId;
 
         if (photo.SlotId == null) return;
 

@@ -11,6 +11,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Entities.Website;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Serialization.News;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Playlist;
 using LBPUnion.ProjectLighthouse.Types.Serialization.Slot;
@@ -76,13 +77,13 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        this.Slots = await LoadEntities<SlotEntity, SlotBase>(this.SlotIds, slot => SlotBase.CreateFromEntity(slot, this.TargetGame, this.TargetUserId));
+        this.Slots = await LoadEntities<SlotEntity, SlotBase>(this.SlotIds, slot => SlotBase.CreateFromEntity(slot, this.TargetGame, this.TargetUserId), s => s.Type == SlotType.User);
         this.Users = await LoadEntities<UserEntity, GameUser>(this.UserIds, user => GameUser.CreateFromEntity(user, this.TargetGame));
         this.Playlists = await LoadEntities<PlaylistEntity, GamePlaylist>(this.PlaylistIds, GamePlaylist.CreateFromEntity);
         this.News = await LoadEntities<WebsiteAnnouncementEntity, GameNewsObject>(this.NewsIds, a => GameNewsObject.CreateFromEntity(a, this.TargetGame));
         return;
 
-        async Task<List<TResult>> LoadEntities<TFrom, TResult>(List<int> ids, Func<TFrom, TResult> transformation) 
+        async Task<List<TResult>> LoadEntities<TFrom, TResult>(List<int> ids, Func<TFrom, TResult> transformation, Func<TFrom, bool> predicate = null) 
             where TFrom : class
         {
             List<TResult> results = new();
@@ -90,6 +91,9 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
             foreach (int id in ids)
             {
                 TFrom entity = await database.Set<TFrom>().FindAsync(id);
+
+                if (predicate != null && !predicate(entity)) continue;
+
                 if (entity == null) continue;
 
                 results.Add(transformation(entity));
