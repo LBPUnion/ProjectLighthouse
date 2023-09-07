@@ -19,16 +19,16 @@ public class DismissExpiredCasesTask : IRepeatingTask
 
     public async Task Run(DatabaseContext database)
     {
-        List<ModerationCaseEntity> cases =
+        List<ModerationCaseEntity> expiredCases =
             await database.Cases.Where(c => c.ExpiresAt != null && c.ExpiresAt < DateTime.Now).ToListAsync();
 
-        if (cases.Count == 0)
+        if (expiredCases.Count == 0)
         {
             Logger.Info("There are no expired cases to dismiss", LogArea.Maintenance);
             return;
         }
 
-        foreach (ModerationCaseEntity @case in cases)
+        foreach (ModerationCaseEntity @case in expiredCases)
         {
             @case.DismissedAt = DateTime.Now;
             Logger.Info($"Dismissed expired case {@case.CaseId}", LogArea.Maintenance);
