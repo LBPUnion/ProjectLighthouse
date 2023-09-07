@@ -118,7 +118,7 @@ public static class ActivityQueryExtensions
                 ? ((UserActivityEntity)a).TargetUserId
                 : a is CommentActivityEntity && ((CommentActivityEntity)a).Comment.Type == CommentType.Profile
                     ? ((CommentActivityEntity)a).Comment.TargetUserId
-                    : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId != 0
+                    : a is PhotoActivityEntity && ((PhotoActivityEntity)a).Photo.SlotId == 0
                         ? ((PhotoActivityEntity)a).Photo.CreatorId
                         : 0,
             TargetPlaylistId = a is PlaylistActivityEntity || a is PlaylistWithSlotActivityEntity

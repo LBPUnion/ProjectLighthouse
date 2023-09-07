@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
@@ -206,6 +207,55 @@ public class ActivityEventHandlerTests
     }
 
     [Fact]
+    public async Task HeartedLevel_InsertDuplicate_ShouldRemoveOldActivity()
+    {
+        ActivityEntityEventHandler eventHandler = new();
+        DatabaseContext database = await MockHelper.GetTestDatabase(new List<UserEntity>
+        {
+            new()
+            {
+                Username = "test",
+                UserId = 1,
+            },
+        });
+
+        SlotEntity slot = new()
+        {
+            SlotId = 1,
+            CreatorId = 1,
+        };
+        database.Slots.Add(slot);
+
+        LevelActivityEntity levelActivity = new()
+        {
+            UserId = 1,
+            SlotId = 1,
+            Type = EventType.HeartLevel,
+            Timestamp = DateTime.MinValue,
+        };
+
+        database.Activities.Add(levelActivity);
+
+        await database.SaveChangesAsync();
+
+        HeartedLevelEntity heartedLevel = new()
+        {
+            HeartedLevelId = 1,
+            UserId = 1,
+            SlotId = 1,
+            Slot = slot,
+        };
+
+        Assert.NotNull(database.Activities.OfType<LevelActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.HeartLevel && a.SlotId == 1 && a.Timestamp == DateTime.MinValue));
+
+        eventHandler.OnEntityInserted(database, heartedLevel);
+
+        Assert.NotNull(database.Activities.OfType<LevelActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.HeartLevel && a.SlotId == 1 && a.Timestamp != DateTime.MinValue));
+    }
+
+    [Fact]
     public async Task HeartedProfile_Insert_ShouldCreateUserActivity()
     {
         ActivityEntityEventHandler eventHandler = new();
@@ -229,6 +279,46 @@ public class ActivityEventHandlerTests
 
         Assert.NotNull(database.Activities.OfType<UserActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.HeartUser && a.TargetUserId == 1));
+    }
+
+    [Fact]
+    public async Task HeartedProfile_InsertDuplicate_ShouldRemoveOldActivity()
+    {
+        ActivityEntityEventHandler eventHandler = new();
+        DatabaseContext database = await MockHelper.GetTestDatabase(new List<UserEntity>
+        {
+            new()
+            {
+                Username = "test",
+                UserId = 1,
+            },
+        });
+
+        UserActivityEntity userActivity = new()
+        {
+            UserId = 1,
+            TargetUserId = 1,
+            Type = EventType.HeartUser,
+            Timestamp = DateTime.MinValue,
+        };
+
+        database.Activities.Add(userActivity);
+        await database.SaveChangesAsync();
+
+        Assert.NotNull(database.Activities.OfType<UserActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.HeartUser && a.TargetUserId == 1 && a.Timestamp == DateTime.MinValue));
+
+        HeartedProfileEntity heartedProfile = new()
+        {
+            HeartedProfileId = 1,
+            UserId = 1,
+            HeartedUserId = 1,
+        };
+
+        eventHandler.OnEntityInserted(database, heartedProfile);
+
+        Assert.NotNull(database.Activities.OfType<UserActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.HeartUser && a.TargetUserId == 1 && a.Timestamp != DateTime.MinValue));
     }
 
     [Fact]
@@ -263,6 +353,54 @@ public class ActivityEventHandlerTests
 
         Assert.NotNull(database.Activities.OfType<PlaylistActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.HeartPlaylist && a.PlaylistId == 1));
+    }
+
+    [Fact]
+    public async Task HeartedPlaylist_InsertDuplicate_ShouldCreatePlaylistActivity()
+    {
+        ActivityEntityEventHandler eventHandler = new();
+        DatabaseContext database = await MockHelper.GetTestDatabase(new List<UserEntity>
+        {
+            new()
+            {
+                Username = "test",
+                UserId = 1,
+            },
+        });
+
+        PlaylistEntity playlist = new()
+        {
+            PlaylistId = 1,
+            CreatorId = 1,
+        };
+        database.Playlists.Add(playlist);
+
+        PlaylistActivityEntity playlistActivity = new()
+        {
+            UserId = 1,
+            PlaylistId = 1,
+            Type = EventType.HeartPlaylist,
+            Timestamp = DateTime.MinValue,
+        };
+        database.Activities.Add(playlistActivity);
+
+        await database.SaveChangesAsync();
+
+        HeartedPlaylistEntity heartedPlaylist = new()
+        {
+            HeartedPlaylistId = 1,
+            UserId = 1,
+            PlaylistId = 1,
+        };
+
+        Assert.NotNull(database.Activities.OfType<PlaylistActivityEntity>()
+            .FirstOrDefault(a =>
+                a.Type == EventType.HeartPlaylist && a.PlaylistId == 1 && a.Timestamp == DateTime.MinValue));
+
+        eventHandler.OnEntityInserted(database, heartedPlaylist);
+
+        Assert.NotNull(database.Activities.OfType<PlaylistActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.HeartPlaylist && a.PlaylistId == 1 && a.Timestamp != DateTime.MinValue));
     }
 
     [Fact]
@@ -697,6 +835,52 @@ public class ActivityEventHandlerTests
     }
 
     [Fact]
+    public async Task HeartedLevel_DeleteDuplicate_ShouldRemoveOldActivity()
+    {
+        ActivityEntityEventHandler eventHandler = new();
+        DatabaseContext database = await MockHelper.GetTestDatabase(new List<UserEntity>
+        {
+            new()
+            {
+                Username = "test",
+                UserId = 1,
+            },
+        });
+
+        SlotEntity slot = new()
+        {
+            SlotId = 1,
+            CreatorId = 1,
+        };
+        database.Slots.Add(slot);
+
+        LevelActivityEntity levelActivity = new()
+        {
+            UserId = 1,
+            SlotId = 1,
+            Type = EventType.UnheartLevel,
+            Timestamp = DateTime.MinValue,
+        };
+
+        database.Activities.Add(levelActivity);
+
+        HeartedLevelEntity heartedLevel = new()
+        {
+            HeartedLevelId = 1,
+            UserId = 1,
+            SlotId = 1,
+        };
+
+        database.HeartedLevels.Add(heartedLevel);
+        await database.SaveChangesAsync();
+
+        eventHandler.OnEntityDeleted(database, heartedLevel);
+
+        Assert.NotNull(database.Activities.OfType<LevelActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.UnheartLevel && a.SlotId == 1 && a.Timestamp != DateTime.MinValue));
+    }
+
+    [Fact]
     public async Task HeartedProfile_Delete_ShouldCreateLevelActivity()
     {
         ActivityEntityEventHandler eventHandler = new();
@@ -730,6 +914,47 @@ public class ActivityEventHandlerTests
 
         Assert.NotNull(database.Activities.OfType<UserActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.UnheartUser && a.UserId == 1));
+    }
+
+    [Fact]
+    public async Task HeartedProfile_DeleteDuplicate_ShouldCreateLevelActivity()
+    {
+        ActivityEntityEventHandler eventHandler = new();
+        DatabaseContext database = await MockHelper.GetTestDatabase(new List<UserEntity>
+        {
+            new()
+            {
+                Username = "test",
+                UserId = 1,
+            },
+        });
+
+        UserActivityEntity userActivity = new()
+        {
+            UserId = 1,
+            TargetUserId = 1,
+            Type = EventType.UnheartUser,
+            Timestamp = DateTime.MinValue,
+        };
+        database.Activities.Add(userActivity);
+
+        HeartedProfileEntity heartedProfile = new()
+        {
+            HeartedProfileId = 1,
+            UserId = 1,
+            HeartedUserId = 1,
+        };
+
+        database.HeartedProfiles.Add(heartedProfile);
+        await database.SaveChangesAsync();
+
+        Assert.NotNull(database.Activities.OfType<UserActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.UnheartUser && a.UserId == 1 && a.Timestamp == DateTime.MinValue));
+
+        eventHandler.OnEntityDeleted(database, heartedProfile);
+
+        Assert.NotNull(database.Activities.OfType<UserActivityEntity>()
+            .FirstOrDefault(a => a.Type == EventType.UnheartUser && a.UserId == 1 && a.Timestamp != DateTime.MinValue));
     }
     #endregion
 }

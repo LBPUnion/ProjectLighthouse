@@ -1,7 +1,9 @@
 ﻿#nullable enable
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
@@ -144,11 +146,56 @@ public class ActivityEntityEventHandler : IEntityEventHandler
         InsertActivity(database, activity);
     }
 
+    private static void RemoveDuplicateEvents(DatabaseContext database, ActivityEntity activity)
+    {
+        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+        switch (activity.Type)
+        {
+            case EventType.HeartLevel:
+            case EventType.UnheartLevel:
+            {
+                if (activity is not LevelActivityEntity levelActivity) break;
+
+                DeleteActivity(a => a.TargetSlotId == levelActivity.SlotId);
+                break;
+            }
+            case EventType.HeartUser:
+            case EventType.UnheartUser:
+            {
+                if (activity is not UserActivityEntity userActivity) break;
+
+                DeleteActivity(a => a.TargetUserId == userActivity.TargetUserId);
+                break;
+            }
+            case EventType.HeartPlaylist:
+            {
+                if (activity is not PlaylistActivityEntity playlistActivity) break;
+
+                DeleteActivity(a => a.TargetPlaylistId == playlistActivity.PlaylistId);
+                break;
+            }
+        }
+
+        return;
+
+        void DeleteActivity(Expression<Func<ActivityDto, bool>> predicate)
+        {
+            database.Activities.ToActivityDto()
+                .Where(a => a.Activity.UserId == activity.UserId)
+                .Where(a => a.Activity.Type == activity.Type)
+                .Where(predicate)
+                .Select(a => a.Activity)
+                .ExecuteDelete();
+        }
+    }
+
     private static void InsertActivity(DatabaseContext database, ActivityEntity? activity)
     {
         if (activity == null) return;
 
         Logger.Debug("Inserting activity: " + activity.GetType().Name, LogArea.Activity);
+
+        RemoveDuplicateEvents(database, activity);
 
         activity.Timestamp = DateTime.UtcNow;
         database.Activities.Add(activity);
