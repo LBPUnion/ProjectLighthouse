@@ -24,7 +24,7 @@ public class DismissExpiredCasesTask : IRepeatingTask
 
         if (expiredCases.Count == 0)
         {
-            Logger.Info("There are no expired cases to dismiss", LogArea.Maintenance);
+            Logger.Debug("There are no expired cases to dismiss", LogArea.Maintenance);
             return;
         }
 
