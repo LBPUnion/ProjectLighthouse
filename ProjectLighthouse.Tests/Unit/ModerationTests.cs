@@ -14,7 +14,7 @@ public class ModerationTests
     [Fact]
     public async void CanDismissExpiredCases()
     {
-        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+        await using DatabaseContext database = await MockHelper.GetTestDatabase();
         
         ModerationCaseEntity @case = new()
         {
@@ -36,7 +36,7 @@ public class ModerationTests
     [Fact]
     public async void DoNotDismissActiveCases()
     {
-        await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
+        await using DatabaseContext database = await MockHelper.GetTestDatabase();
 
         ModerationCaseEntity @case = new()
         {
