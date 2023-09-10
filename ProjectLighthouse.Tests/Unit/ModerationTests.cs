@@ -30,7 +30,7 @@ public class ModerationTests
         DismissExpiredCasesTask task = new();
         await task.Run(database);
         
-        Assert.False(await database.Cases.AnyAsync(c => c.CaseId == 1));
+        Assert.True(await database.Cases.AnyAsync(c => c.CaseId == 1 && c.DismissedAt != null));
     }
 
     [Fact]
@@ -52,6 +52,6 @@ public class ModerationTests
         DismissExpiredCasesTask task = new();
         await task.Run(database);
 
-        Assert.True(await database.Cases.AnyAsync(c => c.CaseId == 2));
+        Assert.True(await database.Cases.AnyAsync(c => c.CaseId == 2 && c.DismissedAt == null));
     }
 }
