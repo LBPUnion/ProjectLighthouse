@@ -12,14 +12,14 @@ namespace LBPUnion.ProjectLighthouse.Tests.Unit;
 public class ModerationTests
 {
     [Fact]
-    public async void CanDismissExpiredCases()
+    public async void DismissExpiredCases_ShouldDismissExpiredCase()
     {
         await using DatabaseContext database = await MockHelper.GetTestDatabase();
         
         ModerationCaseEntity @case = new()
         {
             CaseId = 1,
-            ExpiresAt = DateTime.Now - TimeSpan.FromHours(1),
+            ExpiresAt = DateTime.UnixEpoch,
             CreatorUsername = "unitTestUser",
         };
         
@@ -34,14 +34,14 @@ public class ModerationTests
     }
 
     [Fact]
-    public async void DoNotDismissActiveCases()
+    public async void DismissExpiredCases_ShouldNotDismissActiveCase()
     {
         await using DatabaseContext database = await MockHelper.GetTestDatabase();
 
         ModerationCaseEntity @case = new()
         {
             CaseId = 2,
-            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
+            ExpiresAt = DateTime.UtcNow.AddHours(1),
             CreatorUsername = "unitTestUser",
         };
 
