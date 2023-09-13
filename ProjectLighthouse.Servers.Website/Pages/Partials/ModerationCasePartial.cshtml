@@ -44,7 +44,6 @@
         </span><br>
     }
 
-
     @if (Model.Type.AffectsLevel())
     {
         SlotEntity? slot = await Model.GetSlotAsync(Database);
@@ -129,7 +128,7 @@
         <pre><b>No notes were provided.</b></pre>
     }
 
-    @if (!Model.Dismissed && !Model.Expired)
+    @if (Model is { Dismissed: false, Expired: false, })
     {
         <a class="ui green small button" href="/moderation/case/@Model.CaseId/dismiss">
             <i class="checkmark icon"></i>
