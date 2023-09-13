@@ -31,7 +31,8 @@ public class DismissExpiredCasesTask : IRepeatingTask
 
         foreach (ModerationCaseEntity @case in expiredCases)
         {
-            @case.DismissedAt = DateTime.Now;
+            @case.DismissedAt = DateTime.UtcNow;
+            @case.DismisserUsername = "maintenance task";
             Logger.Info($"Dismissed expired case {@case.CaseId}", LogArea.Maintenance);
         }
 
