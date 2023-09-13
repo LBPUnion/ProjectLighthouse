@@ -19,8 +19,9 @@ public class DismissExpiredCasesTask : IRepeatingTask
 
     public async Task Run(DatabaseContext database)
     {
-        List<ModerationCaseEntity> expiredCases =
-            await database.Cases.Where(c => c.ExpiresAt != null && c.ExpiresAt < DateTime.UtcNow).ToListAsync();
+        List<ModerationCaseEntity> expiredCases = await database.Cases
+            .Where(c => c.DismissedAt == null && c.ExpiresAt != null && c.ExpiresAt < DateTime.UtcNow)
+            .ToListAsync();
 
         if (expiredCases.Count == 0)
         {
