@@ -12,7 +12,7 @@
 
 <p>There are @Model.CaseCount total cases, @Model.ExpiredCaseCount of which are queued for dismissal, and @Model.DismissedCaseCount of which have been dismissed.</p>
 
-<form action="/moderation/cases/@Model.PageNumber">
+<form action="/moderation/cases/0">
     <div class="ui icon input">
         <input type="text" autocomplete="off" name="name" placeholder="Search cases..." value="@Model.SearchValue">
         <i class="search icon"></i>
