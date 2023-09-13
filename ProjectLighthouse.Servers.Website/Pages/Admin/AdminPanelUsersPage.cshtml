@@ -28,22 +28,21 @@
 
         switch (user.PermissionLevel)
         {
-            // jank but works
             case PermissionLevel.Banned:
             {
-                color = "red";
+                color = "grey";
                 subtitle = $"Banned user! Reason: {user.BannedReason}";
                 break;
             }
             case PermissionLevel.Moderator:
             {
-                color = "green";
+                color = "orange";
                 subtitle = "Moderator";
                 break;
             }
             case PermissionLevel.Administrator:
             {
-                color = "yellow";
+                color = "red";
                 subtitle = "Admin";       
                 break;
             }
@@ -82,6 +81,8 @@
         </div>
     }
 </div>
+
+<br />
 
 @if (Model.PageNumber != 0)
 {
