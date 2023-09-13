@@ -76,7 +76,7 @@ public class ModerationTests
         await task.Run(database);
 
         // check that the case was not dismissed again by comparing original time to new time
-        Assert.NotNull(await database.Cases.FirstOrDefaultAsync(c =>
-            c.CaseId == 3 && c.DismissedAt == DateTime.UnixEpoch && c.DismissedAt != null));
+        Assert.NotNull(
+            await database.Cases.FirstOrDefaultAsync(c => c.CaseId == 3 && c.DismissedAt == DateTime.UnixEpoch));
     }
 }
