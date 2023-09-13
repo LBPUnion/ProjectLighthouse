@@ -11,7 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Moderation;
 public class CasePage : BaseLayout
 {
     public CasePage(DatabaseContext database) : base(database)
-    {}
+    { }
 
     public List<ModerationCaseEntity> Cases = new();
     public int CaseCount;
@@ -32,9 +32,12 @@ public class CasePage : BaseLayout
 
         this.SearchValue = name.Replace(" ", string.Empty);
 
-        this.CaseCount = await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue));
-        this.ExpiredCaseCount = await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue) && c.ExpiresAt != null && c.ExpiresAt < DateTime.UtcNow);
-        this.DismissedCaseCount = await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue) && c.DismissedAt != null);
+        this.CaseCount =
+            await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue));
+        this.ExpiredCaseCount =
+            await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue) && c.DismissedAt == null && c.ExpiresAt < DateTime.UtcNow);
+        this.DismissedCaseCount =
+            await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue) && c.DismissedAt != null);
 
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.CaseCount / ServerStatics.PageSize));
@@ -42,8 +45,7 @@ public class CasePage : BaseLayout
         if (this.PageNumber < 0 || this.PageNumber >= this.PageAmount)
             return this.Redirect($"/moderation/cases/{Math.Clamp(this.PageNumber, 0, this.PageAmount - 1)}");
 
-        this.Cases = await this.Database.Cases
-            .Include(c => c.Creator)
+        this.Cases = await this.Database.Cases.Include(c => c.Creator)
             .Include(c => c.Dismisser)
             .Where(c => c.Reason.Contains(this.SearchValue))
             .OrderByDescending(c => c.CaseId)
