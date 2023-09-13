@@ -10,7 +10,7 @@
     string timeZone = Model.GetTimeZone();
 }
 
-<p>There are @Model.CaseCount total cases, @Model.ExpiredCaseCount of which are queued for expiration, and @Model.DismissedCaseCount of which have been dismissed.</p>
+<p>There are @Model.CaseCount total cases, @Model.ExpiredCaseCount of which are queued for dismissal, and @Model.DismissedCaseCount of which have been dismissed.</p>
 
 <form action="/moderation/cases/@Model.PageNumber">
     <div class="ui icon input">
