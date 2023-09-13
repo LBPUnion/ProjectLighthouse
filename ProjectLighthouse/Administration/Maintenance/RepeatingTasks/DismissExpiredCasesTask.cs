@@ -14,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.RepeatingTasks;
 public class DismissExpiredCasesTask : IRepeatingTask
 {
     public string Name => "Dismiss Expired Cases";
-    public TimeSpan RepeatInterval => TimeSpan.FromHours(4);
+    public TimeSpan RepeatInterval => TimeSpan.FromHours(1);
     public DateTime LastRan { get; set; }
 
     public async Task Run(DatabaseContext database)
