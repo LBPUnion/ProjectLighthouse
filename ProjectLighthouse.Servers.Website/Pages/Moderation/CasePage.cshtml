@@ -10,11 +10,11 @@
     string timeZone = Model.GetTimeZone();
 }
 
-<p>There are @Model.CaseCount total cases, @Model.DismissedCaseCount of which have been dismissed.</p>
+<p>There are @Model.CaseCount total cases, @Model.ExpiredCaseCount of which are queued for dismissal, and @Model.DismissedCaseCount of which have been dismissed.</p>
 
 <form action="/moderation/cases/0">
     <div class="ui icon input">
-        <input type="text" autocomplete="off" name="name" placeholder="Search cases..." value="@Model.SearchValue">
+        <input type="text" autocomplete="off" name="name" placeholder="Search by affected ID..." value="@Model.SearchValue">
         <i class="search icon"></i>
     </div>
 </form>
@@ -24,4 +24,14 @@
 @foreach (ModerationCaseEntity @case in Model.Cases)
 {
     @(await Html.PartialAsync("Partials/ModerationCasePartial", @case, ViewData.WithTime(timeZone)))
+}
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/moderation/cases/@(Model.PageNumber - 1)@(Model.SearchValue?.Length == 0 ? "" : "?name=" + Model.SearchValue)">Previous Page</a>
+}
+@(Model.PageNumber + 1) / @(Model.PageAmount)
+@if (Model.PageNumber < Model.PageAmount - 1)
+{
+    <a href="/moderation/cases/@(Model.PageNumber + 1)@(Model.SearchValue?.Length == 0 ? "" : "?name=" + Model.SearchValue)">Next Page</a>
 }

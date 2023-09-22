@@ -1,4 +1,4 @@
-@page "/admin/users"
+@page "/admin/users/{pageNumber:int}"
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminPanelUsersPage
@@ -11,6 +11,15 @@
 <p>There are currently @Model.UserCount users registered to your instance.</p>
 <p><b>Note:</b> Users are ordered by their permissions, then by most-recent-first.</p>
 
+<form action="/admin/users/0">
+    <div class="ui icon input">
+        <input type="text" autocomplete="off" name="name" placeholder="Search users..." value="@Model.SearchValue">
+        <i class="search icon"></i>
+    </div>
+</form>
+
+<div class="ui divider"></div>
+
 <div class="ui grid">
     @foreach (UserEntity user in Model.Users)
     {
@@ -19,22 +28,21 @@
 
         switch (user.PermissionLevel)
         {
-            // jank but works
             case PermissionLevel.Banned:
             {
-                color = "red";
+                color = "grey";
                 subtitle = $"Banned user! Reason: {user.BannedReason}";
                 break;
             }
             case PermissionLevel.Moderator:
             {
-                color = "green";
+                color = "orange";
                 subtitle = "Moderator";
                 break;
             }
             case PermissionLevel.Administrator:
             {
-                color = "yellow";
+                color = "red";
                 subtitle = "Admin";       
                 break;
             }
@@ -73,3 +81,15 @@
         </div>
     }
 </div>
+
+<br />
+
+@if (Model.PageNumber != 0)
+{
+    <a href="/admin/users/@(Model.PageNumber - 1)@(Model.SearchValue?.Length == 0 ? "" : "?name=" + Model.SearchValue)">Previous Page</a>
+}
+@(Model.PageNumber + 1) / @(Model.PageAmount)
+@if (Model.PageNumber < Model.PageAmount - 1)
+{
+    <a href="/admin/users/@(Model.PageNumber + 1)@(Model.SearchValue?.Length == 0 ? "" : "?name=" + Model.SearchValue)">Next Page</a>
+}

@@ -7,42 +7,19 @@
 @inject DatabaseContext Database
 
 @{
-    string color = "blue";
-
     string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
     TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 
-    if (Model.Expired) color = "yellow";
-    if (Model.Dismissed) color = "green";
+    string color = "red";
+
+    if (Model.Expired)
+        color = "yellow";
+    if (Model.Dismissed)
+        color = "green";
 }
 
 <div class="ui @color segment">
     <h2>Case #@Model.CaseId: @Model.Type</h2>
-    
-    @if (Model.Dismissed)
-    {
-        Debug.Assert(Model.DismissedAt != null);
-
-        @if (Model.Dismisser != null)
-        {
-            <h3 class="ui @color header">
-                This case was dismissed by <a href="/user/@Model.Dismisser.UserId">@Model.DismisserUsername</a> on @TimeZoneInfo.ConvertTime(Model.DismissedAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
-            </h3>
-        }
-        else
-        {
-            <h3 class="ui @color header">
-                This case was dismissed by @Model.DismisserUsername on @TimeZoneInfo.ConvertTime(Model.DismissedAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
-            </h3>
-        }
-        
-    }
-    else if (Model.Expired)
-    {
-        <h3 class="ui @color header">
-            This case expired on @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
-        </h3>
-    }
 
     @if (Model.Creator != null && Model.Creator.Username.Length != 0)
     {
@@ -66,14 +43,15 @@
             }
         </span><br>
     }
-    
-    
+
     @if (Model.Type.AffectsLevel())
     {
         SlotEntity? slot = await Model.GetSlotAsync(Database);
         if (slot != null)
         {
-            <p><strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name</a></p>
+            <p>
+                <strong>Affected level:</strong> <a href="/slot/@slot.SlotId">@slot.Name (@slot.SlotId)</a>
+            </p>
         }
     }
     else if (Model.Type.AffectsUser())
@@ -81,10 +59,55 @@
         UserEntity? user = await Model.GetUserAsync(Database);
         if (user != null)
         {
-            <p><strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username</a></p>
+            <p>
+                <strong>Affected user:</strong> <a href="/user/@user.UserId">@user.Username (@user.UserId)</a>
+            </p>
         }
     }
     
+    <h3>Case Status</h3>
+    @if (Model.Dismissed)
+    {
+        Debug.Assert(Model.DismissedAt != null);
+
+        @if (Model.Dismisser != null)
+        {
+            <div>
+                <i class="ui green icon check"></i>
+                <span class="ui green text">
+                    This case was dismissed by <a href="/user/@Model.Dismisser.UserId">@Model.DismisserUsername</a> on @TimeZoneInfo.ConvertTime(Model.DismissedAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
+                </span>
+            </div>
+        }
+        else
+        {
+            <div>
+                <i class="ui green icon check"></i>
+                <span class="ui green text">
+                    This case was dismissed by @Model.DismisserUsername on @TimeZoneInfo.ConvertTime(Model.DismissedAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
+                </span>
+            </div>
+        }
+    }
+    else if (Model.Expired)
+    {
+        <div>
+            <i class="ui orange icon clock"></i>
+            <span class="ui orange text">
+                This case expired on @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt") and has been queued for dismissal.
+            </span>
+        </div>
+    }
+    else
+    {
+        <div>
+            <i class="ui red icon times"></i>
+            <span class="ui red text">
+                This case is currently active and will expire on @TimeZoneInfo.ConvertTime(Model.ExpiresAt!.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt").
+            </span>
+        </div>
+    }
+
     <h3>Reason</h3>
     @if (!string.IsNullOrWhiteSpace(Model.Reason))
     {
@@ -94,7 +117,7 @@
     {
         <pre><b>No reason was provided.</b></pre>
     }
-    
+
     <h3>Moderator Notes</h3>
     @if (!string.IsNullOrWhiteSpace(Model.ModeratorNotes))
     {
@@ -104,8 +127,8 @@
     {
         <pre><b>No notes were provided.</b></pre>
     }
-    
-    @if (!Model.Dismissed)
+
+    @if (Model is { Dismissed: false, Expired: false, })
     {
         <a class="ui green small button" href="/moderation/case/@Model.CaseId/dismiss">
             <i class="checkmark icon"></i>

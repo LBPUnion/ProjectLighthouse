@@ -108,6 +108,6 @@ public class AdminUserController : ControllerBase
             return this.Redirect($"/moderation/newCase?type={(int)CaseType.UserBan}&affectedId={id}");
         }
 
-        return this.Redirect("/admin/users");
+        return this.Redirect("/admin/users/0");
     }
 }

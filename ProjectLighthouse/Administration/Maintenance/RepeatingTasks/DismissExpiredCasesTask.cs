@@ -14,7 +14,7 @@ namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.RepeatingTasks;
 public class DismissExpiredCasesTask : IRepeatingTask
 {
     public string Name => "Dismiss Expired Cases";
-    public TimeSpan RepeatInterval => TimeSpan.FromHours(4);
+    public TimeSpan RepeatInterval => TimeSpan.FromHours(1);
     public DateTime LastRan { get; set; }
 
     public async Task Run(DatabaseContext database)
@@ -31,7 +31,8 @@ public class DismissExpiredCasesTask : IRepeatingTask
 
         foreach (ModerationCaseEntity @case in expiredCases)
         {
-            @case.DismissedAt = DateTime.Now;
+            @case.DismissedAt = DateTime.UtcNow;
+            @case.DismisserUsername = "maintenance task";
             Logger.Info($"Dismissed expired case {@case.CaseId}", LogArea.Maintenance);
         }
 
