@@ -34,6 +34,6 @@ public class ModerationCaseController : ControllerBase
 
         await this.database.SaveChangesAsync();
         
-        return this.Ok();
+        return this.Redirect($"/moderation/cases/0");
     }
 }
