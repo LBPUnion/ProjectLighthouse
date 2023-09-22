@@ -11,10 +11,6 @@ the [LBP Union Ministry of Technology Research and Development team](https://www
 
 For concerns and inquiries about the project, please contact us [here](https://www.lbpunion.com/contact).
 
-For general questions and discussion about Project Lighthouse, please see
-the [megathread](https://www.lbpunion.com/forum/union-hall/project-lighthouse-littlebigplanet-private-servers-megathread)
-on our forum.
-
 ## DISCLAIMERS (Please read!)
 
 ### This is not a final product.
