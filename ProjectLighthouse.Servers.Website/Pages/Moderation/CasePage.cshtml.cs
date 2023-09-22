@@ -50,7 +50,7 @@ public class CasePage : BaseLayout
 
         this.Cases = await this.Database.Cases.Include(c => c.Creator)
             .Include(c => c.Dismisser)
-            .Where(c => c.Reason.Contains(this.SearchValue))
+            .Where(c => c.AffectedId.ToString().Contains(this.SearchValue))
             .OrderByDescending(c => c.CaseId)
             .Skip(pageNumber * ServerStatics.PageSize)
             .Take(ServerStatics.PageSize)
