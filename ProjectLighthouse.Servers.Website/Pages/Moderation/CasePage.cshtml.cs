@@ -33,11 +33,14 @@ public class CasePage : BaseLayout
         this.SearchValue = name.Replace(" ", string.Empty);
 
         this.CaseCount =
-            await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue));
+            await this.Database.Cases.CountAsync(c =>
+                c.AffectedId.ToString().Contains(this.SearchValue));
         this.ExpiredCaseCount =
-            await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue) && c.DismissedAt == null && c.ExpiresAt < DateTime.UtcNow);
+            await this.Database.Cases.CountAsync(c =>
+                c.AffectedId.ToString().Contains(this.SearchValue) && c.DismissedAt == null && c.ExpiresAt < DateTime.UtcNow);
         this.DismissedCaseCount =
-            await this.Database.Cases.CountAsync(c => c.Reason.Contains(this.SearchValue) && c.DismissedAt != null);
+            await this.Database.Cases.CountAsync(c =>
+                c.AffectedId.ToString().Contains(this.SearchValue)&& c.DismissedAt != null);
 
         this.PageNumber = pageNumber;
         this.PageAmount = Math.Max(1, (int)Math.Ceiling((double)this.CaseCount / ServerStatics.PageSize));
