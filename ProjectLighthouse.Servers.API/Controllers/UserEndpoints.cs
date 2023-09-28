@@ -1,4 +1,3 @@
-#nullable enable
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -66,7 +65,7 @@ public class UserEndpoints : ApiEndpointController
     {
         List<ApiUser> users = (await this.database.Users
             .Where(u => u.PermissionLevel != PermissionLevel.Banned && u.Username.Contains(query))
-            .Where(u => u.ProfileVisibility == PrivacyType.All) // TODO: change check for when user is logged in
+            .Where(u => u.ProfileVisibility == PrivacyType.All)
             .OrderByDescending(b => b.UserId)
             .Take(20)
             .ToListAsync()).ToSerializableList(ApiUser.CreateFromEntity);
@@ -99,12 +98,7 @@ public class UserEndpoints : ApiEndpointController
         if (!Configuration.ServerConfiguration.Instance.Authentication.RegistrationEnabled)
             return this.NotFound();
 
-        string? authHeader = this.Request.Headers["Authorization"];
-        if (string.IsNullOrWhiteSpace(authHeader)) return this.NotFound();
-
-        string authToken = authHeader[(authHeader.IndexOf(' ') + 1)..];
-
-        ApiKeyEntity? apiKey = await this.database.APIKeys.FirstOrDefaultAsync(k => k.Key == authToken);
+        ApiKeyEntity? apiKey = this.database.ApiKeyFromWebRequest(this.Request);
         if (apiKey == null) return this.StatusCode(403);
 
         if (!string.IsNullOrWhiteSpace(username))
