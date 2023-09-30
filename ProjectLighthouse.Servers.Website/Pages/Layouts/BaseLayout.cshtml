@@ -191,12 +191,22 @@
     <footer>
         <div class="ui black attached inverted segment">
             <div class="ui container">
-
-                <p>@Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)</p>
+                <span>
+                    @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
+                </span>
                 @if (VersionHelper.IsDirty)
                 {
                     <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>
                 }
+                <span style="float: right;">
+                    <a href="https://github.com/LBPUnion/ProjectLighthouse/blob/main/LICENSE">
+                        AGPL-3.0 License
+                    </a>
+                    &centerdot;
+                    <a href="@VersionHelper.Remotes[0]" target="_blank">
+                        Source Code
+                    </a>
+                </span>
             </div>
         </div>
         @if (ServerStatics.IsDebug())
