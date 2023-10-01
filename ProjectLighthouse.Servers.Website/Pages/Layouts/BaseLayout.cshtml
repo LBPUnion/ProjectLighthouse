@@ -192,8 +192,13 @@
         <div class="ui black attached inverted segment">
             <div class="ui container">
                 @{
-                    string? firstRemoteUnparsedUrl = VersionHelper.Remotes.FirstOrDefault();
+                    string? firstRemoteUnparsedUrl = null;
                     string? firstRemoteParsedUrl = null;
+
+                    if (VersionHelper.Remotes != null)
+                    {
+                        firstRemoteUnparsedUrl = VersionHelper.Remotes.FirstOrDefault();
+                    }
 
                     if (firstRemoteUnparsedUrl != null)
                     {
