@@ -193,7 +193,7 @@
             <div class="ui container">
                 @{
                     string? firstRemoteUnparsedUrl = VersionHelper.Remotes.FirstOrDefault();
-                    string? firstRemoteParsedUrl;
+                    string? firstRemoteParsedUrl = null;
 
                     if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("git@"))
                     {
@@ -202,10 +202,6 @@
                     else if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("https://"))
                     {
                         firstRemoteParsedUrl = firstRemoteUnparsedUrl.Replace("https://", "").Split(".git").FirstOrDefault();
-                    }
-                    else
-                    {
-                        firstRemoteParsedUrl = null;
                     }
                 }
                 <span>
