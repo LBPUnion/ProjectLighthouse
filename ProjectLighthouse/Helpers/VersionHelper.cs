@@ -49,8 +49,7 @@ public static class VersionHelper
 
     #nullable enable
     /// <summary>
-    ///     Determines the URL of the git remote. This doesn't return a complete URL and it's only really used for the
-    ///     "Source Code" hyperlink in the BaseLayout. Use this with caution.
+    ///     Determines the URL of the git remote.
     /// </summary>
     /// <param name="includePrefix">Include the "https://" prefix in the returned URL.</param>
     public static string? DetermineRemoteUrl(bool includePrefix = true)
