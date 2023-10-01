@@ -197,7 +197,7 @@
 
                     if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("git@"))
                     {
-                        firstRemoteParsedUrl = firstRemoteUnparsedUrl.Replace("git@", "").Replace(":", "").Split(".git").FirstOrDefault();    
+                        firstRemoteParsedUrl = firstRemoteUnparsedUrl.Replace("git@", "").Replace(":", "/").Split(".git").FirstOrDefault();    
                     }
                     else if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("https://"))
                     {
