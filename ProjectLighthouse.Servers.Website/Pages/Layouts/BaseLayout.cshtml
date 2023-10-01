@@ -197,11 +197,11 @@
 
                     if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("git@"))
                     {
-                        firstRemoteParsedUrl = VersionHelper.Remotes.FirstOrDefault()?.Replace("git@", "").Replace(":", "").Split(".git").FirstOrDefault();    
+                        firstRemoteParsedUrl = firstRemoteUnparsedUrl.Replace("git@", "").Replace(":", "").Split(".git").FirstOrDefault();    
                     }
                     else if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("https://"))
                     {
-                        firstRemoteParsedUrl = VersionHelper.Remotes.FirstOrDefault()?.Replace("https://", "").Split(".git").FirstOrDefault();
+                        firstRemoteParsedUrl = firstRemoteUnparsedUrl.Replace("https://", "").Split(".git").FirstOrDefault();
                     }
                     else
                     {
