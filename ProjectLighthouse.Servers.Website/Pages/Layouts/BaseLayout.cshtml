@@ -192,7 +192,21 @@
         <div class="ui black attached inverted segment">
             <div class="ui container">
                 @{
-                    string? firstRemoteUrl = VersionHelper.Remotes.FirstOrDefault()?.Replace("git@", "https://").Replace(":", "").Replace(".git", "");
+                    string? firstRemoteUnparsedUrl = VersionHelper.Remotes.FirstOrDefault();
+                    string? firstRemoteParsedUrl;
+
+                    if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("git@"))
+                    {
+                        firstRemoteParsedUrl = VersionHelper.Remotes.FirstOrDefault()?.Replace("git@", "").Replace(":", "").Split(".git").FirstOrDefault();    
+                    }
+                    else if (firstRemoteUnparsedUrl != null && firstRemoteUnparsedUrl.Contains("https://"))
+                    {
+                        firstRemoteParsedUrl = VersionHelper.Remotes.FirstOrDefault()?.Replace("https://", "").Split(".git").FirstOrDefault();
+                    }
+                    else
+                    {
+                        firstRemoteParsedUrl = null;
+                    }
                 }
                 <span>
                     @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
@@ -206,15 +220,15 @@
                         AGPL-3.0 License
                     </a>
                     &centerdot;
-                    @if (!string.IsNullOrWhiteSpace(firstRemoteUrl))
+                    @if (!string.IsNullOrWhiteSpace(firstRemoteParsedUrl))
                     {
-                        <a href="@firstRemoteUrl" target="_blank">
+                        <a href="https://@firstRemoteParsedUrl" target="_blank">
                             Source Code
                         </a>    
                     }
                     else
                     {
-                        <span class="ui text red">Cannot Determine Remote</span>
+                        <span class="ui text red">Cannot Detect Source Code</span>
                     }
                 </span>
             </div>
