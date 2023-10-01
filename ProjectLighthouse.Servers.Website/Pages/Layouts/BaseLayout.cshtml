@@ -192,25 +192,7 @@
         <div class="ui black attached inverted segment">
             <div class="ui container">
                 @{
-                    string? firstRemoteUnparsedUrl = null;
-                    string? firstRemoteParsedUrl = null;
-
-                    if (VersionHelper.Remotes != null)
-                    {
-                        firstRemoteUnparsedUrl = VersionHelper.Remotes.FirstOrDefault();
-                    }
-
-                    if (firstRemoteUnparsedUrl != null)
-                    {
-                        if (firstRemoteUnparsedUrl.Contains("git@"))
-                        {
-                            firstRemoteParsedUrl = firstRemoteUnparsedUrl.Replace("git@", "").Replace(":", "/").Split(".git").FirstOrDefault();
-                        }
-                        else if (firstRemoteUnparsedUrl.Contains("https://"))
-                        {
-                            firstRemoteParsedUrl = firstRemoteUnparsedUrl.Replace("https://", "").Split(".git").FirstOrDefault();
-                        }    
-                    }
+                    string? remoteUrl = VersionHelper.DetermineRemoteUrl();
                 }
                 <span>
                     @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
@@ -224,11 +206,11 @@
                         AGPL-3.0 License
                     </a>
                     &centerdot;
-                    @if (!string.IsNullOrWhiteSpace(firstRemoteParsedUrl))
+                    @if (!string.IsNullOrWhiteSpace(remoteUrl))
                     {
-                        <a href="https://@firstRemoteParsedUrl" target="_blank">
+                        <a href="https://@remoteUrl" target="_blank">
                             Source Code
-                        </a>    
+                        </a>
                     }
                     else
                     {
