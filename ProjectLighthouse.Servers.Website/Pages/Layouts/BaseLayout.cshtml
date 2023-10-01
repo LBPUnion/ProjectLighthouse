@@ -191,6 +191,9 @@
     <footer>
         <div class="ui black attached inverted segment">
             <div class="ui container">
+                @{
+                    string? firstRemoteUrl = VersionHelper.Remotes.FirstOrDefault()?.Replace("git@", "https://").Replace(":", "").Replace(".git", "");
+                }
                 <span>
                     @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
                 </span>
@@ -203,9 +206,16 @@
                         AGPL-3.0 License
                     </a>
                     &centerdot;
-                    <a href="@VersionHelper.Remotes[0].Split(".git")[0]" target="_blank">
-                        Source Code
-                    </a>
+                    @if (!string.IsNullOrWhiteSpace(firstRemoteUrl))
+                    {
+                        <a href="@firstRemoteUrl" target="_blank">
+                            Source Code
+                        </a>    
+                    }
+                    else
+                    {
+                        <span class="ui text red">Cannot Determine Remote</span>
+                    }
                 </span>
             </div>
         </div>
