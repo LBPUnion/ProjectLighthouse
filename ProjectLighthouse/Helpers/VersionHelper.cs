@@ -62,7 +62,9 @@ public static class VersionHelper
 
         if (remoteUnparsedUrl.Contains("git@"))
         {
-            remoteParsedUrl = remoteUnparsedUrl.Replace("git@", "").Replace(":", "/").Split(".git").FirstOrDefault();
+            remoteParsedUrl = includePrefix
+                ? remoteUnparsedUrl.Replace("git@", "https://").Replace(":", "/").Split(".git").FirstOrDefault()
+                : remoteUnparsedUrl.Replace("git@", "").Replace(":", "/").Split(".git").FirstOrDefault();
         }
         else if (remoteUnparsedUrl.Contains("https://"))
         {
