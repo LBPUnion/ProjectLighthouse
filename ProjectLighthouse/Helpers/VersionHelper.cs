@@ -52,7 +52,8 @@ public static class VersionHelper
     ///     Determines the URL of the git remote. This doesn't return a complete URL and it's only really used for the
     ///     "Source Code" hyperlink in the BaseLayout. Use this with caution.
     /// </summary>
-    public static string? DetermineRemoteUrl()
+    /// <param name="includePrefix">Include the "https://" prefix in the returned URL.</param>
+    public static string? DetermineRemoteUrl(bool includePrefix = true)
     {
         string? remoteUnparsedUrl = null;
         string? remoteParsedUrl = null;
@@ -66,7 +67,9 @@ public static class VersionHelper
         }
         else if (remoteUnparsedUrl.Contains("https://"))
         {
-            remoteParsedUrl = remoteUnparsedUrl.Replace("https://", "").Split(".git").FirstOrDefault();
+            remoteParsedUrl = includePrefix
+                ? remoteUnparsedUrl.Split(".git").FirstOrDefault()
+                : remoteUnparsedUrl.Replace("https://", "").Split(".git").FirstOrDefault();
         }
 
         return remoteParsedUrl;
