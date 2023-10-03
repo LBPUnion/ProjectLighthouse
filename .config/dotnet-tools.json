@@ -9,7 +9,7 @@
       ]
     },
     "dotnet-trace": {
-      "version": "7.0.442301",
+      "version": "7.0.447801",
       "commands": [
         "dotnet-trace"
       ]
