@@ -37,18 +37,7 @@ public class WebsiteStartup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
-        #if DEBUG
-        services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation((options) =>
-        {
-            // jank but works
-            string projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
-
-            options.FileProviders.Clear();
-            options.FileProviders.Add(new PhysicalFileProvider(projectDir));
-        });
-        #else
         services.AddRazorPages().WithRazorPagesAtContentRoot();
-        #endif
 
         services.AddDbContext<DatabaseContext>(builder =>
         {

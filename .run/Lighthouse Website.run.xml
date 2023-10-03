@@ -6,7 +6,6 @@
     <option name="PASS_PARENT_ENVS" value="1" />
     <envs>
       <env name="ASPNETCORE_ENVIRONMENT" value="Development" />
-      <env name="ASPNETCORE_HOSTINGSTARTUPASSEMBLIES" value="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
     </envs>
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="USE_MONO" value="0" />
