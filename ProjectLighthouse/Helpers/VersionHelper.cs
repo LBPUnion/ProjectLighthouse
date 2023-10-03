@@ -1,11 +1,12 @@
 using System.Linq;
+using System.Text.RegularExpressions;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
-public static class VersionHelper
+public static partial class VersionHelper
 {
     static VersionHelper()
     {
@@ -47,33 +48,23 @@ public static class VersionHelper
         CanCheckForUpdates = false;
     }
 
+    [GeneratedRegex(@"((git|ssh|http(s)?)|(git@[\w\.-]+))(:(\/\/)?)([\w\.@\:\/\-~]+)((\.git)(\/))?( .+)?")]
+    private static partial Regex GitRemoteRegex();
+
     #nullable enable
     /// <summary>
     ///     Determines the URL of the git remote.
     /// </summary>
-    /// <param name="includePrefix">Include the "https://" prefix in the returned URL.</param>
-    public static string? DetermineRemoteUrl(bool includePrefix = true)
+    public static string? DetermineRemoteUrl()
     {
-        string? remoteUnparsedUrl = null;
-        string? remoteParsedUrl = null;
+        string? remote = Remotes?.FirstOrDefault();
+        if (remote == null) return null;
 
-        if (Remotes != null) remoteUnparsedUrl = Remotes.FirstOrDefault();
-        if (remoteUnparsedUrl == null) return null;
+        Match match = GitRemoteRegex().Match(remote);
 
-        if (remoteUnparsedUrl.Contains("git@"))
-        {
-            remoteParsedUrl = includePrefix
-                ? remoteUnparsedUrl.Replace("git@", "https://").Replace(":", "/").Split(".git").FirstOrDefault()
-                : remoteUnparsedUrl.Replace("git@", "").Replace(":", "/").Split(".git").FirstOrDefault();
-        }
-        else if (remoteUnparsedUrl.Contains("https://"))
-        {
-            remoteParsedUrl = includePrefix
-                ? remoteUnparsedUrl.Split(".git").FirstOrDefault()
-                : remoteUnparsedUrl.Replace("https://", "").Split(".git").FirstOrDefault();
-        }
+        if (!match.Success || match.Groups.Count != 12) return null;
 
-        return remoteParsedUrl;
+        return match.Groups[7].Value;
     }
     #nullable disable
 
@@ -99,11 +90,11 @@ public static class VersionHelper
     public static string[] Remotes { get; set; }
 
     public const string Build =
-        #if DEBUG
+#if DEBUG
         "Debug";
-        #elif RELEASE
+#elif RELEASE
         "Release";
-        #else
-             "Unknown";
-        #endif
+#else
+        "Unknown";
+#endif
 }

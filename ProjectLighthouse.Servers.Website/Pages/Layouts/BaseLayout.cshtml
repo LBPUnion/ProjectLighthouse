@@ -192,15 +192,11 @@
         <div class="ui black attached inverted segment">
             <div class="ui container">
                 @{
-                    string? remoteUrl = VersionHelper.DetermineRemoteUrl(false);
+                    string? remoteUrl = VersionHelper.DetermineRemoteUrl();
                 }
                 <span>
                     @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
                 </span>
-                @if (VersionHelper.IsDirty)
-                {
-                    <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>
-                }
                 <span style="float: right;">
                     <a href="https://github.com/LBPUnion/ProjectLighthouse/blob/main/LICENSE" target="_blank">
                         AGPL-3.0 License
@@ -217,6 +213,10 @@
                         <span class="ui text red">Cannot Detect Source Code</span>
                     }
                 </span>
+                @if (VersionHelper.IsDirty)
+                {
+                    <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>
+                }
             </div>
         </div>
         @if (ServerStatics.IsDebug())
