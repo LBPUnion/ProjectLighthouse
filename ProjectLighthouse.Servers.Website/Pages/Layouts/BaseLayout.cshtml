@@ -191,8 +191,28 @@
     <footer>
         <div class="ui black attached inverted segment">
             <div class="ui container">
-
-                <p>@Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)</p>
+                @{
+                    string? remoteUrl = VersionHelper.DetermineRemoteUrl();
+                }
+                <span>
+                    @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
+                </span>
+                <span style="float: right;">
+                    <a href="https://github.com/LBPUnion/ProjectLighthouse/blob/main/LICENSE" target="_blank">
+                        AGPL-3.0 License
+                    </a>
+                    &centerdot;
+                    @if (!string.IsNullOrWhiteSpace(remoteUrl))
+                    {
+                        <a href="https://@remoteUrl" target="_blank">
+                            Source Code
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="ui text red">Cannot Detect Source Code</span>
+                    }
+                </span>
                 @if (VersionHelper.IsDirty)
                 {
                     <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>
