@@ -27,17 +27,10 @@ png/
 /ProjectLighthouse/r/*
 /ProjectLighthouse/logs/*
 lighthouse.config.json
-lighthouse.yml
-lighthouse.yml.configme
-censor.yml
-gitBranch.txt
-gitVersion.txt
-gitRemotes.txt
-gitUnpushed.txt
-logs/*
+**.yml*
+**/logs
 npTicket*
 r.tar.gz
-lighthouse.yml.configme
 
 # MSBuild stuff
 bin/
