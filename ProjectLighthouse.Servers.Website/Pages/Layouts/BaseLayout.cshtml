@@ -192,7 +192,7 @@
         <div class="ui black attached inverted segment">
             <div class="ui container">
                 @{
-                    string? remoteUrl = VersionHelper.DetermineRemoteUrl();
+                    string? remoteUrl = VersionHelper.RepositoryUrl;
                 }
                 <span>
                     @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
