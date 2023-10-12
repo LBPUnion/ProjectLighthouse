@@ -14,8 +14,8 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.12" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.12">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -30,7 +30,7 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Moq" Version="4.20.69" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.12" />
     </ItemGroup>
 
     <ItemGroup>
