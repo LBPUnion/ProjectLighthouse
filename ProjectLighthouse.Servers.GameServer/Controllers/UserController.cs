@@ -83,12 +83,9 @@ public class UserController : ControllerBase
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
         {
-            if (resource == "0") continue;
+            if (string.IsNullOrWhiteSpace(resource)) continue;
 
-            if (resource != null && !resource.StartsWith('g') && !FileHelper.ResourceExists(resource))
-            {
-                return this.BadRequest();
-            }
+            if (!FileHelper.ResourceExists(resource)) return this.BadRequest();
         }
 
         if (update.IconHash != null) user.IconHash = update.IconHash;

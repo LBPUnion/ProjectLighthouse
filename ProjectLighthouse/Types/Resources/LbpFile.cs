@@ -30,7 +30,8 @@ public class LbpFile
 
     public static LbpFile? FromHash(string? hash)
     {
-        if (hash == null) return null;
+        if (hash == null || !FileHelper.IsResourceValid(hash)) return null;
+
         string path = FileHelper.GetResourcePath(hash);
         if (!File.Exists(path)) return null;
 
