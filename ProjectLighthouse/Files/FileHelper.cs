@@ -59,7 +59,7 @@ public static partial class FileHelper
     }
 
     public static bool ResourceExists(string hash) => ResourceRegex().IsMatch(hash) && File.Exists(GetResourcePath(hash));
-    public static bool ImageExists(string hash) => ResourceRegex().IsMatch(hash) && File.Exists(GetImagePath(hash));
+    public static bool ImageExists(string hash) => File.Exists(GetImagePath(hash));
 
     public static void DeleteResource(string hash)
     {
