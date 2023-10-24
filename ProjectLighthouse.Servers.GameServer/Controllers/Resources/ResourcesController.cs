@@ -49,7 +49,6 @@ public class ResourcesController : ControllerBase
         return this.NotFound();
     }
 
-    // TODO: check if this is a valid hash
     [HttpPost("upload/{hash}/unattributed")]
     [HttpPost("upload/{hash}")]
     public async Task<IActionResult> UploadResource(string hash)
