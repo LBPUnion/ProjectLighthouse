@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Types.Resources;
 
@@ -9,6 +10,9 @@ namespace LBPUnion.ProjectLighthouse.Files;
 
 public static partial class FileHelper
 {
+    [GeneratedRegex("^(g[0-9]{3,16}|[a-z0-9]{40})$")]
+    private static partial Regex ResourceRegex();
+
     public static readonly string ResourcePath = Path.Combine(Environment.CurrentDirectory, "r");
 
     public static readonly string FullResourcePath = Path.GetFullPath(ResourcePath);
@@ -20,6 +24,8 @@ public static partial class FileHelper
     public static string GetResourcePath(string hash) => Path.Combine(ResourcePath, hash);
 
     public static string GetImagePath(string hash) => Path.Combine(ImagePath, hash);
+
+    public static bool IsResourceValid(string hash) => ResourceRegex().IsMatch(hash);
 
     public static bool IsFileSafe(LbpFile file)
     {
@@ -52,7 +58,7 @@ public static partial class FileHelper
         };
     }
 
-    public static bool ResourceExists(string hash) => File.Exists(GetResourcePath(hash));
+    public static bool ResourceExists(string hash) => ResourceRegex().IsMatch(hash) && File.Exists(GetResourcePath(hash));
     public static bool ImageExists(string hash) => File.Exists(GetImagePath(hash));
 
     public static void DeleteResource(string hash)

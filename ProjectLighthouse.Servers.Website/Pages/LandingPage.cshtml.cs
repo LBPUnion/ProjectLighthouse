@@ -40,14 +40,14 @@ public class LandingPage : BaseLayout
 
         const int maxShownLevels = 5;
 
-        this.LatestTeamPicks = await this.Database.Slots.Where(s => s.Type == SlotType.User && !s.SubLevel)
+        this.LatestTeamPicks = await this.Database.Slots.Where(s => s.Type == SlotType.User && !s.SubLevel && !s.Hidden)
             .Where(s => s.TeamPick)
             .OrderByDescending(s => s.FirstUploaded)
             .Take(maxShownLevels)
             .Include(s => s.Creator)
             .ToListAsync();
 
-        this.NewestLevels = await this.Database.Slots.Where(s => s.Type == SlotType.User && !s.SubLevel)
+        this.NewestLevels = await this.Database.Slots.Where(s => s.Type == SlotType.User && !s.SubLevel && !s.Hidden)
             .OrderByDescending(s => s.FirstUploaded)
             .Take(maxShownLevels)
             .Include(s => s.Creator)

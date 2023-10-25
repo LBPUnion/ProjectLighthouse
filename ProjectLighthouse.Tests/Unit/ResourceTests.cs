@@ -10,6 +10,39 @@ namespace LBPUnion.ProjectLighthouse.Tests.Unit;
 [Trait("Category", "Unit")]
 public class ResourceTests
 {
+
+    [Fact]
+    public void IsResourceValid_ReturnsTrue_ForValidResource()
+    {
+        string[] resources = {
+            "g123456", "g123", "98f54143ab4e86b28c3afee0f50f2f51cfb2ed38", "0ebe53fc820a544798000188d39bfda94f53fe37"
+        };
+        Assert.Multiple(() =>
+        {
+            foreach (string resource in resources)
+            {
+                Assert.True(FileHelper.IsResourceValid(resource));
+            }
+        });
+        
+    }
+
+    [Fact]
+    public void IsResourceValid_ReturnsFalse_ForInvalidResource()
+    {
+        string[] resources =
+        {
+            "G0234", "g123456789012334567", "b28c3afee0f50f2f51cfb2ed38", "../Test",
+        };
+        Assert.Multiple(() =>
+        {
+            foreach (string resource in resources)
+            {
+                Assert.False(FileHelper.IsResourceValid(resource));
+            }
+        });
+    }
+
     [Fact]
     public void ShouldNotDeleteResourceFolder()
     {
