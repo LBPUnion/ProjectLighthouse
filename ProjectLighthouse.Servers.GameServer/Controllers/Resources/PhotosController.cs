@@ -3,6 +3,7 @@ using Discord;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -41,6 +42,13 @@ public class PhotosController : ControllerBase
 
         GamePhoto? photo = await this.DeserializeBody<GamePhoto>();
         if (photo == null) return this.BadRequest();
+
+        string[] photoHashes =
+        {
+            photo.LargeHash, photo.MediumHash, photo.SmallHash, photo.PlanHash,
+        };
+
+        if (photoHashes.Any(hash => !FileHelper.ResourceExists(hash))) return this.BadRequest();
 
         foreach (PhotoEntity p in this.database.Photos.Where(p => p.CreatorId == token.UserId))
         {
