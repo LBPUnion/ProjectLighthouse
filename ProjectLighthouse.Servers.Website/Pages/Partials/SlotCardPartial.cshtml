@@ -53,7 +53,7 @@
             @if (showLink)
             {
                 <h2>
-                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
+                    <a href="~/slot/@Model.SlotId/@Model.GenerateSlug()">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
                 </h2>
             }
             else
@@ -68,7 +68,7 @@
             @if (showLink)
             {
                 <h3>
-                    <a href="~/slot/@Model.SlotId">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
+                    <a href="~/slot/@Model.SlotId/@Model.GenerateSlug()">@slotName</a> <i class="@Model.GetLevelLockIcon()"></i>
                 </h3>
             }
             else

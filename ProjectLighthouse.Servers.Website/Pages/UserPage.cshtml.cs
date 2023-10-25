@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -38,10 +39,16 @@ public class UserPage : BaseLayout
     public UserPage(DatabaseContext database) : base(database)
     { }
 
-    public async Task<IActionResult> OnGet([FromRoute] int userId)
+    public async Task<IActionResult> OnGet([FromRoute] int userId, string? slug)
     {
         this.ProfileUser = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (this.ProfileUser == null) return this.NotFound();
+
+        string userSlug = this.ProfileUser.GenerateSlug();
+        if (slug == null || userSlug != slug)
+        {
+            return this.Redirect($"~/user/{userId}/{userSlug}");
+        }
 
         bool isAuthenticated = this.User != null;
         bool isOwner = this.ProfileUser == this.User || this.User != null && this.User.IsModerator;
