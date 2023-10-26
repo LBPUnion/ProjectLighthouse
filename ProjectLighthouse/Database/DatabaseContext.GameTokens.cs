@@ -11,6 +11,12 @@ namespace LBPUnion.ProjectLighthouse.Database;
 
 public partial class DatabaseContext
 {
+    public async Task<int> UserIdFromGameToken(GameTokenEntity? token)
+    {
+        if (token == null) return -1;
+
+        return await this.Users.Where(u => u.UserId == token.UserId).Select(u => u.UserId).FirstAsync();
+    }
 
     public async Task<string> UsernameFromGameToken(GameTokenEntity? token)
     {

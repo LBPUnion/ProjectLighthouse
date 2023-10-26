@@ -5,10 +5,12 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -66,12 +68,27 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
                                   $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
                                   "---DEBUG INFO---");
         #endif
-        
+
         return this.Ok(announceText.ToString());
     }
 
     [HttpGet("notification")]
-    public IActionResult Notification() => this.Ok();
+    [Produces("text/xml")]
+    public async Task<IActionResult> Notification()
+    {
+        GameTokenEntity token = this.GetToken();
+
+        int userId = await this.database.UserIdFromGameToken(token);
+
+        NotificationEntity? notification = await this.database.Notifications
+            .FirstOrDefaultAsync(n => n.UserId == userId);
+
+        if (notification == null) return this.Ok();
+
+        this.database.Notifications.Remove(notification);
+
+        return this.Ok(NotificationEntity.ConvertToGame(notification));
+    }
 
     /// <summary>
     ///     Filters chat messages sent by a user.
@@ -104,7 +121,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         }
 
         string username = await this.database.UsernameFromGameToken(token);
-        
+
         string filteredText = CensorHelper.FilterMessage(message);
 
         if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);

@@ -11,7 +11,7 @@ public class ServerConfiguration : ConfigurationBase<ServerConfiguration>
     // This is so Lighthouse can properly identify outdated configurations and update them with newer settings accordingly.
     // If you are modifying anything here, this value MUST be incremented.
     // Thanks for listening~
-    public override int ConfigVersion { get; set; } = 23;
+    public override int ConfigVersion { get; set; } = 24;
 
     public override string ConfigName { get; set; } = "lighthouse.yml";
     public string WebsiteListenUrl { get; set; } = "http://localhost:10060";
@@ -43,6 +43,7 @@ public class ServerConfiguration : ConfigurationBase<ServerConfiguration>
     public RateLimitConfiguration RateLimitConfiguration { get; set; } = new();
     public TwoFactorConfiguration TwoFactorConfiguration { get; set; } = new();
     public RichPresenceConfiguration RichPresenceConfiguration { get; set; } = new();
+    public NotificationConfiguration NotificationConfiguration { get; set; } = new();
 
     public override ConfigurationBase<ServerConfiguration> Deserialize(IDeserializer deserializer, string text) => deserializer.Deserialize<ServerConfiguration>(text);
 }
