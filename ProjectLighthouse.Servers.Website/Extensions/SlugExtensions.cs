@@ -10,6 +10,9 @@ public static partial class SlugExtensions
     [GeneratedRegex("[^a-zA-Z0-9 ]")]
     private static partial Regex ValidSlugCharactersRegex();
 
+    [GeneratedRegex(@"[\s]{2,}")]
+    private static partial Regex WhitespaceRegex();
+
     /// <summary>
     /// Generates a URL slug that only contains alphanumeric characters
     /// with spaces replaced with dashes
@@ -19,7 +22,7 @@ public static partial class SlugExtensions
     public static string GenerateSlug(this SlotEntity slot) =>
         slot.Name.Length == 0
             ? "unnamed-level"
-            : ValidSlugCharactersRegex().Replace(HttpUtility.HtmlDecode(slot.Name), "").Replace(" ", "-").ToLower();
+            : WhitespaceRegex().Replace(ValidSlugCharactersRegex().Replace(HttpUtility.HtmlDecode(slot.Name), ""), " ").Replace(" ", "-").ToLower();
 
     /// <summary>
     /// Generates a URL slug for the given user
