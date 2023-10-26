@@ -78,10 +78,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameTokenEntity token = this.GetToken();
 
-        int userId = await this.database.UserIdFromGameToken(token);
-
         NotificationEntity? notification = await this.database.Notifications
-            .FirstOrDefaultAsync(n => n.UserId == userId);
+            .FirstOrDefaultAsync(n => n.UserId == token.UserId);
 
         if (notification == null) return this.Ok();
 
