@@ -1,10 +1,12 @@
 #nullable enable
+using System.ComponentModel.Design;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -78,14 +80,27 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameTokenEntity token = this.GetToken();
 
-        NotificationEntity? notification = await this.database.Notifications
-            .FirstOrDefaultAsync(n => n.UserId == token.UserId);
+        List<NotificationEntity> notifications = await this.database.Notifications
+            .Where(n => n.UserId == token.UserId)
+            .OrderBy(n => n.Id)
+            .ToListAsync();
 
-        if (notification == null) return this.Ok();
+        // We don't need to do any more work if there are no unconverted notifications to begin with.
+        if (notifications.Count == 0) return this.Ok();
 
-        this.database.Notifications.Remove(notification);
+        StringBuilder builder = new();
 
-        return this.Ok(NotificationEntity.ConvertToGame(notification));
+        notifications.ForEach(n =>
+        {
+            builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
+                NotificationEntity.ConvertToGame(n)));
+        });
+
+        this.database.Notifications.RemoveRange(notifications);
+        return this.Ok(new GameManualXml
+        {
+            Content = builder.ToString(),
+        });
     }
 
     /// <summary>
