@@ -335,8 +335,9 @@ else
 
         @if (Model.User.IsAdmin)
         {
-            @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
             <div class="ui divider"></div>
+            @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
+            <div class="ui fitted hidden divider" style="margin-bottom: 3px;"></div>
             @await Html.PartialAsync("Partials/AdminSendNotificationPartial", Model.ProfileUser)
         }
     </div>
