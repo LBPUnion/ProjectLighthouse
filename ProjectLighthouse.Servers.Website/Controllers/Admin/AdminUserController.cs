@@ -8,7 +8,6 @@ using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using IOFile = System.IO.File;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 
@@ -68,7 +67,7 @@ public class AdminUserController : ControllerBase
             // And finally, attempt to remove the resource from the filesystem. We don't want that taking up space.
             try
             {
-                IOFile.Delete(FileHelper.GetResourcePath(hash));
+                FileHelper.DeleteResource(hash);
                 Logger.Success($"Deleted planet resource {hash}",
                     LogArea.Admin);
             }
