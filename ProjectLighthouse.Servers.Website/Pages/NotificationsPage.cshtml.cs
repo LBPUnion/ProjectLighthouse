@@ -31,7 +31,7 @@ public class NotificationsPage : BaseLayout
         this.Notifications = await this.Database.Notifications
             .Where(n => n.UserId == this.User.UserId)
             .Include(n => n.User)
-            .OrderBy(n => n.Id)
+            .OrderByDescending(n => n.Id)
             .ToListAsync();
 
         return this.Page();

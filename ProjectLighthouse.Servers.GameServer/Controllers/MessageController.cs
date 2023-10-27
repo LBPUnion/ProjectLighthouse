@@ -81,7 +81,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         List<NotificationEntity> notifications = await this.database.Notifications
             .Where(n => n.UserId == token.UserId)
-            .OrderBy(n => n.Id)
+            .OrderByDescending(n => n.Id)
             .ToListAsync();
 
         // We don't need to do any more work if there are no unconverted notifications to begin with.
