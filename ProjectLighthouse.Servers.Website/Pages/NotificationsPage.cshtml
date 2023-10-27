@@ -72,14 +72,6 @@
         </div>
     }
 }
-else
-{
-    <div class="ui blue segment" style="position: relative;">
-        <p>There are no announcements to display.</p>
-    </div>
-}
-
-<div class="ui divider"></div>
 
 @if (Model.Notifications != null && Model.Notifications.Any())
 {
@@ -132,16 +124,16 @@ else
 }
 else
 {
-    @if (Model.User != null)
+    @if (Model.User == null)
     {
         <div class="ui blue segment" style="position: relative;">
-            <p>There are no notifications to display.</p>
+            <p>You need to <a href="/login">log in</a> to view your notifications.</p>
         </div>
     }
     else
     {
         <div class="ui blue segment" style="position: relative;">
-            <p>You need to <a href="/login">log in</a> to view your notifications.</p>
+            <p>You don't have any new notifications.</p>
         </div>
     }
 }
