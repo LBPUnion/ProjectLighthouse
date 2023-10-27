@@ -45,7 +45,7 @@ public class ClientConfigurationController : ControllerBase
 
     [HttpGet("ChallengeConfig.xml")]
     [Produces("text/xml")]
-    public IActionResult Challenges() => this.Ok();
+    public IActionResult Challenges() => this.Content(System.IO.File.ReadAllText("StaticFiles/ChallengeConfig.xml"));
 
     [HttpGet("farc_hashes")]
     public IActionResult FarcHashes() => this.Ok();
