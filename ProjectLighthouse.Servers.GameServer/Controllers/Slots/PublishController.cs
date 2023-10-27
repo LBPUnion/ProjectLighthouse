@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -47,14 +46,16 @@ public class PublishController : ControllerBase
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because of an issue with your level.");
             return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
         }
 
         if (string.IsNullOrEmpty(slot.RootLevel))
         {
             Logger.Warn("Rejecting level upload, slot does not include rootLevel", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because of an issue with your level.");
             return this.BadRequest();
         }
 
@@ -63,7 +64,8 @@ public class PublishController : ControllerBase
         if (slot.Resources == null)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because of an issue with your level.");
             return this.BadRequest();
         }
 
@@ -76,13 +78,15 @@ public class PublishController : ControllerBase
             if (oldSlot == null)
             {
                 Logger.Warn("Rejecting level republish, could not find old slot", LogArea.Publish);
-                await this.database.SendNotification(user.UserId, "Level republish was rejected by the server.");
+                await this.database.SendNotification(user.UserId,
+                    "Level republish was rejected by the server because of an issue with your level.");
                 return this.NotFound();
             }
             if (oldSlot.CreatorId != user.UserId)
             {
                 Logger.Warn("Rejecting level republish, old slot's creator is not publishing user", LogArea.Publish);
-                await this.database.SendNotification(user.UserId, "Level republish was rejected by the server.");
+                await this.database.SendNotification(user.UserId,
+                    "Level republish was rejected by the server because you are not the original publisher.");
                 return this.BadRequest();
             }
         }
@@ -116,14 +120,16 @@ public class PublishController : ControllerBase
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because of an issue with your level.");
             return this.BadRequest();
         }
 
         if (slot.Resources?.Length == 0)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because of an issue with your level.");
             return this.BadRequest();
         }
         // Yes Rider, this isn't null
@@ -134,7 +140,8 @@ public class PublishController : ControllerBase
         if (slot.Description.Length > 512)
         {
             Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                $"Level upload was rejected by the server because the description is too long. ({slot.Description.Length} characters)");
             return this.BadRequest();
         }
 
@@ -143,14 +150,16 @@ public class PublishController : ControllerBase
         if (slot.Name.Length > 64)
         {
             Logger.Warn($"Rejecting level upload, title too long ({slot.Name.Length} characters)", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                $"Level upload was rejected by the server because the name is too long. ({slot.Name.Length} characters)");
             return this.BadRequest();
         }
 
         if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
         {
             Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because of a missing resource.");
             return this.BadRequest();
         }
 
@@ -159,7 +168,8 @@ public class PublishController : ControllerBase
         if (rootLevel == null)
         {
             Logger.Warn("Rejecting level upload, unable to find rootLevel", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because of an issue with your level.");
             return this.BadRequest();
         }
 
@@ -168,7 +178,8 @@ public class PublishController : ControllerBase
             if (rootLevel.FileType != LbpFileType.Level)
             {
                 Logger.Warn("Rejecting level upload, rootLevel is not a level", LogArea.Publish);
-                await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+                await this.database.SendNotification(user.UserId,
+                    "Level upload was rejected by the server because of an issue with your level.");
                 return this.BadRequest();
             }
         }
@@ -177,7 +188,8 @@ public class PublishController : ControllerBase
             if (rootLevel.FileType != LbpFileType.Adventure)
             {
                 Logger.Warn("Rejecting level upload, rootLevel is not a LBP 3 Adventure", LogArea.Publish);
-                await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+                await this.database.SendNotification(user.UserId,
+                    "Level upload was rejected by the server because of an issue with your level.");
                 return this.BadRequest();
             }
         }
@@ -206,7 +218,8 @@ public class PublishController : ControllerBase
             if (oldSlot.CreatorId != user.UserId)
             {
                 Logger.Warn("Rejecting level republish, old level not owned by current user", LogArea.Publish);
-                await this.database.SendNotification(user.UserId, "Level republish was rejected by the server.");
+                await this.database.SendNotification(user.UserId,
+                    "Level upload was rejected by the server because you are not the original publisher.");
                 return this.BadRequest();
             }
 
@@ -270,7 +283,8 @@ public class PublishController : ControllerBase
         if (usedSlots > user.EntitledSlots)
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
-            await this.database.SendNotification(user.UserId, "Level upload was rejected by the server.");
+            await this.database.SendNotification(user.UserId,
+                "Level upload was rejected by the server because you have published too many slots.");
             return this.BadRequest();
         }
 
