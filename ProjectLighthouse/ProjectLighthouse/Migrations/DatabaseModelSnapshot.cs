@@ -604,6 +604,9 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsDismissed")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Text")
                         .HasColumnType("longtext");
 

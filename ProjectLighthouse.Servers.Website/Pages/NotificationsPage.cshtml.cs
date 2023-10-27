@@ -30,6 +30,7 @@ public class NotificationsPage : BaseLayout
 
         this.Notifications = await this.Database.Notifications
             .Where(n => n.UserId == this.User.UserId)
+            .Where(n => n.IsDismissed == false)
             .Include(n => n.User)
             .OrderByDescending(n => n.Id)
             .ToListAsync();
@@ -94,11 +95,13 @@ public class NotificationsPage : BaseLayout
             {
                 NotificationEntity? notification = await this.Database.Notifications
                     .Where(n => n.Id == id)
+                    .Where(n => n.IsDismissed == false)
                     .FirstOrDefaultAsync();
 
                 if (notification == null || notification.UserId != user.UserId) return this.BadRequest();
 
-                this.Database.Notifications.Remove(notification);
+                notification.IsDismissed = true;
+
                 await this.Database.SaveChangesAsync();
 
                 break;

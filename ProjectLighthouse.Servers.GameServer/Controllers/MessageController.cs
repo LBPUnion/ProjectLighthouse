@@ -79,23 +79,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameTokenEntity token = this.GetToken();
 
-        List<NotificationEntity> notifications = await this.database.Notifications
+        IQueryable<NotificationEntity> notificationQuery = this.database.Notifications
             .Where(n => n.UserId == token.UserId)
-            .OrderByDescending(n => n.Id)
-            .ToListAsync();
+            .Where(n => n.IsDismissed == false)
+            .OrderByDescending(n => n.Id);
 
         // We don't need to do any more work if there are no unconverted notifications to begin with.
-        if (notifications.Count == 0) return this.Ok();
+        if (!await notificationQuery.AnyAsync()) return this.Ok();
 
         StringBuilder builder = new();
 
-        notifications.ForEach(n =>
+        await notificationQuery.ForEachAsync(n =>
         {
             builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
                 NotificationEntity.ConvertToGame(n)));
+            n.IsDismissed = true;
         });
+        await this.database.SaveChangesAsync();
 
-        this.database.Notifications.RemoveRange(notifications);
         return this.Ok(new LbpCustomXml
         {
             Content = builder.ToString(),

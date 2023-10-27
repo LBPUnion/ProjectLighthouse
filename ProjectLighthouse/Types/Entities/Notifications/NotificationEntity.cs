@@ -24,6 +24,8 @@ public class NotificationEntity
 
     public string Text { get; set; } = "";
 
+    public bool IsDismissed { get; set; } = false;
+
     public static GameNotification ConvertToGame(NotificationEntity notification) => new()
     {
         Type = notification.Type,
