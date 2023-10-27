@@ -29,7 +29,7 @@ public partial class DatabaseContext
         {
             UserId = userId,
             Type = type,
-            Text = text,
+            Text = builder.ToString(),
         };
 
         await this.Notifications.AddAsync(notification);
