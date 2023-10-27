@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.Commands;
 
-public class QueueGlobalNotification : ICommand
+public class SendNotificationToUser : ICommand
 {
     public string Name() => "Send Notification to User";
 

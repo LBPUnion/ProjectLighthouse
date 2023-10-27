@@ -2,8 +2,7 @@
 
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
-public class GameManualXml : ILbpSerializable
+public class LbpCustomXml : ILbpSerializable
 {
-    [XmlText]
     public string Content { get; set; } = "";
 }

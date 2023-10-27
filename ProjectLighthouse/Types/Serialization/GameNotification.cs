@@ -6,12 +6,9 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 [XmlRoot("notification")]
 public class GameNotification : ILbpSerializable
 {
-    [XmlIgnore]
-    public int UserId { get; set; }
-
     [XmlAttribute("type")]
     public NotificationType Type { get; set; }
 
     [XmlElement("text")]
-    public string Text { get; set; } = null!;
+    public string Text { get; set; } = "";
 }

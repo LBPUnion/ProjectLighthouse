@@ -1,5 +1,4 @@
 #nullable enable
-using System.ComponentModel.Design;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -97,7 +96,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         });
 
         this.database.Notifications.RemoveRange(notifications);
-        return this.Ok(new GameManualXml
+        return this.Ok(new LbpCustomXml
         {
             Content = builder.ToString(),
         });

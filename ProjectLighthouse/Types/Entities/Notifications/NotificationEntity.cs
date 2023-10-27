@@ -22,11 +22,10 @@ public class NotificationEntity
 
     public NotificationType Type { get; set; } = NotificationType.ModerationNotification;
 
-    public string Text { get; set; } = null!;
+    public string Text { get; set; } = "";
 
     public static GameNotification ConvertToGame(NotificationEntity notification) => new()
     {
-        UserId = notification.UserId,
         Type = notification.Type,
         Text = notification.Text,
     };

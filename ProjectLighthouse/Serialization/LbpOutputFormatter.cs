@@ -28,11 +28,11 @@ public class LbpOutputFormatter : TextOutputFormatter
         return false;
     }
 
-    public async override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+    public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
     {
         if (context.Object is not ILbpSerializable o) return;
 
-        if (o is GameManualXml manualXml)
+        if (o is LbpCustomXml manualXml)
         {
             await context.HttpContext.Response.WriteAsync(manualXml.Content);
             return;
