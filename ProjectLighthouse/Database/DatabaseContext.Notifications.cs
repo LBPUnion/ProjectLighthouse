@@ -9,6 +9,12 @@ namespace LBPUnion.ProjectLighthouse.Database;
 
 public partial class DatabaseContext
 {
+    /// <summary>
+    ///     Sends a notification to a user.
+    /// </summary>
+    /// <param name="userId">The user ID of the target user.</param>
+    /// <param name="text">The message to send.</param>
+    /// <param name="type">The <see cref="NotificationType"/> for the notification. Defaults to <c>ModerationNotification</c>.</param>
     public async Task SendNotification
         (int userId, string text, NotificationType type = NotificationType.ModerationNotification)
     {
