@@ -2,7 +2,7 @@
 <root>
   <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
   </xsd:schema>
   <resheader name="resmimetype">
@@ -58,5 +58,8 @@
     </data>
   <data name="announcements" xml:space="preserve">
         <value>Announcements</value>
+    </data>
+  <data name="notifications" xml:space="preserve">
+        <value>Notifications</value>
     </data>
 </root>
