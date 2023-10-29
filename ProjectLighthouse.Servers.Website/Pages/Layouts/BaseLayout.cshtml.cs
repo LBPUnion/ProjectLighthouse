@@ -1,4 +1,3 @@
-#nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
@@ -26,6 +25,7 @@ public class BaseLayout : PageModel
     public string Title = string.Empty;
 
     private UserEntity? user;
+
     public BaseLayout(DatabaseContext database)
     {
         this.Database = database;
@@ -33,8 +33,6 @@ public class BaseLayout : PageModel
         this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderUsers, "/users/0", "user friends"));
         this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderPhotos, "/photos/0", "camera"));
         this.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderSlots, "/slots/0", "globe americas"));
-        
-        this.NavigationItemsRight.Add(new PageNavigationItem(GeneralStrings.Announcements, "/announce", "bullhorn"));
     }
 
     public new UserEntity? User {
@@ -55,10 +53,10 @@ public class BaseLayout : PageModel
         if (this.language != null) return this.language;
 
         if (this.User != null) return this.language = this.User.Language;
-        
+
         IRequestCultureFeature? requestCulture = this.Request.HttpContext.Features.Get<IRequestCultureFeature>();
         if (requestCulture == null) return this.language = LocalizationManager.DefaultLang;
-        
+
         return this.language = requestCulture.RequestCulture.UICulture.Name;
     }
 

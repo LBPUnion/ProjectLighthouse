@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
+using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Entities.Website;
@@ -59,10 +60,14 @@ public partial class DatabaseContext : DbContext
     public DbSet<GriefReportEntity> Reports { get; set; }
     #endregion
 
+    #region Notifications
+    public DbSet<NotificationEntity> Notifications { get; set; }
+    #endregion
+
     #region Misc
     public DbSet<CompletedMigrationEntity> CompletedMigrations { get; set; }
     #endregion
-    
+
     #region Website
     public DbSet<WebsiteAnnouncementEntity> WebsiteAnnouncements { get; set; }
     #endregion

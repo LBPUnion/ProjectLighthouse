@@ -3,7 +3,7 @@
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = "Set granted slots for " + Model.TargetedUser!.Username;
+    Model.Title = $"Set granted slots for {Model.TargetedUser!.Username}";
 }
 
 @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.TargetedUser)

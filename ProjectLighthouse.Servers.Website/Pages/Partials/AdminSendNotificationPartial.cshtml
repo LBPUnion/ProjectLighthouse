@@ -1,0 +1,12 @@
+﻿@model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
+
+<form method="post" action="/admin/user/@Model.UserId/sendNotification">
+    @Html.AntiForgeryToken()
+    <span class="ui left action input">
+        <button type="submit" class="ui blue button">
+            <i class="comment icon"></i>
+            <span>Send Notification</span>
+        </button>
+        <textarea name="notificationContent" placeholder="Notification Content" rows="1" cols="100" style="width: 100%;"></textarea>
+    </span>
+</form>

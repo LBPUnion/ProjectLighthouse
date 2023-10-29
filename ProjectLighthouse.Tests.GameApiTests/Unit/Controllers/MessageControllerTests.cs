@@ -108,19 +108,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     }
 
     [Fact]
-    public async Task Notification_ShouldReturn_Empty()
-    {
-        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
-
-        MessageController messageController = new(dbMock);
-        messageController.SetupTestController();
-
-        IActionResult result = messageController.Notification();
-
-        Assert.IsType<OkResult>(result);
-    }
-
-    [Fact]
     public async Task Filter_ShouldNotCensor_WhenCensorDisabled()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
@@ -194,7 +181,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     public async Task Filter_ShouldSendEmail_WhenMailEnabled_AndEmailNotTaken()
     {
         await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
-        
+
         Mock<IMailService> mailMock = getMailServiceMock();
 
         const string request = "/setemail unittest@unittest.com";

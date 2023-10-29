@@ -1,12 +1,14 @@
-﻿@page "/announce"
+﻿@page "/notifications"
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Types.Entities.Notifications
 @using LBPUnion.ProjectLighthouse.Types.Entities.Website
-@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.AnnouncePage
+@using LBPUnion.ProjectLighthouse.Types.Notifications
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.NotificationsPage
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     Layout = "Layouts/BaseLayout";
-    Model.Title = Model.Translate(GeneralStrings.Announcements);
+    Model.Title = Model.Translate(GeneralStrings.Notifications);
 }
 
 @if (Model.User != null && Model.User.IsAdmin)
@@ -17,7 +19,7 @@
         {
             @await Html.PartialAsync("Partials/ErrorModalPartial", (Model.Translate(GeneralStrings.Error), Model.Error), ViewData)
         }
-        <form id="form" method="POST" class="ui form center aligned" action="/announce">
+        <form id="form" method="POST" class="ui form center aligned" action="/notifications">
             @Html.AntiForgeryToken()
             <div class="field">
                 <label style="text-align: left" for="title">Announcement Title</label>
@@ -32,7 +34,7 @@
     </div>
 }
 
-@if (Model.Announcements.Any())
+@if (Model.Announcements.Count > 0)
 {
     @foreach (WebsiteAnnouncementEntity announcement in Model.Announcements)
     {
@@ -40,7 +42,7 @@
             <div>
                 <h3>@announcement.Title</h3>
                 <div style="padding-bottom: 2em;">
-                    <span style="white-space: pre-line; ">@announcement.Content</span>
+                    <span style="white-space: pre-line">@announcement.Content</span>
                 </div>
                 @if (announcement.Publisher != null)
                 {
@@ -58,6 +60,7 @@
                     @Html.AntiForgeryToken()
                     <button
                         asp-page-handler="delete"
+                        asp-route-type="announcement"
                         asp-route-id="@announcement.AnnouncementId"
                         onclick="return confirm('Are you sure you want to delete this announcement?')"
                         class="ui red icon button"
@@ -69,9 +72,45 @@
         </div>
     }
 }
+
+@if (Model.Notifications.Count > 0)
+{
+    @foreach (NotificationEntity notification in Model.Notifications)
+    {
+        <div class="ui blue segment" style="position: relative;">
+            <div>
+                <div>
+                    <i class="bell icon"></i>
+                    <span style="white-space: pre-line">@notification.Text</span>
+                </div>
+            </div>
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <button
+                    asp-page-handler="delete"
+                    asp-route-type="notification"
+                    asp-route-id="@notification.Id"
+                    onclick="return confirm('Are you sure you want to mark this notification as read?')"
+                    class="ui green icon button"
+                    style="position: absolute; right: 0.5em; top: 0.5em">
+                    <i class="check icon"></i>
+                </button>
+            </form>
+        </div>
+    }
+}
 else
 {
-    <div class="ui blue segment" style="position: relative;">
-        <p>There are no announcements to display.</p>
-    </div>
+    @if (Model.User == null)
+    {
+        <div class="ui blue segment" style="position: relative;">
+            <p>You need to <a href="/login">log in</a> to view your notifications.</p>
+        </div>
+    }
+    else
+    {
+        <div class="ui blue segment" style="position: relative;">
+            <p>You don't have any new notifications.</p>
+        </div>
+    }
 }
