@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers;
 
 [ApiController]
-[Route("user/{id:int}")]
+[Route("user/{id:int}/{slug?}")]
 public class UserPageController : ControllerBase
 {
     private readonly DatabaseContext database;

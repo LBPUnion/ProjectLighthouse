@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers;
 
 [ApiController]
-[Route("slot/{id:int}")]
+[Route("slot/{id:int}/{slug?}")]
 public class SlotPageController : ControllerBase
 {
     private readonly DatabaseContext database;
