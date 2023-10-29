@@ -3,6 +3,7 @@
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.Servers.Website.Types
+@using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts.BaseLayout
 
 @{
@@ -15,6 +16,15 @@
     else
     {
         Model.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAuthentication, "/authentication", "key"));
+
+        @if (await Model.Database.Notifications.AnyAsync(n => n.UserId == Model.User.UserId && !n.IsDismissed))
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem(GeneralStrings.Notifications, "/notifications", "bell"));
+        }
+        else
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem(GeneralStrings.Notifications, "/notifications", "bell outline"));
+        }
 
         @if (Model.User.IsAdmin)
         {
