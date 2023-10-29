@@ -16,7 +16,7 @@ public class NotificationsPage : BaseLayout
     { }
 
     public List<WebsiteAnnouncementEntity> Announcements { get; set; } = new();
-    public List<NotificationEntity>? Notifications { get; set; } = new();
+    public List<NotificationEntity> Notifications { get; set; } = new();
     public string Error { get; set; } = "";
 
     public async Task<IActionResult> OnGet()
@@ -30,8 +30,7 @@ public class NotificationsPage : BaseLayout
 
         this.Notifications = await this.Database.Notifications
             .Where(n => n.UserId == this.User.UserId)
-            .Where(n => n.IsDismissed == false)
-            .Include(n => n.User)
+            .Where(n => !n.IsDismissed)
             .OrderByDescending(n => n.Id)
             .ToListAsync();
 
@@ -57,7 +56,7 @@ public class NotificationsPage : BaseLayout
             PublisherId = user.UserId,
         };
 
-        await this.Database.WebsiteAnnouncements.AddAsync(announcement);
+        this.Database.WebsiteAnnouncements.Add(announcement);
         await this.Database.SaveChangesAsync();
 
         if (!DiscordConfiguration.Instance.DiscordIntegrationEnabled) return this.RedirectToPage();
@@ -95,7 +94,7 @@ public class NotificationsPage : BaseLayout
             {
                 NotificationEntity? notification = await this.Database.Notifications
                     .Where(n => n.Id == id)
-                    .Where(n => n.IsDismissed == false)
+                    .Where(n => !n.IsDismissed)
                     .FirstOrDefaultAsync();
 
                 if (notification == null || notification.UserId != user.UserId) return this.BadRequest();

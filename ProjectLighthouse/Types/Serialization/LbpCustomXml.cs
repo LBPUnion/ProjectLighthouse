@@ -4,5 +4,5 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 public class LbpCustomXml : ILbpSerializable
 {
-    public string Content { get; set; } = "";
+    public required string Content { get; init; }
 }

@@ -32,9 +32,9 @@ public class LbpOutputFormatter : TextOutputFormatter
     {
         if (context.Object is not ILbpSerializable o) return;
 
-        if (o is LbpCustomXml manualXml)
+        if (o is LbpCustomXml customXml)
         {
-            await context.HttpContext.Response.WriteAsync(manualXml.Content);
+            await context.HttpContext.Response.WriteAsync(customXml.Content);
             return;
         }
 

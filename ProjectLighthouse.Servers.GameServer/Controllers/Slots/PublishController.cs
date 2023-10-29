@@ -284,7 +284,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because you have published too many slots.");
+                "Your level failed to publish because you have reached the maximum number of levels on your earth.");
             return this.BadRequest();
         }
 

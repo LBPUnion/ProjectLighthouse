@@ -81,7 +81,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         IQueryable<NotificationEntity> notificationQuery = this.database.Notifications
             .Where(n => n.UserId == token.UserId)
-            .Where(n => n.IsDismissed == false)
+            .Where(n => !n.IsDismissed)
             .OrderByDescending(n => n.Id);
 
         // We don't need to do any more work if there are no unconverted notifications to begin with.

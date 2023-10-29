@@ -34,7 +34,7 @@
     </div>
 }
 
-@if (Model.Announcements.Any())
+@if (Model.Announcements is {Count: > 0, })
 {
     @foreach (WebsiteAnnouncementEntity announcement in Model.Announcements)
     {
@@ -73,7 +73,7 @@
     }
 }
 
-@if (Model.Notifications != null && Model.Notifications.Any())
+@if (Model.Notifications is {Count: > 0, })
 {
     @foreach (NotificationEntity notification in Model.Notifications)
     {
