@@ -34,7 +34,7 @@
     </div>
 }
 
-@if (Model.Announcements is {Count: > 0, })
+@if (Model.Announcements.Count > 0)
 {
     @foreach (WebsiteAnnouncementEntity announcement in Model.Announcements)
     {
@@ -42,7 +42,7 @@
             <div>
                 <h3>@announcement.Title</h3>
                 <div style="padding-bottom: 2em;">
-                    <span style="white-space: pre-line; ">@announcement.Content</span>
+                    <span style="white-space: pre-line">@announcement.Content</span>
                 </div>
                 @if (announcement.Publisher != null)
                 {
@@ -73,7 +73,7 @@
     }
 }
 
-@if (Model.Notifications is {Count: > 0, })
+@if (Model.Notifications.Count > 0)
 {
     @foreach (NotificationEntity notification in Model.Notifications)
     {
@@ -104,7 +104,7 @@
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    <span style="white-space: pre-line; ">@notification.Text</span>
+                    <span style="white-space: pre-line">@notification.Text</span>
                 </div>
             </div>
             <form method="post">

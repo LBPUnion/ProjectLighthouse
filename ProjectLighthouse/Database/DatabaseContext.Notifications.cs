@@ -38,7 +38,7 @@ public partial class DatabaseContext
             Text = builder.ToString(),
         };
 
-        await this.Notifications.AddAsync(notification);
+        this.Notifications.Add(notification);
         await this.SaveChangesAsync();
     }
 }
