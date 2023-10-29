@@ -22,7 +22,7 @@ public static partial class SlugExtensions
     public static string GenerateSlug(this SlotEntity slot) =>
         slot.Name.Length == 0
             ? "unnamed-level"
-            : WhitespaceRegex().Replace(ValidSlugCharactersRegex().Replace(HttpUtility.HtmlDecode(slot.Name), ""), " ").Replace(" ", "-").ToLower();
+            : WhitespaceRegex().Replace(ValidSlugCharactersRegex().Replace(HttpUtility.HtmlDecode(slot.Name), ""), " ").Trim().Replace(" ", "-").ToLower();
 
     /// <summary>
     /// Generates a URL slug for the given user
