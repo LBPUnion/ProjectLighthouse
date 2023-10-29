@@ -90,7 +90,7 @@ public class GameServerStartup
         {
             Logger.Warn
             (
-                "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will prevent LBP 1, and LBP 3 from working, and may break features in the other games (i.e Dive in). " +
+                "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will prevent LBP 1 and LBP 3 from working, and may break features in the other games (i.e Dive In). " +
                 "To increase security, it is recommended that you find and set this variable.",
                 LogArea.Startup
             );
