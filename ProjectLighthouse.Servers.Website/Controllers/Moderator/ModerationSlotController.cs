@@ -1,4 +1,3 @@
-#nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -34,6 +33,10 @@ public class ModerationSlotController : ControllerBase
         // Send webhook with slot.Name and slot.Creator.Username
         await WebhookHelper.SendWebhook("New Team Pick!", $"The level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId}) by **{slot.Creator?.Username}** has been team picked");
 
+        // Send a notification to the creator
+        await this.database.SendNotification(slot.CreatorId,
+            $"Your level, {slot.Name}, has been team picked!");
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect("~/slot/" + id);
@@ -50,6 +53,10 @@ public class ModerationSlotController : ControllerBase
 
         slot.TeamPick = false;
 
+        // Send a notification to the creator
+        await this.database.SendNotification(slot.CreatorId,
+            $"Your level, {slot.Name}, is no longer team picked.");
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect("~/slot/" + id);
@@ -63,6 +70,10 @@ public class ModerationSlotController : ControllerBase
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.Ok();
+
+        // Send a notification to the creator
+        await this.database.SendNotification(slot.CreatorId,
+            $"Your level, {slot.Name}, has been deleted by a moderator.");
 
         await this.database.RemoveSlot(slot);
 

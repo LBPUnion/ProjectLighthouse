@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -28,7 +29,7 @@ public class SlotPage : BaseLayout
     public SlotPage(DatabaseContext database) : base(database)
     {}
 
-    public async Task<IActionResult> OnGet([FromRoute] int id)
+    public async Task<IActionResult> OnGet([FromRoute] int id, string? slug)
     {
         SlotEntity? slot = await this.Database.Slots.Include(s => s.Creator)
             .Where(s => s.Type == SlotType.User || (this.User != null && this.User.PermissionLevel >= PermissionLevel.Moderator))
@@ -44,6 +45,12 @@ public class SlotPage : BaseLayout
 
         if ((slot.Hidden || slot.SubLevel && (this.User == null && this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
             return this.NotFound();
+
+        string slotSlug = slot.GenerateSlug();
+        if (slug == null || slotSlug != slug)
+        {
+            return this.Redirect($"~/slot/{id}/{slotSlug}");
+        }
 
         this.Slot = slot;
 

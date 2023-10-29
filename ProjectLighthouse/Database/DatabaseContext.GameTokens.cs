@@ -11,7 +11,6 @@ namespace LBPUnion.ProjectLighthouse.Database;
 
 public partial class DatabaseContext
 {
-
     public async Task<string> UsernameFromGameToken(GameTokenEntity? token)
     {
         if (token == null) return "";

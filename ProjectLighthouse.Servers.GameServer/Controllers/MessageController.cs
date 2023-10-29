@@ -1,14 +1,16 @@
-#nullable enable
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -66,12 +68,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
                                   $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
                                   "---DEBUG INFO---");
         #endif
-        
+
         return this.Ok(announceText.ToString());
     }
 
     [HttpGet("notification")]
-    public IActionResult Notification() => this.Ok();
+    [Produces("text/xml")]
+    public async Task<IActionResult> Notification()
+    {
+        GameTokenEntity token = this.GetToken();
+
+        List<NotificationEntity> notifications = await this.database.Notifications
+            .Where(n => n.UserId == token.UserId)
+            .Where(n => !n.IsDismissed)
+            .OrderByDescending(n => n.Id)
+            .ToListAsync();
+
+        // We don't need to do any more work if there are no unconverted notifications to begin with.
+        if (notifications.Count == 0) return this.Ok();
+
+        StringBuilder builder = new();
+
+        // ReSharper disable once ForCanBeConvertedToForeach
+        // Suppressing this because we need to modify the list while iterating over it.
+        for (int i = 0; i < notifications.Count; i++)
+        {
+            NotificationEntity n = notifications[i];
+
+            builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
+                GameNotification.CreateFromEntity(n)));
+
+            n.IsDismissed = true;
+        }
+
+        await this.database.SaveChangesAsync();
+
+        return this.Ok(new LbpCustomXml
+        {
+            Content = builder.ToString(),
+        });
+    }
 
     /// <summary>
     ///     Filters chat messages sent by a user.
@@ -104,7 +140,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         }
 
         string username = await this.database.UsernameFromGameToken(token);
-        
+
         string filteredText = CensorHelper.FilterMessage(message);
 
         if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);

@@ -32,7 +32,7 @@ public class AdminUserController : ControllerBase
 
         UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
-        
+
         string[] hashes = {
             targetedUser.PlanetHashLBP2,
             targetedUser.PlanetHashLBP3,
@@ -44,7 +44,7 @@ public class AdminUserController : ControllerBase
         {
             // Don't try to remove empty hashes. That's a horrible idea.
             if (string.IsNullOrWhiteSpace(hash)) continue;
-            
+
             // Find users with a matching hash
             List<UserEntity> users = await this.database.Users
                 .Where(u => u.PlanetHashLBP2 == hash ||
@@ -54,7 +54,7 @@ public class AdminUserController : ControllerBase
 
             // We should match at least the targeted user...
             System.Diagnostics.Debug.Assert(users.Count != 0);
-            
+
             // Reset each users' hash.
             foreach (UserEntity userWithPlanet in users)
             {
@@ -63,7 +63,7 @@ public class AdminUserController : ControllerBase
                 userWithPlanet.PlanetHashLBPVita = "";
                 Logger.Success($"Deleted planets for {userWithPlanet.Username} (id:{userWithPlanet.UserId})", LogArea.Admin);
             }
-            
+
             // And finally, attempt to remove the resource from the filesystem. We don't want that taking up space.
             try
             {
@@ -82,7 +82,10 @@ public class AdminUserController : ControllerBase
                 Logger.Error($"Failed to delete planet resource {hash}\n{e}", LogArea.Admin);
             }
         }
-        
+
+        await this.database.SendNotification(targetedUser.UserId,
+            "Your earth decorations have been reset by a moderator.");
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect($"/user/{targetedUser.UserId}");

@@ -1,4 +1,4 @@
-@page "/user/{userId:int}"
+@page "/user/{userId:int}/{slug?}"
 @using System.Web
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
@@ -141,7 +141,7 @@
         @if (isMobile)
         {
             <br/>
-        }    
+        }
     }
 </div>
 
@@ -241,7 +241,7 @@ else
                         <p>
                             <i>The user's privacy settings prevent you from viewing this page.</i>
                         </p>
-                    </div>    
+                    </div>
                 }
                 else
                 {
@@ -256,7 +256,7 @@ else
                                 @await slot.ToHtml(Html, ViewData, Model.User, $"~/user/{Model.ProfileUser.UserId}#levels", language, timeZone, isMobile, true)
                             </div>
                         }
-                    </div>    
+                    </div>
                 }
             </div>
             <div class="lh-content" id="lh-playlists">
@@ -314,37 +314,31 @@ else
 
         @if (!Model.ProfileUser.IsBanned)
         {
-            <div>
-                <a class="ui red button" href="/moderation/newCase?type=@((int)CaseType.UserBan)&affectedId=@Model.ProfileUser.UserId">
-                    <i class="ban icon"></i>
-                    <span>Ban User</span>
-                </a>
-            </div>
-            <div class="ui fitted hidden divider"></div>
-        }
-        
-        <div>
-            <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
-                <i class="trash alternate icon"></i>
-                <span>Wipe Earth Decorations</span>
+            <a class="ui red button" href="/moderation/newCase?type=@((int)CaseType.UserBan)&affectedId=@Model.ProfileUser.UserId">
+                <i class="ban icon"></i>
+                <span>Ban User</span>
             </a>
-        </div>
-        <div class="ui fitted hidden divider"></div>
+        }
+
+        <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipePlanets">
+            <i class="trash alternate icon"></i>
+            <span>Wipe Earth Decorations</span>
+        </a>
 
         @if (!Model.CommentsDisabledByModerator)
         {
-            <div>
-                <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
-                    <i class="lock icon"></i>
-                    <span>Forcibly Disable Comments</span>
-                </a>
-            </div>
-            <div class="ui fitted hidden divider"></div>
+            <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
+                <i class="lock icon"></i>
+                <span>Forcibly Disable Comments</span>
+            </a>
         }
 
         @if (Model.User.IsAdmin)
         {
+            <div class="ui divider"></div>
             @await Html.PartialAsync("Partials/AdminSetGrantedSlotsFormPartial", Model.ProfileUser)
+            <div class="ui fitted hidden divider" style="margin-bottom: 3px;"></div>
+            @await Html.PartialAsync("Partials/AdminSendNotificationPartial", Model.ProfileUser)
         }
     </div>
     @if (isMobile)
@@ -375,7 +369,7 @@ function setVisible(e){
     }
     // unhide content
     eTarget.style.display = "";
-    
+
     e.classList.add("active");
 }
 
@@ -394,7 +388,7 @@ if (selectedElement != null) {
     while (selectedElement != null && !selectedElement.classList.contains("lh-content")){
         selectedElement = selectedElement.parentElement;
     }
-    
+
     let sidebarEle = document.querySelector("[target=" + selectedElement.id + "]")
     setVisible(sidebarEle);
 }

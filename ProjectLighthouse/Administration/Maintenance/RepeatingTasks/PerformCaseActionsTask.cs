@@ -48,7 +48,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                     continue;
                 }
             }
-            
+
             if (@case.Expired || @case.Dismissed)
             {
                 switch (@case.Type)
@@ -63,18 +63,30 @@ public class PerformCaseActionsTask : IRepeatingTask
                     case CaseType.UserDisableComments:
                     {
                         user!.CommentsEnabled = true;
+
+                        await database.SendNotification(user.UserId,
+                            "Your profile comments have been re-enabled by a moderator.");
+
                         break;
                     }
-                    
+
                     case CaseType.LevelHide:
                     {
                         slot!.Hidden = false;
                         slot.HiddenReason = "";
+
+                        await database.SendNotification(slot.CreatorId,
+                            $"Your level, {slot.Name}, is no longer hidden by a moderator.");
+
                         break;
                     }
                     case CaseType.LevelDisableComments:
                     {
                         slot!.CommentsEnabled = true;
+
+                        await database.SendNotification(slot.CreatorId,
+                            $"The comments on your level, {slot.Name}, have been re-enabled by a moderator.");
+
                         break;
                     }
                     case CaseType.LevelLock:
@@ -82,6 +94,10 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot!.InitiallyLocked = false;
                         slot.LockedByModerator = false;
                         slot.LockedReason = "";
+
+                        await database.SendNotification(slot.CreatorId,
+                            $"Your level, {slot.Name}, is no longer locked by a moderator.");
+
                         break;
                     }
                     default: throw new ArgumentOutOfRangeException();
@@ -105,7 +121,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                     {
                         user!.PermissionLevel = PermissionLevel.Banned;
                         user.BannedReason = @case.Reason;
-                        
+
                         database.GameTokens.RemoveRange(database.GameTokens.Where(t => t.UserId == user.UserId));
                         database.WebTokens.RemoveRange(database.WebTokens.Where(t => t.UserId == user.UserId));
                         break;
@@ -113,6 +129,10 @@ public class PerformCaseActionsTask : IRepeatingTask
                     case CaseType.UserDisableComments:
                     {
                         user!.CommentsEnabled = false;
+
+                        await database.SendNotification(user.UserId,
+                            "Your profile comments have been disabled by a moderator.");
+
                         break;
                     }
 
@@ -120,12 +140,19 @@ public class PerformCaseActionsTask : IRepeatingTask
                     {
                         slot!.Hidden = true;
                         slot.HiddenReason = @case.Reason;
-                        
+
+                        await database.SendNotification(slot.CreatorId,
+                            $"Your level, {slot.Name}, has been hidden by a moderator.");
+
                         break;
                     }
                     case CaseType.LevelDisableComments:
                     {
                         slot!.CommentsEnabled = false;
+
+                        await database.SendNotification(slot.CreatorId,
+                            $"The comments on your level, {slot.Name}, have been disabled by a moderator.");
+
                         break;
                     }
                     case CaseType.LevelLock:
@@ -133,6 +160,10 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot!.InitiallyLocked = true;
                         slot.LockedByModerator = true;
                         slot.LockedReason = @case.Reason;
+
+                        await database.SendNotification(slot.CreatorId,
+                            $"Your level, {slot.Name}, has been locked by a moderator.");
+
                         break;
                     }
                     default: throw new ArgumentOutOfRangeException();

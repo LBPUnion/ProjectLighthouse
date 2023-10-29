@@ -19,6 +19,4 @@ public class WebsiteAnnouncementEntity
 
     [ForeignKey(nameof(PublisherId))]
     public UserEntity? Publisher { get; set; }
-
-    #nullable disable
 }

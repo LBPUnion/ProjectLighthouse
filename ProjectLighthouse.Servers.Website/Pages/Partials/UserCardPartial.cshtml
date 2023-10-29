@@ -22,7 +22,7 @@
         @if (showLink)
         {
             <h2 style="margin-bottom: 2px;">
-                <a href="~/user/@Model.UserId">@Model.Username</a>
+                <a href="~/user/@Model.UserId/@Model.GenerateSlug()">@Model.Username</a>
                     @if (Model.IsModerator)
                     {
                         <span class="profile-tag ui label @Model.PermissionLevel.ToHtmlColor()">

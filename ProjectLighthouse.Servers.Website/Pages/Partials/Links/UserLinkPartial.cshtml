@@ -12,7 +12,7 @@
     string userStatus = includeStatus ? Model.GetStatus(Database).ToTranslatedString(language, timeZone) : "";
 }
 
-<a href="/user/@Model.UserId" title="@userStatus" class="user-link">
+<a href="/user/@Model.UserId/@Model.GenerateSlug()" title="@userStatus" class="user-link">
     <img src="/gameAssets/@Model.WebsiteAvatarHash" alt=""/>
 
     @if (Model.IsModerator)
