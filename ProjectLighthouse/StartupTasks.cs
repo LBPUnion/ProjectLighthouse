@@ -53,6 +53,13 @@ public static class StartupTasks
 
         // Version info depends on ServerConfig 
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
+        if (VersionHelper.IsDirty)
+        {
+            Logger.Warn("This is a modified version of Project Lighthouse. " +
+                        "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
+                LogArea.Startup);
+        }
+
         Logger.Info("Connecting to the database...", LogArea.Startup);
 
         await using DatabaseContext database = DatabaseContext.CreateNewInstance();
