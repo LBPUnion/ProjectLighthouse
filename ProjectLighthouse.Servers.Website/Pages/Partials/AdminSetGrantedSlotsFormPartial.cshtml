@@ -1,6 +1,6 @@
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
 
-<form method="post" action="/admin/user/@Model.UserId/setGrantedSlots" style="display: inline-block;">
+<form method="post" action="/admin/user/@Model.UserId/setGrantedSlots">
     @Html.AntiForgeryToken()
     <span class="ui left action input">
         <button type="submit" class="ui blue button">
