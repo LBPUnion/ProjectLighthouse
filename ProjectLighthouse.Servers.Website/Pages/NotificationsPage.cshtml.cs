@@ -63,7 +63,7 @@ public class NotificationsPage : BaseLayout
         if (!DiscordConfiguration.Instance.DiscordIntegrationEnabled) return this.RedirectToPage();
 
         string truncatedAnnouncement = content.Length > 250
-            ? content[..250] + $"... [read more]({ServerConfiguration.Instance.ExternalUrl}/announce)"
+            ? content[..250] + $"... [read more]({ServerConfiguration.Instance.ExternalUrl}/notifications)"
             : content;
 
         await WebhookHelper.SendWebhook($":mega: {title}", truncatedAnnouncement);
