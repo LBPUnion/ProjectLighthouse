@@ -80,30 +80,7 @@
         <div class="ui blue segment" style="position: relative;">
             <div>
                 <div>
-                    @switch (notification.Type)
-                    {
-                        case NotificationType.MMPick:
-                            <i class="award icon"></i>
-                            break;
-                        case NotificationType.PlaysOnSlot:
-                            <i class="play icon"></i>
-                            break;
-                        case NotificationType.Top100Hottest:
-                            <i class="fire icon"></i>
-                            break;
-                        case NotificationType.ModerationNotification:
-                            <i class="gavel icon"></i>
-                            break;
-                        case NotificationType.CommentOnSlot:
-                            <i class="comment icon"></i>
-                            break;
-                        case NotificationType.HeartsOnSlot:
-                        case NotificationType.HeartedAsAuthor:
-                            <i class="heart icon"></i>
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    <i class="bell icon"></i>
                     <span style="white-space: pre-line">@notification.Text</span>
                 </div>
             </div>
