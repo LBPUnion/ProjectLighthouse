@@ -64,7 +64,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                     {
                         user!.CommentsEnabled = true;
 
-                        await database.SendNotification(@case.AffectedId,
+                        await database.SendNotification(user.UserId,
                             "Your profile comments have been re-enabled.");
 
                         break;
@@ -75,7 +75,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot!.Hidden = false;
                         slot.HiddenReason = "";
 
-                        await database.SendNotification(@case.AffectedId,
+                        await database.SendNotification(slot.CreatorId,
                             $"Your level, {slot.Name}, is no longer hidden.");
 
                         break;
@@ -84,7 +84,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                     {
                         slot!.CommentsEnabled = true;
 
-                        await database.SendNotification(@case.AffectedId,
+                        await database.SendNotification(slot.CreatorId,
                             $"The comments on your level, {slot.Name}, have been re-enabled.");
 
                         break;
@@ -95,8 +95,8 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.LockedByModerator = false;
                         slot.LockedReason = "";
 
-                        await database.SendNotification(@case.AffectedId,
-                            $"Your level, {slot.Name}, is no longer locked by a moderator.");
+                        await database.SendNotification(slot.CreatorId,
+                            $"Your level, {slot.Name}, is no longer locked.");
 
                         break;
                     }
@@ -130,7 +130,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                     {
                         user!.CommentsEnabled = false;
 
-                        await database.SendNotification(@case.AffectedId,
+                        await database.SendNotification(user.UserId,
                             "Your profile comments have been disabled.");
 
                         break;
@@ -141,7 +141,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot!.Hidden = true;
                         slot.HiddenReason = @case.Reason;
 
-                        await database.SendNotification(@case.AffectedId,
+                        await database.SendNotification(slot.CreatorId,
                             $"Your level, {slot.Name}, has been hidden.");
 
                         break;
@@ -150,7 +150,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                     {
                         slot!.CommentsEnabled = false;
 
-                        await database.SendNotification(@case.AffectedId,
+                        await database.SendNotification(slot.CreatorId,
                             $"The comments on your level, {slot.Name}, have been disabled.");
 
                         break;
@@ -161,8 +161,8 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.LockedByModerator = true;
                         slot.LockedReason = @case.Reason;
 
-                        await database.SendNotification(@case.AffectedId,
-                            $"Your level, {slot.Name}, has been locked by a moderator.");
+                        await database.SendNotification(slot.CreatorId,
+                            $"Your level, {slot.Name}, has been locked.");
 
                         break;
                     }
