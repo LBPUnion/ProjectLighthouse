@@ -90,7 +90,7 @@ public class ModerationRemovalController : ControllerBase
             case CommentType.Profile when comment.DeletedType == "moderator" && comment.TargetUser != null:
             {
                 await this.database.SendNotification(comment.TargetUser.UserId,
-                        $"Your comment on {comment.TargetUser}'s profile has been removed by a moderator.");
+                        $"Your comment on {comment.TargetUser.Username}'s profile has been removed by a moderator.");
 
                 break;
             }
