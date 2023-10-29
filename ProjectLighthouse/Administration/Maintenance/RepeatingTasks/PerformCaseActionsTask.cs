@@ -96,7 +96,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.LockedReason = "";
 
                         await database.SendNotification(@case.AffectedId,
-                            $"Your level, {slot.Name}, is no longer locked.");
+                            $"Your level, {slot.Name}, is no longer locked by a moderator.");
 
                         break;
                     }
@@ -162,7 +162,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.LockedReason = @case.Reason;
 
                         await database.SendNotification(@case.AffectedId,
-                            $"Your level, {slot.Name}, has been locked.");
+                            $"Your level, {slot.Name}, has been locked by a moderator.");
 
                         break;
                     }
