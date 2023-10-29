@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -79,22 +78,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameTokenEntity token = this.GetToken();
 
-        IQueryable<NotificationEntity> notificationQuery = this.database.Notifications
+        List<NotificationEntity> notifications = await this.database.Notifications
             .Where(n => n.UserId == token.UserId)
             .Where(n => !n.IsDismissed)
-            .OrderByDescending(n => n.Id);
+            .OrderByDescending(n => n.Id)
+            .ToListAsync();
 
         // We don't need to do any more work if there are no unconverted notifications to begin with.
-        if (!await notificationQuery.AnyAsync()) return this.Ok();
+        if (notifications.Count == 0) return this.Ok();
 
         StringBuilder builder = new();
 
-        await notificationQuery.ForEachAsync(n =>
+        // ReSharper disable once ForCanBeConvertedToForeach
+        // Suppressing this because we need to modify the list while iterating over it.
+        for (int i = 0; i < notifications.Count; i++)
         {
+            NotificationEntity n = notifications[i];
+
             builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
-                NotificationEntity.ConvertToGame(n)));
+                GameNotification.CreateFromEntity(n)));
+
             n.IsDismissed = true;
-        });
+        }
+
         await this.database.SaveChangesAsync();
 
         return this.Ok(new LbpCustomXml

@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Notifications;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 
@@ -24,11 +23,5 @@ public class NotificationEntity
 
     public string Text { get; set; } = "";
 
-    public bool IsDismissed { get; set; } = false;
-
-    public static GameNotification ConvertToGame(NotificationEntity notification) => new()
-    {
-        Type = notification.Type,
-        Text = notification.Text,
-    };
+    public bool IsDismissed { get; set; }
 }

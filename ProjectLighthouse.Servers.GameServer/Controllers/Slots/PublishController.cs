@@ -47,7 +47,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because of an issue with your level.");
+                "Your level failed to publish. (Error code: LH-PUB-0001)");
             return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
         }
 
@@ -55,7 +55,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, slot does not include rootLevel", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because of an issue with your level.");
+                $"{slot.Name} failed to publish. (Error code: LH-PUB-0002)");
             return this.BadRequest();
         }
 
@@ -65,7 +65,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because of an issue with your level.");
+                $"{slot.Name} failed to publish. (Error code: LH-PUB-0003)");
             return this.BadRequest();
         }
 
@@ -79,14 +79,14 @@ public class PublishController : ControllerBase
             {
                 Logger.Warn("Rejecting level republish, could not find old slot", LogArea.Publish);
                 await this.database.SendNotification(user.UserId,
-                    "Level republish was rejected by the server because of an issue with your level.");
+                    $"{slot.Name} failed to republish. (Error code: LH-REP-0001)");
                 return this.NotFound();
             }
             if (oldSlot.CreatorId != user.UserId)
             {
                 Logger.Warn("Rejecting level republish, old slot's creator is not publishing user", LogArea.Publish);
                 await this.database.SendNotification(user.UserId,
-                    "Level republish was rejected by the server because you are not the original publisher.");
+                    $"{slot.Name} failed to republish because you are not the original publisher. (Error code: LH-REP-0002)");
                 return this.BadRequest();
             }
         }
@@ -121,7 +121,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because of an issue with your level.");
+                "Your level failed to publish. (Error code: LH-PUB-0001)");
             return this.BadRequest();
         }
 
@@ -129,29 +129,31 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because of an issue with your level.");
+                $"{slot.Name} failed to publish. (Error code: LH-PUB-0003)");
             return this.BadRequest();
         }
         // Yes Rider, this isn't null
         Debug.Assert(slot.Resources != null, "slot.ResourceList != null");
 
-        slot.Description = CensorHelper.FilterMessage(slot.Description);
-
-        if (slot.Description.Length > 512)
-        {
-            Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)", LogArea.Publish);
-            await this.database.SendNotification(user.UserId,
-                $"Level upload was rejected by the server because the description is too long. ({slot.Description.Length} characters)");
-            return this.BadRequest();
-        }
-
         slot.Name = CensorHelper.FilterMessage(slot.Name);
 
         if (slot.Name.Length > 64)
         {
-            Logger.Warn($"Rejecting level upload, title too long ({slot.Name.Length} characters)", LogArea.Publish);
+            Logger.Warn($"Rejecting level upload, title too long ({slot.Name.Length} characters)",
+                LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                $"Level upload was rejected by the server because the name is too long. ({slot.Name.Length} characters)");
+                $"{slot.Name} failed to publish because the name is too long, {slot.Name.Length} characters. (Error code: LH-PUB-0004)");
+            return this.BadRequest();
+        }
+
+        slot.Description = CensorHelper.FilterMessage(slot.Description);
+
+        if (slot.Description.Length > 512)
+        {
+            Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)",
+                LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish because the description is too long, {slot.Description.Length} characters. (Error code: LH-PUB-0005)");
             return this.BadRequest();
         }
 
@@ -159,7 +161,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because of a missing resource.");
+                $"{slot.Name} failed to publish because the server is missing resources. (Error code: LH-PUB-0006)");
             return this.BadRequest();
         }
 
@@ -169,7 +171,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, unable to find rootLevel", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Level upload was rejected by the server because of an issue with your level.");
+                $"{slot.Name} failed to publish. (Error code: LH-PUB-0002)");
             return this.BadRequest();
         }
 
@@ -179,7 +181,7 @@ public class PublishController : ControllerBase
             {
                 Logger.Warn("Rejecting level upload, rootLevel is not a level", LogArea.Publish);
                 await this.database.SendNotification(user.UserId,
-                    "Level upload was rejected by the server because of an issue with your level.");
+                    $"{slot.Name} failed to publish. (Error code: LH-PUB-0007)");
                 return this.BadRequest();
             }
         }
@@ -189,7 +191,7 @@ public class PublishController : ControllerBase
             {
                 Logger.Warn("Rejecting level upload, rootLevel is not a LBP 3 Adventure", LogArea.Publish);
                 await this.database.SendNotification(user.UserId,
-                    "Level upload was rejected by the server because of an issue with your level.");
+                    $"{slot.Name} failed to publish. (Error code: LH-PUB-0008)");
                 return this.BadRequest();
             }
         }
@@ -219,7 +221,7 @@ public class PublishController : ControllerBase
             {
                 Logger.Warn("Rejecting level republish, old level not owned by current user", LogArea.Publish);
                 await this.database.SendNotification(user.UserId,
-                    "Level upload was rejected by the server because you are not the original publisher.");
+                    $"{slot.Name} failed to republish because you are not the original publisher. (Error code: LH-REP-0002)");
                 return this.BadRequest();
             }
 
@@ -284,7 +286,7 @@ public class PublishController : ControllerBase
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
             await this.database.SendNotification(user.UserId,
-                "Your level failed to publish because you have reached the maximum number of levels on your earth.");
+                $"{slot.Name} failed to publish because you have reached the maximum number of levels on your earth. (Error code: LH-PUB-0009)");
             return this.BadRequest();
         }
 
