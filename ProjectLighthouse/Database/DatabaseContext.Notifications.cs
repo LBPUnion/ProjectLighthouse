@@ -20,12 +20,12 @@ public partial class DatabaseContext
     {
         StringBuilder builder = new(text);
 
-        // Append server name to notification text if enabled
+        // Prepend server name to notification text if enabled
         if (ServerConfiguration.Instance.NotificationConfiguration.ShowServerNameInText)
         {
             builder.Insert(0, $"[{ServerConfiguration.Instance.Customization.ServerName}] ");
         }
-        // Append timestamp to notification text if enabled
+        // Prepend timestamp to notification text if enabled
         if (ServerConfiguration.Instance.NotificationConfiguration.ShowTimestampInText)
         {
             builder.Insert(0, $"[{DateTime.Now:HH:mm:ss}] ");
