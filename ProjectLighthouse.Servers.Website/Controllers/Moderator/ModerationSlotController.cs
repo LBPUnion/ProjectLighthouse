@@ -37,8 +37,7 @@ public class ModerationSlotController : ControllerBase
 
         // Send a notification to the creator
         await this.database.SendNotification(slot.CreatorId,
-            $"Your level, {slot.Name}, has been team picked!",
-            NotificationType.MMPick);
+            $"Your level, {slot.Name}, has been team picked!");
 
         await this.database.SaveChangesAsync();
 
@@ -58,8 +57,7 @@ public class ModerationSlotController : ControllerBase
 
         // Send a notification to the creator
         await this.database.SendNotification(slot.CreatorId,
-            $"Your level, {slot.Name}, is no longer team picked.",
-            NotificationType.MMPick);
+            $"Your level, {slot.Name}, is no longer team picked.");
 
         await this.database.SaveChangesAsync();
 
