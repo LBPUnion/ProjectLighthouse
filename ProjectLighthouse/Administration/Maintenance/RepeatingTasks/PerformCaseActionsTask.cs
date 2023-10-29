@@ -65,7 +65,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         user!.CommentsEnabled = true;
 
                         await database.SendNotification(user.UserId,
-                            "Your profile comments have been re-enabled.");
+                            "Your profile comments have been re-enabled by a moderator.");
 
                         break;
                     }
@@ -76,7 +76,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.HiddenReason = "";
 
                         await database.SendNotification(slot.CreatorId,
-                            $"Your level, {slot.Name}, is no longer hidden.");
+                            $"Your level, {slot.Name}, is no longer hidden by a moderator.");
 
                         break;
                     }
@@ -85,7 +85,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot!.CommentsEnabled = true;
 
                         await database.SendNotification(slot.CreatorId,
-                            $"The comments on your level, {slot.Name}, have been re-enabled.");
+                            $"The comments on your level, {slot.Name}, have been re-enabled by a moderator.");
 
                         break;
                     }
@@ -96,7 +96,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.LockedReason = "";
 
                         await database.SendNotification(slot.CreatorId,
-                            $"Your level, {slot.Name}, is no longer locked.");
+                            $"Your level, {slot.Name}, is no longer locked by a moderator.");
 
                         break;
                     }
@@ -131,7 +131,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         user!.CommentsEnabled = false;
 
                         await database.SendNotification(user.UserId,
-                            "Your profile comments have been disabled.");
+                            "Your profile comments have been disabled by a moderator.");
 
                         break;
                     }
@@ -142,7 +142,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.HiddenReason = @case.Reason;
 
                         await database.SendNotification(slot.CreatorId,
-                            $"Your level, {slot.Name}, has been hidden.");
+                            $"Your level, {slot.Name}, has been hidden by a moderator.");
 
                         break;
                     }
@@ -151,7 +151,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot!.CommentsEnabled = false;
 
                         await database.SendNotification(slot.CreatorId,
-                            $"The comments on your level, {slot.Name}, have been disabled.");
+                            $"The comments on your level, {slot.Name}, have been disabled by a moderator.");
 
                         break;
                     }
@@ -162,7 +162,7 @@ public class PerformCaseActionsTask : IRepeatingTask
                         slot.LockedReason = @case.Reason;
 
                         await database.SendNotification(slot.CreatorId,
-                            $"Your level, {slot.Name}, has been locked.");
+                            $"Your level, {slot.Name}, has been locked by a moderator.");
 
                         break;
                     }
