@@ -24,6 +24,11 @@ public partial class DatabaseContext
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(text) || text.Length > 2048)
+        {
+            return;
+        }
+
         StringBuilder builder = new(text);
 
         // Prepend server name to notification text if enabled
