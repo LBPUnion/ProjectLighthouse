@@ -56,8 +56,9 @@ public class ModerationRemovalController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        CommentEntity? comment = await this.database.Comments.Include(commentEntity => commentEntity.TargetUser)
-            .Include(commentEntity => commentEntity.TargetSlot)
+        CommentEntity? comment = await this.database.Comments
+            .Include(c => c.TargetUser)
+            .Include(c => c.TargetSlot)
             .FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.Redirect("~/404");
 
