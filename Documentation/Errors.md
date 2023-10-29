@@ -26,3 +26,5 @@ website notifications to indicate what went wrong.
 - `LH-REP-0001`: The level failed to republish because the old slot does not exist.
 - `LH-REP-0002`: The level failed to republish because the original publisher is not the current publisher.
   - **Potential Fix:** Copying the level to another slot on your moon typically fixes this issue.
+- `LH-REP-0003`: The level could not be unlocked because it was locked by a moderator.
+  - **Potential Fix:** Ask a server administrator/moderator to unlock the level for you.

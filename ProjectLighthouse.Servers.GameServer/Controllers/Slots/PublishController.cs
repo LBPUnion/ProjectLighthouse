@@ -271,8 +271,10 @@ public class PublishController : ControllerBase
             oldSlot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
 
             // Check if the level has been locked by a moderator to avoid unlocking it
-            if (oldSlot.LockedByModerator)
+            if (oldSlot.LockedByModerator && !slot.InitiallyLocked)
             {
+                await this.database.SendNotification(user.UserId,
+                    $"{slot.Name} will not be unlocked because it has been locked by a moderator. (LH-REP-0003)");
                 oldSlot.InitiallyLocked = true;
             }
 
