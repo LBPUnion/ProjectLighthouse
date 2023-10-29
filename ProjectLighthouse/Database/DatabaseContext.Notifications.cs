@@ -28,7 +28,7 @@ public partial class DatabaseContext
         // Prepend timestamp to notification text if enabled
         if (ServerConfiguration.Instance.NotificationConfiguration.ShowTimestampInText)
         {
-            builder.Insert(0, $"[{DateTime.Now:HH:mm:ss}] ");
+            builder.Insert(0, $"[{DateTime.Now:g}] ");
         }
 
         NotificationEntity notification = new()
