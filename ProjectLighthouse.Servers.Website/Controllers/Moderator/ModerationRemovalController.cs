@@ -38,9 +38,15 @@ public class ModerationRemovalController : ControllerBase
         return await this.Delete<ScoreEntity>(this.database.Scores, scoreId, callbackUrl, async (user, id) =>
         {
             ScoreEntity? score = await this.database.Scores.Include(s => s.Slot).FirstOrDefaultAsync(s => s.ScoreId == id);
-            if (score == null) return null;
+            if (score == null || !user.IsModerator) return null;
 
-            return user.IsModerator ? score : null;
+            if (score.Slot != null)
+            {
+                await this.database.SendNotification(user.UserId,
+                    $"Your score on {score.Slot.Name} has been removed by a moderator.");
+            }
+
+            return score;
         });
     }
 
@@ -50,7 +56,10 @@ public class ModerationRemovalController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        CommentEntity? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+        CommentEntity? comment = await this.database.Comments
+            .Include(c => c.TargetUser)
+            .Include(c => c.TargetSlot)
+            .FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.Redirect("~/404");
 
         if (comment.Deleted) return this.Redirect(callbackUrl ?? "~/");
@@ -75,6 +84,26 @@ public class ModerationRemovalController : ControllerBase
         comment.Deleted = true;
         comment.DeletedBy = user.Username;
         comment.DeletedType = !canDelete && user.IsModerator ? "moderator" : "user";
+
+        switch (comment.Type)
+        {
+            case CommentType.Profile when comment.DeletedType == "moderator" && comment.TargetUser != null:
+            {
+                await this.database.SendNotification(comment.TargetUser.UserId,
+                    $"Your comment on {comment.TargetUser.Username}'s profile has been removed by a moderator.");
+
+                break;
+            }
+            case CommentType.Level when comment.DeletedType == "moderator" && comment.TargetSlot != null:
+            {
+                await this.database.SendNotification(comment.TargetSlot.CreatorId,
+                    $"Your comment on level {comment.TargetSlot.Name} has been removed by a moderator.");
+
+                break;
+            }
+            default: throw new ArgumentOutOfRangeException(nameof(comment.Type), @"Comment type is out of range.");
+        }
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect(callbackUrl ?? "~/");
@@ -96,6 +125,13 @@ public class ModerationRemovalController : ControllerBase
 
         review.Deleted = true;
         review.DeletedBy = !canDelete && user.IsModerator ? DeletedBy.Moderator : DeletedBy.LevelAuthor;
+
+        if (review.Slot != null && review.DeletedBy == DeletedBy.Moderator)
+        {
+            await this.database.SendNotification(review.Slot.CreatorId,
+                $"Your review on level {review.Slot.Name} has been removed by a moderator.");
+        }
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect(callbackUrl ?? "~/");
@@ -110,6 +146,12 @@ public class ModerationRemovalController : ControllerBase
             if (photo == null) return null;
 
             if (!user.IsModerator && photo.CreatorId != user.UserId) return null;
+
+            if (photo.Slot != null)
+            {
+                await this.database.SendNotification(photo.Slot.CreatorId,
+                    $"Your photo on level {photo.Slot.Name} has been removed by a moderator.");
+            }
 
             return photo;
         });
