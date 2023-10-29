@@ -17,7 +17,8 @@
     {
         Model.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAuthentication, "/authentication", "key"));
 
-        @if (await Model.Database.Notifications.AnyAsync(n => n.UserId == Model.User.UserId && !n.IsDismissed))
+        @if (await Model.Database.Notifications.AnyAsync(n => n.UserId == Model.User.UserId && !n.IsDismissed) ||
+             await Model.Database.WebsiteAnnouncements.AnyAsync())
         {
             Model.NavigationItemsRight.Add(new PageNavigationItem(GeneralStrings.Notifications, "/notifications", "bell"));
         }
