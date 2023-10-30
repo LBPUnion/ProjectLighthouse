@@ -212,7 +212,8 @@
                     &centerdot;
                     @if (!string.IsNullOrWhiteSpace(remoteUrl))
                     {
-                        <a href="https://@remoteUrl" target="_blank">
+                        if (!remoteUrl.StartsWith("https://")) remoteUrl = $"https://{remoteUrl}";
+                        <a href="@remoteUrl" target="_blank">
                             Source Code
                         </a>
                     }
