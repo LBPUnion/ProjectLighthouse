@@ -42,7 +42,7 @@ public class ModerationRemovalController : ControllerBase
 
             if (score.Slot != null)
             {
-                await this.database.SendNotification(user.UserId,
+                await this.database.SendNotification(score.UserId,
                     $"Your score on {score.Slot.Name} has been removed by a moderator.");
             }
 
@@ -89,14 +89,14 @@ public class ModerationRemovalController : ControllerBase
         {
             case CommentType.Profile when comment.DeletedType == "moderator" && comment.TargetUser != null:
             {
-                await this.database.SendNotification(comment.TargetUser.UserId,
+                await this.database.SendNotification(comment.PosterUserId,
                     $"Your comment on {comment.TargetUser.Username}'s profile has been removed by a moderator.");
 
                 break;
             }
             case CommentType.Level when comment.DeletedType == "moderator" && comment.TargetSlot != null:
             {
-                await this.database.SendNotification(comment.TargetSlot.CreatorId,
+                await this.database.SendNotification(comment.PosterUserId,
                     $"Your comment on level {comment.TargetSlot.Name} has been removed by a moderator.");
 
                 break;
@@ -128,7 +128,7 @@ public class ModerationRemovalController : ControllerBase
 
         if (review.Slot != null && review.DeletedBy == DeletedBy.Moderator)
         {
-            await this.database.SendNotification(review.Slot.CreatorId,
+            await this.database.SendNotification(review.ReviewerId,
                 $"Your review on level {review.Slot.Name} has been removed by a moderator.");
         }
 
@@ -147,9 +147,9 @@ public class ModerationRemovalController : ControllerBase
 
             if (!user.IsModerator && photo.CreatorId != user.UserId) return null;
 
-            if (photo.Slot != null)
+            if (photo.Slot != null && user.IsModerator && photo.CreatorId != user.UserId)
             {
-                await this.database.SendNotification(photo.Slot.CreatorId,
+                await this.database.SendNotification(photo.CreatorId,
                     $"Your photo on level {photo.Slot.Name} has been removed by a moderator.");
             }
 
