@@ -33,6 +33,9 @@ public class DismissExpiredCasesTask : IRepeatingTask
         {
             @case.DismissedAt = DateTime.UtcNow;
             @case.DismisserUsername = "maintenance task";
+
+            @case.Processed = false;
+
             Logger.Info($"Dismissed expired case {@case.CaseId}", LogArea.Maintenance);
         }
 

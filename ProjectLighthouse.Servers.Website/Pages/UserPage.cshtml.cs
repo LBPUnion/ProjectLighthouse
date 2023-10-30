@@ -52,7 +52,7 @@ public class UserPage : BaseLayout
 
         bool isAuthenticated = this.User != null;
         bool isOwner = this.ProfileUser == this.User || this.User != null && this.User.IsModerator;
-        
+
         // Determine if user can view profile according to profileUser's privacy settings
         this.CanViewProfile = this.ProfileUser.ProfileVisibility.CanAccess(isAuthenticated, isOwner);
         this.CanViewSlots = this.ProfileUser.LevelVisibility.CanAccess(isAuthenticated, isOwner);
@@ -68,6 +68,7 @@ public class UserPage : BaseLayout
         this.Slots = await this.Database.Slots.Include(p => p.Creator)
             .OrderByDescending(s => s.LastUpdated)
             .Where(p => p.CreatorId == userId)
+            .Where(p => p.Creator != null && (!p.SubLevel || p.Creator == this.User))
             .Take(10)
             .ToListAsync();
 
