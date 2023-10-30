@@ -39,11 +39,11 @@ public class SlotPage : BaseLayout
 
         bool isAuthenticated = this.User != null;
         bool isOwner = slot.Creator == this.User || this.User != null && this.User.IsModerator;
-        
+
         // Determine if user can view slot according to creator's privacy settings
         this.CanViewSlot = slot.Creator.LevelVisibility.CanAccess(isAuthenticated, isOwner);
 
-        if ((slot.Hidden || slot.SubLevel && (this.User == null && this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
+        if ((slot.Hidden || slot.SubLevel && (this.User == null || this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
             return this.NotFound();
 
         string slotSlug = slot.GenerateSlug();
@@ -60,7 +60,7 @@ public class SlotPage : BaseLayout
                 from blockedProfile in this.Database.BlockedProfiles
                 where blockedProfile.UserId == this.User.UserId
                 select blockedProfile.BlockedUserId).ToListAsync();
-        
+
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.Slot.CommentsEnabled;
         if (this.CommentsEnabled)
         {
