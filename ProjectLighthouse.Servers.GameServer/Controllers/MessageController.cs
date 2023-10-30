@@ -89,16 +89,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         StringBuilder builder = new();
 
-        // ReSharper disable once ForCanBeConvertedToForeach
-        // Suppressing this because we need to modify the list while iterating over it.
-        for (int i = 0; i < notifications.Count; i++)
+        foreach (NotificationEntity notification in notifications)
         {
-            NotificationEntity n = notifications[i];
-
             builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
-                GameNotification.CreateFromEntity(n)));
+                GameNotification.CreateFromEntity(notification)));
 
-            n.IsDismissed = true;
+            notification.IsDismissed = true;
         }
 
         await this.database.SaveChangesAsync();
