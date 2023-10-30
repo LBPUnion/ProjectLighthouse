@@ -10,5 +10,5 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class StoreController : Controller
 {
     [HttpGet("promotions")]
-    public IActionResult Promotions() => this.Content(System.IO.File.ReadAllText("StaticFiles/promote.xml"));
+    public IActionResult Promotions() => this.Ok();
 }
