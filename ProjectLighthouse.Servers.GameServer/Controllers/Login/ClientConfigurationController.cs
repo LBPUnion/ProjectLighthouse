@@ -1,8 +1,10 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -43,9 +45,27 @@ public class ClientConfigurationController : ControllerBase
     [Produces("text/xml")]
     public IActionResult Conf() => this.Ok(new TelemetryConfigResponse());
 
+    // The challenge config here is currently based on the official server's config.
+    // We should probably make this configurable in the future.
     [HttpGet("ChallengeConfig.xml")]
     [Produces("text/xml")]
-    public IActionResult Challenges() => this.Content(System.IO.File.ReadAllText("ChallengeConfig.xml"));
+    public IActionResult Challenges()
+    {
+        StringBuilder builder = new();
+
+        builder.Append(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
+            GameChallenge.OfficialServerChallenge()));
+
+        // Remove these tags because they're not used, we're simply using these to
+        // easily serialize the challenge config.
+        builder.Replace("<Challenge_Item_Datas>", "");
+        builder.Replace("</Challenge_Item_Datas>", "");
+
+        return this.Ok(new LbpCustomXml
+        {
+            Content = builder.ToString(),
+        });
+    }
 
     [HttpGet("farc_hashes")]
     public IActionResult FarcHashes() => this.Ok();
@@ -75,12 +95,12 @@ public class ClientConfigurationController : ControllerBase
 
         PrivacySettings? settings = await this.DeserializeBody<PrivacySettings>();
         if (settings == null) return this.BadRequest();
-        
+
         if (settings.LevelVisibility != null)
         {
             PrivacyType? type = PrivacyTypeExtensions.FromSerializedString(settings.LevelVisibility);
             if (type == null) return this.BadRequest();
-            
+
             user.LevelVisibility = (PrivacyType)type;
         }
 
