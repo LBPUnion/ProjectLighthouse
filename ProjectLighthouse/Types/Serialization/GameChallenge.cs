@@ -25,7 +25,7 @@ public class GameChallenge : ILbpSerializable
     public ulong ChallengeCycleTime { get; set; }
 
     // ReSharper disable once IdentifierTypo
-    [XmlElement("Challenge_Item_Datas")]
+    [XmlElement("item_data")]
     public List<ChallengeItemData> ChallengeItemDatas { get; set; }
 
     #region Official server challenge configuration
@@ -245,7 +245,6 @@ public class GameChallenge : ILbpSerializable
     #endregion
 }
 
-[XmlRoot("item_data")]
 public class ChallengeItemData
 {
     [XmlAttribute("Challenge_ID")]

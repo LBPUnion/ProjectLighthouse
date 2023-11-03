@@ -49,23 +49,7 @@ public class ClientConfigurationController : ControllerBase
     // We should probably make this configurable in the future.
     [HttpGet("ChallengeConfig.xml")]
     [Produces("text/xml")]
-    public IActionResult Challenges()
-    {
-        StringBuilder builder = new();
-
-        builder.Append(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
-            GameChallenge.OfficialServerChallenge()));
-
-        // Remove these tags because they're not used, we're simply using these to
-        // easily serialize the challenge config.
-        builder.Replace("<Challenge_Item_Datas>", "");
-        builder.Replace("</Challenge_Item_Datas>", "");
-
-        return this.Ok(new LbpCustomXml
-        {
-            Content = builder.ToString(),
-        });
-    }
+    public IActionResult Challenges() => this.Ok(GameChallenge.OfficialServerChallenge());
 
     [HttpGet("farc_hashes")]
     public IActionResult FarcHashes() => this.Ok();
