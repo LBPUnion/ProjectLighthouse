@@ -49,7 +49,7 @@ public class ClientConfigurationController : ControllerBase
     // We should probably make this configurable in the future.
     [HttpGet("ChallengeConfig.xml")]
     [Produces("text/xml")]
-    public IActionResult Challenges() => this.Ok(GameChallenge.OfficialServerChallenge());
+    public IActionResult Challenges() => this.Ok(GameChallenge.ServerChallenges());
 
     [HttpGet("farc_hashes")]
     public IActionResult FarcHashes() => this.Ok();

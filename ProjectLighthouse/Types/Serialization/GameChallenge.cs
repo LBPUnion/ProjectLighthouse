@@ -10,234 +10,234 @@ public class GameChallenge : ILbpSerializable
     public int TotalChallenges { get; set; }
 
     [XmlElement("Challenge_End_Date")]
-    public ulong ChallengeEndDate { get; set; }
+    public ulong EndDate { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Bronze_Range")]
-    public decimal ChallengeTopRankBronzeRange { get; set; }
+    public decimal TopRankBronzePercentage { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Silver_Range")]
-    public decimal ChallengeTopRankSilverRange { get; set; }
+    public decimal TopRankSilverPercentage { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Gold_Range")]
-    public decimal ChallengeTopRankGoldRange { get; set; }
+    public decimal TopRankGoldPercentage { get; set; }
 
     [XmlElement("Challenge_CycleTime")]
-    public ulong ChallengeCycleTime { get; set; }
+    public ulong CycleTime { get; set; }
 
     // ReSharper disable once IdentifierTypo
     [XmlElement("item_data")]
     public List<ChallengeItemData> ChallengeItemDatas { get; set; }
 
-    #region Official server challenge configuration
+    #region Server challenge configuration
 
-    public static GameChallenge OfficialServerChallenge() => new()
+    public static GameChallenge ServerChallenges() => new()
     {
         TotalChallenges = 14,
-        ChallengeEndDate = 1494460860000000,
-        ChallengeTopRankBronzeRange = 0.51m,
-        ChallengeTopRankSilverRange = 0.26m,
-        ChallengeTopRankGoldRange = 0.11m,
-        ChallengeCycleTime = 1209600000000,
+        EndDate = 1494460860000000,
+        TopRankBronzePercentage = 0.51m,
+        TopRankSilverPercentage = 0.26m,
+        TopRankGoldPercentage = 0.11m,
+        CycleTime = 1209600000000,
         ChallengeItemDatas = new List<ChallengeItemData>
         {
             new()
             {
-                ChallengeId = 0,
-                ChallengeActiveDateStarts = 1476096166000000,
-                ChallengeActiveDateEnds = 1478736060000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_NEWTONBOUNCE_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_NEWTONBOUNCE_NAME",
-                ChallengePinId = 3003874881,
-                ChallengeRankPin = 2922567456,
-                ChallengeContentName = "TG_LittleBigPlanet3",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085260,
-                ChallengePhoto1 = 1112639,
+                Id = 0,
+                ActiveDateStarts = 1476096166000000,
+                ActiveDateEnds = 1478736060000000,
+                LamsDescriptionId = "CHALLENGE_NEWTONBOUNCE_DESC",
+                LamsTitleId = "CHALLENGE_NEWTONBOUNCE_NAME",
+                PinId = 3003874881,
+                RankPin = 2922567456,
+                ContentName = "TG_LittleBigPlanet3",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085260,
+                Photo1 = 1112639,
             },
             new()
             {
-                ChallengeId = 1,
-                ChallengeActiveDateStarts = 1478736060000000,
-                ChallengeActiveDateEnds = 1479945660000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_SCREENCHASE_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_SCREENCHASE_NAME",
-                ChallengePinId = 282407472,
-                ChallengeRankPin = 3340696069,
-                ChallengeContentName = "TG_LittleBigPlanet2",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1102387,
-                ChallengePhoto1 = 1112651,
+                Id = 1,
+                ActiveDateStarts = 1478736060000000,
+                ActiveDateEnds = 1479945660000000,
+                LamsDescriptionId = "CHALLENGE_SCREENCHASE_DESC",
+                LamsTitleId = "CHALLENGE_SCREENCHASE_NAME",
+                PinId = 282407472,
+                RankPin = 3340696069,
+                ContentName = "TG_LittleBigPlanet2",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1102387,
+                Photo1 = 1112651,
             },
             new()
             {
-                ChallengeId = 2,
-                ChallengeActiveDateStarts = 1479945660000000,
-                ChallengeActiveDateEnds = 1481155260000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_RABBITBOXING_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_RABBITBOXING_NAME",
-                ChallengePinId = 2529088759,
-                ChallengeRankPin = 958144818,
-                ChallengeContentName = "TG_LittleBigPlanet2",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085264,
-                ChallengePhoto1 = 1112627,
+                Id = 2,
+                ActiveDateStarts = 1479945660000000,
+                ActiveDateEnds = 1481155260000000,
+                LamsDescriptionId = "CHALLENGE_RABBITBOXING_DESC",
+                LamsTitleId = "CHALLENGE_RABBITBOXING_NAME",
+                PinId = 2529088759,
+                RankPin = 958144818,
+                ContentName = "TG_LittleBigPlanet2",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085264,
+                Photo1 = 1112627,
             },
             new()
             {
-                ChallengeId = 3,
-                ChallengeActiveDateStarts = 1481155260000000,
-                ChallengeActiveDateEnds = 1481414460000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_FLOATYFLUID_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_FLOATYFLUID_NAME",
-                ChallengePinId = 183892581,
-                ChallengeRankPin = 3442917932,
-                ChallengeContent = "LBPDLCNISBLK0001",
-                ChallengeContentName = "SBSP_THEME_PACK_NAME",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1095449,
-                ChallengePhoto1 = 1112619,
+                Id = 3,
+                ActiveDateStarts = 1481155260000000,
+                ActiveDateEnds = 1481414460000000,
+                LamsDescriptionId = "CHALLENGE_FLOATYFLUID_DESC",
+                LamsTitleId = "CHALLENGE_FLOATYFLUID_NAME",
+                PinId = 183892581,
+                RankPin = 3442917932,
+                Content = "LBPDLCNISBLK0001",
+                ContentName = "SBSP_THEME_PACK_NAME",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1095449,
+                Photo1 = 1112619,
             },
             new()
             {
-                ChallengeId = 4,
-                ChallengeActiveDateStarts = 1481414460000000,
-                ChallengeActiveDateEnds = 1483574460000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_ISLANDRACE_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_ISLANDRACE_NAME",
-                ChallengePinId = 315245769,
-                ChallengeRankPin = 443310584,
-                ChallengeContentName = "TG_LittleBigPlanet",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1102858,
-                ChallengePhoto1 = 1112655,
+                Id = 4,
+                ActiveDateStarts = 1481414460000000,
+                ActiveDateEnds = 1483574460000000,
+                LamsDescriptionId = "CHALLENGE_ISLANDRACE_DESC",
+                LamsTitleId = "CHALLENGE_ISLANDRACE_NAME",
+                PinId = 315245769,
+                RankPin = 443310584,
+                ContentName = "TG_LittleBigPlanet",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1102858,
+                Photo1 = 1112655,
             },
             new()
             {
-                ChallengeId = 5,
-                ChallengeActiveDateStarts = 1483574460000000,
-                ChallengeActiveDateEnds = 1484784060000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_SPACEDODGING_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_SPACEDODGING_NAME",
-                ChallengePinId = 144212050,
-                ChallengeRankPin = 2123417147,
-                ChallengeContentName = "TG_LittleBigPlanet3",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085266,
-                ChallengePhoto1 = 1112667,
+                Id = 5,
+                ActiveDateStarts = 1483574460000000,
+                ActiveDateEnds = 1484784060000000,
+                LamsDescriptionId = "CHALLENGE_SPACEDODGING_DESC",
+                LamsTitleId = "CHALLENGE_SPACEDODGING_NAME",
+                PinId = 144212050,
+                RankPin = 2123417147,
+                ContentName = "TG_LittleBigPlanet3",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085266,
+                Photo1 = 1112667,
             },
             new()
             {
-                ChallengeId = 6,
-                ChallengeActiveDateStarts = 1484784060000000,
-                ChallengeActiveDateEnds = 1485993660000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_INVISIBLECIRCUIT_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_INVISIBLECIRCUIT_NAME",
-                ChallengePinId = 249569175,
-                ChallengeRankPin = 1943114258,
-                ChallengeContentName = "TG_LittleBigPlanet",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1096814,
-                ChallengePhoto1 = 1112635,
+                Id = 6,
+                ActiveDateStarts = 1484784060000000,
+                ActiveDateEnds = 1485993660000000,
+                LamsDescriptionId = "CHALLENGE_INVISIBLECIRCUIT_DESC",
+                LamsTitleId = "CHALLENGE_INVISIBLECIRCUIT_NAME",
+                PinId = 249569175,
+                RankPin = 1943114258,
+                ContentName = "TG_LittleBigPlanet",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1096814,
+                Photo1 = 1112635,
             },
             new()
             {
-                ChallengeId = 7,
-                ChallengeActiveDateStarts = 1485993660000000,
-                ChallengeActiveDateEnds = 1487203260000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_HOVERBOARDRAILS_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_HOVERBOARDRAILS_NAME",
-                ChallengePinId = 3478661003,
-                ChallengeRankPin = 592022798,
-                ChallengeContent = "LBPDLCBTTFLK0001",
-                ChallengeContentName = "BTTF_LEVEL_KIT_NAME",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085256,
-                ChallengePhoto1 = 1112623,
+                Id = 7,
+                ActiveDateStarts = 1485993660000000,
+                ActiveDateEnds = 1487203260000000,
+                LamsDescriptionId = "CHALLENGE_HOVERBOARDRAILS_DESC",
+                LamsTitleId = "CHALLENGE_HOVERBOARDRAILS_NAME",
+                PinId = 3478661003,
+                RankPin = 592022798,
+                Content = "LBPDLCBTTFLK0001",
+                ContentName = "BTTF_LEVEL_KIT_NAME",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085256,
+                Photo1 = 1112623,
             },
             new()
             {
-                ChallengeId = 8,
-                ChallengeActiveDateStarts = 1487203260000000,
-                ChallengeActiveDateEnds = 1488412860000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_TOWERBOOST_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_TOWERBOOST_NAME",
-                ChallengePinId = 216730878,
-                ChallengeRankPin = 545532447,
-                ChallengeContentName = "TG_LittleBigPlanet2",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1092504,
-                ChallengePhoto1 = 1112671,
+                Id = 8,
+                ActiveDateStarts = 1487203260000000,
+                ActiveDateEnds = 1488412860000000,
+                LamsDescriptionId = "CHALLENGE_TOWERBOOST_DESC",
+                LamsTitleId = "CHALLENGE_TOWERBOOST_NAME",
+                PinId = 216730878,
+                RankPin = 545532447,
+                ContentName = "TG_LittleBigPlanet2",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1092504,
+                Photo1 = 1112671,
             },
             new()
             {
-                ChallengeId = 9,
-                ChallengeActiveDateStarts = 1488412860000000,
-                ChallengeActiveDateEnds = 1489622460000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_SWOOPPANELS_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_SWOOPPANELS_NAME",
-                ChallengePinId = 2054302637,
-                ChallengeRankPin = 3288689476,
-                ChallengeContentName = "TG_LittleBigPlanet2",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085268,
-                ChallengePhoto1 = 1112643,
+                Id = 9,
+                ActiveDateStarts = 1488412860000000,
+                ActiveDateEnds = 1489622460000000,
+                LamsDescriptionId = "CHALLENGE_SWOOPPANELS_DESC",
+                LamsTitleId = "CHALLENGE_SWOOPPANELS_NAME",
+                PinId = 2054302637,
+                RankPin = 3288689476,
+                ContentName = "TG_LittleBigPlanet2",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085268,
+                Photo1 = 1112643,
             },
             new()
             {
-                ChallengeId = 10,
-                ChallengeActiveDateStarts = 1489622460000000,
-                ChallengeActiveDateEnds = 1490832060000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_PINBALLCRYPTS_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_PINBALLCRYPTS_NAME",
-                ChallengePinId = 618998172,
-                ChallengeRankPin = 4087839785,
-                ChallengeContentName = "TG_LittleBigPlanet3",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085262,
-                ChallengePhoto1 = 1112647,
+                Id = 10,
+                ActiveDateStarts = 1489622460000000,
+                ActiveDateEnds = 1490832060000000,
+                LamsDescriptionId = "CHALLENGE_PINBALLCRYPTS_DESC",
+                LamsTitleId = "CHALLENGE_PINBALLCRYPTS_NAME",
+                PinId = 618998172,
+                RankPin = 4087839785,
+                ContentName = "TG_LittleBigPlanet3",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085262,
+                Photo1 = 1112647,
             },
             new()
             {
-                ChallengeId = 11,
-                ChallengeActiveDateStarts = 1490832060000000,
-                ChallengeActiveDateEnds = 1492041660000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_TIEHOP_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_TIEHOP_NAME",
-                ChallengePinId = 3953447125,
-                ChallengeRankPin = 2556445436,
-                ChallengeContentName = "TG_LittleBigPlanet",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1092367,
-                ChallengePhoto1 = 1112659,
+                Id = 11,
+                ActiveDateStarts = 1490832060000000,
+                ActiveDateEnds = 1492041660000000,
+                LamsDescriptionId = "CHALLENGE_TIEHOP_DESC",
+                LamsTitleId = "CHALLENGE_TIEHOP_NAME",
+                PinId = 3953447125,
+                RankPin = 2556445436,
+                ContentName = "TG_LittleBigPlanet",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1092367,
+                Photo1 = 1112659,
             },
             new()
             {
-                ChallengeId = 12,
-                ChallengeActiveDateStarts = 1492041660000000,
-                ChallengeActiveDateEnds = 1493251260000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_JOKERFUNHOUSE_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_JOKERFUNHOUSE_NAME",
-                ChallengePinId = 1093784294,
-                ChallengeRankPin = 1757295127,
-                ChallengeContent = "LBPDLCWBDCLK0001",
-                ChallengeContentName = "DCCOMICS_THEME_NAME",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085258,
-                ChallengePhoto1 = 1112631,
+                Id = 12,
+                ActiveDateStarts = 1492041660000000,
+                ActiveDateEnds = 1493251260000000,
+                LamsDescriptionId = "CHALLENGE_JOKERFUNHOUSE_DESC",
+                LamsTitleId = "CHALLENGE_JOKERFUNHOUSE_NAME",
+                PinId = 1093784294,
+                RankPin = 1757295127,
+                Content = "LBPDLCWBDCLK0001",
+                ContentName = "DCCOMICS_THEME_NAME",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085258,
+                Photo1 = 1112631,
             },
             new()
             {
-                ChallengeId = 13,
-                ChallengeActiveDateStarts = 1493251260000000,
-                ChallengeActiveDateEnds = 1494460860000000,
-                ChallengeLamsDescriptionId = "CHALLENGE_DINERSHOOTING_DESC",
-                ChallengeLamsTitleId = "CHALLENGE_DINERSHOOTING_NAME",
-                ChallengePinId = 1568570416,
-                ChallengeRankPin = 3721717765,
-                ChallengeContentName = "TG_LittleBigPlanet3",
-                ChallengePlanetUser = "qd3c781a5a6-GBen",
-                ChallengePlanetId = 1085254,
-                ChallengePhoto1 = 1112663,
+                Id = 13,
+                ActiveDateStarts = 1493251260000000,
+                ActiveDateEnds = 1494460860000000,
+                LamsDescriptionId = "CHALLENGE_DINERSHOOTING_DESC",
+                LamsTitleId = "CHALLENGE_DINERSHOOTING_NAME",
+                PinId = 1568570416,
+                RankPin = 3721717765,
+                ContentName = "TG_LittleBigPlanet3",
+                PlanetUser = "qd3c781a5a6-GBen",
+                PlanetId = 1085254,
+                Photo1 = 1112663,
             },
         },
     };
@@ -248,38 +248,38 @@ public class GameChallenge : ILbpSerializable
 public class ChallengeItemData
 {
     [XmlAttribute("Challenge_ID")]
-    public int ChallengeId { get; set; }
+    public int Id { get; set; }
 
     [XmlAttribute("Challenge_active_date_starts")]
-    public ulong ChallengeActiveDateStarts { get; set; }
+    public ulong ActiveDateStarts { get; set; }
 
     [XmlAttribute("Challenge_active_date_ends")]
-    public ulong ChallengeActiveDateEnds { get; set; }
+    public ulong ActiveDateEnds { get; set; }
 
     [XmlAttribute("Challenge_LAMSDescription_Id")]
-    public string ChallengeLamsDescriptionId { get; set; }
+    public string LamsDescriptionId { get; set; }
 
     [XmlAttribute("Challenge_LAMSTitle_Id")]
-    public string ChallengeLamsTitleId { get; set; }
+    public string LamsTitleId { get; set; }
 
     [XmlAttribute("Challenge_PinId")]
-    public ulong ChallengePinId { get; set; }
+    public ulong PinId { get; set; }
 
     [XmlAttribute("Challenge_RankPin")]
-    public ulong ChallengeRankPin { get; set; }
+    public ulong RankPin { get; set; }
 
     [XmlAttribute("Challenge_Content")]
-    public string ChallengeContent { get; set; }
+    public string Content { get; set; }
 
     [XmlAttribute("Challenge_Content_name")]
-    public string ChallengeContentName { get; set; }
+    public string ContentName { get; set; }
 
     [XmlAttribute("Challenge_Planet_User")]
-    public string ChallengePlanetUser { get; set; }
+    public string PlanetUser { get; set; }
 
     [XmlAttribute("Challenge_planetId")]
-    public ulong ChallengePlanetId { get; set; }
+    public ulong PlanetId { get; set; }
 
     [XmlAttribute("Challenge_photo_1")]
-    public ulong ChallengePhoto1 { get; set; }
+    public ulong Photo1 { get; set; }
 }
