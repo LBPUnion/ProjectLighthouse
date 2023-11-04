@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 namespace LBPUnion.ProjectLighthouse.Types.Serialization;
 
 [XmlRoot("Challenge_header")]
-public class GameChallenge : ILbpSerializable
+public partial class GameChallengeResponse : ILbpSerializable
 {
     [XmlElement("Total_challenges")]
     public int TotalChallenges { get; set; }
