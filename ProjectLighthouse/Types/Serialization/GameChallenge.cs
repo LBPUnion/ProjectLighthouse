@@ -10,7 +10,7 @@ public partial class GameChallengeResponse : ILbpSerializable
     public int TotalChallenges { get; set; }
 
     [XmlElement("Challenge_End_Date")]
-    public ulong EndDate { get; set; }
+    public ulong EndTime { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Bronze_Range")]
     public float BronzeRankPercentage { get; set; }
