@@ -26,7 +26,7 @@ public class GameChallenge : ILbpSerializable
 
     // ReSharper disable once IdentifierTypo
     [XmlElement("item_data")]
-    public List<ChallengeItemData> ChallengeItemDatas { get; set; }
+    public List<GameChallenge> Challenges { get; set; }
 
     #region Server challenge configuration
 
