@@ -254,7 +254,7 @@ public class ChallengeItemData
     public ulong StartTime { get; set; }
 
     [XmlAttribute("Challenge_active_date_ends")]
-    public ulong ActiveDateEnds { get; set; }
+    public ulong EndTime { get; set; }
 
     [XmlAttribute("Challenge_LAMSDescription_Id")]
     public string LamsDescriptionId { get; set; }
