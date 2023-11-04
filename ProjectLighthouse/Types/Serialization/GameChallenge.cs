@@ -19,7 +19,7 @@ public class GameChallenge : ILbpSerializable
     public float SilverRankPercentage { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Gold_Range")]
-    public decimal TopRankGoldPercentage { get; set; }
+    public float GoldRankPercentage { get; set; }
 
     [XmlElement("Challenge_CycleTime")]
     public ulong CycleTime { get; set; }
