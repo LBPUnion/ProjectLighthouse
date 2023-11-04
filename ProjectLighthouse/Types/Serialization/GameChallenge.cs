@@ -13,7 +13,7 @@ public class GameChallenge : ILbpSerializable
     public ulong EndDate { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Bronze_Range")]
-    public decimal TopRankBronzePercentage { get; set; }
+    public float BronzeRankPercentage { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Silver_Range")]
     public decimal TopRankSilverPercentage { get; set; }
