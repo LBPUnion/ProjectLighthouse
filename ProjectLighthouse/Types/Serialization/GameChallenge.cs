@@ -245,7 +245,7 @@ public partial class GameChallengeResponse : ILbpSerializable
     #endregion
 }
 
-public class ChallengeItemData
+public class GameChallenge
 {
     [XmlAttribute("Challenge_ID")]
     public int Id { get; set; }
