@@ -281,5 +281,5 @@ public class ChallengeItemData
     public ulong PlanetId { get; set; }
 
     [XmlAttribute("Challenge_photo_1")]
-    public ulong Photo1 { get; set; }
+    public ulong PhotoId { get; set; }
 }
