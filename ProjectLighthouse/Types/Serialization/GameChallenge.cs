@@ -16,7 +16,7 @@ public class GameChallenge : ILbpSerializable
     public float BronzeRankPercentage { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Silver_Range")]
-    public decimal TopRankSilverPercentage { get; set; }
+    public float SilverRankPercentage { get; set; }
 
     [XmlElement("Challenge_Top_Rank_Gold_Range")]
     public decimal TopRankGoldPercentage { get; set; }
