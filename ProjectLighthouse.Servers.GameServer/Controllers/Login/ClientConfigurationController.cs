@@ -43,9 +43,11 @@ public class ClientConfigurationController : ControllerBase
     [Produces("text/xml")]
     public IActionResult Conf() => this.Ok(new TelemetryConfigResponse());
 
+    // The challenge config here is currently based on the official server's config.
+    // We should probably make this configurable in the future.
     [HttpGet("ChallengeConfig.xml")]
     [Produces("text/xml")]
-    public IActionResult Challenges() => this.Ok();
+    public IActionResult Challenges() => this.Ok(GameChallengeResponse.ServerChallenges());
 
     [HttpGet("farc_hashes")]
     public IActionResult FarcHashes() => this.Ok();
@@ -75,12 +77,12 @@ public class ClientConfigurationController : ControllerBase
 
         PrivacySettings? settings = await this.DeserializeBody<PrivacySettings>();
         if (settings == null) return this.BadRequest();
-        
+
         if (settings.LevelVisibility != null)
         {
             PrivacyType? type = PrivacyTypeExtensions.FromSerializedString(settings.LevelVisibility);
             if (type == null) return this.BadRequest();
-            
+
             user.LevelVisibility = (PrivacyType)type;
         }
 
