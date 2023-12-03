@@ -34,10 +34,10 @@ jobs:
         if: ${{ matrix.os.database }}
         run: mysql -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} -h 127.0.0.1 -e "CREATE DATABASE ${{ env.DB_DATABASE }};";
 
-      - name: Install .NET 7.0
+      - name: Install .NET 8.0
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "7.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Compile
         run: |
@@ -59,7 +59,7 @@ jobs:
         if: ${{ matrix.os.webTest }}
         continue-on-error: true
         run: dotnet test -c Release --no-build --logger "trx;LogFileName=${{github.workspace}}/TestResults-${{matrix.os.prettyName}}-WebsiteTests.trx" ProjectLighthouse.Tests.WebsiteTests
-      
+
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
