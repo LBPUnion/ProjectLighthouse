@@ -16,7 +16,6 @@ public class DigestMiddleware : Middleware
         this.computeDigests = computeDigests;
     }
 
-    #if !DEBUG
     private static readonly HashSet<string> exemptPathList = new()
     {
         "/login",
@@ -28,17 +27,14 @@ public class DigestMiddleware : Middleware
         "/network_settings.nws",
         "/ChallengeConfig.xml",
     };
-    #endif
 
     public override async Task InvokeAsync(HttpContext context)
     {
         // Client digest check.
         if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie)) authCookie = string.Empty;
         string digestPath = context.Request.Path;
-        #if !DEBUG
         const string url = "/LITTLEBIGPLANETPS3_XML";
         string strippedPath = digestPath.Contains(url) ? digestPath[url.Length..] : "";
-        #endif
         byte[] bodyBytes = await context.Request.BodyReader.ReadAllAsync();
 
         bool usedAlternateDigestKey = false;
@@ -87,7 +83,7 @@ public class DigestMiddleware : Middleware
                     }
                 }
             }
-            #if !DEBUG
+
             // The game doesn't start sending digests until after the announcement so if it's not one of those requests
             // and it doesn't include a digest we need to reject the request
             else if (!exemptPathList.Contains(strippedPath))
@@ -95,7 +91,7 @@ public class DigestMiddleware : Middleware
                 context.Response.StatusCode = 403;
                 return;
             }
-            #endif
+
 
             context.Response.Headers.Append("X-Digest-B", clientRequestDigest);
             context.Request.Body.Position = 0;

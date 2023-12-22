@@ -413,8 +413,9 @@ public class DigestMiddlewareTests
         const string expectedServerDigest = "404e589cafbff7886fe9fc5ee8a5454b57d9cb50";
         const string expectedClientDigest = "80714c0936408855d86d47a650320f91895812d0";
         const string expectedContentLen = "2000";
+        const string expectedContentEncoding = "deflate";
         const string expectedCompressedContentLen = "23";
-        const string expectedData = "783F4B4C1C053F60143F3F51300A463F500700643F3F";
+        const string expectedData = "783F4B4C1C053F60143F3F51300A463F500700643F3F3F";
 
         context.Response.Body.Position = 0;
         string output = await new StreamReader(context.Response.Body).ReadToEndAsync();
@@ -423,8 +424,8 @@ public class DigestMiddlewareTests
         Assert.Equal(expectedCode, context.Response.StatusCode);
         Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
         Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
-        Assert.NotEmpty(context.Response.Headers["Content-Encoding"]);
         Assert.NotEmpty(context.Response.Headers["X-Original-Content-Length"]);
+        Assert.Equal(expectedContentEncoding, context.Response.Headers.ContentEncoding);
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
         Assert.Equal(expectedContentLen, context.Response.Headers["X-Original-Content-Length"][0]);
