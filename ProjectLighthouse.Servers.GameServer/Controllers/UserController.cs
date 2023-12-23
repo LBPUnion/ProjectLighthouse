@@ -4,6 +4,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -85,7 +86,9 @@ public class UserController : ControllerBase
         {
             if (string.IsNullOrWhiteSpace(resource)) continue;
 
-            if (!FileHelper.ResourceExists(resource)) return this.BadRequest();
+            if (!FileHelper.ResourceExists(resource) && !resource.StartsWith('g')) return this.BadRequest();
+
+            if (!GameResourceHelper.IsValidTexture(resource)) return this.BadRequest();
         }
 
         if (update.IconHash != null) user.IconHash = update.IconHash;

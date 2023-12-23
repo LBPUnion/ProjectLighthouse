@@ -13,4 +13,8 @@
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
     </ItemGroup>
     
+    <ItemGroup>
+        <EmbeddedResource Include="textureGuids.txt" />
+    </ItemGroup>
+    
 </Project>
