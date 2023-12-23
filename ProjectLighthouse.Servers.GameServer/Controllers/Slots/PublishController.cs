@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -154,6 +155,14 @@ public class PublishController : ControllerBase
                 LogArea.Publish);
             await this.database.SendNotification(user.UserId,
                 $"{slot.Name} failed to publish because the description is too long, {slot.Description.Length} characters. (LH-PUB-0005)");
+            return this.BadRequest();
+        }
+
+        if (!GameResourceHelper.IsValidTexture(slot.IconHash))
+        {
+            Logger.Warn("Rejecting level upload, invalid icon resource", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish because your level icon is invalid. (LH-PUB-0010)");
             return this.BadRequest();
         }
 

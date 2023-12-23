@@ -20,6 +20,7 @@ website notifications to indicate what went wrong.
 - `LH-PUB-0008`: The level failed to publish because the root level is not an LBP3 Adventure level.
 - `LH-PUB-0009`: The level failed to publish because the the user has reached their level publishing limit.
   - **Fix:** Delete some of your previously published levels to make room for new ones.
+- `LH-PUB-0010`: THe level failed to publish because the icon of the level is not a valid texture or image.
 
 ## Level Republishing
 
