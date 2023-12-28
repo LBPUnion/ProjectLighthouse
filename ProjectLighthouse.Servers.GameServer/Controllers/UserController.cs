@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -82,7 +81,7 @@ public class UserController : ControllerBase
         if (update.Location != null) user.Location = update.Location;
 
         // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
+        foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash,})
         {
             if (string.IsNullOrWhiteSpace(resource)) continue;
 
@@ -90,6 +89,9 @@ public class UserController : ControllerBase
 
             if (!GameResourceHelper.IsValidTexture(resource)) return this.BadRequest();
         }
+
+        if (!string.IsNullOrWhiteSpace(update.PlanetHash) && !GameResourceHelper.IsValidLevel(update.PlanetHash))
+            return this.BadRequest();
 
         if (update.IconHash != null) user.IconHash = update.IconHash;
 

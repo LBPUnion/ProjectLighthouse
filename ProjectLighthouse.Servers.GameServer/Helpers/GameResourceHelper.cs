@@ -37,4 +37,13 @@ public static class GameResourceHelper
         return LbpFile.FromHash(resource)?.FileType is LbpFileType.Png or LbpFileType.Jpeg or LbpFileType.Painting
             or LbpFileType.Texture;
     }
+
+    public static bool IsValidLevel(string resource)
+    {
+        if (!FileHelper.IsResourceValid(resource)) return false;
+
+        // Technically this method could be used (and is used) to check if a planet is valid,
+        // but I'm keeping the method name as is for semantic reasons.
+        return LbpFile.FromHash(resource)?.FileType is LbpFileType.Level;
+    }
 }
