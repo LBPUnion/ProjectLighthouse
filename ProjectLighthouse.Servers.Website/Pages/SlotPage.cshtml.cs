@@ -47,7 +47,8 @@ public class SlotPage : BaseLayout
             return this.NotFound();
 
         string slotSlug = slot.GenerateSlug();
-        if (slug == null || slotSlug != slug)
+        // Only redirect if there is a valid slug for this level and the current slug doesn't match 
+        if (!string.IsNullOrWhiteSpace(slotSlug) && (slug == null || slotSlug != slug))
         {
             return this.Redirect($"~/slot/{id}/{slotSlug}");
         }
