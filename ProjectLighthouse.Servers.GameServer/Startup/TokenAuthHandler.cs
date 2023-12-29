@@ -17,10 +17,8 @@ public class TokenAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
     (
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         UrlEncoder encoder,
-        ISystemClock clock,
         DatabaseContext database
-        // I said I don't want any damn vegetables (logs)
-    ) : base(options, new NullLoggerFactory(), encoder, clock)
+    ) : base(options, new NullLoggerFactory(), encoder)
     {
         this.database = database;
     }
