@@ -37,6 +37,13 @@ public class RenameUserCommand : ICommand
             }
         }
 
+        // prevent the placeholder user from being renamed
+        if (user.Username.Length == 0)
+        {
+            logger.LogError("Cannot rename the placeholder user", LogArea.Command);
+            return;
+        }
+
         user.Username = args[1];
         await database.SaveChangesAsync();
 
