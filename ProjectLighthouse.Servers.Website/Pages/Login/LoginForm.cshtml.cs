@@ -87,7 +87,7 @@ public class LoginForm : BaseLayout
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
-            ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromDays(7),
             Verified = !ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled || !user.IsTwoFactorSetup,
         };
 

@@ -29,7 +29,7 @@ public class CreateApiKeyCommand : ICommand
             key.Description = "<no description specified>";
         }
         key.Key = CryptoHelper.GenerateAuthToken();
-        key.Created = DateTime.Now;
+        key.Created = DateTime.UtcNow;
         DatabaseContext database = provider.GetRequiredService<DatabaseContext>();
         await database.APIKeys.AddAsync(key);
         await database.SaveChangesAsync();
