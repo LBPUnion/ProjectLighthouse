@@ -19,6 +19,7 @@ public class ModerationTests
         ModerationCaseEntity @case = new()
         {
             CaseId = 1,
+            CreatorId = 1,
             ExpiresAt = DateTime.UnixEpoch,
             CreatorUsername = "unitTestUser",
         };
@@ -41,6 +42,7 @@ public class ModerationTests
         ModerationCaseEntity @case = new()
         {
             CaseId = 2,
+            CreatorId = 1,
             ExpiresAt = DateTime.UtcNow.AddHours(1),
             CreatorUsername = "unitTestUser",
         };
@@ -63,6 +65,7 @@ public class ModerationTests
         ModerationCaseEntity @case = new()
         {
             CaseId = 3,
+            CreatorId = 1,
             ExpiresAt = DateTime.UnixEpoch,
             DismissedAt = DateTime.UnixEpoch,
             CreatorUsername = "unitTestUser",

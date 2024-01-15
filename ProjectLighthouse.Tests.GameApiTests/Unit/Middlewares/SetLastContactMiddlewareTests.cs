@@ -87,7 +87,7 @@ public class SetLastContactMiddlewareTests
             },
         };
 
-        DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[]{lastContacts,});
+        DatabaseContext dbMock = await MockHelper.GetTestDatabase(lastContacts);
 
         await middleware.InvokeAsync(context, dbMock);
 
@@ -132,10 +132,7 @@ public class SetLastContactMiddlewareTests
         };
         tokens[0].GameVersion = GameVersion.LittleBigPlanet2;
 
-        DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[]
-        {
-            tokens,
-        });
+        DatabaseContext dbMock = await MockHelper.GetTestDatabase(tokens);
 
         await middleware.InvokeAsync(context, dbMock);
 

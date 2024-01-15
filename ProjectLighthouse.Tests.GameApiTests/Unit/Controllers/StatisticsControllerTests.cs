@@ -40,18 +40,21 @@ public class StatisticsControllerTests
             new SlotEntity
             {
                 SlotId = 1,
+                CreatorId = 1,
             },
             new SlotEntity
             {
                 SlotId = 2,
+                CreatorId = 1,
             },
             new SlotEntity
             {
                 SlotId = 3,
+                CreatorId = 1,
                 TeamPick = true,
             },
         };
-        await using DatabaseContext db = await MockHelper.GetTestDatabase(new []{slots,});
+        await using DatabaseContext db = await MockHelper.GetTestDatabase(slots);
 
         StatisticsController statsController = new(db);
         statsController.SetupTestController();
@@ -74,21 +77,24 @@ public class StatisticsControllerTests
             new SlotEntity
             {
                 SlotId = 1,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
             new SlotEntity
             {
                 SlotId = 2,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
             new SlotEntity
             {
                 SlotId = 3,
+                CreatorId = 1,
                 TeamPick = true,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
         };
-        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[]{slots,});
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(slots);
 
         StatisticsController statsController = new(dbMock);
         statsController.SetupTestController();
@@ -111,21 +117,24 @@ public class StatisticsControllerTests
             new SlotEntity
             {
                 SlotId = 1,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanet1,
             },
             new SlotEntity
             {
                 SlotId = 2,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanet1,
             },
             new SlotEntity
             {
                 SlotId = 3,
+                CreatorId = 1,
                 TeamPick = true,
                 GameVersion = GameVersion.LittleBigPlanet1,
             },
         };
-        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[] {slots,});
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(slots);
 
         StatisticsController statsController = new(dbMock);
         statsController.SetupTestController();
@@ -146,21 +155,24 @@ public class StatisticsControllerTests
             new SlotEntity
             {
                 SlotId = 1,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
             new SlotEntity
             {
                 SlotId = 2,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
             new SlotEntity
             {
                 SlotId = 3,
+                CreatorId = 1,
                 TeamPick = true,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
         }; 
-        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[] {slots,});
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(slots);
 
         StatisticsController statsController = new(dbMock);
         statsController.SetupTestController();
