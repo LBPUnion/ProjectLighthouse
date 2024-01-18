@@ -94,7 +94,7 @@ public class CommentControllerTests
                 Type = SlotType.User,
             },
         };
-        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[]{slots,});
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(slots);
 
         CommentController commentController = new(dbMock);
         commentController.SetupTestController("<comment><message>test</message></comment>");
@@ -122,7 +122,7 @@ public class CommentControllerTests
                 Type = SlotType.Developer,
             },
         };
-        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new[] { slots, });
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(slots);
 
         CommentController commentController = new(dbMock);
         commentController.SetupTestController("<comment><message>test</message></comment>");

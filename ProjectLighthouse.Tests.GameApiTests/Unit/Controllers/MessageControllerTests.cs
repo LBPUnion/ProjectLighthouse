@@ -205,7 +205,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     {
         List<UserEntity> users = new()
         {
-            MockHelper.GetUnitTestUser(),
             new UserEntity
             {
                 UserId = 2,
@@ -259,10 +258,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
     {
         UserEntity unitTestUser = MockHelper.GetUnitTestUser();
         unitTestUser.EmailAddressVerified = true;
-        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(new List<UserEntity>
-        {
-            unitTestUser,
-        });
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase();
 
         Mock<IMailService> mailMock = getMailServiceMock();
 
