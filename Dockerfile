@@ -30,7 +30,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copy build files
 COPY --from=build /ProjectLighthouse/publish /lighthouse/app
-COPY --from=build /ProjectLighthouse/ProjectLighthouse/StaticFiles /lighthouse/temp/StaticFiles
+COPY --from=build /ProjectLighthouse/ProjectLighthouse.Servers.Website/StaticFiles /lighthouse/temp/StaticFiles
 COPY --from=build /ProjectLighthouse/scripts-and-tools/docker-entrypoint.sh /lighthouse
 
 RUN chown -R lighthouse:lighthouse /lighthouse && \
