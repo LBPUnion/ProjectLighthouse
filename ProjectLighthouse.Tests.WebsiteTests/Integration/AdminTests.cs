@@ -28,7 +28,7 @@ public class AdminTests : LighthouseWebTest
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
-            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromHours(1),
             Verified = true,
         };
 
@@ -55,7 +55,7 @@ public class AdminTests : LighthouseWebTest
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
-            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromHours(1),
             Verified = true,
         };
 

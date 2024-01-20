@@ -72,7 +72,7 @@ public partial class DatabaseContext
             Platform = npTicket.Platform,
             TicketHash = npTicket.TicketHash,
             // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
-            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromHours(1),
         };
 
         this.GameTokens.Add(gameToken);

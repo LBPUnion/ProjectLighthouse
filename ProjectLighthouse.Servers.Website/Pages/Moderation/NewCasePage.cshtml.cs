@@ -98,7 +98,7 @@ public class NewCasePage : BaseLayout
             Reason = reason,
             ModeratorNotes = modNotes,
             ExpiresAt = expires,
-            CreatedAt = DateTime.Now,
+            CreatedAt = DateTime.UtcNow,
             CreatorId = user.UserId,
             CreatorUsername = user.Username,
             AffectedId = affectedId.Value,

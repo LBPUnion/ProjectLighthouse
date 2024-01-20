@@ -109,7 +109,7 @@ public class UserEndpoints : ApiEndpointController
 
         RegistrationTokenEntity token = new()
         {
-            Created = DateTime.Now,
+            Created = DateTime.UtcNow,
             Token = CryptoHelper.GenerateAuthToken(),
             Username = username,
         };
