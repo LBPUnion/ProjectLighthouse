@@ -8,9 +8,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectLighthouse.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230814031609_AddPublishedAtToAnnouncements")]
-    public partial class AddPublishedAtToAnnouncements : Migration
+    [Migration("20240120214606_AddPublishedAtToWebAnnouncements")]
+    public partial class AddPublishedAtToWebAnnouncements : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
@@ -21,6 +22,7 @@ namespace ProjectLighthouse.Migrations
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

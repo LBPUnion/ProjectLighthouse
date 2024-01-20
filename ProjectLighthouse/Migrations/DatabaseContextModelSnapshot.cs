@@ -1107,6 +1107,9 @@ namespace ProjectLighthouse.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int?>("PublisherId")
                         .HasColumnType("int");
 
