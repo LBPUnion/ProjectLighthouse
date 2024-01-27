@@ -89,7 +89,7 @@ public class RegisterForm : BaseLayout
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
-            ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromDays(7),
         };
 
         this.Database.WebTokens.Add(webToken);

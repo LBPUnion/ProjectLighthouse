@@ -117,7 +117,7 @@ public static class MaintenanceHelper
         CompletedMigrationEntity completedMigration = new()
         {
             MigrationName = migrationTask.GetType().Name,
-            RanAt = DateTime.Now,
+            RanAt = DateTime.UtcNow,
         };
 
         database.CompletedMigrations.Add(completedMigration);

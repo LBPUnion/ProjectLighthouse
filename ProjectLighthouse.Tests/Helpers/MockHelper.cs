@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
@@ -14,6 +14,7 @@ using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -42,17 +43,22 @@ public static class MockHelper
 
     public static T2 CastTo<T1, T2>(this IActionResult result) where T1 : ObjectResult
     {
-        Assert.IsType<T1>(result);
-        T1? typedResult = result as T1;
+        T1 typedResult = Assert.IsType<T1>(result);
         Assert.NotNull(typedResult);
         Assert.NotNull(typedResult.Value);
-        Assert.IsType<T2?>(typedResult.Value);
-        T2? finalResult = (T2?)typedResult.Value;
+        T2 finalResult = Assert.IsType<T2>(typedResult.Value);
         Assert.NotNull(finalResult);
         return finalResult;
     }
 
-    public static async Task<DatabaseContext> GetTestDatabase(IEnumerable<IList> sets, [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0)
+    private static async Task<DbContextOptionsBuilder<DatabaseContext>> GetInMemoryDbOptions()
+    {
+        DbConnection connection = new SqliteConnection("DataSource=:memory:");
+        await connection.OpenAsync();
+        return new DbContextOptionsBuilder<DatabaseContext>().UseSqlite(connection);
+    }
+
+    public static async Task<DatabaseContext> GetTestDatabase(params object[] sets)
     {
         await RoomHelper.Rooms.RemoveAllAsync();
 
@@ -64,27 +70,32 @@ public static class MockHelper
             setDict[type] = list;
         }
 
-        if (!setDict.TryGetValue(typeof(GameTokenEntity), out _))
+        setDict.TryAdd(typeof(GameTokenEntity), new List<GameTokenEntity>());
+        setDict.TryAdd(typeof(UserEntity), new List<UserEntity>());
+
+        // add the default user token if another token with id 1 isn't specified
+        if (setDict.TryGetValue(typeof(GameTokenEntity), out IList? tokens))
         {
-            setDict[typeof(GameTokenEntity)] = new List<GameTokenEntity>
+            if (tokens.Cast<GameTokenEntity>().FirstOrDefault(t => t.TokenId == 1) == null)
             {
-                GetUnitTestToken(),
-            };
+                setDict[typeof(GameTokenEntity)].Add(GetUnitTestToken());
+            }
         }
 
-        if (!setDict.TryGetValue(typeof(UserEntity), out _))
+        // add the default user if another user with id 1 isn't specified
+        if (setDict.TryGetValue(typeof(UserEntity), out IList? users))
         {
-            setDict[typeof(UserEntity)] = new List<UserEntity>
+            if (users.Cast<UserEntity>().FirstOrDefault(u => u.UserId == 1) == null)
             {
-                GetUnitTestUser(),
-            };
+                setDict[typeof(UserEntity)].Add(GetUnitTestUser());
+            }
         }
 
-        DbContextOptions<DatabaseContext> options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase($"{caller}_{lineNum}")
-            .Options;
+        DbContextOptions<DatabaseContext> options = (await GetInMemoryDbOptions()).Options;
 
         await using DatabaseContext context = new(options);
+        await context.Database.EnsureCreatedAsync();
+
         foreach (IList list in setDict.Select(p => p.Value))
         {
             foreach (object item in list)
@@ -93,35 +104,8 @@ public static class MockHelper
             }
         }
 
-
         await context.SaveChangesAsync();
-        await context.DisposeAsync();
-        return new DatabaseContext(options);
-    }
 
-    public static async Task<DatabaseContext> GetTestDatabase(List<UserEntity>? users = null, List<GameTokenEntity>? tokens = null,
-        [CallerMemberName] string caller = "", [CallerLineNumber] int lineNum = 0
-    )
-    {
-        await RoomHelper.Rooms.RemoveAllAsync();
-
-        users ??= new List<UserEntity>
-        {
-            GetUnitTestUser(),
-        };
-
-        tokens ??= new List<GameTokenEntity>
-        {
-            GetUnitTestToken(),
-        };
-        DbContextOptions<DatabaseContext> options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase($"{caller}_{lineNum}")
-            .Options;
-        await using DatabaseContext context = new(options);
-        context.Users.AddRange(users);
-        context.GameTokens.AddRange(tokens);
-        await context.SaveChangesAsync();
-        await context.DisposeAsync();
         return new DatabaseContext(options);
     }
 

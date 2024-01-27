@@ -28,7 +28,7 @@ public class ModerationCaseEntity
     public DateTime CreatedAt { get; set; }
     
     public DateTime? ExpiresAt { get; set; }
-    public bool Expired => this.ExpiresAt != null && this.ExpiresAt < DateTime.Now;
+    public bool Expired => this.ExpiresAt != null && this.ExpiresAt < DateTime.UtcNow;
 
     public DateTime? DismissedAt { get; set; }
     public bool Dismissed => this.DismissedAt != null;

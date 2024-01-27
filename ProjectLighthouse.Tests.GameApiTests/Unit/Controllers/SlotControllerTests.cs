@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Database;
@@ -57,26 +57,29 @@ public class SlotControllerTests
         };
         List<UserEntity> users = new()
         {
-            MockHelper.GetUnitTestUser(),
             new UserEntity
             {
                 Username = "bytest",
                 UserId = 2,
             },
+            new UserEntity
+            {
+                Username = "user3",
+                UserId = 3,
+            },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new IList[]
-        {
-            slots, users,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots, users);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
         IActionResult result = await slotsController.SlotsBy("bytest");
 
         const int expectedElements = 2;
+        HashSet<int> expectedSlotIds = new(){1, 2,};
 
         GenericSlotResponse slotResponse = result.CastTo<OkObjectResult, GenericSlotResponse>();
         Assert.Equal(expectedElements, slotResponse.Slots.Count);
+        Assert.Equal(expectedSlotIds, slotResponse.Slots.OfType<GameUserSlot>().Select(s => s.SlotId).ToHashSet());
     }
 
     [Fact]
@@ -105,17 +108,13 @@ public class SlotControllerTests
         };
         List<UserEntity> users = new()
         {
-            MockHelper.GetUnitTestUser(),
             new UserEntity
             {
                 Username = "bytest",
                 UserId = 2,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new IList[]
-        {
-            slots, users,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots, users);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
@@ -143,13 +142,11 @@ public class SlotControllerTests
         {
             new SlotEntity
             {
+                CreatorId = 1,
                 SlotId = 2,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new[]
-        {
-            slots,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
@@ -165,14 +162,12 @@ public class SlotControllerTests
         {
             new SlotEntity
             {
+                CreatorId = 1,
                 SlotId = 2,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new[]
-        {
-            slots,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
@@ -195,13 +190,11 @@ public class SlotControllerTests
             new SlotEntity
             {
                 SlotId = 2,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanetVita,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new IList[]
-        {
-            slots, tokens,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots, tokens);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController(token);
 
@@ -224,13 +217,11 @@ public class SlotControllerTests
             new SlotEntity
             {
                 SlotId = 2,
+                CreatorId = 1,
                 GameVersion = GameVersion.LittleBigPlanet1,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new IList[]
-        {
-            slots, tokens,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots, tokens);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController(token);
 
@@ -259,14 +250,11 @@ public class SlotControllerTests
             new SlotEntity
             {
                 SlotId = 27,
-                CreatorId = 4,
+                CreatorId = 1,
                 SubLevel = false,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new[]
-        {
-            slots,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
@@ -283,14 +271,11 @@ public class SlotControllerTests
             new SlotEntity
             {
                 SlotId = 27,
-                CreatorId = 4,
+                CreatorId = 1,
                 Hidden = true,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new[]
-        {
-            slots,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
@@ -307,13 +292,11 @@ public class SlotControllerTests
             new SlotEntity
             {
                 SlotId = 27,
+                CreatorId = 1,
                 Type = SlotType.Developer,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new[]
-        {
-            slots,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
@@ -330,11 +313,11 @@ public class SlotControllerTests
             new SlotEntity
             {
                 SlotId = 27,
-                CreatorId = 4,
+                CreatorId = 1,
                 SubLevel = true,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new []{slots,});
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots);
         SlotsController slotsController = new(db);
         slotsController.SetupTestController();
 
@@ -353,14 +336,12 @@ public class SlotControllerTests
             new SlotEntity
             {
                 SlotId = 1,
+                CreatorId = 1,
                 InternalSlotId = 25,
                 Type = SlotType.Developer,
             },
         };
-        DatabaseContext db = await MockHelper.GetTestDatabase(new[]
-        {
-            slots,
-        });
+        DatabaseContext db = await MockHelper.GetTestDatabase(slots);
         SlotsController controller = new(db);
         controller.SetupTestController();
 
@@ -405,31 +386,32 @@ public class SlotControllerTests
         roomMutex.WaitOne();
         try
         {
-            DatabaseContext db = await MockHelper.GetTestDatabase(new[]
+            DatabaseContext db = await MockHelper.GetTestDatabase(new List<SlotEntity>
             {
-                new List<SlotEntity>
+                new()
                 {
-                    new()
-                    {
-                        SlotId = 1,
-                        Type = SlotType.User,
-                    },
-                    new()
-                    {
-                        SlotId = 2,
-                        Type = SlotType.User,
-                    },
-                    new()
-                    {
-                        SlotId = 3,
-                        Type = SlotType.User,
-                    },
-                    new()
-                    {
-                        SlotId = 4,
-                        Type = SlotType.Developer,
-                        InternalSlotId = 10,
-                    },
+                    SlotId = 1,
+                    CreatorId = 1,
+                    Type = SlotType.User,
+                },
+                new()
+                {
+                    SlotId = 2,
+                    CreatorId = 1,
+                    Type = SlotType.User,
+                },
+                new()
+                {
+                    SlotId = 3,
+                    CreatorId = 1,
+                    Type = SlotType.User,
+                },
+                new()
+                {
+                    SlotId = 4,
+                    CreatorId = 1,
+                    Type = SlotType.Developer,
+                    InternalSlotId = 10,
                 },
             });
             SlotsController controller = new(db);
@@ -466,16 +448,14 @@ public class SlotControllerTests
         roomMutex.WaitOne();
         try
         {
-            DatabaseContext db = await MockHelper.GetTestDatabase(new[]
+            DatabaseContext db = await MockHelper.GetTestDatabase(new List<SlotEntity>
             {
-                new List<SlotEntity>
+                new()
                 {
-                    new()
-                    {
-                        SlotId = 4,
-                        Type = SlotType.Developer,
-                        InternalSlotId = 10,
-                    },
+                    SlotId = 4,
+                    CreatorId = 1,
+                    Type = SlotType.Developer,
+                    InternalSlotId = 10,
                 },
             });
             SlotsController controller = new(db);
