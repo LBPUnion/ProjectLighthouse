@@ -46,6 +46,8 @@ public static class SMTPHelper
     {
         if (!CanSendMail(user)) return;
 
+        if (await database.PasswordResetTokens.CountAsync(t => t.UserId == user.UserId) > 0) return;
+
         PasswordResetTokenEntity token = new()
         {
             Created = DateTime.UtcNow,
@@ -59,7 +61,8 @@ public static class SMTPHelper
         string messageBody = $"Hello, {user.Username}.\n\n" +
                              "A request to reset your account's password was issued. If this wasn't you, this can probably be ignored.\n\n" +
                              $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be reset at the following link:\n" +
-                             $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={token.ResetToken}";
+                             $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={token.ResetToken}\n\n" + 
+                             "This link will expire in 24 hours";
 
         await mail.SendEmailAsync(user.EmailAddress, $"Project Lighthouse Password Reset Request for {user.Username}", messageBody);
 
