@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -166,11 +165,10 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         var stats = await database.Users.Where(u => u.UserId == this.UserId)
             .Select(_ => new
             {
-                Username = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.Username).First(),
                 BonusSlots = database.Users.Where(u => u.UserId == this.UserId).Select(u => u.AdminGrantedSlots).First(),
                 PlaylistCount = database.Playlists.Count(p => p.CreatorId == this.UserId),
                 ReviewCount = database.Reviews.Count(r => r.ReviewerId == this.UserId),
-                CommentCount = database.Comments.Count(c => c.TargetId == this.UserId && c.Type == CommentType.Profile),
+                CommentCount = database.Comments.Count(c => c.TargetUserId == this.UserId),
                 HeartCount = database.HeartedProfiles.Count(h => h.HeartedUserId == this.UserId),
                 PhotosByMeCount = database.Photos.Count(p => p.CreatorId == this.UserId),
                 PhotosWithMeCount = database.Photos.Include(p => p.PhotoSubjects)
@@ -180,9 +178,9 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
                 HeartedPlaylistCount = database.HeartedPlaylists.Count(h => h.UserId == this.UserId),
                 QueuedLevelCount = database.QueuedLevels.Count(q => q.UserId == this.UserId),
             })
-            .FirstOrDefaultAsync();
+            .OrderBy(_ => 1)
+            .FirstAsync();
 
-        this.UserHandle.Username = stats.Username;
         this.CommentsEnabled = this.CommentsEnabled && ServerConfiguration.Instance.UserGeneratedContentLimits.ProfileCommentsEnabled;
 
         int entitledSlots = ServerConfiguration.Instance.UserGeneratedContentLimits.EntitledSlots + stats.BonusSlots;
@@ -195,7 +193,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         if (this.TargetGame == GameVersion.LittleBigPlanetVita)
         {
             this.Lbp2EntitledSlots = entitledSlots;
-            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync();
+            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanetVita).CountAsync();
         }
         else
         {
@@ -204,7 +202,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
             this.CrossControlEntitledSlots = entitledSlots;
             this.Lbp3EntitledSlots = entitledSlots;
             this.Lbp1UsedSlots = await SlotCount(GameVersion.LittleBigPlanet1).CountAsync();
-            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync();
+            this.Lbp2UsedSlots = await SlotCount(GameVersion.LittleBigPlanet2).CountAsync(s => !s.CrossControllerRequired);
             this.Lbp3UsedSlots = await SlotCount(GameVersion.LittleBigPlanet3).CountAsync();
             
             this.Lbp1FreeSlots = this.Lbp1EntitledSlots - this.Lbp1UsedSlots;
@@ -236,7 +234,7 @@ public class GameUser : ILbpSerializable, INeedsPreparationForSerialization
         new()
         {
             UserId = entity.UserId,
-            UserHandle = new NpHandle("", entity.IconHash),
+            UserHandle = new NpHandle(entity.Username, entity.IconHash),
             Biography = entity.Biography,
             Location = entity.Location,
             ProfilePins = entity.Pins,

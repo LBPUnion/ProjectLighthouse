@@ -2,19 +2,18 @@
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Servers.Website.Types;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
-using LBPUnion.ProjectLighthouse.Types.Maintenance;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin;
 
 public class AdminPanelPage : BaseLayout
 {
-    public List<ICommand> Commands = MaintenanceHelper.Commands;
     public AdminPanelPage(DatabaseContext database) : base(database)
     { }
 
@@ -28,8 +27,8 @@ public class AdminPanelPage : BaseLayout
         if (user == null) return this.Redirect("~/login");
         if (!user.IsAdmin) return this.NotFound();
 
-        this.Statistics.Add(new AdminPanelStatistic("Users", await StatisticsHelper.UserCount(this.Database), "/admin/users"));
-        this.Statistics.Add(new AdminPanelStatistic("Slots", await StatisticsHelper.SlotCount(this.Database)));
+        this.Statistics.Add(new AdminPanelStatistic("Users", await StatisticsHelper.UserCount(this.Database), "/admin/users/0"));
+        this.Statistics.Add(new AdminPanelStatistic("Slots", await StatisticsHelper.SlotCount(this.Database, new SlotQueryBuilder())));
         this.Statistics.Add(new AdminPanelStatistic("Photos", await StatisticsHelper.PhotoCount(this.Database)));
         this.Statistics.Add(new AdminPanelStatistic("API Keys", await StatisticsHelper.ApiKeyCount(this.Database), "/admin/keys"));
 
@@ -39,7 +38,7 @@ public class AdminPanelPage : BaseLayout
             args = command + " " + args;
             string[] split = args.Split(" ");
 
-            List<LogLine> runCommand = await MaintenanceHelper.RunCommand(split);
+            List<LogLine> runCommand = await MaintenanceHelper.RunCommand(this.HttpContext.RequestServices, split);
             return this.Redirect($"~/admin?log={CryptoHelper.ToBase64(runCommand.ToLogString())}");
         }
 

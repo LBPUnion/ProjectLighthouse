@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -18,40 +17,12 @@ namespace LBPUnion.ProjectLighthouse.Serialization;
 /// </summary>
 public class CustomXmlSerializer : XmlSerializer
 {
-    private readonly IServiceProvider provider;
+    public CustomXmlSerializer(Type type, XmlRootAttribute rootAttribute) : base(type, rootAttribute)
+    { }
 
-    public CustomXmlSerializer(Type type, IServiceProvider provider, XmlRootAttribute rootAttribute) : base(type, rootAttribute)
+    public void Serialize(IServiceProvider provider, XmlWriter xmlWriter, object o, XmlSerializerNamespaces namespaces)
     {
-        this.provider = provider;
-    }
-
-    public new void Serialize(object o, XmlSerializationWriter xmlSerializationWriter)
-    {
-        this.TriggerCallback(o);
-        base.Serialize(o, xmlSerializationWriter);
-    }
-
-    public new void Serialize(Stream stream, object o)
-    {
-        this.TriggerCallback(o);
-        base.Serialize(stream, o);
-    }
-
-    public new void Serialize(TextWriter textWriter, object o)
-    {
-        this.TriggerCallback(o);
-        base.Serialize(textWriter, o);
-    }
-
-    public new void Serialize(XmlWriter xmlWriter, object o)
-    {
-        this.TriggerCallback(o);
-        base.Serialize(xmlWriter, o);
-    }
-
-    public new void Serialize(XmlWriter xmlWriter, object o, XmlSerializerNamespaces namespaces)
-    {
-        this.TriggerCallback(o);
+        this.TriggerCallback(provider, o);
         base.Serialize(xmlWriter, o, namespaces);
     }
 
@@ -86,11 +57,12 @@ public class CustomXmlSerializer : XmlSerializer
     /// <summary>
     /// Recursively finds all properties of an object
     /// </summary>
+    /// <param name="provider">The service provider from the ASP.NET request that is used to resolve dependencies</param>
     /// <param name="obj">The object to recursively find all properties of</param>
     /// <param name="alreadyPrepared">A list of type references that have already been prepared to prevent duplicate preparing</param>
     /// <param name="recursionDepth">A number tracking how deep into the recursion call stack we are to prevent recursive loops</param>
     /// <returns>A list of object references of all properties of the object</returns>
-    public void RecursivelyPrepare(object obj, List<INeedsPreparationForSerialization> alreadyPrepared, int recursionDepth = 0)
+    private void RecursivelyPrepare(IServiceProvider provider, object obj, ICollection<INeedsPreparationForSerialization> alreadyPrepared, int recursionDepth = 0)
     {
         if (recursionDepth > 5) return;
         switch (obj)
@@ -98,7 +70,7 @@ public class CustomXmlSerializer : XmlSerializer
             case INeedsPreparationForSerialization needsPreparation:
                 if (alreadyPrepared.Contains(needsPreparation)) break;
 
-                this.PrepareForSerialization(needsPreparation);
+                PrepareForSerialization(provider, needsPreparation);
                 alreadyPrepared.Add(needsPreparation);
                 break;
             case null: return;
@@ -119,8 +91,9 @@ public class CustomXmlSerializer : XmlSerializer
                 }
                 
             }
-            // Otherwise if the object isn't a ILbpSerializable, skip
-            else if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType))
+            // Otherwise if the object isn't a ILbpSerializable or a nullable ILbpSerializable, skip
+            else if (!typeof(ILbpSerializable).IsAssignableFrom(propertyInfo.PropertyType) &&
+                     !typeof(ILbpSerializable).IsAssignableFrom(Nullable.GetUnderlyingType(propertyInfo.PropertyType)))
             {
                 continue;
             }
@@ -131,32 +104,32 @@ public class CustomXmlSerializer : XmlSerializer
                 case IList list:
                     foreach (object o in list)
                     {
-                        this.RecursivelyPrepare(o, alreadyPrepared, recursionDepth+1);
+                        this.RecursivelyPrepare(provider, o, alreadyPrepared, recursionDepth+1);
                     }
                     break;
                 case INeedsPreparationForSerialization nP:
                     if (alreadyPrepared.Contains(nP)) break;
 
                     // Prepare object
-                    this.PrepareForSerialization(nP);
+                    PrepareForSerialization(provider, nP);
                     alreadyPrepared.Add(nP);
 
                     // Recursively find objects in this INeedsPreparationForSerialization object
-                    this.RecursivelyPrepare(nP, alreadyPrepared, recursionDepth+1);
+                    this.RecursivelyPrepare(provider, nP, alreadyPrepared, recursionDepth+1);
                     break;
                 case ILbpSerializable serializable:
                     // Recursively find objects in this ILbpSerializable object
-                    this.RecursivelyPrepare(serializable, alreadyPrepared, recursionDepth+1);
+                    this.RecursivelyPrepare(provider, serializable, alreadyPrepared, recursionDepth+1);
                     break;
             }
         }
     }
 
-    public void PrepareForSerialization(INeedsPreparationForSerialization obj) 
-        => LighthouseSerializer.PrepareForSerialization(this.provider, obj);
+    private static void PrepareForSerialization(IServiceProvider provider, INeedsPreparationForSerialization obj) 
+        => LighthouseSerializer.PrepareForSerialization(provider, obj);
 
-    public void TriggerCallback(object o)
+    private void TriggerCallback(IServiceProvider provider, object o)
     {
-        this.RecursivelyPrepare(o, new List<INeedsPreparationForSerialization>());
+        this.RecursivelyPrepare(provider, o, new List<INeedsPreparationForSerialization>());
     }
 }

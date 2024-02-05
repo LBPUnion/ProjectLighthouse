@@ -1,21 +1,14 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Tickets.Parser;
+using LBPUnion.ProjectLighthouse.Tickets.Signature;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Users;
-using Org.BouncyCastle.Asn1;
-using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Math.EC;
-using Org.BouncyCastle.Security;
 #if DEBUG
 using System.Text.Json;
 #endif
@@ -27,224 +20,78 @@ namespace LBPUnion.ProjectLighthouse.Tickets;
 /// </summary>
 public class NPTicket
 {
-    public string? Username { get; set; }
+    public string Username { get; protected internal set; } = "";
 
-    private TicketVersion? ticketVersion { get; set; }
-
-    public Platform Platform { get; set; }
+    public Platform Platform { get; private set; }
+    public GameVersion GameVersion { get; private set; }
+    public string TicketHash { get; private set; } = "";
 
     public uint IssuerId { get; set; }
-    public ulong IssuedDate { get; set; }
-    public ulong ExpireDate { get; set; }
+    public ulong IssueTime { get; set; }
+    public ulong ExpireTime { get; set; }
     public ulong UserId { get; set; }
-    public string TicketHash { get; set; } = "";
 
-    private string? titleId { get; set; }
+    private TicketVersion? TicketVersion { get; set; }
 
-    private byte[] ticketBody { get; set; } = Array.Empty<byte>();
+    protected internal string TitleId { get; set; } = "";
 
-    private byte[] ticketSignature { get; set; } = Array.Empty<byte>();
-    private byte[] ticketSignatureIdentifier { get; set; } = Array.Empty<byte>();
+    private TicketSignatureVerifier SignatureVerifier { get; set; } = new NullSignatureVerifier();
 
-    public GameVersion GameVersion { get; set; }
+    protected internal SectionHeader BodyHeader { get; set; }
 
-    private static ECDomainParameters FromX9EcParams(X9ECParameters param) =>
-        new(param.Curve, param.G, param.N, param.H, param.GetSeed());
+    protected internal byte[] Data { get; set; } = Array.Empty<byte>();
+    protected internal byte[] TicketSignature { get; set; } = Array.Empty<byte>();
+    protected internal byte[] TicketSignatureIdentifier { get; set; } = Array.Empty<byte>();
 
-    public static readonly ECDomainParameters Secp224K1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp224k1"));
-    public static readonly ECDomainParameters Secp192R1 = FromX9EcParams(ECNamedCurveTable.GetByName("secp192r1"));
-
-    private static readonly ECPoint rpcnPublic = Secp224K1.Curve.CreatePoint(
-        new BigInteger("b07bc0f0addb97657e9f389039e8d2b9c97dc2a31d3042e7d0479b93", 16),
-        new BigInteger("d81c42b0abdf6c42191a31e31f93342f8f033bd529c2c57fdb5a0a7d", 16));
-
-    private static readonly ECPoint psnPublic = Secp192R1.Curve.CreatePoint(
-        new BigInteger("39c62d061d4ee35c5f3f7531de0af3cf918346526edac727", 16),
-        new BigInteger("a5d578b55113e612bf1878d4cc939d61a41318403b5bdf86", 16));
-
-    private static readonly ECPoint unitTestPublic = Secp192R1.Curve.CreatePoint(
-        new BigInteger("b6f3374bde4ec23a25e1508889e7d7e71870ba74daf8654f", 16),
-        new BigInteger("738de93dad0fffb5642045439afaaf8c6fda319a72d2a584", 16));
-
-    internal class SignatureParams
+    private static bool ReadTicket(NPTicket npTicket, TicketReader reader)
     {
-        public string HashAlgo { get; set; }
-        public ECPoint PublicKey { get; set; }
-        public ECDomainParameters CurveParams { get; set; }
+        npTicket.TicketVersion = reader.ReadTicketVersion();
 
-        public SignatureParams(string hashAlgo, ECPoint pubKey, ECDomainParameters curve)
-        {
-            this.HashAlgo = hashAlgo;
-            this.PublicKey = pubKey;
-            this.CurveParams = curve;
-        }
-    }
-
-    private readonly Dictionary<string, SignatureParams> signatureParamsMap = new()
-    {
-        //psn
-        { "719F1D4A", new SignatureParams("SHA-1", psnPublic, Secp192R1) },
-        //rpcn
-        { "5250434E", new SignatureParams("SHA-224", rpcnPublic, Secp224K1) },
-        //unit test
-        { "54455354", new SignatureParams("SHA-1", unitTestPublic, Secp192R1) },
-    };
-
-    private bool ValidateSignature()
-    {
-        string identifierHex = Convert.ToHexString(this.ticketSignatureIdentifier);
-        if (!this.signatureParamsMap.ContainsKey(identifierHex))
-        {
-            Logger.Warn($"Unknown signature identifier in ticket: {identifierHex}, platform={this.Platform}", LogArea.Login);
-            return false;
-        }
-
-        SignatureParams sigParams = this.signatureParamsMap[identifierHex];
-        ECPublicKeyParameters pubKey = new(sigParams.PublicKey, sigParams.CurveParams);
-
-        ISigner signer = SignerUtilities.GetSigner($"{sigParams.HashAlgo}withECDSA");
-        signer.Init(false, pubKey);
-
-        signer.BlockUpdate(this.ticketBody);
-
-        return signer.VerifySignature(this.ticketSignature);
-    }
-
-    // Sometimes psn signatures have one or two extra empty bytes
-    // This is slow but it's better than carelessly chopping 0's
-    private static byte[] ParseSignature(byte[] signature)
-    {
-        for (int i = 0; i <= 2; i++)
-        {
-            try
-            {
-                Asn1Object.FromByteArray(signature);
-                break;
-            }
-            catch
-            {
-                signature = signature.SkipLast(1).ToArray();
-            }
-        }
-
-        return signature;
-    }
-
-    private static bool Read21Ticket(NPTicket npTicket, TicketReader reader)
-    {
-        reader.ReadTicketString(); // serial id
-
-        npTicket.IssuerId = reader.ReadTicketUInt32();
-        npTicket.IssuedDate = reader.ReadTicketUInt64();
-        npTicket.ExpireDate = reader.ReadTicketUInt64();
-
-        npTicket.UserId = reader.ReadTicketUInt64();
-
-        npTicket.Username = reader.ReadTicketString();
-
-        reader.ReadTicketString(); // Country
-        reader.ReadTicketString(); // Domain
-
-        npTicket.titleId = reader.ReadTicketString();
-
-        reader.ReadTicketUInt32(); // status
-
-        reader.ReadTicketEmpty(); // padding
-        reader.ReadTicketEmpty();
-
-        SectionHeader footer = reader.ReadSectionHeader(); // footer header
-        if (footer.Type != SectionType.Footer)
-        {
-            Logger.Warn(@$"Unexpected ticket footer header: expected={SectionType.Footer}, actual={footer}",
-                LogArea.Login);
-            return false;
-        }
-
-        npTicket.ticketSignatureIdentifier = reader.ReadTicketBinary();
-
-        npTicket.ticketSignature = ParseSignature(reader.ReadTicketBinary());
-        return true;
-    }
-
-    private static bool Read30Ticket(NPTicket npTicket, TicketReader reader)
-    {
-        reader.ReadTicketString(); // serial id
-
-        npTicket.IssuerId = reader.ReadTicketUInt32();
-        npTicket.IssuedDate = reader.ReadTicketUInt64();
-        npTicket.ExpireDate = reader.ReadTicketUInt64();
-
-        npTicket.UserId = reader.ReadTicketUInt64();
-
-        npTicket.Username = reader.ReadTicketString();
-
-        reader.ReadTicketString(); // Country
-        reader.ReadTicketString(); // Domain
-
-        npTicket.titleId = reader.ReadTicketString();
-
-        reader.ReadSectionHeader(); // date of birth section
-        reader.ReadBytes(4); // 4 bytes for year month and day
-        reader.ReadTicketUInt32();
-
-        reader.ReadSectionHeader(); // empty section?
-        reader.ReadTicketEmpty();
-
-        SectionHeader footer = reader.ReadSectionHeader(); // footer header
-        if (footer.Type != SectionType.Footer)
-        {
-            Logger.Warn(@$"Unexpected ticket footer header: expected={SectionType.Footer}, actual={footer}",
-                LogArea.Login);
-            return false;
-        }
-
-        npTicket.ticketSignatureIdentifier = reader.ReadTicketBinary();
-
-        npTicket.ticketSignature = ParseSignature(reader.ReadTicketBinary());
-        return true;
-    }
-
-    private static bool ReadTicket(byte[] data, NPTicket npTicket, TicketReader reader)
-    {
-        npTicket.ticketVersion = reader.ReadTicketVersion();
-
-        reader.ReadBytes(4); // Skip header
+        reader.SkipBytes(4); // Skip header
 
         ushort ticketLen = reader.ReadUInt16BE();
+
         // Subtract 8 bytes to account for ticket header
-        if (ticketLen != data.Length - 0x8)
+        if (ticketLen != npTicket.Data.Length - 0x8)
         {
-            Logger.Warn(@$"Ticket length mismatch, expected={ticketLen}, actual={data.Length - 0x8}", LogArea.Login);
-            return false;
+            throw new TicketParseException(
+                @$"Ticket length mismatch, expected={ticketLen}, actual={npTicket.Data.Length - 0x8}");
         }
 
-        long bodyStart = reader.BaseStream.Position;
-        SectionHeader bodyHeader = reader.ReadSectionHeader();
+        npTicket.BodyHeader = reader.ReadSectionHeader();
 
-        if (bodyHeader.Type != SectionType.Body)
+        if (npTicket.BodyHeader.Type != SectionType.Body)
         {
-            Logger.Warn(@$"Unexpected ticket body header: expected={SectionType.Body}, actual={bodyHeader}", LogArea.Login);
-            return false;
+            throw new TicketParseException(
+                @$"Unexpected ticket body header: expected={SectionType.Body}, actual={npTicket.BodyHeader.Type}");
         }
 
-        Logger.Debug($"bodyHeader.Type is {bodyHeader.Type}, index={bodyStart}", LogArea.Login);
+        Logger.Debug($"bodyHeader.Type is {npTicket.BodyHeader.Type}, index={npTicket.BodyHeader.Position}",
+            LogArea.Login);
 
-        bool parsedSuccessfully = npTicket.ticketVersion.ToString() switch
+        ITicketParser ticketParser = npTicket.TicketVersion switch
         {
-            "2.1" => Read21Ticket(npTicket, reader), // used by ps3 and rpcs3
-            "3.0" => Read30Ticket(npTicket, reader), // used by ps vita
+            Tickets.TicketVersion.V21 => new TicketParser21(npTicket, reader), // used by ps3 and rpcs3
+            Tickets.TicketVersion.V30 => new TicketParser30(npTicket, reader), // used by ps vita
             _ => throw new NotImplementedException(),
         };
 
-        if (!parsedSuccessfully) return false;
+        if (!ticketParser.ParseTicket()) return false;
 
-        npTicket.ticketBody = Convert.ToHexString(npTicket.ticketSignatureIdentifier) switch
+        // Create a uint in big endian
+        uint signatureIdentifier = (uint)(npTicket.TicketSignatureIdentifier[0] << 24 |
+                                          npTicket.TicketSignatureIdentifier[1] << 16 |
+                                          npTicket.TicketSignatureIdentifier[2] << 8 |
+                                          npTicket.TicketSignatureIdentifier[3]);
+
+        npTicket.SignatureVerifier = signatureIdentifier switch
         {
-            // rpcn
-            "5250434E" => data.AsSpan().Slice((int)bodyStart, bodyHeader.Length + 4).ToArray(),
-            // psn and unit test
-            "719F1D4A" or "54455354" => data.AsSpan()[..data.AsSpan().IndexOf(npTicket.ticketSignature)].ToArray(),
-            _ => throw new ArgumentOutOfRangeException(nameof(npTicket)),
+            0x5250434E => new RpcnSignatureVerifier(npTicket),
+            0x719F1D4A => new PsnSignatureVerifier(npTicket),
+            0x54455354 => new UnitTestSignatureVerifier(npTicket),
+            _ => throw new ArgumentOutOfRangeException(nameof(npTicket),
+                signatureIdentifier,
+                @"Invalid signature identifier"),
         };
 
         return true;
@@ -255,46 +102,60 @@ public class NPTicket
     /// </summary>
     public static NPTicket? CreateFromBytes(byte[] data)
     {
-        NPTicket npTicket = new();
+        // Header should have at least 8 bytes
+        if (data.Length < 8)
+        {
+            Logger.Warn("NpTicket does not contain header", LogArea.Login);
+            return null;
+        }
+        NPTicket npTicket = new()
+        {
+            Data = data,
+        };
         try
         {
-            using MemoryStream ms = new(data);
-            using TicketReader reader = new(ms);
+            using TicketReader reader = new(new MemoryStream(data));
 
-            bool validTicket = ReadTicket(data, npTicket, reader);
+            bool validTicket = ReadTicket(npTicket, reader);
             if (!validTicket)
             {
                 Logger.Warn($"Failed to parse ticket from {npTicket.Username}", LogArea.Login);
                 return null;
             }
 
-            if (npTicket.IssuedDate > (ulong)TimeHelper.TimestampMillis)
+            if (npTicket.IssueTime > (ulong)TimeHelper.TimestampMillis)
             {
-                Logger.Warn($"Ticket isn't valid yet from {npTicket.Username} ({npTicket.IssuedDate} > {(ulong)TimeHelper.TimestampMillis})", LogArea.Login);
-                return null;
-            }
-            if ((ulong)TimeHelper.TimestampMillis > npTicket.ExpireDate)
-            {
-                Logger.Warn($"Ticket has expired from {npTicket.Username} ({(ulong)TimeHelper.TimestampMillis} > {npTicket.ExpireDate}", LogArea.Login);
+                Logger.Warn(
+                    $"Ticket isn't valid yet from {npTicket.Username} ({npTicket.IssueTime} > {(ulong)TimeHelper.TimestampMillis})",
+                    LogArea.Login);
                 return null;
             }
 
-            if (npTicket.titleId == null) throw new ArgumentNullException($"{nameof(npTicket)}.{nameof(npTicket.titleId)}");
+            if ((ulong)TimeHelper.TimestampMillis > npTicket.ExpireTime)
+            {
+                Logger.Warn(
+                    $"Ticket has expired from {npTicket.Username} ({(ulong)TimeHelper.TimestampMillis} > {npTicket.ExpireTime}",
+                    LogArea.Login);
+                return null;
+            }
+
+            if (npTicket.TitleId == null)
+                throw new ArgumentNullException($"{nameof(npTicket)}.{nameof(npTicket.TitleId)}");
 
             // We already read the title id, however we need to do some post-processing to get what we want.
             // Current data: UP9000-BCUS98245_00
             // We need to chop this to get the titleId we're looking for
-            npTicket.titleId = npTicket.titleId[7..]; // Trim UP9000-
-            npTicket.titleId = npTicket.titleId[..^3]; // Trim _00 at the end
+            npTicket.TitleId = npTicket.TitleId[7..]; // Trim UP9000-
+            npTicket.TitleId = npTicket.TitleId[..^3]; // Trim _00 at the end
             // Data now (hopefully): BCUS98245
 
-            Logger.Debug($"titleId is {npTicket.titleId}", LogArea.Login);
+            Logger.Debug($"titleId is {npTicket.TitleId}", LogArea.Login);
 
-            npTicket.GameVersion = GameVersionHelper.FromTitleId(npTicket.titleId); // Finally, convert it to GameVersion
+            npTicket.GameVersion = GameVersionHelper.FromTitleId(npTicket.TitleId); // Finally, convert it to GameVersion
 
             if (npTicket.GameVersion == GameVersion.Unknown)
             {
-                Logger.Warn($"Could not determine game version from title id {npTicket.titleId}", LogArea.Login);
+                Logger.Warn($"Could not determine game version from title id {npTicket.TitleId}", LogArea.Login);
                 return null;
             }
 
@@ -308,15 +169,16 @@ public class NPTicket
                 _ => Platform.Unknown,
             };
 
-            if (npTicket.Platform == Platform.PS3 && npTicket.GameVersion == GameVersion.LittleBigPlanetVita) npTicket.Platform = Platform.Vita;
+            if (npTicket.GameVersion == GameVersion.LittleBigPlanetVita) npTicket.Platform = Platform.Vita;
 
-            if (npTicket.Platform == Platform.Unknown || (npTicket.Platform == Platform.UnitTest && !ServerStatics.IsUnitTesting))
+            if (npTicket.Platform == Platform.Unknown)
             {
                 Logger.Warn($"Could not determine platform from IssuerId {npTicket.IssuerId} decimal", LogArea.Login);
                 return null;
             }
 
-            if (ServerConfiguration.Instance.Authentication.VerifyTickets && !npTicket.ValidateSignature())
+            if (ServerConfiguration.Instance.Authentication.VerifyTickets &&
+                !npTicket.SignatureVerifier.ValidateSignature())
             {
                 Logger.Warn($"Failed to verify authenticity of ticket from user {npTicket.Username}", LogArea.Login);
                 return null;
@@ -332,12 +194,17 @@ public class NPTicket
 
             return npTicket;
         }
+        catch (TicketParseException e)
+        {
+            Logger.Error($"Parsing npTicket failed: {e.Message}", LogArea.Login);
+            return null;
+        }
         catch(NotImplementedException)
         {
-            Logger.Error($"The ticket version {npTicket.ticketVersion} is not implemented yet.", LogArea.Login);
+            Logger.Error($"The ticket version {npTicket.TicketVersion} is not implemented yet.", LogArea.Login);
             Logger.Error
             (
-                "Please let us know that this is a ticket version that is actually used on our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues !",
+                "Please let us know that this is a ticket version that is actually used on our issue tracker at https://github.com/LBPUnion/ProjectLighthouse/issues !",
                 LogArea.Login
             );
             return null;
@@ -347,7 +214,7 @@ public class NPTicket
             Logger.Error("Failed to read npTicket!", LogArea.Login);
             Logger.Error("Either this is spam data, or the more likely that this is a bug.", LogArea.Login);
             Logger.Error
-                ("Please report the following exception to our issue tracker at https://github.com/LBPUnion/project-lighthouse/issues!", LogArea.Login);
+                ("Please report the following exception to our issue tracker at https://github.com/LBPUnion/ProjectLighthouse/issues!", LogArea.Login);
             Logger.Error(e.ToDetailedException(), LogArea.Login);
             return null;
         }

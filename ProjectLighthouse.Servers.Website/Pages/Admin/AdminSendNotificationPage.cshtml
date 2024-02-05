@@ -1,0 +1,9 @@
+﻿@page "/admin/user/{id:int}/sendNotification"
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Admin.AdminSendNotificationPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = $"Send notification to {Model.TargetedUser!.Username}";
+}
+
+@await Html.PartialAsync("Partials/AdminSendNotificationPartial", Model.TargetedUser)

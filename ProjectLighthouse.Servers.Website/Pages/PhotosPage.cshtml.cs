@@ -10,7 +10,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages;
 
 public class PhotosPage : BaseLayout
 {
-
     public int PageAmount;
 
     public int PageNumber;

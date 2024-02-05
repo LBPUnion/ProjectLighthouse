@@ -29,9 +29,6 @@
   <data name="password_doesnt_match" xml:space="preserve">
         <value>¡Las contraseñas no coinciden!</value>
     </data>
-  <data name="token_invalid" xml:space="preserve">
-        <value>Toquen inválido</value>
-    </data>
   <data name="captcha_failed" xml:space="preserve">
         <value>Debes completar el captcha correctamente</value>
     </data>
@@ -41,7 +38,7 @@
   <data name="email_invalid" xml:space="preserve">
         <value>Debes de colocar un correo electrónico</value>
     </data>
-  <data name="user_banned" xml:space="preserve">
-        <value>Has sido vetado. Por favor contacta a un administrador para más información.\n Razón: {0}</value>
+  <data name="action_no_permission" xml:space="preserve">
+        <value>No tienes permiso para realizar esta acción.</value>
     </data>
 </root>

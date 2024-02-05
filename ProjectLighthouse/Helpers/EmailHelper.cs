@@ -9,56 +9,91 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
-public partial class SMTPHelper
+public static class SMTPHelper
 {
     // (User id, timestamp of last request + 30 seconds)
-    private static readonly ConcurrentDictionary<int, long> recentlySentEmail = new();
+    private static readonly ConcurrentDictionary<int, long> recentlySentMail = new();
 
-    public static async Task<bool> SendVerificationEmail(DatabaseContext database, UserEntity user)
+    private const long emailCooldown = 1000 * 30;
+
+    private static bool CanSendMail(UserEntity user)
     {
         // Remove expired entries
-        for (int i = recentlySentEmail.Count - 1; i >= 0; i--)
+        for (int i = recentlySentMail.Count - 1; i >= 0; i--)
         {
-            KeyValuePair<int, long> entry = recentlySentEmail.ElementAt(i);
-            bool valueExists = recentlySentEmail.TryGetValue(entry.Key, out long timestamp);
-            if (!valueExists)
+            KeyValuePair<int, long> entry = recentlySentMail.ElementAt(i);
+            if (recentlySentMail.TryGetValue(entry.Key, out long expiration) &&
+                TimeHelper.TimestampMillis > expiration)
             {
-                recentlySentEmail.TryRemove(entry.Key, out _);
-                continue;
+                recentlySentMail.TryRemove(entry.Key, out _);
             }
-
-            if (TimeHelper.TimestampMillis > timestamp) recentlySentEmail.TryRemove(entry.Key, out _);
         }
 
-
-        if (recentlySentEmail.ContainsKey(user.UserId))
+        if (recentlySentMail.TryGetValue(user.UserId, out long userExpiration))
         {
-            bool valueExists = recentlySentEmail.TryGetValue(user.UserId, out long timestamp);
-            if (!valueExists)
-            {
-                recentlySentEmail.TryRemove(user.UserId, out _);
-            }
-            else if (timestamp > TimeHelper.TimestampMillis)
-            {
-                return true;
-            }
+            return TimeHelper.TimestampMillis > userExpiration;
         }
+        // If they don't have an entry in the dictionary then they can't be on cooldown
+        return true;
+    }
+
+    public static async Task SendPasswordResetEmail(DatabaseContext database, IMailService mail, UserEntity user)
+    {
+        if (!CanSendMail(user)) return;
+
+        if (await database.PasswordResetTokens.CountAsync(t => t.UserId == user.UserId) > 0) return;
+
+        PasswordResetTokenEntity token = new()
+        {
+            Created = DateTime.UtcNow,
+            UserId = user.UserId,
+            ResetToken = CryptoHelper.GenerateAuthToken(),
+        };
+
+        database.PasswordResetTokens.Add(token);
+        await database.SaveChangesAsync();
+
+        string messageBody = $"Hello, {user.Username}.\n\n" +
+                             "A request to reset your account's password was issued. If this wasn't you, this can probably be ignored.\n\n" +
+                             $"If this was you, your {ServerConfiguration.Instance.Customization.ServerName} password can be reset at the following link:\n" +
+                             $"{ServerConfiguration.Instance.ExternalUrl}/passwordReset?token={token.ResetToken}\n\n" + 
+                             "This link will expire in 24 hours";
+
+        await mail.SendEmailAsync(user.EmailAddress, $"Project Lighthouse Password Reset Request for {user.Username}", messageBody);
+
+        recentlySentMail.TryAdd(user.UserId, TimeHelper.TimestampMillis + emailCooldown);
+    }
+
+    public static void SendRegistrationEmail(IMailService mail, UserEntity user)
+    {
+        // There is intentionally no cooldown here because this is only used for registration
+        // and a user can only be registered once, i.e. this should only be called once per user
+        string body = "An account for Project Lighthouse has been registered with this email address.\n\n" +
+                      $"You can login at {ServerConfiguration.Instance.ExternalUrl}.";
+
+        mail.SendEmail(user.EmailAddress, "Project Lighthouse Account Created: " + user.Username, body);
+    }
+
+    public static async Task<bool> SendVerificationEmail(DatabaseContext database, IMailService mail, UserEntity user)
+    {
+        if (!CanSendMail(user)) return false;
 
         string? existingToken = await database.EmailVerificationTokens.Where(v => v.UserId == user.UserId)
             .Select(v => v.EmailToken)
             .FirstOrDefaultAsync();
-        if (existingToken != null) database.EmailVerificationTokens.RemoveWhere(t => t.EmailToken == existingToken);
+        if (existingToken != null) await database.EmailVerificationTokens.RemoveWhere(t => t.EmailToken == existingToken);
 
         EmailVerificationTokenEntity verifyToken = new()
         {
             UserId = user.UserId,
             User = user,
             EmailToken = CryptoHelper.GenerateAuthToken(),
-            ExpiresAt = DateTime.Now.AddHours(6),
+            ExpiresAt = DateTime.UtcNow.AddHours(6),
         };
 
         database.EmailVerificationTokens.Add(verifyToken);
@@ -69,10 +104,10 @@ public partial class SMTPHelper
                       $"To verify your account, click the following link: {ServerConfiguration.Instance.ExternalUrl}/verifyEmail?token={verifyToken.EmailToken}\n\n\n" +
                       "If this wasn't you, feel free to ignore this email.";
 
-        bool success = await SendEmailAsync(user.EmailAddress, "Project Lighthouse Email Verification", body);
+        bool success = await mail.SendEmailAsync(user.EmailAddress, "Project Lighthouse Email Verification", body);
 
         // Don't send another email for 30 seconds
-        recentlySentEmail.TryAdd(user.UserId, TimeHelper.TimestampMillis + 30 * 1000);
+        recentlySentMail.TryAdd(user.UserId, TimeHelper.TimestampMillis + emailCooldown);
         return success;
     }
 }

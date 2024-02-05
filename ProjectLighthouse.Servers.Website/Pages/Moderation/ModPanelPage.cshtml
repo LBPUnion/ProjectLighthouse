@@ -51,3 +51,14 @@ else
     <i class="globe americas icon"></i>
     <span>View hidden levels</span>
 </a>
+
+<div class="ui divider"></div>
+<form method="post" action="/moderation/findStoryLevel">
+    @Html.AntiForgeryToken()
+    <div class="ui left action input">
+        <button type="submit" class="ui blue button">
+            <span>Find Story Level</span>
+        </button>
+        <input type="text" name="placeholderSlotId" placeholder="Level ID" minlength="1" pattern="^\d*$" required>
+    </div>
+</form>

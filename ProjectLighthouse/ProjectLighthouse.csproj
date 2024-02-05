@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <TargetFramework>net7.0</TargetFramework>
@@ -10,52 +10,31 @@
 
     <ItemGroup>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="GitInfo" Version="3.3.3">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Pfim" Version="0.11.2" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
-        <PackageReference Include="Discord.Net.Webhook" Version="3.10.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.4" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4">
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
+        <PackageReference Include="Discord.Net.Webhook" Version="3.12.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.13" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.13" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.13">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
-        <PackageReference Include="Redis.OM" Version="0.4.2" />
+        <PackageReference Include="Redis.OM" Version="0.5.4" />
         <PackageReference Include="SharpZipLib" Version="1.4.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="YamlDotNet" Version="13.0.2" />
-        <PackageReference Include="BouncyCastle.Cryptography" Version="2.1.1" />
+        <PackageReference Include="YamlDotNet" Version="13.7.1" />
+        <PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
         <PackageReference Include="DistributedLock.MySql" Version="1.0.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-		<None Remove="gitVersion.txt" />
-		<EmbeddedResource Include="gitVersion.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<None Remove="gitBranch.txt" />
-		<EmbeddedResource Include="gitBranch.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<None Remove="gitRemotes.txt" />
-		<EmbeddedResource Include="gitRemotes.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<None Remove="gitUnpushed.txt" />
-		<EmbeddedResource Include="gitUnpushed.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\ProjectLighthouse.Localization\ProjectLighthouse.Localization.csproj" />
     </ItemGroup>
-
-    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitVersion.txt&quot;" />
-		<Exec Command="git branch --show-current &gt; &quot;$(ProjectDir)/gitBranch.txt&quot;" />
-		<Exec Command="git remote -v &gt; &quot;$(ProjectDir)/gitRemotes.txt&quot;" />
-		<Exec Command="git log --branches --not --remotes --oneline &gt; &quot;$(ProjectDir)/gitUnpushed.txt&quot;" />
-    </Target>
+    
 </Project>

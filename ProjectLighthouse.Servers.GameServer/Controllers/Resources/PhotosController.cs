@@ -9,6 +9,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -34,17 +35,24 @@ public class PhotosController : ControllerBase
     [HttpPost("uploadPhoto")]
     public async Task<IActionResult> UploadPhoto()
     {
-        UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
-        if (user == null) return this.Forbid();
+        GameTokenEntity token = this.GetToken();
 
-        if (user.GetUploadedPhotoCount(this.database) >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
+        int photoCount = await this.database.Photos.CountAsync(p => p.CreatorId == token.UserId);
+        if (photoCount >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
 
         GamePhoto? photo = await this.DeserializeBody<GamePhoto>();
         if (photo == null) return this.BadRequest();
 
-        foreach (PhotoEntity p in this.database.Photos.Where(p => p.CreatorId == user.UserId))
+        string[] photoHashes =
         {
-            if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uplaoded
+            photo.LargeHash, photo.MediumHash, photo.SmallHash, photo.PlanHash,
+        };
+
+        if (photoHashes.Any(hash => !FileHelper.ResourceExists(hash))) return this.BadRequest();
+
+        foreach (PhotoEntity p in this.database.Photos.Where(p => p.CreatorId == token.UserId))
+        {
+            if (p.LargeHash == photo.LargeHash) return this.Ok(); // photo already uploaded
             if (p.MediumHash == photo.MediumHash) return this.Ok();
             if (p.SmallHash == photo.SmallHash) return this.Ok();
             if (p.PlanHash == photo.PlanHash) return this.Ok();
@@ -52,8 +60,7 @@ public class PhotosController : ControllerBase
 
         PhotoEntity photoEntity = new()
         {
-            CreatorId = user.UserId,
-            Creator = user,
+            CreatorId = token.UserId,
             SmallHash = photo.SmallHash,
             MediumHash = photo.MediumHash,
             LargeHash = photo.LargeHash,
@@ -103,7 +110,7 @@ public class PhotosController : ControllerBase
 
         if (photo.Subjects?.Count > 4) return this.BadRequest();
 
-        if (photo.Timestamp > TimeHelper.Timestamp) photo.Timestamp = TimeHelper.Timestamp;
+        if (photo.Timestamp > TimeHelper.Timestamp) photoEntity.Timestamp = TimeHelper.Timestamp;
 
         this.database.Photos.Add(photoEntity);
 
@@ -134,6 +141,7 @@ public class PhotosController : ControllerBase
                 {
                     PhotoId = photoEntity.PhotoId,
                     UserId = subject.UserId,
+                    Bounds = subject.Bounds,
                 };
 
                 Logger.Debug($"Adding PhotoSubject (userid {subject.UserId}) to db", LogArea.Photos);
@@ -144,12 +152,14 @@ public class PhotosController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
+        string username = await this.database.UsernameFromGameToken(token);
+
         await WebhookHelper.SendWebhook
         (
             new EmbedBuilder
             {
                 Title = "New photo uploaded!",
-                Description = $"{user.Username} uploaded a new photo.",
+                Description = $"{username} uploaded a new photo.",
                 ImageUrl = $"{ServerConfiguration.Instance.ExternalUrl}/gameAssets/{photo.LargeHash}",
                 Color = WebhookHelper.GetEmbedColor(),
             }
@@ -159,58 +169,63 @@ public class PhotosController : ControllerBase
     }
 
     [HttpGet("photos/{slotType}/{id:int}")]
-    public async Task<IActionResult> SlotPhotos([FromQuery] int pageStart, [FromQuery] int pageSize, string slotType, int id)
+    public async Task<IActionResult> SlotPhotos(string slotType, int id, [FromQuery] string? by)
     {
-        if (pageSize <= 0) return this.BadRequest();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
 
-        List<GamePhoto> photos = await this.database.Photos.Include(p => p.PhotoSubjects)
+        PaginationData pageData = this.Request.GetPaginationData();
+
+        int creatorId = 0;
+        if (by != null)
+        {
+            creatorId = await this.database.Users.Where(u => u.Username == by)
+                .Select(u => u.UserId)
+                .FirstOrDefaultAsync();
+        }
+
+        List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
+            .Where(p => creatorId == 0 || p.CreatorId == creatorId)
             .Where(p => p.SlotId == id)
             .OrderByDescending(s => s.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
-            .Select(p => GamePhoto.CreateFromEntity(p))
-            .ToListAsync();
+            .ApplyPagination(pageData)
+            .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
 
         return this.Ok(new PhotoListResponse(photos));
     }
 
     [HttpGet("photos/by")]
-    public async Task<IActionResult> UserPhotosBy([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> UserPhotosBy(string user)
     {
-        if (pageSize <= 0) return this.BadRequest();
 
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
-        List<GamePhoto> photos = await this.database.Photos.Include(p => p.PhotoSubjects)
+        PaginationData pageData = this.Request.GetPaginationData();
+
+        List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.CreatorId == targetUserId)
             .OrderByDescending(s => s.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
-            .Select(p => GamePhoto.CreateFromEntity(p))
-            .ToListAsync();
+            .ApplyPagination(pageData)
+            .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
         return this.Ok(new PhotoListResponse(photos));
     }
 
     [HttpGet("photos/with")]
-    public async Task<IActionResult> UserPhotosWith([FromQuery] string user, [FromQuery] int pageStart, [FromQuery] int pageSize)
+    public async Task<IActionResult> UserPhotosWith(string user)
     {
-        if (pageSize <= 0) return this.BadRequest();
-
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
-        List<GamePhoto> photos = await this.database.Photos.Include(p => p.PhotoSubjects)
+        PaginationData pageData = this.Request.GetPaginationData();
+
+        List<GamePhoto> photos = (await this.database.Photos.Include(p => p.PhotoSubjects)
             .Where(p => p.PhotoSubjects.Any(ps => ps.UserId == targetUserId))
             .OrderByDescending(s => s.Timestamp)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
-            .Select(p => GamePhoto.CreateFromEntity(p))
-            .ToListAsync();
+            .ApplyPagination(pageData)
+            .ToListAsync()).ToSerializableList(GamePhoto.CreateFromEntity);
 
         return this.Ok(new PhotoListResponse(photos));
     }
@@ -228,12 +243,6 @@ public class PhotosController : ControllerBase
         {
             SlotEntity? photoSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == photo.SlotId && s.Type == SlotType.User);
             if (photoSlot == null || photoSlot.CreatorId != token.UserId) return this.Unauthorized();
-        }
-
-        HashSet<string> photoResources = new(){photo.LargeHash, photo.SmallHash, photo.MediumHash, photo.PlanHash,};
-        foreach (string hash in photoResources)
-        {
-            FileHelper.DeleteResource(hash);
         }
 
         this.database.Photos.Remove(photo);

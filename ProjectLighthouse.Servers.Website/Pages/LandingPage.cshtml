@@ -10,7 +10,7 @@
 @{
     Layout = "Layouts/BaseLayout";
     Model.ShowTitleInPage = false;
-    
+
     bool isMobile = Request.IsMobile();
     string language = Model.GetLanguage();
     string timeZone = Model.GetTimeZone();
@@ -25,7 +25,9 @@
     if (Model.PendingAuthAttempts > 0)
     {
         <p>
-            <b><a href="/authentication">@Model.Translate(LandingPageStrings.AuthAttemptsPending, Model.PendingAuthAttempts)</a></b>
+            <b>
+                <a href="/authentication">@Model.Translate(LandingPageStrings.AuthAttemptsPending, Model.PendingAuthAttempts)</a>
+            </b>
         </p>
     }
 }
@@ -48,13 +50,13 @@
     int i = 0;
     foreach (UserEntity user in Model.PlayersOnline)
     {
-        i++; 
+        i++;
         @await user.ToLink(Html, ViewData, language, timeZone, true)
         @* whitespace has forced my hand *@
         if (i != Model.PlayersOnline.Count)
         {
             <span>,</span>
-        } 
+        }
     }
 }
 
@@ -63,7 +65,9 @@
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
         <div class="ui inverted pink segment">
-            <h1><i class="star icon"></i>@Model.Translate(LandingPageStrings.LatestTeamPicks)</h1>
+            <h1>
+                <i class="star icon"></i>@Model.Translate(LandingPageStrings.LatestTeamPicks)
+            </h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
                 @foreach (SlotEntity slot in Model.LatestTeamPicks!) @* Can't reach a point where this is null *@
@@ -80,7 +84,9 @@
     }
     <div class="eight wide column">
         <div class="ui inverted blue segment">
-            <h1><i class="globe americas icon"></i>@Model.Translate(LandingPageStrings.NewestLevels)</h1>
+            <h1>
+                <i class="globe americas icon"></i>@Model.Translate(LandingPageStrings.NewestLevels)
+            </h1>
             <div class="ui divider"></div>
             <div class="ui left aligned segment">
                 @foreach (SlotEntity slot in Model.NewestLevels!) @* Can't reach a point where this is null *@

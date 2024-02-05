@@ -3,8 +3,10 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Entities.Moderation;
+using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Entities.Website;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Database;
@@ -58,12 +60,32 @@ public partial class DatabaseContext : DbContext
     public DbSet<GriefReportEntity> Reports { get; set; }
     #endregion
 
+    #region Notifications
+    public DbSet<NotificationEntity> Notifications { get; set; }
+    #endregion
+
     #region Misc
     public DbSet<CompletedMigrationEntity> CompletedMigrations { get; set; }
     #endregion
 
+    #region Website
+    public DbSet<WebsiteAnnouncementEntity> WebsiteAnnouncements { get; set; }
     #endregion
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseMySql(ServerConfiguration.Instance.DbConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
+    #endregion
+
+    // Used for mocking DbContext
+    protected internal DatabaseContext()
+    { }
+
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+    { }
+
+    public static DatabaseContext CreateNewInstance()
+    {
+        DbContextOptionsBuilder<DatabaseContext> builder = new();
+        builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+            MySqlServerVersion.LatestSupportedServerVersion);
+        return new DatabaseContext(builder.Options);
+    }
 }

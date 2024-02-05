@@ -2,12 +2,13 @@ using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
+using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,8 +16,14 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class RegisterForm : BaseLayout
 {
-    public RegisterForm(DatabaseContext database) : base(database)
-    { }
+    public readonly IMailService Mail;
+    private readonly ICaptchaService captchaService;
+
+    public RegisterForm(DatabaseContext database, IMailService mail, ICaptchaService captchaService) : base(database)
+    {
+        this.Mail = mail;
+        this.captchaService = captchaService;
+    }
 
     public string? Error { get; private set; }
 
@@ -68,7 +75,7 @@ public class RegisterForm : BaseLayout
             return this.Page();
         }
 
-        if (!await this.Request.CheckCaptchaValidity())
+        if (!await this.captchaService.VerifyCaptcha(this.Request))
         {
             this.Error = this.Translate(ErrorStrings.CaptchaFailed);
             return this.Page();
@@ -76,11 +83,13 @@ public class RegisterForm : BaseLayout
 
         UserEntity user = await this.Database.CreateUser(username, CryptoHelper.BCryptHash(password), emailAddress);
 
+        if(ServerConfiguration.Instance.Mail.MailEnabled) SMTPHelper.SendRegistrationEmail(this.Mail, user);
+
         WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
-            ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromDays(7),
         };
 
         this.Database.WebTokens.Add(webToken);

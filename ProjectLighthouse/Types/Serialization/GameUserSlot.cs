@@ -11,7 +11,6 @@ using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
-using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -60,6 +59,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     [XmlElement("resource")]
     public string[]? Resources { get; set; }
+    public bool ShouldSerializeResources() => false;
 
     [XmlElement("icon")]
     public string IconHash { get; set; } = "";
@@ -118,7 +118,7 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
     public bool IsMoveRequired { get; set; }
     public bool ShouldSerializeIsMoveRequired() => this.SerializationMode == SerializationMode.Full;
 
-    [XmlElement("crossControlRequired")]
+    [XmlElement("vitaCrossControlRequired")]
     public bool IsCrossControlRequired { get; set; }
     public bool ShouldSerializeIsCrossControlRequired() => this.SerializationMode == SerializationMode.Full;
 
@@ -234,21 +234,23 @@ public class GameUserSlot : SlotBase, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        var stats = await database.Slots
+        var stats = await database.Slots.Where(s => s.SlotId == this.SlotId)
             .Select(_ => new
             {
                 ThumbsUp = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == 1),
                 ThumbsDown = database.RatedLevels.Count(r => r.SlotId == this.SlotId && r.Rating == -1),
                 ReviewCount = database.Reviews.Count(r => r.SlotId == this.SlotId),
-                CommentCount = database.Comments.Count(c => c.TargetId == this.SlotId && c.Type == CommentType.Level),
+                CommentCount = database.Comments.Count(c => c.TargetSlotId == this.SlotId),
                 PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
                 AuthorPhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId && p.CreatorId == this.CreatorId),
                 HeartCount = database.HeartedLevels.Count(h => h.SlotId == this.SlotId),
                 Username = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => u.Username).First(),
+                UserIcon = database.Users.Where(u => u.UserId == this.CreatorId).Select(u => u.IconHash).First(),
             })
+            .OrderBy(_ => 1)
             .FirstAsync();
         ReflectionHelper.CopyAllFields(stats, this);
-        this.AuthorHandle = new NpHandle(stats.Username, "");
+        this.AuthorHandle = new NpHandle(stats.Username, stats.UserIcon);
 
         if (this.GameVersion == GameVersion.LittleBigPlanet1)
         {

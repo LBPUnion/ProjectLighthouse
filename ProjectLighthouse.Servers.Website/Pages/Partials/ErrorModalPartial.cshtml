@@ -1,0 +1,8 @@
+﻿@model (string Title, string Message)
+
+<div class="ui negative message" id="error-message">
+    <div class="header">
+        @Model.Title
+    </div>
+    <p style="white-space: pre-line">@Model.Message</p>
+</div>

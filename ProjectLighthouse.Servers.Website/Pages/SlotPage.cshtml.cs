@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
@@ -22,42 +23,35 @@ public class SlotPage : BaseLayout
     public bool CommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
 
+    public bool CanViewSlot;
+
     public SlotEntity? Slot;
     public SlotPage(DatabaseContext database) : base(database)
     {}
 
-    public async Task<IActionResult> OnGet([FromRoute] int id)
+    public async Task<IActionResult> OnGet([FromRoute] int id, string? slug)
     {
         SlotEntity? slot = await this.Database.Slots.Include(s => s.Creator)
-            .Where(s => s.Type == SlotType.User)
+            .Where(s => s.Type == SlotType.User || (this.User != null && this.User.PermissionLevel >= PermissionLevel.Moderator))
             .FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
         System.Diagnostics.Debug.Assert(slot.Creator != null);
 
+        bool isAuthenticated = this.User != null;
+        bool isOwner = slot.Creator == this.User || this.User != null && this.User.IsModerator;
+
         // Determine if user can view slot according to creator's privacy settings
-        if (this.User == null || !this.User.IsAdmin)
-        {
-            switch (slot.Creator.ProfileVisibility)
-            {
-                case PrivacyType.PSN:
-                {
-                    if (this.User != null) return this.NotFound();
+        this.CanViewSlot = slot.Creator.LevelVisibility.CanAccess(isAuthenticated, isOwner);
 
-                    break;
-                }
-                case PrivacyType.Game:
-                {
-                    if (this.User == null || slot.Creator != this.User) return this.NotFound();
-
-                    break;
-                }
-                case PrivacyType.All: break;
-                default: throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        if ((slot.Hidden || slot.SubLevel && (this.User == null && this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
+        if ((slot.Hidden || slot.SubLevel && (this.User == null || this.User != slot.Creator)) && !(this.User?.IsModerator ?? false))
             return this.NotFound();
+
+        string slotSlug = slot.GenerateSlug();
+        // Only redirect if there is a valid slug for this level and the current slug doesn't match 
+        if (!string.IsNullOrWhiteSpace(slotSlug) && (slug == null || slotSlug != slug))
+        {
+            return this.Redirect($"~/slot/{id}/{slotSlug}");
+        }
 
         this.Slot = slot;
 
@@ -67,13 +61,13 @@ public class SlotPage : BaseLayout
                 from blockedProfile in this.Database.BlockedProfiles
                 where blockedProfile.UserId == this.User.UserId
                 select blockedProfile.BlockedUserId).ToListAsync();
-        
+
         this.CommentsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled && this.Slot.CommentsEnabled;
         if (this.CommentsEnabled)
         {
-            this.Comments = await this.Database.Comments.Include(p => p.Poster)
-                .OrderByDescending(p => p.Timestamp)
-                .Where(c => c.TargetId == id && c.Type == CommentType.Level)
+            this.Comments = await this.Database.Comments.Include(c => c.Poster)
+                .OrderByDescending(c => c.Timestamp)
+                .Where(c => c.Type == CommentType.Level && c.TargetSlotId == id)
                 .Where(c => !blockedUsers.Contains(c.PosterUserId))
                 .Include(c => c.Poster)
                 .Where(c => c.Poster.PermissionLevel != PermissionLevel.Banned)

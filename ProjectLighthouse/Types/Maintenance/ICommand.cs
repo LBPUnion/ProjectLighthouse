@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -8,7 +9,7 @@ namespace LBPUnion.ProjectLighthouse.Types.Maintenance;
 public interface ICommand
 {
     public string FirstAlias => this.Aliases()[0];
-    public Task Run(string[] args, Logger logger);
+    public Task Run(IServiceProvider provider, string[] args, Logger logger);
 
     public string Name();
 

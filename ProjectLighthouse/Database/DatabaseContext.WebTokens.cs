@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Extensions;
@@ -25,7 +26,7 @@ public partial class DatabaseContext
         WebTokenEntity? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
 
-        if (DateTime.Now <= token.ExpiresAt) return this.Users.FirstOrDefault(u => u.UserId == token.UserId);
+        if (DateTime.UtcNow <= token.ExpiresAt) return this.Users.FirstOrDefault(u => u.UserId == token.UserId);
 
         this.Remove(token);
         this.SaveChanges();
@@ -47,7 +48,7 @@ public partial class DatabaseContext
         WebTokenEntity? token = this.WebTokens.FirstOrDefault(t => t.UserToken == lighthouseToken);
         if (token == null) return null;
 
-        if (DateTime.Now <= token.ExpiresAt) return token;
+        if (DateTime.UtcNow <= token.ExpiresAt) return token;
 
         this.Remove(token);
         this.SaveChanges();
@@ -64,7 +65,7 @@ public partial class DatabaseContext
             await this.PasswordResetTokens.FirstOrDefaultAsync(token => token.ResetToken == resetToken);
         if (token == null) return null;
 
-        if (token.Created >= DateTime.Now.AddHours(-1))
+        if (token.Created >= DateTime.UtcNow.AddHours(-1))
             return await this.Users.FirstOrDefaultAsync(user => user.UserId == token.UserId);
 
         this.PasswordResetTokens.Remove(token);
@@ -80,7 +81,7 @@ public partial class DatabaseContext
         RegistrationTokenEntity? token = this.RegistrationTokens.FirstOrDefault(t => t.Token == tokenString);
         if (token == null) return false;
 
-        if (token.Created >= DateTime.Now.AddDays(-7)) return true;
+        if (token.Created >= DateTime.UtcNow.AddDays(-7)) return true;
 
         this.RegistrationTokens.Remove(token);
         this.SaveChanges();
@@ -91,18 +92,19 @@ public partial class DatabaseContext
 
     public async Task RemoveExpiredTokens()
     {
-        foreach (GameTokenEntity token in await this.GameTokens.Where(t => DateTime.Now > t.ExpiresAt).ToListAsync())
+        List<GameTokenEntity> expiredTokens = await this.GameTokens.Where(t => DateTime.UtcNow > t.ExpiresAt).ToListAsync(); 
+        foreach (GameTokenEntity token in expiredTokens)
         {
             UserEntity? user = await this.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
             if (user != null) user.LastLogout = TimeHelper.TimestampMillis;
-            this.GameTokens.Remove(token);
         }
-
-        this.WebTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
-        this.EmailVerificationTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
-        this.EmailSetTokens.RemoveWhere(t => DateTime.Now > t.ExpiresAt);
-
         await this.SaveChangesAsync();
+
+        await this.GameTokens.RemoveWhere(t => DateTime.UtcNow > t.ExpiresAt);
+        await this.WebTokens.RemoveWhere(t => DateTime.UtcNow > t.ExpiresAt);
+        await this.EmailVerificationTokens.RemoveWhere(t => DateTime.UtcNow > t.ExpiresAt);
+        await this.EmailSetTokens.RemoveWhere(t => DateTime.UtcNow > t.ExpiresAt);
+        await this.PasswordResetTokens.RemoveWhere(t => DateTime.UtcNow > t.Created.AddDays(1));
     }
 
     public async Task RemoveRegistrationToken(string? tokenString)

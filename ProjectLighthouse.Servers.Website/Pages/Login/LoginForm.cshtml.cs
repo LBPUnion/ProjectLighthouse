@@ -3,10 +3,10 @@ using System.Web;
 using JetBrains.Annotations;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -18,8 +18,12 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login;
 
 public class LoginForm : BaseLayout
 {
-    public LoginForm(DatabaseContext database) : base(database)
-    {}
+    private readonly ICaptchaService captchaService;
+
+    public LoginForm(DatabaseContext database, ICaptchaService captchaService) : base(database)
+    {
+        this.captchaService = captchaService;
+    }
 
     public string? Error { get; private set; }
 
@@ -38,7 +42,7 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        if (!await this.Request.CheckCaptchaValidity())
+        if (!await this.captchaService.VerifyCaptcha(this.Request))
         {
             this.Error = this.Translate(ErrorStrings.CaptchaFailed);
             return this.Page();
@@ -79,18 +83,11 @@ public class LoginForm : BaseLayout
             return this.Page();
         }
 
-        if (user.IsBanned)
-        {
-            Logger.Warn($"User {user.Username} (id: {user.UserId}) failed to login on web due to being banned", LogArea.Login);
-            this.Error = this.Translate(ErrorStrings.UserIsBanned, user.BannedReason);
-            return this.Page();
-        }
-
         WebTokenEntity webToken = new()
         {
             UserId = user.UserId,
             UserToken = CryptoHelper.GenerateAuthToken(),
-            ExpiresAt = DateTime.Now + TimeSpan.FromDays(7),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromDays(7),
             Verified = !ServerConfiguration.Instance.TwoFactorConfiguration.TwoFactorEnabled || !user.IsTwoFactorSetup,
         };
 
@@ -114,6 +111,11 @@ public class LoginForm : BaseLayout
             return string.IsNullOrWhiteSpace(redirect)
                 ? this.Redirect("~/2fa")
                 : this.Redirect("~/2fa" + "?redirect=" + HttpUtility.UrlEncode(redirect));
+        }
+
+        if (user.IsBanned)
+        {
+            return this.Redirect("~/banned");
         }
 
         if (user.PasswordResetRequired) return this.Redirect("~/passwordResetRequired");

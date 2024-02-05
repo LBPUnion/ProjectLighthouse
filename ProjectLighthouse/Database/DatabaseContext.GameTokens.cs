@@ -11,7 +11,6 @@ namespace LBPUnion.ProjectLighthouse.Database;
 
 public partial class DatabaseContext
 {
-
     public async Task<string> UsernameFromGameToken(GameTokenEntity? token)
     {
         if (token == null) return "";
@@ -34,7 +33,7 @@ public partial class DatabaseContext
 
         if (token == null) return null;
 
-        if (DateTime.Now <= token.ExpiresAt) return token;
+        if (DateTime.UtcNow <= token.ExpiresAt) return token;
 
         this.Remove(token);
         await this.SaveChangesAsync();

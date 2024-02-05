@@ -8,7 +8,6 @@ using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using IOFile = System.IO.File;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Admin;
 
@@ -33,7 +32,7 @@ public class AdminUserController : ControllerBase
 
         UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
-        
+
         string[] hashes = {
             targetedUser.PlanetHashLBP2,
             targetedUser.PlanetHashLBP3,
@@ -45,7 +44,7 @@ public class AdminUserController : ControllerBase
         {
             // Don't try to remove empty hashes. That's a horrible idea.
             if (string.IsNullOrWhiteSpace(hash)) continue;
-            
+
             // Find users with a matching hash
             List<UserEntity> users = await this.database.Users
                 .Where(u => u.PlanetHashLBP2 == hash ||
@@ -55,7 +54,7 @@ public class AdminUserController : ControllerBase
 
             // We should match at least the targeted user...
             System.Diagnostics.Debug.Assert(users.Count != 0);
-            
+
             // Reset each users' hash.
             foreach (UserEntity userWithPlanet in users)
             {
@@ -64,11 +63,11 @@ public class AdminUserController : ControllerBase
                 userWithPlanet.PlanetHashLBPVita = "";
                 Logger.Success($"Deleted planets for {userWithPlanet.Username} (id:{userWithPlanet.UserId})", LogArea.Admin);
             }
-            
+
             // And finally, attempt to remove the resource from the filesystem. We don't want that taking up space.
             try
             {
-                IOFile.Delete(FileHelper.GetResourcePath(hash));
+                FileHelper.DeleteResource(hash);
                 Logger.Success($"Deleted planet resource {hash}",
                     LogArea.Admin);
             }
@@ -83,7 +82,10 @@ public class AdminUserController : ControllerBase
                 Logger.Error($"Failed to delete planet resource {hash}\n{e}", LogArea.Admin);
             }
         }
-        
+
+        await this.database.SendNotification(targetedUser.UserId,
+            "Your earth decorations have been reset by a moderator.");
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect($"/user/{targetedUser.UserId}");
@@ -108,6 +110,6 @@ public class AdminUserController : ControllerBase
             return this.Redirect($"/moderation/newCase?type={(int)CaseType.UserBan}&affectedId={id}");
         }
 
-        return this.Redirect("/admin/users");
+        return this.Redirect("/admin/users/0");
     }
 }

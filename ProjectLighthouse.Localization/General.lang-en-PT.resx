@@ -2,7 +2,7 @@
 <root>
   <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
   </xsd:schema>
   <resheader name="resmimetype">
@@ -24,7 +24,7 @@
         <value>Secret key</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Create an account</value>
+        <value>Register</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>Forgot yer secret key?</value>
@@ -39,7 +39,7 @@
         <value>Unknown</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>Aye!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
         <value>New secret key</value>
@@ -55,5 +55,11 @@
     </data>
   <data name="email" xml:space="preserve">
         <value>Email</value>
+    </data>
+  <data name="announcements" xml:space="preserve">
+        <value>Announcements</value>
+    </data>
+  <data name="notifications" xml:space="preserve">
+        <value>Notifications</value>
     </data>
 </root>

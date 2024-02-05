@@ -5,7 +5,7 @@ using LBPUnion.ProjectLighthouse.Types.Maintenance;
 namespace LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 
 /// <summary>
-/// A record of the completion of a <see cref="IMigrationTask"/>.
+/// A record of the completion of a <see cref="MigrationTask"/>.
 /// </summary>
 public class CompletedMigrationEntity
 {

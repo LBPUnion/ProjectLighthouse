@@ -1,11 +1,19 @@
 using System.Globalization;
 using System.Net;
+using LBPUnion.ProjectLighthouse.Administration.Maintenance;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
+using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
+using LBPUnion.ProjectLighthouse.Services;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
@@ -23,26 +31,40 @@ public class WebsiteStartup
         this.Configuration = configuration;
     }
 
-    public IConfiguration Configuration { get; }
+    private IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
-        #if DEBUG
-        services.AddRazorPages().WithRazorPagesAtContentRoot().AddRazorRuntimeCompilation((options) =>
-        {
-            // jank but works
-            string projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
-            
-            options.FileProviders.Clear();
-            options.FileProviders.Add(new PhysicalFileProvider(projectDir));
-        });
-        #else
         services.AddRazorPages().WithRazorPagesAtContentRoot();
-        #endif
 
-        services.AddDbContext<DatabaseContext>();
+        services.AddDbContext<DatabaseContext>(builder =>
+        {
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion);
+        });
+
+        IMailService mailService = ServerConfiguration.Instance.Mail.MailEnabled
+            ? new MailQueueService(new SmtpMailSender())
+            : new NullMailService();
+        services.AddSingleton(mailService);
+
+        services.AddHostedService(provider => new RepeatingTaskService(provider, MaintenanceHelper.RepeatingTasks));
+
+        services.AddHttpClient<ICaptchaService, CaptchaService>("CaptchaAPI",
+            client =>
+            {
+                Uri captchaUri = ServerConfiguration.Instance.Captcha.Type switch
+                {
+                    CaptchaType.HCaptcha => new Uri("https://hcaptcha.com"),
+                    CaptchaType.ReCaptcha => new Uri("https://www.google.com/recaptcha/api/"),
+                    _ => throw new ArgumentOutOfRangeException(nameof(client)),
+                };
+                client.BaseAddress = captchaUri;
+                client.Timeout = TimeSpan.FromSeconds(5);
+                client.DefaultRequestHeaders.Add("User-Agent", "Project Lighthouse");
+            });
 
         services.Configure<ForwardedHeadersOptions>
         (
@@ -98,7 +120,10 @@ public class WebsiteStartup
 
         app.UseRequestLocalization();
 
-        app.UseEndpoints(endpoints => endpoints.MapControllers());
-        app.UseEndpoints(endpoints => endpoints.MapRazorPages());
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+            endpoints.MapRazorPages();
+        });
     }
 }

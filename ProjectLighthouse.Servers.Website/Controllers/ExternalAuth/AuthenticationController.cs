@@ -38,8 +38,7 @@ public class AuthenticationController : ControllerBase
             invalidTokens = new[] { Platform.RPCS3, };
         }
 
-        this.database.GameTokens.RemoveWhere(t => t.UserId == user.UserId && invalidTokens.Contains(t.Platform));
-
+        await this.database.GameTokens.RemoveWhere(t => t.UserId == user.UserId && invalidTokens.Contains(t.Platform));
         await this.database.SaveChangesAsync();
 
         return this.Redirect("~/authentication");

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Administration;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -15,20 +14,23 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Logging.Loggers;
 using LBPUnion.ProjectLighthouse.StorableLists;
-using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Maintenance;
-using LBPUnion.ProjectLighthouse.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Medallion.Threading.MySql;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using ServerType = LBPUnion.ProjectLighthouse.Types.Misc.ServerType;
 
 namespace LBPUnion.ProjectLighthouse;
 
 public static class StartupTasks
 {
-    public static void Run(string[] args, ServerType serverType)
+    public static async Task Run(ServerType serverType)
     {
         // Log startup time
         Stopwatch stopwatch = new();
@@ -43,7 +45,7 @@ public static class StartupTasks
         Logger.Info($"Welcome to the Project Lighthouse {serverType.ToString()}!", LogArea.Startup);
 
         Logger.Info("Loading configurations...", LogArea.Startup);
-        if (!loadConfigurations())
+        if (!LoadConfigurations())
         {
             Logger.Error("Failed to load one or more configurations", LogArea.Config);
             Environment.Exit(1);
@@ -51,22 +53,33 @@ public static class StartupTasks
 
         // Version info depends on ServerConfig 
         Logger.Info($"You are running version {VersionHelper.FullVersion}", LogArea.Startup);
+        if (VersionHelper.IsDirty)
+        {
+            Logger.Warn("This is a modified version of Project Lighthouse. " +
+                        "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
+                LogArea.Startup);
+        }
 
         Logger.Info("Connecting to the database...", LogArea.Startup);
-        bool dbConnected = ServerStatics.DbConnected;
-        if (!dbConnected)
+
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
+        try
         {
-            Logger.Error("Database unavailable! Exiting.", LogArea.Startup);
+            if (!await database.Database.CanConnectAsync())
+            {
+                Logger.Error("Database unavailable! Exiting.", LogArea.Startup);
+                Logger.Error("Ensure that you have set the dbConnectionString field in lighthouse.yml", LogArea.Startup);
+                Environment.Exit(-1);
+            }
         }
-        else
+        catch (Exception e)
         {
-            Logger.Success("Connected to the database!", LogArea.Startup);
+            Logger.Error("There was an error connecting to the database:", LogArea.Startup);
+            Logger.Error(e.ToDetailedException(), LogArea.Startup);
+            Environment.Exit(-1);
         }
 
-        if (!dbConnected) Environment.Exit(1);
-        using DatabaseContext database = new();
-        
-        migrateDatabase(database).Wait();
+        await MigrateDatabase(database);
 
         Logger.Debug
         (
@@ -77,13 +90,6 @@ public static class StartupTasks
         );
         Logger.Debug("You can do so by running any dotnet command with the flag: \"-c Release\". ", LogArea.Startup);
 
-        if (args.Length != 0)
-        {
-            List<LogLine> logLines = MaintenanceHelper.RunCommand(args).Result;
-            Console.WriteLine(logLines.ToLogString());
-            return;
-        }
-
         if (ServerConfiguration.Instance.WebsiteConfiguration.ConvertAssetsOnStartup
             && serverType == ServerType.Website)
         {
@@ -92,9 +98,6 @@ public static class StartupTasks
 
         Logger.Info("Initializing Redis...", LogArea.Startup);
         RedisDatabase.Initialize().Wait();
-
-        Logger.Info("Initializing repeating tasks...", LogArea.Startup);
-        RepeatingTaskHandler.Initialize();
 
         // Create admin user if no users exist
         if (serverType == ServerType.Website && database.Users.CountAsync().Result == 0)
@@ -106,7 +109,7 @@ public static class StartupTasks
             admin.PermissionLevel = PermissionLevel.Administrator;
             admin.PasswordResetRequired = true;
 
-            database.SaveChanges();
+            await database.SaveChangesAsync();
 
             Logger.Success("No users were found, so an admin user was created. " + 
                            $"The username is 'admin' and the password is '{passwordClear}'.", LogArea.Startup);
@@ -116,7 +119,7 @@ public static class StartupTasks
         Logger.Success($"Ready! Startup took {stopwatch.ElapsedMilliseconds}ms. Passing off control to ASP.NET...", LogArea.Startup);
     }
 
-    private static bool loadConfigurations()
+    private static bool LoadConfigurations()
     {
         Assembly assembly = Assembly.GetAssembly(typeof(ConfigurationBase<>));
         if (assembly == null) return false;
@@ -151,7 +154,7 @@ public static class StartupTasks
         return didLoad;
     }
 
-    private static async Task migrateDatabase(DatabaseContext database)
+    private static async Task MigrateDatabase(DatabaseContext database)
     {
         int? originalTimeout = database.Database.GetCommandTimeout();
         database.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
@@ -168,23 +171,53 @@ public static class StartupTasks
             Logger.Success($"Acquiring migration lock took {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
             stopwatch.Restart();
-            await database.Database.MigrateAsync();
-            stopwatch.Stop();
-            Logger.Success($"Structure migration took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+            List<string> pendingMigrations = (await database.Database.GetPendingMigrationsAsync()).ToList();
+            IMigrator migrator = database.GetInfrastructure().GetRequiredService<IMigrator>();
+
+            async Task<bool> RunLighthouseMigrations(Func<MigrationTask, bool> predicate)
+            {
+                List<MigrationTask> tasks = MaintenanceHelper.MigrationTasks
+                    .Where(predicate)
+                    .ToList();
+                foreach (MigrationTask task in tasks)
+                {
+                    if (!await MaintenanceHelper.RunMigration(database, task)) return false;
+                }
+                return true;
+            }
+
+            Logger.Info($"There are {pendingMigrations.Count} pending migrations", LogArea.Database);
+
+            foreach (string migration in pendingMigrations)
+            {
+                try
+                {
+                    await using IDbContextTransaction transaction = await database.Database.BeginTransactionAsync();
+                    Logger.Debug($"Running migration '{migration}", LogArea.Database);
+                    stopwatch.Restart();
+                    if (!await RunLighthouseMigrations(m => m.Name() == migration && m.HookType() == MigrationHook.Before))
+                        throw new Exception($"Failed to run pre migration hook for {migration}");
+
+                    await migrator.MigrateAsync(migration);
+
+                    stopwatch.Stop();
+                    Logger.Success($"Running migration '{migration}' took {stopwatch.ElapsedMilliseconds}ms.", LogArea.Database);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error($"Failed to run migration '{migration}'", LogArea.Database);
+                    Logger.Error(e.ToDetailedException(), LogArea.Database);
+                    if (database.Database.CurrentTransaction != null)
+                        await database.Database.RollbackTransactionAsync();
+                    Environment.Exit(-1);
+                }
+            }
 
             stopwatch.Restart();
 
-            List<CompletedMigrationEntity> completedMigrations = database.CompletedMigrations.ToList();
-            List<IMigrationTask> migrationsToRun = MaintenanceHelper.MigrationTasks
-                .Where(migrationTask => !completedMigrations
-                    .Select(m => m.MigrationName)
-                    .Contains(migrationTask.GetType().Name)
-                ).ToList();
+            List<string> completedMigrations = database.CompletedMigrations.Select(m => m.MigrationName).ToList();
 
-            foreach (IMigrationTask migrationTask in migrationsToRun)
-            {
-                MaintenanceHelper.RunMigration(migrationTask, database).Wait();
-            }
+            await RunLighthouseMigrations(m => !completedMigrations.Contains(m.GetType().Name) && m.HookType() == MigrationHook.None);
 
             stopwatch.Stop();
             totalStopwatch.Stop();

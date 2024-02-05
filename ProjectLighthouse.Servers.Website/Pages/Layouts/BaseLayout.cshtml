@@ -3,16 +3,29 @@
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.Servers.Website.Types
+@using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts.BaseLayout
 
 @{
     if (Model.User == null)
     {
-        Model.NavigationItemsRight.Add(new PageNavigationItem(BaseLayoutStrings.HeaderLoginRegister, "/login", "sign in"));
+        Model.NavigationItemsRight.Add(ServerConfiguration.Instance.Authentication.RegistrationEnabled
+            ? new PageNavigationItem(BaseLayoutStrings.HeaderLoginRegister, "/login", "sign in")
+            : new PageNavigationItem(BaseLayoutStrings.HeaderLogin, "/login", "sign in"));
     }
     else
     {
         Model.NavigationItems.Add(new PageNavigationItem(BaseLayoutStrings.HeaderAuthentication, "/authentication", "key"));
+
+        @if (await Model.Database.Notifications.AnyAsync(n => n.UserId == Model.User.UserId && !n.IsDismissed) ||
+             await Model.Database.WebsiteAnnouncements.AnyAsync())
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem(GeneralStrings.Notifications, "/notifications", "bell"));
+        }
+        else
+        {
+            Model.NavigationItemsRight.Add(new PageNavigationItem(GeneralStrings.Notifications, "/notifications", "bell outline"));
+        }
 
         @if (Model.User.IsAdmin)
         {
@@ -26,8 +39,8 @@
 
     Model.IsMobile = Model.Request.IsMobile();
 
-    string title = Model.Title == string.Empty 
-        ? ServerConfiguration.Instance.Customization.ServerName 
+    string title = Model.Title == string.Empty
+        ? ServerConfiguration.Instance.Customization.ServerName
         : $"{Model.Title} - {ServerConfiguration.Instance.Customization.ServerName}";
 }
 
@@ -82,7 +95,9 @@
 
                 <a class="item home-logo" href="/">
                     <img src="~/logo-mono.png" alt="Home" class="logo-mono"/>
-                    <img src="~/logo-color.png" alt="Home" class="logo-color"/>
+                    <img src="~/@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.Now.Month == 6 ? "logo-pride.png" : "logo-color.png")"
+                         alt="Home"
+                         class="logo-color"/>
                 </a>
                 @foreach (PageNavigationItem navigationItem in Model.NavigationItems)
                 {
@@ -94,7 +109,9 @@
 
                         @if (!Model.IsMobile)
                         {
-                            <span class="ui inline @navigationItem.CustomColor text">@Model.Translate(navigationItem.Name)</span>
+                            <span class="ui inline @navigationItem.CustomColor text">
+                                @Model.Translate(navigationItem.Name)
+                            </span>
                         }
                     </a>
                 }
@@ -113,11 +130,11 @@
                             }
                         </a>
                     }
-                    
+
                     @if (Model.User != null)
                     {
                         <a class="item" href="/user/@Model.User.UserId">
-                            <img src="/gameAssets/@Model.User.WebsiteAvatarHash" 
+                            <img src="/gameAssets/@Model.User.WebsiteAvatarHash"
                                  onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'"
                                  alt=""
                                  class="lighthouse-avatar"/>
@@ -148,11 +165,11 @@
                     <i class="warning icon"></i>
                     <span style="font-size: 1.2rem;">@Model.Translate(BaseLayoutStrings.LicenseWarnTitle)</span>
                     <p>
-                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn1, 
+                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn1,
                             "<a href=\"https://github.com/LBPUnion/project-lighthouse/blob/main/LICENSE\">GNU Affero General Public License v3.0</a>"))
                     </p>
                     <p>
-                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn2, 
+                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn2,
                             "<code>git status</code>", "<a href=\"https://github.com/LBPUnion/project-lighthouse/issues\">", "</a>"))
                     </p>
                     <p>
@@ -182,8 +199,29 @@
     <footer>
         <div class="ui black attached inverted segment">
             <div class="ui container">
-
-                <p>@Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)</p>
+                @{
+                    string? remoteUrl = VersionHelper.RepositoryUrl;
+                }
+                <span>
+                    @Model.Translate(BaseLayoutStrings.GeneratedBy, VersionHelper.FullVersion)
+                </span>
+                <span style="float: right;">
+                    <a href="https://github.com/LBPUnion/ProjectLighthouse/blob/main/LICENSE" target="_blank">
+                        AGPL-3.0 License
+                    </a>
+                    &centerdot;
+                    @if (!string.IsNullOrWhiteSpace(remoteUrl))
+                    {
+                        if (!remoteUrl.StartsWith("https://")) remoteUrl = $"https://{remoteUrl}";
+                        <a href="@remoteUrl" target="_blank">
+                            Source Code
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="ui text red">Cannot Detect Source Code</span>
+                    }
+                </span>
                 @if (VersionHelper.IsDirty)
                 {
                     <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>
@@ -210,18 +248,18 @@
 
             <script>
                 const collapsible = document.getElementsByClassName("collapsible");
-                
-                for (let i = 0; i < collapsible.length; i++) 
+
+                for (let i = 0; i < collapsible.length; i++)
                 {
-                  collapsible[i].addEventListener("click", function() 
+                  collapsible[i].addEventListener("click", function()
                   {
                     this.classList.toggle("active");
                     const content = this.nextElementSibling;
-                    if (content.style.display === "block") 
+                    if (content.style.display === "block")
                     {
                       content.style.display = "none";
-                    } 
-                    else 
+                    }
+                    else
                     {
                       content.style.display = "block";
                     }

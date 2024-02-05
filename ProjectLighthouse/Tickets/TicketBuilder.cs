@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tickets.Signature;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
@@ -92,7 +93,7 @@ public class TicketBuilder
 
     private static byte[] SignData(byte[] data)
     {
-        ECPrivateKeyParameters key = new(privateKey, NPTicket.Secp192R1);
+        ECPrivateKeyParameters key = new(privateKey, UnitTestSignatureVerifier.PublicKeyParams.Value.Parameters);
 
         ISigner signer = SignerUtilities.GetSigner("SHA-1withECDSA");
         signer.Init(true, key);
@@ -126,7 +127,7 @@ public class TicketBuilder
         return this;
     }
 
-    public TicketBuilder SetIssuerId(ushort issuerId)
+    public TicketBuilder SetIssuerId(uint issuerId)
     {
         this.IssuerId = issuerId;
         return this;
@@ -155,5 +156,4 @@ public class TicketBuilder
         this.Status = status;
         return this;
     }
-
 }

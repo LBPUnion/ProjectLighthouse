@@ -18,30 +18,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>The username field is blank.</value>
+        <value>Ang patlang ng pangalan ng user ay walang laman.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>The username you've chosen is already taken.</value>
+        <value>Ang napiling pangalan ng user ay mayroon nang kumuha.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>Password field is required.</value>
+        <value>Kinakailangan ang patlang ng password.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Passwords do not match!</value>
-    </data>
-  <data name="token_invalid" xml:space="preserve">
-        <value>Invalid Token</value>
+        <value>Hindi magkatugma ang mga password!</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>You must complete the captcha correctly.</value>
+        <value>Kailangan mong wastong tapusin ang captcha.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
-        <value>The email address you've chosen is already taken.</value>
+        <value>Ang napiling email address ay mayroon nang kumuha.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Email address field is required.</value>
+        <value>Kinakailangan ang patlang ng email address.</value>
     </data>
-  <data name="user_banned" xml:space="preserve">
-        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
+  <data name="action_no_permission" xml:space="preserve">
+        <value>You don't have permissions to perform this action.</value>
     </data>
 </root>

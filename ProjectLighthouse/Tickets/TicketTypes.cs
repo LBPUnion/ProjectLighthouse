@@ -8,7 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Tickets;
 
 public abstract class TicketData
 {
-    public void WriteHeader(BinaryWriter writer)
+    protected void WriteHeader(BinaryWriter writer)
     {
         byte[] id = new byte[2];
         byte[] len = new byte[2];
@@ -19,7 +19,7 @@ public abstract class TicketData
     }
 
     public abstract void Write(BinaryWriter writer);
-    public abstract short Id();
+    protected abstract short Id();
     public abstract short Len();
 }
 
@@ -31,7 +31,7 @@ public class EmptyData : TicketData
         this.WriteHeader(writer);
     }
 
-    public override short Id() => 0;
+    protected override short Id() => 0;
     public override short Len() => 0;
 }
 #endregion
@@ -54,7 +54,7 @@ public class UInt32Data : TicketData
         writer.Write(data);
     }
 
-    public override short Id() => 1;
+    protected override short Id() => 1;
     public override short Len() => 4;
 }
 #endregion
@@ -77,7 +77,7 @@ public class UInt64Data : TicketData
         writer.Write(data);
     }
 
-    public override short Id() => 2;
+    protected override short Id() => 2;
     public override short Len() => 8;
 }
 #endregion
@@ -103,7 +103,7 @@ public class StringData : TicketData
         writer.Write(this.val);
     }
 
-    public override short Id() => 4;
+    protected override short Id() => 4;
     public override short Len() => (short)this.val.Length;
 }
 #endregion
@@ -126,7 +126,7 @@ public class TimestampData : TicketData
         writer.Write(data);
     }
 
-    public override short Id() => 7;
+    protected override short Id() => 7;
     public override short Len() => 8;
 }
 #endregion
@@ -147,7 +147,7 @@ public class BinaryData : TicketData
         writer.Write(this.val);
     }
 
-    public override short Id() => 8;
+    protected override short Id() => 8;
     public override short Len() => (short)this.val.Length;
 }
 #endregion
@@ -173,7 +173,7 @@ public class BlobData : TicketData
         }
     }
 
-    public override short Id() => (short)(0x3000 | this.id);
+    protected override short Id() => (short)(0x3000 | this.id);
     public override short Len() => (short)this.data.Sum(d => d.Len() + 4);
 }
 #endregion

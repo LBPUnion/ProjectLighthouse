@@ -25,17 +25,14 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.Error))
 {
-    <div class="ui negative message">
-        <div class="header">
-            @Model.Translate(GeneralStrings.Error)
-        </div>
-        <p>@Model.Error</p>
-    </div>
+    @await Html.PartialAsync("Partials/ErrorModalPartial", (Model.Translate(GeneralStrings.Error), Model.Error), ViewData)
 }
 
 @if (Model.Username == null)
 {
-    <p><b>@Model.Translate(RegisterStrings.UsernameNotice)</b></p>
+    <p>
+        <b>@Model.Translate(RegisterStrings.UsernameNotice)</b>
+    </p>
 }
 
 <form class="ui form" onsubmit="return onSubmit(this)" method="post">

@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -6,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -47,12 +47,16 @@ public class PublishController : ControllerBase
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                "Your level failed to publish. (LH-PUB-0001)");
             return this.BadRequest(); // if the level cant be parsed then it obviously cant be uploaded
         }
 
         if (string.IsNullOrEmpty(slot.RootLevel))
         {
             Logger.Warn("Rejecting level upload, slot does not include rootLevel", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish. (LH-PUB-0002)");
             return this.BadRequest();
         }
 
@@ -61,6 +65,8 @@ public class PublishController : ControllerBase
         if (slot.Resources == null)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish. (LH-PUB-0003)");
             return this.BadRequest();
         }
 
@@ -73,11 +79,15 @@ public class PublishController : ControllerBase
             if (oldSlot == null)
             {
                 Logger.Warn("Rejecting level republish, could not find old slot", LogArea.Publish);
+                await this.database.SendNotification(user.UserId,
+                    $"{slot.Name} failed to republish. (LH-REP-0001)");
                 return this.NotFound();
             }
             if (oldSlot.CreatorId != user.UserId)
             {
                 Logger.Warn("Rejecting level republish, old slot's creator is not publishing user", LogArea.Publish);
+                await this.database.SendNotification(user.UserId,
+                    $"{slot.Name} failed to republish because you are not the original publisher. (LH-REP-0002)");
                 return this.BadRequest();
             }
         }
@@ -111,36 +121,56 @@ public class PublishController : ControllerBase
         if (slot == null)
         {
             Logger.Warn("Rejecting level upload, slot is null", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                "Your level failed to publish. (LH-PUB-0001)");
             return this.BadRequest();
         }
 
         if (slot.Resources?.Length == 0)
         {
             Logger.Warn("Rejecting level upload, resource list is null", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish. (LH-PUB-0003)");
             return this.BadRequest();
         }
         // Yes Rider, this isn't null
         Debug.Assert(slot.Resources != null, "slot.ResourceList != null");
 
-        slot.Description = CensorHelper.FilterMessage(slot.Description);
-
-        if (slot.Description.Length > 512)
-        {
-            Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)", LogArea.Publish);
-            return this.BadRequest();
-        }
-
         slot.Name = CensorHelper.FilterMessage(slot.Name);
 
         if (slot.Name.Length > 64)
         {
-            Logger.Warn($"Rejecting level upload, title too long ({slot.Name.Length} characters)", LogArea.Publish);
+            Logger.Warn($"Rejecting level upload, title too long ({slot.Name.Length} characters)",
+                LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish because the name is too long, {slot.Name.Length} characters. (LH-PUB-0004)");
+            return this.BadRequest();
+        }
+
+        slot.Description = CensorHelper.FilterMessage(slot.Description);
+
+        if (slot.Description.Length > 512)
+        {
+            Logger.Warn($"Rejecting level upload, description too long ({slot.Description.Length} characters)",
+                LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish because the description is too long, {slot.Description.Length} characters. (LH-PUB-0005)");
+            return this.BadRequest();
+        }
+
+        if (!GameResourceHelper.IsValidTexture(slot.IconHash))
+        {
+            Logger.Warn("Rejecting level upload, invalid icon resource", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish because your level icon is invalid. (LH-PUB-0010)");
             return this.BadRequest();
         }
 
         if (slot.Resources.Any(resource => !FileHelper.ResourceExists(resource)))
         {
             Logger.Warn("Rejecting level upload, missing resource(s)", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish because the server is missing resources. (LH-PUB-0006)");
             return this.BadRequest();
         }
 
@@ -149,6 +179,8 @@ public class PublishController : ControllerBase
         if (rootLevel == null)
         {
             Logger.Warn("Rejecting level upload, unable to find rootLevel", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish. (LH-PUB-0002)");
             return this.BadRequest();
         }
 
@@ -157,6 +189,8 @@ public class PublishController : ControllerBase
             if (rootLevel.FileType != LbpFileType.Level)
             {
                 Logger.Warn("Rejecting level upload, rootLevel is not a level", LogArea.Publish);
+                await this.database.SendNotification(user.UserId,
+                    $"{slot.Name} failed to publish. (LH-PUB-0007)");
                 return this.BadRequest();
             }
         }
@@ -165,8 +199,10 @@ public class PublishController : ControllerBase
             if (rootLevel.FileType != LbpFileType.Adventure)
             {
                 Logger.Warn("Rejecting level upload, rootLevel is not a LBP 3 Adventure", LogArea.Publish);
+                await this.database.SendNotification(user.UserId,
+                    $"{slot.Name} failed to publish. (LH-PUB-0008)");
                 return this.BadRequest();
-            }      
+            }
         }
 
         GameVersion slotVersion = FileHelper.ParseLevelVersion(rootLevel);
@@ -179,41 +215,41 @@ public class PublishController : ControllerBase
         if (!slot.Resources.Contains(slot.RootLevel))
             slot.Resources = slot.Resources.Append(rootLevel.Hash).ToArray();
 
-        string resourceCollection = string.Join(",", slot.Resources); 
+        string resourceCollection = string.Join(",", slot.Resources);
 
-        // Republish logic
+        SlotEntity? oldSlot = null;
         if (slot.SlotId != 0)
         {
-            SlotEntity? oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
-            if (oldSlot == null)
-            {
-                Logger.Warn("Rejecting level republish, wasn't able to find old slot", LogArea.Publish);
-                return this.NotFound();
-            }
+            oldSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == slot.SlotId);
+        }
 
+        // Republish logic
+        if (oldSlot != null)
+        {
             if (oldSlot.CreatorId != user.UserId)
             {
                 Logger.Warn("Rejecting level republish, old level not owned by current user", LogArea.Publish);
+                await this.database.SendNotification(user.UserId,
+                    $"{slot.Name} failed to republish because you are not the original publisher. (LH-REP-0002)");
                 return this.BadRequest();
             }
 
-            // I hate lbp3
-            if (game != null)
+            // This is a workaround to prevent lbp3 from overwriting the rootLevel of older levels
+            // For some reason when republishing in lbp3 it automatically converts the level to lbp3
+            // so it must be handled here. The game query is only sent by lbp3 so it can be safely assumed
+            // that if it is present, then the level must be be checked for conversion
+            GameVersion intendedVersion = game != null ? FromAbbreviation(game) : slot.GameVersion;
+            if (intendedVersion != GameVersion.Unknown && intendedVersion == slot.GameVersion)
             {
-                GameVersion intendedVersion = FromAbbreviation(game);
-                if (intendedVersion != GameVersion.Unknown && intendedVersion != slotVersion)
-                {
-                    // Delete the useless rootLevel that lbp3 just uploaded
-                    if (slotVersion == GameVersion.LittleBigPlanet3)
-                        FileHelper.DeleteResource(rootLevel.Hash);
-                    else
-                    // Only change the rootLevel and gameversion if it's not lbp3
-                    {
-                        oldSlot.GameVersion = slot.GameVersion;
-                        oldSlot.RootLevel = rootLevel.Hash;
-                        oldSlot.ResourceCollection = resourceCollection;
-                    }
-                }
+                oldSlot.GameVersion = slot.GameVersion;
+                oldSlot.RootLevel = rootLevel.Hash;
+                oldSlot.ResourceCollection = resourceCollection;
+            }
+            else
+            {
+                Logger.Warn(
+                    $"Slot rootLevel divergence: game={game}, slotVersion={slot.GameVersion}, intendedVersion={intendedVersion}, oldVersion={oldSlot.GameVersion}",
+                    LogArea.Publish);
             }
 
             oldSlot.Name = slot.Name;
@@ -243,6 +279,14 @@ public class PublishController : ControllerBase
             oldSlot.MinimumPlayers = Math.Clamp(slot.MinimumPlayers, 1, 4);
             oldSlot.MaximumPlayers = Math.Clamp(slot.MaximumPlayers, 1, 4);
 
+            // Check if the level has been locked by a moderator to avoid unlocking it
+            if (oldSlot.LockedByModerator && !slot.InitiallyLocked)
+            {
+                await this.database.SendNotification(user.UserId,
+                    $"{slot.Name} will not be unlocked because it has been locked by a moderator. (LH-REP-0003)");
+                oldSlot.InitiallyLocked = true;
+            }
+
             await this.database.SaveChangesAsync();
             return this.Ok(SlotBase.CreateFromEntity(oldSlot, token));
         }
@@ -252,6 +296,8 @@ public class PublishController : ControllerBase
         if (usedSlots > user.EntitledSlots)
         {
             Logger.Warn("Rejecting level upload, too many published slots", LogArea.Publish);
+            await this.database.SendNotification(user.UserId,
+                $"{slot.Name} failed to publish because you have reached the maximum number of levels on your earth. (LH-PUB-0009)");
             return this.BadRequest();
         }
 

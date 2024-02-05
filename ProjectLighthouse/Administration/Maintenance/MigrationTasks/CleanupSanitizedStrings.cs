@@ -8,11 +8,11 @@ using LBPUnion.ProjectLighthouse.Types.Maintenance;
 
 namespace LBPUnion.ProjectLighthouse.Administration.Maintenance.MigrationTasks;
 
-public class CleanupSanitizedStrings : IMigrationTask
+public class CleanupSanitizedStrings : MigrationTask
 {
-    public string Name() => "Cleanup Sanitized strings";
+    public override string Name() => "Cleanup Sanitized strings";
 
-    async Task<bool> IMigrationTask.Run(DatabaseContext database)
+    public override async Task<bool> Run(DatabaseContext database)
     {
         List<object> objsToBeSanitized = new();
 

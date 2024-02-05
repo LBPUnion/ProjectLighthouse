@@ -1,12 +1,16 @@
-#nullable enable
+using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Mail;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,42 +54,72 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        string announceText = ServerConfiguration.Instance.AnnounceText;
+        StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
 
-        announceText = announceText.Replace("%user", username);
-        announceText = announceText.Replace("%id", token.UserId.ToString());
+        announceText.Replace("%user", username);
+        announceText.Replace("%id", token.UserId.ToString());
 
-        return this.Ok
-        (
-            announceText +
-            #if DEBUG
-            "\n\n---DEBUG INFO---\n" +
-            $"user.UserId: {token.UserId}\n" +
-            $"token.UserLocation: {token.UserLocation}\n" +
-            $"token.GameVersion: {token.GameVersion}\n" +
-            $"token.TicketHash: {token.TicketHash}\n" +
-            $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
-            "---DEBUG INFO---" +
-            #endif
-            (string.IsNullOrWhiteSpace(announceText) ? "" : "\n")
-        );
+        #if DEBUG
+        announceText.Append("\n\n---DEBUG INFO---\n" +
+                                  $"user.UserId: {token.UserId}\n" +
+                                  $"token.UserLocation: {token.UserLocation}\n" +
+                                  $"token.GameVersion: {token.GameVersion}\n" +
+                                  $"token.TicketHash: {token.TicketHash}\n" +
+                                  $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
+                                  "---DEBUG INFO---");
+        #endif
+
+        return this.Ok(announceText.ToString());
     }
 
     [HttpGet("notification")]
-    public IActionResult Notification() => this.Ok();
+    [Produces("text/xml")]
+    public async Task<IActionResult> Notification()
+    {
+        GameTokenEntity token = this.GetToken();
+
+        List<NotificationEntity> notifications = await this.database.Notifications
+            .Where(n => n.UserId == token.UserId)
+            .Where(n => !n.IsDismissed)
+            .OrderByDescending(n => n.Id)
+            .ToListAsync();
+
+        // We don't need to do any more work if there are no unconverted notifications to begin with.
+        if (notifications.Count == 0) return this.Ok();
+
+        StringBuilder builder = new();
+
+        foreach (NotificationEntity notification in notifications)
+        {
+            builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,
+                GameNotification.CreateFromEntity(notification)));
+
+            notification.IsDismissed = true;
+        }
+
+        await this.database.SaveChangesAsync();
+
+        return this.Ok(new LbpCustomXml
+        {
+            Content = builder.ToString(),
+        });
+    }
 
     /// <summary>
     ///     Filters chat messages sent by a user.
     ///     The response sent is the text that will appear in-game.
     /// </summary>
     [HttpPost("filter")]
-    public async Task<IActionResult> Filter()
+    public async Task<IActionResult> Filter(IMailService mailService)
     {
         GameTokenEntity token = this.GetToken();
 
         string message = await this.ReadBodyAsync();
 
-        if (message.StartsWith("/setemail "))
+        const int lbpCharLimit = 512;
+        if (message.Length > lbpCharLimit) return this.BadRequest();
+
+        if (message.StartsWith("/setemail ") && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
             if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
@@ -96,17 +130,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             if (user == null || user.EmailAddressVerified) return this.Ok();
 
             user.EmailAddress = email;
-            await SMTPHelper.SendVerificationEmail(this.database, user);
+            await SMTPHelper.SendVerificationEmail(this.database, mailService, user);
 
             return this.Ok();
         }
 
-        string filteredText = CensorHelper.FilterMessage(message);
-
         string username = await this.database.UsernameFromGameToken(token);
 
-        if (ServerConfiguration.Instance.LogChatFiltering) 
-          Logger.Info($"{username}: {message} / {filteredText}", LogArea.Filter);
+        string filteredText = CensorHelper.FilterMessage(message);
+
+        if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
+
+        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != message)
+            Logger.Info(
+                $"Censored profane word(s) from in-game text sent by {username}: \"{message}\" => \"{filteredText}\"",
+                LogArea.Filter);
 
         return this.Ok(filteredText);
     }

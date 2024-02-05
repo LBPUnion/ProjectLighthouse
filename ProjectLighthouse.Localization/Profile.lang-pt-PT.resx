@@ -26,4 +26,7 @@
   <data name="title" xml:space="preserve">
         <value>Página do usuário {0}</value>
     </data>
+  <data name="profile_tag" xml:space="preserve">
+        <value>Profile Tag</value>
+    </data>
 </root>

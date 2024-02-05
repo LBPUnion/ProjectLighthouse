@@ -44,7 +44,7 @@ function onSubmit(e){
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
         <div class="ui blue segment">
-            <h1><i class="cog icon"></i>@Model.ProfileUser.Username's Settings</h1>
+            <h1><i class="cog icon"></i>@Model.ProfileUser.Username's Profile Settings</h1>
             <div class="ui divider"></div>
             <form id="form" method="POST" class="ui form center aligned" action="/user/@Model.ProfileUser.UserId/settings" onsubmit="onSubmit(event)">
                 @Html.AntiForgeryToken()
@@ -61,7 +61,7 @@ function onSubmit(e){
                     </div>
                 </div>
                 <div class="field">
-                    <label style="text-align: left" for="username">@Model.Translate(GeneralStrings.Username)</label>
+                    <label style="text-align: left" for="username">@Model.Translate(GeneralStrings.Username) <i class="ui icon lock"></i></label>
                     <input type="text" name="username" id="username" value="@Model.ProfileUser.Username" placeholder="Username" readonly>
                 </div>
                 @if (ServerConfiguration.Instance.Mail.MailEnabled && (Model.User == Model.ProfileUser || Model.User!.IsAdmin))
@@ -71,6 +71,16 @@ function onSubmit(e){
                         <input type="text" name="email" id="email" required value="@Model.ProfileUser.EmailAddress" placeholder="Email Address">
                     </div>
                 }
+                <div class="field">
+                    <label style="text-align: left" for="profileTag">
+                        @Model.Translate(ProfileStrings.ProfileTag)
+                        @if (!Model.User!.IsAdmin)
+                        {
+                            <i class="ui icon lock"></i>
+                        }
+                    </label>
+                    <input type="text" name="profileTag" id="profileTag" value="@Model.ProfileUser.ProfileTag" placeholder="Profile Tag" @(!Model.User!.IsAdmin ? "readonly" : "")>
+                </div>
                 <div class="field">
                     <label style="text-align: left" for="biography">@Model.Translate(ProfileStrings.Biography)</label>
                     <textarea name="biography" id="biography" spellcheck="false" placeholder="Biography">@HttpUtility.HtmlDecode(Model.ProfileUser.Biography)</textarea>

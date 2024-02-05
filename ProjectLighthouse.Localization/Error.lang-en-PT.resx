@@ -29,9 +29,6 @@
   <data name="password_doesnt_match" xml:space="preserve">
         <value>Secret keys do not match!</value>
     </data>
-  <data name="token_invalid" xml:space="preserve">
-        <value>Invalid Token</value>
-    </data>
   <data name="captcha_failed" xml:space="preserve">
         <value>Ye must complete the captcha correctly.</value>
     </data>
@@ -41,7 +38,7 @@
   <data name="email_invalid" xml:space="preserve">
         <value>Email address field be required.</value>
     </data>
-  <data name="user_banned" xml:space="preserve">
-        <value>Ye 'ave been banned. Please contact an administrator fer more information.\nreason: {0}</value>
+  <data name="action_no_permission" xml:space="preserve">
+        <value>Ye don't 'ave permissions t' perform this action.</value>
     </data>
 </root>

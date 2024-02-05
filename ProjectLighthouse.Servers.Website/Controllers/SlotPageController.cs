@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -68,16 +69,21 @@ public class SlotPageController : ControllerBase
             return this.Redirect("~/slot/" + id);
         }
 
-        msg = CensorHelper.FilterMessage(msg);
+        string username = await this.database.UsernameFromWebToken(token);
+        string filteredText = CensorHelper.FilterMessage(msg);
 
-        bool success = await this.database.PostComment(token.UserId, id, CommentType.Level, msg);
+        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != msg)
+            Logger.Info($"Censored profane word(s) from slot comment sent by {username}: \"{msg}\" => \"{filteredText}\"",
+                LogArea.Filter);
+
+        bool success = await this.database.PostComment(token.UserId, id, CommentType.Level, filteredText);
         if (success)
         {
-            Logger.Success($"Posted comment from {token.UserId}: \"{msg}\" on level {id}", LogArea.Comments);
+            Logger.Success($"Posted comment from {username}: \"{filteredText}\" on level {id}", LogArea.Comments);
         }
         else
         {
-            Logger.Error($"Failed to post comment from {token.UserId}: \"{msg}\" on level {id}", LogArea.Comments);
+            Logger.Error($"Failed to post comment from {username}: \"{filteredText}\" on level {id}", LogArea.Comments);
         }
 
         return this.Redirect("~/slot/" + id);

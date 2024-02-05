@@ -1,10 +1,14 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -42,18 +46,25 @@ public class CommentController : ControllerBase
 
     [HttpGet("comments/{slotType}/{slotId:int}")]
     [HttpGet("userComments/{username}")]
-    public async Task<IActionResult> GetComments([FromQuery] int pageStart, [FromQuery] int pageSize, string? username, string? slotType, int slotId)
+    public async Task<IActionResult> GetComments(string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
 
-        if (pageSize <= 0 || pageStart < 0) return this.BadRequest();
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Unauthorized();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
+
+        int originalSlotId = slotId;
 
         if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
         int targetId;
         CommentType type = username == null ? CommentType.Level : CommentType.Profile;
+
+        PaginationData pageData = this.Request.GetPaginationData();
+
+        IQueryable<CommentEntity> baseQuery = this.database.Comments.Where(c => c.Type == type);
 
         if (type == CommentType.Level)
         {
@@ -61,6 +72,8 @@ public class CommentController : ControllerBase
                 .Where(s => s.CommentsEnabled && !s.Hidden)
                 .Select(s => s.SlotId)
                 .FirstOrDefaultAsync();
+
+            baseQuery = baseQuery.Where(c => c.TargetSlotId == targetId);
         }
         else
         {
@@ -68,6 +81,8 @@ public class CommentController : ControllerBase
                 .Where(u => u.CommentsEnabled)
                 .Select(u => u.UserId)
                 .FirstOrDefaultAsync();
+
+            baseQuery = baseQuery.Where(c => c.TargetUserId == targetId);
         }
 
         if (targetId == 0) return this.NotFound();
@@ -77,15 +92,23 @@ public class CommentController : ControllerBase
                 where blockedProfile.UserId == token.UserId
                 select blockedProfile.BlockedUserId).ToListAsync();
 
-        List<GameComment> comments = await this.database.Comments.Where(p => p.TargetId == targetId && p.Type == type)
-            .OrderByDescending(p => p.Timestamp)
-            .Where(p => !blockedUsers.Contains(p.PosterUserId))
+        List<GameComment> comments = (await baseQuery.OrderByDescending(c => c.Timestamp)
+            .Where(c => !blockedUsers.Contains(c.PosterUserId))
             .Include(c => c.Poster)
-            .Where(p => p.Poster.PermissionLevel != PermissionLevel.Banned)
-            .Skip(Math.Max(0, pageStart - 1))
-            .Take(Math.Min(pageSize, 30))
-            .Select(c => GameComment.CreateFromEntity(c, token.UserId))
-            .ToListAsync();
+            .Where(c => c.Poster.PermissionLevel != PermissionLevel.Banned)
+            .ApplyPagination(pageData)
+            .ToListAsync()).ToSerializableList(c => GameComment.CreateFromEntity(c, token.UserId));
+
+        if (type == CommentType.Level && slotType == "developer" && user.IsModerator && pageData.PageStart == 1)
+        {
+            comments.Insert(0, new GameComment
+            {
+                CommentId = 0,
+                Timestamp = 0,
+                AuthorUsername = "LH",
+                Message = $"Slot ID: {targetId}, Story level ID: {originalSlotId}",
+            });
+        }
 
         return this.Ok(new CommentListResponse(comments));
     }
@@ -97,7 +120,7 @@ public class CommentController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         GameComment? comment = await this.DeserializeBody<GameComment>();
-        if (comment == null) return this.BadRequest();
+        if (comment?.Message == null) return this.BadRequest();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 
@@ -119,6 +142,10 @@ public class CommentController : ControllerBase
         }
 
         string filteredText = CensorHelper.FilterMessage(comment.Message);
+
+        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != comment.Message)
+            Logger.Info($"Censored profane word(s) from in-game comment sent by {username}: \"{comment.Message}\" => \"{filteredText}\"",
+                LogArea.Filter);
 
         bool success = await this.database.PostComment(token.UserId, targetId, type, filteredText);
         if (success) return this.Ok();
@@ -142,15 +169,15 @@ public class CommentController : ControllerBase
         bool canDelete;
         if (comment.Type == CommentType.Profile)
         {
-            canDelete = comment.PosterUserId == token.UserId || comment.TargetId == token.UserId;
+            canDelete = comment.PosterUserId == token.UserId || comment.TargetUserId == token.UserId;
         }
         else
         {
             if (slotType == "developer") slotId = await SlotHelper.GetPlaceholderSlotId(this.database, slotId, SlotType.Developer);
 
-            if (slotId != comment.TargetId) return this.BadRequest();
+            if (slotId != comment.TargetSlotId) return this.BadRequest();
 
-            int slotCreator = await this.database.Slots.Where(s => s.SlotId == comment.TargetId)
+            int slotCreator = await this.database.Slots.Where(s => s.SlotId == comment.TargetSlotId)
                 .Where(s => s.CommentsEnabled)
                 .Select(s => s.CreatorId)
                 .FirstOrDefaultAsync();

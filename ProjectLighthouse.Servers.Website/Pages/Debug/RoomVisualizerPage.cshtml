@@ -1,10 +1,12 @@
 @page "/debug/roomVisualizer"
+@using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Extensions
 @using LBPUnion.ProjectLighthouse.Helpers
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
 @using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms
 @using LBPUnion.ProjectLighthouse.Types.Users
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Debug.RoomVisualizerPage
+@inject DatabaseContext Database
 
 @{
     Layout = "Layouts/BaseLayout";
@@ -59,7 +61,7 @@
 #nullable enable
     if (version == GameVersion.LittleBigPlanet1 || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown) continue;
 
-    FindBestRoomResponse? response = RoomHelper.FindBestRoom(null, version, null, null, null);
+    FindBestRoomResponse? response = RoomHelper.FindBestRoom(Database, null, version, null, null, null);
     string text = response == null ? "No room found." : "Room " + response.RoomId;
 
     <p><b>Best room for @version.ToPrettyString()</b>: @text</p>

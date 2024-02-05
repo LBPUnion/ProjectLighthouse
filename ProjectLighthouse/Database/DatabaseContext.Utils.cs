@@ -49,13 +49,6 @@ public partial class DatabaseContext
 
         await this.SaveChangesAsync();
 
-        if (!ServerConfiguration.Instance.Mail.MailEnabled || emailAddress == null) return user;
-
-        string body = "An account for Project Lighthouse has been registered with this email address.\n\n" +
-                      $"You can login at {ServerConfiguration.Instance.ExternalUrl}.";
-
-        SMTPHelper.SendEmail(emailAddress, "Project Lighthouse Account Created: " + username, body);
-
         return user;
     }
 
@@ -79,7 +72,7 @@ public partial class DatabaseContext
             Platform = npTicket.Platform,
             TicketHash = npTicket.TicketHash,
             // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
-            ExpiresAt = DateTime.Now + TimeSpan.FromHours(1),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromHours(1),
         };
 
         this.GameTokens.Add(gameToken);
@@ -129,6 +122,8 @@ public partial class DatabaseContext
 
     public async Task HeartUser(int userId, UserEntity heartedUser)
     {
+        if (userId == heartedUser.UserId) return;
+
         HeartedProfileEntity? heartedProfile = await this.HeartedProfiles.FirstOrDefaultAsync(q => q.UserId == userId && q.HeartedUserId == heartedUser.UserId);
         if (heartedProfile != null) return;
 
@@ -170,9 +165,7 @@ public partial class DatabaseContext
     {
         if (userId == blockedUser.UserId) return;
 
-        this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
-
-        await this.SaveChangesAsync();
+        await this.BlockedProfiles.RemoveWhere(bp => bp.BlockedUserId == blockedUser.UserId && bp.UserId == userId);
     }
 
     public async Task<bool> IsUserBlockedBy(int userId, int targetId)

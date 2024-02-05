@@ -68,21 +68,21 @@ services:
       - "./data:/lighthouse/data:z"
       - "./data/.aspnet:/lighthouse/.aspnet:z"
   db:
-    image: mariadb
+    image: mariadb:latest
     container_name: db
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: lighthouse
       MARIADB_DATABASE: lighthouse
     healthcheck:
-      test: "/usr/bin/mysql --user=root --password=lighthouse --execute \"SHOW DATABASES;\""
+      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect"]
       timeout: 10s
       interval: 5s
       retries: 5
     volumes:
       - "database:/var/lib/mysql"
   redis:
-    image: redis/redis-stack-server
+    image: redis/redis-stack-server:latest
     container_name: redis
     restart: unless-stopped
     volumes:

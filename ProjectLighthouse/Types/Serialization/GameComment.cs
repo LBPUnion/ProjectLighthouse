@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,6 +53,8 @@ public class GameComment : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
+        if (this.CommentId == 0 || this.PosterUserId == 0) return;
+
         this.AuthorUsername = await database.Users.Where(u => u.UserId == this.PosterUserId)
             .Select(u => u.Username)
             .FirstOrDefaultAsync();

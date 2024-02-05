@@ -18,51 +18,51 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="enable_2fa" xml:space="preserve">
-        <value>Enable Two-Factor</value>
+        <value>İki Aşamalı Doğrulamayı Etkinleştir</value>
     </data>
   <data name="disable_2fa" xml:space="preserve">
-        <value>Disable Two-Factor</value>
+        <value>İki Aşamalı Doğrulamayı Devre Dışı Bırak</value>
     </data>
   <data name="qr_description" xml:space="preserve">
-        <value>Once you have added this two factor code to your app of choice, enter a valid code below to finish the setup process</value>
+        <value>Bu iki faktörlü kodu tercih ettiğiniz uygulamanıza ekledikten sonra, kurulum işlemini tamamlamak için aşağıya geçerli bir kod girin</value>
     </data>
   <data name="qr_title" xml:space="preserve">
-        <value>Here is your Two-Factor QR code</value>
+        <value>İşte İki Aşamalı Doğrulama QR kodunuz</value>
     </data>
   <data name="backup_title" xml:space="preserve">
-        <value>Backup codes</value>
+        <value>Yedek kodlar</value>
     </data>
   <data name="backup_description" xml:space="preserve">
-        <value>These codes will allow you to regain access to your account if you ever lose access to your 2FA device</value>
+        <value>Bu kodlar, 2AD cihazınıza erişiminizi kaybederseniz, hesabınıza yeniden erişim kazanmanıza izin verecektir</value>
     </data>
   <data name="backup_description2" xml:space="preserve">
-        <value>Save these codes somewhere because otherwise you may be locked out of your account</value>
+        <value>Bu kodları bir yere kaydedin çünkü aksi takdirde hesabınıza erişiminizi kaybedebilirsiniz</value>
     </data>
   <data name="backup_confirmation" xml:space="preserve">
-        <value>I've saved these codes</value>
+        <value>Bu kodları kaydettim</value>
     </data>
   <data name="invalid_code" xml:space="preserve">
-        <value>Invalid 2FA Code</value>
+        <value>Geçersiz 2AD Kodu</value>
     </data>
   <data name="disable_2fa_description" xml:space="preserve">
-        <value>To disable two-factor authentication, enter a correct code from your authenticator app.</value>
+        <value>İki aşamalı kimlik doğrulamayı devre dışı bırakmak için kimlik doğrulayıcı uygulamanızdan doğru kodu girin.</value>
     </data>
   <data name="2fa" xml:space="preserve">
-        <value>Two-Factor Authentication</value>
+        <value>İki Aşamalı Kimlik Doğrulama</value>
     </data>
   <data name="2fa_required" xml:space="preserve">
-        <value>You are required to setup 2FA because of your role within this instance.</value>
+        <value>Bu örnek içindeki rolünüz nedeniyle 2 Aşamalı Doğrulamayı kurmanız gerekmektedir.</value>
     </data>
   <data name="2fa_description" xml:space="preserve">
-        <value>Enter a valid 2FA code to continue</value>
+        <value>Devam etmek için geçerli bir 2AD kodu girin</value>
     </data>
   <data name="2fa_backup_description" xml:space="preserve">
-        <value>Alternatively, you can click {0}here{1} to enter one of your backup codes</value>
+        <value>Alternatif olarak, yedek kodlarınızdan birini girmek için {0}buraya{1} tıklayabilirsiniz</value>
     </data>
   <data name="backup_download" xml:space="preserve">
-        <value>Download backup codes</value>
+        <value>Yedek kodları indir</value>
     </data>
   <data name="invalid_backup" xml:space="preserve">
-        <value>Invalid Backup Code</value>
+        <value>Geçersiz Yedek Kodu</value>
     </data>
 </root>

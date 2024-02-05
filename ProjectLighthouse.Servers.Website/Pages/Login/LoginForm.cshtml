@@ -29,21 +29,19 @@
 
 <div class="ui middle aligned center aligned grid">
     <form class="ui form" onsubmit="return onSubmit(this)" method="post">
-    @if (!string.IsNullOrWhiteSpace(Model.Error))
+        @if (!string.IsNullOrWhiteSpace(Model.Error))
         {
-            <div class="ui negative message">
-                <div class="header">
-                    @Model.Translate(GeneralStrings.Error)
-                </div>
-                <p style="white-space: pre-line">@Model.Error</p>
-            </div>
+            @await Html.PartialAsync("Partials/ErrorModalPartial", (Model.Translate(GeneralStrings.Error), Model.Error), ViewData)
         }
         @Html.AntiForgeryToken()
         <input type="hidden" id="redirect" name="redirect">
-    
+
         <div class="column">
             <h2 class="ui black image header centered">
-                <img src="~/logo-color.png" class="image" style="width: 128px;">
+                <img src="~/@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.Now.Month == 6 ? "logo-pride.png" : "logo-color.png")"
+                     alt="Instance logo"
+                     class="image"
+                     style="width: 128px;"/>
                 <div class="content">
                     @Model.Title
                 </div>
@@ -81,7 +79,7 @@
                     @Model.Translate(GeneralStrings.ForgotPassword)
                 </div>
             </a>
-            
+
             @if (ServerConfiguration.Instance.Authentication.RegistrationEnabled)
             {
                 <div class="ui divider"></div>

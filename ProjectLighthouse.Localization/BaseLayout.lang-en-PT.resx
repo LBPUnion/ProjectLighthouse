@@ -21,10 +21,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
   </resheader>
-  <data name="header_home" xml:space="preserve">
-        <value>'ome</value>
-        <comment>A button on the header that takes you to the landing page.</comment>
-    </data>
   <data name="header_users" xml:space="preserve">
         <value>Gentlemen o' fortune</value>
         <comment>A button on the header that takes you to the user listing.</comment>
@@ -38,19 +34,19 @@
         <comment>A button on the header that takes you to a list of user-uploaded levels. Levels are internally referred to as "slots".</comment>
     </data>
   <data name="header_authentication" xml:space="preserve">
-        <value>Authentication</value>
+        <value>Treasure chest</value>
         <comment>A button on the header that takes you to a list of authentication attempts.</comment>
+    </data>
+  <data name="header_login" xml:space="preserve">
+        <value>Unlock</value>
+        <comment>A button on the header that lets you log in.</comment>
     </data>
   <data name="header_loginRegister" xml:space="preserve">
         <value>Go Aboard / Register</value>
         <comment>A button on the header that lets you log in or register.</comment>
     </data>
-  <data name="header_profile" xml:space="preserve">
-        <value>Ship</value>
-        <comment>A quick shortcut on the header to take you to your profile if logged in.</comment>
-    </data>
   <data name="header_adminPanel" xml:space="preserve">
-        <value>Admin</value>
+        <value>Captain's deck</value>
         <comment>A header link that takes you to the admin panel if available.</comment>
     </data>
   <data name="header_logout" xml:space="preserve">
@@ -58,7 +54,7 @@
         <comment>A shortcut to log you out of your account.</comment>
     </data>
   <data name="header_modPanel" xml:space="preserve">
-        <value>Mod Panel</value>
+        <value>First mate's quarters</value>
     </data>
   <data name="generated_by" xml:space="preserve">
         <value>This here ship be made by {0}.</value>

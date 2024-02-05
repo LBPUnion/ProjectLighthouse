@@ -32,6 +32,7 @@ public struct SectionHeader
 {
     public SectionType Type;
     public ushort Length;
+    public int Position;
 }
 
 public class TicketReader : BinaryReader
@@ -39,7 +40,9 @@ public class TicketReader : BinaryReader
     public TicketReader([NotNull] Stream input) : base(input)
     {}
 
-    public TicketVersion ReadTicketVersion() => new((byte)(this.ReadByte() >> 4), this.ReadByte());
+    public TicketVersion ReadTicketVersion() => (TicketVersion)this.ReadUInt16BE();
+
+    public void SkipBytes(long bytes) => this.BaseStream.Position += bytes;
 
     public SectionHeader ReadSectionHeader()
     {
@@ -49,6 +52,7 @@ public class TicketReader : BinaryReader
         {
             Type = (SectionType)this.ReadByte(),
             Length = this.ReadUInt16BE(),
+            Position = (int)(this.BaseStream.Position - 4),
         };
 
         return sectionHeader;

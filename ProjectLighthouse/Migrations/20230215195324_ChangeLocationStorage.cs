@@ -59,7 +59,6 @@ namespace ProjectLighthouse.Migrations
                 table: "Slots");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

@@ -1,7 +1,9 @@
 @using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
-@using LBPUnion.ProjectLighthouse.Types.Users
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
+@using Microsoft.EntityFrameworkCore
 @model LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity
+@inject DatabaseContext Database
 
 @{
     bool showLink = (bool?)ViewData["ShowLink"] ?? false;
@@ -20,11 +22,17 @@
         @if (showLink)
         {
             <h2 style="margin-bottom: 2px;">
-                <a href="~/user/@Model.UserId">@Model.Username</a>
+                <a href="~/user/@Model.UserId/@Model.GenerateSlug()">@Model.Username</a>
                     @if (Model.IsModerator)
                     {
-                        <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                        <span class="profile-tag ui label @Model.PermissionLevel.ToHtmlColor()">
                             @Model.PermissionLevel.ToString()
+                        </span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.ProfileTag))
+                    {
+                        <span class="profile-tag ui label">
+                            @Model.ProfileTag
                         </span>
                     }
             </h2>
@@ -35,28 +43,35 @@
                 @Model.Username
                 @if (Model.IsModerator)
                 {
-                    <span class="permissionBadge" style="background-color: @Model.PermissionLevel.ToHtmlColor();">
+                    <span class="profile-tag ui label @Model.PermissionLevel.ToHtmlColor()">
                         @Model.PermissionLevel.ToString()
+                    </span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.ProfileTag))
+                {
+                    <span class="profile-tag ui label">
+                        @Model.ProfileTag
                     </span>
                 }
             </h1>
         }
         @{
-            await using DatabaseContext context = new();
-
-            int hearts = Model.GetHeartCount(context);
-            int comments = Model.GetCommentCount(context);
-            int levels = Model.GetUsedSlotCount(context);
-            int photos = Model.GetUploadedPhotoCount(context);
+            var stats = await Database.Users.Where(u => u.UserId == Model.UserId).Select(_ => new
+            {
+                HeartCount = Database.HeartedProfiles.Count(hp => hp.HeartedUserId == Model.UserId),
+                CommentCount = Database.Comments.Count(c => c.PosterUserId == Model.UserId),
+                LevelCount = Database.Slots.Count(s => s.CreatorId == Model.UserId),
+                PhotoCount = Database.Photos.Count(p => p.CreatorId == Model.UserId),
+            }).OrderBy(_ => 1).FirstAsync();
         }
         <span>
-            <i>@Model.GetStatus(context).ToTranslatedString(language, timeZone)</i>
+            <i>@Model.GetStatus(Database).ToTranslatedString(language, timeZone)</i>
         </span>
         <div class="cardStatsUnderTitle">
-            <i class="pink heart icon" title="Hearts"></i> <span>@hearts</span>
-            <i class="blue comment icon" title="Comments"></i> <span>@comments</span>
-            <i class="green upload icon" title="Uploaded Levels"></i><span>@levels</span>
-            <i class="purple camera icon" title="Uploaded Photos"></i><span>@photos</span>
+            <i class="pink heart icon" title="Hearts"></i> <span>@stats.HeartCount</span>
+            <i class="blue comment icon" title="Comments"></i> <span>@stats.CommentCount</span>
+            <i class="green upload icon" title="Uploaded Levels"></i><span>@stats.LevelCount</span>
+            <i class="purple camera icon" title="Uploaded Photos"></i><span>@stats.PhotoCount</span>
         </div>
     </div>
 </div>

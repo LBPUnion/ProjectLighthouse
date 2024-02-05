@@ -1,9 +1,10 @@
 ﻿@using System.Web
-@using System.IO
+@using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
 @using LBPUnion.ProjectLighthouse.Types.Entities.Interaction
 @using LBPUnion.ProjectLighthouse.Types.Entities.Profile
+@inject DatabaseContext Database
 
 @{
     string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
@@ -15,11 +16,11 @@
 <div class="ui yellow segment" id="comments">
     @if (Model.Comments.Count == 0 && Model.CommentsEnabled)
     {
-        <p><i>There are no comments.</i></p>
+        <span><i>There are no comments.</i></span>
     }
     else if (!Model.CommentsEnabled)
     {
-        <p><i>Comments are disabled.</i></p>
+        <span><i>Comments are disabled.</i></span>
     }
     else
     {
@@ -30,7 +31,7 @@
     @if (Model.CommentsEnabled && Model.User != null)
     {
         <div class="ui divider"></div>
-        <form class="ui reply form" action="@Url.RouteUrl(ViewContext.RouteData.Values)/postComment" method="post">
+        <form class="ui reply form" action="postComment" method="post">
             <div class="field">
                 <textarea style="min-height: 70px; height: 70px; max-height:120px" maxlength="100" name="msg"></textarea>
             </div>
@@ -49,12 +50,8 @@
             CommentEntity comment = commentAndReaction.Key;
             int yourThumb = commentAndReaction.Value?.Rating ?? 0;
             DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(comment.Timestamp / 1000).ToLocalTime();
-            StringWriter messageWriter = new();
-            HttpUtility.HtmlDecode(comment.getComment(), messageWriter);
 
-            string decodedMessage = messageWriter.ToString();
-            string? url = Url.RouteUrl(ViewContext.RouteData.Values);
-            if (url == null) continue;
+            string decodedMessage = HttpUtility.HtmlDecode(comment.GetCommentMessage(Database));
 
             int rating = comment.ThumbsUp - comment.ThumbsDown;
 
@@ -67,11 +64,11 @@
                     }
                 }
                 <div class="voting" style="@(style)">
-                    <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == 1 ? 0 : 1)">
+                    <a href="rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == 1 ? 0 : 1)">
                         <i class="fitted @(yourThumb == 1 ? "green" : "grey") arrow up link icon" style="display: block"></i>
                     </a>
                     <span style="text-align: center; margin: auto; @(rating < 0 ? "margin-left: -5px" : "")">@(rating)</span>
-                    <a href="@url/rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == -1 ? 0 : -1)">
+                    <a href="rateComment?commentId=@(comment.CommentId)&rating=@(yourThumb == -1 ? 0 : -1)">
                         <i class="fitted @(yourThumb == -1 ? "red" : "grey") arrow down link icon" style="display: block"></i>
                     </a>
                 </div>

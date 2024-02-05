@@ -1,14 +1,19 @@
 using System.Net;
+using LBPUnion.ProjectLighthouse.Administration.Maintenance;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
+using LBPUnion.ProjectLighthouse.Services;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Startup;
 
@@ -19,7 +24,7 @@ public class GameServerStartup
         this.Configuration = configuration;
     }
 
-    public IConfiguration Configuration { get; }
+    private IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -49,7 +54,18 @@ public class GameServerStartup
             }
         );
 
-        services.AddDbContext<DatabaseContext>();
+        services.AddDbContext<DatabaseContext>(builder =>
+        {
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion);
+        });
+
+        IMailService mailService = ServerConfiguration.Instance.Mail.MailEnabled
+            ? new MailQueueService(new SmtpMailSender())
+            : new NullMailService();
+        services.AddSingleton(mailService);
+
+        services.AddHostedService(provider => new RepeatingTaskService(provider, MaintenanceHelper.RepeatingTasks));
 
         services.Configure<ForwardedHeadersOptions>
         (
@@ -74,7 +90,7 @@ public class GameServerStartup
         {
             Logger.Warn
             (
-                "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will also prevent LBP 1, LBP 2, and LBP Vita from working. " +
+                "The serverDigestKey configuration option wasn't set, so digest headers won't be set or verified. This will prevent LBP 1 and LBP 3 from working, and may break features in the other games (i.e Dive In). " +
                 "To increase security, it is recommended that you find and set this variable.",
                 LogArea.Startup
             );
@@ -97,6 +113,5 @@ public class GameServerStartup
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints => endpoints.MapControllers());
-        app.UseEndpoints(endpoints => endpoints.MapRazorPages());
     }
 }

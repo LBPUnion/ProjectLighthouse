@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="suspension_heading" xml:space="preserve">
+        <value>Sinuspinde ang Account</value>
+    </data>
+  <data name="suspension_explanation" xml:space="preserve">
+        <value>Ang iyong {0} account ay sinuspinde dahil sa paglabag sa code of conduct.</value>
+    </data>
+  <data name="suspension_expiration" xml:space="preserve">
+        <value>Sa panahong ito ng suspensyon, ang sumusunod na mga feature ay magiging limitado hanggang sa {0}:</value>
+    </data>
+  <data name="suspension_reason" xml:space="preserve">
+        <value>Dahilan ng suspensyon: "{0}"</value>
+    </data>
+  <data name="suspension_circumvent_warning" xml:space="preserve">
+        <value>Ang pagtatangka na palampasin ang suspensyong ito ay magdudulot ng pahabang panahon ng suspensyon.</value>
+    </data>
+  <data name="lbp_online_multiplayer" xml:space="preserve">
+        <value>LittleBigPlanet™ Online multiplayer</value>
+    </data>
+  <data name="does_not_expire" xml:space="preserve">
+        <value>manually dismissed</value>
+    </data>
+  <data name="profile_visibility" xml:space="preserve">
+        <value>Nakikita ang profile</value>
+    </data>
+  <data name="website_interactions" xml:space="preserve">
+        <value>Pagsusuri sa mga antas, mga larawan, at mga profile</value>
+    </data>
+  <data name="account_profile_management" xml:space="preserve">
+        <value>Pamamahala ng account at profile</value>
+    </data>
+</root>

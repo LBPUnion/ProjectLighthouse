@@ -1,10 +1,9 @@
-#nullable enable
 using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
-using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -82,15 +81,17 @@ public class UserController : ControllerBase
         if (update.Location != null) user.Location = update.Location;
 
         // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash, update.PlanetHash,})
+        foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash,})
         {
-            if (resource == "0") continue;
+            if (string.IsNullOrWhiteSpace(resource)) continue;
 
-            if (resource != null && !resource.StartsWith('g') && !FileHelper.ResourceExists(resource))
-            {
-                return this.BadRequest();
-            }
+            if (!FileHelper.ResourceExists(resource) && !resource.StartsWith('g')) return this.BadRequest();
+
+            if (!GameResourceHelper.IsValidTexture(resource)) return this.BadRequest();
         }
+
+        if (!string.IsNullOrWhiteSpace(update.PlanetHash) && !GameResourceHelper.IsValidLevel(update.PlanetHash))
+            return this.BadRequest();
 
         if (update.IconHash != null) user.IconHash = update.IconHash;
 

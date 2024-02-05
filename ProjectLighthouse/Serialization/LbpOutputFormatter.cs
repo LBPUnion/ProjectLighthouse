@@ -26,11 +26,17 @@ public class LbpOutputFormatter : TextOutputFormatter
         if (isSerializable) return base.CanWriteType(type);
         Logger.Warn($"Unable to serialize type '{type?.Name}' because it doesn't extend ISerializable: (fullType={type?.FullName}", LogArea.Serialization);
         return false;
-    } 
+    }
 
     public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
     {
         if (context.Object is not ILbpSerializable o) return;
+
+        if (o is LbpCustomXml customXml)
+        {
+            await context.HttpContext.Response.WriteAsync(customXml.Content);
+            return;
+        }
 
         string serialized = LighthouseSerializer.Serialize(context.HttpContext.RequestServices, o);
 

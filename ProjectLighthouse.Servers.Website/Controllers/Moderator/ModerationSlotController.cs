@@ -1,4 +1,3 @@
-#nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -34,6 +33,10 @@ public class ModerationSlotController : ControllerBase
         // Send webhook with slot.Name and slot.Creator.Username
         await WebhookHelper.SendWebhook("New Team Pick!", $"The level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId}) by **{slot.Creator?.Username}** has been team picked");
 
+        // Send a notification to the creator
+        await this.database.SendNotification(slot.CreatorId,
+            $"Your level, {slot.Name}, has been team picked!");
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect("~/slot/" + id);
@@ -50,6 +53,10 @@ public class ModerationSlotController : ControllerBase
 
         slot.TeamPick = false;
 
+        // Send a notification to the creator
+        await this.database.SendNotification(slot.CreatorId,
+            $"Your level, {slot.Name}, is no longer team picked.");
+
         await this.database.SaveChangesAsync();
 
         return this.Redirect("~/slot/" + id);
@@ -64,8 +71,35 @@ public class ModerationSlotController : ControllerBase
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.Ok();
 
+        // Send a notification to the creator
+        await this.database.SendNotification(slot.CreatorId,
+            $"Your level, {slot.Name}, has been deleted by a moderator.");
+
         await this.database.RemoveSlot(slot);
 
         return this.Redirect("~/slots/0");
+    }
+
+    [HttpGet("flag")]
+    public async Task<IActionResult> FlagLevel([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null) return this.Redirect($"~/slot/{id}");
+
+        SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
+        if (slot == null) return this.BadRequest();
+        if (slot.CreatorId == user.UserId) return this.Redirect($"~/slot/{slot.SlotId}");
+
+        string externalUrl = ServerConfiguration.Instance.ExternalUrl;
+
+        await WebhookHelper.SendWebhook(title: "New duplicate level flag",
+            description: @$"Level [**{slot.Name}**]({externalUrl}/slot/{slot.SlotId}) has been flagged as a duplicate level.
+                            
+                            > **Reporter:** [{user.Username}]({externalUrl}/user/{user.UserId})
+                            > **Offender:** [{slot.Creator!.Username}]({externalUrl}/user/{slot.CreatorId})
+                            > **Level Hash:** {slot.RootLevel}",
+            dest: WebhookHelper.WebhookDestination.Moderation);
+
+        return this.Redirect($"~/slot/{slot.SlotId}");
     }
 }

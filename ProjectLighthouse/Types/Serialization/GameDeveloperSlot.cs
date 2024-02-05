@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.EntityFrameworkCore;
@@ -33,11 +32,16 @@ public class GameDeveloperSlot : SlotBase, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        var stats = await database.Slots.Select(_ => new
-        {
-            CommentCount = database.Comments.Count(c => c.TargetId == this.SlotId && c.Type == CommentType.Level),
-            PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
-        }).FirstAsync();
+        if (this.SlotId == 0 || this.InternalSlotId == 0) return;
+
+        var stats = await database.Slots.Where(s => s.SlotId == this.SlotId)
+            .Select(_ => new
+            {
+                CommentCount = database.Comments.Count(c => c.Type == CommentType.Level && c.TargetSlotId == this.SlotId),
+                PhotoCount = database.Photos.Count(p => p.SlotId == this.SlotId),
+            })
+            .OrderBy(_ => 1)
+            .FirstAsync();
         ReflectionHelper.CopyAllFields(stats, this);
         this.PlayerCount = RoomHelper.Rooms
             .Where(r => r.Slot.SlotType == SlotType.Developer && r.Slot.SlotId == this.InternalSlotId)

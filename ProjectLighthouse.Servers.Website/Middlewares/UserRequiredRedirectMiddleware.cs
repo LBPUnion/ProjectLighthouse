@@ -59,6 +59,18 @@ public class UserRequiredRedirectMiddleware : MiddlewareDBContext
             return;
         }
 
+        if (user.IsBanned)
+        {
+            if (!pathContains(ctx, "/banned"))
+            {
+                ctx.Response.Redirect("/banned");
+                return;
+            }
+
+            await this.next(ctx);
+            return;
+        }
+
         if (user.EmailAddress == null && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             if (!pathContains(ctx, "/login/setEmail"))

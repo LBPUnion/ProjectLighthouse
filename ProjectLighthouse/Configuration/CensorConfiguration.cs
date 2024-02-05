@@ -25,11 +25,14 @@ public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
 
     public FilterMode UserInputFilterMode { get; set; } = FilterMode.None;
 
+    // ReSharper disable once StringLiteralTypo
     public List<string> FilteredWordList { get; set; } = new()
     {
         "cunt",
         "fag",
         "faggot",
+        "tranny",
+        "dyke",
         "horny",
         "kook",
         "kys",
@@ -42,8 +45,8 @@ public class CensorConfiguration : ConfigurationBase<CensorConfiguration>
         "retarded",
         "vagina",
         "vore",
-        "restitched",
-        "h4h",
+        "porn",
+        "pornography",
     };
     
     public override ConfigurationBase<CensorConfiguration> Deserialize(IDeserializer deserializer, string text) => deserializer.Deserialize<CensorConfiguration>(text);

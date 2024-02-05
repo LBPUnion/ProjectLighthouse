@@ -1,73 +1,26 @@
-using System.Linq;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Logging;
-using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class VersionHelper
 {
-    static VersionHelper()
-    {
-        try
-        {
-            CommitHash = ResourceHelper.ReadManifestFile("gitVersion.txt");
-            Branch = ResourceHelper.ReadManifestFile("gitBranch.txt");
-            string commitNumber = $"{CommitHash}_{Build}";
-            FullRevision = Branch == "main" ? $"r{commitNumber}" : $"{Branch}_r{commitNumber}";
+    public static string CommitHash => ThisAssembly.Git.Commit;
+    public static string Branch => ThisAssembly.Git.Branch;
 
-            string remotesFile = ResourceHelper.ReadManifestFile("gitRemotes.txt");
-
-            string[] lines = remotesFile.Split('\n');
-
-            // line[0] line[1]                                        line[2]
-            // origin  git@github.com:LBPUnion/project-lighthouse.git (fetch)
-
-            // linq is a serious and painful catastrophe but its useful so i'm gonna keep using it
-            Remotes = lines.Select(line => line.Split("\t")[1]).ToArray();
-
-            CommitsOutOfDate = ResourceHelper.ReadManifestFile("gitUnpushed.txt").Split('\n').Length;
-
-            CanCheckForUpdates = true;
-        }
-        catch
-        {
-            Logger.Error
-            (
-                "Project Lighthouse was built incorrectly. Please make sure git is available when building.",
-                LogArea.Startup
-            );
-            CommitHash = "invalid";
-            Branch = "invalid";
-            CanCheckForUpdates = false;
-        }
-
-        if (!IsDirty) return;
-
-        Logger.Warn
-        (
-            "This is a modified version of Project Lighthouse. " +
-            "Please make sure you are properly disclosing the source code to any users who may be using this instance.",
-            LogArea.Startup
-        );
-        CanCheckForUpdates = false;
-    }
-
-    public static string CommitHash { get; set; }
-    public static string Branch { get; set; }
     /// <summary>
-    /// The full revision string. States current revision hash and, if not main, the branch.
+    ///     The full revision string. States current revision hash and, if not main, the branch.
     /// </summary>
-    public static string FullRevision { get; set; }
+    private static string FullRevision => (Branch == "main" ? "" : $"{Branch}_") + $"r{CommitHash}_{Build}";
+
     /// <summary>
-    /// The server's branding (environment version) to show to LBP clients. Shows the environment name next to the revision.
+    ///     The server's branding (environment version) to show to LBP clients. Shows the environment name next to the
+    ///     revision.
     /// </summary>
     public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {FullRevision}";
-    public static string FullVersion => $"Project Lighthouse {ServerConfiguration.Instance.Customization.EnvironmentName} {Branch}@{CommitHash} {Build}";
-    public static bool IsDirty => CommitHash.EndsWith("-dirty") || CommitsOutOfDate != 1 || CommitHash == "invalid" || Branch == "invalid";
-    public static int CommitsOutOfDate { get; set; }
-    public static bool CanCheckForUpdates { get; set; }
-    public static string[] Remotes { get; set; }
+    public static string FullVersion =>
+        $"Project Lighthouse {ServerConfiguration.Instance.Customization.EnvironmentName} {Branch}@{CommitHash} {Build}";
+    public static bool IsDirty => ThisAssembly.Git.IsDirty;
+    public static string RepositoryUrl => ThisAssembly.Git.RepositoryUrl;
 
     public const string Build =
     #if DEBUG

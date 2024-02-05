@@ -10,14 +10,9 @@
     @Html.AntiForgeryToken()
     <div class="digits" id="2fa">
         @if (!string.IsNullOrWhiteSpace(error))
-            {
-                <div class="ui negative message">
-                    <div class="header">
-                        @Model.Translate(GeneralStrings.Error)
-                    </div>
-                    <p style="white-space: pre-line">@Model.Error</p>
-                </div>
-            }
+        {
+            @await Html.PartialAsync("Partials/ErrorModalPartial", ((string)Model.Translate(GeneralStrings.Error), error), ViewData)
+        }
         <input type="text" pattern="\d*" maxlength="1" id="digit1"/>
         <input type="text" pattern="\d*" maxlength="1" id="digit2"/>
         <input type="text" pattern="\d*" maxlength="1" id="digit3" class="middleDigit"/>
@@ -45,16 +40,16 @@
 
 @if (allowBackupCodes)
 {
-<text>
-document.getElementById("backup-link").addEventListener("click", function (){
-    let backupInput = document.getElementById("backup"); 
-    if (backupInput.style.display === "none"){
-        backupInput.style.display = "";
-    } else {
-        backupInput.style.display = "none";
-    }
-});
-</text>
+    <text>
+        document.getElementById("backup-link").addEventListener("click", function (){
+            let backupInput = document.getElementById("backup"); 
+            if (backupInput.style.display === "none"){
+                backupInput.style.display = "";
+            } else {
+                backupInput.style.display = "none";
+            }
+        });
+    </text>
 }
 
 document.querySelector(".digits").addEventListener("keydown", function(event){

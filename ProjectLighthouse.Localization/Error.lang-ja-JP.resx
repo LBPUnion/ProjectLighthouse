@@ -29,9 +29,6 @@
   <data name="password_doesnt_match" xml:space="preserve">
         <value>パスワードが一致しません。</value>
     </data>
-  <data name="token_invalid" xml:space="preserve">
-        <value>このトークンが無効です</value>
-    </data>
   <data name="captcha_failed" xml:space="preserve">
         <value>キャプチャを正しく完了してください</value>
     </data>
@@ -41,7 +38,7 @@
   <data name="email_invalid" xml:space="preserve">
         <value>Email address field is required.</value>
     </data>
-  <data name="user_banned" xml:space="preserve">
-        <value>You have been banned. Please contact an administrator for more information.\nReason: {0}</value>
+  <data name="action_no_permission" xml:space="preserve">
+        <value>You don't have permissions to perform this action.</value>
     </data>
 </root>

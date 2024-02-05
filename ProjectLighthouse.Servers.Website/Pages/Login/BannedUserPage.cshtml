@@ -1,0 +1,68 @@
+﻿@page "/banned"
+@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Localization.StringLists
+@using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Login.BannedUserPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = Model.Translate(ModerationStrings.SuspensionHeading);
+
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+}
+
+<div class="ui middle aligned left aligned">
+    <p>
+        @Model.Translate(ModerationStrings.SuspensionExplanation, ServerConfiguration.Instance.Customization.ServerName)
+    </p>         
+   
+    <p>
+        @if (Model.ModCase != null)
+        {
+            <span>
+                @if (Model.ModCase.ExpiresAt < BannedUserPage.MaximumExpiration)
+                {
+                    @Model.Translate(ModerationStrings.SuspensionExpiration, TimeZoneInfo.ConvertTime(Model.ModCase.ExpiresAt.Value, timeZoneInfo).ToString("M/d/yyyy @ h:mm tt"))
+                }
+                else
+                {
+                    @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(ModerationStrings.DoesNotExpire))
+                }
+            </span>    
+        }
+        else
+        {
+            <span>
+                @Model.Translate(ModerationStrings.SuspensionExpiration, Model.Translate(GeneralStrings.Unknown))
+            </span>
+        }
+    </p>
+    
+    <div>
+        <ul>
+            <li>@Model.Translate(ModerationStrings.LbpOnlineMultiplayer)</li>
+            <li>@Model.Translate(ModerationStrings.WebsiteInteractions)</li>
+            <li>@Model.Translate(ModerationStrings.ProfileVisibility)</li>
+            <li>@Model.Translate(ModerationStrings.AccountProfileManagement)</li>
+        </ul>
+    </div>
+
+    @if (Model.ModCase != null)
+    {
+        <p>
+            @if (!string.IsNullOrWhiteSpace(Model.ModCase.Reason))
+            {
+                @Model.Translate(ModerationStrings.SuspensionReason, Model.ModCase.Reason)    
+            }
+            else
+            {
+                @Model.Translate(ModerationStrings.SuspensionReason, "No reason was provided.")
+            }
+        </p>     
+    }
+
+    <p>
+        @Model.Translate(ModerationStrings.SuspensionCircumventWarning)
+    </p>
+</div>

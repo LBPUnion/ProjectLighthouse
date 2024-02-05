@@ -23,6 +23,5 @@ public class FileLogger : ILogger
             File.AppendAllText(Path.Combine(logsDirectory, "all.log"), contentAll);
         }
         catch(IOException) {} // windows, ya goofed
-
     }
 }

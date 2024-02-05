@@ -19,22 +19,22 @@ public static class MaintenanceHelper
 {
     static MaintenanceHelper()
     {
-        Commands = getListOfInterfaceObjects<ICommand>();
-        MaintenanceJobs = getListOfInterfaceObjects<IMaintenanceJob>();
-        MigrationTasks = getListOfInterfaceObjects<IMigrationTask>();
-        RepeatingTasks = getListOfInterfaceObjects<IRepeatingTask>();
+        Commands = GetListOfInterfaceObjects<ICommand>();
+        MaintenanceJobs = GetListOfInterfaceObjects<IMaintenanceJob>();
+        MigrationTasks = GetListOfInterfaceObjects<MigrationTask>();
+        RepeatingTasks = GetListOfInterfaceObjects<IRepeatingTask>();
     }
     
     public static List<ICommand> Commands { get; }
     public static List<IMaintenanceJob> MaintenanceJobs { get; }
-    public static List<IMigrationTask> MigrationTasks { get; }
+    public static List<MigrationTask> MigrationTasks { get; }
     public static List<IRepeatingTask> RepeatingTasks { get; }
 
-    public static async Task<List<LogLine>> RunCommand(string[] args)
+    public static async Task<List<LogLine>> RunCommand(IServiceProvider provider, string[] args)
     {
         if (args.Length < 1)
-            throw new Exception
-                ("This should never happen. " + "If it did, its because you tried to run a command before validating that the user actually wants to run one.");
+            throw new Exception("This should never happen. " +
+                                "If it did, its because you tried to run a command before validating that the user actually wants to run one.");
 
         string baseCmd = args[0];
         args = args.Skip(1).ToArray();
@@ -44,21 +44,32 @@ public static class MaintenanceHelper
         InMemoryLogger memoryLogger = new();
         logger.AddLogger(memoryLogger);
 
-        IEnumerable<ICommand> suitableCommands = Commands.Where
-                (command => command.Aliases().Any(a => a.ToLower() == baseCmd.ToLower()))
-            .Where(command => args.Length >= command.RequiredArgs());
-        foreach (ICommand command in suitableCommands)
+        ICommand? command = Commands
+            .Where(command =>
+                command.Aliases().Any(a => string.Equals(a, baseCmd, StringComparison.CurrentCultureIgnoreCase)))
+            .FirstOrDefault(command => args.Length >= command.RequiredArgs());
+        if (command == null)
         {
-            logger.LogInfo("Running command " + command.Name(), LogArea.Command);
-            
-            await command.Run(args, logger);
+            logger.LogError("Failed to find command", LogArea.Command);
             logger.Flush();
             return memoryLogger.Lines;
         }
+        try
+        {
+            logger.LogInfo("Running command " + command.Name(), LogArea.Command);
 
-        logger.LogError("Command not found.", LogArea.Command);
-        logger.Flush();
-        return memoryLogger.Lines;
+            await command.Run(provider, args, logger);
+
+            logger.Flush();
+            return memoryLogger.Lines;
+        }
+        catch(Exception e)
+        {
+            logger.LogError($"Failed to run command: {e.Message}", LogArea.Command);
+            logger.LogError(e.ToDetailedException(), LogArea.Command);
+            logger.Flush();
+            return memoryLogger.Lines;
+        }
     }
 
     public static async Task RunMaintenanceJob(string jobName)
@@ -69,17 +80,18 @@ public static class MaintenanceHelper
         await job.Run();
     }
 
-    public static async Task RunMigration(IMigrationTask migrationTask, DatabaseContext? database = null)
+    public static async Task<bool> RunMigration(DatabaseContext database, MigrationTask migrationTask)
     {
-        database ??= new DatabaseContext();
-
         // Migrations should never be run twice.
-        Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name));
+        Debug.Assert(!await database.CompletedMigrations.Has(m => m.MigrationName == migrationTask.GetType().Name),
+            $"Tried to run migration {migrationTask.GetType().Name} twice");
         
-        Logger.Info($"Running migration task {migrationTask.Name()}", LogArea.Database);
+        Logger.Info($"Running LH migration task {migrationTask.Name()}", LogArea.Database);
         
         bool success;
         Exception? exception = null;
+
+        Stopwatch stopwatch = Stopwatch.StartNew();
         
         try
         {
@@ -93,29 +105,31 @@ public static class MaintenanceHelper
         
         if (!success)
         {
-            Logger.Error($"Could not run migration {migrationTask.Name()}", LogArea.Database);
+            Logger.Error($"Could not run LH migration {migrationTask.Name()}", LogArea.Database);
             if (exception != null) Logger.Error(exception.ToDetailedException(), LogArea.Database);
             
-            return;
+            return false;
         }
-        
-        Logger.Success($"Successfully completed migration {migrationTask.Name()}", LogArea.Database);
+        stopwatch.Stop();
+
+        Logger.Success($"Successfully completed LH migration {migrationTask.Name()} in {stopwatch.ElapsedMilliseconds}ms", LogArea.Database);
 
         CompletedMigrationEntity completedMigration = new()
         {
             MigrationName = migrationTask.GetType().Name,
-            RanAt = DateTime.Now,
+            RanAt = DateTime.UtcNow,
         };
 
         database.CompletedMigrations.Add(completedMigration);
         await database.SaveChangesAsync();
+        return true;
     }
 
-    private static List<T> getListOfInterfaceObjects<T>() where T : class
+    private static List<T> GetListOfInterfaceObjects<T>() where T : class
     {
         return Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.GetInterfaces().Contains(typeof(T)) && t.GetConstructor(Type.EmptyTypes) != null)
+            .Where(t => (t.IsSubclassOf(typeof(T)) || t.GetInterfaces().Contains(typeof(T))) && t.GetConstructor(Type.EmptyTypes) != null)
             .Select(t => Activator.CreateInstance(t) as T)
             .ToList()!;
     }
