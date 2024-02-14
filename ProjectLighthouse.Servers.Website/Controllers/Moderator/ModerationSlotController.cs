@@ -28,7 +28,7 @@ public class ModerationSlotController : ControllerBase
         SlotEntity? slot = await this.database.Slots.Include(s => s.Creator).FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        slot.TeamPick = true;
+        slot.TeamPickTime = TimeHelper.TimestampMillis;
 
         // Send webhook with slot.Name and slot.Creator.Username
         await WebhookHelper.SendWebhook("New Team Pick!", $"The level [**{slot.Name}**]({ServerConfiguration.Instance.ExternalUrl}/slot/{slot.SlotId}) by **{slot.Creator?.Username}** has been team picked");
@@ -51,7 +51,7 @@ public class ModerationSlotController : ControllerBase
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();
 
-        slot.TeamPick = false;
+        slot.TeamPickTime = 0;
 
         // Send a notification to the creator
         await this.database.SendNotification(slot.CreatorId,

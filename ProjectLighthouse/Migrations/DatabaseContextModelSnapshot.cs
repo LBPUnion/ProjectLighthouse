@@ -472,8 +472,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<bool>("SubLevel")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("TeamPick")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<long>("TeamPickTime")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");

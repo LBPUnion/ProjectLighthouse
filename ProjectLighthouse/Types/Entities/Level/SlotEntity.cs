@@ -102,7 +102,7 @@ public class SlotEntity
 
     public long LastUpdated { get; set; }
 
-    public bool TeamPick { get; set; }
+    public long TeamPickTime { get; set; }
 
     public GameVersion GameVersion { get; set; }
 

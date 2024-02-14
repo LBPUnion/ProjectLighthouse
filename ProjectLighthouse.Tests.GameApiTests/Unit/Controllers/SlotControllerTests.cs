@@ -495,4 +495,62 @@ public class SlotControllerTests
         }
     }
     #endregion
+
+    #region Team Picks
+    [Fact]
+    public async Task TeamPick_ShouldOnlyIncludeTeamPickedLevels()
+    {
+        DatabaseContext db = await MockHelper.GetTestDatabase(new List<SlotEntity>
+        {
+            new()
+            {
+                SlotId = 1,
+                CreatorId = 1,
+                TeamPickTime = 1,
+            },
+            new()
+            {
+                SlotId = 2,
+                CreatorId = 1,
+                TeamPickTime = 0,
+            },
+        });
+        SlotsController controller = new(db);
+        controller.SetupTestController();
+
+        IActionResult result = await controller.TeamPickedSlots();
+        GenericSlotResponse slotResponse = result.CastTo<OkObjectResult, GenericSlotResponse>();
+        Assert.Single(slotResponse.Slots);
+        Assert.Equal(1, slotResponse.Slots.OfType<GameUserSlot>().First().SlotId);
+    }
+
+    [Fact]
+    public async Task TeamPick_LevelsAreSortedByTimestamp()
+    {
+        DatabaseContext db = await MockHelper.GetTestDatabase(new List<SlotEntity>
+        {
+            new()
+            {
+                SlotId = 1,
+                CreatorId = 1,
+                TeamPickTime = 1,
+            },
+            new()
+            {
+                SlotId = 2,
+                CreatorId = 1,
+                TeamPickTime = 5,
+            },
+        });
+        SlotsController controller = new(db);
+        controller.SetupTestController();
+
+        IActionResult result = await controller.TeamPickedSlots();
+
+        GenericSlotResponse slotResponse = result.CastTo<OkObjectResult, GenericSlotResponse>();
+        Assert.Equal(2, slotResponse.Slots.Count);
+        Assert.Equal(2, slotResponse.Slots.OfType<GameUserSlot>().First().SlotId);
+        Assert.Equal(1, slotResponse.Slots.OfType<GameUserSlot>().Last().SlotId);
+    }
+    #endregion
 }

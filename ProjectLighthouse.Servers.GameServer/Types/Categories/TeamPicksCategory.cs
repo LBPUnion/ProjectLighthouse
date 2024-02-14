@@ -19,5 +19,5 @@ public class TeamPicksCategory : SlotCategory
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.Slots.Where(queryBuilder.Clone().AddFilter(new TeamPickFilter()).Build())
-            .ApplyOrdering(new SlotSortBuilder<SlotEntity>().AddSort(new FirstUploadedSort()));
+            .ApplyOrdering(new SlotSortBuilder<SlotEntity>().AddSort(new TeamPickSort()).AddSort(new FirstUploadedSort()));
 }

@@ -31,7 +31,7 @@ public struct MinimalApiSlot
             Type = slot.Type,
             Name = slot.Name,
             IconHash = slot.IconHash,
-            TeamPick = slot.TeamPick,
+            TeamPick = slot.TeamPickTime != 0,
             IsAdventure = slot.IsAdventurePlanet,
             Location = slot.Location,
             GameVersion = slot.GameVersion,

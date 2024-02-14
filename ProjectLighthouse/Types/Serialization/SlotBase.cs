@@ -84,7 +84,7 @@ public abstract class SlotBase : ILbpSerializable
             InitiallyLocked = slot.InitiallyLocked,
             RootLevel = slot.RootLevel,
             IsShareable = slot.Shareable,
-            IsTeamPicked = slot.TeamPick,
+            IsTeamPicked = slot.TeamPickTime != 0,
             FirstUploaded = slot.FirstUploaded,
             LastUpdated = slot.LastUpdated,
             IsCrossControlRequired = slot.CrossControllerRequired,
