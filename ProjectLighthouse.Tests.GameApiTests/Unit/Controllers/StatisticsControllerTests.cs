@@ -51,7 +51,7 @@ public class StatisticsControllerTests
             {
                 SlotId = 3,
                 CreatorId = 1,
-                TeamPick = true,
+                TeamPickTime = 1,
             },
         };
         await using DatabaseContext db = await MockHelper.GetTestDatabase(slots);
@@ -90,7 +90,7 @@ public class StatisticsControllerTests
             {
                 SlotId = 3,
                 CreatorId = 1,
-                TeamPick = true,
+                TeamPickTime = 1,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
         };
@@ -130,7 +130,7 @@ public class StatisticsControllerTests
             {
                 SlotId = 3,
                 CreatorId = 1,
-                TeamPick = true,
+                TeamPickTime = 1,
                 GameVersion = GameVersion.LittleBigPlanet1,
             },
         };
@@ -168,7 +168,7 @@ public class StatisticsControllerTests
             {
                 SlotId = 3,
                 CreatorId = 1,
-                TeamPick = true,
+                TeamPickTime = 1,
                 GameVersion = GameVersion.LittleBigPlanet2,
             },
         }; 
