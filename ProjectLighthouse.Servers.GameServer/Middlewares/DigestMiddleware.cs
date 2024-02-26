@@ -33,8 +33,7 @@ public class DigestMiddleware : Middleware
     public override async Task InvokeAsync(HttpContext context)
     {
         // Client digest check.
-        if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie))
-            authCookie = string.Empty;
+        if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie)) authCookie = string.Empty;
         string digestPath = context.Request.Path;
         #if !DEBUG
         const string url = "/LITTLEBIGPLANETPS3_XML";
@@ -55,8 +54,11 @@ public class DigestMiddleware : Middleware
                 excludeBodyFromDigest = true;
             }
 
-            string clientRequestDigest = CryptoHelper.ComputeDigest
-                (digestPath, authCookie, bodyBytes, ServerConfiguration.Instance.DigestKey.PrimaryDigestKey, excludeBodyFromDigest);
+            string clientRequestDigest = CryptoHelper.ComputeDigest(digestPath,
+                authCookie,
+                bodyBytes,
+                ServerConfiguration.Instance.DigestKey.PrimaryDigestKey,
+                excludeBodyFromDigest);
 
             // Check the digest we've just calculated against the digest header if the game set the header. They should match.
             if (context.Request.Headers.TryGetValue(digestHeaderKey, out StringValues sentDigest))
@@ -66,8 +68,11 @@ public class DigestMiddleware : Middleware
                     // If we got here, the normal ServerDigestKey failed to validate. Lets try again with the alternate digest key.
                     usedAlternateDigestKey = true;
 
-                    clientRequestDigest = CryptoHelper.ComputeDigest
-                        (digestPath, authCookie, bodyBytes, ServerConfiguration.Instance.DigestKey.AlternateDigestKey, excludeBodyFromDigest);
+                    clientRequestDigest = CryptoHelper.ComputeDigest(digestPath,
+                        authCookie,
+                        bodyBytes,
+                        ServerConfiguration.Instance.DigestKey.AlternateDigestKey,
+                        excludeBodyFromDigest);
                     if (clientRequestDigest != sentDigest)
                     {
                         #if DEBUG
@@ -82,9 +87,10 @@ public class DigestMiddleware : Middleware
                     }
                 }
             }
+
             #if !DEBUG
             // The game doesn't start sending digests until after the announcement so if it's not one of those requests
-            // and it doesn't include a digest we need to reject the request 
+            // and it doesn't include a digest we need to reject the request
             else if (!exemptPathList.Contains(strippedPath))
             {
                 context.Response.StatusCode = 403;
@@ -92,7 +98,7 @@ public class DigestMiddleware : Middleware
             }
             #endif
 
-            context.Response.Headers.Add("X-Digest-B", clientRequestDigest);
+            context.Response.Headers.Append("X-Digest-B", clientRequestDigest);
             context.Request.Body.Position = 0;
         }
 
@@ -104,19 +110,21 @@ public class DigestMiddleware : Middleware
         await this.next(context); // Handle the request so we can get the server digest hash
         responseBuffer.Position = 0;
 
-        if (responseBuffer.Length > 1000 && context.Request.Headers.AcceptEncoding.Contains("deflate") && (context.Response.ContentType ?? string.Empty).Contains("text/xml"))
+        if (responseBuffer.Length > 1000 &&
+            context.Request.Headers.AcceptEncoding.Contains("deflate") &&
+            (context.Response.ContentType ?? string.Empty).Contains("text/xml"))
         {
-            context.Response.Headers.Add("X-Original-Content-Length", responseBuffer.Length.ToString());
-            context.Response.Headers.Add("Vary", "Accept-Encoding");
+            context.Response.Headers.Append("X-Original-Content-Length", responseBuffer.Length.ToString());
+            context.Response.Headers.Append("Vary", "Accept-Encoding");
             MemoryStream resultStream = new();
             const int defaultCompressionLevel = 6;
             await using ZOutputStreamLeaveOpen stream = new(resultStream, defaultCompressionLevel);
             await stream.WriteAsync(responseBuffer.ToArray());
             stream.Finish();
-        
+
             resultStream.Position = 0;
-            context.Response.Headers.Add("Content-Length", resultStream.Length.ToString());
-            context.Response.Headers.Add("Content-Encoding", "deflate");
+            context.Response.Headers.Append("Content-Length", resultStream.Length.ToString());
+            context.Response.Headers.Append("Content-Encoding", "deflate");
             responseBuffer.SetLength(0);
             await resultStream.CopyToAsync(responseBuffer);
         }
@@ -125,7 +133,7 @@ public class DigestMiddleware : Middleware
             string headerName = !context.Response.Headers.ContentLength.HasValue
                 ? "Content-Length"
                 : "X-Original-Content-Length";
-            context.Response.Headers.Add(headerName, responseBuffer.Length.ToString());
+            context.Response.Headers.Append(headerName, responseBuffer.Length.ToString());
         }
 
         // Compute the server digest hash.
@@ -138,8 +146,9 @@ public class DigestMiddleware : Middleware
                 : ServerConfiguration.Instance.DigestKey.PrimaryDigestKey;
 
             // Compute the digest for the response.
-            string serverDigest = CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer.ToArray(), digestKey);
-            context.Response.Headers.Add("X-Digest-A", serverDigest);
+            string serverDigest =
+                CryptoHelper.ComputeDigest(context.Request.Path, authCookie, responseBuffer.ToArray(), digestKey);
+            context.Response.Headers.Append("X-Digest-A", serverDigest);
         }
 
         // Copy the buffered response to the actual response stream.

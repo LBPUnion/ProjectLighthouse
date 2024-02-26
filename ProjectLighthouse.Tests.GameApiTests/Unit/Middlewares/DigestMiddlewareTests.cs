@@ -145,8 +145,8 @@ public class DigestMiddlewareTests
         const string expectedClientDigest = "df619790a2579a077eae4a6b6864966ff4768723";
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
     }
@@ -182,8 +182,8 @@ public class DigestMiddlewareTests
         const string expectedClientDigest = "9243acecfa83ac25bdfefe97f5681b439c003f1e";
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"]);
     }
@@ -219,8 +219,8 @@ public class DigestMiddlewareTests
         const string expectedClientDigest = "0a06d25662c2d3bab2a767c0c504898df2385e62";
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
     }
@@ -257,8 +257,8 @@ public class DigestMiddlewareTests
         const string expectedClientDigest = "df619790a2579a077eae4a6b6864966ff4768723";
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
     }
@@ -295,8 +295,8 @@ public class DigestMiddlewareTests
         const string expectedClientDigest = "3105059f9283773f7982a4d79455bcc97c330f10";
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
     }
@@ -333,8 +333,8 @@ public class DigestMiddlewareTests
         const string expectedClientDigest = "3105059f9283773f7982a4d79455bcc97c330f10";
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
     }
@@ -371,8 +371,8 @@ public class DigestMiddlewareTests
         const string expectedClientDigest = "2e54cd2bc69ff8c1ff85dd3b4f62e0a0e27d9e23";
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
     }
@@ -414,18 +414,19 @@ public class DigestMiddlewareTests
         const string expectedServerDigest = "404e589cafbff7886fe9fc5ee8a5454b57d9cb50";
         const string expectedClientDigest = "80714c0936408855d86d47a650320f91895812d0";
         const string expectedContentLen = "2000";
+        const string expectedContentEncoding = "deflate";
         const string expectedCompressedContentLen = "23";
-        const string expectedData = "783F4B4C1C053F60143F3F51300A463F500700643F3F";
+        const string expectedData = "783F4B4C1C053F60143F3F51300A463F500700643F3F3F";
 
         context.Response.Body.Position = 0;
         string output = await new StreamReader(context.Response.Body).ReadToEndAsync();
         string outputBytes = Convert.ToHexString(Encoding.ASCII.GetBytes(output)); 
 
         Assert.Equal(expectedCode, context.Response.StatusCode);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-A"]);
-        Assert.NotEmpty(context.Response.Headers["X-Digest-B"]);
-        Assert.NotEmpty(context.Response.Headers["Content-Encoding"]);
-        Assert.NotEmpty(context.Response.Headers["X-Original-Content-Length"]);
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-A", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Digest-B", out _));
+        Assert.True(context.Response.Headers.TryGetValue("X-Original-Content-Length", out _));
+        Assert.Equal(expectedContentEncoding, context.Response.Headers.ContentEncoding);
         Assert.Equal(expectedServerDigest, context.Response.Headers["X-Digest-A"][0]);
         Assert.Equal(expectedClientDigest, context.Response.Headers["X-Digest-B"][0]);
         Assert.Equal(expectedContentLen, context.Response.Headers["X-Original-Content-Length"][0]);
