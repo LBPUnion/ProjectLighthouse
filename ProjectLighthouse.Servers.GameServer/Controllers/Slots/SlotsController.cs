@@ -247,7 +247,8 @@ public class SlotsController : ControllerBase
         pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 
         SlotSortBuilder<SlotEntity> sortBuilder = new();
-        sortBuilder.AddSort(new LastUpdatedSort());
+        sortBuilder.AddSort(new TeamPickSort());
+        sortBuilder.AddSort(new FirstUploadedSort());
 
         List<SlotBase> slots = await this.database.GetSlots(token, queryBuilder, pageData, sortBuilder);
 

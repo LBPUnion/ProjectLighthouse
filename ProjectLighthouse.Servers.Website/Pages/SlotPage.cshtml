@@ -217,9 +217,9 @@ else
     <div class="ui green segment">
         <h2>Moderation Options</h2>
 
-        @if (Model.Slot?.TeamPick ?? false)
+        @if ((Model.Slot?.TeamPickTime ?? 0) != 0)
         {
-            <a href="/moderation/slot/@Model.Slot.SlotId/removeTeamPick">
+            <a href="/moderation/slot/@Model.Slot?.SlotId/removeTeamPick">
                 <div class="ui pink button">
                     <i class="star icon"></i>
                     <span>Remove Team Pick</span>

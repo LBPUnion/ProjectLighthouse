@@ -729,7 +729,7 @@ public class FilterTests
 
         SlotEntity slot = new()
         {
-            TeamPick = true,
+            TeamPickTime = 1,
         };
 
         Assert.True(teamPickFunc(slot));
@@ -743,7 +743,7 @@ public class FilterTests
 
         SlotEntity slot = new()
         {
-            TeamPick = false,
+            TeamPickTime = 0,
         };
 
         Assert.False(teamPickFunc(slot));

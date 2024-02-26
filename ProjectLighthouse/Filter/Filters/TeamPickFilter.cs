@@ -7,5 +7,5 @@ namespace LBPUnion.ProjectLighthouse.Filter.Filters;
 
 public class TeamPickFilter : ISlotFilter
 {
-    public Expression<Func<SlotEntity, bool>> GetPredicate() => s => s.TeamPick;
+    public Expression<Func<SlotEntity, bool>> GetPredicate() => s => s.TeamPickTime != 0;
 }

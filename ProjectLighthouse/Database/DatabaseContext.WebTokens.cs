@@ -104,6 +104,7 @@ public partial class DatabaseContext
         await this.WebTokens.RemoveWhere(t => DateTime.UtcNow > t.ExpiresAt);
         await this.EmailVerificationTokens.RemoveWhere(t => DateTime.UtcNow > t.ExpiresAt);
         await this.EmailSetTokens.RemoveWhere(t => DateTime.UtcNow > t.ExpiresAt);
+        await this.PasswordResetTokens.RemoveWhere(t => DateTime.UtcNow > t.Created.AddDays(1));
     }
 
     public async Task RemoveRegistrationToken(string? tokenString)

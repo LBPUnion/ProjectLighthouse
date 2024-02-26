@@ -41,7 +41,7 @@ guide we'll use `EBOOTlocalhost.elf`.
 
 Now, copy the `EBOOTlocalhost.elf` file to where you got your `EBOOT.elf` file from, and you're now good to go.
 
-To launch the game with the patched EBOOT, open up RPCS3, go to File, Boot SELF/ELF, and open up `EBOOTlocalhost.elf`.
+To launch the game with the patched EBOOT, open up RPCS3, go to File, Boot S(Elf), and open up `EBOOTlocalhost.elf`.
 
 Assuming you patched the file correctly, the database is migrated, and
 Project Lighthouse is running, the game should now connect, and you may begin contributing!

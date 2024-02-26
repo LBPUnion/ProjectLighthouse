@@ -61,7 +61,7 @@ public struct ApiSlot
             MoveRequired = slot.MoveRequired,
             FirstUploaded = slot.FirstUploaded,
             LastUpdated = slot.LastUpdated,
-            TeamPick = slot.TeamPick,
+            TeamPick = slot.TeamPickTime != 0,
             Location = slot.Location,
             GameVersion = slot.GameVersion,
             Plays = slot.Plays,
