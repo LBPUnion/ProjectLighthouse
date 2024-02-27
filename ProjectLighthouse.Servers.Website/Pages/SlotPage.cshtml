@@ -16,7 +16,7 @@
     Model.ShowTitleInPage = false;
 
     Model.Title = HttpUtility.HtmlDecode(Model.Slot?.Name ?? "");
-    Model.Description = HttpUtility.HtmlDecode(Model.Slot?.Description ?? "");
+    if (Model.CanViewSlot) Model.Description = HttpUtility.HtmlDecode(Model.Slot?.Description ?? "");
 
     bool isMobile = Request.IsMobile();
     string language = Model.GetLanguage();

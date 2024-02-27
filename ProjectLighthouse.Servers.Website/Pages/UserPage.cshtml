@@ -13,7 +13,7 @@
     Model.ShowTitleInPage = false;
 
     Model.Title = Model.Translate(ProfileStrings.Title, Model.ProfileUser!.Username);
-    Model.Description = Model.ProfileUser!.Biography;
+    if (Model.CanViewProfile) Model.Description = Model.ProfileUser!.Biography;
 
     bool isMobile = Request.IsMobile();
     string language = Model.GetLanguage();
