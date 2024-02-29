@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Xunit;
@@ -14,25 +14,44 @@ namespace ProjectLighthouse.Tests.GameApiTests.Unit.Middlewares;
 [Trait("Category", "Unit")]
 public class DigestMiddlewareTests
 {
-
-    [Fact]
-    public async Task DigestMiddleware_ShouldNotComputeDigests_WhenDigestsDisabled()
+    //TODO: fix remaining unit tests
+    private static DefaultHttpContext GetHttpContext
+        (Stream body, string path, string cookie, Dictionary<string, StringValues>? extraHeaders = null)
     {
+
         DefaultHttpContext context = new()
         {
             Request =
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers = { KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"), },
+                Body = body,
+                Path = path,
+                Headers =
+                {
+                    KeyValuePair.Create<string, StringValues>("Cookie", cookie),
+                }
             },
         };
+        if (extraHeaders == null) return context;
+
+        foreach ((string key, StringValues value) in extraHeaders)
+        {
+            context.Request.Headers.Append(key, value);
+        }
+
+        return context;
+    }
+
+    [Fact]
+    public async Task DigestMiddleware_ShouldNotComputeDigests_WithoutDigestAttribute()
+    {
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(), "/LITTLEBIGPLANETPS3_XML/notification", "MM_AUTH=unittest");
+        context.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(), null));
         DigestMiddleware middleware = new(httpContext =>
         {
             httpContext.Response.StatusCode = 200;
             httpContext.Response.WriteAsync("");
             return Task.CompletedTask;
-        }, false);
+        }, []);
 
         await middleware.InvokeAsync(context);
 
@@ -46,26 +65,15 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldReject_WhenDigestHeaderIsMissing()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
-            {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
-                {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                },
-            },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(), "/LITTLEBIGPLANETPS3_XML/notification", "MM_AUTH=unittest");
+        context.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(new UseDigestAttribute()), null));
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -80,28 +88,23 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldReject_WhenRequestDigestInvalid()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/notification",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "invalid_digest"),
+                    "X-Digest-A", "invalid_digest"
                 },
-            },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
-        ServerConfiguration.Instance.DigestKey.AlternateDigestKey = "test";
+            });
+        context.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(new UseDigestAttribute()), null));
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -115,28 +118,23 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldUseAlternateDigest_WhenPrimaryDigestInvalid()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/notification",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "df619790a2579a077eae4a6b6864966ff4768723"),
+                    "X-Digest-A", "df619790a2579a077eae4a6b6864966ff4768723"
                 },
-            },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "test";
-        ServerConfiguration.Instance.DigestKey.AlternateDigestKey = "bruh";
+            });
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["test, bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -166,14 +164,14 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -203,14 +201,14 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -241,14 +239,14 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -279,14 +277,14 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -317,14 +315,13 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("digest test");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -355,14 +352,13 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -398,7 +394,6 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
@@ -406,7 +401,7 @@ public class DigestMiddlewareTests
                 httpContext.Response.Headers.ContentType = "text/xml";
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
