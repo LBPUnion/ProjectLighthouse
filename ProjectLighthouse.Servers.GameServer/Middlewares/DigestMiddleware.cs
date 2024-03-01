@@ -103,7 +103,6 @@ public class DigestMiddleware : Middleware
         }
 
         context.Response.Headers.Append("X-Digest-B", calculatedRequestDigest);
-        // context.Request.Body.Position = 0;
 
         // Let endpoint generate response so we can calculate the digest for it
         Stream originalBody = context.Response.Body;
