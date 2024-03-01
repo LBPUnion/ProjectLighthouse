@@ -1,20 +1,17 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Filter.Filters;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
-[ApiController]
-[Authorize]
-[Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/plain")]
-public class StatisticsController : ControllerBase
+public class StatisticsController : GameController
 {
     private readonly DatabaseContext database;
 

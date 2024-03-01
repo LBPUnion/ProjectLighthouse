@@ -1,4 +1,3 @@
-using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Middlewares;
@@ -10,13 +9,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 
 public class DigestMiddleware : Middleware
 {
-    private readonly bool computeDigests;
-
-    public DigestMiddleware(RequestDelegate next, bool computeDigests) : base(next)
-    {
-        this.computeDigests = computeDigests;
-    }
-
     private readonly List<string> digestKeys;
 
     public DigestMiddleware(RequestDelegate next, List<string> digestKeys) : base(next)
@@ -54,61 +46,59 @@ public class DigestMiddleware : Middleware
 
     public override async Task InvokeAsync(HttpContext context)
     {
-        UseDigestAttribute? digestAttribute = context.GetEndpoint()?.Metadata.OfType<UseDigestAttribute>().FirstOrDefault();
+        // If no digest keys are supplied, then we can't do anything
+        if (this.digestKeys.Count == 0)
+        {
+            await this.next(context);
+            return;
+        }
+
+        UseDigestAttribute? digestAttribute = context.GetEndpoint()?.Metadata.GetMetadata<UseDigestAttribute>();
         if (digestAttribute == null)
         {
             await this.next(context);
             return;
         }
 
-        if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie))
-        {
-            context.Response.StatusCode = 403;
-            return;
-        }
+        if (!context.Request.Cookies.TryGetValue("MM_AUTH", out string? authCookie)) authCookie = string.Empty;
 
         string digestPath = context.Request.Path;
 
         byte[] bodyBytes = await context.Request.BodyReader.ReadAllAsync();
 
-        if (!context.Request.Headers.TryGetValue(digestAttribute.DigestHeaderName, out StringValues digestHeaders) ||
-            digestHeaders.Count != 1 && digestAttribute.EnforceDigest)
+        if ((!context.Request.Headers.TryGetValue(digestAttribute.DigestHeaderName, out StringValues digestHeaders) ||
+            digestHeaders.Count != 1) && digestAttribute.EnforceDigest)
         {
             context.Response.StatusCode = 403;
             return;
         }
 
-        string? clientDigest = digestHeaders[0];
+        string? clientDigest = digestHeaders.FirstOrDefault() ?? null;
 
         string? matchingDigestKey = null;
         string? calculatedRequestDigest = null;
 
-        foreach (string digestKey in this.digestKeys)
+        if (clientDigest != null)
         {
-            string calculatedDigest = CryptoHelper.ComputeDigest(digestPath,
-                authCookie,
-                bodyBytes,
-                digestKey,
-                digestAttribute.ExcludeBodyFromDigest);
-            if (calculatedDigest != clientDigest) continue;
+            foreach (string digestKey in this.digestKeys)
+            {
+                string calculatedDigest = CalculateDigest(digestKey, bodyBytes);
+                if (calculatedDigest != clientDigest) continue;
 
-            matchingDigestKey = digestKey;
-            calculatedRequestDigest = calculatedDigest;
+                matchingDigestKey = digestKey;
+                calculatedRequestDigest = calculatedDigest;
+            }
         }
 
         matchingDigestKey ??= this.digestKeys.First();
 
-        switch (matchingDigestKey)
+        switch (calculatedRequestDigest)
         {
             case null when digestAttribute.EnforceDigest:
                 context.Response.StatusCode = 403;
                 return;
             case null:
-                calculatedRequestDigest = CryptoHelper.ComputeDigest(digestPath,
-                    authCookie,
-                    bodyBytes,
-                    matchingDigestKey,
-                    digestAttribute.ExcludeBodyFromDigest);
+                calculatedRequestDigest = CalculateDigest(matchingDigestKey, bodyBytes);
                 break;
         }
 
@@ -124,17 +114,21 @@ public class DigestMiddleware : Middleware
 
         await HandleResponseCompression(context, responseBuffer);
 
-        string responseDigest = CryptoHelper.ComputeDigest(digestPath,
-            authCookie,
-            responseBuffer.ToArray(),
-            matchingDigestKey,
-            digestAttribute.ExcludeBodyFromDigest);
+        string responseDigest = CalculateDigest(matchingDigestKey, responseBuffer.ToArray());
 
         context.Response.Headers.Append("X-Digest-A", responseDigest);
 
         responseBuffer.Position = 0;
         await responseBuffer.CopyToAsync(originalBody);
         context.Response.Body = originalBody;
+        return;
+
+        string CalculateDigest(string digestKey, byte[] data) =>
+            CryptoHelper.ComputeDigest(digestPath,
+                authCookie,
+                data,
+                digestKey,
+                digestAttribute.ExcludeBodyFromDigest);
     }
 
 }

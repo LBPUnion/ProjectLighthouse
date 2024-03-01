@@ -1,4 +1,3 @@
-#nullable enable
 using System.Net;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;

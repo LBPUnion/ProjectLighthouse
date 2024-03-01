@@ -7,5 +7,5 @@ public class UseDigestAttribute : Attribute
 
     public string DigestHeaderName { get; set; } = "X-Digest-A";
 
-    public bool ExcludeBodyFromDigest { get; set; } = false;
+    public bool ExcludeBodyFromDigest { get; set; }
 }

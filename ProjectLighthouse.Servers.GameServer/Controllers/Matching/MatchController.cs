@@ -1,26 +1,21 @@
-#nullable enable
 using System.Text.Json;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.MatchCommands;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 
-[ApiController]
-[Authorize]
-[Route("LITTLEBIGPLANETPS3_XML/")]
-[Produces("text/xml")]
-public class MatchController : ControllerBase
+public class MatchController : GameController
 {
     private readonly DatabaseContext database;
 
