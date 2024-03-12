@@ -245,10 +245,13 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             {
                 if (origEntity is not SlotEntity oldSlotEntity) break;
 
-                switch (oldSlotEntity.TeamPick)
+                bool oldIsTeamPick = oldSlotEntity.TeamPickTime != 0;
+                bool newIsTeamPick = slotEntity.TeamPickTime != 0;
+
+                switch (oldIsTeamPick)
                 {
                     // When a level is team picked
-                    case false when slotEntity.TeamPick:
+                    case false when newIsTeamPick:
                         activity = new LevelActivityEntity
                         {
                             Type = EventType.MMPickLevel,
@@ -257,7 +260,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                         };
                         break;
                     // When a level has its team pick removed then remove the corresponding activity
-                    case true when !slotEntity.TeamPick:
+                    case true when !newIsTeamPick:
                         database.Activities.OfType<LevelActivityEntity>()
                             .Where(a => a.Type == EventType.MMPickLevel)
                             .Where(a => a.SlotId == slotEntity.SlotId)

@@ -673,7 +673,7 @@ public class ActivityEventHandlerTests
         {
             SlotId = 1,
             CreatorId = 1,
-            TeamPick = true,
+            TeamPickTime = 1,
         };
 
         eventHandler.OnEntityChanged(database, oldSlot, newSlot);
