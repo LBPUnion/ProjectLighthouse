@@ -44,7 +44,7 @@ public class MatchController : ControllerBase
         if (user == null) return this.Forbid();
 
         // Do not allow matchmaking if it has been disabled
-        if (!ServerConfiguration.Instance.Matchmaking.MatchmakingEnabled) return this.Forbid();
+        if (!ServerConfiguration.Instance.Matchmaking.MatchmakingEnabled) return this.BadRequest();
 
         #region Parse match data
 
