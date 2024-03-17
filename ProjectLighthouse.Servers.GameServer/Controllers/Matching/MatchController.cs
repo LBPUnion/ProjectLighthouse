@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -41,6 +42,9 @@ public class MatchController : ControllerBase
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
+
+        // Do not allow matchmaking if it has been disabled
+        if (!ServerConfiguration.Instance.Matchmaking.MatchmakingEnabled) return this.Forbid();
 
         #region Parse match data
 
