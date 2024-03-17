@@ -43,6 +43,8 @@ public class MatchController : ControllerBase
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
 
+        await LastContactHelper.SetLastContact(this.database, user, token.GameVersion, token.Platform);
+
         // Do not allow matchmaking if it has been disabled
         if (!ServerConfiguration.Instance.Matchmaking.MatchmakingEnabled) return this.BadRequest();
 
@@ -78,8 +80,6 @@ public class MatchController : ControllerBase
         Logger.Info($"Parsed match from {user.Username} (type: {matchData.GetType()})", LogArea.Match);
 
         #endregion
-
-        await LastContactHelper.SetLastContact(this.database, user, token.GameVersion, token.Platform);
 
         #region Process match data
 
