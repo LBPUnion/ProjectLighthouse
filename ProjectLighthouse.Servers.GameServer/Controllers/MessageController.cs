@@ -62,7 +62,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         #if DEBUG
         announceText.Append("\n\n---DEBUG INFO---\n" +
                                   $"user.UserId: {token.UserId}\n" +
-                                  $"token.UserLocation: {token.UserLocation}\n" +
                                   $"token.GameVersion: {token.GameVersion}\n" +
                                   $"token.TicketHash: {token.TicketHash}\n" +
                                   $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +

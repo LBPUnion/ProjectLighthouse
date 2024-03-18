@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +26,7 @@ public static class RoomHelper
     private static int roomIdIncrement;
     internal static int RoomIdIncrement => roomIdIncrement++;
 
-    public static FindBestRoomResponse? FindBestRoom(DatabaseContext database, UserEntity? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform, string? location)
+    public static FindBestRoomResponse? FindBestRoom(DatabaseContext database, UserEntity? user, GameVersion roomVersion, RoomSlot? slot, Platform? platform)
     {
         if (roomVersion == GameVersion.LittleBigPlanet1 || roomVersion == GameVersion.LittleBigPlanetPSP)
         {
@@ -61,30 +60,10 @@ public static class RoomHelper
         {
             if (user != null && MatchHelper.DidUserRecentlyDiveInWith(user.UserId, room.HostId)) continue;
 
-            Dictionary<int, string> relevantUserLocations = new();
-
-            // Determine if all players in a room have UserLocations stored, also store the relevant userlocations while we're at it
-            bool allPlayersHaveLocations = room.PlayerIds.All
-            (
-                p =>
-                {
-                    bool gotValue = MatchHelper.UserLocations.TryGetValue(p, out string? value);
-
-                    if (gotValue && value != null) relevantUserLocations.TryAdd(p, value);
-                    return gotValue;
-                }
-            );
-
-            // If we don't have all locations then the game won't know how to communicate. Thus, it's not a valid room.
-            if (!allPlayersHaveLocations) continue;
-
-            // If we got here then it should be a valid room.
-
             FindBestRoomResponse response = new()
             {
                 RoomId = room.RoomId,
                 Players = new List<Player>(),
-                Locations = new List<string>(),
             };
 
             foreach (UserEntity player in room.GetPlayers(database))
@@ -97,8 +76,6 @@ public static class RoomHelper
                         User = player,
                     }
                 );
-
-                response.Locations.Add(relevantUserLocations.GetValueOrDefault(player.UserId)); // Already validated to exist
             }
 
             if (user != null)
@@ -110,8 +87,6 @@ public static class RoomHelper
                         User = user,
                     }
                 );
-
-            if (location == null) response.Locations.Add(location);
 
             response.Slots = new List<List<int>>
             {
@@ -189,7 +164,7 @@ public static class RoomHelper
         {
             StorableList<Room> rooms = Rooms; // cache rooms so we dont gen a new one every time
             List<Room> roomsToUpdate = new();
-            
+
             #if DEBUG
             Logger.Debug($"Cleaning up rooms... (took {stopwatch.ElapsedMilliseconds}ms to get lock on {nameof(RoomLock)})", LogArea.Match);
             #endif
@@ -205,7 +180,7 @@ public static class RoomHelper
                     .ToList();
 
                 foreach (int player in playersToRemove) room.PlayerIds.Remove(player);
-                
+
                 roomsToUpdate.Add(room);
             }
 
@@ -248,7 +223,7 @@ public static class RoomHelper
             int roomCountAfterCleanup = rooms.Count();
 
             // Log the amount of rooms cleaned up.
-            // If we didnt clean any rooms, it's not useful to log in a 
+            // If we didnt clean any rooms, it's not useful to log in a
             // production environment but it's still quite useful for debugging.
             //
             // So, we handle that case here:

@@ -67,7 +67,6 @@ public partial class DatabaseContext
             UserToken = CryptoHelper.GenerateAuthToken(),
             User = user,
             UserId = user.UserId,
-            UserLocation = userLocation,
             GameVersion = npTicket.GameVersion,
             Platform = npTicket.Platform,
             TicketHash = npTicket.TicketHash,

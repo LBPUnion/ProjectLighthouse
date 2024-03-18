@@ -72,7 +72,7 @@ public class LoginController : ControllerBase
         switch (npTicket.Platform)
         {
             case Platform.RPCS3:
-                user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedRpcnId == npTicket.UserId); 
+                user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedRpcnId == npTicket.UserId);
                 break;
             case Platform.PS3:
             case Platform.Vita:
@@ -88,7 +88,7 @@ public class LoginController : ControllerBase
         // If this user id hasn't been linked to any accounts
         if (user == null)
         {
-            // Check if there is an account with that username already 
+            // Check if there is an account with that username already
             UserEntity? targetUsername = await this.database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
             if (targetUsername != null)
             {
@@ -175,7 +175,7 @@ public class LoginController : ControllerBase
         }
 
         GameTokenEntity? token = await this.database.GameTokens.Include(t => t.User)
-            .FirstOrDefaultAsync(t => t.UserLocation == ipAddress && t.User.Username == npTicket.Username && t.TicketHash == npTicket.TicketHash);
+            .FirstOrDefaultAsync(t => t.User.Username == npTicket.Username && t.TicketHash == npTicket.TicketHash);
 
         if (token != null)
         {

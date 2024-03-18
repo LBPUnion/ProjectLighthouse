@@ -19,8 +19,6 @@ public class GameTokenEntity
 
     public string UserToken { get; set; }
 
-    public string UserLocation { get; set; }
-
     public GameVersion GameVersion { get; set; }
 
     public Platform Platform { get; set; }

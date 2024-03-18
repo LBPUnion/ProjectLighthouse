@@ -1,8 +1,5 @@
 using LBPUnion.ProjectLighthouse.Database;
-using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Debug;
 
@@ -27,10 +24,6 @@ public class RoomVisualizerController : ControllerBase
         List<int> users = await this.database.Users.OrderByDescending(_ => EF.Functions.Random()).Take(2).Select(u => u.UserId).ToListAsync();
         RoomHelper.CreateRoom(users, GameVersion.LittleBigPlanet2, Platform.PS3);
 
-        foreach (int user in users)
-        {
-            MatchHelper.SetUserLocation(user, "127.0.0.1");
-        }
         return this.Redirect("/debug/roomVisualizer");
         #endif
     }
