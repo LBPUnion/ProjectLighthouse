@@ -50,7 +50,7 @@ public static class MockHelper
         return finalResult;
     }
 
-    private static async Task<DbContextOptionsBuilder<DatabaseContext>> GetInMemoryDbOptions()
+    public static async Task<DbContextOptionsBuilder<DatabaseContext>> GetInMemoryDbOptions()
     {
         DbConnection connection = new SqliteConnection("DataSource=:memory:");
         await connection.OpenAsync();

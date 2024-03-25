@@ -38,7 +38,7 @@
 
         <div class="column">
             <h2 class="ui black image header centered">
-                <img src="~/@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.Now.Month == 6 ? "logo-pride.png" : "logo-color.png")"
+                <img src="~/@(ServerConfiguration.Instance.WebsiteConfiguration.PrideEventEnabled && DateTime.UtcNow.Month == 6 ? "logo-pride.png" : "logo-color.png")"
                      alt="Instance logo"
                      class="image"
                      style="width: 128px;"/>

@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 
 namespace LBPUnion.ProjectLighthouse.StorableLists.Stores;
@@ -10,7 +11,7 @@ public static class RoomStore
 
     public static StorableList<Room> GetRooms()
     {
-        if (RedisDatabase.Initialized)
+        if (!ServerStatics.IsUnitTesting && RedisDatabase.Initialized)
         {
             return new RedisStorableList<Room>(RedisDatabase.GetRooms());
         }
