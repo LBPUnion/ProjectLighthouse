@@ -25,11 +25,11 @@ public class ActivityDto
         };
 
     public ActivityGroupType GroupType =>
-        this.TargetSlotId != 0
+        this.TargetSlotId != null
             ? ActivityGroupType.Level
-            : this.TargetUserId != 0
+            : this.TargetUserId != null
                 ? ActivityGroupType.User
-                : this.TargetPlaylistId != 0
+                : this.TargetPlaylistId != null
                     ? ActivityGroupType.Playlist
                     : ActivityGroupType.News;
 }

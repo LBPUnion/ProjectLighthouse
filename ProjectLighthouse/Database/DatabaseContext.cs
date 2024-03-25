@@ -109,13 +109,15 @@ public partial class DatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<LevelActivityEntity>().UseTphMappingStrategy();
-        modelBuilder.Entity<PhotoActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserPhotoActivity>().UseTphMappingStrategy();
+        modelBuilder.Entity<LevelPhotoActivity>().UseTphMappingStrategy();
         modelBuilder.Entity<PlaylistActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<PlaylistWithSlotActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<ScoreActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<NewsActivityEntity>().UseTphMappingStrategy();
-        modelBuilder.Entity<CommentActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<LevelCommentActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserCommentActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
         modelBuilder.Entity<ReviewActivityEntity>().UseTphMappingStrategy();
         base.OnModelCreating(modelBuilder);

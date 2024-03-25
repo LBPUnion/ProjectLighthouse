@@ -41,40 +41,44 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             {
                 CommentType.Level => comment.TargetSlot?.Type switch
                 {
-                    SlotType.User => new CommentActivityEntity
+                    SlotType.User => new LevelCommentActivityEntity
                     {
                         Type = EventType.CommentOnLevel,
                         CommentId = comment.CommentId,
                         UserId = comment.PosterUserId,
+                        SlotId = comment.TargetSlotId ?? throw new NullReferenceException("SlotId in Level comment is null, this shouldn't happen."),
                     },
                     _ => null,
                 },
-                CommentType.Profile => new CommentActivityEntity
+                CommentType.Profile => new UserCommentActivityEntity()
                 {
                     Type = EventType.CommentOnUser,
                     CommentId = comment.CommentId,
                     UserId = comment.PosterUserId,
+                    TargetUserId = comment.TargetUserId ?? throw new NullReferenceException("TargetUserId in User comment is null, this shouldn't happen."),
                 }, 
                 _ => null,
             },
             PhotoEntity photo => photo.SlotId switch
             {
                 // Photos without levels
-                null => new PhotoActivityEntity
+                null => new UserPhotoActivity
                 {
                     Type = EventType.UploadPhoto,
                     PhotoId = photo.PhotoId,
                     UserId = photo.CreatorId,
+                    TargetUserId = photo.CreatorId,
                 },
                 _ => photo.Slot?.Type switch
                 {
                     SlotType.Developer => null,
                     // Non-story levels (moon, pod, etc)
-                    _ => new PhotoActivityEntity
+                    _ => new LevelPhotoActivity
                     {
                         Type = EventType.UploadPhoto,
                         PhotoId = photo.PhotoId,
                         UserId = photo.CreatorId,
+                        SlotId = photo.SlotId ?? throw new NullReferenceException("SlotId in Photo is null"),
                     },
                 },
             },
@@ -86,6 +90,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                     Type = EventType.Score,
                     ScoreId = score.ScoreId,
                     UserId = score.UserId,
+                    SlotId = score.SlotId,
                 },
                 _ => null,
             },
@@ -122,6 +127,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 Type = EventType.ReviewLevel,
                 ReviewId = review.ReviewId,
                 UserId = review.ReviewerId,
+                SlotId = review.SlotId,
             },
             RatedLevelEntity ratedLevel => new LevelActivityEntity
             {

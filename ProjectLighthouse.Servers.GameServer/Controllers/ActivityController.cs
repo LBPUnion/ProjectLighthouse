@@ -56,7 +56,7 @@ public class ActivityController : ControllerBase
             .ToListAsync();
 
         List<int>? friendIds = UserFriendStore.GetUserFriendData(token.UserId)?.FriendIds;
-        friendIds ??= new List<int>();
+        friendIds ??= [];
 
         // This is how lbp3 does its filtering
         GameStreamFilter? filter = await this.DeserializeBody<GameStreamFilter>();
@@ -89,7 +89,7 @@ public class ActivityController : ControllerBase
             predicate = predicate.Or(dto => dto.TargetSlotCreatorId == token.UserId);
         }
 
-        List<int> includedUserIds = new();
+        List<int> includedUserIds = [];
 
         if (!excludeFriends)
         {
@@ -168,7 +168,7 @@ public class ActivityController : ControllerBase
 
     private static DateTime GetOldestTime
         (IReadOnlyCollection<IGrouping<ActivityGroup, ActivityDto>> groups, DateTime defaultTimestamp) =>
-        groups.Any()
+        groups.Count != 0
             ? groups.Min(g => g.MinBy(a => a.Activity.Timestamp)?.Activity.Timestamp ?? defaultTimestamp)
             : defaultTimestamp;
 
@@ -247,7 +247,7 @@ public class ActivityController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
-        if (token.GameVersion == GameVersion.LittleBigPlanet1) return this.NotFound();
+        if (token.GameVersion is GameVersion.LittleBigPlanet1 or GameVersion.LittleBigPlanetPSP) return this.NotFound();
 
         IQueryable<ActivityDto> activityEvents = await this.GetFilters(this.database.Activities.ToActivityDto(true),
             token,
@@ -305,10 +305,11 @@ public class ActivityController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
-        if (token.GameVersion == GameVersion.LittleBigPlanet1) return this.NotFound();
+        if (token.GameVersion is GameVersion.LittleBigPlanet1 or GameVersion.LittleBigPlanetPSP) return this.NotFound();
 
         if ((SlotHelper.IsTypeInvalid(slotType) || slotId == 0) == (username == null)) return this.BadRequest();
 
+        // User and Level activity will never contain news posts or MM pick events.
         IQueryable<ActivityDto> activityQuery = this.database.Activities.ToActivityDto()
             .Where(a => a.Activity.Type != EventType.NewsPost && a.Activity.Type != EventType.MMPickLevel);
 
@@ -342,6 +343,8 @@ public class ActivityController : ControllerBase
         List<IGrouping<ActivityGroup, ActivityDto>> groups = await activityQuery.ToActivityGroups().ToListAsync();
 
         List<OuterActivityGroup> outerGroups = groups.ToOuterActivityGroups();
+
+        PrintOuterGroups(outerGroups);
 
         long oldestTimestamp = GetOldestTime(groups, times.Start).ToUnixTimeMilliseconds();
 

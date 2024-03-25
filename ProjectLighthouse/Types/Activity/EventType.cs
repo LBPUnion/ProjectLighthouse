@@ -3,7 +3,12 @@
 namespace LBPUnion.ProjectLighthouse.Types.Activity;
 
 /// <summary>
-/// UnheartLevel, UnheartUser, DeleteLevelComment, and UnpublishLevel don't actually do anything
+/// An enum of all possible event types that LBP recognizes in Recent Activity
+/// <remarks>
+/// <para>
+/// <see cref="UnheartLevel"/>, <see cref="UnheartUser"/>, <see cref="DeleteLevelComment"/>, <see cref="UnpublishLevel"/> are ignored by the game
+/// </para>
+/// </remarks>
 /// </summary>
 public enum EventType
 {
@@ -61,12 +66,21 @@ public enum EventType
     [XmlEnum("comment_on_user")]
     CommentOnUser = 17,
 
+    /// <remarks>
+    /// This event is only used in LBP3
+    /// </remarks>>
     [XmlEnum("create_playlist")]
     CreatePlaylist = 18,
 
+    /// <remarks>
+    /// This event is only used in LBP3
+    /// </remarks>>
     [XmlEnum("heart_playlist")]
     HeartPlaylist = 19,
 
+    /// <remarks>
+    /// This event is only used in LBP3
+    /// </remarks>>
     [XmlEnum("add_level_to_playlist")]
     AddLevelToPlaylist = 20,
 }

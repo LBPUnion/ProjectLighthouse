@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ProjectLighthouse.Migrations
+namespace LBPUnion.ProjectLighthouse.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240120214525_InitialActivity")]
+    [Migration("20240325034658_InitialActivity")]
     public partial class InitialActivity : Migration
     {
         /// <inheritdoc />
@@ -24,12 +24,12 @@ namespace ProjectLighthouse.Migrations
                     Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    Discriminator = table.Column<string>(type: "longtext", nullable: false)
+                    Discriminator = table.Column<string>(type: "varchar(34)", maxLength: 34, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CommentId = table.Column<int>(type: "int", nullable: true),
                     SlotId = table.Column<int>(type: "int", nullable: true),
-                    NewsId = table.Column<int>(type: "int", nullable: true),
+                    CommentId = table.Column<int>(type: "int", nullable: true),
                     PhotoId = table.Column<int>(type: "int", nullable: true),
+                    NewsId = table.Column<int>(type: "int", nullable: true),
                     PlaylistId = table.Column<int>(type: "int", nullable: true),
                     ReviewId = table.Column<int>(type: "int", nullable: true),
                     ScoreId = table.Column<int>(type: "int", nullable: true),

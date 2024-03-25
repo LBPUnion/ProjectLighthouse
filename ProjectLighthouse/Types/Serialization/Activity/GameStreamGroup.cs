@@ -37,8 +37,6 @@ public class GameStreamGroup : ILbpSerializable
     [XmlArray("events")]
     [XmlArrayItem("event")]
     [DefaultValue(null)]
-    // ReSharper disable once MemberCanBePrivate.Global
-    // (the serializer can't see this if it's private)
     public List<GameEvent> Events { get; set; }
 
     public static GameStreamGroup CreateFromGroup(OuterActivityGroup group)
@@ -56,8 +54,7 @@ public class GameStreamGroup : ILbpSerializable
                 g.Key.TargetId,
                 streamGroup =>
                 {
-                    streamGroup.Timestamp =
-                        g.MaxBy(a => a.Activity.Timestamp).Activity.Timestamp.ToUnixTimeMilliseconds();
+                    streamGroup.Timestamp = g.Max(a => a.Activity.Timestamp).ToUnixTimeMilliseconds();
                     streamGroup.Events = GameEvent.CreateFromActivities(g).ToList();
                 }))
             .ToList());

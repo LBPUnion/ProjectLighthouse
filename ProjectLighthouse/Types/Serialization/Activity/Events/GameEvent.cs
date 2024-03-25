@@ -58,7 +58,7 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
 
     public static IEnumerable<GameEvent> CreateFromActivities(IEnumerable<ActivityDto> activities)
     {
-        List<GameEvent> events = new();
+        List<GameEvent> events = [];
         List<IGrouping<EventType, ActivityDto>> typeGroups = activities.GroupBy(g => g.Activity.Type).ToList();
         foreach (IGrouping<EventType, ActivityDto> typeGroup in typeGroups)
         {

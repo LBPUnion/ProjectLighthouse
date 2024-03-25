@@ -93,7 +93,7 @@ public class ActivityInterceptor : SaveChangesInterceptor
     {
         if (eventData.Context is not DatabaseContext context) return;
 
-        HashSet<CustomTrackedEntity> entities = new();
+        HashSet<CustomTrackedEntity> entities = [];
 
         List<EntityEntry> entries = context.ChangeTracker.Entries().ToList();
 

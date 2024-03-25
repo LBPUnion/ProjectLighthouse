@@ -26,20 +26,33 @@ namespace LBPUnion.ProjectLighthouse.Types.Serialization.Activity;
 [XmlRoot("stream")]
 public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
 {
+    /// <summary>
+    /// A list of <see cref="SlotEntity.SlotId"/> that should be included in the root
+    /// of the stream object. These will be loaded into <see cref="Slots"/> 
+    /// </summary>
     [XmlIgnore]
     public List<int> SlotIds { get; set; }
 
+    /// <summary>
+    /// A list of <see cref="UserEntity.UserId"/> that should be included in the root
+    /// of the stream object. These will be loaded into <see cref="Users"/> 
+    /// </summary>
     [XmlIgnore]
     public List<int> UserIds { get; set; }
 
+    /// <summary>
+    /// A list of <see cref="PlaylistEntity.PlaylistId"/> that should be included in the root
+    /// of the stream object. These will be loaded into <see cref="Playlists"/> 
+    /// </summary>
     [XmlIgnore]
     public List<int> PlaylistIds { get; set; }
 
+    /// <summary>
+    /// A list of <see cref="WebsiteAnnouncementEntity.AnnouncementId"/> that should be included in the root
+    /// of the stream object. These will be loaded into <see cref="News"/> 
+    /// </summary>
     [XmlIgnore]
     public List<int> NewsIds { get; set; }
-
-    [XmlIgnore]
-    private int TargetUserId { get; set; }
 
     [XmlIgnore]
     private GameVersion TargetGame { get; set; }
@@ -77,7 +90,7 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
 
     public async Task PrepareSerialization(DatabaseContext database)
     {
-        this.Slots = await LoadEntities<SlotEntity, SlotBase>(this.SlotIds, slot => SlotBase.CreateFromEntity(slot, this.TargetGame, this.TargetUserId), s => s.Type == SlotType.User);
+        this.Slots = await LoadEntities<SlotEntity, SlotBase>(this.SlotIds, slot => SlotBase.CreateFromEntity(slot, this.TargetGame, 0), s => s.Type == SlotType.User);
         this.Users = await LoadEntities<UserEntity, GameUser>(this.UserIds, user => GameUser.CreateFromEntity(user, this.TargetGame));
         this.Playlists = await LoadEntities<PlaylistEntity, GamePlaylist>(this.PlaylistIds, GamePlaylist.CreateFromEntity);
         this.News = await LoadEntities<WebsiteAnnouncementEntity, GameNewsObject>(this.NewsIds, a => GameNewsObject.CreateFromEntity(a, this.TargetGame));
@@ -86,15 +99,15 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
         async Task<List<TResult>> LoadEntities<TFrom, TResult>(List<int> ids, Func<TFrom, TResult> transformation, Func<TFrom, bool> predicate = null) 
             where TFrom : class
         {
-            List<TResult> results = new();
+            List<TResult> results = [];
             if (ids.Count <= 0) return null;
             foreach (int id in ids)
             {
                 TFrom entity = await database.Set<TFrom>().FindAsync(id);
 
-                if (predicate != null && !predicate(entity)) continue;
-
                 if (entity == null) continue;
+
+                if (predicate != null && !predicate(entity)) continue;
 
                 results.Add(transformation(entity));
             }
@@ -108,7 +121,6 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
     {
         GameStream gameStream = new()
         {
-            TargetUserId = token.UserId,
             TargetGame = token.GameVersion,
             StartTimestamp = startTimestamp,
             EndTimestamp = endTimestamp,
