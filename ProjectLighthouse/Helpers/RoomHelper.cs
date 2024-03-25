@@ -15,6 +15,9 @@ using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking;
 using LBPUnion.ProjectLighthouse.Types.Matchmaking.Rooms;
 using LBPUnion.ProjectLighthouse.Types.Users;
+#if DEBUG
+using System.Diagnostics;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 

@@ -1,5 +1,10 @@
 using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.AspNetCore.Mvc;
+#if DEBUG
+using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Types.Users;
+using Microsoft.EntityFrameworkCore;
+#endif
 
 namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers.Debug;
 
