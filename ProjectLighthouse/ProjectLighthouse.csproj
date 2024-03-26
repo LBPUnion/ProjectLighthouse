@@ -30,7 +30,7 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="YamlDotNet" Version="15.1.0" />
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
-        <PackageReference Include="DistributedLock.MySql" Version="1.0.1" />
+        <PackageReference Include="DistributedLock.MySql" Version="1.0.2" />
     </ItemGroup>
 
     <ItemGroup>
