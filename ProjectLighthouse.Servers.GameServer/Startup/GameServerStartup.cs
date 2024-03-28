@@ -84,8 +84,6 @@ public class GameServerStartup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        bool computeDigests = true;
-
         if (string.IsNullOrEmpty(ServerConfiguration.Instance.DigestKey.PrimaryDigestKey))
         {
             Logger.Warn
@@ -94,7 +92,6 @@ public class GameServerStartup
                 "To increase security, it is recommended that you find and set this variable.",
                 LogArea.Startup
             );
-            computeDigests = false;
         }
 
         #if DEBUG
@@ -105,10 +102,16 @@ public class GameServerStartup
 
         app.UseMiddleware<RequestLogMiddleware>();
         app.UseMiddleware<RateLimitMiddleware>();
-        app.UseMiddleware<DigestMiddleware>(computeDigests);
         app.UseMiddleware<SetLastContactMiddleware>();
 
         app.UseRouting();
+
+        List<string> digestKeys =
+        [
+            ServerConfiguration.Instance.DigestKey.PrimaryDigestKey,
+            ServerConfiguration.Instance.DigestKey.AlternateDigestKey,
+        ];
+        app.UseMiddleware<DigestMiddleware>(digestKeys);
 
         app.UseAuthorization();
 
