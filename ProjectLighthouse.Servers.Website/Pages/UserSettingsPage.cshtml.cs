@@ -52,7 +52,8 @@ public class UserSettingsPage : BaseLayout
         if (biography != null)
         {
             // Deny request if in read-only mode
-            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.Redirect($"~/user/{userId}");
+            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
+                return this.Redirect($"~/user/{userId}");
 
             biography = CensorHelper.FilterMessage(biography);
             if (this.ProfileUser.Biography != biography && biography.Length <= 512)
