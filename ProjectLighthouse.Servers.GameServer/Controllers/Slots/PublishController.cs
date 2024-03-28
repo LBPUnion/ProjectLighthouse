@@ -43,6 +43,9 @@ public class PublishController : ControllerBase
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
 
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
         GameUserSlot? slot = await this.DeserializeBody<GameUserSlot>();
         if (slot == null)
         {
@@ -115,6 +118,9 @@ public class PublishController : ControllerBase
 
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
+
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
         GameUserSlot? slot = await this.DeserializeBody<GameUserSlot>();
 
@@ -334,6 +340,9 @@ public class PublishController : ControllerBase
     public async Task<IActionResult> Unpublish(int id)
     {
         GameTokenEntity token = this.GetToken();
+
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
         SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
         if (slot == null) return this.NotFound();

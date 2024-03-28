@@ -178,6 +178,18 @@
                 </div>
             </div>
         }
+        @if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
+        {
+            <div class="ui bottom attached red message large">
+                <div class="ui container">
+                    <i class="warning icon"></i>
+                    <span style="font-size: 1.2rem;">@Model.Translate(BaseLayoutStrings.ReadOnlyWarnTitle)</span>
+                    <p>
+                        @Html.Raw(Model.Translate(BaseLayoutStrings.ReadOnlyWarn))
+                    </p>
+                </div>
+            </div>
+        }
     </header>
     <div class="main">
         <div class="ui container">

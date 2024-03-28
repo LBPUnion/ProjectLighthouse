@@ -37,6 +37,9 @@ public class PhotosController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
         int photoCount = await this.database.Photos.CountAsync(p => p.CreatorId == token.UserId);
         if (photoCount >= ServerConfiguration.Instance.UserGeneratedContentLimits.PhotosQuota) return this.BadRequest();
 
@@ -90,7 +93,7 @@ public class PhotosController : ControllerBase
                 case SlotType.Developer:
                 {
                     SlotEntity? slot = await this.database.Slots.FirstOrDefaultAsync(s => s.Type == photoSlot.SlotType && s.InternalSlotId == photoSlot.SlotId);
-                    if (slot != null) 
+                    if (slot != null)
                         photoSlot.SlotId = slot.SlotId;
                     else
                         photoSlot.SlotId = await SlotHelper.GetPlaceholderSlotId(this.database, photoSlot.SlotId, photoSlot.SlotType);
