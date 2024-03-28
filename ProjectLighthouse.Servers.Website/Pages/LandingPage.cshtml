@@ -60,34 +60,7 @@
     }
 }
 
-@if (Model.LatestAnnouncement != null)
-{
-    <div class="ui blue segment" style="position: relative;">
-        <div>
-            <h3>@Model.LatestAnnouncement.Title</h3>
-            <div style="padding-bottom: 2em;">
-                <span style="white-space: pre-line">
-                    @(Model.LatestAnnouncement.Content.Length > 250
-                        ? Model.LatestAnnouncement.Content[..250] + $"... [read more]({ServerConfiguration.Instance.ExternalUrl}/notifications)"
-                        : Model.LatestAnnouncement.Content)
-                </span>
-            </div>
-            @if (Model.LatestAnnouncement.Publisher != null)
-            {
-                <div class="ui tiny bottom left attached label">
-                    Posted by
-                    <a style="color: black" href="~/user/@Model.LatestAnnouncement.Publisher.UserId">
-                        @Model.LatestAnnouncement.Publisher.Username
-                    </a>
-                </div>
-            }
-        </div>
-    </div>
-}
-else
-{
-    <br /><br />
-}
+<br><br>
 
 <div class="@(isMobile ? "" : "ui center aligned grid")">
     <div class="eight wide column">
