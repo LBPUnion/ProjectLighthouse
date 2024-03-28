@@ -39,15 +39,13 @@ public class UserSettingsPage : BaseLayout
 
         if (!this.User.IsModerator && this.User != this.ProfileUser) return this.Redirect("~/user/" + userId);
 
+        // Deny request if in read-only mode
+        if (avatar != null && ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
+            return this.Redirect($"~/user/{userId}");
+
         string? avatarHash = await FileHelper.ParseBase64Image(avatar);
 
-        if (avatarHash != null)
-        {
-            // Deny request if in read-only mode
-            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.Redirect($"~/user/{userId}");
-
-            this.ProfileUser.IconHash = avatarHash;
-        }
+        if (avatarHash != null) this.ProfileUser.IconHash = avatarHash;
 
         if (this.User.IsAdmin) this.ProfileUser.ProfileTag = profileTag;
 
