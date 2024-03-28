@@ -67,9 +67,13 @@
             <h3>@Model.LatestAnnouncement.Title</h3>
             <div style="padding-bottom: 2em;">
                 <span style="white-space: pre-line">
-                    @(Model.LatestAnnouncement.Content.Length > 250
-                        ? Model.LatestAnnouncement.Content[..250] + $"... [read more]({ServerConfiguration.Instance.ExternalUrl}/notifications)"
-                        : Model.LatestAnnouncement.Content)
+                    @{
+                        string truncatedAnnouncement = Model.LatestAnnouncement.Content.Length > 250
+                            ? Model.LatestAnnouncement.Content[..250] +
+                              $"... <a href='{ServerConfiguration.Instance.ExternalUrl}/notifications'>read more</a>"
+                            : Model.LatestAnnouncement.Content;
+                    }
+                    @Html.Raw(truncatedAnnouncement)
                 </span>
             </div>
             @if (Model.LatestAnnouncement.Publisher != null)
