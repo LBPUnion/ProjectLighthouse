@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Website;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ public class LandingPage : BaseLayout
 
     public int PendingAuthAttempts;
     public List<UserEntity> PlayersOnline = new();
+
+    public WebsiteAnnouncementEntity? LatestAnnouncement;
 
     public LandingPage(DatabaseContext database) : base(database)
     { }
@@ -53,6 +56,10 @@ public class LandingPage : BaseLayout
             .Take(maxShownLevels)
             .Include(s => s.Creator)
             .ToListAsync();
+
+        this.LatestAnnouncement = await this.Database.WebsiteAnnouncements.Include(a => a.Publisher)
+            .OrderByDescending(a => a.AnnouncementId)
+            .FirstOrDefaultAsync();
 
         return this.Page();
     }
