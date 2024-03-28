@@ -23,5 +23,8 @@ public static class BaseLayoutStrings
     public static readonly TranslatableString LicenseWarn2 = create("license_warn_2");
     public static readonly TranslatableString LicenseWarn3 = create("license_warn_3");
 
+    public static readonly TranslatableString ReadOnlyWarnTitle = create("read_only_warn_title");
+    public static readonly TranslatableString ReadOnlyWarn = create("read_only_warn");
+
     private static TranslatableString create(string key) => new(TranslationAreas.BaseLayout, key);
 }

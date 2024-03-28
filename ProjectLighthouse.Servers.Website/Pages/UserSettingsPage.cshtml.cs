@@ -41,12 +41,21 @@ public class UserSettingsPage : BaseLayout
 
         string? avatarHash = await FileHelper.ParseBase64Image(avatar);
 
-        if (avatarHash != null) this.ProfileUser.IconHash = avatarHash;
+        if (avatarHash != null)
+        {
+            // Deny request if in read-only mode
+            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
+            this.ProfileUser.IconHash = avatarHash;
+        }
 
         if (this.User.IsAdmin) this.ProfileUser.ProfileTag = profileTag;
 
         if (biography != null)
         {
+            // Deny request if in read-only mode
+            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
             biography = CensorHelper.FilterMessage(biography);
             if (this.ProfileUser.Biography != biography && biography.Length <= 512)
                 this.ProfileUser.Biography = biography;

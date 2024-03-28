@@ -59,6 +59,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         announceText.Replace("%user", username);
         announceText.Replace("%id", token.UserId.ToString());
 
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
+        {
+            announceText.Insert(0, "This instance is currently in read-only mode. Level and photo uploads, comments, " +
+                                   "reviews, and certain profile changes will be restricted until read-only mode is " +
+                                   "disabled.");
+        }
+
         #if DEBUG
         announceText.Append("\n\n---DEBUG INFO---\n" +
                                   $"user.UserId: {token.UserId}\n" +
