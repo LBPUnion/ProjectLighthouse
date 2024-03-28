@@ -3,6 +3,8 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
@@ -61,9 +63,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
-            announceText.Insert(0, "This instance is currently in read-only mode. Level and photo uploads, comments, " +
-                                   "reviews, and certain profile changes will be restricted until read-only mode is " +
-                                   "disabled.");
+            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang));
         }
 
         #if DEBUG
