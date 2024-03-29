@@ -5,23 +5,20 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
-[ApiController]
-[Authorize]
-[Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/plain")]
-public class MessageController : ControllerBase
+public class MessageController : GameController
 {
     private readonly DatabaseContext database;
 
@@ -45,9 +42,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     }
 
     [HttpGet("eula")]
+    [UseDigest(EnforceDigest = false)]
     public IActionResult Eula() => this.Ok($"{license}\n{ServerConfiguration.Instance.EulaText}");
 
     [HttpGet("announce")]
+    [UseDigest(EnforceDigest = false)]
     public async Task<IActionResult> Announce()
     {
         GameTokenEntity token = this.GetToken();
