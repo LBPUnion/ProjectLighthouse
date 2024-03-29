@@ -69,7 +69,7 @@
                     @if (Model.LatestAnnouncement.Content.Length > 250)
                     {
                         <span style="white-space: pre-line">
-                            @Model.LatestAnnouncement.Content[..250]
+                            @Model.LatestAnnouncement.Content[..250]...
                             <a href="@ServerConfiguration.Instance.ExternalUrl/notifications">read more</a>
                         </span>
                     }
