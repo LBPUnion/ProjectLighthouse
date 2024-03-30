@@ -1,10 +1,5 @@
 name: Build Docker Image
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 on:
   push:
     branches: [ "main" ]
@@ -19,8 +14,8 @@ env:
 
 
 jobs:
-  build:
-
+  build-publish:
+    name: Build and Publish
     runs-on: ubuntu-latest
     permissions:
       contents: read
