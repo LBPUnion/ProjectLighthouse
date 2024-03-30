@@ -40,7 +40,7 @@ public class UserPageController : ControllerBase
         if (token == null) return this.Redirect("~/login");
 
         // Deny request if in read-only mode
-        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.Redirect("~/user/" + id);
 
         if (msg == null)
         {
