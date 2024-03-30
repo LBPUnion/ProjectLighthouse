@@ -40,11 +40,7 @@ jobs:
         uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 #v3.4.0
         with:
           cosign-release: 'v2.2.3'
-     
-      # try to make this workflow play nice with ARM
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      
+
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
       # https://github.com/docker/setup-buildx-action
