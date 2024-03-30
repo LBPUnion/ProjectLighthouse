@@ -63,8 +63,8 @@ public class SlotPageController : ControllerBase
         WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
-    // Deny request if in read-only mode
-    if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.Redirect("~/slot/" + id);
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.Redirect("~/slot/" + id);
 
         if (msg == null)
         {
