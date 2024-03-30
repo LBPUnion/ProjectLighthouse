@@ -63,7 +63,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
-            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang));
+            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
         }
 
         #if DEBUG
