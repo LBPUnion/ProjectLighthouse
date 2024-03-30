@@ -80,4 +80,10 @@
   <data name="license_warn_3" xml:space="preserve">
         <value>Jos ei, julkaise lähdekoodisi jonnekin, jossa se on käyttäjillesi saatavissa.</value>
     </data>
+  <data name="read_only_warn_title" xml:space="preserve">
+        <value>Read-Only Mode</value>
+    </data>
+  <data name="read_only_warn" xml:space="preserve">
+        <value>This instance is currently in read-only mode. Level and photo uploads, comments, reviews, and certain profile changes will be restricted until read-only mode is disabled.</value>
+    </data>
 </root>
