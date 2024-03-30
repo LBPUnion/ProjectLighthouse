@@ -39,6 +39,9 @@ public class UserPageController : ControllerBase
         WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
 
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.Redirect("~/user/" + id);
+
         if (msg == null)
         {
             Logger.Error($"Refusing to post comment from {token.UserId} on user {id}, {nameof(msg)} is null", LogArea.Comments);

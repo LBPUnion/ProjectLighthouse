@@ -1,4 +1,5 @@
 ﻿@using System.Web
+@using LBPUnion.ProjectLighthouse.Configuration
 @using LBPUnion.ProjectLighthouse.Database
 @using LBPUnion.ProjectLighthouse.Localization
 @using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
@@ -31,18 +32,32 @@
     @if (Model.CommentsEnabled && Model.User != null)
     {
         <div class="ui divider"></div>
-        <form class="ui reply form" action="postComment" method="post">
-            <div class="field">
-                <textarea style="min-height: 70px; height: 70px; max-height:120px" maxlength="100" name="msg"></textarea>
+        @if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
+        {
+            <div class="ui red segment">
+                <p>
+                    <i>
+                        @ServerConfiguration.Instance.Customization.ServerName is currently in read-only mode.
+                        You will not be able to post comments until read-only mode is disabled.
+                    </i>
+                </p>
             </div>
-            <input type="submit" class="ui blue button">
-        </form>
+        }
+        else
+        {
+            <form class="ui reply form" action="postComment" method="post">
+                <div class="field">
+                    <textarea style="min-height: 70px; height: 70px; max-height:120px" maxlength="100" name="msg"></textarea>
+                </div>
+                <input type="submit" class="ui blue button">
+            </form>
+        }
         @if (Model.Comments.Count > 0)
         {
             <div class="ui divider"></div>
         }
     }
-    
+
     @{
         int i = 0;
         foreach (KeyValuePair<CommentEntity, RatedCommentEntity?> commentAndReaction in Model.Comments)

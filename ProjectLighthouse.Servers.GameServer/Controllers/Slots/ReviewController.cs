@@ -1,4 +1,5 @@
 #nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -92,6 +93,9 @@ public class ReviewController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
         GameReview? newReview = await this.DeserializeBody<GameReview>();
         if (newReview == null) return this.BadRequest();
 
@@ -115,7 +119,7 @@ public class ReviewController : ControllerBase
         }
         review.Thumb = Math.Clamp(newReview.Thumb, -1, 1);
         review.LabelCollection = LabelHelper.RemoveInvalidLabels(newReview.LabelCollection);
-        
+
         review.Text = newReview.Text;
         review.Deleted = false;
         review.Timestamp = TimeHelper.TimestampMillis;
@@ -238,6 +242,9 @@ public class ReviewController : ControllerBase
     public async Task<IActionResult> DeleteReview(int slotId, string username)
     {
         GameTokenEntity token = this.GetToken();
+
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
         int creatorId = await this.database.Slots.Where(s => s.SlotId == slotId).Select(s => s.CreatorId).FirstOrDefaultAsync();
         if (creatorId == 0) return this.BadRequest();

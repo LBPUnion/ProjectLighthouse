@@ -119,6 +119,9 @@ public class CommentController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
         GameComment? comment = await this.DeserializeBody<GameComment>();
         if (comment?.Message == null) return this.BadRequest();
 
@@ -158,6 +161,9 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
+
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 

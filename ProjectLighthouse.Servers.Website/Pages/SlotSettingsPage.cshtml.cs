@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -25,6 +26,10 @@ public class SlotSettingsPage : BaseLayout
 
         if (!this.User.IsModerator && this.User != this.Slot.Creator) return this.Redirect("~/slot/" + slotId);
 
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
+            return this.Redirect($"~/slot/{slotId}");
+
         string? avatarHash = await FileHelper.ParseBase64Image(avatar);
 
         if (avatarHash != null) this.Slot.IconHash = avatarHash;
@@ -46,7 +51,7 @@ public class SlotSettingsPage : BaseLayout
         if (labels != null)
         {
             labels = LabelHelper.RemoveInvalidLabels(labels);
-            if (this.Slot.AuthorLabels != labels) 
+            if (this.Slot.AuthorLabels != labels)
                 this.Slot.AuthorLabels = labels;
         }
 
