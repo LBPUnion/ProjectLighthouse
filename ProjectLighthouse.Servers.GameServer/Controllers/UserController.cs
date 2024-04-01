@@ -1,4 +1,5 @@
 using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
@@ -73,6 +74,9 @@ public class UserController : ControllerBase
 
         if (update.Biography != null)
         {
+            // Deny request if in read-only mode
+            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
             if (update.Biography.Length > 512) return this.BadRequest();
 
             user.Biography = update.Biography;
@@ -84,6 +88,9 @@ public class UserController : ControllerBase
         foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash,})
         {
             if (string.IsNullOrWhiteSpace(resource)) continue;
+
+            // Deny request if in read-only mode
+            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
             if (!FileHelper.ResourceExists(resource) && !resource.StartsWith('g')) return this.BadRequest();
 
