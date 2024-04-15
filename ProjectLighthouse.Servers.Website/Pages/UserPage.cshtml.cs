@@ -45,7 +45,8 @@ public class UserPage : BaseLayout
         if (this.ProfileUser == null) return this.NotFound();
 
         string userSlug = this.ProfileUser.GenerateSlug();
-        if (slug == null || userSlug != slug)
+        // Only redirect if there is a valid slug for this user and the current slug doesn't match 
+        if (!string.IsNullOrWhiteSpace(userSlug) && (slug == null || userSlug != slug))
         {
             return this.Redirect($"~/user/{userId}/{userSlug}");
         }
