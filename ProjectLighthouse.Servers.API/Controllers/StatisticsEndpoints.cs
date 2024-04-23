@@ -61,7 +61,7 @@ public class StatisticsEndpoints : ApiEndpointController
     /// <summary>
     /// Get player counts for each individual title
     /// </summary>
-    /// <returns>An instance of PlayerCountResponse</returns>
+    /// <returns>An instance of PlayerCountByGameResponse</returns>
     [HttpGet("playerCount")]
     [HttpGet("playerCount/game")]
     [ProducesResponseType(typeof(PlayerCountByGameResponse), StatusCodes.Status200OK)]
@@ -86,9 +86,9 @@ public class StatisticsEndpoints : ApiEndpointController
     }
 
     /// <summary>
-    /// Get player counts for each individual title
+    /// Get player counts for each individual platform
     /// </summary>
-    /// <returns>An instance of PlayerCountResponse</returns>
+    /// <returns>An instance of PlayerCountByPlatformResponse</returns>
     [HttpGet("playerCount/platform")]
     [ProducesResponseType(typeof(PlayerCountByPlatformResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPlayerCountsByPlatform()
@@ -115,7 +115,7 @@ public class StatisticsEndpoints : ApiEndpointController
     /// <summary>
     /// Gets a list of online players 
     /// </summary>
-    /// <returns>An instance of PlayerCountResponse</returns>
+    /// <returns>An instance of PlayerListResponse</returns>
     [HttpGet("players")]
     [ProducesResponseType(typeof(PlayerListResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPlayerList()
