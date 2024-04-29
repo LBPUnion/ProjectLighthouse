@@ -9,5 +9,5 @@ public class PlayerListObject
 {
     public required string Username { get; set; }
     public required string Game { get; set; }
-    public required  string Platform { get; set; }
+    public required string Platform { get; set; }
 }
