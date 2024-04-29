@@ -157,6 +157,13 @@ public class ReviewController : ControllerBase
 
         List<GameReview> reviews = (await this.database.Reviews
             .Where(r => r.SlotId == slotId)
+            .Select(r => new
+            {
+                Review = r,
+                SlotVersion = r.Slot!.GameVersion,
+            })
+            .Where(a => a.SlotVersion <= token.GameVersion)
+            .Select(a => a.Review)
             .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
             .ThenByDescending(r => r.Timestamp)
             .ApplyPagination(pageData)
@@ -178,6 +185,13 @@ public class ReviewController : ControllerBase
 
         List<GameReview> reviews = (await this.database.Reviews
             .Where(r => r.ReviewerId == targetUserId)
+            .Select(r => new
+            {
+                Review = r,
+                SlotVersion = r.Slot!.GameVersion,
+            })
+            .Where(a => a.SlotVersion <= token.GameVersion)
+            .Select(a => a.Review)
             .OrderByDescending(r => r.Timestamp)
             .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(r => GameReview.CreateFromEntity(r, token));
