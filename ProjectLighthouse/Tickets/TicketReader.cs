@@ -33,6 +33,9 @@ public struct SectionHeader
     public SectionType Type;
     public ushort Length;
     public int Position;
+
+    public override string ToString() =>
+        $"SectionHeader(Type='{this.Type}', Length='{this.Length}', Position='{this.Position}')";
 }
 
 public class TicketReader : BinaryReader
