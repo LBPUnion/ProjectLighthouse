@@ -177,4 +177,29 @@ public class UserControllerTests
         Assert.Equal(expectedPins, dbMock.Users.First().Pins);
         Assert.Equal(expectedResponse, pinsResponse);
     }
+
+    [Fact]
+    public async Task UpdateMyPins_ShouldRemove_DuplicatePins()
+    {
+        UserEntity entity = MockHelper.GetUnitTestUser();
+        entity.Pins = "1234";
+        List<UserEntity> users = new()
+        {
+            entity,
+        };
+        await using DatabaseContext dbMock = await MockHelper.GetTestDatabase(users);
+
+        UserController userController = new(dbMock);
+        userController.SetupTestController("{\"profile_pins\": [1234, 1234]}");
+
+        const string expectedPins = "1234";
+        const string expectedResponse = "[{\"StatusCode\":200}]";
+
+        IActionResult result = await userController.UpdateMyPins();
+
+        string pinsResponse = result.CastTo<OkObjectResult, string>();
+
+        Assert.Equal(expectedPins, dbMock.Users.First().Pins);
+        Assert.Equal(expectedResponse, pinsResponse);
+    }
 }
