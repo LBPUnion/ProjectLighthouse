@@ -22,13 +22,20 @@ public class ActivityInterceptor : SaveChangesInterceptor
         public required object OldEntity { get; init; }
     }
 
-    private readonly ConcurrentDictionary<(Type Type, int HashCode), CustomTrackedEntity> unsavedEntities;
+    private struct TrackedEntityKey
+    {
+        public Type Type { get; set; }
+        public int HashCode { get; set; }
+        public Guid ContextId { get; set; }
+    }
+
+    private readonly ConcurrentDictionary<TrackedEntityKey, CustomTrackedEntity> unsavedEntities;
     private readonly IEntityEventHandler eventHandler;
 
     public ActivityInterceptor(IEntityEventHandler eventHandler)
     {
         this.eventHandler = eventHandler;
-        this.unsavedEntities = new ConcurrentDictionary<(Type Type, int HashCode), CustomTrackedEntity>();
+        this.unsavedEntities = new ConcurrentDictionary<TrackedEntityKey, CustomTrackedEntity>();
     }
 
     #region Hooking stuff
@@ -78,8 +85,12 @@ public class ActivityInterceptor : SaveChangesInterceptor
             if (entry.Metadata.Name.Contains("Token")) continue;
 
             if (entry.State is not (EntityState.Added or EntityState.Deleted or EntityState.Modified)) continue;
-
-            this.unsavedEntities.TryAdd((entry.Entity.GetType(), entry.Entity.GetHashCode()),
+            this.unsavedEntities.TryAdd(new TrackedEntityKey
+                {
+                    ContextId = context.ContextId.InstanceId,
+                    Type = entry.Entity.GetType(),
+                    HashCode = entry.Entity.GetHashCode(),
+                },
                 new CustomTrackedEntity
                 {
                     State = entry.State,
@@ -97,7 +108,7 @@ public class ActivityInterceptor : SaveChangesInterceptor
 
         List<EntityEntry> entries = context.ChangeTracker.Entries().ToList();
 
-        foreach (KeyValuePair<(Type Type, int HashCode), CustomTrackedEntity> kvp in this.unsavedEntities)
+        foreach (KeyValuePair<TrackedEntityKey, CustomTrackedEntity> kvp in this.unsavedEntities)
         {
             EntityEntry entry = entries.FirstOrDefault(e =>
                 e.Metadata.ClrType == kvp.Key.Type && e.Entity.GetHashCode() == kvp.Key.HashCode);

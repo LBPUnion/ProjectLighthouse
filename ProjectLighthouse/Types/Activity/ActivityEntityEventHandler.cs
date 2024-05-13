@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -13,10 +14,6 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Website;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.EntityFrameworkCore;
-#if DEBUG
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
-#endif
 
 namespace LBPUnion.ProjectLighthouse.Types.Activity;
 
@@ -24,7 +21,6 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 {
     public void OnEntityInserted<T>(DatabaseContext database, T entity) where T : class
     {
-        Logger.Debug($@"OnEntityInserted: {entity.GetType().Name}", LogArea.Activity);
         ActivityEntity? activity = entity switch
         {
             SlotEntity slot => slot.Type switch
@@ -50,7 +46,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                     },
                     _ => null,
                 },
-                CommentType.Profile => new UserCommentActivityEntity()
+                CommentType.Profile => new UserCommentActivityEntity
                 {
                     Type = EventType.CommentOnUser,
                     CommentId = comment.CommentId,
@@ -199,6 +195,8 @@ public class ActivityEntityEventHandler : IEntityEventHandler
     {
         if (activity == null) return;
 
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return;
+
         Logger.Debug("Inserting activity: " + activity.GetType().Name, LogArea.Activity);
 
         RemoveDuplicateEvents(database, activity);
@@ -210,24 +208,6 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 
     public void OnEntityChanged<T>(DatabaseContext database, T origEntity, T currentEntity) where T : class
     {
-        #if DEBUG
-        foreach (PropertyInfo propInfo in currentEntity.GetType().GetProperties())
-        {
-            if (!propInfo.CanRead || !propInfo.CanWrite) continue;
-
-            if (propInfo.CustomAttributes.Any(c => c.AttributeType == typeof(NotMappedAttribute))) continue;
-
-            object? origVal = propInfo.GetValue(origEntity);
-            object? newVal = propInfo.GetValue(currentEntity);
-            if ((origVal == null && newVal == null) || (origVal != null && newVal != null && origVal.Equals(newVal))) continue;
-
-            Logger.Debug($@"Value for {propInfo.Name} changed", LogArea.Activity);
-            Logger.Debug($@"Orig val: {origVal?.ToString() ?? "null"}", LogArea.Activity);
-            Logger.Debug($@"New val: {newVal?.ToString() ?? "null"}", LogArea.Activity);
-        }
-        Logger.Debug($@"OnEntityChanged: {currentEntity.GetType().Name}", LogArea.Activity);
-        #endif
-
         ActivityEntity? activity = null;
         switch (currentEntity)
         {
@@ -354,7 +334,6 @@ public class ActivityEntityEventHandler : IEntityEventHandler
 
     public void OnEntityDeleted<T>(DatabaseContext database, T entity) where T : class
     {
-        Logger.Debug($@"OnEntityDeleted: {entity.GetType().Name}", LogArea.Activity);
         ActivityEntity? activity = entity switch
         {
             HeartedLevelEntity heartedLevel => heartedLevel.Slot.Type switch

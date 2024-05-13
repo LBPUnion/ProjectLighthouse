@@ -30,9 +30,6 @@ public class ActivityController : ControllerBase
         this.database = database;
     }
 
-    /// <summary>
-    /// This method is only used for LBP2 so we exclude playlists
-    /// </summary>
     private async Task<IQueryable<ActivityDto>> GetFilters
     (
         IQueryable<ActivityDto> dtoQuery,
@@ -122,8 +119,6 @@ public class ActivityController : ControllerBase
                 dto.Activity.Type != EventType.HeartPlaylist &&
                 dto.Activity.Type != EventType.AddLevelToPlaylist);
         }
-
-        Logger.Debug(predicate.ToString(), LogArea.Activity);
 
         dtoQuery = dtoQuery.Where(predicate);
 
@@ -343,8 +338,6 @@ public class ActivityController : ControllerBase
         List<IGrouping<ActivityGroup, ActivityDto>> groups = await activityQuery.ToActivityGroups().ToListAsync();
 
         List<OuterActivityGroup> outerGroups = groups.ToOuterActivityGroups();
-
-        PrintOuterGroups(outerGroups);
 
         long oldestTimestamp = GetOldestTime(groups, times.Start).ToUnixTimeMilliseconds();
 
