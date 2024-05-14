@@ -19,7 +19,7 @@ namespace LBPUnion.ProjectLighthouse.Migrations
                 table: "WebsiteAnnouncements",
                 type: "datetime(6)",
                 nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                defaultValue: DateTime.UtcNow);
         }
 
         /// <inheritdoc />
