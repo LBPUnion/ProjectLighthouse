@@ -120,12 +120,21 @@ public class ActivityEventHandlerTests
                 Username = "test",
                 UserId = 1,
             },
+        },
+        new List<SlotEntity>
+        {
+            new()
+            {
+                SlotId = 1,
+                CreatorId = 1,
+            },
         });
 
         PhotoEntity photo = new()
         {
             PhotoId = 1,
             CreatorId = 1,
+            SlotId = 1,
         };
         database.Photos.Add(photo);
         await database.SaveChangesAsync();
