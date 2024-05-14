@@ -35,7 +35,9 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             },
             CommentEntity comment => comment.Type switch
             {
-                CommentType.Level => comment.TargetSlot?.Type switch
+                CommentType.Level => database.Slots.Where(s => s.SlotId == comment.TargetSlotId)
+                        .Select(s => s.Type)
+                        .FirstOrDefault() switch
                 {
                     SlotType.User => new LevelCommentActivityEntity
                     {
@@ -55,10 +57,10 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 }, 
                 _ => null,
             },
-            PhotoEntity photo => photo.SlotId switch
+            PhotoEntity photo => database.Slots.Where(s => s.SlotId == photo.SlotId)
+                    .Select(s => s.Type)
+                    .FirstOrDefault() switch
             {
-                _ => photo.Slot?.Type switch
-                {
                     SlotType.User => new LevelPhotoActivity
                     {
                         Type = EventType.UploadPhoto,
@@ -68,9 +70,10 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                     },
                     // All other photos (story, moon, pod, etc.)
                     _ => null,
-                },
             },
-            ScoreEntity score => score.Slot.Type switch
+            ScoreEntity score => database.Slots.Where(s => s.SlotId == score.SlotId)
+                    .Select(s => s.Type)
+                    .FirstOrDefault() switch
             {
                 // Don't add story scores or versus scores
                 SlotType.User when score.Type != 7 => new ScoreActivityEntity
@@ -82,7 +85,9 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 },
                 _ => null,
             },
-            HeartedLevelEntity heartedLevel => heartedLevel.Slot.Type switch
+            HeartedLevelEntity heartedLevel => database.Slots.Where(s => s.SlotId == heartedLevel.SlotId)
+                    .Select(s => s.Type)
+                    .FirstOrDefault() switch
             {
                 SlotType.User => new LevelActivityEntity
                 {
@@ -226,7 +231,11 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 // don't track versus levels
                 if (oldScore.Type == 7) break;
 
-                if (score.Slot.Type != SlotType.User) break;
+                SlotType slotType = database.Slots.Where(s => s.SlotId == score.SlotId)
+                    .Select(s => s.Type)
+                    .FirstOrDefault();
+
+                if (slotType != SlotType.User) break;
 
                 if (oldScore.Points > score.Points) break;
 
@@ -349,7 +358,9 @@ public class ActivityEntityEventHandler : IEntityEventHandler
     {
         ActivityEntity? activity = entity switch
         {
-            HeartedLevelEntity heartedLevel => heartedLevel.Slot.Type switch
+            HeartedLevelEntity heartedLevel => database.Slots.Where(s => s.SlotId == heartedLevel.SlotId)
+                    .Select(s => s.Type)
+                    .FirstOrDefault() switch
             {
                 SlotType.User => new LevelActivityEntity
                 {
