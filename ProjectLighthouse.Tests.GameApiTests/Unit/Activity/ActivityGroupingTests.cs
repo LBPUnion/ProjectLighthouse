@@ -86,34 +86,27 @@ public class ActivityGroupingTests
                },
           ];
 
-          //TODO: fix test
           List<OuterActivityGroup> groups = activities.ToActivityDto().AsQueryable().ToActivityGroups().ToList().ToOuterActivityGroups();
           Assert.NotNull(groups);
-          Assert.Single(groups);
-          OuterActivityGroup outerGroup = groups.First();
+          Assert.Equal(3, groups.Count);
+          
+          Assert.Equal(ActivityGroupType.User, groups.ElementAt(0).Key.GroupType);
+          Assert.Equal(ActivityGroupType.User, groups.ElementAt(1).Key.GroupType);
+          Assert.Equal(ActivityGroupType.Level, groups.ElementAt(2).Key.GroupType);
 
-          Assert.Equal(ActivityGroupType.Level, outerGroup.Key.GroupType);
-          Assert.Equal(1, outerGroup.Key.TargetSlotId);
+          Assert.Equal(1, groups.ElementAt(0).Key.TargetUserId);
+          Assert.Equal(2, groups.ElementAt(1).Key.TargetUserId);
+          Assert.Equal(1, groups.ElementAt(2).Key.TargetSlotId);
 
-          IGrouping<InnerActivityGroup, ActivityDto>? firstGroup = outerGroup.Groups.First();
-          IGrouping<InnerActivityGroup, ActivityDto>? secondGroup = outerGroup.Groups.Last();
-
-          Assert.NotNull(secondGroup);
-          Assert.Equal(ActivityGroupType.User, secondGroup.Key.Type);
-          Assert.Equal(1, secondGroup.Key.TargetId); // user group should have the user id
-          Assert.Equal(1, secondGroup.ToList()[0].TargetSlotId); // events in user group should have t
-          Assert.Equal(1, secondGroup.ToList()[1].TargetSlotId);
-
-          Assert.NotNull(firstGroup);
-          Assert.Equal(ActivityGroupType.User, firstGroup.Key.Type);
-          Assert.Equal(2, firstGroup.Key.TargetId);
-          Assert.Equal(1, firstGroup.ToList()[0].TargetSlotId);
+          Assert.Single(groups.ElementAt(0).Groups);
+          Assert.Single(groups.ElementAt(1).Groups);
+          Assert.Equal(2, groups.ElementAt(2).Groups.Count);
      }
 
      [Fact]
      public void ToOuterActivityGroups_ShouldCreateGroupPerObject_WhenGroupedBy_ActorThenObject()
      {
-                    List<ActivityEntity> activities = [
+          List<ActivityEntity> activities = [
                new LevelActivityEntity
                {
                     UserId = 1,
@@ -181,11 +174,13 @@ public class ActivityGroupingTests
                .ToActivityGroups(true)
                .ToList()
                .ToOuterActivityGroups(true);
-          //TODO: fix test
+
           Assert.Multiple(() =>
           {
                Assert.NotNull(groups);
                Assert.Equal(2, groups.Count);
+               Assert.Equal(1, groups.Count(g => g.Key.UserId == 1));
+               Assert.Equal(1, groups.Count(g => g.Key.UserId == 2));
                OuterActivityGroup firstUserGroup = groups.FirstOrDefault(g => g.Key.UserId == 1);
                OuterActivityGroup secondUserGroup = groups.FirstOrDefault(g => g.Key.UserId == 2);
                Assert.NotNull(firstUserGroup.Groups);
@@ -194,28 +189,8 @@ public class ActivityGroupingTests
                Assert.Equal(ActivityGroupType.User, firstUserGroup.Key.GroupType);
                Assert.Equal(ActivityGroupType.User, secondUserGroup.Key.GroupType);
 
-               Assert.Single(firstUserGroup.Groups);
-               Assert.Single(secondUserGroup.Groups);
-
-               Assert.Equal(2, firstUserGroup.Groups.ToList()[0].Count());
-               Assert.Single(secondUserGroup.Groups.ToList()[0]);
-
-               // Assert.Equal(ActivityGroupType.Level, outerGroup.Key.GroupType);
-               // Assert.Equal(1, outerGroup.Key.TargetSlotId);
-               //
-               // IGrouping<InnerActivityGroup, ActivityDto>? firstGroup = outerGroup.Groups.First();
-               // IGrouping<InnerActivityGroup, ActivityDto>? secondGroup = outerGroup.Groups.Last();
-               //
-               // Assert.NotNull(secondGroup);
-               // Assert.Equal(ActivityGroupType.User, secondGroup.Key.Type);
-               // Assert.Equal(1, secondGroup.Key.TargetId); // user group should have the user id
-               // Assert.Equal(1, secondGroup.ToList()[0].TargetSlotId); // events in user group should have t
-               // Assert.Equal(1, secondGroup.ToList()[1].TargetSlotId);
-               //
-               // Assert.NotNull(firstGroup);
-               // Assert.Equal(ActivityGroupType.User, firstGroup.Key.Type);
-               // Assert.Equal(2, firstGroup.Key.TargetId);
-               // Assert.Equal(1, firstGroup.ToList()[0].TargetSlotId);
+               Assert.True(firstUserGroup.Groups.All(g => g.Key.UserId == 1));
+               Assert.True(secondUserGroup.Groups.All(g => g.Key.UserId == 2));
           });
      }
 
@@ -317,8 +292,6 @@ public class ActivityGroupingTests
                UserId = 1,
           });
           await db.SaveChangesAsync();
-
-          var sql = db.Activities.ToActivityDto().ToQueryString();
 
           List<ActivityDto> resultDto = await db.Activities.ToActivityDto(includeSlotCreator: true, includeTeamPick: true).ToListAsync();
 

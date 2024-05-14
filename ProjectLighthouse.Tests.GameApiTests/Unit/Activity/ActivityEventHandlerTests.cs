@@ -76,7 +76,7 @@ public class ActivityEventHandlerTests
 
         eventHandler.OnEntityInserted(database, comment);
 
-        Assert.NotNull(database.Activities.OfType<CommentActivityEntity>()
+        Assert.NotNull(database.Activities.ToList().OfType<CommentActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.CommentOnLevel && a.CommentId == 1));
     }
 
@@ -105,7 +105,7 @@ public class ActivityEventHandlerTests
 
         eventHandler.OnEntityInserted(database, comment);
 
-        Assert.NotNull(database.Activities.OfType<CommentActivityEntity>()
+        Assert.NotNull(database.Activities.ToList().OfType<CommentActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.CommentOnUser && a.CommentId == 1));
     }
 
@@ -132,7 +132,7 @@ public class ActivityEventHandlerTests
 
         eventHandler.OnEntityInserted(database, photo);
 
-        Assert.NotNull(database.Activities.OfType<PhotoActivityEntity>()
+        Assert.NotNull(database.Activities.ToList().OfType<PhotoActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.UploadPhoto && a.PhotoId == 1));
     }
 
@@ -678,7 +678,7 @@ public class ActivityEventHandlerTests
 
         eventHandler.OnEntityChanged(database, oldSlot, newSlot);
 
-        Assert.NotNull(database.Activities.OfType<LevelActivityEntity>()
+        Assert.NotNull(database.Activities.ToList().OfType<LevelActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.MMPickLevel && a.SlotId == 1));
     }
 
@@ -713,7 +713,7 @@ public class ActivityEventHandlerTests
 
         eventHandler.OnEntityChanged(database, oldSlot, newSlot);
 
-        Assert.NotNull(database.Activities.OfType<LevelActivityEntity>()
+        Assert.NotNull(database.Activities.ToList().OfType<LevelActivityEntity>()
             .FirstOrDefault(a => a.Type == EventType.PublishLevel && a.SlotId == 1));
     }
 
@@ -750,8 +750,8 @@ public class ActivityEventHandlerTests
 
         eventHandler.OnEntityChanged(database, oldComment, newComment);
 
-        Assert.NotNull(database.Activities.OfType<CommentActivityEntity>()
-            .FirstOrDefault(a => a.Type == EventType.DeleteLevelComment && a.CommentId == 1));
+        Assert.NotNull(database.Activities.ToList()
+            .FirstOrDefault(a => a.Type == EventType.DeleteLevelComment && ((CommentActivityEntity)a).CommentId == 1));
     }
 
     [Fact]
