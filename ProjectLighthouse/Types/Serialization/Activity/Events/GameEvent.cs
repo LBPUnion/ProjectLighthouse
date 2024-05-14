@@ -187,7 +187,7 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
                 PhotoId = ((PhotoActivityEntity)activity.Activity).PhotoId,
                 Slot = new ReviewSlot
                 {
-                    SlotId = targetId,
+                    SlotId = activity.TargetSlotId ?? -1,
                 },
             },
             EventType.MMPickLevel => new GameTeamPickLevelEvent
@@ -211,15 +211,15 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
             },
             EventType.CreatePlaylist => new GameCreatePlaylistEvent
             {
-                TargetPlaylistId = targetId,
+                TargetPlaylistId = activity.TargetPlaylistId ?? -1,
             },
             EventType.HeartPlaylist => new GameHeartPlaylistEvent
             {
-                TargetPlaylistId = targetId,
+                TargetPlaylistId = activity.TargetPlaylistId ?? -1,
             },
             EventType.AddLevelToPlaylist => new GameAddLevelToPlaylistEvent
             {
-                TargetPlaylistId = targetId,
+                TargetPlaylistId = activity.TargetPlaylistId ?? -1,
                 Slot = new ReviewSlot
                 {
                     SlotId = ((PlaylistWithSlotActivityEntity)activity.Activity).SlotId,

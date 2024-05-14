@@ -57,25 +57,17 @@ public class ActivityEntityEventHandler : IEntityEventHandler
             },
             PhotoEntity photo => photo.SlotId switch
             {
-                // Photos without levels
-                null => new UserPhotoActivity
-                {
-                    Type = EventType.UploadPhoto,
-                    PhotoId = photo.PhotoId,
-                    UserId = photo.CreatorId,
-                    TargetUserId = photo.CreatorId,
-                },
                 _ => photo.Slot?.Type switch
                 {
-                    SlotType.Developer => null,
-                    // Non-story levels (moon, pod, etc)
-                    _ => new LevelPhotoActivity
+                    SlotType.User => new LevelPhotoActivity
                     {
                         Type = EventType.UploadPhoto,
                         PhotoId = photo.PhotoId,
                         UserId = photo.CreatorId,
                         SlotId = photo.SlotId ?? throw new NullReferenceException("SlotId in Photo is null"),
                     },
+                    // All other photos (story, moon, pod, etc.)
+                    _ => null,
                 },
             },
             ScoreEntity score => score.Slot.Type switch
@@ -226,6 +218,27 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                 break;
 
                 int Plays(VisitedLevelEntity entity) => entity.PlaysLBP1 + entity.PlaysLBP2 + entity.PlaysLBP3;
+            }
+            case ScoreEntity score:
+            {
+                if (origEntity is not ScoreEntity oldScore) break;
+
+                // don't track versus levels
+                if (oldScore.Type == 7) break;
+
+                if (score.Slot.Type != SlotType.User) break;
+
+                if (oldScore.Points > score.Points) break;
+
+                activity = new ScoreActivityEntity
+                {
+                    Type = EventType.Score,
+                    ScoreId = score.ScoreId,
+                    SlotId = score.SlotId,
+                    UserId = score.UserId,
+                };
+
+                break;
             }
             case SlotEntity slotEntity:
             {

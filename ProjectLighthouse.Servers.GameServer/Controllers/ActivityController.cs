@@ -306,6 +306,9 @@ public class ActivityController : ControllerBase
 
         if ((SlotHelper.IsTypeInvalid(slotType) || slotId == 0) == (username == null)) return this.BadRequest();
 
+        bool isLevelActivity = username == null;
+        bool groupByActor = !isLevelActivity && token.GameVersion == GameVersion.LittleBigPlanet3;
+
         // User and Level activity will never contain news posts or MM pick events.
         IQueryable<ActivityDto> activityQuery = this.database.Activities.ToActivityDto()
             .Where(a => a.Activity.Type != EventType.NewsPost && a.Activity.Type != EventType.MMPickLevel);
@@ -317,8 +320,6 @@ public class ActivityController : ControllerBase
                 a.Activity.Type != EventType.HeartPlaylist &&
                 a.Activity.Type != EventType.AddLevelToPlaylist);
         }
-
-        bool isLevelActivity = username == null;
 
         // Slot activity
         if (isLevelActivity)
@@ -345,9 +346,9 @@ public class ActivityController : ControllerBase
         activityQuery = activityQuery.Where(dto =>
             dto.Activity.Timestamp < times.Start && dto.Activity.Timestamp > times.End);
 
-        List<IGrouping<ActivityGroup, ActivityDto>> groups = await activityQuery.ToActivityGroups().ToListAsync();
+        List<IGrouping<ActivityGroup, ActivityDto>> groups = await activityQuery.ToActivityGroups(groupByActor).ToListAsync();
 
-        List<OuterActivityGroup> outerGroups = groups.ToOuterActivityGroups();
+        List<OuterActivityGroup> outerGroups = groups.ToOuterActivityGroups(groupByActor);
 
         long oldestTimestamp = GetOldestTime(groups, times.Start).ToUnixTimeMilliseconds();
 

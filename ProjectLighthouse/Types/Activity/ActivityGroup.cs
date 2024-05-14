@@ -19,7 +19,7 @@ public struct ActivityGroup
         this.GroupType switch
         {
             ActivityGroupType.User => this.TargetUserId ?? this.UserId,
-            ActivityGroupType.Level => this.TargetSlotId?? 0,
+            ActivityGroupType.Level => this.TargetSlotId ?? 0,
             ActivityGroupType.TeamPick => this.TargetTeamPickSlotId ?? 0,
             ActivityGroupType.Playlist => this.TargetPlaylistId ?? 0,
             ActivityGroupType.News => this.TargetNewsId ?? 0,
@@ -27,17 +27,15 @@ public struct ActivityGroup
         };
 
     public ActivityGroupType GroupType =>
-        (this.TargetSlotId ?? 0) != 0
-            ? ActivityGroupType.Level
-            : (this.TargetUserId ?? 0) != 0
-                ? ActivityGroupType.User
-                : (this.TargetPlaylistId ?? 0) != 0
-                    ? ActivityGroupType.Playlist
-                    : (this.TargetNewsId ?? 0) != 0
-                        ? ActivityGroupType.News
-                        : (this.TargetTeamPickSlotId ?? 0) != 0
-                            ? ActivityGroupType.TeamPick
-                            : ActivityGroupType.User;
+        (this.TargetPlaylistId ?? 0) != 0
+            ? ActivityGroupType.User
+            : (this.TargetNewsId ?? 0) != 0
+                ? ActivityGroupType.News
+                : (this.TargetTeamPickSlotId ?? 0) != 0
+                    ? ActivityGroupType.TeamPick
+                    : (this.TargetSlotId ?? 0) != 0
+                        ? ActivityGroupType.Level
+                        : ActivityGroupType.User;
 
     public override string ToString() =>
         $@"{this.GroupType} Group: Timestamp: {this.Timestamp}, UserId: {this.UserId}, TargetId: {this.TargetId}";

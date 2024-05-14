@@ -131,7 +131,9 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        ScoreEntity? existingScore = await this.database.Scores.Where(s => s.SlotId == slot.SlotId)
+        ScoreEntity? existingScore = await this.database.Scores
+            .Include(s => s.Slot)
+            .Where(s => s.SlotId == slot.SlotId)
             .Where(s => s.ChildSlotId == 0 || s.ChildSlotId == childId)
             .Where(s => s.UserId == token.UserId)
             .Where(s => s.Type == score.Type)
