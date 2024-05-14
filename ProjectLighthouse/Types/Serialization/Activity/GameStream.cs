@@ -134,9 +134,10 @@ public class GameStream : ILbpSerializable, INeedsPreparationForSerialization
         gameStream.Groups = groups.Select(GameStreamGroup.CreateFromGroup).ToList();
 
         // Workaround for level activity because it shouldn't contain nested activity groups
-        if (gameStream.Groups.Count == 1 && groups.First().Key.GroupType == ActivityGroupType.Level && removeNesting)
+        if (gameStream.Groups.Count >= 1 && groups.All(g => g.Key.GroupType == ActivityGroupType.Level) && removeNesting)
         {
-            gameStream.Groups = gameStream.Groups.First().Groups;
+            // Flatten all inner groups into a single list
+            gameStream.Groups = gameStream.Groups.Select(g => g.Groups).SelectMany(g => g).ToList();
         }
 
         // Workaround to turn a single subgroup into the primary group for news and team picks

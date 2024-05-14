@@ -283,11 +283,13 @@ public class ActivityController : ControllerBase
             foreach (IGrouping<InnerActivityGroup, ActivityDto> item in itemGroup)
             {
                 Logger.Debug(
-                    @$"  Inner group key: TargetId={item.Key.TargetId}, UserId={item.Key.UserId}, Type={item.Key.Type}", LogArea.Activity);
+                    @$"  Inner group key: TargetId={item.Key.TargetId}, UserId={item.Key.UserId}, Type={item.Key.Type}",
+                    LogArea.Activity);
                 foreach (ActivityDto activity in item)
                 {
                     Logger.Debug(
-                        @$"        Activity: {activity.GroupType}, Timestamp: {activity.Activity.Timestamp}, UserId: {activity.Activity.UserId}, EventType: {activity.Activity.Type}, TargetId: {activity.TargetId}", LogArea.Activity);
+                        @$"        Activity: {activity.GroupType}, Timestamp: {activity.Activity.Timestamp}, UserId: {activity.Activity.UserId}, EventType: {activity.Activity.Type}, TargetId: {activity.TargetId}",
+                        LogArea.Activity);
                 }
             }
         }
@@ -307,6 +309,14 @@ public class ActivityController : ControllerBase
         // User and Level activity will never contain news posts or MM pick events.
         IQueryable<ActivityDto> activityQuery = this.database.Activities.ToActivityDto()
             .Where(a => a.Activity.Type != EventType.NewsPost && a.Activity.Type != EventType.MMPickLevel);
+
+        if (token.GameVersion != GameVersion.LittleBigPlanet3)
+        {
+            activityQuery = activityQuery.Where(a =>
+                a.Activity.Type != EventType.CreatePlaylist &&
+                a.Activity.Type != EventType.HeartPlaylist &&
+                a.Activity.Type != EventType.AddLevelToPlaylist);
+        }
 
         bool isLevelActivity = username == null;
 
@@ -346,6 +356,7 @@ public class ActivityController : ControllerBase
         return this.Ok(GameStream.CreateFromGroups(token,
             outerGroups,
             times.Start.ToUnixTimeMilliseconds(),
-            oldestTimestamp, isLevelActivity));
+            oldestTimestamp,
+            isLevelActivity));
     }
 }
