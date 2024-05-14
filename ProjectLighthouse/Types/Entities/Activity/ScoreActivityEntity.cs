@@ -22,4 +22,6 @@ public class ScoreActivityEntity : ActivityEntity
 
     [ForeignKey(nameof(SlotId))]
     public SlotEntity Slot { get; set; }
+
+    public int Points { get; set; }
 }

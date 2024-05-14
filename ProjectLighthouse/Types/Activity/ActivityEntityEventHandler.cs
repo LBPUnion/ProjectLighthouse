@@ -82,6 +82,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                     ScoreId = score.ScoreId,
                     UserId = score.UserId,
                     SlotId = score.SlotId,
+                    Points = score.Points,
                 },
                 _ => null,
             },
@@ -245,6 +246,7 @@ public class ActivityEntityEventHandler : IEntityEventHandler
                     ScoreId = score.ScoreId,
                     SlotId = score.SlotId,
                     UserId = score.UserId,
+                    Points = score.Points,
                 };
 
                 break;

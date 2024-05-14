@@ -32,8 +32,6 @@ public class GameScoreEvent : GameEvent
         SlotEntity slot = await database.Slots.FindAsync(score.SlotId);
         if (slot == null) return;
 
-        this.Score = score.Points;
-        //TODO is this correct?
         this.UserCount = score.Type;
 
         this.Slot = ReviewSlot.CreateFromEntity(slot);

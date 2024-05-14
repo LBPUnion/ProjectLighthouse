@@ -3,6 +3,7 @@ using System;
 using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -16,14 +17,18 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity", b =>
                 {
                     b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ActivityId"));
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
@@ -56,6 +61,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HeartedLevelId"));
+
                     b.Property<int>("SlotId")
                         .HasColumnType("int");
 
@@ -76,6 +83,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("HeartedPlaylistId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HeartedPlaylistId"));
 
                     b.Property<int>("PlaylistId")
                         .HasColumnType("int");
@@ -98,6 +107,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HeartedProfileId"));
+
                     b.Property<int>("HeartedUserId")
                         .HasColumnType("int");
 
@@ -119,6 +130,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("QueuedLevelId"));
+
                     b.Property<int>("SlotId")
                         .HasColumnType("int");
 
@@ -139,6 +152,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("RatingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RatingId"));
 
                     b.Property<int>("CommentId")
                         .HasColumnType("int");
@@ -163,6 +178,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("RatedLevelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RatedLevelId"));
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
@@ -194,6 +211,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RatedReviewId"));
+
                     b.Property<int>("ReviewId")
                         .HasColumnType("int");
 
@@ -217,6 +236,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("VisitedLevelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("VisitedLevelId"));
 
                     b.Property<int>("PlaysLBP1")
                         .HasColumnType("int");
@@ -248,6 +269,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CategoryId"));
+
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
@@ -273,6 +296,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PlaylistId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PlaylistId"));
 
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
@@ -301,6 +326,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ReviewId"));
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("tinyint(1)");
@@ -349,6 +376,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ScoreId"));
+
                     b.Property<int>("ChildSlotId")
                         .HasColumnType("int");
 
@@ -381,6 +410,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("SlotId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("SlotId"));
 
                     b.Property<string>("AuthorLabels")
                         .IsRequired()
@@ -535,6 +566,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ReportId"));
+
                     b.Property<string>("Bounds")
                         .HasColumnType("longtext");
 
@@ -580,6 +613,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("CaseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CaseId"));
 
                     b.Property<int>("AffectedId")
                         .HasColumnType("int");
@@ -635,6 +670,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<bool>("IsDismissed")
                         .HasColumnType("tinyint(1)");
 
@@ -660,6 +697,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BlockedProfileId"));
+
                     b.Property<int>("BlockedUserId")
                         .HasColumnType("int");
 
@@ -680,6 +719,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("CommentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CommentId"));
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("tinyint(1)");
@@ -750,6 +791,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PhotoId"));
+
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
@@ -790,6 +833,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PhotoSubjectId"));
+
                     b.Property<string>("Bounds")
                         .HasColumnType("longtext");
 
@@ -813,6 +858,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PlatformLinkAttemptId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PlatformLinkAttemptId"));
 
                     b.Property<string>("IPAddress")
                         .HasColumnType("longtext");
@@ -841,6 +888,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<int>("AdminGrantedSlots")
                         .HasColumnType("int");
@@ -947,6 +996,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
@@ -966,6 +1017,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("EmailSetTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EmailSetTokenId"));
 
                     b.Property<string>("EmailToken")
                         .HasColumnType("longtext");
@@ -989,6 +1042,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EmailVerificationTokenId"));
+
                     b.Property<string>("EmailToken")
                         .HasColumnType("longtext");
 
@@ -1010,6 +1065,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
@@ -1042,6 +1099,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
@@ -1062,6 +1121,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
@@ -1081,6 +1142,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
@@ -1104,6 +1167,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("AnnouncementId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AnnouncementId"));
 
                     b.Property<string>("Content")
                         .HasColumnType("longtext");
@@ -1245,6 +1310,9 @@ namespace ProjectLighthouse.Migrations
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ScoreActivityEntity", b =>
                 {
                     b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
 
                     b.Property<int>("ScoreId")
                         .HasColumnType("int");

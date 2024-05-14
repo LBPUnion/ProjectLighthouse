@@ -150,6 +150,7 @@ public class GameEvent : ILbpSerializable, INeedsPreparationForSerialization
             EventType.Score => new GameScoreEvent
             {
                 ScoreId = ((ScoreActivityEntity)activity.Activity).ScoreId,
+                Score = ((ScoreActivityEntity)activity.Activity).Points,
                 Slot = new ReviewSlot
                 {
                     SlotId = targetId,
