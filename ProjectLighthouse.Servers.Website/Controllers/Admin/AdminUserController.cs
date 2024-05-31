@@ -103,14 +103,14 @@ public class AdminUserController : ControllerBase
 
         UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
+        if (user.EmailAddressVerified) return this.NotFound();
 
         List<EmailVerificationTokenEntity> tokens = await this.database.EmailVerificationTokens
             .Where(t => t.UserId == targetedUser.UserId)
             .ToListAsync();
-        if (tokens.Count == 0) return this.NotFound();
+        this.database.EmailVerificationTokens.RemoveRange(tokens);
 
         targetedUser.EmailAddressVerified = true;
-        this.database.EmailVerificationTokens.RemoveRange(tokens);
 
         await this.database.SaveChangesAsync();
 
