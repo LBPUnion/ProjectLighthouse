@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -85,6 +86,31 @@ public class AdminUserController : ControllerBase
 
         await this.database.SendNotification(targetedUser.UserId,
             "Your earth decorations have been reset by a moderator.");
+
+        await this.database.SaveChangesAsync();
+
+        return this.Redirect($"/user/{targetedUser.UserId}");
+    }
+
+    /// <summary>
+    ///     Forces the email verification of a user.
+    /// </summary>
+    [HttpGet("forceVerifyEmail")]
+    public async Task<IActionResult> ForceVerifyEmail([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsModerator) return this.NotFound();
+
+        UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        List<EmailVerificationTokenEntity> tokens = await this.database.EmailVerificationTokens
+            .Where(t => t.UserId == targetedUser.UserId)
+            .ToListAsync();
+        if (tokens.Count == 0) return this.NotFound();
+
+        targetedUser.EmailAddressVerified = true;
+        this.database.EmailVerificationTokens.RemoveRange(tokens);
 
         await this.database.SaveChangesAsync();
 
