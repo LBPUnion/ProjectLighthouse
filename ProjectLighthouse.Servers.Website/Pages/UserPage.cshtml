@@ -333,11 +333,11 @@ else
             </a>
         }
 
-        @if (!Model.ProfileUser.EmailAddressVerified)
+        @if (Model.ProfileUser.EmailAddress != null && !Model.ProfileUser.EmailAddressVerified)
         {
             <a class="ui green button" href="/moderation/user/@Model.ProfileUser.UserId/forceVerifyEmail">
                 <i class="check icon"></i>
-                <span>Force Verify Email</span>
+                <span>Forcibly Verify Email</span>
             </a>
         }
 
