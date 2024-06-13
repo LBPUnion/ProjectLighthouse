@@ -47,7 +47,7 @@ services:
       - "./data:/lighthouse/data:z"
       - "./data/.aspnet:/lighthouse/.aspnet:z"
   api:
-    image: lighthouse:latest
+    image: ghcr.io/lbpunion/projectlighthouse:main
     container_name: api
     restart: unless-stopped
     ports:
