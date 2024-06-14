@@ -29,7 +29,8 @@ public class AdminUserController : ControllerBase
     /// Resets the user's earth decorations to a blank state. Useful for users who abuse audio for example.
     /// </summary>
     [HttpGet("wipePlanets")]
-    public async Task<IActionResult> WipePlanets([FromRoute] int id) {
+    public async Task<IActionResult> WipePlanets([FromRoute] int id)
+    {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.NotFound();
 
@@ -98,7 +99,8 @@ public class AdminUserController : ControllerBase
     /// Deletes every comment by the user. Useful in case of mass spam
     /// </summary>
     [HttpGet("wipeComments")]
-    public async Task<IActionResult> WipeComments([FromRoute] int id) {
+    public async Task<IActionResult> WipeComments([FromRoute] int id)
+    {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.NotFound();
 
