@@ -1,7 +1,9 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -86,6 +88,63 @@ public class AdminUserController : ControllerBase
 
         await this.database.SendNotification(targetedUser.UserId,
             "Your earth decorations have been reset by a moderator.");
+
+        await this.database.SaveChangesAsync();
+
+        return this.Redirect($"/user/{targetedUser.UserId}");
+    }
+    
+    /// <summary>
+    /// Deletes every comment by the user. Useful in case of mass spam
+    /// </summary>
+    [HttpGet("wipeComments")]
+    public async Task<IActionResult> WipeComments([FromRoute] int id) {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsModerator) return this.NotFound();
+
+        UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        // Get every comment posted by the target user
+        List<CommentEntity> comments = await this.database.Comments
+            .Where(c => c.Poster == targetedUser)
+            .ToListAsync();
+
+        // Loop through and delete all of the comments
+        foreach (CommentEntity comment in comments)
+        {
+            comment.Deleted = true;
+            comment.DeletedBy = user.Username;
+            comment.DeletedType = "moderator";
+            Logger.Success($"Deleted comments for {targetedUser.Username} (id:{targetedUser.UserId})",
+                LogArea.Admin);
+        }
+
+        await this.database.SendNotification(targetedUser.UserId,
+            "Your comments have been deleted by a moderator.");
+
+        await this.database.SaveChangesAsync();
+
+        return this.Redirect($"/user/{targetedUser.UserId}");
+    }
+
+    /// <summary>
+    /// Deletes every score from the user. Useful in the case where a user cheated a ton of scores
+    /// </summary>
+    [HttpGet("wipeScores")]
+    public async Task<IActionResult> WipeScores([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsModerator) return this.NotFound();
+
+        UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        // Find and delete every score uploaded by the target user
+        await this.database.Scores.RemoveWhere(c => c.User == targetedUser);
+        Logger.Success($"Deleted scores for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
+
+        await this.database.SendNotification(targetedUser.UserId, "Your scores have been deleted by a moderator.");
 
         await this.database.SaveChangesAsync();
 

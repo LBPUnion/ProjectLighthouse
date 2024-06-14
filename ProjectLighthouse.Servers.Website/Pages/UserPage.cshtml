@@ -324,6 +324,16 @@ else
             <i class="trash alternate icon"></i>
             <span>Wipe Earth Decorations</span>
         </a>
+        
+        <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipeComments">
+            <i class="trash alternate icon"></i>
+            <span>Wipe User's Comments</span>
+        </a>
+        
+        <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipeScores">
+            <i class="trash alternate icon"></i>
+            <span>Wipe User's Scores</span>
+        </a>
 
         @if (!Model.CommentsDisabledByModerator)
         {
