@@ -107,18 +107,12 @@ public class AdminUserController : ControllerBase
         UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (targetedUser == null) return this.NotFound();
 
-        // Get every comment posted by the target user
-        List<CommentEntity> comments = await this.database.Comments
-            .Where(c => c.Poster == targetedUser)
-            .ToListAsync();
-
-        // Loop through and delete all of the comments
-        foreach (CommentEntity comment in comments)
-        {
-            comment.Deleted = true;
-            comment.DeletedBy = user.Username;
-            comment.DeletedType = "moderator";
-        }
+        // Find every comment by the user, then set the deletion info on them
+        await this.database.Comments.Where(c => c.PosterUserId == targetedUser.UserId)
+            .ExecuteUpdateAsync(s =>
+                s.SetProperty(c => c.Deleted, true)
+                 .SetProperty(c => c.DeletedBy, user.Username)
+                 .SetProperty(c => c.DeletedType, "moderator"));
         Logger.Success($"Deleted comments for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
 
         await this.database.SendNotification(targetedUser.UserId,
