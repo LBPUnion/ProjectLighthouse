@@ -118,9 +118,8 @@ public class AdminUserController : ControllerBase
             comment.Deleted = true;
             comment.DeletedBy = user.Username;
             comment.DeletedType = "moderator";
-            Logger.Success($"Deleted comments for {targetedUser.Username} (id:{targetedUser.UserId})",
-                LogArea.Admin);
         }
+        Logger.Success($"Deleted comments for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
 
         await this.database.SendNotification(targetedUser.UserId,
             "Your comments have been deleted by a moderator.");
