@@ -142,7 +142,7 @@ public class AdminUserController : ControllerBase
         if (targetedUser == null) return this.NotFound();
 
         // Find and delete every score uploaded by the target user
-        await this.database.Scores.RemoveWhere(c => c.User == targetedUser);
+        await this.database.Scores.Where(c => c.UserId == targetedUser.UserId).ExecuteDeleteAsync();
         Logger.Success($"Deleted scores for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
 
         await this.database.SendNotification(targetedUser.UserId, "Your scores have been deleted by a moderator.");
