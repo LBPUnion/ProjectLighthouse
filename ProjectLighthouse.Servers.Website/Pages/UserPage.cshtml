@@ -324,6 +324,18 @@ else
             <i class="trash alternate icon"></i>
             <span>Wipe Earth Decorations</span>
         </a>
+        
+        <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipeComments" 
+           onclick="return confirm('Are you sure you want to delete ALL of this user\'s comments? This action cannot be reversed.')">
+            <i class="trash alternate icon"></i>
+            <span>Wipe User&apos;s Comments</span>
+        </a>
+        
+        <a class="ui red button" href="/moderation/user/@Model.ProfileUser.UserId/wipeScores"
+           onclick="return confirm('Are you sure you want to delete ALL of this user\'s scores? This action cannot be reversed.')">
+            <i class="trash alternate icon"></i>
+            <span>Wipe User&apos;s Scores</span>
+        </a>
 
         @if (!Model.CommentsDisabledByModerator)
         {
