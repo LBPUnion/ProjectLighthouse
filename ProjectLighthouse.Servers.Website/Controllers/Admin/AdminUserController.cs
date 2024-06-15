@@ -118,8 +118,6 @@ public class AdminUserController : ControllerBase
         await this.database.SendNotification(targetedUser.UserId,
             "Your comments have been deleted by a moderator.");
 
-        await this.database.SaveChangesAsync();
-
         return this.Redirect($"/user/{targetedUser.UserId}");
     }
 
@@ -140,8 +138,6 @@ public class AdminUserController : ControllerBase
         Logger.Success($"Deleted scores for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
 
         await this.database.SendNotification(targetedUser.UserId, "Your scores have been deleted by a moderator.");
-
-        await this.database.SaveChangesAsync();
 
         return this.Redirect($"/user/{targetedUser.UserId}");
     }
