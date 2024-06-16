@@ -1,8 +1,11 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Moderation.Cases;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -26,7 +29,8 @@ public class AdminUserController : ControllerBase
     /// Resets the user's earth decorations to a blank state. Useful for users who abuse audio for example.
     /// </summary>
     [HttpGet("wipePlanets")]
-    public async Task<IActionResult> WipePlanets([FromRoute] int id) {
+    public async Task<IActionResult> WipePlanets([FromRoute] int id)
+    {
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.NotFound();
 
@@ -85,6 +89,78 @@ public class AdminUserController : ControllerBase
 
         await this.database.SendNotification(targetedUser.UserId,
             "Your earth decorations have been reset by a moderator.");
+
+        await this.database.SaveChangesAsync();
+
+        return this.Redirect($"/user/{targetedUser.UserId}");
+    }
+    
+    /// <summary>
+    /// Deletes every comment by the user. Useful in case of mass spam
+    /// </summary>
+    [HttpGet("wipeComments")]
+    public async Task<IActionResult> WipeComments([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsModerator) return this.NotFound();
+
+        UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        // Find every comment by the user, then set the deletion info on them
+        await this.database.Comments.Where(c => c.PosterUserId == targetedUser.UserId)
+            .ExecuteUpdateAsync(s =>
+                s.SetProperty(c => c.Deleted, true)
+                 .SetProperty(c => c.DeletedBy, user.Username)
+                 .SetProperty(c => c.DeletedType, "moderator"));
+        Logger.Success($"Deleted comments for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
+
+        await this.database.SendNotification(targetedUser.UserId,
+            "Your comments have been deleted by a moderator.");
+
+        return this.Redirect($"/user/{targetedUser.UserId}");
+    }
+
+    /// <summary>
+    /// Deletes every score from the user. Useful in the case where a user cheated a ton of scores
+    /// </summary>
+    [HttpGet("wipeScores")]
+    public async Task<IActionResult> WipeScores([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsModerator) return this.NotFound();
+
+        UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        // Find and delete every score uploaded by the target user
+        await this.database.Scores.Where(c => c.UserId == targetedUser.UserId).ExecuteDeleteAsync();
+        Logger.Success($"Deleted scores for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
+
+        await this.database.SendNotification(targetedUser.UserId, "Your scores have been deleted by a moderator.");
+
+        return this.Redirect($"/user/{targetedUser.UserId}");
+    }
+
+    /// <summary>
+    ///     Forces the email verification of a user.
+    /// </summary>
+    [HttpGet("forceVerifyEmail")]
+    public async Task<IActionResult> ForceVerifyEmail([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
+        if (user == null || !user.IsModerator) return this.NotFound();
+
+        UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+        if (targetedUser.EmailAddress == null || targetedUser.EmailAddressVerified) return this.NotFound();
+
+        List<EmailVerificationTokenEntity> tokens = await this.database.EmailVerificationTokens
+            .Where(t => t.UserId == targetedUser.UserId)
+            .ToListAsync();
+        this.database.EmailVerificationTokens.RemoveRange(tokens);
+
+        targetedUser.EmailAddressVerified = true;
 
         await this.database.SaveChangesAsync();
 

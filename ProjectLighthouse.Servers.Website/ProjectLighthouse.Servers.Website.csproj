@@ -11,6 +11,6 @@
     <ItemGroup>
         <ProjectReference Include="..\ProjectLighthouse.Localization\ProjectLighthouse.Localization.csproj" />
         <ProjectReference Include="..\ProjectLighthouse\ProjectLighthouse.csproj" />
-        <PackageReference Include="QRCoder" Version="1.4.3" />
+        <PackageReference Include="QRCoder" Version="1.5.1" />
     </ItemGroup>
 </Project>
