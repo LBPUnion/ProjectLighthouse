@@ -19,7 +19,6 @@ public static class CryptoHelper
     public static string GenerateAuthToken()
     {
         byte[] bytes = (byte[])GenerateRandomBytes(256);
-        
         return Convert.ToBase64String(Encoding.UTF8.GetBytes(BCryptHash(Sha256Hash(bytes))));
     }
 
