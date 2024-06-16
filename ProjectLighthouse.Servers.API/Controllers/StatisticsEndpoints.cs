@@ -36,7 +36,6 @@ public class StatisticsEndpoints : ApiEndpointController
                 Slots = await StatisticsHelper.SlotCount(this.database, new SlotQueryBuilder()),
                 Users = await StatisticsHelper.UserCount(this.database),
                 RecentMatches = await StatisticsHelper.RecentMatches(this.database),
-                RoomsPerPlatform = await StatisticsHelper.RoomCountPerPlatform(this.database),
                 TeamPicks = await StatisticsHelper.SlotCount(this.database, new SlotQueryBuilder().AddFilter(new TeamPickFilter())),
             }
         );
