@@ -158,26 +158,6 @@
                 </div>
             </div>
         </noscript>
-        @if (!ServerStatics.IsDebug() && VersionHelper.IsDirty)
-        {
-            <div class="ui bottom attached red message large">
-                <div class="ui container">
-                    <i class="warning icon"></i>
-                    <span style="font-size: 1.2rem;">@Model.Translate(BaseLayoutStrings.LicenseWarnTitle)</span>
-                    <p>
-                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn1,
-                            "<a href=\"https://github.com/LBPUnion/project-lighthouse/blob/main/LICENSE\">GNU Affero General Public License v3.0</a>"))
-                    </p>
-                    <p>
-                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn2,
-                            "<code>git status</code>", "<a href=\"https://github.com/LBPUnion/project-lighthouse/issues\">", "</a>"))
-                    </p>
-                    <p>
-                        @Html.Raw(Model.Translate(BaseLayoutStrings.LicenseWarn3))
-                    </p>
-                </div>
-            </div>
-        }
         @if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
             <div class="ui bottom attached red message large">
@@ -234,10 +214,6 @@
                         <span class="ui text red">Cannot Detect Source Code</span>
                     }
                 </span>
-                @if (VersionHelper.IsDirty)
-                {
-                    <p>@Model.Translate(BaseLayoutStrings.GeneratedModified)</p>
-                }
             </div>
         </div>
         @if (ServerStatics.IsDebug())
