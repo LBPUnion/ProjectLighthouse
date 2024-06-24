@@ -54,6 +54,7 @@ public class NotificationsPage : BaseLayout
             Title = title.Trim(),
             Content = content.Trim(),
             PublisherId = user.UserId,
+            PublishedAt = DateTime.UtcNow,
         };
 
         this.Database.WebsiteAnnouncements.Add(announcement);

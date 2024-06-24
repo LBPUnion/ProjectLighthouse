@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Slot;
 
 namespace LBPUnion.ProjectLighthouse.Types.Levels;
 

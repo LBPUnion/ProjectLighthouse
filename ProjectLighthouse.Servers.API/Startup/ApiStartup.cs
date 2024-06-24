@@ -28,11 +28,7 @@ public class ApiStartup
             }
         );
 
-        services.AddDbContext<DatabaseContext>(builder =>
-        {
-            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
-                MySqlServerVersion.LatestSupportedServerVersion);
-        });
+        services.AddDbContext<DatabaseContext>(DatabaseContext.ConfigureBuilder());
 
         services.AddSwaggerGen
         (

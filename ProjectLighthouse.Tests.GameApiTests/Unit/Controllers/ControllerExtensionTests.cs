@@ -1,5 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse.Filter;
-using LBPUnion.ProjectLighthouse.Filter.Filters;
+using LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;

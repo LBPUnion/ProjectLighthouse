@@ -2,13 +2,14 @@
 @using LBPUnion.ProjectLighthouse.Localization.StringLists
 @using LBPUnion.ProjectLighthouse.Types.Entities.Notifications
 @using LBPUnion.ProjectLighthouse.Types.Entities.Website
-@using LBPUnion.ProjectLighthouse.Types.Notifications
 @model LBPUnion.ProjectLighthouse.Servers.Website.Pages.NotificationsPage
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     Layout = "Layouts/BaseLayout";
     Model.Title = Model.Translate(GeneralStrings.Notifications);
+    string timeZone = Model.GetTimeZone();
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 
 @if (Model.User != null && Model.User.IsAdmin)
@@ -51,6 +52,7 @@
                         <a style="color: black" href="~/user/@announcement.Publisher.UserId">
                             @announcement.Publisher.Username
                         </a>
+                        at @TimeZoneInfo.ConvertTime(announcement.PublishedAt, TimeZoneInfo.Utc, timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt")
                     </div>
                 }
             </div>

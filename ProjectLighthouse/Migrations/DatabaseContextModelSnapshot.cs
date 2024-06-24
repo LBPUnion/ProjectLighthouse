@@ -3,6 +3,7 @@ using System;
 using LBPUnion.ProjectLighthouse.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -16,14 +17,51 @@ namespace ProjectLighthouse.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity", b =>
+                {
+                    b.Property<int>("ActivityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ActivityId"));
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("varchar(34)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ActivityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Activities");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ActivityEntity");
+
+                    b.UseTphMappingStrategy();
+                });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
                 {
                     b.Property<int>("HeartedLevelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HeartedLevelId"));
 
                     b.Property<int>("SlotId")
                         .HasColumnType("int");
@@ -46,6 +84,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HeartedPlaylistId"));
+
                     b.Property<int>("PlaylistId")
                         .HasColumnType("int");
 
@@ -66,6 +106,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("HeartedProfileId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HeartedProfileId"));
 
                     b.Property<int>("HeartedUserId")
                         .HasColumnType("int");
@@ -88,6 +130,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("QueuedLevelId"));
+
                     b.Property<int>("SlotId")
                         .HasColumnType("int");
 
@@ -108,6 +152,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("RatingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RatingId"));
 
                     b.Property<int>("CommentId")
                         .HasColumnType("int");
@@ -132,6 +178,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("RatedLevelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RatedLevelId"));
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
@@ -163,6 +211,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RatedReviewId"));
+
                     b.Property<int>("ReviewId")
                         .HasColumnType("int");
 
@@ -186,6 +236,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("VisitedLevelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("VisitedLevelId"));
 
                     b.Property<int>("PlaysLBP1")
                         .HasColumnType("int");
@@ -217,6 +269,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CategoryId"));
+
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
@@ -242,6 +296,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PlaylistId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PlaylistId"));
 
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
@@ -270,6 +326,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ReviewId"));
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("tinyint(1)");
@@ -318,6 +376,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ScoreId"));
+
                     b.Property<int>("ChildSlotId")
                         .HasColumnType("int");
 
@@ -350,6 +410,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("SlotId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("SlotId"));
 
                     b.Property<string>("AuthorLabels")
                         .IsRequired()
@@ -504,6 +566,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ReportId"));
+
                     b.Property<string>("Bounds")
                         .HasColumnType("longtext");
 
@@ -549,6 +613,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("CaseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CaseId"));
 
                     b.Property<int>("AffectedId")
                         .HasColumnType("int");
@@ -604,6 +670,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<bool>("IsDismissed")
                         .HasColumnType("tinyint(1)");
 
@@ -629,6 +697,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BlockedProfileId"));
+
                     b.Property<int>("BlockedUserId")
                         .HasColumnType("int");
 
@@ -649,6 +719,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("CommentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CommentId"));
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("tinyint(1)");
@@ -719,6 +791,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PhotoId"));
+
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
@@ -759,6 +833,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PhotoSubjectId"));
+
                     b.Property<string>("Bounds")
                         .HasColumnType("longtext");
 
@@ -782,6 +858,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("PlatformLinkAttemptId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PlatformLinkAttemptId"));
 
                     b.Property<string>("IPAddress")
                         .HasColumnType("longtext");
@@ -810,6 +888,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<int>("AdminGrantedSlots")
                         .HasColumnType("int");
@@ -916,6 +996,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
@@ -935,6 +1017,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("EmailSetTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EmailSetTokenId"));
 
                     b.Property<string>("EmailToken")
                         .HasColumnType("longtext");
@@ -958,6 +1042,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EmailVerificationTokenId"));
+
                     b.Property<string>("EmailToken")
                         .HasColumnType("longtext");
 
@@ -979,6 +1065,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
@@ -1011,6 +1099,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
@@ -1031,6 +1121,8 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
@@ -1050,6 +1142,8 @@ namespace ProjectLighthouse.Migrations
                     b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TokenId"));
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
@@ -1074,8 +1168,13 @@ namespace ProjectLighthouse.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AnnouncementId"));
+
                     b.Property<string>("Content")
                         .HasColumnType("longtext");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("PublisherId")
                         .HasColumnType("int");
@@ -1088,6 +1187,211 @@ namespace ProjectLighthouse.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("WebsiteAnnouncements");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("SlotId");
+
+                    b.HasDiscriminator().HasValue("LevelActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelCommentActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("SlotId");
+
+                    b.HasDiscriminator().HasValue("LevelCommentActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelPhotoActivity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("PhotoId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("PhotoId");
+
+                    b.HasIndex("SlotId");
+
+                    b.HasDiscriminator().HasValue("LevelPhotoActivity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.NewsActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("NewsId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("NewsId");
+
+                    b.HasDiscriminator().HasValue("NewsActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("PlaylistId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("PlaylistId");
+
+                    b.HasIndex("PlaylistId");
+
+                    b.HasDiscriminator().HasValue("PlaylistActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistWithSlotActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("PlaylistId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("PlaylistId");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("PlaylistId");
+
+                    b.HasDiscriminator().HasValue("PlaylistWithSlotActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ReviewActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("SlotId");
+
+                    b.HasDiscriminator().HasValue("ReviewActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ScoreActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScoreId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("SlotId");
+
+                    b.HasIndex("ScoreId");
+
+                    b.HasIndex("SlotId");
+
+                    b.HasDiscriminator().HasValue("ScoreActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("TargetUserId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("TargetUserId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.HasDiscriminator().HasValue("UserActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserCommentActivityEntity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetUserId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("TargetUserId");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.HasDiscriminator().HasValue("UserCommentActivityEntity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserPhotoActivity", b =>
+                {
+                    b.HasBaseType("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity");
+
+                    b.Property<int>("PhotoId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetUserId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("int")
+                        .HasColumnName("TargetUserId");
+
+                    b.HasIndex("PhotoId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.HasDiscriminator().HasValue("UserPhotoActivity");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.HeartedLevelEntity", b =>
@@ -1481,6 +1785,175 @@ namespace ProjectLighthouse.Migrations
                         .HasForeignKey("PublisherId");
 
                     b.Navigation("Publisher");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelCommentActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.CommentEntity", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("Slot");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.LevelPhotoActivity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", "Photo")
+                        .WithMany()
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Photo");
+
+                    b.Navigation("Slot");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.NewsActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Website.WebsiteAnnouncementEntity", "News")
+                        .WithMany()
+                        .HasForeignKey("NewsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("News");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.PlaylistEntity", "Playlist")
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Playlist");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.PlaylistWithSlotActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.PlaylistEntity", "Playlist")
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Playlist");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ReviewActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.ReviewEntity", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+
+                    b.Navigation("Slot");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.ScoreActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.ScoreEntity", "Score")
+                        .WithMany()
+                        .HasForeignKey("ScoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Score");
+
+                    b.Navigation("Slot");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TargetUser");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserCommentActivityEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.CommentEntity", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("TargetUser");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Activity.UserPhotoActivity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", "Photo")
+                        .WithMany()
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Photo");
+
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Profile.PhotoEntity", b =>

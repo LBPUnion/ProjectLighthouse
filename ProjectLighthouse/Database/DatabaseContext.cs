@@ -1,4 +1,7 @@
+using System;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Types.Activity;
+using LBPUnion.ProjectLighthouse.Types.Entities.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Maintenance;
@@ -24,6 +27,10 @@ public partial class DatabaseContext : DbContext
     public DbSet<PasswordResetTokenEntity> PasswordResetTokens { get; set; }
     public DbSet<RegistrationTokenEntity> RegistrationTokens { get; set; }
     public DbSet<WebTokenEntity> WebTokens { get; set; }
+    #endregion
+
+    #region Activity
+    public DbSet<ActivityEntity> Activities { get; set; }
     #endregion
 
     #region Users
@@ -84,8 +91,36 @@ public partial class DatabaseContext : DbContext
     public static DatabaseContext CreateNewInstance()
     {
         DbContextOptionsBuilder<DatabaseContext> builder = new();
-        builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
-            MySqlServerVersion.LatestSupportedServerVersion);
+        ConfigureBuilder()(builder);
         return new DatabaseContext(builder.Options);
     }
+
+    public static Action<DbContextOptionsBuilder> ConfigureBuilder()
+    {
+        return builder =>
+        {
+            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
+                MySqlServerVersion.LatestSupportedServerVersion);
+            builder.AddInterceptors(new ActivityInterceptor(new ActivityEntityEventHandler()));
+        };
+    }
+
+    #region Activity
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<LevelActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserPhotoActivity>().UseTphMappingStrategy();
+        modelBuilder.Entity<LevelPhotoActivity>().UseTphMappingStrategy();
+        modelBuilder.Entity<PlaylistActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<PlaylistWithSlotActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<ScoreActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<NewsActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<LevelCommentActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserCommentActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<UserActivityEntity>().UseTphMappingStrategy();
+        modelBuilder.Entity<ReviewActivityEntity>().UseTphMappingStrategy();
+        base.OnModelCreating(modelBuilder);
+    }
+    #endregion
 }
