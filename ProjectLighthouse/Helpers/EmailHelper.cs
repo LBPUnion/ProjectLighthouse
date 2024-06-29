@@ -52,7 +52,7 @@ public static class SMTPHelper
         {
             Created = DateTime.UtcNow,
             UserId = user.UserId,
-            ResetToken = CryptoHelper.GenerateAuthToken(),
+            ResetToken = CryptoHelper.GenerateUrlToken(),
         };
 
         database.PasswordResetTokens.Add(token);
@@ -92,7 +92,7 @@ public static class SMTPHelper
         {
             UserId = user.UserId,
             User = user,
-            EmailToken = CryptoHelper.GenerateAuthToken(),
+            EmailToken = CryptoHelper.GenerateUrlToken(),
             ExpiresAt = DateTime.UtcNow.AddHours(6),
         };
 

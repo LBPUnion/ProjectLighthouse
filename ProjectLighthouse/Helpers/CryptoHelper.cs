@@ -16,8 +16,13 @@ public static class CryptoHelper
     public static string GenerateAuthToken()
     {
         byte[] bytes = (byte[])GenerateRandomBytes(256);
-
         return BCryptHash(Sha256Hash(bytes));
+    }
+
+    public static string GenerateUrlToken()
+    {
+        byte[] bytes = (byte[])GenerateRandomBytes(256);
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(BCryptHash(Sha256Hash(bytes))));
     }
 
     public static string ComputeDigest(string path, string authCookie, byte[] body, string digestKey, bool excludeBody = false)
