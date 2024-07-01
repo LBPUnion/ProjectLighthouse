@@ -4,7 +4,7 @@ volumes:
   redis:
 services:
   gameserver:
-    image: lighthouse:latest
+    image: ghcr.io/lbpunion/projectlighthouse:main
     container_name: gameserver
     build: .
     restart: unless-stopped
@@ -26,7 +26,7 @@ services:
       - "./data:/lighthouse/data:z"
       - "./data/.aspnet:/lighthouse/.aspnet:z"
   website:
-    image: lighthouse:latest
+    image: ghcr.io/lbpunion/projectlighthouse:main
     container_name: website
     restart: unless-stopped
     ports:
@@ -47,7 +47,7 @@ services:
       - "./data:/lighthouse/data:z"
       - "./data/.aspnet:/lighthouse/.aspnet:z"
   api:
-    image: lighthouse:latest
+    image: ghcr.io/lbpunion/projectlighthouse:main
     container_name: api
     restart: unless-stopped
     ports:
