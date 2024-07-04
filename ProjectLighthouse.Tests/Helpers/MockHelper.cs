@@ -37,7 +37,6 @@ public static class MockHelper
             UserId = 1,
             ExpiresAt = DateTime.MaxValue,
             TokenId = 1,
-            UserLocation = "127.0.0.1",
             UserToken = "unittest",
         };
 

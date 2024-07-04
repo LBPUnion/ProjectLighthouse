@@ -10,7 +10,7 @@ using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-// I would like to apologize in advance for anyone dealing with this file. 
+// I would like to apologize in advance for anyone dealing with this file.
 // Theres probably a better way to do this with delegates but I'm tired.
 // TODO: Clean up this file
 // - jvyden
@@ -62,6 +62,9 @@ public class SlotPageController : ControllerBase
     {
         WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
+
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.Redirect("~/slot/" + id);
 
         if (msg == null)
         {

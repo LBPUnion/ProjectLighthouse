@@ -185,7 +185,7 @@ public class NPTicket
             }
 
             // Used to identify duplicate tickets
-            npTicket.TicketHash = CryptoHelper.Sha1Hash(data);
+            npTicket.TicketHash = CryptoHelper.Sha256Hash(data);
 
             #if DEBUG
             Logger.Debug("npTicket data:", LogArea.Login);

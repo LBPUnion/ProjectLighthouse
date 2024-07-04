@@ -11,14 +11,7 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static partial class MatchHelper
 {
-    public static readonly ConcurrentDictionary<int, string?> UserLocations = new();
     public static readonly ConcurrentDictionary<int, List<int>?> UserRecentlyDivedIn = new();
-
-    public static void SetUserLocation(int userId, string location)
-    {
-        if (UserLocations.TryGetValue(userId, out string? _)) UserLocations.TryRemove(userId, out _);
-        UserLocations.TryAdd(userId, location);
-    }
 
     public static void AddUserRecentlyDivedIn(int userId, int otherUserId)
     {

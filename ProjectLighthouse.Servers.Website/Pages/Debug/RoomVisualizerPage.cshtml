@@ -17,15 +17,15 @@
 
 <script>
     let shouldRefresh = true;
-    
+
     setTimeout(() => {
         if (shouldRefresh) window.location.reload();
     }, @(refreshSeconds * 1000));
-    
+
     function stopRefreshing() {
         shouldRefresh = false;
         console.log("Stopped refresh");
-        
+
         const stopRefreshButton = document.getElementById("stop-refresh-button");
         stopRefreshButton.parentElement.removeChild(stopRefreshButton);
         console.log("Removed stop refresh button");
@@ -61,7 +61,7 @@
 #nullable enable
     if (version == GameVersion.LittleBigPlanet1 || version == GameVersion.LittleBigPlanetPSP || version == GameVersion.Unknown) continue;
 
-    FindBestRoomResponse? response = RoomHelper.FindBestRoom(Database, null, version, null, null, null);
+    FindBestRoomResponse? response = RoomHelper.FindBestRoom(Database, null, version, null, null);
     string text = response == null ? "No room found." : "Room " + response.RoomId;
 
     <p><b>Best room for @version.ToPrettyString()</b>: @text</p>

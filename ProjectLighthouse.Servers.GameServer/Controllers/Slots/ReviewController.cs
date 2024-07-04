@@ -1,3 +1,5 @@
+#nullable enable
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -87,6 +89,9 @@ public class ReviewController : GameController
     {
         GameTokenEntity token = this.GetToken();
 
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
         GameReview? newReview = await this.DeserializeBody<GameReview>();
         if (newReview == null) return this.BadRequest();
 
@@ -110,7 +115,7 @@ public class ReviewController : GameController
         }
         review.Thumb = Math.Clamp(newReview.Thumb, -1, 1);
         review.LabelCollection = LabelHelper.RemoveInvalidLabels(newReview.LabelCollection);
-        
+
         review.Text = newReview.Text;
         review.Deleted = false;
         review.Timestamp = TimeHelper.TimestampMillis;
@@ -148,6 +153,13 @@ public class ReviewController : GameController
 
         List<GameReview> reviews = (await this.database.Reviews
             .Where(r => r.SlotId == slotId)
+            .Select(r => new
+            {
+                Review = r,
+                SlotVersion = r.Slot!.GameVersion,
+            })
+            .Where(a => a.SlotVersion <= token.GameVersion)
+            .Select(a => a.Review)
             .OrderByDescending(r => r.ThumbsUp - r.ThumbsDown)
             .ThenByDescending(r => r.Timestamp)
             .ApplyPagination(pageData)
@@ -169,6 +181,13 @@ public class ReviewController : GameController
 
         List<GameReview> reviews = (await this.database.Reviews
             .Where(r => r.ReviewerId == targetUserId)
+            .Select(r => new
+            {
+                Review = r,
+                SlotVersion = r.Slot!.GameVersion,
+            })
+            .Where(a => a.SlotVersion <= token.GameVersion)
+            .Select(a => a.Review)
             .OrderByDescending(r => r.Timestamp)
             .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(r => GameReview.CreateFromEntity(r, token));
@@ -233,6 +252,9 @@ public class ReviewController : GameController
     public async Task<IActionResult> DeleteReview(int slotId, string username)
     {
         GameTokenEntity token = this.GetToken();
+
+        // Deny request if in read-only mode
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
         int creatorId = await this.database.Slots.Where(s => s.SlotId == slotId).Select(s => s.CreatorId).FirstOrDefaultAsync();
         if (creatorId == 0) return this.BadRequest();

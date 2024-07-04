@@ -9,9 +9,6 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class CryptoHelper
 {
-
-    private static readonly SHA256 sha256 = SHA256.Create();
-
     /// <summary>
     ///     Generates a random SHA256 and BCrypted token
     /// </summary>
@@ -19,8 +16,13 @@ public static class CryptoHelper
     public static string GenerateAuthToken()
     {
         byte[] bytes = (byte[])GenerateRandomBytes(256);
-
         return BCryptHash(Sha256Hash(bytes));
+    }
+
+    public static string GenerateUrlToken()
+    {
+        byte[] bytes = (byte[])GenerateRandomBytes(256);
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(BCryptHash(Sha256Hash(bytes))));
     }
 
     public static string ComputeDigest(string path, string authCookie, byte[] body, string digestKey, bool excludeBody = false)
@@ -156,7 +158,7 @@ public static class CryptoHelper
 
     public static string Sha256Hash(string str) => Sha256Hash(Encoding.UTF8.GetBytes(str));
 
-    public static string Sha256Hash(byte[] bytes) => BitConverter.ToString(sha256.ComputeHash(bytes)).Replace("-", "").ToLower();
+    public static string Sha256Hash(byte[] bytes) => BitConverter.ToString(SHA256.HashData(bytes)).Replace("-", "").ToLower();
 
     public static string Sha1Hash(byte[] bytes) => BitConverter.ToString(SHA1.HashData(bytes)).Replace("-", "");
 

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
@@ -69,6 +70,9 @@ public class UserController : GameController
 
         if (update.Biography != null)
         {
+            // Deny request if in read-only mode
+            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
             if (update.Biography.Length > 512) return this.BadRequest();
 
             user.Biography = update.Biography;
@@ -80,6 +84,9 @@ public class UserController : GameController
         foreach (string? resource in new[]{update.IconHash, update.YayHash, update.MehHash, update.BooHash,})
         {
             if (string.IsNullOrWhiteSpace(resource)) continue;
+
+            // Deny request if in read-only mode
+            if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
             if (!FileHelper.ResourceExists(resource) && !resource.StartsWith('g')) return this.BadRequest();
 
@@ -169,7 +176,7 @@ public class UserController : GameController
         // Sometimes the update gets called periodically as pin progress updates via playing,
         // may not affect equipped profile pins however, so check before setting it.
         string currentPins = user.Pins;
-        string newPins = string.Join(",", pinJson.ProfilePins);
+        string newPins = string.Join(",", pinJson.ProfilePins.Distinct());
 
         if (string.Equals(currentPins, newPins)) return this.Ok("[{\"StatusCode\":200}]");
 

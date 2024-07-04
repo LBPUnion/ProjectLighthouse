@@ -1,4 +1,5 @@
 using System.Text.Json;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
@@ -37,6 +38,11 @@ public class MatchController : GameController
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
 
+        await LastContactHelper.SetLastContact(this.database, user, token.GameVersion, token.Platform);
+
+        // Do not allow matchmaking if it has been disabled
+        if (!ServerConfiguration.Instance.Matchmaking.MatchmakingEnabled) return this.BadRequest();
+
         #region Parse match data
 
         // Example POST /match: [UpdateMyPlayerData,["Player":"FireGamer9872"]]
@@ -70,15 +76,12 @@ public class MatchController : GameController
 
         #endregion
 
-        await LastContactHelper.SetLastContact(this.database, user, token.GameVersion, token.Platform);
-
         #region Process match data
 
         switch (matchData)
         {
             case UpdateMyPlayerData playerData:
             {
-                MatchHelper.SetUserLocation(user.UserId, token.UserLocation);
                 Room? room = RoomHelper.FindRoomByUser(user.UserId, token.GameVersion, token.Platform, true);
 
                 if (playerData.RoomState != null)
@@ -86,19 +89,13 @@ public class MatchController : GameController
                         room.State = (RoomState)playerData.RoomState;
                 break;
             }
-            // Check how many people are online in release builds, disabled for debug for ..well debugging.
-            #if DEBUG
             case FindBestRoom diveInData:
-            #else
-            case FindBestRoom diveInData when MatchHelper.UserLocations.Count > 1:
-            #endif
             {
                 FindBestRoomResponse? response = RoomHelper.FindBestRoom(this.database,
                     user,
                     token.GameVersion,
                     diveInData.RoomSlot,
-                    token.Platform,
-                    token.UserLocation);
+                    token.Platform);
 
                 if (response == null) return this.NotFound();
 
@@ -108,7 +105,7 @@ public class MatchController : GameController
 
                 return this.Ok($"[{{\"StatusCode\":200}},{serialized}]");
             }
-            case CreateRoom createRoom when !MatchHelper.UserLocations.IsEmpty:
+            case CreateRoom createRoom:
             {
                 List<int> users = new();
                 foreach (string playerUsername in createRoom.Players)

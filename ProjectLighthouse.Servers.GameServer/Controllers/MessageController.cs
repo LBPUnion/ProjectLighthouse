@@ -3,6 +3,8 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
@@ -58,10 +60,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         announceText.Replace("%user", username);
         announceText.Replace("%id", token.UserId.ToString());
 
+        if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
+        {
+            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
+        }
+
         #if DEBUG
         announceText.Append("\n\n---DEBUG INFO---\n" +
                                   $"user.UserId: {token.UserId}\n" +
-                                  $"token.UserLocation: {token.UserLocation}\n" +
                                   $"token.GameVersion: {token.GameVersion}\n" +
                                   $"token.TicketHash: {token.TicketHash}\n" +
                                   $"token.ExpiresAt: {token.ExpiresAt.ToString()}\n" +
