@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="enable_2fa" xml:space="preserve">
+        <value>Enable Two-Factor</value>
+    </data>
+  <data name="disable_2fa" xml:space="preserve">
+        <value>Disable Two-Factor</value>
+    </data>
+  <data name="qr_description" xml:space="preserve">
+        <value>Once you have added this two factor code to your app of choice, enter a valid code below to finish the setup process</value>
+    </data>
+  <data name="qr_title" xml:space="preserve">
+        <value>Here is your Two-Factor QR code</value>
+    </data>
+  <data name="backup_title" xml:space="preserve">
+        <value>Backup codes</value>
+    </data>
+  <data name="backup_description" xml:space="preserve">
+        <value>These codes will allow you to regain access to your account if you ever lose access to your 2FA device</value>
+    </data>
+  <data name="backup_description2" xml:space="preserve">
+        <value>Save these codes somewhere because otherwise you may be locked out of your account</value>
+    </data>
+  <data name="backup_confirmation" xml:space="preserve">
+        <value>I've saved these codes</value>
+    </data>
+  <data name="invalid_code" xml:space="preserve">
+        <value>Invalid 2FA Code</value>
+    </data>
+  <data name="disable_2fa_description" xml:space="preserve">
+        <value>To disable two-factor authentication, enter a correct code from your authenticator app.</value>
+    </data>
+  <data name="2fa" xml:space="preserve">
+        <value>Two-Factor Authentication</value>
+    </data>
+  <data name="2fa_required" xml:space="preserve">
+        <value>You are required to setup 2FA because of your role within this instance.</value>
+    </data>
+  <data name="2fa_description" xml:space="preserve">
+        <value>Enter a valid 2FA code to continue</value>
+    </data>
+  <data name="2fa_backup_description" xml:space="preserve">
+        <value>Alternatively, you can click {0}here{1} to enter one of your backup codes</value>
+    </data>
+  <data name="backup_download" xml:space="preserve">
+        <value>Download backup codes</value>
+    </data>
+  <data name="invalid_backup" xml:space="preserve">
+        <value>Invalid Backup Code</value>
+    </data>
+</root>

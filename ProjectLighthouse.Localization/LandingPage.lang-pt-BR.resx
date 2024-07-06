@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <data name="welcome" xml:space="preserve">
+        <value>Welcome to {0}!</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+  <data name="loggedInAs" xml:space="preserve">
+        <value>Greetings, {0}.</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+  <data name="users_none" xml:space="preserve">
+        <value>There are no people online. Why not hop on?</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+  <data name="users_single" xml:space="preserve">
+        <value>There is 1 person currently online:</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+  <data name="users_multiple" xml:space="preserve">
+        <value>There are currently {0} people online:</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+  <data name="authAttemptsPending" xml:space="preserve">
+        <value>You have {0} authentication attempts pending. Click here to view them.</value>
+        <comment>A greeting on the main page of the website.</comment>
+    </data>
+  <data name="newest_levels" xml:space="preserve">
+        <value>Newest Levels</value>
+    </data>
+  <data name="latest_team_picks" xml:space="preserve">
+        <value>Latest Team Picks</value>
+    </data>
+</root>
