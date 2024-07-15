@@ -27,7 +27,8 @@ public class StatisticsController : ControllerBase
     public IActionResult PlayersInPodCount() => this.Ok(StatisticsHelper.RoomCountForPlatform(this.GetToken().Platform).ToString());
 
     [HttpGet("totalPlayerCount")]
-    public async Task<IActionResult> TotalPlayerCount() => this.Ok((await StatisticsHelper.RecentMatchesForGame(this.database, this.GetToken().GameVersion)).ToString());
+    public async Task<IActionResult> TotalPlayerCount() =>
+        this.Ok((await StatisticsHelper.RecentMatches(this.database, l => l.GameVersion == this.GetToken().GameVersion)).ToString());
 
     [HttpGet("planetStats")]
     [Produces("text/xml")]
