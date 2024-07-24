@@ -1,14 +1,10 @@
-﻿using LBPUnion.ProjectLighthouse.Types.Serialization;
-using Microsoft.AspNetCore.Authorization;
+﻿using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
+using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 
-[ApiController]
-[Authorize]
-[Route("LITTLEBIGPLANETPS3_XML/")]
-[Produces("text/xml")]
-public class DeveloperController : Controller
+public class DeveloperController : GameController
 {
     [HttpGet("developer_videos")]
     public IActionResult DeveloperVideos() => this.Ok(new GameDeveloperVideos());
