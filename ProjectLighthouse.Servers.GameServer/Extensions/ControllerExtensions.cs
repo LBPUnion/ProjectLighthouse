@@ -175,9 +175,6 @@ public static class ControllerExtensions
 
         if (!queryBuilder.GetFilters(typeof(CrossControlFilter)).Any())
             queryBuilder.AddFilter(new ExcludeCrossControlFilter());
-        
-        if (controller.Request.Path.Value != null && controller.Request.Path.Value.EndsWith("lbp2luckydip"))
-            queryBuilder.AddFilter(new LockedSlotFilter());
 
         queryBuilder.AddFilter(new SubLevelFilter(token.UserId));
         queryBuilder.AddFilter(new HiddenSlotFilter());
