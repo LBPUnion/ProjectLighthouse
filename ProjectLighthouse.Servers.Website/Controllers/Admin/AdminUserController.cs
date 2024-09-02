@@ -143,7 +143,22 @@ public class AdminUserController : ControllerBase
     }
 
     /// <summary>
-    ///     Forces the email verification of a user.
+    /// Deletes the user's current avatar. Can prevent crashes in-game, or just be used to remove images that break guidelines.
+    /// </summary>
+    [HttpGet("wipeAvatar")]
+    public async Task<IActionResult> WipeAvatar([FromRoute] int id)
+    {
+        UserEntity? user = this.database.UserFromWebRequest(this.request);
+        if (user == null || !user.IsModerator) return this.NotFound();
+
+        UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (targetedUser == null) return this.NotFound();
+
+        targetedUser.IconHash = "";
+    }
+
+    /// <summary>
+    /// Forces the email verification of a user.
     /// </summary>
     [HttpGet("forceVerifyEmail")]
     public async Task<IActionResult> ForceVerifyEmail([FromRoute] int id)
