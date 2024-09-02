@@ -155,6 +155,13 @@ public class AdminUserController : ControllerBase
         if (targetedUser == null) return this.NotFound();
 
         targetedUser.IconHash = "";
+        
+        await this.database.SaveChangesAsync();
+        Logger.Success($"Reset profile picture for {targetedUser.Username} (id:{targetedUser.UserId})", LogArea.Admin);
+
+        await this.database.SendNotification(targetedUser.UserId, "Your profile picture has been reset by a moderator.");
+        
+        return this.Redirect($"/user/{targetedUser.UserId}");
     }
 
     /// <summary>
