@@ -148,7 +148,7 @@ public class AdminUserController : ControllerBase
     [HttpGet("wipeAvatar")]
     public async Task<IActionResult> WipeAvatar([FromRoute] int id)
     {
-        UserEntity? user = this.database.UserFromWebRequest(this.request);
+        UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null || !user.IsModerator) return this.NotFound();
 
         UserEntity? targetedUser = await this.database.Users.FirstOrDefaultAsync(u => u.UserId == id);
