@@ -167,7 +167,7 @@ public class SlotPageController : ControllerBase
 
         if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
 
-        targetSlot.InitiallyLocked = True;
+        targetSlot.InitiallyLocked = true;
 
         return this.Redirect(callbackUrl);
     }
@@ -183,7 +183,7 @@ public class SlotPageController : ControllerBase
 
         if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
 
-        targetSlot.InitiallyLocked = False;
+        targetSlot.InitiallyLocked = false;
 
         return this.Redirect(callbackUrl);
     }
@@ -199,13 +199,13 @@ public class SlotPageController : ControllerBase
 
         if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
 
-        targetSlot.IsShareable = true;
+        targetSlot.Shareable = 1;
 
         return this.Redirect(callbackUrl);
     }
 
-    [HttpGet("setUnshareable")]
-    public async Task<IActionResult> SetUnshareable([FromRoute] int id, [FromQuery] string? callbackUrl)
+    [HttpGet("unsetShareable")]
+    public async Task<IActionResult> UnsetShareable([FromRoute] int id, [FromQuery] string? callbackUrl)
     {
         WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
         if (token == null) return this.Redirect("~/login");
@@ -215,7 +215,39 @@ public class SlotPageController : ControllerBase
 
         if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
 
-        targetSlot.IsShareable = false;
+        targetSlot.Shareable = 0;
+
+        return this.Redirect(callbackUrl);
+    }
+
+    [HttpGet("setSubLevel")]
+    public async Task<IActionResult> SetSubLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
+    {
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        if (targetSlot == null) return this.Redirect("~/slots/0");
+
+        if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
+
+        targetSlot.SubLevel = false;
+
+        return this.Redirect(callbackUrl);
+    }
+
+    [HttpGet("unsetSubLevel")]
+    public async Task<IActionResult> UnsetSubLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
+    {
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        if (targetSlot == null) return this.Redirect("~/slots/0");
+
+        if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
+
+        targetSlot.SubLevel = false;
 
         return this.Redirect(callbackUrl);
     }
