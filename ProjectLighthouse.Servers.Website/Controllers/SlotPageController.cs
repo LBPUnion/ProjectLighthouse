@@ -155,4 +155,68 @@ public class SlotPageController : ControllerBase
 
         return this.Redirect(callbackUrl);
     }
+
+    [HttpGet("lockLevel")]
+    public async Task<IActionResult> LockLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
+    {
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        if (targetSlot == null) return this.Redirect("~/slots/0");
+
+        if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
+
+        targetSlot.InitiallyLocked = True;
+
+        return this.Redirect(callbackUrl);
+    }
+
+    [HttpGet("unlockLevel")]
+    public async Task<IActionResult> UnlockLevel([FromRoute] int id, [FromQuery] string? callbackUrl)
+    {
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        if (targetSlot == null) return this.Redirect("~/slots/0");
+
+        if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
+
+        targetSlot.InitiallyLocked = False;
+
+        return this.Redirect(callbackUrl);
+    }
+
+    [HttpGet("setShareable")]
+    public async Task<IActionResult> SetShareable([FromRoute] int id, [FromQuery] string? callbackUrl)
+    {
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        if (targetSlot == null) return this.Redirect("~/slots/0");
+
+        if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
+
+        targetSlot.IsShareable = true;
+
+        return this.Redirect(callbackUrl);
+    }
+
+    [HttpGet("setUnshareable")]
+    public async Task<IActionResult> SetUnshareable([FromRoute] int id, [FromQuery] string? callbackUrl)
+    {
+        WebTokenEntity? token = this.database.WebTokenFromRequest(this.Request);
+        if (token == null) return this.Redirect("~/login");
+
+        SlotEntity? targetSlot = await this.database.Slots.FirstOrDefaultAsync(s => s.SlotId == id);
+        if (targetSlot == null) return this.Redirect("~/slots/0");
+
+        if (targetSlot.CreatorId != token.UserId) return this.Redirect("~/slot/" + id);
+
+        targetSlot.IsShareable = false;
+
+        return this.Redirect(callbackUrl);
+    }
 }
