@@ -54,28 +54,24 @@ public class SlotSettingsPage : BaseLayout
                 this.Slot.AuthorLabels = labels;
         }
 
-        if (locked != null)
+        if (this.Slot.InitiallyLocked != locked)
         {
-            if (this.Slot.InitiallyLocked != locked)
-                this.Slot.InitiallyLocked = locked;
+            this.Slot.InitiallyLocked = locked;
         }
 
-        if (copyable != null)
+        if (this.Slot.Shareable != (copyable ? 1 : 0))
         {
-            if (this.Slot.Shareable != (copyable ? 1 : 0))
-                this.Slot.Shareable = (copyable ? 1 : 0);
+            this.Slot.Shareable = (copyable ? 1 : 0);
         }
 
-        if (subLevel != null)
+        if (this.Slot.SubLevel != subLevel)
         {
-            if (this.Slot.SubLevel != subLevel)
-                this.Slot.SubLevel = subLevel;
+            this.Slot.SubLevel = subLevel;
         }
 
-        if (lbp1Only != null)
+        if (this.Slot.Lbp1Only != lbp1Only)
         {
-            if (this.Slot.Lbp1Only != lbp1Only)
-                this.Slot.Lbp1Only = lbp1Only;
+            this.Slot.Lbp1Only = lbp1Only;
         }
 
         // ReSharper disable once InvertIf
