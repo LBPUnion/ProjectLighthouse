@@ -71,8 +71,10 @@ function onSubmit(){
                 @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
                 {
                     <div class="ui blue label">
-                        <i class="arrow circle down icon"></i>
-                        Sub Level
+                        <label for="subLevel">
+                            <i class="arrow circle down icon"></i>
+                            Sub Level
+                        </label>
                         <input type="checkbox" name="subLevel" id="subLevel" style="margin-left: 5px;" @(Model.Slot.SubLevel ? "checked" : "") value="true">
                     </div>
                 }
