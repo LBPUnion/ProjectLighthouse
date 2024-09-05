@@ -55,8 +55,10 @@ function onSubmit(){
 
                 <div class="ui divider"></div>
                 <div class="ui red label">
-                    <i class="lock icon"></i>
-                    Locked
+                    <label for="locked">
+                        <i class="lock icon"></i>
+                        Locked
+                    </label>
                     <input type="checkbox" name="locked" id="locked" style="margin-left: 5px;" @(Model.Slot.InitiallyLocked ? "checked" : "") value="true">
                 </div>
                 <div class="ui green label">
