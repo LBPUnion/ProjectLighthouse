@@ -52,6 +52,37 @@ function onSubmit(){
                         <input type="hidden" name="avatar" id="avatar-encoded">
                     </div>
                 </div>
+
+                <div class="ui divider"></div>
+                <div class="ui red label">
+                    <i class="lock icon"></i>
+                    Locked
+                    <input type="checkbox" name="locked" id="locked" style="margin-left: 5px;">
+                </div>
+                <div class="ui green label">
+                    <i class="check icon"></i>
+                    Copyable
+                    <input type="checkbox" name="copyable" id="copyable" style="margin-left: 5px;">
+                </div>
+                @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
+                {
+                    <div class="ui blue label">
+                        <i class="arrow circle down icon"></i>
+                        Sub Level
+                        <input type="checkbox" name="subLevel" id="subLevel" style="margin-left: 5px;">
+                    </div>
+                }
+                else
+                {
+                    <div class="ui yellow label">
+                        <i class="eye icon"></i>
+                        LBP1 Only
+                        <input type="checkbox" name="lbp1Only" id="lbp1Only" style="margin-left: 5px;">
+                    </div>
+                }
+                <div class="ui divider fitted hidden"></div>
+
+
                 <div class="field">
                     <label style="text-align: left" for="name">Name</label>
                     <input type="text" name="name" id="name" value="@HttpUtility.HtmlDecode(Model.Slot.Name)" placeholder="Name">
@@ -78,7 +109,6 @@ function onSubmit(){
                         <input type="hidden" name="labels" id="labels">
                     </div>
                 }
-                
                 <button class="ui button green" tabindex="0">Save Changes</button>
                 <a class="ui button red" href="/slot/@Model.Slot.SlotId">Discard Changes</a>
                 <div class="ui divider fitted hidden"></div>
@@ -92,78 +122,78 @@ function onSubmit(){
 </div>
 
 <script>
-  let selectedButtons = [];
-  @if (Model.Slot.CreatorId == Model.User.UserId)
-  {
-  <text>
-    function confirmUnpublish(){
-          if (window.confirm("Are you sure you want to unpublish this level?\nThis action cannot be undone")){
-              window.location.href = "/slot/@Model.Slot.SlotId/unpublish";
-          }
+let selectedButtons = [];
+@if (Model.Slot.CreatorId == Model.User.UserId)
+{
+<text>
+function confirmUnpublish(){
+        if (window.confirm("Are you sure you want to unpublish this level?\nThis action cannot be undone")){
+            window.location.href = "/slot/@Model.Slot.SlotId/unpublish";
+        }
+}
+</text>
+}
+function onHoverStart(btn){          
+    generateRandomSkew(btn);
+}
+function generateRandomSkew(element){
+    let rand = Math.random() * 6 - 3; 
+    element.style.setProperty("--skew", "rotate(" + rand + "deg)"); 
+}
+function setupButtons(){
+    const elements = document.getElementsByClassName("skew");
+    for (let i = 0; i < elements.length; i++) {
+        generateRandomSkew(elements[i]);
+        if (elements[i].classList.contains("selected"))
+        selectedButtons.push(elements[i]);
     }
-  </text>
-  }
-  function onHoverStart(btn){          
-      generateRandomSkew(btn);
-  }
-  function generateRandomSkew(element){
-      let rand = Math.random() * 6 - 3; 
-      element.style.setProperty("--skew", "rotate(" + rand + "deg)"); 
-  }
-  function setupButtons(){
-      const elements = document.getElementsByClassName("skew");
-      for (let i = 0; i < elements.length; i++) {
-          generateRandomSkew(elements[i]);
-          if (elements[i].classList.contains("selected"))
-            selectedButtons.push(elements[i]);
-      }
-  }
-  function serializeLabels(){
-      let labels = "";
-      for (let i = 0; i < selectedButtons.length; i++) {
-          if (selectedButtons[i] == null) continue;
-          labels += selectedButtons[i].id;
-          if (i !== selectedButtons.length - 1) {
-              labels += ",";
-          }
-      }
-      return labels;
-  }
-  function labelButtonClick(e){
-      e.preventDefault();
-      
-      const target = e.target;
-      target.blur();
-      if (target.classList.contains("selected")){
-          target.classList.remove("selected");
-      } else {
-          target.classList.add("selected");
-      }
-      if (selectedButtons.includes(target)){
-          let startIndex = selectedButtons.indexOf(target);
-          selectedButtons.splice(startIndex, 1);
-      } else {
-          selectedButtons.push(target);
-          if (selectedButtons.length > 5){
-              let removed = selectedButtons.shift();
-              removed.classList.remove("selected");
-          }
-      }      
-  }
-  setupButtons();
+}
+function serializeLabels(){
+    let labels = "";
+    for (let i = 0; i < selectedButtons.length; i++) {
+        if (selectedButtons[i] == null) continue;
+        labels += selectedButtons[i].id;
+        if (i !== selectedButtons.length - 1) {
+            labels += ",";
+        }
+    }
+    return labels;
+}
+function labelButtonClick(e){
+    e.preventDefault();
+    
+    const target = e.target;
+    target.blur();
+    if (target.classList.contains("selected")){
+        target.classList.remove("selected");
+    } else {
+        target.classList.add("selected");
+    }
+    if (selectedButtons.includes(target)){
+        let startIndex = selectedButtons.indexOf(target);
+        selectedButtons.splice(startIndex, 1);
+    } else {
+        selectedButtons.push(target);
+        if (selectedButtons.length > 5){
+            let removed = selectedButtons.shift();
+            removed.classList.remove("selected");
+        }
+    }      
+}
+setupButtons();
 
-  let selectedAvatar = "";
-  document.getElementById("avatar").onchange = function (e){
-      const file = e.target.files.item(0);
-      if (file.type !== "image/jpeg" && file.type !== "image/png")
-          return;
-      
-      const output = document.getElementById('slotIcon');
-      const reader = new FileReader();
-      reader.onload = function(){
-          output.src = reader.result;
-          selectedAvatar = reader.result;
-      };
-      reader.readAsDataURL(file);
-  }
+let selectedAvatar = "";
+document.getElementById("avatar").onchange = function (e){
+    const file = e.target.files.item(0);
+    if (file.type !== "image/jpeg" && file.type !== "image/png")
+        return;
+    
+    const output = document.getElementById('slotIcon');
+    const reader = new FileReader();
+    reader.onload = function(){
+        output.src = reader.result;
+        selectedAvatar = reader.result;
+    };
+    reader.readAsDataURL(file);
+}
 </script>

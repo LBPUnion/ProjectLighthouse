@@ -17,7 +17,7 @@ public class SlotSettingsPage : BaseLayout
     public SlotSettingsPage(DatabaseContext database) : base(database)
     {}
 
-    public async Task<IActionResult> OnPost([FromRoute] int slotId, [FromForm] string? avatar, [FromForm] string? name, [FromForm] string? description, string? labels)
+    public async Task<IActionResult> OnPost([FromRoute] int slotId, [FromForm] string? avatar, [FromForm] string? name, [FromForm] string? description, string? labels, [FromForm] bool locked, [FromForm] bool copyable, [FromForm] bool subLevel, [FromForm] bool lbp1Only)
     {
         this.Slot = await this.Database.Slots.FirstOrDefaultAsync(u => u.SlotId == slotId);
         if (this.Slot == null) return this.NotFound();
@@ -50,10 +50,14 @@ public class SlotSettingsPage : BaseLayout
 
         if (labels != null)
         {
-            labels = LabelHelper.RemoveInvalidLabels(labels);
             if (this.Slot.AuthorLabels != labels)
                 this.Slot.AuthorLabels = labels;
         }
+
+        if (this.Slot.InitiallyLocked != locked) this.Slot.InitiallyLocked = locked;
+        if (this.Slot.Shareable != (copyable ? 1 : 0)) this.Slot.Shareable = (copyable ? 1 : 0);
+        if (this.Slot.SubLevel != subLevel) this.Slot.SubLevel = subLevel;
+        if (this.Slot.Lbp1Only != lbp1Only) this.Slot.Lbp1Only = lbp1Only;
 
         // ReSharper disable once InvertIf
         if (this.Database.ChangeTracker.HasChanges())
