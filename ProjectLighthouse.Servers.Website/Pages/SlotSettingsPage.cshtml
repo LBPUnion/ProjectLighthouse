@@ -69,7 +69,7 @@ function onSubmit(){
                     <div class="ui blue label">
                         <i class="arrow circle down icon"></i>
                         Sub Level
-                        <input type="checkbox" name="subLevel" id="subLevel" style="margin-left: 5px;">
+                        <input type="checkbox" name="subLevel" id="subLevel" style="margin-left: 5px;" @(Model.Slot.SubLevel ? "checked" : "") value="true">
                     </div>
                 }
                 else
