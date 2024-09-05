@@ -66,7 +66,7 @@ public class SlotSettingsPage : BaseLayout
         }
 
         if (this.Slot.InitiallyLocked != locked) this.Slot.InitiallyLocked = locked;
-        if (this.Slot.Shareable != (copyable ? 1 : 0)) this.Slot.Shareable = (copyable ? 1 : 0);
+        if (this.Slot.Shareable != Convert.ToInt32(copyable)) this.Slot.Shareable = Convert.ToInt32(copyable);
         if (this.Slot.SubLevel != subLevel) this.Slot.SubLevel = subLevel;
         if (this.Slot.Lbp1Only != lbp1Only) this.Slot.Lbp1Only = lbp1Only;
 
