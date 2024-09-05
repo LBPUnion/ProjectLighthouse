@@ -17,7 +17,18 @@ public class SlotSettingsPage : BaseLayout
     public SlotSettingsPage(DatabaseContext database) : base(database)
     {}
 
-    public async Task<IActionResult> OnPost([FromRoute] int slotId, [FromForm] string? avatar, [FromForm] string? name, [FromForm] string? description, string? labels, [FromForm] bool locked, [FromForm] bool copyable, [FromForm] bool subLevel, [FromForm] bool lbp1Only)
+    public async Task<IActionResult> OnPost
+    (
+        [FromRoute] int slotId,
+        [FromForm] string? avatar,
+        [FromForm] string? name,
+        [FromForm] string? description,
+        [FromForm] string? labels,
+        [FromForm] bool locked,
+        [FromForm] bool copyable,
+        [FromForm] bool subLevel,
+        [FromForm] bool lbp1Only
+    )
     {
         this.Slot = await this.Database.Slots.FirstOrDefaultAsync(u => u.SlotId == slotId);
         if (this.Slot == null) return this.NotFound();
