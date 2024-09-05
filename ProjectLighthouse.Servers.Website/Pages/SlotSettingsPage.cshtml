@@ -62,8 +62,10 @@ function onSubmit(){
                     <input type="checkbox" name="locked" id="locked" style="margin-left: 5px;" @(Model.Slot.InitiallyLocked ? "checked" : "") value="true">
                 </div>
                 <div class="ui green label">
-                    <i class="check icon"></i>
-                    Copyable
+                    <label for="copyable">
+                        <i class="icon copy outline"></i>
+                        Copyable
+                    </label>
                     <input type="checkbox" name="copyable" id="copyable" style="margin-left: 5px;" @(Model.Slot.Shareable ? "checked" : "") value="true">
                 </div>
                 @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
