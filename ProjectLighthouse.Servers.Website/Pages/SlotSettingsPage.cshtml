@@ -62,7 +62,7 @@ function onSubmit(){
                 <div class="ui green label">
                     <i class="check icon"></i>
                     Copyable
-                    <input type="checkbox" name="copyable" id="copyable" style="margin-left: 5px;">
+                    <input type="checkbox" name="copyable" id="copyable" style="margin-left: 5px;" @(Model.Slot.Shareable ? "checked" : "") value="true">
                 </div>
                 @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
                 {
