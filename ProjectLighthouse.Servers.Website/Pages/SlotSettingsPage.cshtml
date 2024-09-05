@@ -77,7 +77,7 @@ function onSubmit(){
                     <div class="ui yellow label">
                         <i class="eye icon"></i>
                         LBP1 Only
-                        <input type="checkbox" name="lbp1Only" id="lbp1Only" style="margin-left: 5px;">
+                        <input type="checkbox" name="lbp1Only" id="lbp1Only" style="margin-left: 5px;" @(Model.Slot.Lbp1Only ? "checked" : "") value="true">
                     </div>
                 }
                 <div class="ui divider fitted hidden"></div>
