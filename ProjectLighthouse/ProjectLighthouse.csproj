@@ -15,7 +15,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Pfim" Version="0.11.2" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
         <PackageReference Include="Discord.Net.Webhook" Version="3.15.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.6" />

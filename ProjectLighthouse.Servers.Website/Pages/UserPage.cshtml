@@ -337,6 +337,11 @@ else
             <span>Wipe User&apos;s Scores</span>
         </a>
 
+        <a class="ui yellow button" href="/moderation/user/@Model.ProfileUser.UserId/wipeAvatar">
+            <i class="trash alternate icon"></i>
+            <span>Remove User Avatar</span>
+        </a>
+
         @if (!Model.CommentsDisabledByModerator)
         {
             <a class="ui yellow button" href="/moderation/newCase?type=@((int)CaseType.UserDisableComments)&affectedId=@Model.ProfileUser.UserId">
