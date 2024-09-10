@@ -160,13 +160,17 @@ public class NPTicket
             }
 
             // Production PSN Issuer ID: 0x100
-            // RPCN Issuer ID:           0x33333333
-            npTicket.Platform = npTicket.IssuerId switch
+            // The RPCN signature identifier is always 'RPCN' in ascii
+
+            npTicket.Platform = npTicket.TicketSignatureIdentifier switch
             {
-                0x100 => Platform.PS3,
-                0x33333333 => Platform.RPCS3,
-                0x74657374 => Platform.UnitTest,
-                _ => Platform.Unknown,
+                [0x52, 0x50, 0x43, 0x4E,] => Platform.RPCS3, // 'RPCN' in ascii
+                [0x54, 0x45, 0x53, 0x54,] => Platform.UnitTest, // 'TEST' in ascii
+                _ => npTicket.IssuerId switch
+                {
+                    0x100 => Platform.PS3,
+                    _ => Platform.Unknown,
+                }
             };
 
             if (npTicket.GameVersion == GameVersion.LittleBigPlanetVita) npTicket.Platform = Platform.Vita;
