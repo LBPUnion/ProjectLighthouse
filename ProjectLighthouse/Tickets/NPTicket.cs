@@ -78,19 +78,13 @@ public class NPTicket
 
         if (!ticketParser.ParseTicket()) return false;
 
-        // Create a uint in big endian
-        uint signatureIdentifier = (uint)(npTicket.TicketSignatureIdentifier[0] << 24 |
-                                          npTicket.TicketSignatureIdentifier[1] << 16 |
-                                          npTicket.TicketSignatureIdentifier[2] << 8 |
-                                          npTicket.TicketSignatureIdentifier[3]);
-
-        npTicket.SignatureVerifier = signatureIdentifier switch
+        npTicket.SignatureVerifier = npTicket.TicketSignatureIdentifier switch
         {
-            0x5250434E => new RpcnSignatureVerifier(npTicket),
-            0x719F1D4A => new PsnSignatureVerifier(npTicket),
-            0x54455354 => new UnitTestSignatureVerifier(npTicket),
+            [0x71, 0x9F, 0x1D, 0x4A,] => new PsnSignatureVerifier(npTicket), // PSN LBP Signature Identifier
+            [0x52, 0x50, 0x43, 0x4E,] => new RpcnSignatureVerifier(npTicket), // 'RPCN' in ascii
+            [0x54, 0x45, 0x53, 0x54,] => new UnitTestSignatureVerifier(npTicket), // 'TEST' in ascii
             _ => throw new ArgumentOutOfRangeException(nameof(npTicket),
-                signatureIdentifier,
+                npTicket.TicketSignatureIdentifier,
                 @"Invalid signature identifier"),
         };
 
@@ -159,13 +153,11 @@ public class NPTicket
                 return null;
             }
 
-            // Production PSN Issuer ID: 0x100
-            // RPCN Issuer ID:           0x33333333
-            npTicket.Platform = npTicket.IssuerId switch
+            npTicket.Platform = npTicket.SignatureVerifier switch
             {
-                0x100 => Platform.PS3,
-                0x33333333 => Platform.RPCS3,
-                0x74657374 => Platform.UnitTest,
+                PsnSignatureVerifier => Platform.PS3,
+                RpcnSignatureVerifier => Platform.RPCS3,
+                UnitTestSignatureVerifier => Platform.UnitTest,
                 _ => Platform.Unknown,
             };
 
