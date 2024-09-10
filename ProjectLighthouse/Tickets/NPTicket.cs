@@ -155,7 +155,7 @@ public class NPTicket
 
             npTicket.Platform = npTicket.SignatureVerifier switch
             {
-                PsnSignatureVerifier => Platform.PS3, 
+                PsnSignatureVerifier => Platform.PS3,
                 RpcnSignatureVerifier => Platform.RPCS3,
                 UnitTestSignatureVerifier => Platform.UnitTest,
                 _ => Platform.Unknown,
