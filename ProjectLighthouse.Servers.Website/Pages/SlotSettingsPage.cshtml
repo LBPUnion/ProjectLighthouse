@@ -60,6 +60,34 @@ function onSubmit(){
                     <label style="text-align: left" for="description">Description</label>
                     <textarea name="description" id="description" spellcheck="false" placeholder="Description">@HttpUtility.HtmlDecode(Model.Slot.Description)</textarea>
                 </div>
+                <div class="ui divider"></div>
+                <label class="ui red label" for="initiallyLocked">
+                    <i class="lock icon"></i>
+                    Locked
+                    <input type="checkbox" name="initiallyLocked" id="initiallyLocked" style="margin-left: 5px;" @(Model.Slot.InitiallyLocked ? "checked" : "") value="true">
+                </label>
+                <label class="ui green label" for="shareable">
+                    <i class="check icon"></i>
+                    Copyable
+                    <input type="checkbox" name="shareable" id="shareable" style="margin-left: 5px;" @(Model.Slot.Shareable == 1 ? "checked" : "") value="1">
+                </label>
+                @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
+                {
+                    <label class="ui blue label" for="subLevel">
+                        <i class="arrow circle down icon"></i>
+                        Sub Level
+                        <input type="checkbox" name="subLevel" id="subLevel" style="margin-left: 5px;" @(Model.Slot.SubLevel ? "checked" : "") value="true">
+                    </label>
+                }
+                else
+                {
+                    <label class="ui yellow label" for="lbp1Only">
+                        <i class="eye icon"></i>
+                        LBP1 Only
+                        <input type="checkbox" name="lbp1Only" id="lbp1Only" style="margin-left: 5px;" @(Model.Slot.Lbp1Only ? "checked" : "") value="true">
+                    </label>
+                }
+                <div class="ui divider fitted hidden"></div>
                 @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
                 {
                     <div class="field">
