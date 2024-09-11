@@ -7,7 +7,7 @@
 ![Source Lines of Code](https://tokei.ekzhang.com/b1/github/LBPUnion/ProjectLighthouse)
 
 Project Lighthouse is a clean-room, open-source custom server for LittleBigPlanet. This is a project conducted by
-the [LBP Union Ministry of Technology Research and Development team](https://www.lbpunion.com/technology).
+the LBP Union Ministry of Technology Research and Development team.
 
 For concerns and inquiries about the project, please contact us [here](https://www.lbpunion.com/contact).
 
