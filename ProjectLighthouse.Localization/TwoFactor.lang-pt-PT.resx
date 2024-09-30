@@ -65,4 +65,16 @@
   <data name="invalid_backup" xml:space="preserve">
         <value>Código de Backup Inválido</value>
     </data>
+  <data name="qr_alternative" xml:space="preserve">
+        <value>Can't use the QR code? You can use this secret key instead:</value>
+    </data>
+  <data name="qr_alternative_copy" xml:space="preserve">
+        <value>Copy secret code</value>
+    </data>
+  <data name="qr_alternative_copy_success" xml:space="preserve">
+        <value>Copied to clipboard</value>
+    </data>
+  <data name="qr_alternative_copy_fail" xml:space="preserve">
+        <value>Failed to copy to clipboard</value>
+    </data>
 </root>
