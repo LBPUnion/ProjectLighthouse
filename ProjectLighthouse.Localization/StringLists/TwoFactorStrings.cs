@@ -24,6 +24,10 @@ public static class TwoFactorStrings
 
     public static readonly TranslatableString QrTitle = create("qr_title");
     public static readonly TranslatableString QrDescription = create("qr_description");
+    public static readonly TranslatableString QrAlternativeDescription = create("qr_alternative");
+    public static readonly TranslatableString QrAlternativeCopy = create("qr_alternative_copy");
+    public static readonly TranslatableString QrAlternativeCopySuccess = create("qr_alternative_copy_success");
+    public static readonly TranslatableString QrAlternativeCopyFail = create("qr_alternative_copy_success");
 
     private static TranslatableString create(string key) => new(TranslationAreas.TwoFactor, key);
 }
