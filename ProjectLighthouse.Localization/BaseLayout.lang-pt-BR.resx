@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <data name="header_users" xml:space="preserve">
+        <value>Usuários</value>
+        <comment>A button on the header that takes you to the user listing.</comment>
+    </data>
+  <data name="header_photos" xml:space="preserve">
+        <value>Imagens</value>
+        <comment>A button on the header that takes you to a list of user-uploaded photos.</comment>
+    </data>
+  <data name="header_slots" xml:space="preserve">
+        <value>Níveis</value>
+        <comment>A button on the header that takes you to a list of user-uploaded levels. Levels are internally referred to as "slots".</comment>
+    </data>
+  <data name="header_authentication" xml:space="preserve">
+        <value>Autenticação</value>
+        <comment>A button on the header that takes you to a list of authentication attempts.</comment>
+    </data>
+  <data name="header_login" xml:space="preserve">
+        <value>Entrar</value>
+        <comment>A button on the header that lets you log in.</comment>
+    </data>
+  <data name="header_loginRegister" xml:space="preserve">
+        <value>Entrar / Cadastrar</value>
+        <comment>A button on the header that lets you log in or register.</comment>
+    </data>
+  <data name="header_adminPanel" xml:space="preserve">
+        <value>Administrador</value>
+        <comment>A header link that takes you to the admin panel if available.</comment>
+    </data>
+  <data name="header_logout" xml:space="preserve">
+        <value>Sair</value>
+        <comment>A shortcut to log you out of your account.</comment>
+    </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Painel de Moderação</value>
+    </data>
+  <data name="generated_by" xml:space="preserve">
+        <value>Página gerada por {0}.</value>
+    </data>
+  <data name="generated_modified" xml:space="preserve">
+        <value>Esta página foi gerada usando uma versão modificada do Projeto Lighthouse. Certifique-se de que você está divulgando corretamente o código fonte para qualquer usuário que possa estar usando esta instância.</value>
+    </data>
+  <data name="js_warn" xml:space="preserve">
+        <value>Embora tenhamos a intenção de ter o mínimo de JavaScript possível, nós não podemos garantir que tudo funcionará sem ele. Recomendamos que você coloque JavaScript na lista branca para o Projeto Lighthouse.</value>
+    </data>
+  <data name="js_warn_title" xml:space="preserve">
+        <value>O JavaScript não está habilitado</value>
+    </data>
+  <data name="license_warn_title" xml:space="preserve">
+        <value>Potencial Violação de Licença</value>
+    </data>
+  <data name="license_warn_1" xml:space="preserve">
+        <value>Esta instância é uma instância pública que foi modificada sem as alterações publicadas. Você pode estar violando o {0}.</value>
+    </data>
+  <data name="license_warn_2" xml:space="preserve">
+        <value>Se você acha que isso é um erro, por favor, crie um problema com a saída {0} executada a partir da raiz do código fonte do servidor na descrição do nosso rastreador de problemas {1}{2}.</value>
+    </data>
+  <data name="license_warn_3" xml:space="preserve">
+        <value>Caso contrário, publique o código-fonte em algum lugar acessível aos seus usuários.</value>
+    </data>
+  <data name="read_only_warn_title" xml:space="preserve">
+        <value>Modo somente leitura</value>
+    </data>
+  <data name="read_only_warn" xml:space="preserve">
+        <value>Esta instância está atualmente em modo somente leitura. Envios de fotos, comentários, análises e certas alterações de perfil serão restringidas até que o modo somente leitura seja desativado.</value>
+    </data>
+</root>
