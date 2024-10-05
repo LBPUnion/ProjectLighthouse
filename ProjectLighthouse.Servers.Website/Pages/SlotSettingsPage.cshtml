@@ -135,8 +135,7 @@ function onSubmit(){
       generateRandomSkew(btn);
   }
   function onCheckboxChange(checkbox) {
-      const labelId = checkbox.id.replace('checkbox', 'label');
-      const label = document.getElementById(labelId);
+      const label = checkbox.parentElement;
       if (checkbox.checked) {
           label.classList.add('selected');
       } else {
