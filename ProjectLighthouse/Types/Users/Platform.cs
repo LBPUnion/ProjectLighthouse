@@ -1,5 +1,14 @@
 namespace LBPUnion.ProjectLighthouse.Types.Users;
 
+public static class PlatformExtensions
+{
+
+    public static bool IsPSN(this Platform platform)
+    {
+        return platform == Platform.PS3 || platform == Platform.PSP || platform == Platform.Vita;
+    }
+}
+
 public enum Platform
 {
     PS3 = 0,
