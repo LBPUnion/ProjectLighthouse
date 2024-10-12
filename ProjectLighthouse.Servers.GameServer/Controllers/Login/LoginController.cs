@@ -130,6 +130,23 @@ public class LoginController : ControllerBase
                 Logger.Warn($"Unknown user tried to connect username={username}", LogArea.Login);
                 return this.Forbid();
             }
+
+            // Block RPCN signups if forbidden in config
+            if (npTicket.Platform == Platform.RPCS3 && !ServerConfiguration.Instance.Authentication.AllowRPCNSignup)
+            {
+                Logger.Warn(
+                    $"New user tried to sign up via RPCN, and that is forbidden in the config, username={username}, remoteIpAddress={remoteIpAddress}",
+                    LogArea.Login);
+            }
+
+            // Block PSN signups if forbidden in config
+            if (npTicket.Platform == Platform.RPCS3 && !ServerConfiguration.Instance.Authentication.AllowPSNSignup)
+            {
+                Logger.Warn(
+                    $"New user tried to sign up via PSN, and that is forbidden in the config, username={username}, remoteIpAddress={remoteIpAddress}",
+                    LogArea.Login);
+            }
+            
             // create account for user if they don't exist
             user = await this.database.CreateUser(username, "$");
             user.Password = null;
