@@ -17,8 +17,14 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Login;
 [ApiController]
 [Route("LITTLEBIGPLANETPS3_XML/login")]
 [Produces("text/xml")]
-public class LoginController(DatabaseContext database) : ControllerBase
+public class LoginController : ControllerBase
 {
+    private readonly DatabaseContext database;
+    public LoginController(DatabaseContext database)
+    {
+        this.database = database;
+    }
+    
     [HttpPost]
     public async Task<IActionResult> Login()
     {
@@ -51,13 +57,13 @@ public class LoginController(DatabaseContext database) : ControllerBase
 
         string username = npTicket.Username;
 
-        if (String.IsNullOrEmpty(username))
+        if (string.IsNullOrEmpty(username))
         {
             Logger.Warn("Unable to determine username, rejecting login", LogArea.Login);
             return this.Forbid();
         }
 
-        await database.RemoveExpiredTokens();
+        await this.database.RemoveExpiredTokens();
 
         UserEntity? user;
 
