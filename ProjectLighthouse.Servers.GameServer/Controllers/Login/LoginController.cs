@@ -1,4 +1,3 @@
-#nullable enable
 using System.Net;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -21,12 +20,10 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Login;
 public class LoginController : ControllerBase
 {
     private readonly DatabaseContext database;
-
     public LoginController(DatabaseContext database)
     {
         this.database = database;
     }
-
     [HttpPost]
     public async Task<IActionResult> Login()
     {
@@ -57,9 +54,9 @@ public class LoginController : ControllerBase
 
         string ipAddress = remoteIpAddress.ToString();
 
-        string? username = npTicket.Username;
+        string username = npTicket.Username;
 
-        if (username == null)
+        if (string.IsNullOrEmpty(username))
         {
             Logger.Warn("Unable to determine username, rejecting login", LogArea.Login);
             return this.Forbid();
@@ -77,7 +74,7 @@ public class LoginController : ControllerBase
             case Platform.PS3:
             case Platform.Vita:
             case Platform.UnitTest:
-                user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedPsnId == npTicket.UserId);
+                user = await database.Users.FirstOrDefaultAsync(u => u.LinkedPsnId == npTicket.UserId);
                 break;
             case Platform.PSP:
             case Platform.Unknown:
@@ -89,7 +86,7 @@ public class LoginController : ControllerBase
         if (user == null)
         {
             // Check if there is an account with that username already
-            UserEntity? targetUsername = await this.database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
+            UserEntity? targetUsername = await database.Users.FirstOrDefaultAsync(u => u.Username == npTicket.Username);
             if (targetUsername != null)
             {
                 ulong targetPlatform = npTicket.Platform == Platform.RPCS3
@@ -104,7 +101,7 @@ public class LoginController : ControllerBase
                 }
 
                 // if there is already a pending link request don't create another
-                bool linkAttemptExists = await this.database.PlatformLinkAttempts.AnyAsync(p =>
+                bool linkAttemptExists = await database.PlatformLinkAttempts.AnyAsync(p =>
                     p.Platform == npTicket.Platform &&
                     p.PlatformId == npTicket.UserId &&
                     p.UserId == targetUsername.UserId);
@@ -119,8 +116,8 @@ public class LoginController : ControllerBase
                     Timestamp = TimeHelper.TimestampMillis,
                     PlatformId = npTicket.UserId,
                 };
-                this.database.PlatformLinkAttempts.Add(linkAttempt);
-                await this.database.SaveChangesAsync();
+                database.PlatformLinkAttempts.Add(linkAttempt);
+                await database.SaveChangesAsync();
                 Logger.Success($"User '{npTicket.Username}' tried to login but platform isn't linked, platform={npTicket.Platform}", LogArea.Login);
                 return this.Forbid();
             }
@@ -130,12 +127,31 @@ public class LoginController : ControllerBase
                 Logger.Warn($"Unknown user tried to connect username={username}", LogArea.Login);
                 return this.Forbid();
             }
+
+            // Block RPCN signups if forbidden in config
+            if (npTicket.Platform == Platform.RPCS3 && !ServerConfiguration.Instance.Authentication.AllowRPCNSignup)
+            {
+                Logger.Warn(
+                    $"New user tried to sign up via RPCN, and that is forbidden in the config, username={username}, remoteIpAddress={remoteIpAddress}",
+                    LogArea.Login);
+                return this.Forbid();
+            }
+
+            // Block PSN signups if forbidden in config
+            if (npTicket.Platform.IsPSN() && !ServerConfiguration.Instance.Authentication.AllowPSNSignup)
+            {
+                Logger.Warn(
+                    $"New user tried to sign up via PSN, and that is forbidden in the config, username={username}, remoteIpAddress={remoteIpAddress}",
+                    LogArea.Login);
+                return this.Forbid();
+            }
+            
             // create account for user if they don't exist
-            user = await this.database.CreateUser(username, "$");
+            user = await database.CreateUser(username, "$");
             user.Password = null;
             user.LinkedRpcnId = npTicket.Platform == Platform.RPCS3 ? npTicket.UserId : 0;
             user.LinkedPsnId = npTicket.Platform != Platform.RPCS3 ? npTicket.UserId : 0;
-            await this.database.SaveChangesAsync();
+            await database.SaveChangesAsync();
 
             if (DiscordConfiguration.Instance.DiscordIntegrationEnabled)
             {
@@ -155,7 +171,7 @@ public class LoginController : ControllerBase
         // automatically change username if it doesn't match
         else if (user.Username != npTicket.Username)
         {
-            bool usernameExists = await this.database.Users.AnyAsync(u => u.Username == npTicket.Username);
+            bool usernameExists = await database.Users.AnyAsync(u => u.Username == npTicket.Username);
             if (usernameExists)
             {
                 Logger.Warn($"{npTicket.Platform} user changed their name to a name that is already taken," +
@@ -164,17 +180,17 @@ public class LoginController : ControllerBase
             }
             Logger.Info($"User's username has changed, old='{user.Username}', new='{npTicket.Username}', platform={npTicket.Platform}", LogArea.Login);
             user.Username = username;
-            await this.database.PlatformLinkAttempts.RemoveWhere(p => p.UserId == user.UserId);
+            await database.PlatformLinkAttempts.RemoveWhere(p => p.UserId == user.UserId);
             // unlink other platforms because the names no longer match
             if (npTicket.Platform == Platform.RPCS3)
                 user.LinkedPsnId = 0;
             else
                 user.LinkedRpcnId = 0;
 
-            await this.database.SaveChangesAsync();
+            await database.SaveChangesAsync();
         }
 
-        GameTokenEntity? token = await this.database.GameTokens.Include(t => t.User)
+        GameTokenEntity? token = await database.GameTokens.Include(t => t.User)
             .FirstOrDefaultAsync(t => t.User.Username == npTicket.Username && t.TicketHash == npTicket.TicketHash);
 
         if (token != null)
@@ -183,7 +199,7 @@ public class LoginController : ControllerBase
             return this.Forbid();
         }
 
-        token = await this.database.AuthenticateUser(user, npTicket, ipAddress);
+        token = await database.AuthenticateUser(user, npTicket, ipAddress);
         if (token == null)
         {
             Logger.Warn($"Unable to find/generate a token for username {npTicket.Username}", LogArea.Login);
@@ -200,7 +216,7 @@ public class LoginController : ControllerBase
 
         user.LastLogin = TimeHelper.TimestampMillis;
 
-        await this.database.SaveChangesAsync();
+        await database.SaveChangesAsync();
 
         // Create a new room on LBP2/3/Vita
         if (token.GameVersion != GameVersion.LittleBigPlanet1) RoomHelper.CreateRoom(user.UserId, token.GameVersion, token.Platform);
