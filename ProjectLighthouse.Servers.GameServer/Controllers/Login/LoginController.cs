@@ -24,7 +24,6 @@ public class LoginController : ControllerBase
     {
         this.database = database;
     }
-    
     [HttpPost]
     public async Task<IActionResult> Login()
     {
@@ -70,7 +69,7 @@ public class LoginController : ControllerBase
         switch (npTicket.Platform)
         {
             case Platform.RPCS3:
-                user = await database.Users.FirstOrDefaultAsync(u => u.LinkedRpcnId == npTicket.UserId);
+                user = await this.database.Users.FirstOrDefaultAsync(u => u.LinkedRpcnId == npTicket.UserId);
                 break;
             case Platform.PS3:
             case Platform.Vita:
