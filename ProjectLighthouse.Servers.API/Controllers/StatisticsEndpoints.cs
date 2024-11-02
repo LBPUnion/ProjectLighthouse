@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Servers.API.Controllers;
 
@@ -49,27 +50,88 @@ public class StatisticsEndpoints : ApiEndpointController
         GameVersion.LittleBigPlanetPSP,
     };
 
+    private static readonly List<Platform> platforms = new()
+    {
+        Platform.PS3,
+        Platform.RPCS3,
+        Platform.Vita,
+        Platform.PSP,
+    };
+
     /// <summary>
     /// Get player counts for each individual title
     /// </summary>
-    /// <returns>An instance of PlayerCountResponse</returns>
+    /// <returns>An instance of PlayerCountByGameResponse</returns>
     [HttpGet("playerCount")]
-    [ProducesResponseType(typeof(PlayerCountResponse), StatusCodes.Status200OK)]
+    [HttpGet("playerCount/game")]
+    [ProducesResponseType(typeof(PlayerCountByGameResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPlayerCounts()
     {
         List<PlayerCountObject> gameList = new();
         foreach (GameVersion version in gameVersions)
         {
-            gameList.Add(new PlayerCountObject
+            gameList.Add(new PlayerCountByGameObject
             {
                 Game = version.ToString(),
-                PlayerCount = await StatisticsHelper.RecentMatchesForGame(this.database, version),
+                PlayerCount = await StatisticsHelper.RecentMatches(this.database, l => l.GameVersion == version),
             });
         }
-        PlayerCountResponse response = new()
+        PlayerCountByGameResponse response = new()
         {
             TotalPlayerCount = await StatisticsHelper.RecentMatches(this.database),
             Games = gameList,
+        };
+
+        return this.Ok(response);
+    }
+
+    /// <summary>
+    /// Get player counts for each individual platform
+    /// </summary>
+    /// <returns>An instance of PlayerCountByPlatformResponse</returns>
+    [HttpGet("playerCount/platform")]
+    [ProducesResponseType(typeof(PlayerCountByPlatformResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPlayerCountsByPlatform()
+    {
+        List<PlayerCountObject> platformList = new();
+        foreach (Platform platform in platforms)
+        {
+            platformList.Add(new PlayerCountByPlatformObject
+            {
+                Platform = platform.ToString(),
+                PlayerCount = await StatisticsHelper.RecentMatches(this.database, l => l.Platform == platform),
+            });
+        }
+
+        PlayerCountByPlatformResponse response = new()
+        {
+            TotalPlayerCount = await StatisticsHelper.RecentMatches(this.database),
+            Platforms = platformList,
+        };
+
+        return this.Ok(response);
+    }
+
+    /// <summary>
+    /// Gets a list of online players 
+    /// </summary>
+    /// <returns>An instance of PlayerListResponse</returns>
+    [HttpGet("players")]
+    [ProducesResponseType(typeof(PlayerListResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPlayerList()
+    {
+        List<PlayerListObject> players = await this.database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300)
+            .Select(l => new PlayerListObject
+            {
+                Username = l.User!.Username,
+                Game = l.GameVersion.ToString(),
+                Platform = l.Platform.ToString(),
+            })
+            .ToListAsync();
+
+        PlayerListResponse response = new()
+        {
+            Players = players,
         };
 
         return this.Ok(response);

@@ -263,6 +263,7 @@ public class SlotsController : ControllerBase
         PaginationData pageData = this.Request.GetPaginationData();
 
         SlotQueryBuilder queryBuilder = this.FilterFromRequest(token);
+        queryBuilder.AddFilter(new LockedSlotFilter());
 
         pageData.TotalElements = await StatisticsHelper.SlotCount(this.database, queryBuilder);
 

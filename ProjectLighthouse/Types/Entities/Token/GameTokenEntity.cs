@@ -23,7 +23,11 @@ public class GameTokenEntity
 
     public Platform Platform { get; set; }
 
+    [StringLength(64)]
     public string TicketHash { get; set; }
+
+    [StringLength(64)]
+    public string LocationHash { get; set; }
 
     public DateTime ExpiresAt { get; set; }
 }

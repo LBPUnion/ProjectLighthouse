@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -29,6 +31,13 @@ public class GameDeveloperSlot : SlotBase, INeedsPreparationForSerialization
 
     [XmlElement("photoCount")]
     public int PhotoCount { get; set; }
+
+    [XmlElement("commentsEnabled")]
+    public bool CommentsEnabled
+    {
+        get => ServerConfiguration.Instance.UserGeneratedContentLimits.LevelCommentsEnabled;
+        set => throw new NotSupportedException();
+    }
 
     public async Task PrepareSerialization(DatabaseContext database)
     {

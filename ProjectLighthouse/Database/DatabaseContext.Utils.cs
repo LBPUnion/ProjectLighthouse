@@ -70,6 +70,7 @@ public partial class DatabaseContext
             GameVersion = npTicket.GameVersion,
             Platform = npTicket.Platform,
             TicketHash = npTicket.TicketHash,
+            LocationHash = CryptoHelper.Sha256Hash(userLocation),
             // we can get away with a low expiry here since LBP will just get a new token everytime it gets 403'd
             ExpiresAt = DateTime.UtcNow + TimeSpan.FromHours(1),
         };

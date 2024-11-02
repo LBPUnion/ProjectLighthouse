@@ -19,7 +19,6 @@ public static class VersionHelper
     public static string EnvVer => $"{ServerConfiguration.Instance.Customization.EnvironmentName} {FullRevision}";
     public static string FullVersion =>
         $"Project Lighthouse {ServerConfiguration.Instance.Customization.EnvironmentName} {Branch}@{CommitHash} {Build}";
-    public static bool IsDirty => ThisAssembly.Git.IsDirty;
     public static string RepositoryUrl => ThisAssembly.Git.RepositoryUrl;
 
     public const string Build =
