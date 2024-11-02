@@ -30,16 +30,21 @@ public class ActivityController : ControllerBase
         this.database = database;
     }
 
+    private class ActivityFilterOptions
+    {
+        public bool ExcludeNews { get; init; }
+        public bool ExcludeMyLevels { get; init; }
+        public bool ExcludeFriends { get; init; }
+        public bool ExcludeFavouriteUsers { get; init; }
+        public bool ExcludeMyself { get; init; }
+        public bool ExcludeMyPlaylists { get; init; } = true;
+    }
+
     private async Task<IQueryable<ActivityDto>> GetFilters
     (
         IQueryable<ActivityDto> dtoQuery,
         GameTokenEntity token,
-        bool excludeNews,
-        bool excludeMyLevels,
-        bool excludeFriends,
-        bool excludeFavouriteUsers,
-        bool excludeMyself,
-        bool excludeMyPlaylists = true
+        ActivityFilterOptions options
     )
     {
         dtoQuery = token.GameVersion == GameVersion.LittleBigPlanetVita
@@ -75,37 +80,37 @@ public class ActivityController : ControllerBase
             }
         }
 
-        Expression<Func<ActivityDto, bool>> newsPredicate = !excludeNews
+        Expression<Func<ActivityDto, bool>> newsPredicate = !options.ExcludeNews
             ? new IncludeNewsFilter().GetPredicate()
             : new ExcludeNewsFilter().GetPredicate();
 
         predicate = predicate.Or(newsPredicate);
 
-        if (!excludeMyLevels)
+        if (!options.ExcludeMyLevels)
         {
             predicate = predicate.Or(dto => dto.TargetSlotCreatorId == token.UserId);
         }
 
         List<int> includedUserIds = [];
 
-        if (!excludeFriends)
+        if (!options.ExcludeFriends)
         {
             includedUserIds.AddRange(friendIds);
         }
 
-        if (!excludeFavouriteUsers)
+        if (!options.ExcludeFavouriteUsers)
         {
             includedUserIds.AddRange(favouriteUsers);
         }
 
-        if (!excludeMyself)
+        if (!options.ExcludeMyself)
         {
             includedUserIds.Add(token.UserId);
         }
 
         predicate = predicate.Or(dto => includedUserIds.Contains(dto.Activity.UserId));
 
-        if (!excludeMyPlaylists && !excludeMyself && token.GameVersion == GameVersion.LittleBigPlanet3)
+        if (!options.ExcludeMyPlaylists && !options.ExcludeMyself && token.GameVersion == GameVersion.LittleBigPlanet3)
         {
             List<int> creatorPlaylists = await this.database.Playlists.Where(p => p.CreatorId == token.UserId)
                 .Select(p => p.PlaylistId)
@@ -200,14 +205,15 @@ public class ActivityController : ControllerBase
         if (token.GameVersion != GameVersion.LittleBigPlanet3) return this.NotFound();
 
         IQueryable<ActivityDto> activityEvents = await this.GetFilters(
-            this.database.Activities.ToActivityDto(true, true),
-            token,
-            excludeNews,
-            true,
-            true,
-            true,
-            excludeMyself,
-            excludeMyPlaylists);
+            this.database.Activities.ToActivityDto(true, true), token, new ActivityFilterOptions()
+            {
+                ExcludeNews = excludeNews,
+                ExcludeMyLevels = true,
+                ExcludeFriends = true,
+                ExcludeFavouriteUsers = true,
+                ExcludeMyself = excludeMyself,
+                ExcludeMyPlaylists = excludeMyPlaylists,
+            });
 
         (DateTime Start, DateTime End) times = await this.GetTimeBounds(activityEvents, timestamp, null);
 
@@ -246,11 +252,14 @@ public class ActivityController : ControllerBase
 
         IQueryable<ActivityDto> activityEvents = await this.GetFilters(this.database.Activities.ToActivityDto(true),
             token,
-            excludeNews,
-            excludeMyLevels,
-            excludeFriends,
-            excludeFavouriteUsers,
-            excludeMyself);
+            new ActivityFilterOptions
+            {
+                ExcludeNews = excludeNews,
+                ExcludeMyLevels = excludeMyLevels,
+                ExcludeFriends = excludeFriends,
+                ExcludeFavouriteUsers = excludeFavouriteUsers,
+                ExcludeMyself = excludeMyself,
+            });
 
         (DateTime Start, DateTime End) times = await this.GetTimeBounds(activityEvents, timestamp, endTimestamp);
 

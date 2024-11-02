@@ -32,7 +32,7 @@ public static class ActivityQueryExtensions
     /// Turns a list of <see cref="ActivityDto"/> into a group based on its timestamp 
     /// </summary>
     /// <param name="activityQuery">An <see cref="IQueryable{ActivityDto}"/> to group</param>
-    /// <param name="groupByActor">Whether or not the groups should be created based on the initiator of the event or the target of the event</param>
+    /// <param name="groupByActor">Whether the groups should be created based on the initiator of the event or the target of the event</param>
     /// <returns>The transformed query containing groups of <see cref="ActivityDto"/></returns>
     public static IQueryable<IGrouping<ActivityGroup, ActivityDto>> ToActivityGroups
         (this IQueryable<ActivityDto> activityQuery, bool groupByActor = false) =>
@@ -84,8 +84,8 @@ public static class ActivityQueryExtensions
     /// Converts an <see cref="IQueryable"/>&lt;<see cref="ActivityEntity"/>&gt; into an <see cref="IQueryable"/>&lt;<see cref="ActivityDto"/>&gt; for grouping.
     /// </summary>
     /// <param name="activityQuery">The activity query to be converted.</param>
-    /// <param name="includeSlotCreator">Whether or not the <see cref="ActivityDto.TargetSlotCreatorId"/> field should be included.</param>
-    /// <param name="includeTeamPick">Whether or not the <see cref="ActivityDto.TargetTeamPickId"/> field should be included.</param>
+    /// <param name="includeSlotCreator">Whether the <see cref="ActivityDto.TargetSlotCreatorId"/> field should be included.</param>
+    /// <param name="includeTeamPick">Whether the <see cref="ActivityDto.TargetTeamPickId"/> field should be included.</param>
     /// <returns>The converted <see cref="IQueryable"/>&lt;<see cref="ActivityDto"/>&gt;</returns>
     public static IQueryable<ActivityDto> ToActivityDto
         (this IQueryable<ActivityEntity> activityQuery, bool includeSlotCreator = false, bool includeTeamPick = false)
@@ -107,8 +107,8 @@ public static class ActivityQueryExtensions
     /// Converts an IEnumerable&lt;<see cref="ActivityEntity"/>&gt; into an IEnumerable&lt;<see cref="ActivityDto"/>&gt; for grouping.
     /// </summary>
     /// <param name="activityEnumerable">The activity query to be converted.</param>
-    /// <param name="includeSlotCreator">Whether or not the <see cref="ActivityDto.TargetSlotCreatorId"/> field should be included.</param>
-    /// <param name="includeTeamPick">Whether or not the <see cref="ActivityDto.TargetTeamPickId"/> field should be included.</param>
+    /// <param name="includeSlotCreator">Whether the <see cref="ActivityDto.TargetSlotCreatorId"/> field should be included.</param>
+    /// <param name="includeTeamPick">Whether the <see cref="ActivityDto.TargetTeamPickId"/> field should be included.</param>
     /// <returns>The converted IEnumerable&lt;<see cref="ActivityDto"/>&gt;</returns>
     public static IEnumerable<ActivityDto> ToActivityDto
         (this IEnumerable<ActivityEntity> activityEnumerable, bool includeSlotCreator = false, bool includeTeamPick = false)
