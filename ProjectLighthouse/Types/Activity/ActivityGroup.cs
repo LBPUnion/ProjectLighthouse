@@ -19,21 +19,21 @@ public struct ActivityGroup
         this.GroupType switch
         {
             ActivityGroupType.User => this.TargetUserId ?? this.UserId,
-            ActivityGroupType.Level => this.TargetSlotId ?? 0,
-            ActivityGroupType.TeamPick => this.TargetTeamPickSlotId ?? 0,
-            ActivityGroupType.Playlist => this.TargetPlaylistId ?? 0,
-            ActivityGroupType.News => this.TargetNewsId ?? 0,
+            ActivityGroupType.Level => this.TargetSlotId ?? -1,
+            ActivityGroupType.TeamPick => this.TargetTeamPickSlotId ?? -1,
+            ActivityGroupType.Playlist => this.TargetPlaylistId ?? -1,
+            ActivityGroupType.News => this.TargetNewsId ?? -1,
             _ => this.UserId,
         };
 
     public ActivityGroupType GroupType =>
-        (this.TargetPlaylistId ?? 0) != 0
-            ? ActivityGroupType.User
-            : (this.TargetNewsId ?? 0) != 0
+        (this.TargetPlaylistId ?? -1) != -1
+            ? ActivityGroupType.Playlist
+            : (this.TargetNewsId ?? -1) != -1
                 ? ActivityGroupType.News
-                : (this.TargetTeamPickSlotId ?? 0) != 0
+                : (this.TargetTeamPickSlotId ?? -1) != -1
                     ? ActivityGroupType.TeamPick
-                    : (this.TargetSlotId ?? 0) != 0
+                    : (this.TargetSlotId ?? -1) != -1
                         ? ActivityGroupType.Level
                         : ActivityGroupType.User;
 

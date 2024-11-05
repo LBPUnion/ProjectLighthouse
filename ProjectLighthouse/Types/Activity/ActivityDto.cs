@@ -17,10 +17,10 @@ public class ActivityDto
     public int TargetId =>
         this.GroupType switch
         {
-            ActivityGroupType.User => this.TargetUserId ?? 0,
-            ActivityGroupType.Level => this.TargetSlotId ?? 0,
-            ActivityGroupType.Playlist => this.TargetPlaylistId ?? 0,
-            ActivityGroupType.News => this.TargetNewsId ?? 0,
+            ActivityGroupType.User => this.TargetUserId ?? -1,
+            ActivityGroupType.Level => this.TargetSlotId ?? -1,
+            ActivityGroupType.Playlist => this.TargetPlaylistId ?? -1,
+            ActivityGroupType.News => this.TargetNewsId ?? -1,
             _ => this.Activity.UserId,
         };
 

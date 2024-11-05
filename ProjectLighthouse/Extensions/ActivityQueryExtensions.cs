@@ -41,16 +41,17 @@ public static class ActivityQueryExtensions
             {
                 Timestamp = dto.Activity.Timestamp.Date,
                 UserId = dto.Activity.UserId,
-                TargetNewsId = dto.TargetNewsId ?? 0,
-                TargetTeamPickSlotId = dto.TargetTeamPickId ?? 0,
+                TargetNewsId = dto.TargetNewsId ?? -1,
+                TargetTeamPickSlotId = dto.TargetTeamPickId ?? -1,
             })
             : activityQuery.GroupBy(dto => new ActivityGroup
             {
                 Timestamp = dto.Activity.Timestamp.Date,
-                TargetUserId = dto.TargetUserId ?? 0,
-                TargetSlotId = dto.TargetSlotId ?? 0,
-                TargetPlaylistId = dto.TargetPlaylistId ?? 0,
-                TargetNewsId = dto.TargetNewsId ?? 0,
+                UserId = -1,
+                TargetUserId = dto.TargetUserId ?? -1,
+                TargetSlotId = dto.TargetSlotId ?? -1,
+                TargetPlaylistId = dto.TargetPlaylistId ?? -1,
+                TargetNewsId = dto.TargetNewsId ?? -1,
             });
 
     public static List<OuterActivityGroup> ToOuterActivityGroups
