@@ -58,7 +58,7 @@ public class ModerationRemovalController : ControllerBase
 
         CommentEntity? comment = await this.database.Comments.Include(c => c.TargetUser)
             .Include(c => c.TargetSlot)
-            .Include(c => c.TargetSlot!.Creator)
+            .ThenInclude(s => s!.Creator)
             .FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.Redirect("~/404");
         if (comment.Deleted) return this.Redirect(callbackUrl ?? "~/");
