@@ -28,4 +28,5 @@ public enum LogArea
     Email,
     Serialization,
     Synchronization,
+    Activity,
 }

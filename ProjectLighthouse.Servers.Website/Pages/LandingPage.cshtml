@@ -14,6 +14,7 @@
     bool isMobile = Request.IsMobile();
     string language = Model.GetLanguage();
     string timeZone = Model.GetTimeZone();
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 }
 <h1 class="lighthouse-welcome lighthouse-title">
     @Model.Translate(LandingPageStrings.Welcome, ServerConfiguration.Instance.Customization.ServerName)
@@ -82,6 +83,7 @@
                     <a style="color: black" href="~/user/@Model.LatestAnnouncement.Publisher.UserId">
                         @Model.LatestAnnouncement.Publisher.Username
                     </a>
+                    at @TimeZoneInfo.ConvertTime(Model.LatestAnnouncement.PublishedAt, TimeZoneInfo.Utc, timeZoneInfo).ToString("M/d/yyyy h:mm:ss tt")
                 </div>
             }
         </div>

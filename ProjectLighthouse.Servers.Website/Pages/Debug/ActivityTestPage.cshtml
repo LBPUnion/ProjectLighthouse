@@ -1,0 +1,85 @@
+﻿@page "/debug/activity"
+@using System.Globalization
+@using LBPUnion.ProjectLighthouse.Types.Activity
+@using LBPUnion.ProjectLighthouse.Types.Entities.Activity
+@model LBPUnion.ProjectLighthouse.Servers.Website.Pages.Debug.ActivityTestPage
+
+@{
+    Layout = "Layouts/BaseLayout";
+    Model.Title = "Debug - Activity Test";
+}
+
+<a href="?groupByActor=false">
+    <div class="ui @(!Model.GroupByActor ? "blue" : "") button">Group By Activity</div>
+</a>
+<a href="?groupByActor=true">
+    <div class="ui @(Model.GroupByActor ? "blue" : "") button">Group By Actor</div>
+</a>
+<div class="ui divider"></div>
+
+@foreach (OuterActivityGroup activity in Model.ActivityGroups)
+{
+    <h4 class="ui top attached header">@activity.Key.GroupType, Timestamp: @activity.Key.Timestamp.ToString(CultureInfo.InvariantCulture)</h4>
+    <div class="ui attached segment">
+        
+        @if (activity.Key.UserId != -1)
+        {
+            <p>UserId: @activity.Key.UserId</p>
+        }
+        @if ((activity.Key.TargetNewsId ?? -1) != -1)
+        {
+            <p>TargetNewsId?: @activity.Key.TargetNewsId (targetId=@activity.Key.TargetId)</p>
+        }
+        @if ((activity.Key.TargetPlaylistId ?? -1) != -1)
+        {
+            <p>TargetPlaylistId?: @activity.Key.TargetPlaylistId (targetId=@activity.Key.TargetId)</p>
+        }
+        @if ((activity.Key.TargetSlotId ?? -1) != -1)
+        {
+            <p>TargetSlotId?: @activity.Key.TargetSlotId (targetId=@activity.Key.TargetId)</p>
+        }
+        @if ((activity.Key.TargetTeamPickSlotId ?? -1) != -1)
+        {
+            <p>TargetTeamPickSlot?: @activity.Key.TargetTeamPickSlotId (targetId=@activity.Key.TargetId)</p>
+        }
+        @if ((activity.Key.TargetUserId ?? -1) != -1)
+        {
+            <p>TargetUserId?: @activity.Key.TargetUserId (targetId=@activity.Key.TargetId)</p>
+        }
+        <div class="ui segments">
+
+            @foreach (IGrouping<InnerActivityGroup, ActivityDto>? eventGroup in activity.Groups)
+            {
+                <div class="ui segment">
+                    <h5>Nested Group Type: @eventGroup.Key.Type</h5>
+
+                    @foreach (ActivityDto gameEvent in eventGroup.ToList())
+                    {
+                        <h5 class="ui top attached header" style="text-align: start">
+                            @gameEvent.Activity.Type, Event Id: @gameEvent.Activity.ActivityId
+                        </h5>
+                        <div class="ui attached segment">
+                            <p>Event Group Type: @gameEvent.GroupType</p>
+                            <p>Event Target ID: @gameEvent.TargetId</p>
+                            @if (gameEvent.Activity is LevelActivityEntity level)
+                            {
+                                <p>SlotId: @level.SlotId</p>
+                                <p>SlotVersion: @gameEvent.TargetSlotGameVersion</p>
+                            }
+                            @if (gameEvent.Activity is ScoreActivityEntity score)
+                            {
+                                <p>ScoreId: @score.ScoreId</p>
+                                <p>SlotId: @score.SlotId</p>
+                                <p>SlotVersion: @gameEvent.TargetSlotGameVersion</p>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="ui bottom attached segment">
+        <p>Total events: @activity.Groups.Sum(g => g.ToList().Count)</p>
+    </div>
+    <div class="ui massive divider" style="background-color: #0e91f5"></div>
+}

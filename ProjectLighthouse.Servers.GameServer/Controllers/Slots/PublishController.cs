@@ -11,7 +11,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Resources;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Slot;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

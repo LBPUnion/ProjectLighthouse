@@ -1,6 +1,6 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Filter;
-using LBPUnion.ProjectLighthouse.Filter.Filters;
+using LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.API.Responses;
 using LBPUnion.ProjectLighthouse.Types.Users;

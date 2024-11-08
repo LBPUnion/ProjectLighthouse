@@ -7,7 +7,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Review;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -143,6 +143,22 @@ public class ReviewController : ControllerBase
         await this.database.SaveChangesAsync();
 
         return this.Ok();
+    }
+
+    [HttpGet("review/user/{slotId:int}/{reviewerName}")]
+    public async Task<IActionResult> GetReview(int slotId, string reviewerName)
+    {
+        GameTokenEntity token = this.GetToken();
+
+        int reviewerId = await this.database.Users.Where(u => u.Username == reviewerName)
+            .Select(s => s.UserId)
+            .FirstOrDefaultAsync();
+        if (reviewerId == 0) return this.NotFound();
+
+        ReviewEntity? review = await this.database.Reviews.FirstOrDefaultAsync(r => r.ReviewerId == reviewerId && r.SlotId == slotId);
+        if (review == null) return this.NotFound();
+
+        return this.Ok(GameReview.CreateFromEntity(review, token));
     }
 
     [HttpGet("reviewsFor/user/{slotId:int}")]

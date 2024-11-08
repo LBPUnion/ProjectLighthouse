@@ -1,5 +1,5 @@
 ﻿using LBPUnion.ProjectLighthouse.Filter;
-using LBPUnion.ProjectLighthouse.Filter.Filters;
+using LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Users;

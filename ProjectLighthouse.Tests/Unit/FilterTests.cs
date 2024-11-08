@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LBPUnion.ProjectLighthouse.Filter;
-using LBPUnion.ProjectLighthouse.Filter.Filters;
+using LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Levels;

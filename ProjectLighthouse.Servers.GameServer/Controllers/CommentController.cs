@@ -9,7 +9,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Comment;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +42,20 @@ public class CommentController : ControllerBase
         if (!success) return this.BadRequest();
 
         return this.Ok();
+    }
+
+    [HttpGet("userComment/{username}")]
+    [HttpGet("comment/{slotType}/{slotId:int}")]
+    public async Task<IActionResult> GetSingleComment(string? username, string? slotType, int? slotId, int commentId)
+    {
+        GameTokenEntity token = this.GetToken();
+
+        if (username == null == (SlotHelper.IsTypeInvalid(slotType) || slotId == null)) return this.BadRequest();
+
+        CommentEntity? comment = await this.database.Comments.FindAsync(commentId);
+        if (comment == null) return this.NotFound();
+
+        return this.Ok(GameComment.CreateFromEntity(comment, token.UserId));
     }
 
     [HttpGet("comments/{slotType}/{slotId:int}")]

@@ -6,7 +6,7 @@ using LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Review;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;

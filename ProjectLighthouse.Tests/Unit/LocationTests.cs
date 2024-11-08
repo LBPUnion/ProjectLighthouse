@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Misc;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Slot;
 using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests.Unit;

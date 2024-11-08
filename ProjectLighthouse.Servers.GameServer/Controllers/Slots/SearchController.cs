@@ -2,13 +2,13 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Filter;
-using LBPUnion.ProjectLighthouse.Filter.Filters;
+using LBPUnion.ProjectLighthouse.Filter.Filters.Slot;
 using LBPUnion.ProjectLighthouse.Filter.Sorts;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Slot;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
