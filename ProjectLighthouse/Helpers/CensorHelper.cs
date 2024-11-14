@@ -19,7 +19,7 @@ public static class CensorHelper
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
 
-    public static string FilterMessage(string message, string filterLocation, string username)
+    public static string FilterMessage(string message, string filterLocation = null, string username = null)
     {
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
         StringBuilder stringBuilder = new(message);
@@ -50,9 +50,9 @@ public static class CensorHelper
 
         if (ServerConfiguration.Instance.LogChatFiltering && filteredMessage != message)
             Logger.Info(
-                $"Censored profane word(s) from {filterLocation} "
-                + $"sent by {username}"
-                + $": \"{message}\" => \"{filteredMessage}\"",
+                $"Comment sent {(username != null ? $"by {username} " : "")}" +
+                $"{(filterLocation != null ? $"from {filterLocation}" : "")}" +
+                $"\"{message}\" => \"{filteredMessage}\"", 
                 LogArea.Filter);
 
         return filteredMessage;
