@@ -143,6 +143,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
+        if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
+
         message = CensorHelper.FilterMessage(message,"in-game message", username);
 
         return this.Ok(message);
