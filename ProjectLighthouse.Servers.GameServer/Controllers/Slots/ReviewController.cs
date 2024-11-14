@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -99,7 +100,9 @@ public class ReviewController : ControllerBase
         GameReview? newReview = await this.DeserializeBody<GameReview>();
         if (newReview == null) return this.BadRequest();
 
-        newReview.Text = CensorHelper.FilterMessage(newReview.Text);
+        // Temporary fix until this can be refactored to use a UserEntity properly
+        string username = await this.database.UsernameFromGameToken(token);
+        newReview.Text = CensorHelper.FilterMessage(newReview.Text, "slot review", username);
 
         if (newReview.Text.Length > 512) return this.BadRequest();
 

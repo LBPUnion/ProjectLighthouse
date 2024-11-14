@@ -143,15 +143,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        string filteredText = CensorHelper.FilterMessage(message);
+        message = CensorHelper.FilterMessage(message,"in-game message", username);
 
-        if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
-
-        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != message)
-            Logger.Info(
-                $"Censored profane word(s) from in-game text sent by {username}: \"{message}\" => \"{filteredText}\"",
-                LogArea.Filter);
-
-        return this.Ok(filteredText);
+        return this.Ok(message);
     }
 }

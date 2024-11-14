@@ -142,7 +142,7 @@ public class PublishController : ControllerBase
         // Yes Rider, this isn't null
         Debug.Assert(slot.Resources != null, "slot.ResourceList != null");
 
-        slot.Name = CensorHelper.FilterMessage(slot.Name);
+        slot.Name = CensorHelper.FilterMessage(slot.Name, "slot name", user.Username);
 
         if (slot.Name.Length > 64)
         {
@@ -153,7 +153,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        slot.Description = CensorHelper.FilterMessage(slot.Description);
+        slot.Description = CensorHelper.FilterMessage(slot.Description, "slot description", user.Username);
 
         if (slot.Description.Length > 512)
         {
