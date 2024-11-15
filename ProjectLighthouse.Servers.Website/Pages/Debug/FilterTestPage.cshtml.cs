@@ -19,7 +19,7 @@ public class FilterTestPage : BaseLayout
     public IActionResult OnGet(string? text = null)
     {
         #if DEBUG
-        if (text != null) this.FilteredText = CensorHelper.FilterMessage(text, "test filter", null);
+        if (text != null) this.FilteredText = CensorHelper.FilterMessage(text, "test filter");
         this.Text = text;
 
         return this.Page();
