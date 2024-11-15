@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
@@ -79,7 +80,9 @@ public class UserController : ControllerBase
 
             if (update.Biography.Length > 512) return this.BadRequest();
 
-            user.Biography = update.Biography;
+            string filteredBio = CensorHelper.FilterMessage(update.Biography, "user biography", user.Username);
+
+            user.Biography = filteredBio;
         }
 
         if (update.Location != null) user.Location = update.Location;
