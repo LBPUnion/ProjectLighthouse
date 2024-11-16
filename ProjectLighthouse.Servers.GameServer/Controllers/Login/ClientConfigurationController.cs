@@ -1,22 +1,18 @@
-#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Login;
 
-[ApiController]
-[Authorize]
-[Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/plain")]
-public class ClientConfigurationController : ControllerBase
+public class ClientConfigurationController : GameController
 {
     private readonly DatabaseContext database;
 
@@ -26,6 +22,7 @@ public class ClientConfigurationController : ControllerBase
     }
 
     [HttpGet("network_settings.nws")]
+    [UseDigest(EnforceDigest = false)]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public IActionResult NetworkSettings()
     {
@@ -41,15 +38,18 @@ public class ClientConfigurationController : ControllerBase
 
     [HttpGet("t_conf")]
     [Produces("text/xml")]
+    [UseDigest(EnforceDigest = false)]
     public IActionResult Conf() => this.Ok(new TelemetryConfigResponse());
 
     // The challenge config here is currently based on the official server's config.
     // We should probably make this configurable in the future.
     [HttpGet("ChallengeConfig.xml")]
     [Produces("text/xml")]
+    [UseDigest(EnforceDigest = false)]
     public IActionResult Challenges() => this.Ok(GameChallengeResponse.ServerChallenges());
 
     [HttpGet("farc_hashes")]
+    [UseDigest(EnforceDigest = false)]
     public IActionResult FarcHashes() => this.Ok();
 
     [HttpGet("privacySettings")]

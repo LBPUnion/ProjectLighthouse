@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Xunit;
@@ -14,25 +14,48 @@ namespace ProjectLighthouse.Tests.GameApiTests.Unit.Middlewares;
 [Trait("Category", "Unit")]
 public class DigestMiddlewareTests
 {
-
-    [Fact]
-    public async Task DigestMiddleware_ShouldNotComputeDigests_WhenDigestsDisabled()
+    private static DefaultHttpContext GetHttpContext
+        (Stream body, string path, string cookie, Dictionary<string, StringValues>? extraHeaders = null, UseDigestAttribute? digestAttribute = null)
     {
+
         DefaultHttpContext context = new()
         {
             Request =
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers = { KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"), },
+                Body = body,
+                Path = path,
+                Headers =
+                {
+                    KeyValuePair.Create<string, StringValues>("Cookie", cookie),
+                },
             },
         };
+        if (extraHeaders != null)
+        {
+            foreach ((string key, StringValues value) in extraHeaders)
+            {
+                context.Request.Headers.Append(key, value);
+            }
+        }
+
+        if (digestAttribute != null)
+        {
+            context.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(digestAttribute), null));
+        }
+
+        return context;
+    }
+
+    [Fact]
+    public async Task DigestMiddleware_ShouldNotComputeDigests_WithoutDigestAttribute()
+    {
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(), "/LITTLEBIGPLANETPS3_XML/notification", "MM_AUTH=unittest");
         DigestMiddleware middleware = new(httpContext =>
         {
             httpContext.Response.StatusCode = 200;
             httpContext.Response.WriteAsync("");
             return Task.CompletedTask;
-        }, false);
+        }, []);
 
         await middleware.InvokeAsync(context);
 
@@ -46,33 +69,24 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldReject_WhenDigestHeaderIsMissing()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
-            {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
-                {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                },
-            },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/notification",
+            "MM_AUTH=unittest",
+            null,
+            new UseDigestAttribute());
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
         const int expectedCode = 403;
 
-        Assert.True(expectedCode == context.Response.StatusCode,
-            "The digest middleware accepted the request when it shouldn't have (are you running this test in Debug mode?)");
+        Assert.Equal(expectedCode, context.Response.StatusCode);
         Assert.False(context.Response.Headers.TryGetValue("X-Digest-A", out _));
         Assert.False(context.Response.Headers.TryGetValue("X-Digest-B", out _));
     }
@@ -80,28 +94,23 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldReject_WhenRequestDigestInvalid()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/notification",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "invalid_digest"),
+                    "X-Digest-A", "invalid_digest"
                 },
             },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
-        ServerConfiguration.Instance.DigestKey.AlternateDigestKey = "test";
+            new UseDigestAttribute());
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -115,28 +124,24 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldUseAlternateDigest_WhenPrimaryDigestInvalid()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/notification",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "df619790a2579a077eae4a6b6864966ff4768723"),
+                    "X-Digest-A", "df619790a2579a077eae4a6b6864966ff4768723"
                 },
             },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "test";
-        ServerConfiguration.Instance.DigestKey.AlternateDigestKey = "bruh";
+            new UseDigestAttribute());
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["test", "bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -152,28 +157,24 @@ public class DigestMiddlewareTests
     }
 
     [Fact]
-    public async Task DigestMiddleware_ShouldNotReject_WhenRequestingAnnounce()
+    public async Task DigestMiddleware_ShouldNotReject_WhenNotEnforcingDigest()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/announce",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>(),
+            new UseDigestAttribute
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/announce",
-                Headers =
-                {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                },
-            },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+                EnforceDigest = false,
+            });
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -191,26 +192,24 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldCalculate_WhenAuthCookieEmpty()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/notification",
+            "",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "0a06d25662c2d3bab2a767c0c504898df2385e62"),
+                    "X-Digest-A", "0a06d25662c2d3bab2a767c0c504898df2385e62"
                 },
             },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+            new UseDigestAttribute());
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -228,27 +227,24 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldComputeDigestsWithNoBody_WhenDigestsEnabled()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream(),
+            "/LITTLEBIGPLANETPS3_XML/notification",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream(),
-                Path = "/LITTLEBIGPLANETPS3_XML/notification",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "df619790a2579a077eae4a6b6864966ff4768723"),
+                    "X-Digest-A", "df619790a2579a077eae4a6b6864966ff4768723"
                 },
             },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+            new UseDigestAttribute());
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -266,27 +262,24 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldComputeDigestsWithBody_WhenDigestsEnabled_AndNoResponseBody()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream("digest test"u8.ToArray()),
+            "/LITTLEBIGPLANETPS3_XML/filter",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream("digest test"u8.ToArray()),
-                Path = "/LITTLEBIGPLANETPS3_XML/filter",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "3105059f9283773f7982a4d79455bcc97c330f10"),
+                    "X-Digest-A", "3105059f9283773f7982a4d79455bcc97c330f10"
                 },
             },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+            new UseDigestAttribute());
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -304,27 +297,24 @@ public class DigestMiddlewareTests
     [Fact]
     public async Task DigestMiddleware_ShouldComputeDigestsWithBody_WhenDigestsEnabled_AndResponseBody()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream("digest test"u8.ToArray()),
+            "/LITTLEBIGPLANETPS3_XML/filter",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream("digest test"u8.ToArray()),
-                Path = "/LITTLEBIGPLANETPS3_XML/filter",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-A", "3105059f9283773f7982a4d79455bcc97c330f10"),
+                    "X-Digest-A", "3105059f9283773f7982a4d79455bcc97c330f10"
                 },
             },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+            new UseDigestAttribute());
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("digest test");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -340,29 +330,31 @@ public class DigestMiddlewareTests
     }
 
     [Fact]
-    public async Task DigestMiddleware_ShouldComputeDigestsWithBody_WhenUploading()
+    public async Task DigestMiddleware_ShouldExcludeBody_WithAttributeSetting()
     {
-        DefaultHttpContext context = new()
-        {
-            Request =
+        DefaultHttpContext context = GetHttpContext(new MemoryStream("digest test"u8.ToArray()),
+            "/LITTLEBIGPLANETPS3_XML/upload/unittesthash",
+            "MM_AUTH=unittest",
+            new Dictionary<string, StringValues>
             {
-                Body = new MemoryStream("digest test"u8.ToArray()),
-                Path = "/LITTLEBIGPLANETPS3_XML/upload/unittesthash",
-                Headers =
                 {
-                    KeyValuePair.Create<string, StringValues>("Cookie", "MM_AUTH=unittest"),
-                    KeyValuePair.Create<string, StringValues>("X-Digest-B", "2e54cd2bc69ff8c1ff85dd3b4f62e0a0e27d9e23"),
+                    "X-Digest-B", "2e54cd2bc69ff8c1ff85dd3b4f62e0a0e27d9e23"
                 },
             },
-        };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+            new UseDigestAttribute
+            {
+                DigestHeaderName = "X-Digest-B",
+                ExcludeBodyFromDigest = true,
+            });
+        
+
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
                 httpContext.Response.WriteAsync("");
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
@@ -398,7 +390,8 @@ public class DigestMiddlewareTests
                 },
             },
         };
-        ServerConfiguration.Instance.DigestKey.PrimaryDigestKey = "bruh";
+        context.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(new UseDigestAttribute()), null));
+        
         DigestMiddleware middleware = new(httpContext =>
             {
                 httpContext.Response.StatusCode = 200;
@@ -406,7 +399,7 @@ public class DigestMiddlewareTests
                 httpContext.Response.Headers.ContentType = "text/xml";
                 return Task.CompletedTask;
             },
-            true);
+            ["bruh",]);
 
         await middleware.InvokeAsync(context);
 
