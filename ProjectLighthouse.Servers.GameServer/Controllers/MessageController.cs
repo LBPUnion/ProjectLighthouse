@@ -146,7 +146,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
 
-        message = CensorHelper.FilterMessage(message, Location.ChatMessage, username);
+        message = CensorHelper.FilterMessage(message, FilterLocation.ChatMessage, username);
 
         return this.Ok(message);
     }

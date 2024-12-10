@@ -58,7 +58,7 @@ public class UserSettingsPage : BaseLayout
 
             if (this.ProfileUser.Biography != biography && biography.Length <= 512)
             {
-                string filteredBio = CensorHelper.FilterMessage(biography, Location.UserBiography, this.ProfileUser.Username);
+                string filteredBio = CensorHelper.FilterMessage(biography, FilterLocation.UserBiography, this.ProfileUser.Username);
 
                 this.ProfileUser.Biography = filteredBio;
             }

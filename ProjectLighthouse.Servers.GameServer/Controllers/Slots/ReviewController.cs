@@ -101,7 +101,7 @@ public class ReviewController : ControllerBase
 
         // Temporary fix until this can be refactored to use a UserEntity properly
         string username = await this.database.UsernameFromGameToken(token);
-        newReview.Text = CensorHelper.FilterMessage(newReview.Text, Location.SlotReview, username);
+        newReview.Text = CensorHelper.FilterMessage(newReview.Text, FilterLocation.SlotReview, username);
 
         if (newReview.Text.Length > 512) return this.BadRequest();
 

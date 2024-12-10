@@ -74,7 +74,7 @@ public class SlotPageController : ControllerBase
         }
 
         string username = await this.database.UsernameFromWebToken(token);
-        string filteredText = CensorHelper.FilterMessage(msg, Location.SlotReview, username);
+        string filteredText = CensorHelper.FilterMessage(msg, FilterLocation.SlotReview, username);
 
         bool success = await this.database.PostComment(token.UserId, id, CommentType.Level, filteredText);
         if (success)

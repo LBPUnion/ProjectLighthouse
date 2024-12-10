@@ -20,7 +20,7 @@ public static class CensorHelper
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
 
-    public static string FilterMessage(string message, Location filterLocation = Location.None, string username = null)
+    public static string FilterMessage(string message, FilterLocation filterLocation = FilterLocation.None, string username = null)
     {
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
         StringBuilder stringBuilder = new(message);

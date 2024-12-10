@@ -50,7 +50,7 @@ public class UserPageController : ControllerBase
         }
 
         string username = await this.database.UsernameFromWebToken(token);
-        string filteredText = CensorHelper.FilterMessage(msg, Location.UserComment, username);
+        string filteredText = CensorHelper.FilterMessage(msg, FilterLocation.UserComment, username);
 
         bool success = await this.database.PostComment(token.UserId, id, CommentType.Profile, filteredText);
         if (success)

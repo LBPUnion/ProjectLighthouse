@@ -81,7 +81,7 @@ public class UserController : ControllerBase
 
             if (update.Biography.Length > 512) return this.BadRequest();
 
-            string filteredBio = CensorHelper.FilterMessage(update.Biography, Location.UserBiography, user.Username);
+            string filteredBio = CensorHelper.FilterMessage(update.Biography, FilterLocation.UserBiography, user.Username);
 
             user.Biography = filteredBio;
         }

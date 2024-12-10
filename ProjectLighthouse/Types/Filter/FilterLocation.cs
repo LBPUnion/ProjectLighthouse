@@ -1,6 +1,6 @@
 namespace LBPUnion.ProjectLighthouse.Types.Filter;
 
-public enum Location
+public enum FilterLocation
 {
     SlotName = 0,
     SlotDescription = 1,
