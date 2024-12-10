@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,7 +58,7 @@ public class UserSettingsPage : BaseLayout
 
             if (this.ProfileUser.Biography != biography && biography.Length <= 512)
             {
-                string filteredBio = CensorHelper.FilterMessage(biography, "user biography", this.ProfileUser.Username);
+                string filteredBio = CensorHelper.FilterMessage(biography, Location.UserBiography, this.ProfileUser.Username);
 
                 this.ProfileUser.Biography = filteredBio;
             }

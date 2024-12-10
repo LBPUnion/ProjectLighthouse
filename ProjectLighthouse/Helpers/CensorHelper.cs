@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
@@ -19,7 +20,7 @@ public static class CensorHelper
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
 
-    public static string FilterMessage(string message, string filterLocation = null, string username = null)
+    public static string FilterMessage(string message, Location filterLocation = Location.None, string username = null)
     {
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
         StringBuilder stringBuilder = new(message);
@@ -50,10 +51,8 @@ public static class CensorHelper
 
         if (ServerConfiguration.Instance.LogChatFiltering && filteredMessage != message)
             Logger.Info(
-                $"Comment sent {(username != null ? $"by {username} " : "")}" +
-                $"{(filterLocation != null ? $"from {filterLocation}" : "")}" +
-                $"\"{message}\" => \"{filteredMessage}\"", 
-                LogArea.Filter);
+                $"Comment sent {(username != null ? $"by {username} " : "")}" + $"from {filterLocation}" +
+                $"\"{message}\" => \"{filteredMessage}\"", LogArea.Filter);
 
         return filteredMessage;
     }

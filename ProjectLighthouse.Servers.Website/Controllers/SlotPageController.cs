@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -73,7 +74,7 @@ public class SlotPageController : ControllerBase
         }
 
         string username = await this.database.UsernameFromWebToken(token);
-        string filteredText = CensorHelper.FilterMessage(msg, "slot comment", username);
+        string filteredText = CensorHelper.FilterMessage(msg, Location.SlotReview, username);
 
         bool success = await this.database.PostComment(token.UserId, id, CommentType.Level, filteredText);
         if (success)

@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,14 +37,14 @@ public class SlotSettingsPage : BaseLayout
 
         if (name != null)
         {
-            name = CensorHelper.FilterMessage(name, "slot name", this.User.Username);
+            name = CensorHelper.FilterMessage(name, Location.SlotName, this.User.Username);
             if (this.Slot.Name != name && name.Length <= 64) 
                 this.Slot.Name = name;
         }
 
         if (description != null)
         {
-            description = CensorHelper.FilterMessage(description, "slot description", this.User.Username);
+            description = CensorHelper.FilterMessage(description, Location.SlotDescription, this.User.Username);
             if (this.Slot.Description != description && description.Length <= 512) 
                 this.Slot.Description = description;
         }

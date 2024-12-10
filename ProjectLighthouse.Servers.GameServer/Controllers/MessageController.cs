@@ -10,6 +10,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -145,7 +146,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
 
-        message = CensorHelper.FilterMessage(message, "in-game message", username);
+        message = CensorHelper.FilterMessage(message, Location.ChatMessage, username);
 
         return this.Ok(message);
     }

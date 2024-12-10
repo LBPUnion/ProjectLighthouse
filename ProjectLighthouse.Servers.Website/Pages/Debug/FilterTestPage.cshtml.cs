@@ -3,6 +3,7 @@
 using LBPUnion.ProjectLighthouse.Helpers;
 #endif
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ public class FilterTestPage : BaseLayout
     public IActionResult OnGet(string? text = null)
     {
         #if DEBUG
-        if (text != null) this.FilteredText = CensorHelper.FilterMessage(text, "test filter");
+        if (text != null) this.FilteredText = CensorHelper.FilterMessage(text, Location.Test);
         this.Text = text;
 
         return this.Page();

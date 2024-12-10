@@ -12,6 +12,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -80,7 +81,7 @@ public class UserController : ControllerBase
 
             if (update.Biography.Length > 512) return this.BadRequest();
 
-            string filteredBio = CensorHelper.FilterMessage(update.Biography, "user biography", user.Username);
+            string filteredBio = CensorHelper.FilterMessage(update.Biography, Location.UserBiography, user.Username);
 
             user.Biography = filteredBio;
         }

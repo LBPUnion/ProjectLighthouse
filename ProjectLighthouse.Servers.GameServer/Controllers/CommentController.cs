@@ -142,7 +142,7 @@ public class CommentController : ControllerBase
             targetId = await this.database.UserIdFromUsername(username!);
         }
 
-        string filteredText = CensorHelper.FilterMessage(comment.Message, "in-game comment", username);
+        string filteredText = CensorHelper.FilterMessage(comment.Message, Location.ChatMessage, username);
 
         bool success = await this.database.PostComment(token.UserId, targetId, type, filteredText);
         if (success) return this.Ok();
