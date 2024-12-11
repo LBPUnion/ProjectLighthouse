@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Types.Filter;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Helpers;
 
@@ -17,7 +20,7 @@ public static class CensorHelper
         "UwU", "OwO", "uwu", "owo", "o3o", ">.>", "*pounces on you*", "*boops*", "*baps*", ":P", "x3", "O_O", "xD", ":3", ";3", "^w^",
     };
 
-    public static string FilterMessage(string message)
+    public static string FilterMessage(string message, FilterLocation filterLocation = FilterLocation.None, string username = null)
     {
         if (CensorConfiguration.Instance.UserInputFilterMode == FilterMode.None) return message;
         StringBuilder stringBuilder = new(message);
@@ -44,7 +47,14 @@ public static class CensorHelper
             }
         }
 
-        return stringBuilder.ToString();
+        string filteredMessage = stringBuilder.ToString();
+
+        if (ServerConfiguration.Instance.LogChatFiltering && filteredMessage != message)
+            Logger.Info(
+                $"Comment sent {(username != null ? $"by {username} " : "")}" + $"from {filterLocation}" +
+                $"\"{message}\" => \"{filteredMessage}\"", LogArea.Filter);
+
+        return filteredMessage;
     }
 
     private static void Censor(int profanityIndex, int profanityLength, StringBuilder message)

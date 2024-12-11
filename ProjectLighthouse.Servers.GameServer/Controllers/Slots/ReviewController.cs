@@ -99,7 +99,9 @@ public class ReviewController : ControllerBase
         GameReview? newReview = await this.DeserializeBody<GameReview>();
         if (newReview == null) return this.BadRequest();
 
-        newReview.Text = CensorHelper.FilterMessage(newReview.Text);
+        // Temporary fix until this can be refactored to use a UserEntity properly
+        string username = await this.database.UsernameFromGameToken(token);
+        newReview.Text = CensorHelper.FilterMessage(newReview.Text, FilterLocation.SlotReview, username);
 
         if (newReview.Text.Length > 512) return this.BadRequest();
 
