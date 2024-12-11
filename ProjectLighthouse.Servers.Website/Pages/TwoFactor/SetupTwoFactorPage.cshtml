@@ -18,6 +18,9 @@
         <h2>@Model.Translate(TwoFactorStrings.QrTitle)</h2>
         <img src="@Model.QrCode" alt="2 Factor QR Code"/>
         <p>@Model.Translate(TwoFactorStrings.QrDescription)</p>
+        <p>@Model.Translate(TwoFactorStrings.QrAlternativeDescription)</p>
+        <code class="ui segment">@Model.User?.TwoFactorSecret</code>
+        <button class="ui button primary" style="padding: 1em 1em" id="copyButton" onclick="copySecret('@Model.User?.TwoFactorSecret')">@Model.Translate(TwoFactorStrings.QrAlternativeCopy)</button>
         @await Html.PartialAsync("Partials/TwoFactorPartial", new ViewDataDictionary(ViewData)
         {
             {
@@ -31,6 +34,28 @@
             },
         })
     </div>
+    <script>
+        let copyTimeout;
+
+        function copySecret(secret) {
+            function scheduleButtonReset() {
+                copyTimeout = setTimeout(() => {
+                    document.getElementById("copyButton").textContent = '@Model.Translate(TwoFactorStrings.QrAlternativeCopy)';
+                }, 2000);
+            }
+            if (copyTimeout) {
+                clearTimeout(copyTimeout);
+            }
+
+            navigator.clipboard.writeText(secret).then(() => {
+                document.getElementById("copyButton").textContent = '@Model.Translate(TwoFactorStrings.QrAlternativeCopySuccess)';
+                scheduleButtonReset();
+            }, () => {
+                document.getElementById("copyButton").textContent = '@Model.Translate(TwoFactorStrings.QrAlternativeCopyFail)';
+                scheduleButtonReset();
+            });
+        }
+    </script>
 }
 else
 {

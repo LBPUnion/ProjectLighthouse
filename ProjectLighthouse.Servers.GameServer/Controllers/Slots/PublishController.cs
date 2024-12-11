@@ -10,6 +10,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Resources;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Users;
@@ -142,7 +143,7 @@ public class PublishController : ControllerBase
         // Yes Rider, this isn't null
         Debug.Assert(slot.Resources != null, "slot.ResourceList != null");
 
-        slot.Name = CensorHelper.FilterMessage(slot.Name);
+        slot.Name = CensorHelper.FilterMessage(slot.Name, FilterLocation.SlotName, user.Username);
 
         if (slot.Name.Length > 64)
         {
@@ -153,7 +154,7 @@ public class PublishController : ControllerBase
             return this.BadRequest();
         }
 
-        slot.Description = CensorHelper.FilterMessage(slot.Description);
+        slot.Description = CensorHelper.FilterMessage(slot.Description, FilterLocation.SlotDescription, user.Username);
 
         if (slot.Description.Length > 512)
         {

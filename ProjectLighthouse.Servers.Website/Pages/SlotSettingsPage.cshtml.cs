@@ -49,15 +49,15 @@ public class SlotSettingsPage : BaseLayout
 
         if (name != null)
         {
-            name = CensorHelper.FilterMessage(name);
-            if (this.Slot.Name != name && name.Length <= 64)
+            name = CensorHelper.FilterMessage(name, FilterLocation.SlotName, this.User.Username);
+            if (this.Slot.Name != name && name.Length <= 64) 
                 this.Slot.Name = name;
         }
 
         if (description != null)
         {
-            description = CensorHelper.FilterMessage(description);
-            if (this.Slot.Description != description && description?.Length <= 512)
+            description = CensorHelper.FilterMessage(description, FilterLocation.SlotDescription, this.User.Username);
+            if (this.Slot.Description != description && description.Length <= 512) 
                 this.Slot.Description = description;
         }
 

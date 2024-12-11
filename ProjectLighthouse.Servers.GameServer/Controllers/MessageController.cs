@@ -10,6 +10,7 @@ using LBPUnion.ProjectLighthouse.Serialization;
 using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -143,15 +144,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         string username = await this.database.UsernameFromGameToken(token);
 
-        string filteredText = CensorHelper.FilterMessage(message);
-
         if (ServerConfiguration.Instance.LogChatMessages) Logger.Info($"{username}: \"{message}\"", LogArea.Filter);
 
-        if (ServerConfiguration.Instance.LogChatFiltering && filteredText != message)
-            Logger.Info(
-                $"Censored profane word(s) from in-game text sent by {username}: \"{message}\" => \"{filteredText}\"",
-                LogArea.Filter);
+        message = CensorHelper.FilterMessage(message, FilterLocation.ChatMessage, username);
 
-        return this.Ok(filteredText);
+        return this.Ok(message);
     }
 }
