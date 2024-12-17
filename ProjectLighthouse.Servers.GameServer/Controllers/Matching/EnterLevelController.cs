@@ -37,11 +37,12 @@ public class EnterLevelController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Unauthorized();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         // Return bad request on unverified email if enforcement is enabled
-        if (emailEnforcementEnabled  && !user.EmailAddressVerified) return this.BadRequest();
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         // don't count plays for developer slots
         if (slotType == "developer") return this.Ok();
@@ -112,11 +113,12 @@ public class EnterLevelController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Unauthorized();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         // Return bad request on unverified email if enforcement is enabled
-        if (emailEnforcementEnabled  && !user.EmailAddressVerified) return this.BadRequest();
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         if (slotType == "developer") return this.Ok();
 

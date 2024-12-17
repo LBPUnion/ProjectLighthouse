@@ -43,8 +43,9 @@ public class MatchController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Forbid();
+        if (user == null) return this.Unauthorized();
 
+        // Return bad request on unverified email if enforcement is enabled
         if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         await LastContactHelper.SetLastContact(this.database, user, token.GameVersion, token.Platform);
