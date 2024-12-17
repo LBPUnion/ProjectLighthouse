@@ -1,9 +1,13 @@
 #nullable enable
+using System.Runtime.CompilerServices;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Migrations;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -20,6 +24,8 @@ public class EnterLevelController : ControllerBase
 {
     private readonly DatabaseContext database;
 
+    private static readonly bool emailEnforcementEnabled = EnforceEmailConfiguration.Instance.EnableEmailEnforcement;
+
     public EnterLevelController(DatabaseContext database)
     {
         this.database = database;
@@ -30,7 +36,12 @@ public class EnterLevelController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
+
+        // Return bad request on unverified email if enforcement is enabled
+        if (emailEnforcementEnabled  && !user.EmailAddressVerified) return this.BadRequest();
 
         // don't count plays for developer slots
         if (slotType == "developer") return this.Ok();
@@ -100,7 +111,12 @@ public class EnterLevelController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
+
+        // Return bad request on unverified email if enforcement is enabled
+        if (emailEnforcementEnabled  && !user.EmailAddressVerified) return this.BadRequest();
 
         if (slotType == "developer") return this.Ok();
 

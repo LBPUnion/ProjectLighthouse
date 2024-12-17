@@ -22,6 +22,8 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class CommentController : ControllerBase
 {
     private readonly DatabaseContext database;
+
+    private static readonly bool emailEnforcementEnabled = EnforceEmailConfiguration.Instance.EnableEmailEnforcement; 
     public CommentController(DatabaseContext database)
     {
         this.database = database;
@@ -33,8 +35,12 @@ public class CommentController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
         // Return bad request if both are true or both are false
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
+
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         bool success = await this.database.RateComment(token.UserId, commentId, rating);
         if (!success) return this.BadRequest();
@@ -52,6 +58,8 @@ public class CommentController : ControllerBase
         if (user == null) return this.Unauthorized();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
+
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         int originalSlotId = slotId;
 
@@ -117,8 +125,12 @@ public class CommentController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
+
+        if (emailEnforcementEnabled  && !user.EmailAddressVerified) return this.BadRequest();
 
         GameComment? comment = await this.DeserializeBody<GameComment>();
         if (comment?.Message == null) return this.BadRequest();
@@ -156,10 +168,14 @@ public class CommentController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
+
+        if (emailEnforcementEnabled  && !user.EmailAddressVerified) return this.BadRequest();
 
         CommentEntity? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.NotFound();
