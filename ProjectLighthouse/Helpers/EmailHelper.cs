@@ -82,13 +82,17 @@ public static class SMTPHelper
     public static bool IsValidEmail(DatabaseContext database, string email)
     {
         // Email should not be empty, should be an actual email, and shouldn't already be used by an account
-        if (!string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email) && !EmailIsUsed(database, email).Result)
+        if (!string.IsNullOrWhiteSpace(email) && emailValidator.IsValid(email) && !EmailIsUsed(database, email).Result)
         {
-            // Get domain after '@' character
-            string domain = email.Split('@')[1];
-
             // Don't even bother if there are no domains in blacklist (AKA file path is empty/invalid, or file itself is empty)
-            if (EnforceEmailConfiguration.Instance.EnableEmailBlacklist && blacklistedDomains.Count > 0) return !DomainIsInBlacklist(domain);
+            if (EnforceEmailConfiguration.Instance.EnableEmailBlacklist && blacklistedDomains.Count > 0)
+            {
+                // Get domain by splitting at '@' character
+                string domain = email.Split('@')[1];
+
+                // Return true if domain is found in blacklist
+                return blacklistedDomains.Contains(domain);
+            }
 
             return true;
         }
@@ -96,14 +100,14 @@ public static class SMTPHelper
         return false;
     }
 
+    // Don't want to allocate every single time we call EmailAddressAttribute.IsValidEmail()
+    private static readonly EmailAddressAttribute emailValidator = new();
+
     // Check if email is already in use by an account
     private static async Task<bool> EmailIsUsed(DatabaseContext database, string email)
     {
         return await database.Users.AnyAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == email.ToLower());
     }
-
-    // Check if domain blacklist contains input domain
-    private static bool DomainIsInBlacklist(string domain) => blacklistedDomains.Contains(domain);
 
     public static void SendRegistrationEmail(IMailService mail, UserEntity user)
     {
