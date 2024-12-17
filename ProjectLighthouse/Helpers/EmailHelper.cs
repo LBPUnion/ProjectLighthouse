@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Configuration; 
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -20,6 +22,13 @@ public static class SMTPHelper
     private static readonly ConcurrentDictionary<int, long> recentlySentMail = new();
 
     private const long emailCooldown = 1000 * 30;
+    
+    // To prevent ReadAllLines() exception when BlacklistFilePath is empty
+    private static readonly string[] blacklistFile =
+        !string.IsNullOrWhiteSpace(EnforceEmailConfiguration.Instance.BlacklistFilePath)
+            ? File.ReadAllLines(EnforceEmailConfiguration.Instance.BlacklistFilePath) : [];
+
+    private static readonly HashSet<string> blacklistedDomains = new(blacklistFile);
 
     private static bool CanSendMail(UserEntity user)
     {
@@ -68,6 +77,33 @@ public static class SMTPHelper
 
         recentlySentMail.TryAdd(user.UserId, TimeHelper.TimestampMillis + emailCooldown);
     }
+    
+    // Accumulate checks to determine email validity
+    public static bool IsValidEmail(DatabaseContext database, string email)
+    {
+        // Email should not be empty, should be an actual email, and shouldn't already be used by an account
+        if (!string.IsNullOrWhiteSpace(email) && new EmailAddressAttribute().IsValid(email) && !EmailIsUsed(database, email).Result)
+        {
+            // Get domain after '@' character
+            string domain = email.Split('@')[1];
+
+            // Don't even bother if there are no domains in blacklist (AKA file path is empty/invalid, or file itself is empty)
+            if (EnforceEmailConfiguration.Instance.EnableEmailBlacklist && blacklistedDomains.Count > 0) return !DomainIsInBlacklist(domain);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // Check if email is already in use by an account
+    private static async Task<bool> EmailIsUsed(DatabaseContext database, string email)
+    {
+        return await database.Users.AnyAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == email.ToLower());
+    }
+
+    // Check if domain blacklist contains input domain
+    private static bool DomainIsInBlacklist(string domain) => blacklistedDomains.Contains(domain);
 
     public static void SendRegistrationEmail(IMailService mail, UserEntity user)
     {

@@ -129,9 +129,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         if (message.StartsWith("/setemail ") && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
-            if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
 
-            if (await this.database.Users.AnyAsync(u => u.EmailAddress == email)) return this.Ok();
+            // Return a bad request on invalid email address
+            if (!SMTPHelper.IsValidEmail(this.database, email)) return this.BadRequest();
 
             UserEntity? user = await this.database.UserFromGameToken(token);
             if (user == null || user.EmailAddressVerified) return this.Ok();

@@ -38,9 +38,9 @@ public class PasswordResetRequestForm : BaseLayout
             return this.Page();
         }
 
-        if (!SanitizationHelper.IsValidEmail(email))
+        if (!SMTPHelper.IsValidEmail(this.Database, email))
         {
-            this.Error = "This email is in an invalid format";
+            this.Error = "This email is invalid";
             return this.Page();
         }
 

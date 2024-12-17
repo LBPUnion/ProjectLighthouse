@@ -65,17 +65,13 @@ public class UserSettingsPage : BaseLayout
         }
 
         if (ServerConfiguration.Instance.Mail.MailEnabled &&
-            SanitizationHelper.IsValidEmail(email) &&
+            SMTPHelper.IsValidEmail(this.Database, email) &&
             (this.User == this.ProfileUser || this.User.IsAdmin))
         {
-            // if email hasn't already been used
-            if (!await this.Database.Users.AnyAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == email!.ToLower()))
+            if (this.ProfileUser.EmailAddress != email)
             {
-                if (this.ProfileUser.EmailAddress != email)
-                {
-                    this.ProfileUser.EmailAddress = email;
-                    this.ProfileUser.EmailAddressVerified = false;
-                }
+                this.ProfileUser.EmailAddress = email;
+                this.ProfileUser.EmailAddressVerified = false;
             }
         }
 
