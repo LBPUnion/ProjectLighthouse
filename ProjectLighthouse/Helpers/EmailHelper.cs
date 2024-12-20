@@ -90,8 +90,8 @@ public static class SMTPHelper
                 // Get domain by splitting at '@' character
                 string domain = email.Split('@')[1];
 
-                // Return true if domain is found in blacklist
-                return blacklistedDomains.Contains(domain);
+                // Return false if domain is found in blacklist
+                return !blacklistedDomains.Contains(domain);
             }
 
             return true;

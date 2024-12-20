@@ -60,32 +60,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
 
         announceText.Replace("%user", user.Username);
-        announceText.Replace("%id", user.UserId.ToString());
+        announceText.Replace("%id", token.UserId.ToString());
 
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
             announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
         }
 
-        if (EnforceEmailConfiguration.Instance.EnableEmailEnforcement && user.EmailAddress == null)
+        if (EnforceEmailConfiguration.Instance.EnableEmailEnforcement)
         {
+            announceText.Insert(0, EnforceEmailConfiguration.Instance.EmailEnforcementMessageMain);
+
             if (user.EmailAddress == null)
             {
                 // This will probably need translations
-                announceText.Insert(0,
-                    "This server instance has email enforcement enabled, " +
-                    "you will need to set and verify an email address to use most features.\n" +
-                    "You can set an email by opening the text chat and typing " +
-                    "\"/setemail [youremail@example.com]\" (do not include the brackets.\n\n");
+                announceText.Insert(0, EnforceEmailConfiguration.Instance.EmailEnforcementMessageNoEmail);
             }
-            if (!user.EmailAddressVerified)
+            else if (!user.EmailAddressVerified)
             {
                 // More stuff to translate later
-                announceText.Insert(0,
-                    "You have set an email address on your account, but you have not verified " +
-                    "it. Make sure to check your inbox for a verification email. " +
-                    "If you have not received an email, please contact an instance " +
-                    "administrator for further assistance.\n\n");
+                announceText.Insert(0, EnforceEmailConfiguration.Instance.EmailEnforcementMessageVerify);
             }
         }
 

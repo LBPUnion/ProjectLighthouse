@@ -26,5 +26,10 @@ public static class BaseLayoutStrings
     public static readonly TranslatableString ReadOnlyWarnTitle = create("read_only_warn_title");
     public static readonly TranslatableString ReadOnlyWarn = create("read_only_warn");
 
+    public static readonly TranslatableString EmailEnforcementWarnMain = create("email_enforcement_message_main");
+    public static readonly TranslatableString EmailEnforcementWarnNoEmail = create("email_enforcement_message_no_email");
+    public static readonly TranslatableString EmailEnforcementWarnVerifyEmail = create("email_enforcement_message_verify_email");
+
+
     private static TranslatableString create(string key) => new(TranslationAreas.BaseLayout, key);
 }
