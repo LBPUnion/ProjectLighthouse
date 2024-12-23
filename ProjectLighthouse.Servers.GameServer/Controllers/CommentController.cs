@@ -34,15 +34,14 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Unauthorized();
 
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
+
         // Return bad request if both are true or both are false
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
-
-        // Return bad request on unverified email if enforcement is enabled
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         bool success = await this.database.RateComment(token.UserId, commentId, rating);
         if (!success) return this.BadRequest();
@@ -55,14 +54,13 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetComments(string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-
-        UserEntity? user = await this.database.UserFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token); 
         if (user == null) return this.Unauthorized();
 
-        if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
-
-        // Return bad request on unverified email if enforcement is enabled
+        // Return bad request on unverified email if enforcement is enabled 
         if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
+
+        if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 
         int originalSlotId = slotId;
 
@@ -108,8 +106,7 @@ public class CommentController : ControllerBase
             .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(c => GameComment.CreateFromEntity(c, token.UserId));
 
-        if (type == CommentType.Level && slotType == "developer" && user.IsModerator && pageData.PageStart == 1)
-        {
+        if (type == CommentType.Level && slotType == "developer" && user.IsModerator && pageData.PageStart == 1) {
             comments.Insert(0, new GameComment
             {
                 CommentId = 0,
@@ -127,15 +124,14 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> PostComment(string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Unauthorized();
 
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
+
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
-
-        // Return bad request on unverified email if enforcement is enabled
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         GameComment? comment = await this.DeserializeBody<GameComment>();
         if (comment?.Message == null) return this.BadRequest();
@@ -172,16 +168,15 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-
         UserEntity? user = await this.database.UserFromGameToken(token);
+
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
-
-        // Return bad request on unverified email if enforcement is enabled
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         CommentEntity? comment = await this.database.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.NotFound();

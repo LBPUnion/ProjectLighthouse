@@ -27,6 +27,8 @@ public class PhotosController : ControllerBase
 {
     private readonly DatabaseContext database;
 
+    private static readonly bool emailEnforcementEnabled = EnforceEmailConfiguration.Instance.EnableEmailEnforcement;
+
     public PhotosController(DatabaseContext database)
     {
         this.database = database;
@@ -36,6 +38,11 @@ public class PhotosController : ControllerBase
     public async Task<IActionResult> UploadPhoto()
     {
         GameTokenEntity token = this.GetToken();
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Unauthorized();
+
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
@@ -174,6 +181,11 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/{slotType}/{id:int}")]
     public async Task<IActionResult> SlotPhotos(string slotType, int id, [FromQuery] string? by)
     {
+        GameTokenEntity token = this.GetToken();
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
@@ -202,7 +214,6 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/by")]
     public async Task<IActionResult> UserPhotosBy(string user)
     {
-
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
@@ -218,7 +229,7 @@ public class PhotosController : ControllerBase
 
     [HttpGet("photos/with")]
     public async Task<IActionResult> UserPhotosWith(string user)
-    {
+    { 
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 
@@ -237,6 +248,10 @@ public class PhotosController : ControllerBase
     public async Task<IActionResult> DeletePhoto(int id)
     {
         GameTokenEntity token = this.GetToken();
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         PhotoEntity? photo = await this.database.Photos.FirstOrDefaultAsync(p => p.PhotoId == id);
         if (photo == null) return this.NotFound();

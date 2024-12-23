@@ -41,7 +41,6 @@ public class MatchController : ControllerBase
     public async Task<IActionResult> Match()
     {
         GameTokenEntity token = this.GetToken();
-
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Unauthorized();
 

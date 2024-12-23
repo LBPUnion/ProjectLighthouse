@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration; 
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.EntityFrameworkCore;
 
@@ -91,7 +93,13 @@ public static class SMTPHelper
                 string domain = email.Split('@')[1];
 
                 // Return false if domain is found in blacklist
-                return !blacklistedDomains.Contains(domain);
+                if (blacklistedDomains.Contains(domain))
+                {
+                    Logger.Info($"Invalid email address {email} submitted by user.", LogArea.Email);
+                    return false;
+                }
+
+                return true;
             }
 
             return true;

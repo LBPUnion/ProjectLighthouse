@@ -1,12 +1,15 @@
 #nullable enable
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Misc;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Resources;
+using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IOFile = System.IO.File;
@@ -19,9 +22,17 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Resources;
 [Route("LITTLEBIGPLANETPS3_XML")]
 public class ResourcesController : ControllerBase
 {
+    private readonly DatabaseContext database;
+
+    public ResourcesController(DatabaseContext database)
+    {
+        this.database = database;
+    }
 
     [HttpPost("showModerated")]
     public IActionResult ShowModerated() => this.Ok(new ResourceList());
+
+    private static readonly bool emailEnforcementEnabled = EnforceEmailConfiguration.Instance.EnableEmailEnforcement;
 
     [HttpPost("filterResources")]
     [HttpPost("showNotUploaded")]
@@ -36,8 +47,14 @@ public class ResourcesController : ControllerBase
     }
 
     [HttpGet("r/{hash}")]
-    public IActionResult GetResource(string hash)
+    public async Task<IActionResult> GetResource(string hash)
     {
+        GameTokenEntity token = this.GetToken();
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
+
         string path = FileHelper.GetResourcePath(hash);
 
         string fullPath = Path.GetFullPath(path);
@@ -54,6 +71,12 @@ public class ResourcesController : ControllerBase
     [HttpPost("upload/{hash}")]
     public async Task<IActionResult> UploadResource(string hash)
     {
+        GameTokenEntity token = this.GetToken();
+        UserEntity? user = await this.database.UserFromGameToken(token);
+
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
+
         string assetsDirectory = FileHelper.ResourcePath;
         string path = FileHelper.GetResourcePath(hash);
         string fullPath = Path.GetFullPath(path);

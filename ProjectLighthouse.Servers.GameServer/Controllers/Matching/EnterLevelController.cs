@@ -24,8 +24,6 @@ public class EnterLevelController : ControllerBase
 {
     private readonly DatabaseContext database;
 
-    private static readonly bool emailEnforcementEnabled = EnforceEmailConfiguration.Instance.EnableEmailEnforcement;
-
     public EnterLevelController(DatabaseContext database)
     {
         this.database = database;
@@ -40,9 +38,6 @@ public class EnterLevelController : ControllerBase
         if (user == null) return this.Unauthorized();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
-
-        // Return bad request on unverified email if enforcement is enabled
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         // don't count plays for developer slots
         if (slotType == "developer") return this.Ok();
@@ -116,9 +111,6 @@ public class EnterLevelController : ControllerBase
         if (user == null) return this.Unauthorized();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
-
-        // Return bad request on unverified email if enforcement is enabled
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         if (slotType == "developer") return this.Ok();
 
