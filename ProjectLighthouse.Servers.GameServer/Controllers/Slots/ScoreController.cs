@@ -176,6 +176,7 @@ public class ScoreController : ControllerBase
         {
             GameScore? second = scores.Scores[1];
             UserEntity? user = await this.database.UserFromGameToken(token);
+
             await this.database.SendNotification(second.UserId, $"{user?.InfoXml} beat your highscore (<em>{second.Points}</em>) on {slot.InfoXml} with a score of <em>{score.Points}</em>.", true);
         }
 
