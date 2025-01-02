@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -159,7 +160,7 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Ok(await this.GetScores(new LeaderboardOptions
+        ScoreboardResponse scores = await this.GetScores(new LeaderboardOptions
         {
             RootName = "scoreboardSegment",
             PageSize = 5,
@@ -169,7 +170,16 @@ public class ScoreController : ControllerBase
             ScoreType = score.Type,
             TargetUser = token.UserId,
             TargetPlayerIds = null,
-        })); 
+        });
+
+        if (score.Type == 1 && scores.YourRank == 1 && scores.Total > 1)
+        {
+            GameScore? second = scores.Scores[1];
+            UserEntity? user = await this.database.UserFromGameToken(token);
+            await this.database.SendNotification(second.UserId, $"{user?.InfoXml} beat your highscore (<em>{second.Points}</em>) on {slot.InfoXml} with a score of <em>{score.Points}</em>.", true);
+        }
+
+        return this.Ok(scores); 
     }
 
     [HttpGet("scoreboard/{slotType}/{id:int}")]

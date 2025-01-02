@@ -28,6 +28,9 @@ public class UserEntity
 
     public string IconHash { get; set; }
 
+    [NotMapped]
+    public string InfoXml => $"<player icon=\"{this.IconHash}\">{this.Username}</user>";
+
     /// <summary>
     ///     A user-customizable biography shown on the profile card
     /// </summary>

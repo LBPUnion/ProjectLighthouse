@@ -29,6 +29,9 @@ public class SlotEntity
 
     public string IconHash { get; set; } = "";
 
+    [NotMapped]
+    public string InfoXml => $"<slot type=\"{this.Type}\" id=\"{this.SlotId}\" icon=\"{this.IconHash}\">{this.Name}</slot>";
+
     public bool IsAdventurePlanet { get; set; }
 
     public string RootLevel { get; set; } = "";
