@@ -15,10 +15,10 @@ public partial class DatabaseContext
     /// </summary>
     /// <param name="userId">The user ID of the target user.</param>
     /// <param name="text">The message to send.</param>
-    /// <param name="noPrefix">Ignore the prepended server name/timestamp.</param>
+    /// <param name="prefix">Prepend server name/timestamp.</param>
     /// <param name="type">The <see cref="NotificationType"/> for the notification. Defaults to <c>ModerationNotification</c>.</param>
     public async Task SendNotification
-        (int userId, string text, bool noPrefix = false, NotificationType type = NotificationType.ModerationNotification)
+        (int userId, string text, bool prefix = true, NotificationType type = NotificationType.ModerationNotification)
     {
         if (!await this.Users.AnyAsync(u => u.UserId == userId))
         {
@@ -32,7 +32,7 @@ public partial class DatabaseContext
 
         StringBuilder builder = new(text);
 
-        if (!noPrefix)
+        if (prefix)
         {
             // Prepend server name to notification text if enabled
             if (ServerConfiguration.Instance.NotificationConfiguration.ShowServerNameInText)
