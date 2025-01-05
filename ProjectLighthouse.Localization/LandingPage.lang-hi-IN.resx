@@ -22,33 +22,33 @@
         </value>
   </resheader>
   <data name="welcome" xml:space="preserve">
-        <value>Welcome to {0}!</value>
+        <value>{0} में आपका स्वागत है!</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="loggedInAs" xml:space="preserve">
-        <value>Greetings, {0}.</value>
+        <value>स्वागत है, {0}.</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_none" xml:space="preserve">
-        <value>There are no people online. Why not hop on?</value>
+        <value>यहां कोई भी व्यक्ति ऑनलाइन नहीं है. ब्रेक क्यों नहीं लेते?</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_single" xml:space="preserve">
-        <value>There is 1 person currently online:</value>
+        <value>यहाँ 1 व्यक्ति इस समय ऑनलाइन है:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="users_multiple" xml:space="preserve">
-        <value>There are currently {0} people online:</value>
+        <value>वर्तमान में {0} लोग ऑनलाइन हैं:</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="authAttemptsPending" xml:space="preserve">
-        <value>You have {0} authentication attempts pending. Click here to view them.</value>
+        <value>आपके पास {0} प्रमाणीकरण प्रयास लंबित हैं। उन्हें देखने के लिए यहां क्लिक करें।</value>
         <comment>A greeting on the main page of the website.</comment>
     </data>
   <data name="newest_levels" xml:space="preserve">
-        <value>Newest Levels</value>
+        <value>नवीनतम स्तर</value>
     </data>
   <data name="latest_team_picks" xml:space="preserve">
-        <value>Latest Team Picks</value>
+        <value>नवीनतम टीम का चयन</value>
     </data>
 </root>

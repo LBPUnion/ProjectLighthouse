@@ -21,7 +21,7 @@
         <value>Spielt gerade {0} auf {1}</value>
     </data>
   <data name="offline" xml:space="preserve">
-        <value>Offline</value>
+        <value>Abgemeldet</value>
     </data>
   <data name="last_online" xml:space="preserve">
         <value>Offline seit {0}</value>

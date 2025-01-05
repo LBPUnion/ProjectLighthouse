@@ -39,6 +39,6 @@
         <value>E-posta alanı zorunludur.</value>
     </data>
   <data name="action_no_permission" xml:space="preserve">
-        <value>You don't have permissions to perform this action.</value>
+        <value>Bu eylemi gerçekleştirmek için izniniz yok.</value>
     </data>
 </root>

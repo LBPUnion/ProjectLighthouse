@@ -18,27 +18,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username_invalid" xml:space="preserve">
-        <value>The username field is blank.</value>
+        <value>Het gebruikersnaam veld is leeg.</value>
     </data>
   <data name="username_taken" xml:space="preserve">
-        <value>The username you've chosen is already taken.</value>
+        <value>De gebruikersnaam die je gekozen hebt is al in gebruik.</value>
     </data>
   <data name="password_invalid" xml:space="preserve">
-        <value>Password field is required.</value>
+        <value>Wachtwoordveld is vereist.</value>
     </data>
   <data name="password_doesnt_match" xml:space="preserve">
-        <value>Passwords do not match!</value>
+        <value>Wachtwoorden komen niet overeen!</value>
     </data>
   <data name="captcha_failed" xml:space="preserve">
-        <value>You must complete the captcha correctly.</value>
+        <value>Je moet de captcha correct invullen.</value>
     </data>
   <data name="email_taken" xml:space="preserve">
-        <value>The email address you've chosen is already taken.</value>
+        <value>Het e-mailadres dat je hebt gekozen is al in gebruik.</value>
     </data>
   <data name="email_invalid" xml:space="preserve">
-        <value>Email address field is required.</value>
+        <value>E-mail adres veld is vereist.</value>
     </data>
   <data name="action_no_permission" xml:space="preserve">
-        <value>You don't have permissions to perform this action.</value>
+        <value>U hebt geen rechten om deze actie uit te voeren.</value>
     </data>
 </root>

@@ -18,48 +18,48 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="username" xml:space="preserve">
-        <value>Username</value>
+        <value>उपयोगकर्ता नाम</value>
     </data>
   <data name="password" xml:space="preserve">
-        <value>Password</value>
+        <value>पासवर्ड</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Create an account</value>
+        <value>Register</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
-        <value>Forgot Password?</value>
+        <value>पासवर्ड भूल गए?</value>
     </data>
   <data name="error" xml:space="preserve">
-        <value>Uh oh!</value>
+        <value>अरे नहीं!</value>
     </data>
   <data name="log_in" xml:space="preserve">
-        <value>Log In</value>
+        <value>सत्र प्रारंभ करें</value>
     </data>
   <data name="unknown" xml:space="preserve">
-        <value>Unknown</value>
+        <value>अज्ञात</value>
     </data>
   <data name="success" xml:space="preserve">
-        <value>Success!</value>
+        <value>सफलता!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Reset Password</value>
+        <value>पासवर्ड रीसेट</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
-        <value>Recent Activity</value>
+        <value>हाल की गतिविधि</value>
     </data>
   <data name="soon" xml:space="preserve">
-        <value>Coming soon!</value>
+        <value>शीघ्र ही!</value>
     </data>
   <data name="recent_photos" xml:space="preserve">
-        <value>Most recent photos</value>
+        <value>सबसे ताज़ा तस्वीरें</value>
     </data>
   <data name="email" xml:space="preserve">
-        <value>Email</value>
+        <value>ईमेल</value>
     </data>
   <data name="announcements" xml:space="preserve">
-        <value>Announcements</value>
+        <value>विज्ञापनों</value>
     </data>
   <data name="notifications" xml:space="preserve">
-        <value>Notifications</value>
+        <value>सूचनाएं</value>
     </data>
 </root>

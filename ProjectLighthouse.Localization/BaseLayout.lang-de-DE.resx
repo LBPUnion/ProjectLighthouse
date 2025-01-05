@@ -30,7 +30,7 @@
         <comment>A button on the header that takes you to a list of user-uploaded photos.</comment>
     </data>
   <data name="header_slots" xml:space="preserve">
-        <value>Levels</value>
+        <value>Ebenen</value>
         <comment>A button on the header that takes you to a list of user-uploaded levels. Levels are internally referred to as "slots".</comment>
     </data>
   <data name="header_authentication" xml:space="preserve">
@@ -38,7 +38,7 @@
         <comment>A button on the header that takes you to a list of authentication attempts.</comment>
     </data>
   <data name="header_login" xml:space="preserve">
-        <value>Login</value>
+        <value>Anmelden</value>
         <comment>A button on the header that lets you log in.</comment>
     </data>
   <data name="header_loginRegister" xml:space="preserve">

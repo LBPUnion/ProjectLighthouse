@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+  </resheader>
+  <data name="header_users" xml:space="preserve">
+        <value>Comrades</value>
+        <comment>A button on the header that takes you to the user listing.</comment>
+    </data>
+  <data name="header_photos" xml:space="preserve">
+        <value>Images</value>
+        <comment>A button on the header that takes you to a list of user-uploaded photos.</comment>
+    </data>
+  <data name="header_slots" xml:space="preserve">
+        <value>Levels</value>
+        <comment>A button on the header that takes you to a list of user-uploaded levels. Levels are internally referred to as "slots".</comment>
+    </data>
+  <data name="header_authentication" xml:space="preserve">
+        <value>Validating identity</value>
+        <comment>A button on the header that takes you to a list of authentication attempts.</comment>
+    </data>
+  <data name="header_login" xml:space="preserve">
+        <value>Sign in</value>
+        <comment>A button on the header that lets you log in.</comment>
+    </data>
+  <data name="header_loginRegister" xml:space="preserve">
+        <value>Sign in / Join</value>
+        <comment>A button on the header that lets you log in or register.</comment>
+    </data>
+  <data name="header_adminPanel" xml:space="preserve">
+        <value>Admin</value>
+        <comment>A header link that takes you to the admin panel if available.</comment>
+    </data>
+  <data name="header_logout" xml:space="preserve">
+        <value>Sign out</value>
+        <comment>A shortcut to log you out of your account.</comment>
+    </data>
+  <data name="header_modPanel" xml:space="preserve">
+        <value>Miniluv</value>
+    </data>
+  <data name="generated_by" xml:space="preserve">
+        <value>Page created by {0}.</value>
+    </data>
+  <data name="generated_modified" xml:space="preserve">
+        <value>This page was made with a changed version of Project Lighthouse. Make sure you disclose the source code to any comrades who might use this instance.</value>
+    </data>
+  <data name="js_warn" xml:space="preserve">
+        <value>While we try to use as little JavaScript as we can, we can't promise everything will work without it. We suggest allowing JavaScript for Project Lighthouse.</value>
+    </data>
+  <data name="js_warn_title" xml:space="preserve">
+        <value>JavaScript not on</value>
+    </data>
+  <data name="license_warn_title" xml:space="preserve">
+        <value>Maybe license break</value>
+    </data>
+  <data name="license_warn_1" xml:space="preserve">
+        <value>This public instance changed without publishing changes. Could break {0}.</value>
+    </data>
+  <data name="license_warn_2" xml:space="preserve">
+        <value>If mistake, make issue with output of {0} from root of server code on our {1}issue tracker{2}.</value>
+    </data>
+  <data name="license_warn_3" xml:space="preserve">
+        <value>If not, put source code where comrades can see.</value>
+    </data>
+  <data name="read_only_warn_title" xml:space="preserve">
+        <value>Can only read</value>
+    </data>
+  <data name="read_only_warn" xml:space="preserve">
+        <value>This place only reads. Can't upload levels, images, comments, reviews, or change profiles until just read stops.</value>
+    </data>
+</root>

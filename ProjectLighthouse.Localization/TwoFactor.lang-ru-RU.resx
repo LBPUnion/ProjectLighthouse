@@ -66,15 +66,15 @@
         <value>Неверный Резервный Код</value>
     </data>
   <data name="qr_alternative" xml:space="preserve">
-        <value>Can't use the QR code? You can use this secret key instead:</value>
+        <value>Не можете сканировать QR? Тогда вы можете использовать этот секретный ключ:</value>
     </data>
   <data name="qr_alternative_copy" xml:space="preserve">
-        <value>Copy secret code</value>
+        <value>Скопировать секретный ключ</value>
     </data>
   <data name="qr_alternative_copy_success" xml:space="preserve">
-        <value>Copied to clipboard</value>
+        <value>Скопировано в буфер обмена</value>
     </data>
   <data name="qr_alternative_copy_fail" xml:space="preserve">
-        <value>Failed to copy to clipboard</value>
+        <value>Не удалось скопировать в буфер обмена</value>
     </data>
 </root>

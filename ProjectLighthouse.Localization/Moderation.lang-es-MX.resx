@@ -18,33 +18,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="suspension_heading" xml:space="preserve">
-        <value>Account Suspended</value>
+        <value>Cuenta Suspendida</value>
     </data>
   <data name="suspension_explanation" xml:space="preserve">
-        <value>Your {0} account has been suspended due to code of conduct violations.</value>
+        <value>Tu cuenta de {0} ha sido suspendida debido a infracciones del código de conducta.</value>
     </data>
   <data name="suspension_expiration" xml:space="preserve">
-        <value>During this suspension, the following features will be limited until {0}:</value>
+        <value>Durante esta suspensión, las siguientes características se limitarán hasta el {0}:</value>
     </data>
   <data name="suspension_reason" xml:space="preserve">
-        <value>Reason for suspension: "{0}"</value>
+        <value>Motivo de la suspensión: "{0}"</value>
     </data>
   <data name="suspension_circumvent_warning" xml:space="preserve">
-        <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
+        <value>Los intentos de evadir esta suspensión resultarán en un período de suspensión prolongado.</value>
     </data>
   <data name="lbp_online_multiplayer" xml:space="preserve">
-        <value>LittleBigPlanet™ Online multiplayer</value>
+        <value>Multijugador en línea de LittleBigPlanet™</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>manually dismissed</value>
+        <value>Does not expire</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
-        <value>Profile visibility</value>
+        <value>Visibilidad del perfil</value>
     </data>
   <data name="website_interactions" xml:space="preserve">
-        <value>Browsing levels, photos, and profiles</value>
+        <value>Navegar niveles, fotos y perfiles</value>
     </data>
   <data name="account_profile_management" xml:space="preserve">
-        <value>Account and profile management</value>
+        <value>Gestión de cuenta y perfil</value>
     </data>
 </root>
