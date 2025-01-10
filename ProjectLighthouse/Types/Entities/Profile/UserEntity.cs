@@ -29,7 +29,8 @@ public class UserEntity
     public string IconHash { get; set; }
 
     /// <summary>
-    ///     Markup that displays the username next to a polaroid with the user's icon ingame
+    ///     Markup that displays the username next to a polaroid with the user's icon.
+    ///     This can be used everywhere markup works ingame, e.g. news or notifications
     /// </summary>
     [NotMapped]
     public string InfoXml => $"<player icon=\"{this.IconHash}\">{this.Username}</player>";

@@ -30,7 +30,8 @@ public class SlotEntity
     public string IconHash { get; set; } = "";
 
     /// <summary>
-    ///     Markup that displays the level name next to its badge
+    ///     Markup that displays the level name next to its badge.
+    ///     This can be used everywhere markup works ingame, e.g. news or notifications
     /// </summary>
     [NotMapped]
     public string InfoXml => $"<slot type=\"{this.Type}\" id=\"{this.SlotId}\" icon=\"{this.IconHash}\">{this.Name}</slot>";
