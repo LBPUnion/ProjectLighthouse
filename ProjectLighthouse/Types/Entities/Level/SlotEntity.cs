@@ -29,6 +29,9 @@ public class SlotEntity
 
     public string IconHash { get; set; } = "";
 
+    /// <summary>
+    ///     Markup that displays the level name next to its badge
+    /// </summary>
     [NotMapped]
     public string InfoXml => $"<slot type=\"{this.Type}\" id=\"{this.SlotId}\" icon=\"{this.IconHash}\">{this.Name}</slot>";
 

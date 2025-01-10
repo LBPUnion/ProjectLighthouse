@@ -28,8 +28,11 @@ public class UserEntity
 
     public string IconHash { get; set; }
 
+    /// <summary>
+    ///     Markup that displays the username next to a polaroid with the user's icon ingame
+    /// </summary>
     [NotMapped]
-    public string InfoXml => $"<player icon=\"{this.IconHash}\">{this.Username}</user>";
+    public string InfoXml => $"<player icon=\"{this.IconHash}\">{this.Username}</player>";
 
     /// <summary>
     ///     A user-customizable biography shown on the profile card
