@@ -5,11 +5,13 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Configuration.ConfigurationCategories;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Localization;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Mail;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.Website.Captcha;
 using LBPUnion.ProjectLighthouse.Servers.Website.Middlewares;
 using LBPUnion.ProjectLighthouse.Services;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
@@ -81,7 +83,16 @@ public class WebsiteStartup
 
         services.Configure<RequestLocalizationOptions>(config =>
         {
-            List<CultureInfo> languages = LocalizationManager.GetAvailableLanguages().Select(l => new CultureInfo(LocalizationManager.MapLanguage(l))).ToList();
+            List<CultureInfo> languages = LocalizationManager.GetAvailableLanguages()
+                .Select(l =>
+                {
+                    LocalizationManager.TryGetCultureInfo(l, out CultureInfo? culture);
+                    if(culture == null) Logger.Debug($"Failed to generate culture info for language {l}", LogArea.Startup);
+
+                    return culture;
+                })
+                .Where(c => c != null)
+                .ToList()!;
 
             config.DefaultRequestCulture = new RequestCulture(new CultureInfo("en"));
 

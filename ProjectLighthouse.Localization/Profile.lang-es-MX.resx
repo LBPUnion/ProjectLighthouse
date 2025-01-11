@@ -27,6 +27,6 @@
         <value>{0}'s Página de usuario</value>
     </data>
   <data name="profile_tag" xml:space="preserve">
-        <value>Profile Tag</value>
+        <value>Etiqueta del perfil</value>
     </data>
 </root>

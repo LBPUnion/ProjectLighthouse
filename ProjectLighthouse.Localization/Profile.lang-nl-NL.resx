@@ -18,15 +18,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="biography" xml:space="preserve">
-        <value>Biography</value>
+        <value>Biografie</value>
     </data>
   <data name="no_biography" xml:space="preserve">
-        <value>{0} hasn't introduced themselves yet.</value>
+        <value>{0} Heeft zichzelf nog niet voorgesteld.</value>
     </data>
   <data name="title" xml:space="preserve">
-        <value>{0}'s user page</value>
+        <value>{0} De gebruikerspagina</value>
     </data>
   <data name="profile_tag" xml:space="preserve">
-        <value>Profile Tag</value>
+        <value>Profiel label</value>
     </data>
 </root>

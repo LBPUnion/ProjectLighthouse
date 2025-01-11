@@ -18,33 +18,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="suspension_heading" xml:space="preserve">
-        <value>Account Suspended</value>
+        <value>Konto Gesperrt</value>
     </data>
   <data name="suspension_explanation" xml:space="preserve">
-        <value>Your {0} account has been suspended due to code of conduct violations.</value>
+        <value>Ihr {0} -Konto wurde wegen Verletzung des Verhaltenskodex gesperrt.</value>
     </data>
   <data name="suspension_expiration" xml:space="preserve">
-        <value>During this suspension, the following features will be limited until {0}:</value>
+        <value>Während dieser Suspension sind die folgenden Funktionen bis {0} begrenzt:</value>
     </data>
   <data name="suspension_reason" xml:space="preserve">
-        <value>Reason for suspension: "{0}"</value>
+        <value>Grund für die Suspendierung: "{0}"</value>
     </data>
   <data name="suspension_circumvent_warning" xml:space="preserve">
-        <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
+        <value>Versuche, diese Aussetzung zu umgehen, werden zu einer verlängerten Suspendierung führen.</value>
     </data>
   <data name="lbp_online_multiplayer" xml:space="preserve">
-        <value>LittleBigPlanet™ Online multiplayer</value>
+        <value>LittleBigPlanet™ Online Multiplayer</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>manually dismissed</value>
+        <value>Does not expire</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
-        <value>Profile visibility</value>
+        <value>Profilsichtbarkeit</value>
     </data>
   <data name="website_interactions" xml:space="preserve">
-        <value>Browsing levels, photos, and profiles</value>
+        <value>Levels, Fotos und Profile durchsuchen</value>
     </data>
   <data name="account_profile_management" xml:space="preserve">
-        <value>Account and profile management</value>
+        <value>Konto- und Profilverwaltung</value>
     </data>
 </root>

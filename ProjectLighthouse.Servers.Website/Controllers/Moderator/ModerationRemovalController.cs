@@ -56,52 +56,58 @@ public class ModerationRemovalController : ControllerBase
         UserEntity? user = this.database.UserFromWebRequest(this.Request);
         if (user == null) return this.Redirect("~/login");
 
-        CommentEntity? comment = await this.database.Comments
-            .Include(c => c.TargetUser)
+        CommentEntity? comment = await this.database.Comments.Include(c => c.TargetUser)
             .Include(c => c.TargetSlot)
+            .ThenInclude(s => s!.Creator)
             .FirstOrDefaultAsync(c => c.CommentId == commentId);
         if (comment == null) return this.Redirect("~/404");
-
         if (comment.Deleted) return this.Redirect(callbackUrl ?? "~/");
 
-        bool canDelete;
-        switch (comment.Type)
+        bool canDelete = comment.Type switch
         {
-            case CommentType.Level:
-                int slotCreatorId = await this.database.Slots.Where(s => s.SlotId == comment.TargetSlotId)
-                    .Select(s => s.CreatorId)
-                    .FirstOrDefaultAsync();
-                canDelete = user.UserId == comment.PosterUserId || user.UserId == slotCreatorId;
-                break;
-            case CommentType.Profile:
-                canDelete = user.UserId == comment.PosterUserId || user.UserId == comment.TargetUserId;
-                break;
-            default: throw new ArgumentOutOfRangeException(nameof(commentId));
-        }
-
+            CommentType.Level => user.UserId == comment.PosterUserId || user.UserId == comment.TargetSlot?.CreatorId,
+            CommentType.Profile => user.UserId == comment.PosterUserId || user.UserId == comment.TargetUserId,
+            _ => throw new ArgumentOutOfRangeException(nameof(comment.Type),
+                @"Comment type is not recognized (impossible)."),
+        };
         if (!canDelete && !user.IsModerator) return this.Redirect(callbackUrl ?? "~/");
 
         comment.Deleted = true;
         comment.DeletedBy = user.Username;
         comment.DeletedType = !canDelete && user.IsModerator ? "moderator" : "user";
 
-        switch (comment.Type)
+        switch (comment.DeletedType)
         {
-            case CommentType.Profile when comment.DeletedType == "moderator" && comment.TargetUser != null:
+            case "moderator":
             {
-                await this.database.SendNotification(comment.PosterUserId,
-                    $"Your comment on {comment.TargetUser.Username}'s profile has been removed by a moderator.");
+                string? notificationMessage = comment.Type switch
+                {
+                    CommentType.Profile when comment.TargetUser != null =>
+                        $"Your comment on {comment.TargetUser.Username}'s profile has been removed by a moderator.",
+                    CommentType.Level when comment.TargetSlot != null =>
+                        $"Your comment on level {comment.TargetSlot.Name} has been removed by a moderator.",
+                    _ => null,
+                };
 
+                if (notificationMessage != null)
+                    await this.database.SendNotification(comment.PosterUserId, notificationMessage);
                 break;
             }
-            case CommentType.Level when comment.DeletedType == "moderator" && comment.TargetSlot != null:
+            case "user":
             {
-                await this.database.SendNotification(comment.PosterUserId,
-                    $"Your comment on level {comment.TargetSlot.Name} has been removed by a moderator.");
+                string? notificationMessage = comment.Type switch
+                {
+                    CommentType.Profile when comment.TargetUser != null && user != comment.TargetUser =>
+                        $"Your comment on {comment.TargetUser.Username}'s profile has been removed by the user.",
+                    CommentType.Level when comment.TargetSlot != null && user != comment.TargetSlot.Creator =>
+                        $"Your comment on level {comment.TargetSlot.Name} has been removed by the user.",
+                    _ => null,
+                };
 
+                if (notificationMessage != null)
+                    await this.database.SendNotification(comment.PosterUserId, notificationMessage);
                 break;
             }
-            default: throw new ArgumentOutOfRangeException(nameof(comment.Type), @"Comment type is out of range.");
         }
 
         await this.database.SaveChangesAsync();

@@ -18,52 +18,52 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="enable_2fa" xml:space="preserve">
-        <value>Enable Two-Factor</value>
+        <value>Tweestapsverificatie inschakelen</value>
     </data>
   <data name="disable_2fa" xml:space="preserve">
-        <value>Disable Two-Factor</value>
+        <value>Tweestapsverificatie uitschakelen</value>
     </data>
   <data name="qr_description" xml:space="preserve">
-        <value>Once you have added this two factor code to your app of choice, enter a valid code below to finish the setup process</value>
+        <value>Zodra u deze tweestapsverificatiecode heeft toegevoegd aan uw app van keuze, voert u hieronder een geldige code in om het setup-proces te voltooien</value>
     </data>
   <data name="qr_title" xml:space="preserve">
-        <value>Here is your Two-Factor QR code</value>
+        <value>Hier is je tweestapsQR-code</value>
     </data>
   <data name="backup_title" xml:space="preserve">
-        <value>Backup codes</value>
+        <value>Reservekopie codes</value>
     </data>
   <data name="backup_description" xml:space="preserve">
-        <value>These codes will allow you to regain access to your account if you ever lose access to your 2FA device</value>
+        <value>Met deze codes krijgt u toegang tot uw account als u ooit de toegang tot uw 2FA-apparaat verliest</value>
     </data>
   <data name="backup_description2" xml:space="preserve">
-        <value>Save these codes somewhere because otherwise you may be locked out of your account</value>
+        <value>Sla deze codes ergens op, omdat anders je buiten je account geblokkeerd kan worden</value>
     </data>
   <data name="backup_confirmation" xml:space="preserve">
-        <value>I've saved these codes</value>
+        <value>Ik heb deze codes opgeslagen</value>
     </data>
   <data name="invalid_code" xml:space="preserve">
-        <value>Invalid 2FA Code</value>
+        <value>Ongeldige 2FA Code</value>
     </data>
   <data name="disable_2fa_description" xml:space="preserve">
-        <value>To disable two-factor authentication, enter a correct code from your authenticator app.</value>
+        <value>Voer een correcte code van uw authenticatie-app in om tweestapsverificatie uit te schakelen.</value>
     </data>
   <data name="2fa" xml:space="preserve">
-        <value>Two-Factor Authentication</value>
+        <value>Twee-factor-authenticatie</value>
     </data>
   <data name="2fa_required" xml:space="preserve">
-        <value>You are required to setup 2FA because of your role within this instance.</value>
+        <value>Je bent verplicht om 2FA in te stellen vanwege je rol binnen deze instantie.</value>
     </data>
   <data name="2fa_description" xml:space="preserve">
-        <value>Enter a valid 2FA code to continue</value>
+        <value>Voer een geldige 2FA-code in om door te gaan</value>
     </data>
   <data name="2fa_backup_description" xml:space="preserve">
-        <value>Alternatively, you can click {0}here{1} to enter one of your backup codes</value>
+        <value>Als alternatief kunt u op {0}hier klikken{1} om een van uw backupcodes in te voeren</value>
     </data>
   <data name="backup_download" xml:space="preserve">
-        <value>Download backup codes</value>
+        <value>Back-up codes downloaden</value>
     </data>
   <data name="invalid_backup" xml:space="preserve">
-        <value>Invalid Backup Code</value>
+        <value>Ongeldige back-up code</value>
     </data>
   <data name="qr_alternative" xml:space="preserve">
         <value>Can't use the QR code? You can use this secret key instead:</value>

@@ -24,7 +24,7 @@
         <value>Mot de passe</value>
     </data>
   <data name="register" xml:space="preserve">
-        <value>Create an account</value>
+        <value>Créer un compte</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
         <value>Mot de passe oublié?</value>
@@ -57,7 +57,7 @@
         <value>Courriel</value>
     </data>
   <data name="announcements" xml:space="preserve">
-        <value>Announcements</value>
+        <value>Annonces</value>
     </data>
   <data name="notifications" xml:space="preserve">
         <value>Notifications</value>

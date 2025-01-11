@@ -7,6 +7,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,9 +56,12 @@ public class UserSettingsPage : BaseLayout
             if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
                 return this.Redirect($"~/user/{userId}");
 
-            biography = CensorHelper.FilterMessage(biography);
             if (this.ProfileUser.Biography != biography && biography.Length <= 512)
-                this.ProfileUser.Biography = biography;
+            {
+                string filteredBio = CensorHelper.FilterMessage(biography, FilterLocation.UserBiography, this.ProfileUser.Username);
+
+                this.ProfileUser.Biography = filteredBio;
+            }
         }
 
         if (ServerConfiguration.Instance.Mail.MailEnabled &&

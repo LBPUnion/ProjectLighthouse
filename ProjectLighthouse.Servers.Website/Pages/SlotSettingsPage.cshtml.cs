@@ -5,6 +5,8 @@ using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Users;
+using LBPUnion.ProjectLighthouse.Types.Filter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +19,18 @@ public class SlotSettingsPage : BaseLayout
     public SlotSettingsPage(DatabaseContext database) : base(database)
     {}
 
-    public async Task<IActionResult> OnPost([FromRoute] int slotId, [FromForm] string? avatar, [FromForm] string? name, [FromForm] string? description, string? labels)
+    public async Task<IActionResult> OnPost
+    (
+        [FromRoute] int slotId,
+        [FromForm] string? avatar,
+        [FromForm] string? name,
+        [FromForm] string? description,
+        [FromForm] string? labels,
+        [FromForm] bool initiallyLocked,
+        [FromForm] int shareable,
+        [FromForm] bool subLevel,
+        [FromForm] bool lbp1Only
+    )
     {
         this.Slot = await this.Database.Slots.FirstOrDefaultAsync(u => u.SlotId == slotId);
         if (this.Slot == null) return this.NotFound();
@@ -36,15 +49,15 @@ public class SlotSettingsPage : BaseLayout
 
         if (name != null)
         {
-            name = CensorHelper.FilterMessage(name);
-            if (this.Slot.Name != name && name.Length <= 64)
+            name = CensorHelper.FilterMessage(name, FilterLocation.SlotName, this.User.Username);
+            if (this.Slot.Name != name && name.Length <= 64) 
                 this.Slot.Name = name;
         }
 
         if (description != null)
         {
-            description = CensorHelper.FilterMessage(description);
-            if (this.Slot.Description != description && description?.Length <= 512)
+            description = CensorHelper.FilterMessage(description, FilterLocation.SlotDescription, this.User.Username);
+            if (this.Slot.Description != description && description.Length <= 512) 
                 this.Slot.Description = description;
         }
 
@@ -53,6 +66,22 @@ public class SlotSettingsPage : BaseLayout
             labels = LabelHelper.RemoveInvalidLabels(labels);
             if (this.Slot.AuthorLabels != labels)
                 this.Slot.AuthorLabels = labels;
+        }
+
+        if (this.Slot.InitiallyLocked != initiallyLocked) this.Slot.InitiallyLocked = initiallyLocked;
+
+        if (this.Slot.Shareable != shareable) this.Slot.Shareable = shareable;
+
+        if (this.Slot.SubLevel != subLevel) 
+        {
+            if (this.Slot.GameVersion != GameVersion.LittleBigPlanet1)
+                this.Slot.SubLevel = subLevel;
+        }
+
+        if (this.Slot.Lbp1Only != lbp1Only) 
+        {
+            if (this.Slot.GameVersion == GameVersion.LittleBigPlanet1)
+                this.Slot.Lbp1Only = lbp1Only;
         }
 
         // ReSharper disable once InvertIf

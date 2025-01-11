@@ -27,24 +27,24 @@
         <value>Durante questa sospensione, le seguenti funzioni saranno limitate fino al {0}:</value>
     </data>
   <data name="suspension_reason" xml:space="preserve">
-        <value>Reason for suspension: "{0}"</value>
+        <value>Motivo della sospensione: "{0}"</value>
     </data>
   <data name="suspension_circumvent_warning" xml:space="preserve">
-        <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
+        <value>I tentativi di raggirare questa sospensione risulteranno in un periodo di sospensione prolungato.</value>
     </data>
   <data name="lbp_online_multiplayer" xml:space="preserve">
-        <value>LittleBigPlanet™ Online multiplayer</value>
+        <value>LittleBigPlanet™ Multigiocatore online</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
         <value>manually dismissed</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
-        <value>Profile visibility</value>
+        <value>Visibilità del profilo</value>
     </data>
   <data name="website_interactions" xml:space="preserve">
-        <value>Browsing levels, photos, and profiles</value>
+        <value>Navigazione tra livelli, foto e profili</value>
     </data>
   <data name="account_profile_management" xml:space="preserve">
-        <value>Account and profile management</value>
+        <value>Gestione di account e profilo</value>
     </data>
 </root>

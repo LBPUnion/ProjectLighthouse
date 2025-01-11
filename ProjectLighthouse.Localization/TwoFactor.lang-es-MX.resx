@@ -18,52 +18,52 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="enable_2fa" xml:space="preserve">
-        <value>Enable Two-Factor</value>
+        <value>Activar Dos Factores</value>
     </data>
   <data name="disable_2fa" xml:space="preserve">
-        <value>Disable Two-Factor</value>
+        <value>Desactivar Dos Factores</value>
     </data>
   <data name="qr_description" xml:space="preserve">
-        <value>Once you have added this two factor code to your app of choice, enter a valid code below to finish the setup process</value>
+        <value>Una vez que hayas añadido este código de autenticación de dos factores a la aplicación de tu elección, introduce un código válido a continuación para finalizar el proceso de configuración</value>
     </data>
   <data name="qr_title" xml:space="preserve">
-        <value>Here is your Two-Factor QR code</value>
+        <value>Aquí está tu código QR de Dos Factores</value>
     </data>
   <data name="backup_title" xml:space="preserve">
-        <value>Backup codes</value>
+        <value>Códigos de respaldo</value>
     </data>
   <data name="backup_description" xml:space="preserve">
-        <value>These codes will allow you to regain access to your account if you ever lose access to your 2FA device</value>
+        <value>Estos códigos te permitirán recuperar el acceso a tu cuenta si alguna vez pierdes el acceso a tu dispositivo A2F</value>
     </data>
   <data name="backup_description2" xml:space="preserve">
-        <value>Save these codes somewhere because otherwise you may be locked out of your account</value>
+        <value>Guarda estos códigos en algún lugar porque, de lo contrario, podrías estar bloqueado fuera de tu cuenta</value>
     </data>
   <data name="backup_confirmation" xml:space="preserve">
-        <value>I've saved these codes</value>
+        <value>He guardado estos códigos</value>
     </data>
   <data name="invalid_code" xml:space="preserve">
-        <value>Invalid 2FA Code</value>
+        <value>Código A2F inválido</value>
     </data>
   <data name="disable_2fa_description" xml:space="preserve">
-        <value>To disable two-factor authentication, enter a correct code from your authenticator app.</value>
+        <value>Para desactivar la autenticación de dos factores, introduce un código correcto de tu aplicación de autenticación.</value>
     </data>
   <data name="2fa" xml:space="preserve">
-        <value>Two-Factor Authentication</value>
+        <value>Autenticación de dos factores</value>
     </data>
   <data name="2fa_required" xml:space="preserve">
-        <value>You are required to setup 2FA because of your role within this instance.</value>
+        <value>Debes configurar A2F debido a tu rol dentro de esta instancia.</value>
     </data>
   <data name="2fa_description" xml:space="preserve">
-        <value>Enter a valid 2FA code to continue</value>
+        <value>Introduzca un código A2F válido para continuar</value>
     </data>
   <data name="2fa_backup_description" xml:space="preserve">
-        <value>Alternatively, you can click {0}here{1} to enter one of your backup codes</value>
+        <value>También puedes hacer clic {0}aquí{1} para introducir uno de tus códigos de respaldo</value>
     </data>
   <data name="backup_download" xml:space="preserve">
-        <value>Download backup codes</value>
+        <value>Descargar los códigos de respaldo</value>
     </data>
   <data name="invalid_backup" xml:space="preserve">
-        <value>Invalid Backup Code</value>
+        <value>Código de Respaldo Inválido</value>
     </data>
   <data name="qr_alternative" xml:space="preserve">
         <value>Can't use the QR code? You can use this secret key instead:</value>

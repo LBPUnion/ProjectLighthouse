@@ -81,9 +81,9 @@
         <value>Если нет, пожалуйста, опубликуйте исходный код в доступном для ваших пользователей месте.</value>
     </data>
   <data name="read_only_warn_title" xml:space="preserve">
-        <value>Read-Only Mode</value>
+        <value>Режим "только для чтения"</value>
     </data>
   <data name="read_only_warn" xml:space="preserve">
-        <value>This instance is currently in read-only mode. Level and photo uploads, comments, reviews, and certain profile changes will be restricted until read-only mode is disabled.</value>
+        <value>Данный экземпляр находится в режиме "только для чтения". Загрузка уровней и фото, комментарии, обзоры, а также некоторые изменения профиля будут недоступны до отключения режима "только для чтения".</value>
     </data>
 </root>

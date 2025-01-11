@@ -60,6 +60,33 @@ function onSubmit(){
                     <label style="text-align: left" for="description">Description</label>
                     <textarea name="description" id="description" spellcheck="false" placeholder="Description">@HttpUtility.HtmlDecode(Model.Slot.Description)</textarea>
                 </div>
+                <div class="ui divider"></div>
+                <label class="ui button @(Model.Slot.InitiallyLocked ? "selected" : "")" style="margin-bottom: 1em;" for="checkboxInitiallyLocked">
+                    <i class="lock icon"></i>
+                    Locked
+                    <input type="checkbox" name="initiallyLocked" id="checkboxInitiallyLocked" style="margin-left: 5px;" onchange="onCheckboxChange(this)" @(Model.Slot.InitiallyLocked ? "checked" : "") value="true">
+                </label>
+                <label class="ui button @(Model.Slot.Shareable == 1 ? "selected" : "")" style="margin-bottom: 1em;" for="checkboxShareable">
+                    <i class="check icon"></i>
+                    Copyable
+                    <input type="checkbox" name="shareable" id="checkboxShareable" style="margin-left: 5px;" onchange="onCheckboxChange(this)" @(Model.Slot.Shareable == 1 ? "checked" : "") value="1">
+                </label>
+                @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
+                {
+                    <label class="ui button @(Model.Slot.SubLevel ? "selected" : "")" style="margin-bottom: 1em;" for="checkboxSubLevel">
+                        <i class="arrow circle down icon"></i>
+                        Sub Level
+                        <input type="checkbox" name="subLevel" id="checkboxSubLevel" style="margin-left: 5px;" onchange="onCheckboxChange(this)" @(Model.Slot.SubLevel ? "checked" : "") value="true">
+                    </label>
+                }
+                else
+                {
+                    <label class="ui button @(Model.Slot.Lbp1Only ? "selected" : "")" style="margin-bottom: 1em;" for="checkboxLbp1Only">
+                        <i class="eye icon"></i>
+                        LBP1 Only
+                        <input type="checkbox" name="lbp1Only" id="checkboxLbp1Only" style="margin-left: 5px;" onchange="onCheckboxChange(this)" @(Model.Slot.Lbp1Only ? "checked" : "") value="true">
+                    </label>
+                }
                 @if (Model.Slot.GameVersion != GameVersion.LittleBigPlanet1)
                 {
                     <div class="field">
@@ -105,6 +132,14 @@ function onSubmit(){
   }
   function onHoverStart(btn){          
       generateRandomSkew(btn);
+  }
+  function onCheckboxChange(checkbox) {
+      const label = checkbox.parentElement;
+      if (checkbox.checked) {
+          label.classList.add('selected');
+      } else {
+          label.classList.remove('selected');
+      }
   }
   function generateRandomSkew(element){
       let rand = Math.random() * 6 - 3; 

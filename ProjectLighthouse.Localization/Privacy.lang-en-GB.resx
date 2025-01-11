@@ -33,7 +33,7 @@
         <value>Share your {0} with everyone!</value>
     </data>
   <data name="privacy_psn" xml:space="preserve">
-        <value>Only share your {0} with users who are signed into the website or playing in-game.</value>
+        <value>Only share your {0} with users who are signed in to the website or playing in-game.</value>
     </data>
   <data name="privacy_game" xml:space="preserve">
         <value>Only share your {0} with users who are playing in-game.</value>

@@ -36,7 +36,7 @@
         <value>Онлайн мультиплеер LittleBigPlanet™</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>manually dismissed</value>
+        <value>Не ограничен</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
         <value>Доступность профиля</value>

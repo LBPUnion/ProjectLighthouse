@@ -18,24 +18,24 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="enable_comments" xml:space="preserve">
-        <value>Enable commenting on your profile.</value>
+        <value>Включить комментирование в вашем профиле.</value>
     </data>
   <data name="disable_comments" xml:space="preserve">
-        <value>Disable commenting on your profile.</value>
+        <value>Отключить комментирование в вашем профиле.</value>
     </data>
   <data name="no_blocked_users" xml:space="preserve">
-        <value>You have not blocked any users.</value>
+        <value>Вы ещё никого не заблокировали.</value>
     </data>
   <data name="blocked_users" xml:space="preserve">
-        <value>You have blocked {0} user(s).</value>
+        <value>Вы заблокировали {0} Пользователей.</value>
     </data>
   <data name="privacy_all" xml:space="preserve">
-        <value>Share your {0} with everyone!</value>
+        <value>Поделитесь {0} со всеми!</value>
     </data>
   <data name="privacy_psn" xml:space="preserve">
-        <value>Only share your {0} with users who are signed into the website or playing in-game.</value>
+        <value>Поделитесь вашим {0} только с теми пользователями которые зарегистрированы на сайте или находящееся в игре.</value>
     </data>
   <data name="privacy_game" xml:space="preserve">
-        <value>Only share your {0} with users who are playing in-game.</value>
+        <value>Поделитесь вашим {0} только с пользователями которые находятся в игре.</value>
     </data>
 </root>
