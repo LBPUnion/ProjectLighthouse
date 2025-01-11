@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Resources;
 
@@ -16,7 +17,7 @@ public static class LocalizationManager
         language = mapLanguageBack(language);
 
         #if DEBUG
-        Console.WriteLine($"Attempting to load '{key}' for '{language}'");
+        Console.WriteLine($@"Attempting to load '{key}' for '{language}'");
         #endif
 
         string resourceBasename = $"{namespaceStr}.{translationArea.ToString()}";
@@ -84,28 +85,51 @@ public static class LocalizationManager
     };
 
     /// <summary>
-    /// Some languages crowdin uses have names that differ from the ones that ASP.NET expects. This function converts the names.
+    /// Returns a Crowdin friendly language code from an ASP.NET language code
     /// </summary>
-    /// <param name="language">The language to convert to ASP.NET names</param>
-    /// <returns>The name of the language that ASP.NET expects.</returns>
-    public static string MapLanguage(string language)
-    {
-        foreach ((string? key, string? value) in languageMappings)
-        {
-            if (key == language) return value;
-        }
+    /// <param name="language">The ASP.NET language code</param>
+    /// <returns>The Crowdin friendly language code</returns>
+    private static string mapLanguageBack(string language)
+        => languageMappings.FirstOrDefault(kv => kv.Value == language, KeyValuePair.Create(language, "")).Key;
+    
 
-        return language;
+    private static string getLanguageDisplay(string langCode)
+    {
+        return langCode switch
+        {
+            "en-PT" => "Pirate Speak (The Seven Seas)",
+            "en-UD" => "English (Upside Down)",
+            "zh-CN" => "Simplified Chinese",
+            "zh-TW" => "Traditional Chinese",
+            "ingsoc" => "Newspeak",
+            "toki" => "Toki Pona",
+            _ => langCode,
+        };
+        
     }
 
-    private static string mapLanguageBack(string language)
+    public static string GetLanguageName(string langCode)
     {
-        foreach ((string? key, string? value) in languageMappings)
+        string mappedLanguage = getLanguageDisplay(langCode);
+        if(mappedLanguage == langCode && TryGetCultureInfo(langCode, out CultureInfo? info))
         {
-            if (value == language) return key;
+            return info!.DisplayName;
         }
+        return mappedLanguage;
+    }
 
-        return language;
+    public static bool TryGetCultureInfo(string name, out CultureInfo? culture)
+    {
+        try
+        {
+            culture = new CultureInfo(name);
+            return true;
+        }
+        catch
+        {
+            culture = null;
+            return false;
+        }
     }
 
     // This is a bit scuffed, but it will work for what I need it to do.
@@ -116,7 +140,7 @@ public static class LocalizationManager
         List<string> languages = Assembly.GetExecutingAssembly()
             .GetManifestResourceNames()
             .Where(r => r.StartsWith($"{namespaceStr}.{area}"))
-            .Select(r => r.Substring(r.IndexOf(area), r.Length - r.IndexOf(area)).Substring(area.Length + 1))
+            .Select(r => r.Substring(r.IndexOf(area), r.Length - r.IndexOf(area))[(area.Length + 1)..])
             .Select(r => r.Replace(".resources", string.Empty)) // Remove .resources
             .Select(r => r.Replace("lang-", string.Empty)) // Remove 'lang-' prefix from languages
             .Where(r => r != "resources")

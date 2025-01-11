@@ -27,6 +27,6 @@
         <value>Страница пользователя {0}</value>
     </data>
   <data name="profile_tag" xml:space="preserve">
-        <value>Profile Tag</value>
+        <value>Тег профиля</value>
     </data>
 </root>

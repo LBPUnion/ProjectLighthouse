@@ -18,7 +18,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="suspension_heading" xml:space="preserve">
-        <value>Account Suspended</value>
+        <value>Account suspended</value>
     </data>
   <data name="suspension_explanation" xml:space="preserve">
         <value>Your {0} account has been suspended due to code of conduct violations.</value>
@@ -33,10 +33,10 @@
         <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
     </data>
   <data name="lbp_online_multiplayer" xml:space="preserve">
-        <value>LittleBigPlanet™ Online multiplayer</value>
+        <value>LittleBigPlanet™ online multiplayer</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>manually dismissed</value>
+        <value>Manually dismissed.</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
         <value>Profile visibility</value>

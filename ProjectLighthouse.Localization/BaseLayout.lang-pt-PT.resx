@@ -38,7 +38,7 @@
         <comment>A button on the header that takes you to a list of authentication attempts.</comment>
     </data>
   <data name="header_login" xml:space="preserve">
-        <value>Login</value>
+        <value>Iniciar Sessão</value>
         <comment>A button on the header that lets you log in.</comment>
     </data>
   <data name="header_loginRegister" xml:space="preserve">
@@ -81,9 +81,9 @@
         <value>Se não for o caso, publique o código-fonte em um local acessível aos seus utilizadores.</value>
     </data>
   <data name="read_only_warn_title" xml:space="preserve">
-        <value>Read-Only Mode</value>
+        <value>Modo somente leitura</value>
     </data>
   <data name="read_only_warn" xml:space="preserve">
-        <value>This instance is currently in read-only mode. Level and photo uploads, comments, reviews, and certain profile changes will be restricted until read-only mode is disabled.</value>
+        <value>Esta instância está atualmente em modo somente leitura. Envios de foto, comentários, análises e certas alterações de perfil serão restringidas até que o modo somente leitura seja desativado.</value>
     </data>
 </root>

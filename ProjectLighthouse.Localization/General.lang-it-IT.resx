@@ -57,9 +57,9 @@
         <value>Email</value>
     </data>
   <data name="announcements" xml:space="preserve">
-        <value>Announcements</value>
+        <value>Annunci</value>
     </data>
   <data name="notifications" xml:space="preserve">
-        <value>Notifications</value>
+        <value>Notifiche</value>
     </data>
 </root>

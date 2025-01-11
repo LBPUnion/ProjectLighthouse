@@ -39,6 +39,6 @@
         <value>Il campo dell'indirizzo email è obbligatorio.</value>
     </data>
   <data name="action_no_permission" xml:space="preserve">
-        <value>You don't have permissions to perform this action.</value>
+        <value>Non hai i permessi per eseguire questa azione.</value>
     </data>
 </root>

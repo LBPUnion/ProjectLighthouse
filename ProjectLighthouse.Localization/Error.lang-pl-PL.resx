@@ -39,6 +39,6 @@
         <value>Pole adresu E-mail jest wymagane.</value>
     </data>
   <data name="action_no_permission" xml:space="preserve">
-        <value>You don't have permissions to perform this action.</value>
+        <value>Nie masz uprawnień do wykonania tej akcji.</value>
     </data>
 </root>

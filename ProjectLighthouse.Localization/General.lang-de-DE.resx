@@ -54,12 +54,12 @@
         <value>Neueste Fotos</value>
     </data>
   <data name="email" xml:space="preserve">
-        <value>Email</value>
+        <value>E-Mail</value>
     </data>
   <data name="announcements" xml:space="preserve">
-        <value>Announcements</value>
+        <value>Ankündigungen</value>
     </data>
   <data name="notifications" xml:space="preserve">
-        <value>Notifications</value>
+        <value>Mitteilungen</value>
     </data>
 </root>
