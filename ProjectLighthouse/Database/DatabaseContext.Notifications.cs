@@ -15,9 +15,10 @@ public partial class DatabaseContext
     /// </summary>
     /// <param name="userId">The user ID of the target user.</param>
     /// <param name="text">The message to send.</param>
+    /// <param name="prefix">Prepend server name/timestamp.</param>
     /// <param name="type">The <see cref="NotificationType"/> for the notification. Defaults to <c>ModerationNotification</c>.</param>
     public async Task SendNotification
-        (int userId, string text, NotificationType type = NotificationType.ModerationNotification)
+        (int userId, string text, bool prefix = true, NotificationType type = NotificationType.ModerationNotification)
     {
         if (!await this.Users.AnyAsync(u => u.UserId == userId))
         {
@@ -31,15 +32,19 @@ public partial class DatabaseContext
 
         StringBuilder builder = new(text);
 
-        // Prepend server name to notification text if enabled
-        if (ServerConfiguration.Instance.NotificationConfiguration.ShowServerNameInText)
+        if (prefix)
         {
-            builder.Insert(0, $"[{ServerConfiguration.Instance.Customization.ServerName}] ");
-        }
-        // Prepend timestamp to notification text if enabled
-        if (ServerConfiguration.Instance.NotificationConfiguration.ShowTimestampInText)
-        {
-            builder.Insert(0, $"[{DateTime.Now:g}] ");
+            // Prepend server name to notification text if enabled
+            if (ServerConfiguration.Instance.NotificationConfiguration.ShowServerNameInText)
+            {
+                builder.Insert(0, $"[{ServerConfiguration.Instance.Customization.ServerName}] ");
+            }
+
+            // Prepend timestamp to notification text if enabled
+            if (ServerConfiguration.Instance.NotificationConfiguration.ShowTimestampInText)
+            {
+                builder.Insert(0, $"[{DateTime.Now:g}] ");
+            }
         }
 
         NotificationEntity notification = new()
