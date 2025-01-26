@@ -18,52 +18,52 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="enable_2fa" xml:space="preserve">
-        <value>Enable Two-Factor</value>
+        <value>दोनों कारकों को सक्रिय करें</value>
     </data>
   <data name="disable_2fa" xml:space="preserve">
-        <value>Disable Two-Factor</value>
+        <value>दोनों कारकों को अक्षम करें</value>
     </data>
   <data name="qr_description" xml:space="preserve">
-        <value>Once you have added this two factor code to your app of choice, enter a valid code below to finish the setup process</value>
+        <value>एक बार जब आप अपने पसंदीदा ऐप में यह दो कारक कोड जोड़ लेते हैं, तो सेटअप प्रक्रिया पूरी करने के लिए नीचे एक मान्य कोड दर्ज करें</value>
     </data>
   <data name="qr_title" xml:space="preserve">
-        <value>Here is your Two-Factor QR code</value>
+        <value>यहां दो-कारक क्यूआर कोड है</value>
     </data>
   <data name="backup_title" xml:space="preserve">
-        <value>Backup codes</value>
+        <value>बैकअप कोड</value>
     </data>
   <data name="backup_description" xml:space="preserve">
-        <value>These codes will allow you to regain access to your account if you ever lose access to your 2FA device</value>
+        <value>यदि आप कभी भी अपने 2FA डिवाइस तक पहुंच खो देते हैं तो ये कोड आपको अपने खाते तक पहुंच पुनः प्राप्त करने की अनुमति देंगे</value>
     </data>
   <data name="backup_description2" xml:space="preserve">
-        <value>Save these codes somewhere because otherwise you may be locked out of your account</value>
+        <value>इन कोड को कहीं सुरक्षित रख लें, अन्यथा आपका अकाउंट लॉक हो सकता है</value>
     </data>
   <data name="backup_confirmation" xml:space="preserve">
-        <value>I've saved these codes</value>
+        <value>मैंने ये कोड सहेज लिए हैं</value>
     </data>
   <data name="invalid_code" xml:space="preserve">
-        <value>Invalid 2FA Code</value>
+        <value>अमान्य 2FA कोड</value>
     </data>
   <data name="disable_2fa_description" xml:space="preserve">
-        <value>To disable two-factor authentication, enter a correct code from your authenticator app.</value>
+        <value>दो-कारक प्रमाणीकरण अक्षम करने के लिए, अपने प्रमाणक ऐप से सही कोड दर्ज करें.</value>
     </data>
   <data name="2fa" xml:space="preserve">
-        <value>Two-Factor Authentication</value>
+        <value>दो कारक प्रमाणीकरण</value>
     </data>
   <data name="2fa_required" xml:space="preserve">
-        <value>You are required to setup 2FA because of your role within this instance.</value>
+        <value>इस इंस्टैंस में आपकी भूमिका के कारण आपको 2FA सेटअप करना आवश्यक है।</value>
     </data>
   <data name="2fa_description" xml:space="preserve">
-        <value>Enter a valid 2FA code to continue</value>
+        <value>जारी रखने के लिए मान्य 2FA कोड दर्ज करें</value>
     </data>
   <data name="2fa_backup_description" xml:space="preserve">
-        <value>Alternatively, you can click {0}here{1} to enter one of your backup codes</value>
+        <value>वैकल्पिक रूप से, आप अपना कोई बैकअप कोड दर्ज करने के लिए {0}यहां{1} क्लिक कर सकते हैं</value>
     </data>
   <data name="backup_download" xml:space="preserve">
-        <value>Download backup codes</value>
+        <value>बैकअप कोड डाउनलोड करें</value>
     </data>
   <data name="invalid_backup" xml:space="preserve">
-        <value>Invalid Backup Code</value>
+        <value>अमान्य बैकअप कोड</value>
     </data>
   <data name="qr_alternative" xml:space="preserve">
         <value>Can't use the QR code? You can use this secret key instead:</value>

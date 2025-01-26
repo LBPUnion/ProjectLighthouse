@@ -66,15 +66,15 @@
         <value>Code de secours non valide</value>
     </data>
   <data name="qr_alternative" xml:space="preserve">
-        <value>Can't use the QR code? You can use this secret key instead:</value>
+        <value>Vous ne pouvez pas utiliser le code QR ? Vous pouvez utiliser cette clé secrète à la place :</value>
     </data>
   <data name="qr_alternative_copy" xml:space="preserve">
-        <value>Copy secret code</value>
+        <value>Copier le code secret</value>
     </data>
   <data name="qr_alternative_copy_success" xml:space="preserve">
-        <value>Copied to clipboard</value>
+        <value>Copié dans le presse-papiers</value>
     </data>
   <data name="qr_alternative_copy_fail" xml:space="preserve">
-        <value>Failed to copy to clipboard</value>
+        <value>Échec de la copie dans le presse-papiers</value>
     </data>
 </root>

@@ -18,24 +18,24 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="enable_comments" xml:space="preserve">
-        <value>Enable commenting on your profile.</value>
+        <value>Activer les commentaires sur votre profil.</value>
     </data>
   <data name="disable_comments" xml:space="preserve">
-        <value>Disable commenting on your profile.</value>
+        <value>Désactiver les commentaires sur votre profil.</value>
     </data>
   <data name="no_blocked_users" xml:space="preserve">
-        <value>You have not blocked any users.</value>
+        <value>Vous n'avez bloqué aucun utilisateur.</value>
     </data>
   <data name="blocked_users" xml:space="preserve">
-        <value>You have blocked {0} user(s).</value>
+        <value>Vous avez bloqué {0} utilisateur(s).</value>
     </data>
   <data name="privacy_all" xml:space="preserve">
-        <value>Share your {0} with everyone!</value>
+        <value>Partagez votre {0} avec tout le monde !</value>
     </data>
   <data name="privacy_psn" xml:space="preserve">
-        <value>Only share your {0} with users who are signed into the website or playing in-game.</value>
+        <value>Ne partagez votre {0} qu'avec les utilisateurs qui sont connectés au site web ou qui jouent dans le jeu.</value>
     </data>
   <data name="privacy_game" xml:space="preserve">
-        <value>Only share your {0} with users who are playing in-game.</value>
+        <value>Ne partagez votre {0} qu'avec les utilisateurs qui jouent dans le jeu.</value>
     </data>
 </root>

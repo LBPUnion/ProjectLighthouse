@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -151,7 +152,9 @@ public class ScoreController : ControllerBase
             this.database.Scores.Add(existingScore);
         }
 
-        if (score.Points > existingScore.Points)
+        bool personalBest = score.Points > existingScore.Points;
+        
+        if (personalBest)
         {
             existingScore.Points = score.Points;
             existingScore.Timestamp = TimeHelper.TimestampMillis;
@@ -159,7 +162,7 @@ public class ScoreController : ControllerBase
 
         await this.database.SaveChangesAsync();
 
-        return this.Ok(await this.GetScores(new LeaderboardOptions
+        ScoreboardResponse scores = await this.GetScores(new LeaderboardOptions
         {
             RootName = "scoreboardSegment",
             PageSize = 5,
@@ -169,7 +172,19 @@ public class ScoreController : ControllerBase
             ScoreType = score.Type,
             TargetUser = token.UserId,
             TargetPlayerIds = null,
-        })); 
+        });
+
+        // if this is a PB, singleplayer, at the top of the leaderboard (not scores.YourRank==1 because it might be tied), and there is at least one other score,
+        // send a notification to the user with the previous highscore
+        if (personalBest && score.Type == 1 && scores.Scores[0].UserId == token.UserId && scores.Total > 1)
+        {
+            GameScore? second = scores.Scores[1];
+            UserEntity? user = await this.database.UserFromGameToken(token);
+
+            await this.database.SendNotification(second.UserId, $"{user?.InfoXml} beat your highscore (<em>{second.Points}</em>) on {slot.InfoXml} with a score of <em>{score.Points}</em>.", false);
+        }
+
+        return this.Ok(scores); 
     }
 
     [HttpGet("scoreboard/{slotType}/{id:int}")]

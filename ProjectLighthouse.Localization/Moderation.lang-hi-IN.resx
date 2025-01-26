@@ -18,33 +18,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="suspension_heading" xml:space="preserve">
-        <value>Account Suspended</value>
+        <value>खाता निलंबित कर दिया गया है</value>
     </data>
   <data name="suspension_explanation" xml:space="preserve">
-        <value>Your {0} account has been suspended due to code of conduct violations.</value>
+        <value>आचार संहिता के उल्लंघन के कारण आपका {0} खाता निलंबित कर दिया गया है।</value>
     </data>
   <data name="suspension_expiration" xml:space="preserve">
-        <value>During this suspension, the following features will be limited until {0}:</value>
+        <value>निलंबन के दौरान, निम्नलिखित विकल्प {0} तक सीमित रहेंगे:</value>
     </data>
   <data name="suspension_reason" xml:space="preserve">
-        <value>Reason for suspension: "{0}"</value>
+        <value>निलंबन का कारण: "{0}"</value>
     </data>
   <data name="suspension_circumvent_warning" xml:space="preserve">
-        <value>Attempts to circumvent this suspension will result in an extended suspension period.</value>
+        <value>इस निलंबन को दरकिनार करने के प्रयासों के परिणामस्वरूप निलंबन अवधि बढ़ा दी जाएगी।</value>
     </data>
   <data name="lbp_online_multiplayer" xml:space="preserve">
-        <value>LittleBigPlanet™ Online multiplayer</value>
+        <value>लिटिलबिगप्लेनेट™ ऑनलाइन मल्टीप्लेयर</value>
     </data>
   <data name="does_not_expire" xml:space="preserve">
-        <value>manually dismissed</value>
+        <value>मैन्युअल रूप से अनदेखा किया गया</value>
     </data>
   <data name="profile_visibility" xml:space="preserve">
-        <value>Profile visibility</value>
+        <value>प्रोफ़ाइल विजिबिलिटी</value>
     </data>
   <data name="website_interactions" xml:space="preserve">
-        <value>Browsing levels, photos, and profiles</value>
+        <value>ब्राउज़िंग स्तर, फ़ोटो और प्रोफ़ाइल</value>
     </data>
   <data name="account_profile_management" xml:space="preserve">
-        <value>Account and profile management</value>
+        <value>खाता और प्रोफ़ाइल प्रबंधन</value>
     </data>
 </root>

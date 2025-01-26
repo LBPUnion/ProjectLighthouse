@@ -27,13 +27,13 @@
         <value>Create an account</value>
     </data>
   <data name="forgot_password" xml:space="preserve">
-        <value>Forgot Password?</value>
+        <value>Forgot your password?</value>
     </data>
   <data name="error" xml:space="preserve">
         <value>Uh oh!</value>
     </data>
   <data name="log_in" xml:space="preserve">
-        <value>Log In</value>
+        <value>Log in</value>
     </data>
   <data name="unknown" xml:space="preserve">
         <value>Unknown</value>
@@ -42,7 +42,7 @@
         <value>Success!</value>
     </data>
   <data name="reset_password" xml:space="preserve">
-        <value>Reset Password</value>
+        <value>Reset password</value>
     </data>
   <data name="recent_activity" xml:space="preserve">
         <value>Recent Activity</value>

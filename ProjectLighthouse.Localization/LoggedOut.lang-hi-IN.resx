@@ -18,12 +18,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="logged_out" xml:space="preserve">
-        <value>Logged Out</value>
+        <value>सत्र बंद</value>
     </data>
   <data name="logged_out_info" xml:space="preserve">
-        <value>You have been successfully logged out. You will be redirected in 5 seconds, or you may click below to do so manually.</value>
+        <value>आप सफलतापूर्वक लॉग आउट हो गए हैं। आपको 5 सेकंड में रीडायरेक्ट कर दिया जाएगा, या आप मैन्युअल रूप से ऐसा करने के लिए नीचे क्लिक कर सकते हैं।</value>
     </data>
   <data name="redirect" xml:space="preserve">
-        <value>Redirect</value>
+        <value>पुनर्निर्देशन</value>
     </data>
 </root>
