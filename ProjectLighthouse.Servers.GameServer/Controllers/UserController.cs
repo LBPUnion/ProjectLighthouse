@@ -39,14 +39,16 @@ public class UserController : ControllerBase
     [HttpGet("user/{username}")]
     public async Task<IActionResult> GetUser(string username)
     { 
-        // Return bad request on unverified email if enforcement is enabled 
         GameTokenEntity token = this.GetToken();
-        if (emailEnforcementEnabled && !token.User.EmailAddressVerified) return this.BadRequest();
+        UserEntity? user = await this.database.UserFromGameToken(token);
 
-        UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
-        if (user == null) return this.NotFound();
+        // Return bad request on unverified email if enforcement is enabled 
+        if (emailEnforcementEnabled && !token.User.EmailAddressVerified || user == null) return this.BadRequest();
 
-        return this.Ok(GameUser.CreateFromEntity(user, this.GetToken().GameVersion));
+        UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (targetUser == null) return this.NotFound();
+
+        return this.Ok(GameUser.CreateFromEntity(targetUser, this.GetToken().GameVersion));
     }
 
     [HttpGet("users")]
