@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 
@@ -49,7 +50,7 @@ public class EmailEnforcementMiddleware : MiddlewareDBContext
     public override async Task InvokeAsync(HttpContext context, DatabaseContext database)
     {
         // Split path into segments
-        string[] pathSegments = context.Request.Path.ToString().Split("/");
+        string[] pathSegments = context.Request.Path.ToString().Split("/", StringSplitOptions.RemoveEmptyEntries);
         bool emailEnforcementEnabled = EnforceEmailConfiguration.Instance.EnableEmailEnforcement;
 
         if (pathSegments[0] == "LITTLEBIGPLANETPS3_XML")
