@@ -67,19 +67,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
         }
 
-        if (EnforceEmailConfiguration.Instance.EnableEmailEnforcement)
+        if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
         {
-            announceText.Insert(0, EnforceEmailConfiguration.Instance.EmailEnforcementMessageMain);
+            announceText.Insert(0, EmailEnforcementConfiguration.Instance.EmailEnforcementMessageMain);
 
             if (user.EmailAddress == null)
             {
-                // This will probably need translations
-                announceText.Insert(0, EnforceEmailConfiguration.Instance.EmailEnforcementMessageNoEmail);
+                announceText.Insert(0, EmailEnforcementConfiguration.Instance.EmailEnforcementMessageNoEmail);
             }
             else if (!user.EmailAddressVerified)
             {
-                // More stuff to translate later
-                announceText.Insert(0, EnforceEmailConfiguration.Instance.EmailEnforcementMessageVerify);
+                announceText.Insert(0, EmailEnforcementConfiguration.Instance.EmailEnforcementMessageVerify);
             }
         }
 

@@ -27,8 +27,8 @@ public static class SMTPHelper
     
     // To prevent ReadAllLines() exception when BlacklistFilePath is empty
     private static readonly string[] blacklistFile =
-        !string.IsNullOrWhiteSpace(EnforceEmailConfiguration.Instance.BlacklistFilePath)
-            ? File.ReadAllLines(EnforceEmailConfiguration.Instance.BlacklistFilePath) : [];
+        !string.IsNullOrWhiteSpace(EmailEnforcementConfiguration.Instance.BlacklistFilePath)
+            ? File.ReadAllLines(EmailEnforcementConfiguration.Instance.BlacklistFilePath) : [];
 
     private static readonly HashSet<string> blacklistedDomains = new(blacklistFile);
 
@@ -87,7 +87,7 @@ public static class SMTPHelper
         if (!string.IsNullOrWhiteSpace(email) && emailValidator.IsValid(email) && !EmailIsUsed(database, email).Result)
         {
             // Don't even bother if there are no domains in blacklist (AKA file path is empty/invalid, or file itself is empty)
-            if (EnforceEmailConfiguration.Instance.EnableEmailBlacklist && blacklistedDomains.Count > 0)
+            if (EmailEnforcementConfiguration.Instance.EnableEmailBlacklist && blacklistedDomains.Count > 0)
             {
                 // Get domain by splitting at '@' character
                 string domain = email.Split('@')[1];
