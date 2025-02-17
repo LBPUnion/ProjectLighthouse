@@ -40,7 +40,7 @@ public class PublishController : ControllerBase
     public async Task<IActionResult> StartPublish()
     {
         GameTokenEntity token = this.GetToken();
-
+        
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
 

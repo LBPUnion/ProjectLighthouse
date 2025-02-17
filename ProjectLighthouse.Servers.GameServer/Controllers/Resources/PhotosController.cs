@@ -36,8 +36,6 @@ public class PhotosController : ControllerBase
     public async Task<IActionResult> UploadPhoto()
     {
         GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Unauthorized();
 
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();

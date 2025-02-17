@@ -39,12 +39,6 @@ public class UserController : ControllerBase
     [HttpGet("user/{username}")]
     public async Task<IActionResult> GetUser(string username)
     { 
-        GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token);
-
-        // Return bad request on unverified email if enforcement is enabled 
-        if (emailEnforcementEnabled && !token.User.EmailAddressVerified || user == null) return this.BadRequest();
-
         UserEntity? targetUser = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (targetUser == null) return this.NotFound();
 
@@ -74,11 +68,9 @@ public class UserController : ControllerBase
     public async Task<IActionResult> UpdateUser()
     {
         GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Forbid(); 
 
-        // Return bad request on unverified email if enforcement is enabled 
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Forbid();
 
         UserUpdate? update = await this.DeserializeBody<UserUpdate>("updateUser", "user");
 
@@ -185,9 +177,6 @@ public class UserController : ControllerBase
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
         if (user == null) return this.Forbid();
-
-        // Return bad request on unverified email if enforcement is enabled 
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         string bodyString = await this.ReadBodyAsync();
 

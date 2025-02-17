@@ -38,9 +38,6 @@ public class CategoryController : ControllerBase
     {
         GameTokenEntity token = this.GetToken();
 
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Forbid();
-
         PaginationData pageData = this.Request.GetPaginationData();
 
         pageData.TotalElements = CategoryHelper.Categories.Count(c => !string.IsNullOrWhiteSpace(c.Name));
@@ -71,9 +68,6 @@ public class CategoryController : ControllerBase
     public async Task<IActionResult> GetCategorySlots(string endpointName)
     {
         GameTokenEntity token = this.GetToken();
-
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Forbid();
 
         Category? category = CategoryHelper.Categories.FirstOrDefault(c => c.Endpoint == endpointName);
         if (category == null) return this.NotFound();

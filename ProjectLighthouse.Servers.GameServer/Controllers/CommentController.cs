@@ -32,8 +32,6 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Unauthorized();
 
         // Return bad request if both are true or both are false
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
@@ -49,8 +47,9 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetComments(string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token); 
-        if (user == null) return this.Unauthorized();
+
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Forbid();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 
@@ -116,8 +115,6 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> PostComment(string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Unauthorized();
 
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
