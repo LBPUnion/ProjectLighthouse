@@ -7,7 +7,7 @@ namespace LBPUnion.ProjectLighthouse.Configuration;
 
 public class EmailEnforcementConfiguration : ConfigurationBase<EmailEnforcementConfiguration>
 {
-    public override int ConfigVersion { get; set; } = 3;
+    public override int ConfigVersion { get; set; } = 4;
 
     public override string ConfigName { get; set; } = "enforce-email.yml";
 
@@ -66,22 +66,6 @@ public class EmailEnforcementConfiguration : ConfigurationBase<EmailEnforcementC
         "updateUser",
         "update_my_pins",
     };
-
-    public string EmailEnforcementMessageMain { get; set; } = 
-        "This lighthouse instance has email enforcement enabled. " +
-        "If you haven't already, you will need to set and verify " +
-        "an email address to use most features. ";
-
-    public string EmailEnforcementMessageNoEmail { get; set; } = 
-        "You do not have an email set on your account. You can set " +
-        "an email by opening the text chat and typing \"/setemail " +
-        "[youremail@example.com]\" (do not include the brackets.) ";
-
-    public string EmailEnforcementMessageVerify { get; set; } = 
-        "You have set an email address on your account, but you have not " +
-        "verified it. Make sure to check your inbox for a verification email. " +
-        "If you have not received an email, please contact an instance " +
-        "administrator for further assistance. ";
 
     public override ConfigurationBase<EmailEnforcementConfiguration> Deserialize
         (IDeserializer deserializer, string text) =>

@@ -57,7 +57,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         UserEntity? user = await this.database.UserFromGameToken(token);
 
-        StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
+        StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText + "\n\n");
 
         announceText.Replace("%user", user.Username);
         announceText.Replace("%id", token.UserId.ToString());
@@ -69,15 +69,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
         {
-            announceText.Append(EmailEnforcementConfiguration.Instance.EmailEnforcementMessageMain + "\n\n");
+            announceText.Append(BaseLayoutStrings.EmailEnforcementWarnMain.Translate(LocalizationManager.DefaultLang) + "\n\n");
 
             if (user.EmailAddress == null)
             {
-                announceText.Append(EmailEnforcementConfiguration.Instance.EmailEnforcementMessageNoEmail + "\n\n");
+                announceText.Append(BaseLayoutStrings.EmailEnforcementWarnNoEmail.Translate(LocalizationManager.DefaultLang) + "\n\n");
             }
             else if (!user.EmailAddressVerified)
             {
-                announceText.Append(EmailEnforcementConfiguration.Instance.EmailEnforcementMessageVerify + "\n\n");
+                announceText.Append(BaseLayoutStrings.EmailEnforcementWarnVerifyEmail.Translate(LocalizationManager.DefaultLang) + "\n\n");
             }
         }
 

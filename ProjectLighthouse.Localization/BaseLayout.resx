@@ -93,4 +93,13 @@
     <data name="read_only_warn" xml:space="preserve">
         <value>This instance is currently in read-only mode. Level and photo uploads, comments, reviews, and certain profile changes will be restricted until read-only mode is disabled.</value>
     </data>
+    <data name="email_enforcement_message_main" xml:space="preserve">
+        <value>This instance has email enforcement enabled. If you haven't already, you will need to set and verify an email address to use most features.</value>
+    </data>
+    <data name="email_enforcement_message_no_email" xml:space="preserve">
+        <value>You do not have an email set on your account. You can set an email by opening the text chat and typing "/setemail [youremail@example.com]" (do not include the brackets.)</value>
+    </data>
+    <data name="email_enforcement_message_verify_email" xml:space="preserve">
+        <value>You have set an email address on your account, but you have not verified it. Make sure to check your inbox for a verification email. If you have not recieved an email, please contact an instance administrator for further assistance.</value>
+    </data>
 </root>
