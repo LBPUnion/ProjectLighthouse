@@ -10,6 +10,7 @@ public class EmailEnforcementMiddleware : MiddlewareDBContext
 {
     private static readonly HashSet<string> enforcedPaths = new()
     {
+        "showModerated",
         "rateUserComment",
         "rateComment",
         "comments",
