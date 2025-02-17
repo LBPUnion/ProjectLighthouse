@@ -64,20 +64,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
-            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
+            announceText.Append(BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
         }
 
         if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
         {
-            announceText.Insert(0, EmailEnforcementConfiguration.Instance.EmailEnforcementMessageMain);
+            announceText.Append(EmailEnforcementConfiguration.Instance.EmailEnforcementMessageMain + "\n\n");
 
             if (user.EmailAddress == null)
             {
-                announceText.Insert(0, EmailEnforcementConfiguration.Instance.EmailEnforcementMessageNoEmail);
+                announceText.Append(EmailEnforcementConfiguration.Instance.EmailEnforcementMessageNoEmail + "\n\n");
             }
             else if (!user.EmailAddressVerified)
             {
-                announceText.Insert(0, EmailEnforcementConfiguration.Instance.EmailEnforcementMessageVerify);
+                announceText.Append(EmailEnforcementConfiguration.Instance.EmailEnforcementMessageVerify + "\n\n");
             }
         }
 
