@@ -22,6 +22,7 @@ public class EmailEnforcementMiddleware : MiddlewareDBContext
         "slots",
         "upload",
         "r",
+        "s",
         "uploadPhoto",
         "photos",
         "deletePhoto",
