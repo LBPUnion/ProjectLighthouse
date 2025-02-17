@@ -22,8 +22,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 public class CommentController : ControllerBase
 {
     private readonly DatabaseContext database;
-
-    private static readonly bool emailEnforcementEnabled = EnforceEmailConfiguration.Instance.EnableEmailEnforcement; 
     public CommentController(DatabaseContext database)
     {
         this.database = database;
@@ -36,9 +34,6 @@ public class CommentController : ControllerBase
         GameTokenEntity token = this.GetToken();
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Unauthorized();
-
-        // Return bad request on unverified email if enforcement is enabled 
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         // Return bad request if both are true or both are false
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
@@ -56,9 +51,6 @@ public class CommentController : ControllerBase
         GameTokenEntity token = this.GetToken();
         UserEntity? user = await this.database.UserFromGameToken(token); 
         if (user == null) return this.Unauthorized();
-
-        // Return bad request on unverified email if enforcement is enabled 
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 
@@ -127,9 +119,6 @@ public class CommentController : ControllerBase
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Unauthorized();
 
-        // Return bad request on unverified email if enforcement is enabled 
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
-
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();
 
@@ -168,10 +157,6 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token);
-
-        // Return bad request on unverified email if enforcement is enabled 
-        if (emailEnforcementEnabled && !user.EmailAddressVerified) return this.BadRequest();
 
         // Deny request if in read-only mode
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode) return this.BadRequest();

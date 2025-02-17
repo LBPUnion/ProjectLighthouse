@@ -107,6 +107,7 @@ public class GameServerStartup
         app.UseMiddleware<RateLimitMiddleware>();
         app.UseMiddleware<DigestMiddleware>(computeDigests);
         app.UseMiddleware<SetLastContactMiddleware>();
+        app.UseMiddleware<EmailEnforcementMiddleware>();
 
         app.UseRouting();
 

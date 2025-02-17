@@ -18,7 +18,10 @@ public class EnforceEmailConfiguration : ConfigurationBase<EnforceEmailConfigura
 
     // No blacklist by default, add path to blacklist
     public string BlacklistFilePath { get; set; } = "";
+
+    public string DomainWhitelist { get; set; } = "";
                                                  
+    // TODO: Finalize what to do with these
     // Keep warnings here for debug until pull
     public string EmailEnforcementMessageMain { get; set; } = 
         "This lighthouse instance has email enforcement enabled. " +
