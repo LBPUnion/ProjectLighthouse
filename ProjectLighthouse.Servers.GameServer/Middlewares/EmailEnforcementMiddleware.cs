@@ -15,12 +15,12 @@ public class EmailEnforcementMiddleware : MiddlewareDBContext
 
     public override async Task InvokeAsync(HttpContext context, DatabaseContext database)
     {
-        // Split path into segments
-        string[] pathSegments = context.Request.Path.ToString().Split("/", StringSplitOptions.RemoveEmptyEntries);
+        if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
+        { 
+            // Split path into segments
+            string[] pathSegments = context.Request.Path.ToString().Split("/", StringSplitOptions.RemoveEmptyEntries);
 
-        if (pathSegments[0] == "LITTLEBIGPLANETPS3_XML")
-        {
-            if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
+            if (pathSegments[0] == "LITTLEBIGPLANETPS3_XML")
             {
                 // Get user via GameToken
                 GameTokenEntity? token = await database.GameTokenFromRequest(context.Request);
@@ -35,7 +35,7 @@ public class EmailEnforcementMiddleware : MiddlewareDBContext
                     if (user == null)
                     {
                         // Send bad request status
-                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
                         await context.Response.WriteAsync("Not a valid user");
 
                         // Don't go to next in pipeline

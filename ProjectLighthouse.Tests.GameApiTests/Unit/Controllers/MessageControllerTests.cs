@@ -224,7 +224,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Filter(mailMock.Object);
 
-        Assert.IsType<OkResult>(result);
+        Assert.IsType<BadRequestResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
@@ -249,7 +249,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Filter(mailMock.Object);
 
-        Assert.IsType<OkResult>(result);
+        Assert.IsType<BadRequestResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
@@ -271,7 +271,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>." + "\nuni
 
         IActionResult result = await messageController.Filter(mailMock.Object);
 
-        Assert.IsType<OkResult>(result);
+        Assert.IsType<BadRequestResult>(result);
         mailMock.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 }

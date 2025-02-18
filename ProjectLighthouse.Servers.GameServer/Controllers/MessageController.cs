@@ -57,7 +57,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         UserEntity? user = await this.database.UserFromGameToken(token);
 
-        StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText + "\n\n");
+        StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
 
         announceText.Replace("%user", user.Username);
         announceText.Replace("%id", token.UserId.ToString());
@@ -69,7 +69,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
         {
-            announceText.Append(BaseLayoutStrings.EmailEnforcementWarnMain.Translate(LocalizationManager.DefaultLang) + "\n\n");
+            announceText.Append("\n\n" + BaseLayoutStrings.EmailEnforcementWarnMain.Translate(LocalizationManager.DefaultLang) + "\n\n");
 
             if (user.EmailAddress == null)
             {
@@ -148,7 +148,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             if (!SMTPHelper.IsValidEmail(this.database, email)) return this.BadRequest();
 
             UserEntity? user = await this.database.UserFromGameToken(token);
-            if (user == null || user.EmailAddressVerified) return this.Ok();
+            if (user == null || user.EmailAddressVerified) return this.BadRequest();
 
             user.EmailAddress = email;
             await SMTPHelper.SendVerificationEmail(this.database, mailService, user);
