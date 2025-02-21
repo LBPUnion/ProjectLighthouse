@@ -56,6 +56,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.BadRequest();
 
         StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
 
@@ -67,7 +68,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
             announceText.Append(BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
         }
 
-        if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
+        if (ServerConfiguration.Instance.EmailEnforcement.EnableEmailEnforcement)
         {
             announceText.Append("\n\n" + BaseLayoutStrings.EmailEnforcementWarnMain.Translate(LocalizationManager.DefaultLang) + "\n\n");
 

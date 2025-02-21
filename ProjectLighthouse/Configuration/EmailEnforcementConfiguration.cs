@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Generic;
-using System.IO;
 using YamlDotNet.Serialization;
 
 namespace LBPUnion.ProjectLighthouse.Configuration;
@@ -13,15 +12,15 @@ public class EmailEnforcementConfiguration : ConfigurationBase<EmailEnforcementC
 
     public override bool NeedsConfiguration { get; set; } = false;
 
-    public bool EnableEmailEnforcement { get; set; } = false;
-    public bool EnableEmailBlacklist { get; set; } = false;
+    public bool EnableEmailEnforcement => false;
+    public bool EnableEmailBlacklist => false;
 
     // No blacklist by default, add path to blacklist
-    public string BlacklistFilePath { get; set; } = "";
+    public string BlacklistFilePath => "";
 
     // Endpoints to be blocked
     // This is kind of a random list so some may need to be added or removed
-    public HashSet<string> BlockedEndpoints { get; set; } = new()
+    public HashSet<string> BlockedEndpoints => new()
     { 
         // Comments
         "rateUserComment",

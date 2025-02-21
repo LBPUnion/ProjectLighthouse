@@ -216,7 +216,7 @@ public class PhotosController : ControllerBase
 
     [HttpGet("photos/with")]
     public async Task<IActionResult> UserPhotosWith(string user)
-    { 
+    {
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 

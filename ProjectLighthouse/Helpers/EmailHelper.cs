@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using LBPUnion.ProjectLighthouse.Configuration; 
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Logging;
@@ -20,15 +20,16 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class SMTPHelper
 {
+    private static readonly string blacklistFilePath = ServerConfiguration.Instance.EmailEnforcement.BlacklistFilePath;
+
+    // Null check blacklistFilePath and read into array
+    private static readonly string[] blacklistFile =
+        !string.IsNullOrWhiteSpace(blacklistFilePath) ? File.ReadAllLines(blacklistFilePath) : [];
+
     // (User id, timestamp of last request + 30 seconds)
     private static readonly ConcurrentDictionary<int, long> recentlySentMail = new();
 
     private const long emailCooldown = 1000 * 30;
-    
-    // To prevent ReadAllLines() exception when BlacklistFilePath is empty
-    private static readonly string[] blacklistFile =
-        !string.IsNullOrWhiteSpace(EmailEnforcementConfiguration.Instance.BlacklistFilePath)
-            ? File.ReadAllLines(EmailEnforcementConfiguration.Instance.BlacklistFilePath) : [];
 
     private static readonly HashSet<string> blacklistedDomains = new(blacklistFile);
 
@@ -84,28 +85,24 @@ public static class SMTPHelper
     public static bool IsValidEmail(DatabaseContext database, string email)
     {
         // Email should not be empty, should be an actual email, and shouldn't already be used by an account
-        if (!string.IsNullOrWhiteSpace(email) && emailValidator.IsValid(email) && !EmailIsUsed(database, email).Result)
+        if (string.IsNullOrWhiteSpace(email) || !emailValidator.IsValid(email) || EmailIsUsed(database, email).Result)
+            return false;
+
+        // Don't even bother if there are no domains in blacklist (AKA file path is empty/invalid, or file itself is empty)
+        if (ServerConfiguration.Instance.EmailEnforcement.EnableEmailBlacklist && blacklistedDomains.Count > 0)
         {
-            // Don't even bother if there are no domains in blacklist (AKA file path is empty/invalid, or file itself is empty)
-            if (EmailEnforcementConfiguration.Instance.EnableEmailBlacklist && blacklistedDomains.Count > 0)
+            // Get domain by splitting at '@' character
+            string domain = email.Split('@')[1];
+
+            // Return false if domain is found in blacklist
+            if (blacklistedDomains.Contains(domain))
             {
-                // Get domain by splitting at '@' character
-                string domain = email.Split('@')[1];
-
-                // Return false if domain is found in blacklist
-                if (blacklistedDomains.Contains(domain))
-                {
-                    Logger.Info($"Invalid email address {email} submitted by user.", LogArea.Email);
-                    return false;
-                }
-
-                return true;
+                Logger.Info($"Invalid email address {email} submitted by user.", LogArea.Email);
+                return false;
             }
-
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     // Don't want to allocate every single time we call EmailAddressAttribute.IsValidEmail()

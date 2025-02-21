@@ -8,14 +8,14 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 
 public class EmailEnforcementMiddleware : MiddlewareDBContext
 {
-    private static readonly HashSet<string> enforcedPaths = EmailEnforcementConfiguration.Instance.BlockedEndpoints;
+    private static readonly HashSet<string> enforcedPaths = ServerConfiguration.Instance.EmailEnforcement.BlockedEndpoints;
 
     public EmailEnforcementMiddleware(RequestDelegate next) : base(next)
     { }
 
     public override async Task InvokeAsync(HttpContext context, DatabaseContext database)
     {
-        if (EmailEnforcementConfiguration.Instance.EnableEmailEnforcement)
+        if (ServerConfiguration.Instance.EmailEnforcement.EnableEmailEnforcement)
         { 
             // Split path into segments
             string[] pathSegments = context.Request.Path.ToString().Split("/", StringSplitOptions.RemoveEmptyEntries);

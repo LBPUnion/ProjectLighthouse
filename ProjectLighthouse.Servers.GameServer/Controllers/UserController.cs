@@ -29,8 +29,6 @@ public class UserController : ControllerBase
 {
     private readonly DatabaseContext database;
 
-    private static readonly bool emailEnforcementEnabled = EmailEnforcementConfiguration.Instance.EnableEmailEnforcement;
-
     public UserController(DatabaseContext database)
     {
         this.database = database;

@@ -64,8 +64,8 @@ public class UserSettingsPage : BaseLayout
             }
         }
 
-        if (ServerConfiguration.Instance.Mail.MailEnabled &&
-            SMTPHelper.IsValidEmail(this.Database, email) &&
+        if (ServerConfiguration.Instance.Mail.MailEnabled && 
+            email != null && SMTPHelper.IsValidEmail(this.Database, email) &&
             (this.User == this.ProfileUser || this.User.IsAdmin))
         {
             if (this.ProfileUser.EmailAddress != email)
