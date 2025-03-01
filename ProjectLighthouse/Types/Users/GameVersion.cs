@@ -87,6 +87,12 @@ public static class GameVersionHelper
         "NPEA00437",
         "BCES01693",
         "BCKS10150",
+        "NPHA80113",
+        "NPHA80125",
+        "NPHA80132",
+        "NPHA80163",
+        "NPHA80161",
+        "NPHA80277",
         //Debug, Beta and Demo
         "NPUA70117",
         "BCET70023",
