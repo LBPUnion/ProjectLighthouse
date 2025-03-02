@@ -89,17 +89,17 @@ public static class SMTPHelper
             return false;
 
         // Don't even bother if there are no domains in blacklist (AKA file path is empty/invalid, or file itself is empty)
-        if (ServerConfiguration.Instance.EmailEnforcement.EnableEmailBlacklist && blacklistedDomains.Count > 0)
-        {
-            // Get domain by splitting at '@' character
-            string domain = email.Split('@')[1];
+        if (!ServerConfiguration.Instance.EmailEnforcement.EnableEmailBlacklist || blacklistedDomains.Count <= 0) 
+            return true;
+        
+        // Get domain by splitting at '@' character
+        string domain = email.Split('@')[1];
 
-            // Return false if domain is found in blacklist
-            if (blacklistedDomains.Contains(domain))
-            {
-                Logger.Info($"Invalid email address {email} submitted by user.", LogArea.Email);
-                return false;
-            }
+        // Return false if domain is found in blacklist
+        if (blacklistedDomains.Contains(domain))
+        {
+            Logger.Info($"Invalid email address {email} submitted by user.", LogArea.Email);
+            return false;
         }
 
         return true;

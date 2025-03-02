@@ -6,21 +6,21 @@ namespace LBPUnion.ProjectLighthouse.Configuration;
 
 public class EmailEnforcementConfiguration : ConfigurationBase<EmailEnforcementConfiguration>
 {
-    public override int ConfigVersion { get; set; } = 4;
+    public override int ConfigVersion { get; set; } = 1;
 
     public override string ConfigName { get; set; } = "enforce-email.yml";
 
     public override bool NeedsConfiguration { get; set; } = false;
 
-    public bool EnableEmailEnforcement => false;
-    public bool EnableEmailBlacklist => false;
+    public bool EnableEmailEnforcement { get; set; } = false;
+    public bool EnableEmailBlacklist { get; set; } = false;
 
     // No blacklist by default, add path to blacklist
-    public string BlacklistFilePath => "";
+    public string BlacklistFilePath { get; set; } = "";
 
     // Endpoints to be blocked
     // This is kind of a random list so some may need to be added or removed
-    public HashSet<string> BlockedEndpoints => new()
+    public HashSet<string> BlockedEndpoints { get; set; } = new()
     { 
         // Comments
         "rateUserComment",
