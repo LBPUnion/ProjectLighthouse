@@ -32,9 +32,6 @@ public class TicketParser21 : ITicketParser
         SectionHeader entitlementsSection = this.reader.ReadSectionHeader(); // entitlements section
         this.reader.SkipBytes(entitlementsSection.Length);
 
-        this.reader.ReadTicketEmpty(); // padding
-        this.reader.ReadTicketEmpty();
-
         SectionHeader footer = this.reader.ReadSectionHeader(); // footer header
         if (footer.Type != SectionType.Footer)
         {
