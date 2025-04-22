@@ -2,13 +2,17 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,10 +20,18 @@ namespace LBPUnion.ProjectLighthouse.Helpers;
 
 public static class SMTPHelper
 {
+    private static readonly string blacklistFilePath = ServerConfiguration.Instance.EmailEnforcement.BlacklistFilePath;
+
+    // Null check blacklistFilePath and read into array
+    private static readonly string[] blacklistFile =
+        !string.IsNullOrWhiteSpace(blacklistFilePath) ? File.ReadAllLines(blacklistFilePath) : [];
+
     // (User id, timestamp of last request + 30 seconds)
     private static readonly ConcurrentDictionary<int, long> recentlySentMail = new();
 
     private const long emailCooldown = 1000 * 30;
+
+    private static readonly HashSet<string> blacklistedDomains = new(blacklistFile);
 
     private static bool CanSendMail(UserEntity user)
     {
@@ -67,6 +79,39 @@ public static class SMTPHelper
         await mail.SendEmailAsync(user.EmailAddress, $"Project Lighthouse Password Reset Request for {user.Username}", messageBody);
 
         recentlySentMail.TryAdd(user.UserId, TimeHelper.TimestampMillis + emailCooldown);
+    }
+    
+    // Accumulate checks to determine email validity
+    public static bool IsValidEmail(DatabaseContext database, string email)
+    {
+        // Email should not be empty, should be an actual email, and shouldn't already be used by an account
+        if (string.IsNullOrWhiteSpace(email) || !emailValidator.IsValid(email) || EmailIsUsed(database, email).Result)
+            return false;
+
+        // Don't even bother if there are no domains in blacklist (AKA file path is empty/invalid, or file itself is empty)
+        if (!ServerConfiguration.Instance.EmailEnforcement.EnableEmailBlacklist || blacklistedDomains.Count <= 0) 
+            return true;
+        
+        // Get domain by splitting at '@' character
+        string domain = email.Split('@')[1];
+
+        // Return false if domain is found in blacklist
+        if (blacklistedDomains.Contains(domain))
+        {
+            Logger.Info($"Invalid email address {email} submitted by user.", LogArea.Email);
+            return false;
+        }
+
+        return true;
+    }
+
+    // Don't want to allocate every single time we call EmailAddressAttribute.IsValidEmail()
+    private static readonly EmailAddressAttribute emailValidator = new();
+
+    // Check if email is already in use by an account
+    private static async Task<bool> EmailIsUsed(DatabaseContext database, string email)
+    {
+        return await database.Users.AnyAsync(u => u.EmailAddress != null && u.EmailAddress.ToLower() == email.ToLower());
     }
 
     public static void SendRegistrationEmail(IMailService mail, UserEntity user)

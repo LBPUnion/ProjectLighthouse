@@ -39,7 +39,7 @@ public class SetEmailForm : BaseLayout
         UserEntity? user = await this.Database.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
         if (user == null) return this.Redirect("~/login");
 
-        if (!SanitizationHelper.IsValidEmail(emailAddress))
+        if (!SMTPHelper.IsValidEmail(this.Database, emailAddress))
         {
             this.Error = this.Translate(ErrorStrings.EmailInvalid);
             return this.Page();

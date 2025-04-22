@@ -174,7 +174,6 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/{slotType}/{id:int}")]
     public async Task<IActionResult> SlotPhotos(string slotType, int id, [FromQuery] string? by)
     {
-
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 
         if (slotType == "developer") id = await SlotHelper.GetPlaceholderSlotId(this.database, id, SlotType.Developer);
@@ -202,7 +201,6 @@ public class PhotosController : ControllerBase
     [HttpGet("photos/by")]
     public async Task<IActionResult> UserPhotosBy(string user)
     {
-
         int targetUserId = await this.database.UserIdFromUsername(user);
         if (targetUserId == 0) return this.NotFound();
 

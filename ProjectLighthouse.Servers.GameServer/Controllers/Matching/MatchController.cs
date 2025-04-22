@@ -41,7 +41,7 @@ public class MatchController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Forbid();
+        if (user == null) return this.Unauthorized();
 
         await LastContactHelper.SetLastContact(this.database, user, token.GameVersion, token.Platform);
 

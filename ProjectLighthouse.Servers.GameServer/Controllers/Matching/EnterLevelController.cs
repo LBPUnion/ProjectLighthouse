@@ -4,6 +4,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -99,6 +100,9 @@ public class EnterLevelController : ControllerBase
     public async Task<IActionResult> EnterLevel(string slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
+
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Unauthorized();
 
         if (SlotHelper.IsTypeInvalid(slotType)) return this.BadRequest();
 

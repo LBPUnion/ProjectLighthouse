@@ -49,7 +49,7 @@ public class CommentController : ControllerBase
         GameTokenEntity token = this.GetToken();
 
         UserEntity? user = await this.database.UserFromGameToken(token);
-        if (user == null) return this.Unauthorized();
+        if (user == null) return this.Forbid();
 
         if ((slotId == 0 || SlotHelper.IsTypeInvalid(slotType)) == (username == null)) return this.BadRequest();
 
@@ -97,7 +97,7 @@ public class CommentController : ControllerBase
             .ApplyPagination(pageData)
             .ToListAsync()).ToSerializableList(c => GameComment.CreateFromEntity(c, token.UserId));
 
-        if (type == CommentType.Level && slotType == "developer" && user.IsModerator && pageData.PageStart == 1)
+        if (type == CommentType.Level && slotType == "developer" && user.IsModerator && pageData.PageStart == 1) 
         {
             comments.Insert(0, new GameComment
             {

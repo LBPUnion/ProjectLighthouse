@@ -19,7 +19,6 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Resources;
 [Route("LITTLEBIGPLANETPS3_XML")]
 public class ResourcesController : ControllerBase
 {
-
     [HttpPost("showModerated")]
     public IActionResult ShowModerated() => this.Ok(new ResourceList());
 

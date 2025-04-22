@@ -36,7 +36,7 @@ public class UserController : ControllerBase
 
     [HttpGet("user/{username}")]
     public async Task<IActionResult> GetUser(string username)
-    {
+    { 
         UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return this.NotFound();
 

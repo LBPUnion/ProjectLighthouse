@@ -55,16 +55,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameTokenEntity token = this.GetToken();
 
-        string username = await this.database.UsernameFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.BadRequest();
 
         StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
 
-        announceText.Replace("%user", username);
+        announceText.Replace("%user", user.Username);
         announceText.Replace("%id", token.UserId.ToString());
 
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
-            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
+            announceText.Append(BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
+        }
+
+        if (ServerConfiguration.Instance.EmailEnforcement.EnableEmailEnforcement)
+        {
+            announceText.Append("\n\n" + BaseLayoutStrings.EmailEnforcementWarnMain.Translate(LocalizationManager.DefaultLang) + "\n\n");
+
+            if (user.EmailAddress == null)
+            {
+                announceText.Append(BaseLayoutStrings.EmailEnforcementWarnNoEmail.Translate(LocalizationManager.DefaultLang) + "\n\n");
+            }
+            else if (!user.EmailAddressVerified)
+            {
+                announceText.Append(BaseLayoutStrings.EmailEnforcementWarnVerifyEmail.Translate(LocalizationManager.DefaultLang) + "\n\n");
+            }
         }
 
         #if DEBUG
@@ -129,12 +144,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         if (message.StartsWith("/setemail ") && ServerConfiguration.Instance.Mail.MailEnabled)
         {
             string email = message[(message.IndexOf(" ", StringComparison.Ordinal)+1)..];
-            if (!SanitizationHelper.IsValidEmail(email)) return this.Ok();
 
-            if (await this.database.Users.AnyAsync(u => u.EmailAddress == email)) return this.Ok();
+            // Return a bad request on invalid email address
+            if (!SMTPHelper.IsValidEmail(this.database, email)) return this.BadRequest();
 
             UserEntity? user = await this.database.UserFromGameToken(token);
-            if (user == null || user.EmailAddressVerified) return this.Ok();
+            if (user == null || user.EmailAddressVerified) return this.BadRequest();
 
             user.EmailAddress = email;
             await SMTPHelper.SendVerificationEmail(this.database, mailService, user);
