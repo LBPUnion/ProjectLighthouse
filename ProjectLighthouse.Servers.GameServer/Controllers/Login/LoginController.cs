@@ -67,14 +67,6 @@ public class LoginController : ControllerBase
 
         UserEntity? user;
 
-        if (ServerConfiguration.Instance.Authentication.RequirePatchworkUserAgent)
-        {
-            if (!PatchworkHelper.UserHasValidPatchworkUserAgent(this.Request.Headers.UserAgent.ToString()))
-            {
-                return this.Forbid();
-            }
-        }
-
         switch (npTicket.Platform)
         {
             case Platform.RPCS3:
@@ -219,6 +211,14 @@ public class LoginController : ControllerBase
         {
             Logger.Error($"User {npTicket.Username} tried to login but is banned", LogArea.Login);
             return this.Forbid();
+        }
+
+        if (ServerConfiguration.Instance.Authentication.RequirePatchworkUserAgent)
+        {
+            if (!PatchworkHelper.UserHasValidPatchworkUserAgent(token, this.Request.Headers.UserAgent.ToString()))
+            {
+                return this.Forbid();
+            }
         }
 
         Logger.Success($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);
