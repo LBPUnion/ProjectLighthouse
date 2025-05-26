@@ -54,10 +54,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     public async Task<IActionResult> Announce()
     {
         GameTokenEntity token = this.GetToken();
-        UserEntity? user = await this.database.UserFromGameToken(token);
-
-        if (user == null)
-            return this.Forbid();
 
         string username = await this.database.UsernameFromGameToken(token);
 

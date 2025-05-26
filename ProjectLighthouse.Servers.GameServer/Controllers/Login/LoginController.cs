@@ -215,7 +215,7 @@ public class LoginController : ControllerBase
 
         if (ServerConfiguration.Instance.Authentication.RequirePatchworkUserAgent)
         {
-            if (!PatchworkHelper.UserHasValidPatchworkUserAgent(token, this.Request.Headers.UserAgent.ToString()))
+            if (!PatchworkHelper.UserHasValidPatchworkUserAgent(this.Request.Headers.UserAgent.ToString()))
             {
                 return this.Forbid();
             }

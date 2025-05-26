@@ -9,7 +9,7 @@ public static class PatchworkHelper
 {
     static int patchworkMajorVer = ServerConfiguration.Instance.Authentication.PatchworkMajorVersionMinimum;
     static int patchworkMinorVer = ServerConfiguration.Instance.Authentication.PatchworkMinorVersionMinimum;
-    public static bool UserHasValidPatchworkUserAgent(GameTokenEntity token, string userAgent)
+    public static bool UserHasValidPatchworkUserAgent(string userAgent)
     {
         string userAgentPrefix = "PatchworkLBP";
         char gameVersion = userAgent[userAgentPrefix.Length];
@@ -27,10 +27,7 @@ public static class PatchworkHelper
             numericVersion = gameVersion - '0';
 
         // Don't want it to be 0 still because of Unknown (-1) in GameVersion
-        if (numericVersion == 0)
-            return false;
-
-        if (numericVersion - 1 != (int)token.GameVersion && !Enum.IsDefined(typeof(GameVersion), numericVersion))
+        if (numericVersion - 1 == 0 || !Enum.IsDefined(typeof(GameVersion), numericVersion))
             return false;
 
         string[] patchworkVer = userAgent.Split(' ')[1].Split('.');
