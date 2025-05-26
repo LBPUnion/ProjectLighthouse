@@ -11,7 +11,7 @@ public class ServerConfiguration : ConfigurationBase<ServerConfiguration>
     // This is so Lighthouse can properly identify outdated configurations and update them with newer settings accordingly.
     // If you are modifying anything here, this value MUST be incremented.
     // Thanks for listening~
-    public override int ConfigVersion { get; set; } = 28;
+    public override int ConfigVersion { get; set; } = 29;
 
     public override string ConfigName { get; set; } = "lighthouse.yml";
     public string WebsiteListenUrl { get; set; } = "http://localhost:10060";
@@ -31,12 +31,6 @@ public class ServerConfiguration : ConfigurationBase<ServerConfiguration>
     public bool CheckForUnsafeFiles { get; set; } = true;
     public bool LogChatFiltering { get; set; } = false;
     public bool LogChatMessages { get; set; } = false;
-
-    // Require use of Zaprit's "Patchwork" prx plugin's user agent when connecting to the server
-    // Major and minor version minimums can be left alone if patchwork is not required
-    public bool RequirePatchworkUserAgent { get; set; } = false;
-    public int PatchworkMajorVersionMinimum { get; set; } = 0;
-    public int PatchworkMinorVersionMinimum { get; set; } = 0;
     public AuthenticationConfiguration Authentication { get; set; } = new();
     public CaptchaConfiguration Captcha { get; set; } = new();
     public DigestKeyConfiguration DigestKey { get; set; } = new();

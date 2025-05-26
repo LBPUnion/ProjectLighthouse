@@ -67,9 +67,12 @@ public class LoginController : ControllerBase
 
         UserEntity? user;
 
-        if (!PatchworkHelper.UserHasValidPatchworkUserAgent(this.Request.Headers.UserAgent.ToString()))
+        if (ServerConfiguration.Instance.Authentication.RequirePatchworkUserAgent)
         {
-            return this.Forbid();
+            if (!PatchworkHelper.UserHasValidPatchworkUserAgent(this.Request.Headers.UserAgent.ToString()))
+            {
+                return this.Forbid();
+            }
         }
 
         switch (npTicket.Platform)
