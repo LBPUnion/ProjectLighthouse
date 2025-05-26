@@ -1,6 +1,7 @@
 ﻿using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +32,8 @@ public class LogoutController : ControllerBase
         if (user == null) return this.Forbid();
 
         await LogoutHelper.Logout(token, user, database);
+
+        user.LastLogin = TimeHelper.TimestampMillis;
 
         return this.Ok();
     }

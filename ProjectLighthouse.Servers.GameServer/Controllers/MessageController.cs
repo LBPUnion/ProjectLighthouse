@@ -77,12 +77,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         {
             announceText.Append("This server instance requires the use of the Patchwork plugin for LBP.\n\n");
 
-            if (PatchworkHelper.userHasValidPatchworkUserAgent(user.UserAgent))
+            if (!PatchworkHelper.UserHasValidPatchworkUserAgent(this.Request.Headers.UserAgent.ToString()))
             {
                 announceText.Append("It appears you do not have the Patchwork plugin installed correctly." +
-                    "Since this server instance requires it, you will not be able to play until you so.");
+                   "Since this server instance requires it, you will not be able to play until you so.");
+
+                await LogoutHelper.Logout(token, user, database);
             }
-            await LogoutHelper.Logout(token, user, database);
         }
 
         #if DEBUG

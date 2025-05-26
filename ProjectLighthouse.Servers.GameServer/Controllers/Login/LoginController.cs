@@ -214,12 +214,6 @@ public class LoginController : ControllerBase
 
         Logger.Success($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);
 
-        string userAgent = this.Request.Headers.UserAgent.ToString();
-        if (!String.IsNullOrWhiteSpace(userAgent))
-        {
-            user.UserAgent = userAgent;
-        }
-
         await database.SaveChangesAsync();
 
         // Create a new room on LBP2/3/Vita
