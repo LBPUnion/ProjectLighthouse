@@ -1,6 +1,6 @@
 ﻿using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
-using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using Microsoft.AspNetCore.Authorization;
@@ -30,10 +30,7 @@ public class LogoutController : ControllerBase
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
 
-        user.LastLogout = TimeHelper.TimestampMillis;
-
-        await this.database.GameTokens.RemoveWhere(t => t.TokenId == token.TokenId);
-        await this.database.LastContacts.RemoveWhere(c => c.UserId == token.UserId);
+        await LogoutHelper.Logout(token, user, database);
 
         return this.Ok();
     }

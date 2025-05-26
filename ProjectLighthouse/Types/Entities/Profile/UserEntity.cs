@@ -28,6 +28,8 @@ public class UserEntity
 
     public string IconHash { get; set; }
 
+    public string UserAgent { get;  set;}
+
     /// <summary>
     ///     Markup that displays the username next to a polaroid with the user's icon.
     ///     This can be used everywhere markup works ingame, e.g. news or notifications

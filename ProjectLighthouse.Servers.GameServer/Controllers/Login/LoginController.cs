@@ -214,7 +214,11 @@ public class LoginController : ControllerBase
 
         Logger.Success($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);
 
-        user.LastLogin = TimeHelper.TimestampMillis;
+        string userAgent = this.Request.Headers.UserAgent.ToString();
+        if (!String.IsNullOrWhiteSpace(userAgent))
+        {
+            user.UserAgent = userAgent;
+        }
 
         await database.SaveChangesAsync();
 
