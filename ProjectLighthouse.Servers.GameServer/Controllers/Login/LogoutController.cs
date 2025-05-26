@@ -31,12 +31,12 @@ public class LogoutController : ControllerBase
         UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
 
-        await LogoutHelper.Logout(token, user, database);
+        user.LastLogout = TimeHelper.TimestampMillis;
 
-        user.LastLogin = TimeHelper.TimestampMillis;
+        await this.database.GameTokens.RemoveWhere(t => t.TokenId == token.TokenId);
+        await this.database.LastContacts.RemoveWhere(c => c.UserId == token.UserId);
 
         return this.Ok();
     }
 
-    
 }

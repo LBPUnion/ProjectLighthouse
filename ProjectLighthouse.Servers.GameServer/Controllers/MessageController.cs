@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text; 
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
@@ -8,7 +7,6 @@ using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
-using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -71,19 +69,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
             announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
-        }
-
-        if (ServerConfiguration.Instance.RequirePatchworkUserAgent)
-        {
-            announceText.Append("This server instance requires the use of the Patchwork plugin for LBP.\n\n");
-
-            if (!PatchworkHelper.UserHasValidPatchworkUserAgent(this.Request.Headers.UserAgent.ToString()))
-            {
-                announceText.Append("It appears you do not have the Patchwork plugin installed correctly." +
-                   "Since this server instance requires it, you will not be able to play until you so.");
-
-                await LogoutHelper.Logout(token, user, database);
-            }
         }
 
         #if DEBUG
