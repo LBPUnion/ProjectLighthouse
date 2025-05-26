@@ -30,7 +30,7 @@ public static class PatchworkHelper
         if (numericVersion == 0)
             return false;
 
-        if (numericVersion - 1 != (int)token.GameVersion && !Enum.IsDefined(typeof(GameVersion), numericVersion))
+        if (numericVersion - 1 != (int)token.GameVersion && !Enum.IsDefined(typeof(GameVersion), numericVersion - 1))
             return false;
 
         string[] patchworkVer = userAgent.Split(' ')[1].Split('.');
