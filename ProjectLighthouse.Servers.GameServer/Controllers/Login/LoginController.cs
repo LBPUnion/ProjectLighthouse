@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -210,6 +211,14 @@ public class LoginController : ControllerBase
         {
             Logger.Error($"User {npTicket.Username} tried to login but is banned", LogArea.Login);
             return this.Forbid();
+        }
+
+        if (ServerConfiguration.Instance.Authentication.RequirePatchworkUserAgent)
+        {
+            if (!PatchworkHelper.IsValidPatchworkUserAgent(this.Request.Headers.UserAgent.ToString()))
+            {
+                return this.Forbid();
+            }
         }
 
         Logger.Success($"Successfully logged in user {user.Username} as {token.GameVersion} client", LogArea.Login);

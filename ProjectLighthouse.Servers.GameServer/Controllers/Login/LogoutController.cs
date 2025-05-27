@@ -38,5 +38,4 @@ public class LogoutController : ControllerBase
         return this.Ok();
     }
 
-    
 }
