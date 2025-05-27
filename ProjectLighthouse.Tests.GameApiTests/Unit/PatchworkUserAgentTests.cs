@@ -1,8 +1,7 @@
-using System;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 using Xunit;
 
-namespace ProjectLighthouse.Tests.GameApiTests.Unit.Helpers;
+namespace ProjectLighthouse.Tests.GameApiTests.Unit;
 
 [Trait("Category", "Unit")]
 public class PatchworkUserAgentTests

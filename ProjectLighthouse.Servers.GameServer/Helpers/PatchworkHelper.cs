@@ -3,21 +3,22 @@ using System.Text.RegularExpressions;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 
-public static class PatchworkHelper
+public static partial class PatchworkHelper
 {
-    static int requiredMajor = ServerConfiguration.Instance.Authentication.PatchworkMajorVersionMinimum;
-    static int requiredMinor = ServerConfiguration.Instance.Authentication.PatchworkMinorVersionMinimum;
+    static readonly int requiredMajor = ServerConfiguration.Instance.Authentication.PatchworkMajorVersionMinimum;
+    static readonly int requiredMinor = ServerConfiguration.Instance.Authentication.PatchworkMinorVersionMinimum;
+
+    [GeneratedRegex(@"^PatchworkLBP[123V] (\d{1,5})\.(\d{1,5})$")]
+    private static partial Regex PatchworkUserAgentRegex();
+
     public static bool IsValidPatchworkUserAgent(string userAgent)
     {
-        Match result = Regex.Match(userAgent, @"^PatchworkLBP[123V] (\d{1,5})\.(\d{1,5})$");
+        Match result = PatchworkUserAgentRegex().Match(userAgent);
         if (!result.Success) return false;
 
         if (!int.TryParse(result.Groups[1].Value, out int major) || !int.TryParse(result.Groups[2].Value, out int minor))
             return false;
 
-        if (major < requiredMajor || minor < requiredMinor)
-            return false;
-
-        return true;
+        return major >= requiredMajor && minor >= requiredMinor;
     }
 }
