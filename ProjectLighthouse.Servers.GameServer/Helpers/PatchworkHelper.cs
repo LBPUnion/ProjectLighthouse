@@ -1,31 +1,21 @@
 using LBPUnion.ProjectLighthouse.Configuration;
+using System.Text.RegularExpressions;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
 
 public static class PatchworkHelper
 {
-    static int patchworkMajorVer = ServerConfiguration.Instance.Authentication.PatchworkMajorVersionMinimum;
-    static int patchworkMinorVer = ServerConfiguration.Instance.Authentication.PatchworkMinorVersionMinimum;
-    public static bool UserHasValidPatchworkUserAgent(string userAgent)
+    static int requiredMajor = ServerConfiguration.Instance.Authentication.PatchworkMajorVersionMinimum;
+    static int requiredMinor = ServerConfiguration.Instance.Authentication.PatchworkMinorVersionMinimum;
+    public static bool IsValidPatchworkUserAgent(string userAgent)
     {
-        string userAgentPrefix = "PatchworkLBP";
-        char gameVersion = userAgent[userAgentPrefix.Length];
+        Match result = Regex.Match(userAgent, @"^PatchworkLBP[123V] (\d{1,5})\.(\d{1,5})$");
+        if (!result.Success) return false;
 
-        if (!userAgent.StartsWith(userAgentPrefix))
+        if (!int.TryParse(result.Groups[1].Value, out int major) || !int.TryParse(result.Groups[2].Value, out int minor))
             return false;
 
-        switch (gameVersion) {
-            case '1':
-            case '2':
-            case '3':
-            case 'V':
-                break;
-            default:
-                return false;
-        }
-
-        string[] patchworkVer = userAgent.Split(' ')[1].Split('.');
-        if (int.Parse(patchworkVer[0]) !>= patchworkMajorVer || int.Parse(patchworkVer[1]) !>= patchworkMinorVer)
+        if (major < requiredMajor || minor < requiredMinor)
             return false;
 
         return true;
