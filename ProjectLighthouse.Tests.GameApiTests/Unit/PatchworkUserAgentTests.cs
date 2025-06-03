@@ -30,15 +30,15 @@ public class PatchworkUserAgentTests
         };
 
         bool result;
-        for (int i = 0; i < validUserAgents.Length; i++)
+        foreach (string userAgent in validUserAgents)
         {
-            result = PatchworkHelper.IsValidPatchworkUserAgent(validUserAgents[i]);
-            Assert.True(result, $"Valid user agent: \"{validUserAgents[i]}\" was evaluated as {result}.");
+            result = PatchworkHelper.IsValidPatchworkUserAgent(userAgent);
+            Assert.True(result, $"Valid user agent: \"{userAgent}\" was evaluated as {result}.");
         }
-        for (int i = 0; i < invalidUserAgents.Length; i++)
+        foreach (string userAgent in invalidUserAgents)
         {
-            result = PatchworkHelper.IsValidPatchworkUserAgent(invalidUserAgents[i]);
-            Assert.False(result, $"Invalid user agent: \"{invalidUserAgents[i]}\" was evaluated as {result}.");
+            result = PatchworkHelper.IsValidPatchworkUserAgent(userAgent);
+            Assert.False(result, $"Invalid user agent: \"{userAgent}\" was evaluated as {result}.");
         }
     }
 }
