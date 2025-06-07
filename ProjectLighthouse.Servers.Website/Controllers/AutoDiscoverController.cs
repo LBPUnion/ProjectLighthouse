@@ -8,7 +8,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.Website.Controllers;
 public class AutoDiscoverController: ControllerBase
 {
     [ResponseCache(Duration = 86400)]
-    [HttpGet("/autodiscover")]
+    [HttpGet("autodiscover")]
     [Produces("application/json")]
     public IActionResult AutoDiscover()
     {
