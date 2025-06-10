@@ -63,4 +63,13 @@
     <data name="notifications" xml:space="preserve">
         <value>Notifications</value>
     </data>
+    <data name="comments" xml:space="preserve">
+        <value>Comments</value>
+    </data>
+    <data name="heart" xml:space="preserve">
+      <value>Heart</value>
+    </data>
+    <data name="unheart" xml:space="preserve">
+        <value>Unheart</value>
+    </data>
 </root>
