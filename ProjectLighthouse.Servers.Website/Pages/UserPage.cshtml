@@ -23,15 +23,15 @@
 @if (Model.ProfileUser.IsBanned)
 {
     <div class="ui inverted red segment">
-        <h3><i class="ban icon"></i> This user is currently banned.</h3>
+        <h3><i class="ban icon"></i>@Model.Translate(ProfileStrings.UserBanned)</h3>
         @if (Model.User != null && Model.User.IsModerator)
         {
-            <b>Reason:</b>
+            <b>@Model.Translate(ProfileStrings.BanReason)</b>
             <span>"@Model.ProfileUser.BannedReason"</span>
         }
         else
         {
-            <p>This user has been banned for violating the Terms of Service. Remember to follow the rules!</p>
+            <p>@Model.Translate(ProfileStrings.BanReasonTOS)</p>
         }
     </div>
 }
@@ -62,28 +62,28 @@
             {
                 <a class="ui red button" href="/user/@Model.ProfileUser.UserId/block">
                     <i class="user alternate slash icon"></i>
-                    <span>Block</span>
+                    <span>@Model.Translate(ProfileStrings.Block)</span>
                 </a>
             }
             else
             {
                 <a class="ui black button" href="/user/@Model.ProfileUser.UserId/unblock">
                     <i class="user alternate icon"></i>
-                    <span>Unblock</span>
+                    <span>@Model.Translate(ProfileStrings.Unblock)</span>
                 </a>
             }
             if (!Model.IsProfileUserHearted)
             {
                 <a class="ui pink button" href="/user/@Model.ProfileUser.UserId/heart">
                     <i class="heart icon"></i>
-                    <span>Heart</span>
+                    <span>@Model.Translate(GeneralStrings.Heart)</span>
                 </a>
             }
             else
             {
                 <a class="ui pink button" href="/user/@Model.ProfileUser.UserId/unheart">
                     <i class="heart broken icon"></i>
-                    <span>Unheart</span>
+                    <span>@Model.Translate(GeneralStrings.Unheart)</span>
                 </a>
             }
         }
@@ -91,14 +91,14 @@
         {
             <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/privacy">
                 <i class="eye icon"></i>
-                <span>Privacy Settings</span>
+                <span>@Model.Translate(ProfileStrings.PrivacySettings)</span>
             </a>
         }
         @if (Model.ProfileUser == Model.User || (Model.User?.IsModerator ?? false))
         {
             <a class="ui blue button" href="/user/@Model.ProfileUser.UserId/settings">
                 <i class="cog icon"></i>
-                <span>Profile Settings</span>
+                <span>@Model.Translate(ProfileStrings.ProfileSettings)</span>
             </a>
         }
         @if (Model.ProfileUser == Model.User)
@@ -149,7 +149,7 @@
 {
     <div class="ui red segment">
         <p>
-            <i>The user's privacy settings prevent you from viewing this page.</i>
+            <i>@Model.Translate(ProfileStrings.PrivacyHidden)</i>
         </p>
     </div>
 }
@@ -163,7 +163,7 @@ else
         <div class="@outerDiv">
             <div class="@innerDiv">
                 <a class="item active lh-sidebar" target="lh-comments">
-                    Comments
+                    @Model.Translate(GeneralStrings.Comments)
                 </a>
                 <a class="item lh-sidebar" target="lh-photos">
                     @Model.Translate(BaseLayoutStrings.HeaderPhotos)
@@ -173,15 +173,15 @@ else
                     @Model.Translate(BaseLayoutStrings.HeaderSlots)
                 </a>
                 <a class="item lh-sidebar" target="lh-playlists">
-                    Playlists
+                    @Model.Translate(ProfileStrings.Playlists)
                 </a>
                 @if (Model.User == Model.ProfileUser)
                 {
                     <a class="item lh-sidebar" target="lh-hearted">
-                        Hearted Levels
+                        @Model.Translate(ProfileStrings.HeartedLevels)
                     </a>
                     <a class="item lh-sidebar" target="lh-queued">
-                        Queued Levels
+                        @Model.Translate(ProfileStrings.QueuedLevels)
                     </a>
                 }
             </div>
@@ -195,7 +195,7 @@ else
                 {
                     <div class="ui yellow segment" id="comments">
                         <p>
-                            <i>Comments are disabled because the user is banned.</i>
+                            <i>@Model.Translate(ProfileStrings.CommentsBanned)</i>
                         </p>
                     </div>
                 }
@@ -230,7 +230,7 @@ else
                     }
                     else
                     {
-                        <p>This user hasn't uploaded any photos</p>
+                        <p>@Model.Translate(ProfileStrings.NoPhotos)</p>
                     }
                 </div>
             </div>
@@ -239,7 +239,7 @@ else
                 {
                     <div class="ui red segment">
                         <p>
-                            <i>The user's privacy settings prevent you from viewing this page.</i>
+                            <i>@Model.Translate(ProfileStrings.PrivacyHidden).</i>
                         </p>
                     </div>
                 }
@@ -248,7 +248,7 @@ else
                     <div class="ui green segment" id="levels">
                         @if (Model.Slots?.Count == 0)
                         {
-                            <p>This user hasn't published any levels</p>
+                            <p>@Model.Translate(ProfileStrings.NoLevels)</p>
                         }
                         @foreach (SlotEntity slot in Model.Slots ?? new List<SlotEntity>())
                         {
@@ -270,11 +270,11 @@ else
                     <div class="ui pink segment" id="hearted">
                         @if (Model.HeartedSlots?.Count == 0)
                         {
-                            <p>You haven't hearted any levels</p>
+                            <p>@Model.Translate(ProfileStrings.NoHeartedLevels)</p>
                         }
                         else
                         {
-                            <p>You have hearted @(Model.HeartedSlots?.Count) levels</p>
+                            <p>@Model.Translate(ProfileStrings.HeartedLevelsCount, Model.HeartedSlots?.Count)</p>
                         }
                         @foreach (SlotEntity slot in Model.HeartedSlots ?? new List<SlotEntity>())
                         {
@@ -288,11 +288,11 @@ else
                     <div class="ui yellow segment" id="queued">
                         @if (Model.QueuedSlots?.Count == 0)
                         {
-                            <p>You haven't queued any levels</p>
+                            <p>@Model.Translate(ProfileStrings.NoQueuedLevels)</p>
                         }
                         else
                         {
-                            <p>There are @(Model.QueuedSlots?.Count) levels in your queue</p>
+                            <p>@Model.Translate(ProfileStrings.QueuedLevelsCount, Model.QueuedSlots?.Count)</p>
                         }
                         @foreach (SlotEntity slot in Model.QueuedSlots ?? new List<SlotEntity>())
                         {
