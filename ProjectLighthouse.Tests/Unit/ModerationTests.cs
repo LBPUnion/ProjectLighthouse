@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Administration.Maintenance.RepeatingTasks;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Tests.Helpers;
@@ -12,7 +13,7 @@ namespace LBPUnion.ProjectLighthouse.Tests.Unit;
 public class ModerationTests
 {
     [Fact]
-    public async void DismissExpiredCases_ShouldDismissExpiredCase()
+    public async Task DismissExpiredCases_ShouldDismissExpiredCase()
     {
         await using DatabaseContext database = await MockHelper.GetTestDatabase();
 
@@ -35,7 +36,7 @@ public class ModerationTests
     }
 
     [Fact]
-    public async void DismissExpiredCases_ShouldNotDismissActiveCase()
+    public async Task DismissExpiredCases_ShouldNotDismissActiveCase()
     {
         await using DatabaseContext database = await MockHelper.GetTestDatabase();
 
@@ -58,7 +59,7 @@ public class ModerationTests
     }
 
     [Fact]
-    public async void DismissExpiredCases_ShouldNotDismissAlreadyDismissedCase()
+    public async Task DismissExpiredCases_ShouldNotDismissAlreadyDismissedCase()
     {
         await using DatabaseContext database = await MockHelper.GetTestDatabase();
 
