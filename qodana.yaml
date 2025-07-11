@@ -9,3 +9,5 @@ exclude:
     paths:
       - ProjectLighthouse.Localization
       - ProjectLighthouse/Migrations
+dependencyIgnores:
+  - name: "SixLabors.ImageSharp" # We're open source, so we come under the Apache License
