@@ -26,7 +26,11 @@ public class AuthenticationTests : LighthouseWebTest
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
         UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
 
-        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
+        // Sometimes not having this causes a race condition
+        // ReSharper disable once MethodHasAsyncOverload
+        database.SaveChanges();
+        
+        await this.Driver.Navigate().GoToUrlAsync(this.BaseAddress + "/login");
 
         this.Driver.FindElement(By.Id("text")).SendKeys(user.Username);
         this.Driver.FindElement(By.Id("password")).SendKeys(password);
