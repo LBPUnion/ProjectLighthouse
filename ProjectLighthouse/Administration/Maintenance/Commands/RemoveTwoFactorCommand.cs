@@ -15,12 +15,12 @@ public class RemoveTwoFactorCommand : ICommand
 {
     public string Name() => "Remove Two Factor Authentication";
     public string[] Aliases()
-        => new[]
-        {
-            "remove2fa", "rm2fa",
-        };
+        =>
+        [
+            "removeTwoFactor", "rm2fa",
+        ];
     public string Arguments() => "<username/userId>";
-    public int RequiredArgs() => 2;
+    public int RequiredArgs() => 1;
 
     public async Task Run(IServiceProvider provider, string[] args, Logger logger)
     {
