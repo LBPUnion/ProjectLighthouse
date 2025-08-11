@@ -29,8 +29,7 @@ be sure to report any vulnerabilities. Thank you in advance.
 
 ### We are not obligated to provide support.
 
-Project Lighthouse is open source. However, it is licensed under the GNU Affero General Public License version 3 (
-AGPLv3)
+Project Lighthouse is open source. However, it is licensed under the GNU Affero General Public License version 3 (AGPLv3)
 meaning that Project Lighthouse is provided to you as-is, with **absolutely no warranty.**
 
 Please understand that while this license gives you freedom to do pretty much anything you would want to do, including
