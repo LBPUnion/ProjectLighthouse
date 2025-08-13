@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Logging;
@@ -21,6 +22,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 [Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
+[EmailVerification]
 public class MatchController : ControllerBase
 {
     private readonly DatabaseContext database;
