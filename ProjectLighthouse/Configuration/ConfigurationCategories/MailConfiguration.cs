@@ -17,4 +17,6 @@ public class MailConfiguration
     public string Password { get; set; } = "";
 
     public bool UseSSL { get; set; } = true;
+
+    public bool RequireEmailVerification { get; set; } = true;
 }

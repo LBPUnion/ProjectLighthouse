@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -42,6 +43,7 @@ public class ScoreController : ControllerBase
 
     [HttpPost("scoreboard/{slotType}/{id:int}")]
     [HttpPost("scoreboard/{slotType}/{id:int}/{childId:int}")]
+    [EmailVerification]
     public async Task<IActionResult> SubmitScore(string slotType, int id, int childId)
     {
         GameTokenEntity token = this.GetToken();

@@ -1,9 +1,9 @@
-#nullable enable
 using System.Text;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Misc;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Resources;
@@ -52,6 +52,7 @@ public class ResourcesController : ControllerBase
 
     [HttpPost("upload/{hash}/unattributed")]
     [HttpPost("upload/{hash}")]
+    [EmailVerification]
     public async Task<IActionResult> UploadResource(string hash)
     {
         string assetsDirectory = FileHelper.ResourcePath;

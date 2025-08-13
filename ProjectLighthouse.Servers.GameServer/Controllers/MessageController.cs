@@ -13,6 +13,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
+using LBPUnion.ProjectLighthouse.Types.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -96,6 +97,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         StringBuilder builder = new();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user?.EmailAddressVerified == false)
+        {
+            GameNotification verifyEmailNotification = new();
+            verifyEmailNotification.Type = NotificationType.ModerationNotification;
+            verifyEmailNotification.Text = LocalizationManager.GetLocalizedString(TranslationAreas.Register, user.Language, "email_verify_notice");
+            builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices, verifyEmailNotification));
+        }
+        
         foreach (NotificationEntity notification in notifications)
         {
             builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,

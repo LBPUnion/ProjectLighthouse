@@ -1,57 +1,30 @@
-using System.Diagnostics;
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 
+public class EmailVerificationAttribute : Attribute;
+
 public class EmailVerificationMiddleware: MiddlewareDBContext
 {
-    private readonly bool requireVerification;
 
-    private static readonly HashSet<string> verifyPathList =
-    [
-        "uploadPhoto",
-        "deletePhoto",
-        "upload",
-        "publish",
-        "rateUserComment",
-        "rateComment",
-        "postUserComment",
-        "postComment",
-        "deleteUserComment",
-        "deleteComment",
-        "npdata",
-        "grief",
-        "updateUser",
-        "update_my_pins",
-        "match",
-        "play",
-        "enterLevel",
-        "startPublish",
-    ];
-    
-    public EmailVerificationMiddleware(RequestDelegate next, bool requireVerification) : base(next)
+    public EmailVerificationMiddleware(RequestDelegate next) : base(next)
     {
-        this.requireVerification = requireVerification;
+        
     }
 
     public override async Task InvokeAsync(HttpContext context, DatabaseContext database)
     {
-        if (requireVerification)
+        if (ServerConfiguration.Instance.Mail.RequireEmailVerification)
         {
-            if (context.Request.Path.Value == null)
-            {
-                await this.next(context);
-                return;
-            }
-
-            const string url = "/LITTLEBIGPLANETPS3_XML";
-            string verifyPath = context.Request.Path;
-            string strippedPath = verifyPath.Contains(url) ? verifyPath[url.Length..].Split("/")[0] : "";
+            Endpoint? endpoint = context.Features.Get<IEndpointFeature>()?.Endpoint;
+            EmailVerificationAttribute? attribute = endpoint?.Metadata.GetMetadata<EmailVerificationAttribute>();
             
-            if (verifyPathList.Contains(strippedPath))
+            if (attribute != null)
             {
                 GameTokenEntity? gameToken = await database.GameTokenFromRequest(context.Request);
                 if (gameToken == null)
@@ -63,7 +36,7 @@ public class EmailVerificationMiddleware: MiddlewareDBContext
                 UserEntity? user = await database.UserFromGameToken(gameToken);
                 if (!user!.EmailAddressVerified)
                 {
-                    context.Response.StatusCode = 403;
+                    context.Response.StatusCode = 401; // 403 will cause a re-auth
                     context.Abort();
                     return;
                 }

@@ -21,4 +21,7 @@
     <data name="username_notice" xml:space="preserve">
         <value>Caution: Your username MUST match your PSN/RPCN username in order to be able to sign in from in-game.</value>
     </data>
+    <data name="email_verify_notice" xml:space="preserve">
+        <value>The game will be read-only until you verify your email</value>
+    </data>
 </root>
