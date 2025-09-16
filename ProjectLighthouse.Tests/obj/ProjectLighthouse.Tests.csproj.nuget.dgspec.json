@@ -1,0 +1,352 @@
+{
+  "format": 1,
+  "restore": {
+    "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Tests\\ProjectLighthouse.Tests.csproj": {}
+  },
+  "projects": {
+    "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Localization\\ProjectLighthouse.Localization.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Localization\\ProjectLighthouse.Localization.csproj",
+        "projectName": "ProjectLighthouse.Localization",
+        "projectPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Localization\\ProjectLighthouse.Localization.csproj",
+        "packagesPath": "C:\\Users\\Faisa\\.nuget\\packages\\",
+        "outputPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Localization\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Faisa\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Tests\\ProjectLighthouse.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Tests\\ProjectLighthouse.Tests.csproj",
+        "projectName": "LBPUnion.ProjectLighthouse.Tests",
+        "projectPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Tests\\ProjectLighthouse.Tests.csproj",
+        "packagesPath": "C:\\Users\\Faisa\\.nuget\\packages\\",
+        "outputPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Tests\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Faisa\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse\\ProjectLighthouse.csproj": {
+                "projectPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse\\ProjectLighthouse.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "JetBrains.Annotations": {
+              "target": "Package",
+              "version": "[2024.3.0, )"
+            },
+            "Microsoft.AspNetCore.Mvc.Testing": {
+              "target": "Package",
+              "version": "[8.0.18, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.18, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[8.0.6, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.14.1, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.72, )"
+            },
+            "coverlet.collector": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.4, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.9.3, )"
+            },
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.1.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse\\ProjectLighthouse.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse\\ProjectLighthouse.csproj",
+        "projectName": "LBPUnion.ProjectLighthouse",
+        "projectPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse\\ProjectLighthouse.csproj",
+        "packagesPath": "C:\\Users\\Faisa\\.nuget\\packages\\",
+        "outputPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Faisa\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Localization\\ProjectLighthouse.Localization.csproj": {
+                "projectPath": "G:\\LBP 3 ONLINE ARCHIVE\\LBP 3 ONLINE SITE RECREACTION\\ProjectLighthouse\\ProjectLighthouse.Localization\\ProjectLighthouse.Localization.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "BouncyCastle.Cryptography": {
+              "target": "Package",
+              "version": "[2.6.1, )"
+            },
+            "Discord.Net.Webhook": {
+              "target": "Package",
+              "version": "[3.17.4, )"
+            },
+            "DistributedLock.MySql": {
+              "target": "Package",
+              "version": "[1.0.2, )"
+            },
+            "GitInfo": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.5.0, )"
+            },
+            "JetBrains.Annotations": {
+              "target": "Package",
+              "version": "[2024.3.0, )"
+            },
+            "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.18, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.18, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.18, )"
+            },
+            "Pfim": {
+              "target": "Package",
+              "version": "[0.11.3, )"
+            },
+            "Pomelo.EntityFrameworkCore.MySql": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Redis.OM": {
+              "target": "Package",
+              "version": "[1.0.1, )"
+            },
+            "SharpZipLib": {
+              "target": "Package",
+              "version": "[1.4.2, )"
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[3.1.10, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "YamlDotNet": {
+              "target": "Package",
+              "version": "[16.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
