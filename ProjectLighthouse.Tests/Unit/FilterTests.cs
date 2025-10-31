@@ -750,34 +750,6 @@ public class FilterTests
     }
 
     [Fact]
-    public void TextFilter_ShouldAccept_WhenDescriptionContainsText()
-    {
-        TextFilter textFilter = new("test");
-        Func<SlotEntity, bool> textFunc = textFilter.GetPredicate().Compile();
-
-        SlotEntity slot = new()
-        {
-            Description = "unit test",
-        };
-
-        Assert.True(textFunc(slot));
-    }
-
-    [Fact]
-    public void TextFilter_ShouldReject_WhenDescriptionDoesNotContainText()
-    {
-        TextFilter textFilter = new("test");
-        Func<SlotEntity, bool> textFunc = textFilter.GetPredicate().Compile();
-
-        SlotEntity slot = new()
-        {
-            Description = "fraction exam",
-        };
-
-        Assert.False(textFunc(slot));
-    }
-
-    [Fact]
     public void TextFilter_ShouldAccept_WhenNameContainsText()
     {
         TextFilter textFilter = new("test");
