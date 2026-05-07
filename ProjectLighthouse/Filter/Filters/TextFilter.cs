@@ -18,15 +18,11 @@ public class TextFilter : ISlotFilter
     public Expression<Func<SlotEntity, bool>> GetPredicate()
     {
         Expression<Func<SlotEntity, bool>> predicate = PredicateExtensions.False<SlotEntity>();
-        string[] keywords = this.filter.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        foreach (string keyword in keywords)
-        {
-            predicate = predicate.Or(s =>
-                s.Name.Contains(keyword) ||
-                s.Description.ToLower().Contains(keyword) ||
-                s.SlotId.ToString().Equals(keyword));
-            predicate = predicate.Or(s => s.Creator != null && s.Creator.Username.Contains(keyword));
-        }
+        string trimmed = this.filter.Trim();
+        predicate = predicate.Or(s =>
+            s.Name.Contains(trimmed) ||
+            s.SlotId.ToString().Equals(trimmed));
+        predicate = predicate.Or(s => s.Creator != null && s.Creator.Username.Contains(trimmed));
         return predicate;
     }
 }
