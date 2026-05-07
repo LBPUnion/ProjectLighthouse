@@ -6,9 +6,10 @@ public class WebsiteConfiguration
 
     public bool ConvertAssetsOnStartup { get; set; } = true;
 
-    /*
-     * Decides whether or not to display the Lighthouse Pride logo
-     * during the month of June if enabled.
-     */
+    /// <summary>
+    ///     Displays the Lighthouse Pride logo during the month of June.
+    /// </summary>
     public bool PrideEventEnabled { get; set; } = true;
+
+    public bool ShowOnlinePlayers { get; set; } = true;
 }

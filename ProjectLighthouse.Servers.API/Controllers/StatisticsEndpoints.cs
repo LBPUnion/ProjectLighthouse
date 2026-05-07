@@ -1,3 +1,4 @@
+using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Filter.Filters;
@@ -113,13 +114,15 @@ public class StatisticsEndpoints : ApiEndpointController
     }
 
     /// <summary>
-    /// Gets a list of online players 
+    /// Gets a list of online players
     /// </summary>
     /// <returns>An instance of PlayerListResponse</returns>
     [HttpGet("players")]
     [ProducesResponseType(typeof(PlayerListResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPlayerList()
     {
+        if (!ServerConfiguration.Instance.WebsiteConfiguration.ShowOnlinePlayers) return this.NotFound();
+
         List<PlayerListObject> players = await this.database.LastContacts.Where(l => TimeHelper.Timestamp - l.Timestamp < 300)
             .Select(l => new PlayerListObject
             {
