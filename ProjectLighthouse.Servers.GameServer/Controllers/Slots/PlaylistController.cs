@@ -2,6 +2,7 @@
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -41,6 +42,7 @@ public class PlaylistController : ControllerBase
     }
 
     [HttpPost("playlists/{playlistId:int}/delete")]
+    [EmailVerification]
     public async Task<IActionResult> DeletePlaylist(int playlistId)
     {
         GameTokenEntity token = this.GetToken();
@@ -60,6 +62,7 @@ public class PlaylistController : ControllerBase
     [HttpPost("playlists/{playlistId:int}/slots")]
     [HttpPost("playlists/{playlistId:int}/slots/{slotId:int}/delete")]
     [HttpPost("playlists/{playlistId:int}/order_slots")]
+    [EmailVerification]
     public async Task<IActionResult> UpdatePlaylist(int playlistId, int slotId)
     {
         GameTokenEntity token = this.GetToken();
@@ -124,6 +127,7 @@ public class PlaylistController : ControllerBase
     }
 
     [HttpPost("playlists")]
+    [EmailVerification]
     public async Task<IActionResult> CreatePlaylist()
     {
         GameTokenEntity token = this.GetToken();

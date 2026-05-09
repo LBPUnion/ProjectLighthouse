@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
@@ -29,6 +30,7 @@ public class CommentController : ControllerBase
 
     [HttpPost("rateUserComment/{username}")]
     [HttpPost("rateComment/{slotType}/{slotId:int}")]
+    [EmailVerification]
     public async Task<IActionResult> RateComment([FromQuery] int commentId, [FromQuery] int rating, string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
@@ -113,6 +115,7 @@ public class CommentController : ControllerBase
 
     [HttpPost("postUserComment/{username}")]
     [HttpPost("postComment/{slotType}/{slotId:int}")]
+    [EmailVerification]
     public async Task<IActionResult> PostComment(string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();
@@ -152,6 +155,7 @@ public class CommentController : ControllerBase
 
     [HttpPost("deleteUserComment/{username}")]
     [HttpPost("deleteComment/{slotType}/{slotId:int}")]
+    [EmailVerification]
     public async Task<IActionResult> DeleteComment([FromQuery] int commentId, string? username, string? slotType, int slotId)
     {
         GameTokenEntity token = this.GetToken();

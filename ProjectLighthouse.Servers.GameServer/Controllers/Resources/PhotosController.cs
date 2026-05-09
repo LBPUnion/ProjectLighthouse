@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -33,6 +34,7 @@ public class PhotosController : ControllerBase
     }
 
     [HttpPost("uploadPhoto")]
+    [EmailVerification]
     public async Task<IActionResult> UploadPhoto()
     {
         GameTokenEntity token = this.GetToken();
@@ -234,6 +236,7 @@ public class PhotosController : ControllerBase
     }
 
     [HttpPost("deletePhoto/{id:int}")]
+    [EmailVerification]
     public async Task<IActionResult> DeletePhoto(int id)
     {
         GameTokenEntity token = this.GetToken();

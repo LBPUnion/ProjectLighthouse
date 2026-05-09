@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -24,6 +25,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Slots;
 [Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
+[EmailVerification]
 public class PublishController : ControllerBase
 {
     private readonly DatabaseContext database;

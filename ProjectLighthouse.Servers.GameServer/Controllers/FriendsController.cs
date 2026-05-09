@@ -1,6 +1,7 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.StorableLists.Stores;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -17,6 +18,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers;
 [Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
+[EmailVerification]
 public class FriendsController : ControllerBase
 {
     private readonly DatabaseContext database;

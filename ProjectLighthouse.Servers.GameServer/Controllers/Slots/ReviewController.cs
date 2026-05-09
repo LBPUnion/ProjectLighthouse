@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -29,6 +30,7 @@ public class ReviewController : ControllerBase
 
     // LBP1 rating
     [HttpPost("rate/user/{slotId:int}")]
+    [EmailVerification]
     public async Task<IActionResult> Rate(int slotId, int rating)
     {
         GameTokenEntity token = this.GetToken();
@@ -58,6 +60,7 @@ public class ReviewController : ControllerBase
 
     // LBP2 and beyond rating
     [HttpPost("dpadrate/user/{slotId:int}")]
+    [EmailVerification]
     public async Task<IActionResult> DPadRate(int slotId, int rating)
     {
         GameTokenEntity token = this.GetToken();
@@ -89,6 +92,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpPost("postReview/user/{slotId:int}")]
+    [EmailVerification]
     public async Task<IActionResult> PostReview(int slotId)
     {
         GameTokenEntity token = this.GetToken();
@@ -202,6 +206,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpPost("rateReview/user/{slotId:int}/{username}")]
+    [EmailVerification]
     public async Task<IActionResult> RateReview(int slotId, string username, int rating = 0)
     {
         GameTokenEntity token = this.GetToken();
@@ -255,6 +260,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpPost("deleteReview/user/{slotId:int}/{username}")]
+    [EmailVerification]
     public async Task<IActionResult> DeleteReview(int slotId, string username)
     {
         GameTokenEntity token = this.GetToken();
