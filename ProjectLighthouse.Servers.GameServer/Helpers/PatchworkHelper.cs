@@ -8,7 +8,7 @@ public static partial class PatchworkHelper
     private static readonly int requiredMajor = ServerConfiguration.Instance.Authentication.PatchworkMajorVersionMinimum;
     private static readonly int requiredMinor = ServerConfiguration.Instance.Authentication.PatchworkMinorVersionMinimum;
 
-    [GeneratedRegex(@"^PatchworkLBP[123V] (\d{1,5})\.(\d{1,5})$")]
+    [GeneratedRegex(@"^PatchworkLBP[123V] (\d{1,5})\.(\d{1,5})")]
     private static partial Regex PatchworkUserAgentRegex();
 
     public static bool IsValidPatchworkUserAgent(string userAgent)
