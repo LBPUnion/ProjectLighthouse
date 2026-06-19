@@ -6,6 +6,7 @@ using LBPUnion.ProjectLighthouse.Files;
 using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -63,6 +64,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("updateUser")]
+    [EmailVerification]
     public async Task<IActionResult> UpdateUser()
     {
         GameTokenEntity token = this.GetToken();
@@ -171,6 +173,7 @@ public class UserController : ControllerBase
 
     [HttpPost("update_my_pins")]
     [Produces("text/json")]
+    [EmailVerification]
     public async Task<IActionResult> UpdateMyPins()
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());

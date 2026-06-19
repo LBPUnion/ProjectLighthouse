@@ -1,6 +1,7 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -41,6 +42,7 @@ public class LevelTagsController : ControllerBase
     }
 
     [HttpPost("tag/{slotType}/{id:int}")]
+    [EmailVerification]
     public async Task<IActionResult> PostTag([FromForm(Name = "t")] string tagName, [FromRoute] string slotType, [FromRoute] int id)
     {
         GameTokenEntity token = this.GetToken();

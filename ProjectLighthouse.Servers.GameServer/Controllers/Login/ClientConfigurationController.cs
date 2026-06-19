@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Users;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
@@ -70,6 +71,7 @@ public class ClientConfigurationController : ControllerBase
 
     [HttpPost("privacySettings")]
     [Produces("text/xml")]
+    [EmailVerification]
     public async Task<IActionResult> SetPrivacySetting()
     {
         UserEntity? user = await this.database.UserFromGameToken(this.GetToken());

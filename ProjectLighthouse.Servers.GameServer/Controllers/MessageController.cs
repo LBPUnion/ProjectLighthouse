@@ -3,7 +3,6 @@ using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
-using LBPUnion.ProjectLighthouse.Localization;
 using LBPUnion.ProjectLighthouse.Localization.StringLists;
 using LBPUnion.ProjectLighthouse.Logging;
 using LBPUnion.ProjectLighthouse.Serialization;
@@ -13,6 +12,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
+using LBPUnion.ProjectLighthouse.Types.Notifications;
 using LBPUnion.ProjectLighthouse.Types.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -55,16 +55,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
     {
         GameTokenEntity token = this.GetToken();
 
-        string username = await this.database.UsernameFromGameToken(token);
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user == null) return this.Forbid();
 
         StringBuilder announceText = new(ServerConfiguration.Instance.AnnounceText);
 
-        announceText.Replace("%user", username);
+        announceText.Replace("%user", user.Username);
         announceText.Replace("%id", token.UserId.ToString());
 
+        if (ServerConfiguration.Instance.Mail.RequireEmailVerification)
+        {
+            announceText.Insert(0,
+                RegisterStrings.EmailVerificationNotice.Translate(user.Language) + "\n\n");
+        }
+        
         if (ServerConfiguration.Instance.UserGeneratedContentLimits.ReadOnlyMode)
         {
-            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(LocalizationManager.DefaultLang) + "\n\n");
+            announceText.Insert(0, BaseLayoutStrings.ReadOnlyWarn.Translate(user.Language) + "\n\n");
         }
 
         #if DEBUG
@@ -96,6 +103,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
         StringBuilder builder = new();
 
+        UserEntity? user = await this.database.UserFromGameToken(token);
+        if (user?.EmailAddressVerified == false)
+        {
+            GameNotification verifyEmailNotification = new();
+            verifyEmailNotification.Type = NotificationType.ModerationNotification;
+            verifyEmailNotification.Text = RegisterStrings.EmailVerificationNotice.Translate(user.Language);
+            builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices, verifyEmailNotification));
+        }
+        
         foreach (NotificationEntity notification in notifications)
         {
             builder.AppendLine(LighthouseSerializer.Serialize(this.HttpContext.RequestServices,

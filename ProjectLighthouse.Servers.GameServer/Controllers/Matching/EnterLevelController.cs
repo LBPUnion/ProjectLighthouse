@@ -2,6 +2,7 @@
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Servers.GameServer.Middlewares;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
@@ -16,6 +17,7 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Controllers.Matching;
 [Authorize]
 [Route("LITTLEBIGPLANETPS3_XML/")]
 [Produces("text/xml")]
+[EmailVerification]
 public class EnterLevelController : ControllerBase
 {
     private readonly DatabaseContext database;
