@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
+using Microsoft.EntityFrameworkCore;
 
 namespace LBPUnion.ProjectLighthouse.Tests.Helpers;
 
@@ -14,6 +17,30 @@ public static class IntegrationHelper
         return database.Database.CanConnect();
     });
 
+    public static async Task<UserEntity> CreateRandomUser(string? password = null)
+    {
+        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
+
+        int userId = RandomNumberGenerator.GetInt32(int.MaxValue);
+        const string username = "unitTestUser";
+        // if user already exists, find another random number
+        while (await database.Users.AnyAsync(u => u.Username == $"{username}{userId}"))
+        {
+            userId = RandomNumberGenerator.GetInt32(int.MaxValue);
+        }
+
+        UserEntity user = new()
+        {
+            UserId = userId,
+            Username = $"{username}{userId}",
+            Password = CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password) ?? CryptoHelper.Sha256Hash($"unitTestPassword{userId}")),
+            LinkedPsnId = (ulong)userId,
+        };
+
+        database.Add(user);
+        await database.SaveChangesAsync();
+        return user;
+    }
 
     /// <summary>
     /// Resets the database to a clean state and returns a new DatabaseContext.

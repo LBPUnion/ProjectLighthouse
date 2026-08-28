@@ -38,6 +38,8 @@ public class RegisterTests : LighthouseWebTest
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
+        Assert.Null(this.Driver.GetErrorMessage());
+
         UserEntity? user = await database.Users.FirstOrDefaultAsync(u => u.Username == username);
         Assert.NotNull(user);
 

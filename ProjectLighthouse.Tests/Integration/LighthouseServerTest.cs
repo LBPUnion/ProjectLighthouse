@@ -1,18 +1,16 @@
 using System;
 using System.IO;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LBPUnion.ProjectLighthouse.Configuration;
-using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Helpers;
+using LBPUnion.ProjectLighthouse.Tests.Helpers;
 using LBPUnion.ProjectLighthouse.Tickets;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
 using LBPUnion.ProjectLighthouse.Types.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace LBPUnion.ProjectLighthouse.Tests.Integration;
@@ -33,34 +31,9 @@ public class LighthouseServerTest<TStartup> where TStartup : class
 
     public TestServer GetTestServer() => this.server;
 
-    protected async Task<UserEntity> CreateRandomUser()
-    {
-        await using DatabaseContext database = DatabaseContext.CreateNewInstance();
-
-        int userId = RandomNumberGenerator.GetInt32(int.MaxValue);
-        const string username = "unitTestUser";
-        // if user already exists, find another random number
-        while (await database.Users.AnyAsync(u => u.Username == $"{username}{userId}"))
-        {
-            userId = RandomNumberGenerator.GetInt32(int.MaxValue);
-        }
-
-        UserEntity user = new()
-        {
-            UserId = userId,
-            Username = $"{username}{userId}",
-            Password = CryptoHelper.BCryptHash($"unitTestPassword{userId}"),
-            LinkedPsnId = (ulong)userId,
-        };
-
-        database.Add(user);
-        await database.SaveChangesAsync();
-        return user;
-    }
-
     protected async Task<HttpResponseMessage> AuthenticateResponse()
     {
-        UserEntity user = await this.CreateRandomUser();
+        UserEntity user = await IntegrationHelper.CreateRandomUser();
 
         byte[] ticketData = new TicketBuilder()
             .SetUsername($"{user.Username}{user.UserId}")

@@ -22,7 +22,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        UserEntity user = await this.CreateRandomUser();
+        UserEntity user = await IntegrationHelper.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
             .SetUsername(user.Username)
             .SetUserId((ulong)user.UserId)
@@ -39,7 +39,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        UserEntity user = await this.CreateRandomUser();
+        UserEntity user = await IntegrationHelper.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
             .SetUsername(user.Username)
             .SetUserId((ulong)user.UserId)
@@ -57,7 +57,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        UserEntity user = await this.CreateRandomUser();
+        UserEntity user = await IntegrationHelper.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
             .SetUsername(user.Username)
             .SetUserId((ulong)user.UserId)
@@ -75,7 +75,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         await IntegrationHelper.GetIntegrationDatabase();
 
-        UserEntity user = await this.CreateRandomUser();
+        UserEntity user = await IntegrationHelper.CreateRandomUser();
         byte[] ticketData = new TicketBuilder()
             .SetUsername(user.Username)
             .SetUserId((ulong)user.UserId)
@@ -100,7 +100,7 @@ public class LoginTests : LighthouseServerTest<GameServerTestStartup>
     {
         DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
-        UserEntity user = await this.CreateRandomUser();
+        UserEntity user = await IntegrationHelper.CreateRandomUser();
 
         user.PermissionLevel = PermissionLevel.Banned;
 

@@ -20,8 +20,8 @@ public class SlotTests : LighthouseServerTest<GameServerTestStartup>
     {
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
 
-        UserEntity userA = await this.CreateRandomUser();
-        UserEntity userB = await this.CreateRandomUser();
+        UserEntity userA = await IntegrationHelper.CreateRandomUser();
+        UserEntity userB = await IntegrationHelper.CreateRandomUser();
 
         SlotEntity slotA = new()
         {

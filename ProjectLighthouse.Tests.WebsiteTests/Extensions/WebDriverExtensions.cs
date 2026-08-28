@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using OpenQA.Selenium;
 
 namespace ProjectLighthouse.Tests.WebsiteTests.Extensions;
@@ -9,5 +10,5 @@ public static class WebDriverExtensions
 
     public static string GetPath(this IWebDriver driver) => driver.GetUri().AbsolutePath;
 
-    public static string GetErrorMessage(this IWebDriver driver) => driver.FindElement(By.CssSelector("#error-message > p")).Text;
+    public static string? GetErrorMessage(this IWebDriver driver) => driver.FindElements(By.CssSelector("#error-message > p")).FirstOrDefault()?.Text;
 }

@@ -24,11 +24,7 @@ public class AuthenticationTests : LighthouseWebTest
         this.Driver.Manage().Cookies.DeleteAllCookies();
 
         string password = CryptoHelper.Sha256Hash(CryptoHelper.GenerateRandomBytes(64).ToArray());
-        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password)));
-
-        // Sometimes not having this causes a race condition
-        // ReSharper disable once MethodHasAsyncOverload
-        database.SaveChanges();
+        UserEntity user = await IntegrationHelper.CreateRandomUser(password);
         
         await this.Driver.Navigate().GoToUrlAsync(this.BaseAddress + "/login");
 
@@ -36,6 +32,9 @@ public class AuthenticationTests : LighthouseWebTest
         this.Driver.FindElement(By.Id("password")).SendKeys(password);
 
         this.Driver.FindElement(By.Id("submit")).Click();
+
+        Assert.Null(this.Driver.GetErrorMessage());
+        Assert.Equal("/", this.Driver.GetPath());
 
         WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.NotNull(webToken);
@@ -47,19 +46,19 @@ public class AuthenticationTests : LighthouseWebTest
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         this.Driver.Manage().Cookies.DeleteAllCookies();
 
-        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("just like the hindenberg,"));
+        UserEntity user = await IntegrationHelper.CreateRandomUser("just like the hindenberg,");
 
-        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
+        await this.Driver.Navigate().GoToUrlAsync(this.BaseAddress + "/login");
 
         this.Driver.FindElement(By.Id("text")).SendKeys(user.Username);
 
         this.Driver.FindElement(By.Id("submit")).Click();
 
+        Assert.Equal("The username or password you entered is invalid.", this.Driver.GetErrorMessage());
+        Assert.Equal("/login", this.Driver.GetPath());
+
         WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.Null(webToken);
-
-        Assert.Equal("/login", this.Driver.GetPath());
-        Assert.Equal("The username or password you entered is invalid.", this.Driver.GetErrorMessage());
     }
 
     [Fact]
@@ -68,14 +67,16 @@ public class AuthenticationTests : LighthouseWebTest
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
         this.Driver.Manage().Cookies.DeleteAllCookies();
 
-        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        UserEntity user = await IntegrationHelper.CreateRandomUser("i'm an engineering failure");
 
-        this.Driver.Navigate().GoToUrl(this.BaseAddress + "/login");
+        await this.Driver.Navigate().GoToUrlAsync(this.BaseAddress + "/login");
 
         this.Driver.FindElement(By.Id("text")).SendKeys(user.Username);
         this.Driver.FindElement(By.Id("password")).SendKeys("nah man");
 
         this.Driver.FindElement(By.Id("submit")).Click();
+
+        Assert.Equal("The username or password you entered is invalid.", this.Driver.GetErrorMessage());
 
         WebTokenEntity? webToken = await database.WebTokens.FirstOrDefaultAsync(t => t.UserId == user.UserId);
         Assert.Null(webToken);
@@ -87,7 +88,7 @@ public class AuthenticationTests : LighthouseWebTest
         const string loggedInAsUsernameTextXPath = "/html/body/div/div/div/div/p[1]";
 
         await using DatabaseContext database = await IntegrationHelper.GetIntegrationDatabase();
-        UserEntity user = await database.CreateUser($"unitTestUser{CryptoHelper.GenerateRandomInt32()}", CryptoHelper.BCryptHash("i'm an engineering failure"));
+        UserEntity user = await IntegrationHelper.CreateRandomUser("i'm an engineering failure");
 
         WebTokenEntity webToken = new()
         {
