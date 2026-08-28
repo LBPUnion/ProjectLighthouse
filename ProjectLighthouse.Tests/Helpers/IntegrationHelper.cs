@@ -33,7 +33,7 @@ public static class IntegrationHelper
         {
             UserId = userId,
             Username = $"{username}{userId}",
-            Password = CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password) ?? CryptoHelper.Sha256Hash($"unitTestPassword{userId}")),
+            Password = CryptoHelper.BCryptHash(CryptoHelper.Sha256Hash(password ?? $"unitTestPassword{userId}")),
             LinkedPsnId = (ulong)userId,
         };
 
