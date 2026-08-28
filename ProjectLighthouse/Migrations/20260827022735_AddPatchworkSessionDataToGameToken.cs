@@ -1,10 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using LBPUnion.ProjectLighthouse.Database;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace LBPUnion.ProjectLighthouse.Migrations
+namespace ProjectLighthouse.Migrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(DatabaseContext))]
+    [Migration("20260827022735_AddPatchworkSessionDataToGameToken")]
     public partial class AddPatchworkSessionDataToGameToken : Migration
     {
         /// <inheritdoc />
