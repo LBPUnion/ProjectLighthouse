@@ -33,6 +33,8 @@ public partial class DatabaseContext : DbContext
     public DbSet<PhotoSubjectEntity> PhotoSubjects { get; set; }
     public DbSet<PlatformLinkAttemptEntity> PlatformLinkAttempts { get; set; }
     public DbSet<UserEntity> Users { get; set; }
+    public DbSet<UserPinProgressEntity> UserPinProgress { get; set; }
+    public DbSet<UserProfilePinsEntity> UserProfilePins { get; set; }
     #endregion
 
     #region Levels

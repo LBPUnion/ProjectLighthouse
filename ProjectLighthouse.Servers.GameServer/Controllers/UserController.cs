@@ -40,7 +40,15 @@ public class UserController : ControllerBase
         UserEntity? user = await this.database.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return this.NotFound();
 
-        return this.Ok(GameUser.CreateFromEntity(user, this.GetToken().GameVersion));
+        GameVersion gameVersion = this.GetToken().GameVersion;
+
+        UserProfilePinsEntity? profilePins = await this.database.UserProfilePins.FirstOrDefaultAsync(p => p.UserId == user.UserId && p.GameVersion == gameVersion);
+
+        GameUser profile = GameUser.CreateFromEntity(user, gameVersion);
+
+        profile.ProfilePins = profilePins?.Pins ?? user.Pins;
+
+        return this.Ok(profile);
     }
 
     [HttpGet("users")]
@@ -173,24 +181,103 @@ public class UserController : ControllerBase
     [Produces("text/json")]
     public async Task<IActionResult> UpdateMyPins()
     {
-        UserEntity? user = await this.database.UserFromGameToken(this.GetToken());
+        GameTokenEntity token = this.GetToken();
+
+        UserEntity? user = await this.database.UserFromGameToken(token);
         if (user == null) return this.Forbid();
+
+        if (token.GameVersion is not (GameVersion.LittleBigPlanet2 or GameVersion.LittleBigPlanet3 or GameVersion.LittleBigPlanetVita))
+        {
+            return this.BadRequest();
+        }
 
         string bodyString = await this.ReadBodyAsync();
 
-        Pins? pinJson = JsonSerializer.Deserialize<Pins>(bodyString);
-        if (pinJson?.ProfilePins == null) return this.BadRequest();
+        Pins? pinJson;
 
-        // Sometimes the update gets called periodically as pin progress updates via playing,
-        // may not affect equipped profile pins however, so check before setting it.
-        string currentPins = user.Pins;
-        string newPins = string.Join(",", pinJson.ProfilePins.Distinct());
+        try
+        {
+            pinJson = JsonSerializer.Deserialize<Pins>(bodyString);
+        }
+        catch (JsonException)
+        {
+            return this.BadRequest();
+        }
 
-        if (string.Equals(currentPins, newPins)) return this.Ok("[{\"StatusCode\":200}]");
+        if (pinJson == null)
+            return this.BadRequest();
 
-        user.Pins = newPins;
+        if (!PinUploadParser.TryParse(pinJson, out PinUploadParser.ParsedPinUpload parsed))
+            return this.BadRequest();
+
+        PinSet pinSet = token.GameVersion.ToPinSet();
+
+        Dictionary<uint, UserPinProgressEntity> storedProgress = await this.database.UserPinProgress
+            .Where(p => p.UserId == user.UserId && p.PinSet == pinSet)
+            .ToDictionaryAsync(p => p.ProgressType);
+
+        foreach (KeyValuePair<uint, double> uploaded in parsed.Progress)
+        {
+            if (storedProgress.TryGetValue(uploaded.Key, out UserPinProgressEntity? stored))
+            {
+                stored.Value = PinProgressRules.Merge(uploaded.Key, stored.Value, uploaded.Value);
+
+                continue;
+            }
+
+            UserPinProgressEntity entity = new()
+            {
+                UserId = user.UserId,
+                PinSet = pinSet,
+                ProgressType = uploaded.Key,
+                Value = uploaded.Value,
+            };
+
+            this.database.UserPinProgress.Add(entity);
+            storedProgress.Add(uploaded.Key, entity);
+        }
+
+        if (parsed.ProfilePins != null)
+        {
+            string newPins = string.Join(",", parsed.ProfilePins);
+
+            UserProfilePinsEntity? profilePins = await this.database.UserProfilePins
+                .FirstOrDefaultAsync(p => p.UserId == user.UserId && p.GameVersion == token.GameVersion);
+
+            if (profilePins == null)
+            {
+                profilePins = new UserProfilePinsEntity
+                {
+                    UserId = user.UserId,
+                    GameVersion = token.GameVersion,
+                    Pins = newPins,
+                };
+
+                this.database.UserProfilePins.Add(profilePins);
+            }
+            else if (!string.Equals(profilePins.Pins, newPins))
+            {
+                profilePins.Pins = newPins;
+            }
+        }
+
         await this.database.SaveChangesAsync();
 
-        return this.Ok("[{\"StatusCode\":200}]");
+        List<object> responsePins = [];
+
+        foreach (UserPinProgressEntity progress in storedProgress.Values.OrderBy(p => p.ProgressType))
+        {
+            responsePins.Add(progress.ProgressType);
+            responsePins.Add(progress.Value);
+        }
+
+        return new JsonResult(new
+        {
+            progress = responsePins,
+            awards = responsePins,
+        })
+        {
+            ContentType = "text/json",
+        };
     }
 }
