@@ -15,6 +15,7 @@ public class NewestLevelsCategory : SlotCategory
     public override string IconHash { get; set; } = "g820623";
     public override string Endpoint { get; set; } = "newest";
     public override string Tag => "newest";
+    public override string[] Sorts { get; } = ["date",];
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.Slots.Where(queryBuilder.Build())

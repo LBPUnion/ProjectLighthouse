@@ -53,6 +53,7 @@ public partial class DatabaseContext : DbContext
     public DbSet<RatedLevelEntity> RatedLevels { get; set; }
     public DbSet<RatedReviewEntity> RatedReviews { get; set; }
     public DbSet<VisitedLevelEntity> VisitedLevels { get; set; }
+    public DbSet<RecentlyPlayedEntity> RecentlyPlayed { get; set; }
     #endregion
 
     #region Moderation

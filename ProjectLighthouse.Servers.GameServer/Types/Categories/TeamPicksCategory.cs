@@ -16,6 +16,8 @@ public class TeamPicksCategory : SlotCategory
     public override string IconHash { get; set; } = "g820626";
     public override string Endpoint { get; set; } = "team_picks";
     public override string Tag => "team_picks";
+    public override bool Curated => true;
+    public override bool DefaultToCurrentGame => false;
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.Slots.Where(queryBuilder.Clone().AddFilter(new TeamPickFilter()).Build())

@@ -5,6 +5,7 @@ using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Filter.Sorts.Metadata;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
@@ -16,6 +17,12 @@ public class MostHeartedCategory : SlotCategory
     public override string IconHash { get; set; } = "g820607";
     public override string Endpoint { get; set; } = "most_hearted";
     public override string Tag => "most_hearted";
+    public override string[] Sorts { get; } = ["hearts", "likes", "plays",];
+    public override CategoryDefaults? DefaultFilters { get; } = new()
+    {
+        DateFilterType = "thisMonth",
+    };
+    public override bool DefaultToCurrentGame => false;
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.Slots.Select(s => new SlotMetadata

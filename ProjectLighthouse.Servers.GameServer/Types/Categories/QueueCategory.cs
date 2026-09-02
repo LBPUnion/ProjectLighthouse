@@ -13,6 +13,7 @@ public class QueueCategory : SlotCategory
     public override string IconHash { get; set; } = "g820614";
     public override string Endpoint { get; set; } = "queue";
     public override string Tag => "my_queue";
+    public override string[] Sorts { get; } = ["relevance",];
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.QueuedLevels.Where(q => q.UserId == token.UserId)

@@ -1,5 +1,9 @@
 ﻿#nullable enable
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using LBPUnion.ProjectLighthouse.Configuration;
+using LBPUnion.ProjectLighthouse.Helpers;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using Microsoft.EntityFrameworkCore;
@@ -87,4 +91,34 @@ public partial class DatabaseContext
         await this.SaveChangesAsync();
     }
 
+    public async Task RecordRecentlyPlayedLevel(int userId, int slotId)
+    {
+        long now = TimeHelper.TimestampMillis;
+        int maxLevels = CategoryConfiguration.Instance.RecentlyPlayed.MaxLevels;
+
+        RecentlyPlayedEntity? recentlyPlayed = await this.RecentlyPlayed
+            .FirstOrDefaultAsync(r => r.UserId == userId && r.SlotId == slotId);
+
+        if (recentlyPlayed == null)
+        {
+            this.RecentlyPlayed.Add(new RecentlyPlayedEntity
+            {
+                UserId = userId,
+                SlotId = slotId,
+                LastPlayedAt = now,
+            });
+        }
+        else
+        {
+            recentlyPlayed.LastPlayedAt = now;
+        }
+
+        List<RecentlyPlayedEntity> excessEntries = await this.RecentlyPlayed
+            .Where(r => r.UserId == userId && r.SlotId != slotId)
+            .OrderByDescending(r => r.LastPlayedAt)
+            .Skip(maxLevels - 1)
+            .ToListAsync();
+
+        this.RecentlyPlayed.RemoveRange(excessEntries);
+    }
 }

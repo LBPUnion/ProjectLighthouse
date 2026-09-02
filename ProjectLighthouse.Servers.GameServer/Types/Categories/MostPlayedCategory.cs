@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 
@@ -13,6 +14,13 @@ public class MostPlayedCategory : SlotCategory
     public override string IconHash { get; set; } = "g820608";
     public override string Endpoint { get; set; } = "most_played";
     public override string Tag => "most_played";
+    public override string[] Sorts { get; } = ["plays",];
+    public override CategoryDefaults? DefaultFilters { get; } = new()
+    {
+        DateFilterType = "thisMonth",
+        IncludePlayed = false,
+    };
+    public override bool DefaultToCurrentGame => false;
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.Slots.Where(queryBuilder.Build())

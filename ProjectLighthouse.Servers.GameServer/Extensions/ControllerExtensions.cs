@@ -33,7 +33,7 @@ public static class ControllerExtensions
             .AddFilter(new HiddenSlotFilter())
             .AddFilter(new SlotTypeFilter(SlotType.User));
 
-    public static SlotQueryBuilder FilterFromRequest(this ControllerBase controller, GameTokenEntity token)
+    public static SlotQueryBuilder FilterFromRequest(this ControllerBase controller, GameTokenEntity token, bool defaultToCurrentGame = true)
     {
         SlotQueryBuilder queryBuilder = new();
 
@@ -158,7 +158,7 @@ public static class ControllerExtensions
                     .Select(s => GetGameFilter(s, token.GameVersion))
                     .ToArray()));
             }
-            else
+            else if (defaultToCurrentGame)
             {
                 queryBuilder.AddFilter(new GameVersionFilter(GameVersion.LittleBigPlanet3));
             }

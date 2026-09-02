@@ -18,11 +18,21 @@ public abstract class Category
 
     public abstract string Endpoint { get; set; }
 
-    public string[] Sorts { get; } = { "relevance", "likes", "plays", "hearts", "date", };
+    public virtual string[] Sorts { get; } = ["relevance", "likes", "plays", "hearts", "date",];
 
     public abstract string[] Types { get; }
 
     public abstract string Tag { get; }
+
+    public virtual bool Curated => false;
+
+    public virtual bool DisableFilters => false;
+
+    public virtual CategoryDefaults? DefaultFilters => null;
+
+    public virtual string? Param => null;
+
+    public virtual bool DefaultToCurrentGame => true;
 
     public string IngameEndpoint => $"/searches/{this.Endpoint}";
 

@@ -13,6 +13,7 @@ public class MyPlaylistsCategory : PlaylistCategory
     public override string Endpoint { get; set; } = "my_playlists";
     public override string Tag => "my_playlists";
     public override string[] Types { get; } = { "playlist", };
+    public override string[] Sorts { get; } = ["relevance",];
 
     public override IQueryable<PlaylistEntity> GetItems(DatabaseContext database, GameTokenEntity token) =>
         database.Playlists.Where(p => p.CreatorId == token.UserId).OrderByDescending(p => p.PlaylistId);

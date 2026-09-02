@@ -3,6 +3,7 @@ using LBPUnion.ProjectLighthouse.Database;
 using LBPUnion.ProjectLighthouse.Filter;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Token;
+using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Misc;
 
 namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
@@ -10,10 +11,16 @@ namespace LBPUnion.ProjectLighthouse.Servers.GameServer.Types.Categories;
 public class HighestRatedCategory : SlotCategory
 {
     public override string Name { get; set; } = "Highest Rated";
-    public override string Description { get; set; } = "Community Highest Rated content";
+    public override string Description { get; set; } = "Content with loads of thumbs up";
     public override string IconHash { get; set; } = "g820603";
     public override string Endpoint { get; set; } = "thumbs";
     public override string Tag => "highest_rated";
+    public override string[] Sorts { get; } = ["likes",];
+    public override CategoryDefaults DefaultFilters { get; } = new()
+    {
+        DateFilterType = "thisMonth",
+    };
+    public override bool DefaultToCurrentGame => false;
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.Slots.Select(s => new SlotMetadata

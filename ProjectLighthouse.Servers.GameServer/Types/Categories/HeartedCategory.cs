@@ -13,6 +13,7 @@ public class HeartedCategory : SlotCategory
     public override string IconHash { get; set; } = "g820611";
     public override string Endpoint { get; set; } = "hearted_levels";
     public override string Tag => "my_hearted_levels";
+    public override string[] Sorts { get; } = ["relevance",];
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder) =>
         database.HeartedLevels.Where(h => h.UserId == token.UserId)

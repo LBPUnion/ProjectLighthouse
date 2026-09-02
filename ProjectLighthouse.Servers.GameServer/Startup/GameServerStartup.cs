@@ -60,6 +60,8 @@ public class GameServerStartup
                 MySqlServerVersion.LatestSupportedServerVersion);
         });
 
+        services.AddScoped<RoomPlayerCountService>();
+
         IMailService mailService = ServerConfiguration.Instance.Mail.MailEnabled
             ? new MailQueueService(new SmtpMailSender())
             : new NullMailService();

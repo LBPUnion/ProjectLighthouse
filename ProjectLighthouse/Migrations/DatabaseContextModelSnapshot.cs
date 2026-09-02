@@ -198,6 +198,33 @@ namespace ProjectLighthouse.Migrations
                     b.ToTable("RatedReviews");
                 });
 
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RecentlyPlayedEntity", b =>
+                {
+                    b.Property<int>("RecentlyPlayedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RecentlyPlayedId"));
+
+                    b.Property<long>("LastPlayedAt")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("SlotId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecentlyPlayedId");
+
+                    b.HasIndex("SlotId");
+
+                    b.HasIndex("UserId", "SlotId")
+                        .IsUnique();
+
+                    b.ToTable("RecentlyPlayed");
+                });
+
             modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.VisitedLevelEntity", b =>
                 {
                     b.Property<int>("VisitedLevelId")
@@ -1296,6 +1323,25 @@ namespace ProjectLighthouse.Migrations
                         .IsRequired();
 
                     b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LBPUnion.ProjectLighthouse.Types.Entities.Interaction.RecentlyPlayedEntity", b =>
+                {
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LBPUnion.ProjectLighthouse.Types.Entities.Profile.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Slot");
 
                     b.Navigation("User");
                 });

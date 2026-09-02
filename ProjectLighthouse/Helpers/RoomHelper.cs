@@ -156,6 +156,26 @@ public static class RoomHelper
         return Rooms.FirstOrDefault(room => room.PlayerIds.Any(p => p == userId));
     }
 
+    public static Dictionary<int, int> GetUserLevelPlayerCounts()
+    {
+        lock (RoomLock)
+        {
+            return Rooms
+                .Where(room =>
+                    room.Slot.SlotType == SlotType.User && room.Slot.SlotId != 0)
+                .SelectMany(room =>
+                    room.PlayerIds.Select(playerId => new
+                    {
+                        SlotId = room.Slot.SlotId,
+                        PlayerId = playerId,
+                    }))
+                // Distinct being used here prevents a duplicate room state from messing up the player count.
+                .Distinct()
+                .GroupBy(entry => entry.SlotId)
+                .ToDictionary(group => group.Key, group => group.Count());
+        }
+    }
+
     [SuppressMessage("ReSharper", "InvertIf")]
     public static Task CleanupRooms(DatabaseContext database, int? hostId = null, Room? newRoom = null)
     {

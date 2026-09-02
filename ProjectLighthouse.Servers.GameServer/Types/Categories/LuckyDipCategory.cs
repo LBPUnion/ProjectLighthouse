@@ -15,7 +15,11 @@ public class LuckyDipCategory : SlotCategory
     public override string Description { get; set; } = "A random selection of content";
     public override string IconHash { get; set; } = "g820605";
     public override string Endpoint { get; set; } = "lucky_dip";
-    public override string Tag => "lucky_dip";
+    public override string Tag => "level_of_the_day";
+    public override string[] Sorts { get; } = ["relevance",];
+    public override bool Curated => false;
+    public override bool DisableFilters => true;
+    public override bool DefaultToCurrentGame => false;
 
     public override IQueryable<SlotEntity> GetItems(DatabaseContext database, GameTokenEntity token, SlotQueryBuilder queryBuilder)
     {
