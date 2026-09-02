@@ -30,4 +30,58 @@
     <data name="profile_tag" xml:space="preserve">
         <value>Profile Tag</value>
     </data>
+    <data name="playlists" xml:space="preserve">
+        <value>Playlists</value>
+    </data>
+    <data name="hearted_levels" xml:space="preserve">
+        <value>Hearted Levels</value>
+    </data>
+    <data name="queued_levels" xml:space="preserve">
+        <value>Queued Levels</value>
+    </data>
+    <data name="profile_settings" xml:space="preserve">
+        <value>Profile Settings</value>
+    </data>
+    <data name="privacy_settings" xml:space="preserve">
+        <value>Privacy Settings</value>
+    </data>
+    <data name="block" xml:space="preserve">
+        <value>Block</value>
+    </data>
+    <data name="unblock" xml:space="preserve">
+        <value>Unblock</value>
+    </data>
+    <data name="user_banned" xml:space="preserve">
+        <value>This user is currently banned.</value>
+    </data>
+    <data name="ban_reason" xml:space="preserve">
+        <value>Reason:</value>
+    </data>
+    <data name="ban_reason_tos" xml:space="preserve">
+        <value>This user has been banned for violating the Terms of Service. Remember to follow the rules!</value>
+    </data>
+    <data name="privacy_hidden" xml:space="preserve">
+        <value>The user's privacy settings prevent you from viewing this page.</value>
+    </data>
+    <data name="comments_banned" xml:space="preserve">
+        <value>Comments are disabled because the user is banned.</value>
+    </data>
+    <data name="no_photos" xml:space="preserve">
+        <value>This user hasn't uploaded any photos</value>
+    </data>
+    <data name="no_levels" xml:space="preserve">
+        <value>This user hasn't published any levels</value>
+    </data>
+    <data name="no_hearted_levels" xml:space="preserve">
+        <value>You haven't hearted any levels</value>
+    </data>
+    <data name="hearted_levels_count" xml:space="preserve">
+        <value>You have hearted {0} levels</value>
+    </data>
+    <data name="no_queued_levels" xml:space="preserve">
+        <value>You haven't queued any levels</value>
+    </data>
+    <data name="queued_levels_count" xml:space="preserve">
+        <value>There are {0} levels in your queue</value>
+    </data>
 </root>

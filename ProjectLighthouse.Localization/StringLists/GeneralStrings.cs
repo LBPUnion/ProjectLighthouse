@@ -17,6 +17,9 @@ public static class GeneralStrings
     public static readonly TranslatableString Soon = create("soon");
     public static readonly TranslatableString Announcements = create("announcements");
     public static readonly TranslatableString Notifications = create("notifications");
+    public static readonly TranslatableString Comments = create("comments");
+    public static readonly TranslatableString Heart = create("heart");
+    public static readonly TranslatableString Unheart = create("unheart");
 
     private static TranslatableString create(string key) => new(TranslationAreas.General, key);
 }
