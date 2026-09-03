@@ -1,8 +1,10 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Types.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -19,6 +21,7 @@ public class SlotPage : BaseLayout
     public List<ReviewEntity> Reviews = new();
     public List<PhotoEntity> Photos = new();
     public List<ScoreEntity> Scores = new();
+    public List<IGrouping<ActivityGroup, ActivityDto>> Activity = new();
 
     public bool CommentsEnabled;
     public readonly bool ReviewsEnabled = ServerConfiguration.Instance.UserGeneratedContentLimits.LevelReviewsEnabled;
@@ -107,6 +110,23 @@ public class SlotPage : BaseLayout
             .Where(s => s.SlotId == id)
             .Take(10)
             .ToListAsync();
+
+        this.Activity = await this.Database.Activities.Include("Slot")
+            .Include("Comment")
+            .Include("Photo")
+            .Include("Playlist")
+            .Include("Review")
+            .Include("Score")
+            .Include("TargetUser")
+            .ToActivityDto()
+            .Where(d => d.TargetSlotId == id)
+            .OrderByDescending(d => d.Activity.Timestamp)
+            .Take(20)
+            .ToActivityGroups(groupByActor: true)
+            .ToListAsync();
+
+        // GroupBy on the database side doesn't preserve order
+        this.Activity = [.. this.Activity.OrderByDescending(g => g.MaxBy(a => a.Activity.Timestamp)?.Activity.Timestamp ?? g.Key.Timestamp)];
 
         if (this.User == null) return this.Page();
 

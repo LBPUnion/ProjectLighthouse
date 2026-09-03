@@ -1,8 +1,10 @@
 #nullable enable
 using LBPUnion.ProjectLighthouse.Configuration;
 using LBPUnion.ProjectLighthouse.Database;
+using LBPUnion.ProjectLighthouse.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.Website.Extensions;
 using LBPUnion.ProjectLighthouse.Servers.Website.Pages.Layouts;
+using LBPUnion.ProjectLighthouse.Types.Activity;
 using LBPUnion.ProjectLighthouse.Types.Entities.Interaction;
 using LBPUnion.ProjectLighthouse.Types.Entities.Level;
 using LBPUnion.ProjectLighthouse.Types.Entities.Profile;
@@ -30,6 +32,8 @@ public class UserPage : BaseLayout
 
     public List<SlotEntity>? HeartedSlots;
     public List<SlotEntity>? QueuedSlots;
+
+    public List<IGrouping<ActivityGroup, ActivityDto>> Activity = [];
 
     public UserEntity? ProfileUser;
 
@@ -72,6 +76,23 @@ public class UserPage : BaseLayout
             .Where(p => p.Creator != null && (!p.SubLevel || p.Creator == this.User))
             .Take(10)
             .ToListAsync();
+
+        this.Activity = await this.Database.Activities.Include("Slot")
+            .Include("Comment")
+            .Include("Photo")
+            .Include("Playlist")
+            .Include("Review")
+            .Include("Score")
+            .Include("TargetUser")
+            .ToActivityDto()
+            .Where(d => d.Activity.UserId == userId)
+            .OrderByDescending(d => d.Activity.Timestamp)
+            .Take(20)
+            .ToActivityGroups(groupByActor: false)
+            .ToListAsync();
+
+        // GroupBy on the database side doesn't preserve order
+        this.Activity = [.. this.Activity.OrderByDescending(g => g.MaxBy(a => a.Activity.Timestamp)?.Activity.Timestamp ?? g.Key.Timestamp)];
 
         if (this.User == this.ProfileUser)
         {

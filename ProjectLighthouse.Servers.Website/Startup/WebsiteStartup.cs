@@ -15,7 +15,6 @@ using LBPUnion.ProjectLighthouse.Types.Logging;
 using LBPUnion.ProjectLighthouse.Types.Mail;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 #if !DEBUG
@@ -41,11 +40,7 @@ public class WebsiteStartup
         services.AddControllers();
         services.AddRazorPages().WithRazorPagesAtContentRoot();
 
-        services.AddDbContext<DatabaseContext>(builder =>
-        {
-            builder.UseMySql(ServerConfiguration.Instance.DbConnectionString,
-                MySqlServerVersion.LatestSupportedServerVersion);
-        });
+        services.AddDbContext<DatabaseContext>(DatabaseContext.ConfigureBuilder());
 
         IMailService mailService = ServerConfiguration.Instance.Mail.MailEnabled
             ? new MailQueueService(new SmtpMailSender())

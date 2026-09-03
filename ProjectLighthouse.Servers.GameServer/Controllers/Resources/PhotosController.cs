@@ -12,7 +12,7 @@ using LBPUnion.ProjectLighthouse.Types.Entities.Token;
 using LBPUnion.ProjectLighthouse.Types.Filter;
 using LBPUnion.ProjectLighthouse.Types.Levels;
 using LBPUnion.ProjectLighthouse.Types.Logging;
-using LBPUnion.ProjectLighthouse.Types.Serialization;
+using LBPUnion.ProjectLighthouse.Types.Serialization.Photo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -169,6 +169,15 @@ public class PhotosController : ControllerBase
         );
 
         return this.Ok();
+    }
+
+    [HttpGet("photo/{photoId:int}")]
+    public async Task<IActionResult> GetPhoto(int photoId)
+    {
+        PhotoEntity? photo = await database.Photos.FirstOrDefaultAsync(p => p.PhotoId == photoId);
+        if (photo == null) return this.NotFound();
+
+        return this.Ok(GamePhoto.CreateFromEntity(photo));
     }
 
     [HttpGet("photos/{slotType}/{id:int}")]

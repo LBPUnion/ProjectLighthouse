@@ -44,6 +44,7 @@ public static partial class ControllerExtensions
     public static async Task<T?> DeserializeBody<T>(this ControllerBase controller, params string[] rootElements)
     {
         string bodyString = await controller.ReadBodyAsync();
+        if (bodyString.Length == 0) return default;
         try
         {
             // Prevent unescaped ampersands from causing deserialization to fail

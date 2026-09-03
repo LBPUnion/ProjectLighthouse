@@ -100,7 +100,7 @@ public class LoginForm : BaseLayout
             webToken.UserToken,
             new CookieOptions
             {
-                Expires = DateTimeOffset.Now.AddDays(7),
+                Expires = DateTimeOffset.UtcNow.AddDays(7),
             }
         );
 

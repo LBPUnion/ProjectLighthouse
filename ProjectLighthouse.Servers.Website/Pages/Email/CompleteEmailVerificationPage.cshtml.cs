@@ -64,7 +64,7 @@ public class CompleteEmailVerificationPage : BaseLayout
             webToken.UserToken,
             new CookieOptions
             {
-                Expires = DateTimeOffset.Now.AddDays(7),
+                Expires = DateTimeOffset.UtcNow.AddDays(7),
             });
         return this.Redirect("/passwordReset");
     }

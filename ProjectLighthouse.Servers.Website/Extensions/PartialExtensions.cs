@@ -35,6 +35,17 @@ public static class PartialExtensions
     public static Task<IHtmlContent> ToLink<T>(this UserEntity user, IHtmlHelper<T> helper, ViewDataDictionary<T> viewData, string language, string timeZone = "", bool includeStatus = false) 
         => helper.PartialAsync("Partials/Links/UserLinkPartial", user, viewData.WithLang(language).WithTime(timeZone).WithKeyValue("IncludeStatus", includeStatus));
 
+    public static Task<IHtmlContent> ToLink<T>
+    (
+        this SlotEntity slot,
+        IHtmlHelper<T> helper,
+        ViewDataDictionary<T> viewData,
+        string language
+    ) =>
+        helper.PartialAsync("Partials/Links/SlotLinkPartial",
+            slot,
+            viewData.WithLang(language));
+
     public static Task<IHtmlContent> ToHtml<T>
     (
         this SlotEntity slot,

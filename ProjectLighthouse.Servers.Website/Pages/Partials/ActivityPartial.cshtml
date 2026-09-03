@@ -1,0 +1,122 @@
+﻿@using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using LBPUnion.ProjectLighthouse.Types.Activity
+@using LBPUnion.ProjectLighthouse.Types.Entities.Activity
+@model LBPUnion.ProjectLighthouse.Types.Activity.ActivityDto
+
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+}
+
+@* ReSharper disable SwitchStatementHandlesSomeKnownEnumValuesWithDefault *@
+<div class="item">
+    <i class="minus icon"></i>
+    @switch (Model.Activity)
+    {
+        case LevelActivityEntity levelActivity:
+            switch (Model.Activity.Type)
+            {
+                case EventType.HeartLevel:
+                    <span>hearted @await levelActivity.Slot.ToLink(Html, ViewData, language)</span>
+                    break;
+                case EventType.PlayLevel:
+                    <span>played @await levelActivity.Slot.ToLink(Html, ViewData, language) @(Model.Activity.Data > 1 ? Model.Activity.Data + " times" : "")</span>
+                    break;
+                case EventType.PublishLevel:
+                    <span>@(Model.Activity.Data == 2 ? "republished" : "published") @await levelActivity.Slot.ToLink(Html, ViewData, language)</span>
+                    break;
+                case EventType.UnheartLevel:
+                    <span>unhearted @await levelActivity.Slot.ToLink(Html, ViewData, language)</span>
+                    break;
+                case EventType.DpadRateLevel:
+                case EventType.RateLevel:
+                    <span>left a rating on @await levelActivity.Slot.ToLink(Html, ViewData, language)</span>
+                    break;
+                case EventType.TagLevel:
+                    <span>added a tag on @await levelActivity.Slot.ToLink(Html, ViewData, language)</span>
+                    break;
+                case EventType.MMPickLevel:
+                    <span>team picked @await levelActivity.Slot.ToLink(Html, ViewData, language)</span>
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(Model.Activity.Type), Model.Activity.Type, @"Invalid level activity type");
+            }
+
+            break;
+        case LevelPhotoActivity levelPhoto:
+            <span>uploaded a photo in @await levelPhoto.Slot.ToLink(Html, ViewData, language)</span>
+            break;
+        case LevelCommentActivityEntity levelComment:
+            switch (Model.Activity.Type)
+            {
+                case EventType.CommentOnLevel:
+                    <span>left a comment on @await levelComment.Slot.ToLink(Html, ViewData, language)</span>
+                    break;
+                case EventType.DeleteLevelComment:
+                    switch (levelComment.Comment.DeletedType)
+                    {
+                        case "user":
+                            <span>deleted their comment on @await levelComment.Slot.ToLink(Html, ViewData, language)</span>
+                            break;
+                        case "moderator":
+                            <span>had their comment deleted on @await levelComment.Slot.ToLink(Html, ViewData, language)</span>
+                            break;
+                    }
+
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(Model.Activity.Type), Model.Activity.Type, @"Invalid level comment activity type");
+            }
+
+            break;
+        case UserCommentActivityEntity userComment:
+            <span>left a comment on @await userComment.TargetUser.ToLink(Html, ViewData, language)</span>
+            break;
+        case ReviewActivityEntity reviewActivity:
+            <span>left a review on @await reviewActivity.Slot.ToLink(Html, ViewData, language)</span>
+            break;
+        case UserActivityEntity userActivity:
+            switch (Model.Activity.Type)
+            {
+                case EventType.CommentOnUser:
+                    <span>left a comment on @await userActivity.User.ToLink(Html, ViewData, language)</span>
+                    break;
+
+                case EventType.HeartUser:
+                    <span>hearted @await userActivity.User.ToLink(Html, ViewData, language)</span>
+                    break;
+                case EventType.UnheartUser:
+                    <span>unhearted @await userActivity.User.ToLink(Html, ViewData, language)</span>
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(Model.Activity.Type), Model.Activity.Type, @"Invalid user activity type");
+            }
+
+            break;
+        case UserPhotoActivity userPhoto:
+            <span>uploaded a photo on @await userPhoto.TargetUser.ToLink(Html, ViewData, language)</span>
+            break;
+        case PlaylistActivityEntity playlistActivity:
+            switch (Model.Activity.Type)
+            {
+                case EventType.CreatePlaylist:
+                    <span>created playlist <i>@playlistActivity.Playlist.Name</i></span>
+                    break;
+                case EventType.HeartPlaylist:
+                    <span>hearted playlist <i>@playlistActivity.Playlist.Name</i></span>
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(Model.Activity.Type), Model.Activity.Type, @"Invalid playlist activity type");
+            }
+
+            break;
+        case PlaylistWithSlotActivityEntity playlistWithLevel:
+            <span>added @await playlistWithLevel.Slot.ToLink(Html, ViewData, language) to playlist <i>@playlistWithLevel.Playlist.Name</i></span>
+            break;
+        case ScoreActivityEntity score:
+            <span>completed @await score.Slot.ToLink(Html, ViewData, language) with @score.Data points in @(score.Score.Type == 7 ? "versus" : score.Score.Type + "-player") mode</span>
+            break;
+        case NewsActivityEntity: 
+            <span>created a news post</span> 
+            break;
+        default:
+            <span>Unhandled activity type: @Model.Activity.Type</span>
+            break;
+    }
+</div>

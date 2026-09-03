@@ -1,0 +1,46 @@
+﻿@using LBPUnion.ProjectLighthouse.Configuration
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using LBPUnion.ProjectLighthouse.Types.Levels
+@model LBPUnion.ProjectLighthouse.Types.Entities.Level.SlotEntity
+
+@switch (Model.Type)
+{
+    case SlotType.User:
+        <a href="/slot/@Model.SlotId/@Model.GenerateSlug()">
+            @{
+                int size = 20;
+                bool isAdventure = Model.IsAdventurePlanet;
+                string adventureStyle = isAdventure ? "-webkit-mask-image: url(/assets/advSlotCardMask.png); -webkit-mask-size: contain; border-radius: 0%;" : "";
+                string sizing = $"min-width: {size}px; width: {size}px; height: {size}px;";
+            }
+            <div style="position: relative; display: inline-block; @sizing">
+                <img src=@(Model.IsAdventurePlanet ? "/assets/advSlotCardOverlay.png" : "/assets/slotCardOverlay.png")
+                     style="@sizing; margin-top: 5px; pointer-events: none; position: absolute; z-index: 3;">
+                <img src="~/assets/slotCardBackground.png"
+                     style="@sizing; margin-top: 5px; position: absolute; z-index: 1; @(adventureStyle)">
+                <img class="cardIcon slotCardIcon" src="/gameAssets/@Model.IconHash"
+                     style="@sizing; margin-top: 5px; position: absolute; margin-right: 0; z-index: 2; @(adventureStyle)"
+                     onerror="this.onerror='';this.src='/gameAssets/@ServerConfiguration.Instance.WebsiteConfiguration.MissingIconHash'">
+            </div>
+
+            @Model.Name
+
+        </a>
+        break;
+    case SlotType.Developer:
+        <i>a story mode level</i>
+        break;
+    case SlotType.Local:
+        <i>a level on the moon</i>
+        break;
+    case SlotType.Pod: 
+        <i>the pod</i>
+        break;
+    case SlotType.Moon:
+    case SlotType.Unknown: 
+    case SlotType.Unknown2: 
+    case SlotType.DLC: 
+        <i>Somewhere in the imagisphere</i>
+        break;
+    default: throw new ArgumentOutOfRangeException(nameof(Model.Type));
+}

@@ -1,0 +1,78 @@
+﻿@using LBPUnion.ProjectLighthouse.Database
+@using LBPUnion.ProjectLighthouse.Localization
+@using LBPUnion.ProjectLighthouse.Servers.Website.Extensions
+@using LBPUnion.ProjectLighthouse.Types.Activity
+@using LBPUnion.ProjectLighthouse.Types.Entities.Profile
+@inject DatabaseContext Database
+
+@{
+    string language = (string?)ViewData["Language"] ?? LocalizationManager.DefaultLang;
+    string timeZone = (string?)ViewData["TimeZone"] ?? TimeZoneInfo.Local.Id;
+    TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+
+    void RenderRelativeTime(DateTime time)
+    {
+        TimeSpan timeSpan = DateTime.UtcNow - time;
+        <p style="margin: 5px 0 0 0"
+           title="on @TimeZoneInfo.ConvertTime(time, timeZoneInfo).ToString("M/d/yyyy @ h:mm:ss tt")">
+            @if (timeSpan.TotalSeconds < 5)
+            {
+                <i>just now.</i>
+            }
+            else if (timeSpan.TotalSeconds < 60)
+            {
+                <i>@(Pluralize(Math.Round(timeSpan.TotalSeconds), "second")) ago.</i>
+            }
+            else if (timeSpan.TotalMinutes < 60)
+            {
+                <i>@(Pluralize(Math.Round(timeSpan.TotalMinutes), "minute")) ago.</i>
+            }
+            else if (timeSpan.TotalHours < 24)
+            {
+                <i>@(Pluralize(Math.Round(timeSpan.TotalHours), "hour")) ago.</i>
+            }
+            else if (timeSpan.TotalDays < 30)
+            {
+                <i>@(Pluralize(Math.Round(timeSpan.TotalDays), "day")) ago.</i>
+            }
+            else if (timeSpan.TotalDays < 365)
+            {
+                <i>@(Pluralize(Math.Round(timeSpan.TotalDays / 30.4375), "month")) ago.</i>
+            }
+            else
+            {
+                <i>@(Pluralize(Math.Round(timeSpan.TotalDays / 365), "year")) ago.</i>
+            }
+        </p>
+        return;
+        string Pluralize(double amount, string unit) => $"{amount} {unit}{((int)amount == 1 ? "" : "s")}";
+    }
+}
+
+<div class="ui red segment" id="activity">
+    @if (Model.Activity.Count == 0)
+    {
+        <p>There is no recent activity.</p>
+    }
+    else
+    {
+        @foreach (IGrouping<ActivityGroup, ActivityDto> group in Model.Activity)
+        {
+            <div class="ui gray segment">
+                @{
+                    UserEntity user = await Database.Users.FindAsync(group.First().Activity.UserId) ?? throw new InvalidOperationException();
+                }
+                <span>@await user.ToLink(Html, ViewData, language)</span>
+                @{
+                    RenderRelativeTime(group.MaxBy(g => g.Activity.Timestamp)?.Activity.Timestamp ?? group.Key.Timestamp);
+                }
+                <div class="list">
+                    @foreach (ActivityDto activity in group)
+                    {
+                        @await Html.PartialAsync("Partials/ActivityPartial", activity)
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
